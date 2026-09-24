@@ -1,0 +1,25 @@
+{
+  "engineVersion": 2,
+  "rulesSha256": "f99476c7cfc71c45aae8843fc7a47d85f8e9178dec947d1567978f4b229549a6",
+  "behaviourSha256": "3fe4ff7cd7571419eba0ce8997891c28a9ddb2a6fc6921f1517c26d46295ce4f",
+  "goldens": {
+    "casual-42": 41082,
+    "average-42": 115698,
+    "good-42": 306587,
+    "pro-7919": 557623
+  },
+  "history": [
+    {
+      "engineVersion": 1,
+      "rulesSha256": "1f26b8239188940d7bd9be642db5d321d2562bd9860188f2ee666ed74f80317d",
+      "behaviourSha256": "6c1543d0010b782fa7eab7e79cdd70facdee57e00a4fb6929148af2e0697fc1c",
+      "lockedAt": "2026-09-24"
+    },
+    {
+      "engineVersion": 2,
+      "rulesSha256": "f99476c7cfc71c45aae8843fc7a47d85f8e9178dec947d1567978f4b229549a6",
+      "behaviourSha256": "3fe4ff7cd7571419eba0ce8997891c28a9ddb2a6fc6921f1517c26d46295ce4f",
+      "lockedAt": "2026-09-24"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "name": "@quezby/engine",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "module": "./dist/esm/index.js",
+  "react-native": "./src/index.ts",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "react-native": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "typecheck": "tsc -p tsconfig.check.json --noEmit",
+    "build": "tsc && tsc -p tsconfig.esm.json && node -e \"require('fs').writeFileSync('dist/esm/package.json', '{\\\"type\\\":\\\"module\\\"}\\n')\"",
+    "fixtures": "tsx scripts/fixtures.ts",
+    "simulate": "tsx scripts/simulate.ts",
+    "lock": "tsx scripts/lock.ts",
+    "test": "vitest run --passWithNoTests",
+    "clean": "rm -rf dist .turbo coverage"
+  },
+  
+  "devDependencies": {
+    "@quezby/tsconfig": "workspace:*",
+    "@types/node": "^22.18.0",
+    "tsx": "^4.20.6",
+    "typescript": "~6.0.3",
+    "vitest": "4.1.11"
+  }
+}
