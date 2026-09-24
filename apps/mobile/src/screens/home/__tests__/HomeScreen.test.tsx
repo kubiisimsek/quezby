@@ -19,6 +19,7 @@ import { api } from '@/api/client';
 import { useSession } from '@/auth/session';
 import { REEL_GUIDE } from '@/game/howTo';
 import { HomeScreen } from '@/screens/home/HomeScreen';
+import { useDeviceVerdict } from '@/stores/deviceVerdict';
 import { buildEntry, buildMe, buildRanks } from '@/test/factories';
 import { renderWithProviders } from '@/test/renderWithProviders';
 
@@ -182,6 +183,7 @@ describe('HomeScreen', () => {
     mocked.daily.get.mockResolvedValue(daily());
     mocked.leagues.current.mockResolvedValue(league());
     mocked.leaderboards.get.mockResolvedValue(weekly());
+    useDeviceVerdict.setState({ userId: null, verdict: null, validUntil: null, hydrated: true });
   });
 
   it('is a lobby, not a manual: the how-to section is gone', async () => {
@@ -364,6 +366,38 @@ describe('HomeScreen', () => {
 
     await fireEvent.press(screen.getByText('#310'));
     expect(navigate).toHaveBeenCalledWith('Leaderboard');
+  });
+
+  it('warns up top when this phone failed the integrity check: its scores never rank', async () => {
+    useDeviceVerdict.setState({
+      userId: buildMe().id,
+      verdict: 'fail',
+      validUntil: '2999-01-01T00:00:00.000Z',
+      enforced: true,
+    });
+    await renderLobby();
+
+    expect(screen.getByText('SIRALAMA')).toBeOnTheScreen();
+    expect(screen.getByText('Bu cihazda kapalı')).toBeOnTheScreen();
+    expect(
+      screen.getByText(/güvenlik kontrolü bu cihazı onaylamadı: .* Oynayabilirsin ama skorların sıralamaya girmez\./),
+    ).toBeOnTheScreen();
+    // The game is still there to play.
+    expect(screen.getByRole('button', { name: 'Günün akışını oyna' })).toBeOnTheScreen();
+  });
+
+  it.each([
+    ['a phone that passed', { userId: 'player-1', verdict: 'pass', validUntil: '2999-01-01T00:00:00.000Z', enforced: true }],
+    ['a phone that could not be checked', { userId: 'player-1', verdict: 'unavailable', validUntil: '2999-01-01T00:00:00.000Z', enforced: true }],
+    ['another player’s verdict', { userId: 'player-2', verdict: 'fail', validUntil: '2999-01-01T00:00:00.000Z', enforced: true }],
+    ['a verdict that ran out', { userId: 'player-1', verdict: 'fail', validUntil: '2000-01-01T00:00:00.000Z', enforced: true }],
+    ['no verdict yet', { userId: null, verdict: null, validUntil: null, enforced: true }],
+    ['a failing verdict the API only records (local, staging)', { userId: 'player-1', verdict: 'fail', validUntil: '2999-01-01T00:00:00.000Z', enforced: false }],
+  ] as const)('shows no warning for %s', async (_case, verdict) => {
+    useDeviceVerdict.setState(verdict);
+    await renderLobby();
+
+    expect(screen.queryByText('Bu cihazda kapalı')).not.toBeOnTheScreen();
   });
 
   it('breathes the play button while the lobby is up', async () => {

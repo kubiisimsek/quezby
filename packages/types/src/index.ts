@@ -130,7 +130,29 @@ export type FinishRunRequest = {
   /** What the app showed, for the API to compare against its own replay. */
   clientScore: number;
   clientReels: number;
+  /**
+   * The receipts the API signed at this run's checkpoints, in order. A run
+   * that could not check in (no network) sends none; the API only counts
+   * that against a score that would reach the top.
+   */
+  checkpoints?: string[];
 };
+
+/**
+ * A few times in a ranked run (`CHECKPOINTS.marksMs` in `@quezby/config`)
+ * the app tells the API how far it has played: how many reels, and the
+ * SHA-256 of exactly those moves (`prefixHash`). The API stamps the time it
+ * saw it — that is what shows a slowed-down game at the finish.
+ */
+export type CheckpointRequest = {
+  /** Reels played so far — the length of the log the hash covers. */
+  reel: number;
+  /** `prefixHash(actions, reel)`: lower-case hex SHA-256. */
+  prefixHash: string;
+};
+
+/** An opaque, signed receipt; the finish hands it back untouched. */
+export type CheckpointResponse = { receipt: string };
 
 /**
  * `ranked` counts; `flagged` failed a plausibility check and stays off the
@@ -192,6 +214,13 @@ export type RunResult = {
   maxCombo: number;
   breakdown: RunBreakdown;
   stats: RunStats;
+  /**
+   * Why a `flagged` run is off the boards, when the player can be told:
+   * `device` — this phone failed Google's or Apple's integrity check (rooted,
+   * an emulator, a changed app), so its runs never rank. Null otherwise; the
+   * other checks are not explained to the player.
+   */
+  flagReason: 'device' | null;
 };
 
 export type RankChange = { before: number | null; after: number | null };
@@ -415,6 +444,49 @@ export type AppConfigResponse = {
   storeUrl: string | null;
 };
 
+/* ---------------------------------------------------- device integrity -- */
+
+/**
+ * How far the API trusts the phone a run is played on:
+ * `pass` — Google Play Integrity (Android) or App Attest (iOS) vouched for a
+ * real device running this app, unmodified; `fail` — the check came back
+ * against it (rooted, an emulator, a changed app): its runs never rank;
+ * `unavailable` — no check could be made (no Google services, an old phone,
+ * the service down): its runs rank, but a top score waits for review.
+ */
+export type DeviceVerdict = 'pass' | 'fail' | 'unavailable';
+
+/** A one-time challenge for a device check; used once, within minutes. */
+export type DeviceChallengeResponse = { challenge: string; expiresAt: string };
+
+/**
+ * Android: a Play Integrity standard token requested with
+ * `requestHash = sha256Hex(challenge)` (lower-case hex).
+ */
+export type AndroidIntegrityRequest = { challenge: string; token: string };
+
+/**
+ * iOS, first time on this install: App Attest's attestation (base64) of a new
+ * key (`keyId`, base64 as Apple returns it) over `clientDataHash =
+ * SHA-256(UTF-8 challenge)`.
+ */
+export type IosAttestationRequest = { challenge: string; keyId: string; attestation: string };
+
+/** iOS, after that: an assertion (base64) by the attested key over `SHA-256(UTF-8 challenge)`. */
+export type IosAssertionRequest = { challenge: string; keyId: string; assertion: string };
+
+export type DeviceCheckResponse = {
+  verdict: DeviceVerdict;
+  /** Until when this verdict stands; the app checks again after it. */
+  validUntil: string;
+  /**
+   * Whether a `fail` keeps this device's runs off the boards right now. False
+   * while the API only records verdicts (`QUEZBY_INTEGRITY_MODE=log`, local
+   * and staging) — the app must not tell the player otherwise.
+   */
+  enforced: boolean;
+};
+
 /* ------------------------------------------------------------- errors -- */
 
 export type ApiErrorCode =
@@ -436,6 +508,12 @@ export type ApiErrorCode =
   | 'daily_already_played'
   | 'cannot_follow_self'
   | 'follow_limit'
+  /** A device-check challenge that is unknown, used or expired. */
+  | 'challenge_invalid'
+  /** A device-check proof the API could not read at all. */
+  | 'integrity_invalid'
+  /** An App Attest key the API has never seen: attest a new one. */
+  | 'attest_key_unknown'
   | 'too_many_requests'
   | 'server_error';
 

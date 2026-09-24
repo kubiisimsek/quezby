@@ -58,7 +58,7 @@ it('keeps the email off the account, and a token without one is fine', function 
 });
 
 it('takes tokens for every configured app', function () {
-    $this->postJson('/api/v1/auth/apple', $this->idp->appleSignIn(claims: ['aud' => FakeIdentityProvider::APPLE_STAGING_BUNDLE_ID]))
+    $this->postJson('/api/v1/auth/apple', $this->idp->appleSignIn(claims: ['aud' => FakeIdentityProvider::APPLE_OTHER_BUNDLE_ID]))
         ->assertCreated();
 });
 

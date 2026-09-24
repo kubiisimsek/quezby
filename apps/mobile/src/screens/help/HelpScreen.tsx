@@ -266,6 +266,12 @@ export function HelpScreen({ navigation }: Props) {
             “Skorun inceleniyor” yazar.
           </Txt>
           <Txt tone="muted">
+            Telefonun da kendini tanıtır: Google ya da Apple güvenlik kontrolü
+            onaylamayan bir cihazda (root’lu telefon, emülatör, değiştirilmiş
+            uygulama) oynayabilirsin ama skorlar sıralamaya girmez. Oyunu
+            yavaşlatan araçlar da tur sırasında fark edilir.
+          </Txt>
+          <Txt tone="muted">
             Oyunun eski bir sürümüyle oynanan tur sıralamaya giremez; uygulamanı
             güncel tut.
           </Txt>

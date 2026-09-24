@@ -1,4 +1,4 @@
-import { CONTENT_VERSION, PACE, exitDelayMs } from '@quezby/config';
+import { CHECKPOINTS, CONTENT_VERSION, PACE, exitDelayMs, prefixHash } from '@quezby/config';
 import {
   ENGINE_VERSION,
   EngineError,
@@ -75,8 +75,15 @@ type Mode = 'idle' | 'live' | 'transition' | 'over';
 const DRAG_GRACE_MS = 1200;
 
 /** A monotonic clock where the runtime has one. */
-const clock = (globalThis as { performance?: { now: () => number } }).performance;
-const now = () => (clock ? clock.now() : Date.now());
+const now = () => {
+  const clock = (globalThis as { performance?: { now: () => number } }).performance;
+  return clock ? clock.now() : Date.now();
+};
+
+/** How long a finish waits for a checkpoint still on its way, so its receipt can ride along. */
+const CHECKPOINT_WAIT_MS = 2000;
+
+type Receipt = { reel: number; receipt: string };
 
 function localSeed(): number {
   return (Math.floor(Math.random() * 0xfffffffe) + 1) >>> 0;
@@ -115,6 +122,12 @@ export function useGame(mode: RunMode = 'free') {
   const runRef = useRef<Run | null>(null);
   const runIdRef = useRef<string | null>(null);
   const actionsRef = useRef<Action[]>([]);
+  /** When the countdown ended — the game clock's zero. */
+  const goAtRef = useRef<number | null>(null);
+  /** The next `CHECKPOINTS.marksMs` mark this run has yet to pass. */
+  const markRef = useRef(0);
+  const receiptsRef = useRef<Receipt[]>([]);
+  const checkingInRef = useRef<Set<Promise<void>>>(new Set());
   const modeRef = useRef<Mode>('idle');
   const touchRef = useRef<TouchState>(IDLE);
   const reelStartRef = useRef(0);
@@ -179,18 +192,68 @@ export function useGame(mode: RunMode = 'free') {
     setPhase('result');
   }, []);
 
+  /**
+   * The log, the app's own count and the checkpoint receipts. A checkpoint
+   * still on its way is given a moment to land first, so its receipt rides
+   * along.
+   */
   const submit = useCallback(
     (summary: RunSummary) => {
       const runId = runIdRef.current;
       if (!runId) return;
-      void send(runId, {
-        actions: actionsRef.current.map((a) => [a[0], a[1], a[2]]),
-        clientScore: summary.score,
-        clientReels: summary.reels,
-      });
+      const post = () => {
+        const receipts = [...receiptsRef.current]
+          .sort((a, b) => a.reel - b.reel)
+          .slice(0, CHECKPOINTS.maxReceipts)
+          .map((stamp) => stamp.receipt);
+        void send(runId, {
+          actions: actionsRef.current.map((a) => [a[0], a[1], a[2]]),
+          clientScore: summary.score,
+          clientReels: summary.reels,
+          ...(receipts.length > 0 ? { checkpoints: receipts } : {}),
+        });
+      };
+      const landing = [...checkingInRef.current];
+      if (landing.length === 0) {
+        post();
+        return;
+      }
+      setPhase('finishing');
+      void settled(landing, CHECKPOINT_WAIT_MS).then(post);
     },
     [send],
   );
+
+  /**
+   * A ranked run checks in with the API at the first verdict after its game
+   * clock passes each `CHECKPOINTS.marksMs` mark: how many reels so far, and
+   * the hash of exactly those moves. The API stamps when it saw them — that
+   * is what shows a slowed-down game — and its receipt rides with the
+   * finish. Fire-and-forget: a checkpoint that fails is simply missing.
+   */
+  const checkIn = useCallback(() => {
+    const runId = runIdRef.current;
+    const goAt = goAtRef.current;
+    if (!runId || goAt === null) return;
+    const elapsed = now() - goAt;
+    const marks = CHECKPOINTS.marksMs;
+    let passed = markRef.current;
+    while (passed < marks.length && elapsed >= (marks[passed] ?? Infinity)) passed += 1;
+    if (passed === markRef.current) return;
+    markRef.current = passed;
+
+    const reel = actionsRef.current.length;
+    const request: Promise<void> = api.runs
+      .checkpoint(runId, { reel, prefixHash: prefixHash(actionsRef.current, reel) })
+      .then(({ receipt }) => {
+        if (runIdRef.current === runId) receiptsRef.current.push({ reel, receipt });
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        checkingInRef.current.delete(request);
+      });
+    checkingInRef.current.add(request);
+  }, []);
 
   const finish = useCallback(() => {
     const run = runRef.current;
@@ -279,6 +342,7 @@ export function useGame(mode: RunMode = 'free') {
         step = run.apply(applied);
       }
       actionsRef.current.push(applied);
+      checkIn();
 
       cancelAnimation(timer);
       cancelAnimation(meter);
@@ -313,7 +377,7 @@ export function useGame(mode: RunMode = 'free') {
         });
       });
     },
-    [beginReel, clearTimers, dragY, finish, holding, meter, schedule, timer],
+    [beginReel, checkIn, clearTimers, dragY, finish, holding, meter, schedule, timer],
   );
   commitRef.current = commit;
 
@@ -447,6 +511,10 @@ export function useGame(mode: RunMode = 'free') {
       runRef.current = new Run(runSeed);
       runIdRef.current = runId;
       actionsRef.current = [];
+      goAtRef.current = null;
+      markRef.current = 0;
+      receiptsRef.current = [];
+      checkingInRef.current = new Set();
       setSeed(runSeed);
       setScore(0);
       setCombo(1000);
@@ -462,6 +530,7 @@ export function useGame(mode: RunMode = 'free') {
       schedule('count2', PACE.countdownStepMs, () => setCountdown(2));
       schedule('count1', PACE.countdownStepMs * 2, () => setCountdown(1));
       schedule('go', PACE.countdownStepMs * PACE.countdownSteps, () => {
+        goAtRef.current = now();
         setPhase('playing');
         beginReel();
       });
@@ -560,3 +629,16 @@ export function useGame(mode: RunMode = 'free') {
 }
 
 export type GameController = ReturnType<typeof useGame>;
+
+/** Waits for `pending` to settle, but never longer than `ms`. */
+async function settled(pending: Promise<unknown>[], ms: number): Promise<void> {
+  if (pending.length === 0) return;
+  let timeout: ReturnType<typeof setTimeout> | undefined;
+  await Promise.race([
+    Promise.allSettled(pending),
+    new Promise<void>((resolve) => {
+      timeout = setTimeout(resolve, ms);
+    }),
+  ]);
+  clearTimeout(timeout);
+}

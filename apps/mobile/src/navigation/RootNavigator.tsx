@@ -6,6 +6,7 @@ import { ActivityIndicator, Linking, StatusBar, StyleSheet } from 'react-native'
 
 import { useSession } from '@/auth/session';
 import { useAppStatus } from '@/hooks/useAppStatus';
+import { useDeviceCheck } from '@/hooks/useDeviceCheck';
 import { useMe } from '@/hooks/useMe';
 import { usePendingRunSender } from '@/hooks/usePendingRunSender';
 import { messageFor } from '@/lib/errors';
@@ -61,6 +62,7 @@ export function RootNavigator() {
   const status = useAppStatus();
   const me = useMe();
   usePendingRunSender();
+  useDeviceCheck();
 
   useEffect(() => {
     void useSession.getState().hydrate();

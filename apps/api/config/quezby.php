@@ -87,7 +87,8 @@ return [
     | passed (`now − startedAt < activeMs + reels × min_transition_ms −
     | clock_tolerance_ms`), or when, among at least `fast_min_samples` skip and
     | like hits, more than `fast_share_limit` were decided under
-    | `fast_decision_ms`.
+    | `fast_decision_ms`. Its checkpoint receipts hold it to the clock on the
+    | way, too: a slowed-down game passes the first check, not the second.
     |
     */
 
@@ -120,6 +121,83 @@ return [
         'score_jump_min_runs' => 5,
         'review_top_all' => 10,
         'review_top_weekly' => 3,
+
+        // Checkpoints: a few times in a run the app has the API stamp how far
+        // it got; the finish brings the receipts back (`App\Game\Checkpoint`).
+        // `marks_ms` and `max_receipts` are the twin of `@quezby/config`'s
+        // CHECKPOINTS, checked against packages/config/fixtures/checkpoints.json.
+        'checkpoints' => [
+            // Game-clock marks after the countdown at which the app checks in.
+            'marks_ms' => [45000, 120000, 240000],
+            // Receipts read from a finish; any more are ignored.
+            'max_receipts' => 5,
+            // A receipt stamped later than needed × ratio + ms after the start
+            // is a slowed-down game: hard `slow_motion`, or soft `slow_timing`.
+            'slow_motion_ratio' => 1.35,
+            'slow_motion_ms' => 10000,
+            'slow_timing_ratio' => 1.2,
+            'slow_timing_ms' => 6000,
+            // A mark is only expected of a run that went on this long past it.
+            'missing_grace_ms' => 5000,
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Device integrity
+    |--------------------------------------------------------------------------
+    |
+    | Whether the phone a run is played on is a real, unmodified one: Google
+    | Play Integrity on Android, App Attest on iOS, each proved against a
+    | one-time challenge and kept as a verdict for a while. A run records its
+    | player's verdict when it starts (`runs.device_verdict`); the mode says
+    | what that does:
+    |
+    | - `enforce`: a device that failed never ranks (hard `device_integrity`);
+    |   one without a verdict ranks, but a top score waits for review (soft
+    |   `device_unverified`).
+    | - `log`: verdicts are recorded on the runs and change nothing.
+    | - `off`: devices are not checked; the endpoints answer `unavailable`.
+    |
+    */
+
+    'integrity' => [
+        'mode' => env('QUEZBY_INTEGRITY_MODE', 'log'),
+
+        // A challenge is good for one proof, within this many seconds.
+        'challenge_ttl_seconds' => 300,
+
+        // How long a verdict stands; the app checks again after it. An
+        // `unavailable` one is never stored: it only says when to try again.
+        'verdict_ttl_minutes' => [
+            'pass' => 360,
+            'fail' => 720,
+            'unavailable' => 30,
+        ],
+
+        'android' => [
+            // Apps whose Play Integrity tokens count, tried in this order when
+            // Google decodes one. An empty line counts as unset: Quezby's one
+            // application id, the same in every environment.
+            'packages' => array_values(array_filter(array_map('trim', explode(',', (string) (env('PLAY_INTEGRITY_PACKAGES') ?: 'com.kubisimsek.game.quezby'))))),
+            // The Google Cloud service account's JSON key, absolute or relative
+            // to the API's root. Without it Android checks are `unavailable`.
+            'credentials' => env('GOOGLE_PLAY_INTEGRITY_CREDENTIALS'),
+            // A token asked for longer ago than this (or as far ahead) is stale.
+            'token_max_age_seconds' => 600,
+            // Google's access tokens live an hour; a new one is fetched sooner.
+            'access_token_ttl_seconds' => 3000,
+        ],
+
+        'ios' => [
+            // App Attest keys are for `{APPLE_TEAM_ID}.{bundle id}`: the team
+            // and apps of Sign in with Apple (`social.apple`). Environments a
+            // key may come from: `development` (Xcode builds) and/or
+            // `production` (TestFlight and the App Store).
+            'environments' => array_values(array_filter(array_map('trim', explode(',', (string) (env('APP_ATTEST_ENVIRONMENTS') ?: 'production'))))),
+            // Apple's App Attestation Root CA, pinned; relative to the API's root.
+            'root_ca' => 'resources/certs/apple-app-attestation-root-ca.pem',
+        ],
     ],
 
     /*
@@ -167,12 +245,9 @@ return [
 
     'social' => [
         'apple' => [
-            // An empty `APPLE_BUNDLE_IDS=` line counts as unset, not as "no app".
-            'client_ids' => array_values(array_filter(array_map('trim', explode(',', (string) (env('APPLE_BUNDLE_IDS') ?: implode(',', [
-                'com.kubisimsek.game.quezby',
-                'com.kubisimsek.game.quezby.staging',
-                'com.kubisimsek.game.quezby.local',
-            ])))))),
+            // An empty `APPLE_BUNDLE_IDS=` line counts as unset, not as "no app":
+            // Quezby's one bundle id, the same in every environment.
+            'client_ids' => array_values(array_filter(array_map('trim', explode(',', (string) (env('APPLE_BUNDLE_IDS') ?: 'com.kubisimsek.game.quezby'))))),
             'team_id' => env('APPLE_TEAM_ID'),
             'key_id' => env('APPLE_KEY_ID'),
             'private_key_path' => env('APPLE_PRIVATE_KEY_PATH'),

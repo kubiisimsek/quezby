@@ -33,15 +33,16 @@ A contract change is one commit: `packages/types` → Laravel request/resource �
 | ------ | ---- |
 | 401 | `unauthenticated` — missing or revoked token |
 | 404 | `not_found` — also another player's run, an unknown board, a banned player |
-| 409 | `username_taken`, `email_taken`, `already_linked`, `identity_taken`, `last_sign_in_method`, `run_already_finished`, `daily_already_played` |
+| 409 | `username_taken`, `email_taken`, `already_linked`, `identity_taken`, `last_sign_in_method`, `run_already_finished`, `daily_already_played`, `attest_key_unknown` |
 | 410 | `run_expired` |
-| 422 | `validation_failed`, `username_invalid`, `invalid_credentials`, `identity_invalid`, `run_rejected`, `engine_outdated`, `cannot_follow_self`, `follow_limit` |
+| 422 | `validation_failed`, `username_invalid`, `invalid_credentials`, `identity_invalid`, `run_rejected`, `engine_outdated`, `cannot_follow_self`, `follow_limit`, `challenge_invalid`, `integrity_invalid` |
 | 429 | `too_many_requests` |
 
 Throttles: guest sign-up 10/h/IP · login 10/min/IP · nonce 20/min/IP · Apple/Google
 10/min/IP · identities 10/min · username check 60/min · run start 30/min · run
-finish 20/min · search 30/min · follow 60/min · every read (boards, daily, league,
-stats, players, follow lists) 60/min.
+checkpoint 12/min · run finish 20/min · device challenge 20/min · device checks
+(Android, iOS attest and assert together) 10/min · search 30/min · follow 60/min ·
+every read (boards, daily, league, stats, players, follow lists) 60/min.
 
 ## Health and app
 
@@ -149,9 +150,97 @@ email and no other identity). Unlinking Apple revokes its grant.
 
 ### `DELETE /me`
 
-Deletes the account, its runs, board rows, league seats, follows, stats and
-every token; revokes Apple's grant when there is one (never blocks). `204`.
+Deletes the account, its runs, board rows, league seats, follows, stats, device
+checks, App Attest keys and challenges, and every token; revokes Apple's grant
+when there is one (never blocks). `204`.
 Required by App Store guideline 5.1.1(v).
+
+## Device
+
+The phone vouches for itself against a one-time challenge — **Google Play
+Integrity** on Android, **App Attest** on iOS — and the API keeps the verdict
+for a while. A run records the player's verdict standing when it starts
+(`runs.device_verdict`); what it does at the finish depends on
+`QUEZBY_INTEGRITY_MODE` (see *Integrity mode* under the finish). The app checks
+on launch, on foreground and whenever `validUntil` has passed; every failure
+is silent.
+
+Every answer of the three checks is a `DeviceCheckResponse`:
+
+```json
+{ "verdict": "pass", "validUntil": "2026-09-24T18:00:00.000Z", "enforced": true }
+```
+
+- `pass` (stored, 6 hours) — a real device running our app, unmodified.
+- `fail` (stored, 12 hours) — the proof was readable but fell short: rooted,
+  an emulator, a changed or sideloaded app, a wrong challenge, a replayed key.
+  Not an error: the answer is 200.
+- `unavailable` (not stored; `validUntil` is 30 minutes on, when to try again) —
+  no check could be made: Google or Apple could not be asked, credentials are
+  not configured (`GOOGLE_PLAY_INTEGRITY_CREDENTIALS`, `APPLE_TEAM_ID`), or
+  `QUEZBY_INTEGRITY_MODE=off`. Never held against the player.
+- `enforced` — true only with `QUEZBY_INTEGRITY_MODE=enforce`, when a `fail`
+  keeps this device's runs off the boards. False in `log` and `off`: the app
+  must not tell the player otherwise.
+
+A proof that cannot be read at all → `422 integrity_invalid`. Where the API can
+tell by itself (not token-shaped; not base64, not CBOR, not an attestation or
+assertion; a key id that is not 32 bytes) it refuses before touching the
+challenge; a token Google decodes for none of our apps has used it up.
+Otherwise the challenge is used up by the check; one that is unknown, used,
+expired or another player's → `422 challenge_invalid`.
+
+### `POST /device/challenge`
+
+→ `201 { "challenge": "…", "expiresAt": "…" }`. 32 random bytes, base64url
+without padding; single use, for this player, for 5 minutes. Only its SHA-256
+is stored.
+
+### `POST /device/android`
+
+`{ "challenge", "token" }` — a Play Integrity **standard** token requested with
+`requestHash = sha256Hex(challenge)`. The API trades a JWT signed with its
+Google Cloud service account (`scope playintegrity`) for an access token
+(cached ~50 minutes) and calls
+`POST https://playintegrity.googleapis.com/v1/{package}:decodeIntegrityToken`
+for each of `PLAY_INTEGRITY_PACKAGES` in turn until one decodes it. A **pass**
+needs all of: `requestDetails.requestHash` = sha256Hex(challenge) (else fail
+`hash`), `requestPackageName` one of ours (`package`), `timestampMillis`
+within 10 minutes (`stale`), `appIntegrity.appRecognitionVerdict` =
+`PLAY_RECOGNIZED` (`app`), `deviceIntegrity.deviceRecognitionVerdict` contains
+`MEETS_DEVICE_INTEGRITY` (`device`). Not a token at all, or a 400 from Google
+for every package → `422 integrity_invalid`; Google 5xx, 401, 403, 429 or no
+answer → `unavailable`.
+
+### `POST /device/ios/attest`
+
+`{ "challenge", "keyId", "attestation" }` — once per install: `keyId` from
+`DCAppAttestService.generateKey` (base64 of 32 bytes; base64url is taken too),
+`attestation` from `attestKey(keyId, clientDataHash: SHA-256(UTF-8 challenge))`,
+base64 of CBOR `{fmt, attStmt: {x5c, receipt}, authData}`. Checked as Apple's
+*Validating apps that connect to your server* lays out, each failure a `fail`
+with its reason: `fmt` is `apple-appattest` (`format`); `x5c` chains to the
+Apple App Attestation Root CA pinned in `apps/api/resources/certs`, every
+certificate valid now (`chain`); the credential certificate's extension
+`1.2.840.113635.100.8.2` holds `SHA-256(authData ‖ SHA-256(challenge))`
+(`nonce`); SHA-256 of its public key is the key id (`key_id`); `authData`'s
+RP ID hash is SHA-256 of `{APPLE_TEAM_ID}.{bundle id}` for one of
+`APPLE_BUNDLE_IDS` (`app_id`), its counter is 0 (`counter`), its AAGUID is
+`appattestdevelop` or `appattest` + 7 × 0x00 and that environment is in
+`APP_ATTEST_ENVIRONMENTS` (`environment`), its credential id is the key id
+(`credential_id`). A key already attested → `fail` `key_reused`. A pass keeps
+the key (`app_attest_keys`: PEM, counter, environment, receipt).
+
+### `POST /device/ios/assert`
+
+`{ "challenge", "keyId", "assertion" }` — every later check:
+`generateAssertion(keyId, SHA-256(UTF-8 challenge))`, base64 of CBOR
+`{signature, authenticatorData}`. A key this player never had attested →
+`409 attest_key_unknown`, **and the challenge stays good**: the app drops the
+key and attests a new one (with the same challenge or a new one). Otherwise:
+ECDSA-SHA256 over `SHA-256(authenticatorData ‖ SHA-256(challenge))` by the
+stored key (`signature`), our App ID (`app_id`), a counter above the stored
+one (`counter`) — which then moves up.
 
 ## Runs
 
@@ -168,14 +257,36 @@ Required by App Store guideline 5.1.1(v).
 - Needs a username (`422 validation_failed`).
 - A player has **one open run**: starting another marks the previous one
   `abandoned`. Runs older than `QUEZBY_RUN_TTL_MINUTES` (120) become `expired`.
+- The run records the player's device verdict standing now (`pass`, `fail`, or
+  none) in `runs.device_verdict` — nothing with `QUEZBY_INTEGRITY_MODE=off`.
 - `free`: seed `random_int(1, 4294967295)`. `daily`: the day's seed —
   `hash_hmac('sha256', "quezby-daily|{day}|{engine}", QUEZBY_DAILY_SECRET)` —
   the same for everyone; one attempt per Istanbul day, taken when started
   (`409 daily_already_played`, also under a race).
 
+### `POST /runs/{runId}/checkpoint`
+
+`{ "reel": 162, "prefixHash": "3f5c…" }` → `{ "receipt": "…" }` (200).
+
+A few times in a ranked run — right at the first verdict after the game clock
+(after the countdown) passes 45 s, 120 s and 240 s (`CHECKPOINTS.marksMs` in
+`@quezby/config`) — the app sends how many reels it has played (`reel`, 1–5000)
+and `prefixHash(actions, reel)`: the lower-case hex SHA-256 of the first `reel`
+moves written `g,t,d;g,t,d;…` (`App\Game\Checkpoint::prefixHash`, checked
+against `packages/config/fixtures/checkpoints.json`). The API signs them with
+the time it saw them: `base64url(json {r: runId, n, h, t: ms}) . base64url(HMAC-SHA256)`,
+keyed from `APP_KEY`. **Nothing is written** — the receipt is the record; the
+app keeps it and sends it back with the finish. Fire-and-forget: the run
+never waits on it. Another player's or an unknown run → 404; a run no longer
+`started` → `409 run_already_finished`; one past its time → `410 run_expired`
+(left for the finish to close).
+
 ### `POST /runs/{runId}/finish`
 
-`{ "actions": [[1, 412, 0], [2, 530, 0], [3, 380, 690], [0, 0, 0]], "clientScore": 1234, "clientReels": 4 }`
+`{ "actions": [[1, 412, 0], [2, 530, 0], [3, 380, 690], [0, 0, 0]], "clientScore": 1234, "clientReels": 4, "checkpoints": ["…", "…"] }`
+
+`checkpoints` is optional (older apps send none; up to 20 strings of at most
+512 characters pass validation); the API reads the first 5 distinct receipts.
 
 The API:
 
@@ -185,8 +296,30 @@ The API:
    `422 run_rejected`, the run stored as `rejected`.
 3. Checks plausibility (see [scoring.md](../product/scoring.md), *Hile koruması*):
    hard flags (`wall_clock`, `fast_decisions`, `hold_bounds`, `client_mismatch`,
-   `banned`) make the run `flagged`; soft signals hold a score that would reach
-   the season's top 10 or the week's top 3 as `review`.
+   `banned`, and from the receipts and the device below) make the run
+   `flagged`; soft signals hold a score that would reach the season's top 10
+   or the week's top 3 as `review`.
+
+   **Receipts.** Each is held against the log and the clock: not one the API
+   signed for this run → hard `checkpoint_forged`; `n` past the log or `h` not
+   the hash of its first `n` moves → hard `checkpoint_mismatch`. `needed` is
+   the least time from the start to the verdict of reel `n` on the app's pace
+   (countdown + each reel on screen + the pause and slide after every earlier
+   one — not after reel `n`, as the app checks in right at its verdict);
+   `elapsed = t − startedAt`. `elapsed < needed − 1 s` → hard `wall_clock`
+   (with `reel`); `elapsed > needed × 1.35 + 10 s` → hard `slow_motion`; else
+   `> needed × 1.2 + 6 s` → soft `slow_timing`. Each mark the run went on at
+   least 5 s past (on its needed time after the countdown) wants a receipt of
+   its own, stamped no sooner than the mark after the start (1 s tolerance) —
+   early receipts cannot stand in for later marks; fewer → soft
+   `checkpoint_missing` (`{expected, received}`). All numbers are in
+   `config/quezby.php` › `plausibility.checkpoints`.
+
+   **Integrity mode** (`QUEZBY_INTEGRITY_MODE`, per environment):
+   `enforce` (production) — `device_verdict = fail` → hard `device_integrity`
+   (the result says `flagReason: "device"`), none → soft `device_unverified`;
+   `log` (local, staging, and the default) — the verdict is only recorded on the
+   run; `off` — devices are neither checked nor recorded.
 4. Counts the run from the replay (stats, which posts were shown and liked).
 5. A `ranked` run adds to the player's lifetime stats and, when it scored,
    upserts today's, this week's, this month's and the season's rows (plus
@@ -212,7 +345,12 @@ The API:
 `RunResult` = `{ runId, mode, status: "ranked"|"flagged"|"review", score, reels,
 hits, misses, perfects, maxStreak, level, accuracy, avgReactionMs, activeMs,
 endedBy, maxCombo, breakdown: { reelPoints, bonusPoints, bonuses: { flawless|lightning|coolHead|comeback: { count, points } } },
-stats: { swipes, likes, holds, perfects, freezes, misses: { timeout, wrong, holdEarly, holdLate, caught }, avgReactionMs, bestReactionMs, levelMisses[] } }`.
+stats: { swipes, likes, holds, perfects, freezes, misses: { timeout, wrong, holdEarly, holdLate, caught }, avgReactionMs, bestReactionMs, levelMisses[] },
+flagReason: "device" | null }`.
+`flagReason` is `device` when a `flagged` run carries `device_integrity` — the
+phone failed its integrity check, so its runs never rank, and the app says so
+("Bu cihazda skorlar sıralamaya girmiyor"). It is null for every other flag:
+the other checks are not explained to the player.
 `passed` lists up to three players the run overtook on today's board. `daily`
 is null for a free run; `league` is null when the run did not rank.
 A `flagged` or `review` run still answers 200.

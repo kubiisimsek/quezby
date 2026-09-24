@@ -26,12 +26,14 @@ import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useSession } from '@/auth/session';
-import { REEL_GUIDE, REEL_ORDER } from '@/game/howTo';
+import { APP_PLATFORM } from '@/config/env';
+import { DEVICE_FAILED, REEL_GUIDE, REEL_ORDER } from '@/game/howTo';
 import { useDaily, useLeaderboard, useLeague } from '@/hooks/useBoards';
 import { useMe } from '@/hooks/useMe';
 import { messageFor } from '@/lib/errors';
 import { dativeOf, formatGap, formatRank, formatScore } from '@/lib/format';
 import type { RootStackParamList, TabParamList } from '@/navigation/types';
+import { deviceFailed, useDeviceVerdict } from '@/stores/deviceVerdict';
 import { Icon, type IconName } from '@/ui/icons';
 import {
   Arena,
@@ -86,12 +88,15 @@ export function HomeScreen({ navigation }: Props) {
   const focused = useIsFocused();
   const user = useSession((state) => state.user);
   const ranks = useSession((state) => state.ranks);
+  const userId = user?.id ?? null;
+  const unranked = useDeviceVerdict((state) => deviceFailed(state, userId));
   const me = useMe();
   const daily = useDaily();
   const league = useLeague();
   const weekly = useLeaderboard('weekly', 'everyone', 3);
 
   const strip = useEntrance(0, 10);
+  const warning = useEntrance(0, 10);
   const hero = useEntrance(1, 22);
   const leagueIn = useEntrance(2);
   const rivalIn = useEntrance(3);
@@ -165,6 +170,12 @@ export function HomeScreen({ navigation }: Props) {
           />
         </Animated.View>
 
+        {unranked ? (
+          <Animated.View style={warning}>
+            <DeviceWarning />
+          </Animated.View>
+        ) : null}
+
         <Animated.View style={hero}>
           <DailyHero
             daily={daily}
@@ -208,6 +219,21 @@ export function HomeScreen({ navigation }: Props) {
         </Animated.View>
       </ScrollView>
     </View>
+  );
+}
+
+/**
+ * The API's check came back against this phone — rooted, an emulator, a
+ * changed app. It plays on, but its runs never rank; the lobby says so up
+ * top, before a game starts, as the result of every run does.
+ */
+function DeviceWarning() {
+  return (
+    <LobbyCard title="Bu cihazda kapalı" eyebrow="SIRALAMA" icon="alert" tone="warn">
+      <Txt variant="meta" tone="muted">
+        {`${DEVICE_FAILED.why[APP_PLATFORM]} Oynayabilirsin ama skorların sıralamaya girmez.`}
+      </Txt>
+    </LobbyCard>
   );
 }
 

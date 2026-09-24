@@ -1,6 +1,11 @@
 <?php
 
+use App\Enums\DeviceVerdict;
+use App\Game\Checkpoint;
+use App\Game\Replay;
 use App\Game\Run as Engine;
+use App\Models\Run;
+use App\Services\RunClock;
 use App\Services\RunVerifier;
 use Illuminate\Support\Carbon;
 
@@ -83,3 +88,88 @@ it('matches the score and reel count the app showed', function () {
         ->and(verifier()->clientMismatch($summary, $summary->score + 1, $summary->reels))->toMatchArray(['code' => 'client_mismatch'])
         ->and(verifier()->clientMismatch($summary, $summary->score, $summary->reels + 1))->toMatchArray(['code' => 'client_mismatch']);
 });
+
+/**
+ * A phone playing `$replay` at `$speed` of real time, its timers each
+ * `$latenessMs` late, `$startMs` between the API starting the run and the
+ * countdown, `$networkMs` for each request to reach the API: the receipts
+ * it collects at the checkpoint marks, and when its finish arrives — ms
+ * after the start.
+ *
+ * @return array{receipts: list<string>, finishMs: int}
+ */
+function phonePlaying(Run $run, array $actions, Replay $replay, float $speed = 1.0, int $latenessMs = 0, int $startMs = 250, int $networkMs = 120): array
+{
+    $clock = app(RunClock::class);
+    $needed = $clock->needed($replay);
+    $real = fn (int $ms) => (int) ceil($ms / $speed);
+    $marks = config('quezby.plausibility.checkpoints.marks_ms');
+
+    $at = $startMs + $real($clock->countdownMs()) + $latenessMs;
+    $game = 0;
+    $receipts = [];
+    foreach ($replay->steps as $i => $step) {
+        $after = $clock->afterMs($step);
+        $onScreen = $needed[$i + 1] - $needed[$i] - $after;
+        $at += $real($onScreen) + $latenessMs;
+        $game += $onScreen + $latenessMs;
+        // The app goes by its own game clock, which a speed hack slows down with everything else.
+        if ($marks !== [] && $game >= $marks[0]) {
+            $marks = array_values(array_filter($marks, fn (int $mark) => $mark > $game));
+            $receipts[] = app(Checkpoint::class)->sign($run->id, $i + 1, Checkpoint::prefixHash($actions, $i + 1), $run->started_at->getTimestampMs() + $at + $networkMs);
+        }
+        $at += $real($after) + $latenessMs;
+        $game += $after + $latenessMs;
+    }
+
+    return ['receipts' => $receipts, 'finishMs' => $at + $networkMs];
+}
+
+function unsavedRun(int $seed): Run
+{
+    return (new Run)->forceFill(['id' => '01JCHECKP0INTCA1BRAT10NRUN', 'seed' => $seed, 'started_at' => Carbon::parse('2026-09-24 10:00:00.000')]);
+}
+
+it('never catches a simulated player at its checkpoints, on any honest phone', function (array $fixture, array $phone) {
+    $run = unsavedRun($fixture['seed']);
+    $replay = Engine::replay($fixture['seed'], $fixture['actions']);
+    ['receipts' => $receipts, 'finishMs' => $finishMs] = phonePlaying($run, $fixture['actions'], $replay, ...$phone);
+
+    expect(verifier()->checkpoints($run, $fixture['actions'], $replay, $receipts))->toBe(['hard' => [], 'soft' => []])
+        ->and(verifier()->wallClock($run->started_at, $replay->summary, $replay->steps, $run->started_at->copy()->addMilliseconds($finishMs)))->toBeNull();
+})->with('engine replays')->with([
+    'a quick phone' => [['latenessMs' => 0, 'startMs' => 150, 'networkMs' => 60]],
+    'a slow phone' => [['latenessMs' => 25, 'startMs' => 1500, 'networkMs' => 1500]],
+    'a poor connection' => [['latenessMs' => 8, 'startMs' => 4000, 'networkMs' => 5000]],
+]);
+
+it('catches a slowed-down game at its checkpoints', function (float $speed, array $flags) {
+    $fixture = replayFixture('pro-7919');
+    $run = unsavedRun($fixture['seed']);
+    $replay = Engine::replay($fixture['seed'], $fixture['actions']);
+    ['receipts' => $receipts, 'finishMs' => $finishMs] = phonePlaying($run, $fixture['actions'], $replay, $speed);
+
+    $found = verifier()->checkpoints($run, $fixture['actions'], $replay, $receipts);
+    expect(array_map(fn (array $flags) => array_column($flags, 'code'), $found))->toBe($flags)
+        // A slowed-down game always takes longer than the least time: the finish alone never catches it.
+        ->and(verifier()->wallClock($run->started_at, $replay->summary, $replay->steps, $run->started_at->copy()->addMilliseconds($finishMs)))->toBeNull();
+})->with([
+    'at 90 %: not told apart from a laggy phone' => [0.9, ['hard' => [], 'soft' => []]],
+    'at 80 %: a top score waits for review' => [0.8, ['hard' => [], 'soft' => ['slow_timing']]],
+    'at 70 %: never ranks' => [0.7, ['hard' => ['slow_motion'], 'soft' => ['slow_timing']]],
+    'at half speed' => [0.5, ['hard' => ['slow_motion'], 'soft' => []]],
+]);
+
+it('flags a failed device, and holds an unverified one, only when enforced', function (string $mode, ?DeviceVerdict $verdict, array $expected) {
+    config(['quezby.integrity.mode' => $mode]);
+    $run = unsavedRun(1)->forceFill(['device_verdict' => $verdict]);
+
+    expect(array_map(fn (array $flags) => array_column($flags, 'code'), verifier()->deviceIntegrity($run)))->toBe($expected);
+})->with([
+    'enforce, failed' => ['enforce', DeviceVerdict::Fail, ['hard' => ['device_integrity'], 'soft' => []]],
+    'enforce, none' => ['enforce', null, ['hard' => [], 'soft' => ['device_unverified']]],
+    'enforce, passed' => ['enforce', DeviceVerdict::Pass, ['hard' => [], 'soft' => []]],
+    'log, failed' => ['log', DeviceVerdict::Fail, ['hard' => [], 'soft' => []]],
+    'log, none' => ['log', null, ['hard' => [], 'soft' => []]],
+    'off, failed' => ['off', DeviceVerdict::Fail, ['hard' => [], 'soft' => []]],
+]);

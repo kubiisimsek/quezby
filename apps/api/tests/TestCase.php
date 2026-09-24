@@ -3,11 +3,14 @@
 namespace Tests;
 
 use App\Content\Catalog;
+use App\Game\Checkpoint;
+use App\Game\EngineError;
 use App\Game\Rules;
 use App\Game\Run as Engine;
 use App\Models\Run;
 use App\Models\User;
 use App\Services\LeaderboardService;
+use App\Services\RunClock;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Testing\TestResponse;
 use Laravel\Sanctum\Sanctum;
@@ -66,7 +69,7 @@ abstract class TestCase extends BaseTestCase
      *
      * @param  array{seed: int, summary: array{activeMs: int, reels: int}}  $fixture
      */
-    protected function startRunFor(array $fixture, ?int $startedSecondsAgo = null): string
+    public function startRunFor(array $fixture, ?int $startedSecondsAgo = null): string
     {
         $runId = $this->startRun()->assertCreated()->json('runId');
         $playedMs = 1800 + $fixture['summary']['activeMs'] + ($fixture['summary']['reels'] + 1) * 430;
@@ -96,17 +99,67 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
-     * Finishes a run through the API with the app's log and its claim.
+     * Finishes a run through the API with the app's log and its claim — and,
+     * unless `$checkpoints` says otherwise, with the receipts an honest app
+     * would have collected on the way (`honestCheckpoints`).
      *
      * @param  array<mixed>  $actions
+     * @param  list<string>|null  $checkpoints
      */
-    protected function finishRun(string $runId, array $actions, int $clientScore, int $clientReels): TestResponse
+    protected function finishRun(string $runId, array $actions, int $clientScore, int $clientReels, ?array $checkpoints = null): TestResponse
     {
         return $this->postJson("/api/v1/runs/{$runId}/finish", [
             'actions' => $actions,
             'clientScore' => $clientScore,
             'clientReels' => $clientReels,
+            'checkpoints' => $checkpoints ?? $this->honestCheckpoints($runId, $actions),
         ]);
+    }
+
+    /**
+     * Finishes a run of a replay fixture honestly: its log, its score, and the
+     * receipts collected on the way.
+     *
+     * @param  array{actions: list<array{int, int, int}>, summary: array{score: int, reels: int}}  $fixture
+     */
+    public function finishRunFor(string $runId, array $fixture): TestResponse
+    {
+        return $this->finishRun($runId, $fixture['actions'], $fixture['summary']['score'], $fixture['summary']['reels']);
+    }
+
+    /**
+     * The receipts an honest app collects while it plays `$actions` on the
+     * run: it checks in at the first verdict past each checkpoint mark, on
+     * the app's pace from the run's start, and the API stamps each
+     * `$latencyMs` later. Only those already due by now — a run said to
+     * have started seconds ago has had no time for any.
+     *
+     * @param  array<mixed>  $actions
+     * @return list<string>
+     */
+    public function honestCheckpoints(string $runId, array $actions, int $latencyMs = 150): array
+    {
+        $run = Run::query()->find($runId);
+        try {
+            $replay = $run === null ? null : Engine::replay($run->seed, $actions);
+        } catch (EngineError) {
+            $replay = null;
+        }
+        if ($run === null || $replay === null) {
+            return [];
+        }
+
+        $clock = app(RunClock::class);
+        $receipts = [];
+        foreach ($clock->checkIns($replay, config('quezby.plausibility.checkpoints.marks_ms')) as ['reel' => $reel, 'atMs' => $atMs]) {
+            $stampedMs = $run->started_at->getTimestampMs() + $clock->countdownMs() + $atMs + $latencyMs;
+            if ($stampedMs > now()->getTimestampMs()) {
+                break;
+            }
+            $receipts[] = app(Checkpoint::class)->sign($run->id, $reel, Checkpoint::prefixHash($actions, $reel), $stampedMs);
+        }
+
+        return $receipts;
     }
 
     /**

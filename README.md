@@ -26,21 +26,26 @@ nvm use                      # Node 22
 pnpm install
 pnpm dev:api                 # Laravel, :8000
 pnpm dev:mobile              # Metro, :8081
+pnpm switch-local            # ortam: local (ilk seferde apps/mobile/.env'i de oluşturur)
 pnpm ios                     # "Quezby Local" simülatörde
 ```
 
 İlk kurulum adımları (Composer, `.env` dosyaları, CocoaPods):
 [docs/development/local-development.md](docs/development/local-development.md).
 
-## Üç ortam
+## Tek uygulama, üç ortam
 
-| Ortam | Bundle id | Telefondaki ad | Çalıştır |
+iOS ve Android'de tek kimlik: **`com.kubisimsek.game.quezby`**. Uygulamanın hangi
+API'ye bağlanacağını `apps/mobile/.env` içindeki `QUEZBY_ENV` belirler:
+
+| Ortam | Geçiş | Telefondaki ad | API |
 | --- | --- | --- | --- |
-| Local | `com.kubisimsek.game.quezby.local` | Quezby Local | `pnpm ios` · `pnpm android` |
-| Staging | `com.kubisimsek.game.quezby.staging` | Quezby Staging | `pnpm ios:staging` · `pnpm android:staging` |
-| Production | `com.kubisimsek.game.quezby` | Quezby | Xcode'da `Quezby` → Archive · `bundleProdRelease` |
+| Local | `pnpm switch-local` | Quezby Local | `http://localhost:8000` |
+| Staging | `pnpm switch-staging` | Quezby Staging | `https://staging-api.quezby.com` |
+| Production | `pnpm switch-production` | Quezby | `https://api.quezby.com` |
 
-Üçü aynı telefona yan yana kurulur; her biri kendi API'sine bağlanır
+Geçişten sonra `pnpm ios` / `pnpm android` (Metro açıksa yeniden başlat).
+Mağaza derlemesi: geçiş → Xcode'da `Quezby` → Archive · `./gradlew bundleRelease`
 ([docs/development/environments.md](docs/development/environments.md)).
 API'yi paylaşımlı hostinge atmak için: `pnpm api:package:staging` →
 [docs/deployment/shared-hosting.md](docs/deployment/shared-hosting.md).

@@ -15,5 +15,7 @@ meter runs dry. Start at `docs/product/overview.md`.
   season, on both sides, in one commit — see `docs/product/scoring.md`.
 - Nothing shown after a run is computed on the phone; it comes from the API.
 - Tests for every operation; API tests are Pest.
-- Design SoT: `docs/design/design-language.md` — build screens from the kit.
+- Design SoT: `docs/design/design-language.md` ("Arena" — Quezby looks like a
+  game, never an app) — build screens from the kit; the enforceable rules are in
+  `docs/rules/react-native-rules.md`.
 - Never run `git commit`, `git branch` or `git push` — the owner commits.

@@ -1,15 +1,32 @@
 import {
-  environmentFromBundleId,
+  cloudProjectNumber,
+  environmentFrom,
   hostOfScriptUrl,
   localApiUrl,
 } from '@/config/environment';
 import { formatDuration, formatPerMille, formatRank, formatScore } from '@/lib/format';
 
 describe('environment', () => {
-  it('reads the environment from the bundle id', () => {
-    expect(environmentFromBundleId('com.kubisimsek.game.quezby.local')).toBe('local');
-    expect(environmentFromBundleId('com.kubisimsek.game.quezby.staging')).toBe('staging');
-    expect(environmentFromBundleId('com.kubisimsek.game.quezby')).toBe('production');
+  it('reads the environment QUEZBY_ENV names', () => {
+    expect(environmentFrom('local')).toBe('local');
+    expect(environmentFrom('staging')).toBe('staging');
+    expect(environmentFrom(' production ')).toBe('production');
+  });
+
+  it('is local whenever QUEZBY_ENV names nothing it knows — never production by accident', () => {
+    expect(environmentFrom(undefined)).toBe('local');
+    expect(environmentFrom(null)).toBe('local');
+    expect(environmentFrom('')).toBe('local');
+    expect(environmentFrom('prod')).toBe('local');
+    expect(environmentFrom('Production')).toBe('local');
+  });
+
+  it('takes a Cloud project number only when it is one', () => {
+    expect(cloudProjectNumber('123456789012')).toBe('123456789012');
+    expect(cloudProjectNumber(' 123456789012 ')).toBe('123456789012');
+    expect(cloudProjectNumber('')).toBeNull();
+    expect(cloudProjectNumber(undefined)).toBeNull();
+    expect(cloudProjectNumber('quezby-prod')).toBeNull();
   });
 
   it('finds the Metro host in the bundle URL', () => {

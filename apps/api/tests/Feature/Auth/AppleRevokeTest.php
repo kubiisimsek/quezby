@@ -46,13 +46,13 @@ it('trades the authorization code for a refresh token, and keeps it encrypted', 
 });
 
 it('asks as the app the identity token was issued to', function () {
-    $body = $this->idp->appleSignIn(claims: ['aud' => FakeIdentityProvider::APPLE_STAGING_BUNDLE_ID], body: ['authorizationCode' => 'c.auth-code']);
+    $body = $this->idp->appleSignIn(claims: ['aud' => FakeIdentityProvider::APPLE_OTHER_BUNDLE_ID], body: ['authorizationCode' => 'c.auth-code']);
 
     $this->postJson('/api/v1/auth/apple', $body)->assertCreated();
 
     [$request] = Http::recorded(fn (Request $request) => $request->url() === AppleTokenRevoker::TOKEN_URL)->sole();
-    $this->assertSame(FakeIdentityProvider::APPLE_STAGING_BUNDLE_ID, $request['client_id']);
-    $this->assertSame(FakeIdentityProvider::APPLE_STAGING_BUNDLE_ID, $this->idp->clientSecret($request['client_secret'])[1]['sub']);
+    $this->assertSame(FakeIdentityProvider::APPLE_OTHER_BUNDLE_ID, $request['client_id']);
+    $this->assertSame(FakeIdentityProvider::APPLE_OTHER_BUNDLE_ID, $this->idp->clientSecret($request['client_secret'])[1]['sub']);
 });
 
 it('keeps the newest refresh token when the player signs in again', function () {
@@ -127,7 +127,7 @@ it('asks Apple as every configured app, since the token does not say which it be
     $asked = Http::recorded(fn (Request $request) => $request->url() === AppleTokenRevoker::REVOKE_URL)
         ->map(fn (array $pair) => $pair[0]['client_id'])
         ->all();
-    $this->assertSame([FakeIdentityProvider::APPLE_BUNDLE_ID, FakeIdentityProvider::APPLE_STAGING_BUNDLE_ID], $asked);
+    $this->assertSame([FakeIdentityProvider::APPLE_BUNDLE_ID, FakeIdentityProvider::APPLE_OTHER_BUNDLE_ID], $asked);
 });
 
 it('deletes the account all the same when Apple fails', function (int|Closure $answer) {

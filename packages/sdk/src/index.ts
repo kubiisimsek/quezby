@@ -1,17 +1,24 @@
 import type {
+  AndroidIntegrityRequest,
   ApiErrorBody,
   ApiErrorCode,
   AppConfigResponse,
   AppleLinkRequest,
   AppleSignInRequest,
   AuthResponse,
+  CheckpointRequest,
+  CheckpointResponse,
   DailyResponse,
+  DeviceChallengeResponse,
+  DeviceCheckResponse,
   FinishRunRequest,
   FinishRunResponse,
   FollowListResponse,
   GoogleLinkRequest,
   GoogleSignInRequest,
   GuestSignUpRequest,
+  IosAssertionRequest,
+  IosAttestationRequest,
   LeaderboardBoard,
   LeaderboardResponse,
   LeaderboardScope,
@@ -29,9 +36,9 @@ import type {
   StartRunResponse,
   StatsResponse,
   UpdateSettingsRequest,
+  UsernameAvailability,
   UserSearchResponse,
   UserSettings,
-  UsernameAvailability,
 } from '@quezby/types';
 
 export type ApiClientOptions = {
@@ -235,9 +242,30 @@ export function createApiClient(options: ApiClientOptions) {
           query: { username },
         }),
     },
+    /**
+     * The phone vouching for itself — Play Integrity on Android, App Attest
+     * on iOS — against a one-time challenge. The verdict decides whether this
+     * device's runs can rank.
+     */
+    device: {
+      challenge: () =>
+        request<DeviceChallengeResponse>('/device/challenge', { method: 'POST' }),
+      android: (input: AndroidIntegrityRequest) =>
+        request<DeviceCheckResponse>('/device/android', { method: 'POST', body: input }),
+      iosAttest: (input: IosAttestationRequest) =>
+        request<DeviceCheckResponse>('/device/ios/attest', { method: 'POST', body: input }),
+      iosAssert: (input: IosAssertionRequest) =>
+        request<DeviceCheckResponse>('/device/ios/assert', { method: 'POST', body: input }),
+    },
     runs: {
       start: (input: StartRunRequest) =>
         request<StartRunResponse>('/runs', { method: 'POST', body: input }),
+      /** Stamps a ranked run's progress; the receipt goes back with the finish. */
+      checkpoint: (runId: string, input: CheckpointRequest) =>
+        request<CheckpointResponse>(`/runs/${encodeURIComponent(runId)}/checkpoint`, {
+          method: 'POST',
+          body: input,
+        }),
       finish: (runId: string, input: FinishRunRequest) =>
         request<FinishRunResponse>(`/runs/${encodeURIComponent(runId)}/finish`, {
           method: 'POST',

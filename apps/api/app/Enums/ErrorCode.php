@@ -23,6 +23,9 @@ enum ErrorCode: string
     case DailyAlreadyPlayed = 'daily_already_played';
     case CannotFollowSelf = 'cannot_follow_self';
     case FollowLimit = 'follow_limit';
+    case ChallengeInvalid = 'challenge_invalid';
+    case IntegrityInvalid = 'integrity_invalid';
+    case AttestKeyUnknown = 'attest_key_unknown';
     case TooManyRequests = 'too_many_requests';
     case ServerError = 'server_error';
 
@@ -32,10 +35,11 @@ enum ErrorCode: string
             self::Unauthenticated => 401,
             self::NotFound => 404,
             self::UsernameTaken, self::EmailTaken, self::AlreadyLinked, self::IdentityTaken, self::LastSignInMethod,
-            self::RunAlreadyFinished, self::DailyAlreadyPlayed => 409,
+            self::RunAlreadyFinished, self::DailyAlreadyPlayed, self::AttestKeyUnknown => 409,
             self::RunExpired => 410,
             self::ValidationFailed, self::UsernameInvalid, self::InvalidCredentials, self::IdentityInvalid,
-            self::RunRejected, self::EngineOutdated, self::CannotFollowSelf, self::FollowLimit => 422,
+            self::RunRejected, self::EngineOutdated, self::CannotFollowSelf, self::FollowLimit,
+            self::ChallengeInvalid, self::IntegrityInvalid => 422,
             self::TooManyRequests => 429,
             self::ServerError => 500,
         };
@@ -62,6 +66,9 @@ enum ErrorCode: string
             self::DailyAlreadyPlayed => 'Günün akışını bugün oynadın. Yarın yeni akış seni bekliyor.',
             self::CannotFollowSelf => 'Kendini takip edemezsin.',
             self::FollowLimit => 'En fazla 500 oyuncu takip edebilirsin.',
+            self::ChallengeInvalid => 'Cihaz doğrulama isteği geçersiz ya da süresi dolmuş, tekrar dene.',
+            self::IntegrityInvalid => 'Cihaz doğrulaması okunamadı, tekrar dene.',
+            self::AttestKeyUnknown => 'Bu cihazın anahtarı tanınmıyor, cihazı yeniden doğrula.',
             self::TooManyRequests => 'Çok fazla istek gönderdin, biraz bekleyip tekrar dene.',
             self::ServerError => 'Bir şeyler ters gitti, birazdan tekrar dene.',
         };

@@ -10,6 +10,7 @@
 | [design/mobile-design-system.md](design/mobile-design-system.md) | The kit and the screens |
 | [design/ui-writing.md](design/ui-writing.md) | Voice and copy |
 | [development/environments.md](development/environments.md) | Local / staging / production |
+| [development/device-integrity-setup.md](development/device-integrity-setup.md) | App Attest and Play Integrity, console by console (Turkish) |
 | [development/local-development.md](development/local-development.md) | Running it |
 | [deployment/shared-hosting.md](deployment/shared-hosting.md) | Uploading the API to shared hosting |
 | [rules/react-native-rules.md](rules/react-native-rules.md) | Enforceable mobile rules |

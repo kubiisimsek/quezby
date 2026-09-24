@@ -1,5 +1,51 @@
 # Changelog
 
+## 2026-09-24 — One bundle id; the environment comes from `.env`
+
+- iOS and Android ship one id, **`com.kubisimsek.game.quezby`** — the
+  `.local` and `.staging` apps that installed side by side are gone. iOS keeps
+  only Debug and Release (the `Quezby Staging` scheme and the `Staging.*`
+  configurations are gone); Android has no flavors.
+- `QUEZBY_ENV` in `apps/mobile/.env` picks the API. `pnpm switch-local`,
+  `switch-staging` and `switch-production` (`scripts/switch-env.mjs`, tested
+  with `node --test`, run by `pnpm test`) set it and write
+  `ios/Config/Environment.generated.xcconfig` — the name on the home screen and
+  Google's iOS URL scheme; Gradle reads `.env` itself. `pnpm ios` syncs iOS
+  first, and an Xcode build stops when `.env` changed after the last switch.
+- Google ids and the Play Integrity project number are one each now
+  (`GOOGLE_WEB_CLIENT_ID`, `GOOGLE_IOS_CLIENT_ID`,
+  `GOOGLE_CLOUD_PROJECT_NUMBER`); only the API URLs stay per environment.
+- Metro's cache is keyed on `.env`, so a switch needs only a Metro restart.
+  Jest no longer reads the real `.env` (react-native-dotenv used to inline it
+  into tests): `@env` is `src/types/env.mock.ts`. A `.env.local` /
+  `.env.production` next to `.env` — which react-native-dotenv would merge
+  over it — stops the bundle.
+- API: `APPLE_BUNDLE_IDS` and `PLAY_INTEGRITY_PACKAGES` default to the one id.
+- `docs/development/device-integrity-setup.md`: App Attest and Play Integrity,
+  console by console.
+
+## 2026-09-24 — Anti-cheat v3: device integrity and checkpoints
+
+- **Device integrity.** Android proves itself with Google **Play Integrity**
+  (standard requests), iOS with **App Attest** (a key attested once per install,
+  then signed assertions), both against a one-time server challenge. The API
+  verifies them itself (Google's decode endpoint with a service account; Apple's
+  certificate chain, nonce, app id, counter) and keeps the verdict for a few
+  hours per device, so it is not a per-run cost. Policy (`QUEZBY_INTEGRITY_MODE`,
+  `enforce` in production): a **failing** device (rooted, emulator, changed app)
+  plays but never ranks, and the result says so; an **unverifiable** one (no
+  Google services, old phone, simulator, service down) ranks, with its top
+  scores held for review.
+- **Checkpoints against slowed-down games.** A ranked run checks in at 45 s,
+  120 s and 240 s of play with the SHA-256 of its moves so far; the API signs
+  the time it saw it (no database write) and, at the finish, compares real time
+  with the time those moves need at the app's pace: `slow_motion` (hard),
+  `slow_timing` / `checkpoint_missing` (soft), `checkpoint_forged` /
+  `checkpoint_mismatch` (hard). SHA-256 in `@quezby/config` (Hermes has no
+  WebCrypto) with PHP parity fixtures.
+- Rules: `docs/rules/react-native-rules.md` gained the enforceable
+  "Quezby looks like a game" section; CLAUDE.md and AGENTS.md point to it.
+
 ## 2026-09-24 — Arena: Quezby looks like a game
 
 The owner found v2 still "an app, not a game". After researching how games

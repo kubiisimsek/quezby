@@ -23,6 +23,18 @@ describe('pending run', () => {
     expect(usePendingRun.getState().run).toBeNull();
   });
 
+  it('keeps the checkpoint receipts with the log', async () => {
+    usePendingRun.getState().keep({ ...run, checkpoints: ['receipt-67', 'receipt-182'], savedAt: Date.now() });
+    usePendingRun.setState({ run: null, hydrated: false });
+
+    await usePendingRun.getState().hydrate();
+
+    expect(usePendingRun.getState().run).toMatchObject({
+      runId: 'r1',
+      checkpoints: ['receipt-67', 'receipt-182'],
+    });
+  });
+
   it('forgets a run the server has let expire', async () => {
     await AsyncStorage.setItem('quezby.pendingRun.v1', JSON.stringify({ ...run, savedAt: Date.now() - PENDING_TTL_MS - 1 }));
 

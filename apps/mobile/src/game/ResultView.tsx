@@ -35,7 +35,8 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 
-import { BONUS_ORDER } from '@/game/howTo';
+import { APP_PLATFORM } from '@/config/env';
+import { BONUS_ORDER, DEVICE_FAILED } from '@/game/howTo';
 import type { Outcome } from '@/game/useGame';
 import {
   formatCombo,
@@ -207,6 +208,13 @@ function noteFor(outcome: Outcome): Note | null {
         outcome.reason === 'outdated'
           ? 'Uygulamanın yeni sürümü var; güncelleyene kadar skorların sıralamaya girmez.'
           : 'Çevrimdışı oynadın; bu skor sıralamaya gönderilmedi.',
+    };
+  }
+  if (outcome.response.run.flagReason === 'device') {
+    return {
+      tone: 'warn',
+      title: DEVICE_FAILED.title,
+      body: `${DEVICE_FAILED.why[APP_PLATFORM]} Oynamaya devam edebilirsin.`,
     };
   }
   switch (outcome.response.run.status) {

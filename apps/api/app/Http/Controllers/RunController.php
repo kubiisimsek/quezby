@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CheckpointRequest;
 use App\Http\Requests\FinishRunRequest;
 use App\Http\Requests\StartRunRequest;
 use App\Http\Resources\MeResource;
@@ -40,6 +41,14 @@ class RunController extends Controller
         ], 201);
     }
 
+    /** `CheckpointResponse`: how far the run has got, signed with the time the API saw it. */
+    public function checkpoint(CheckpointRequest $request, string $runId, #[CurrentUser] User $user): JsonResponse
+    {
+        return response()->json([
+            'receipt' => $this->runs->checkpoint($user, $runId, $request->reel(), $request->prefixHash()),
+        ]);
+    }
+
     public function finish(
         FinishRunRequest $request,
         string $runId,
@@ -52,6 +61,7 @@ class RunController extends Controller
             $request->actions(),
             (int) $request->validated('clientScore'),
             (int) $request->validated('clientReels'),
+            $request->checkpoints(),
         );
 
         $outcome = $finished->outcome;

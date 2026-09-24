@@ -4,6 +4,7 @@ use App\Http\Controllers\AppConfigController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CredentialsController;
 use App\Http\Controllers\DailyController;
+use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\IdentityController;
@@ -52,7 +53,13 @@ Route::prefix('v1')->group(function () {
 
         Route::get('usernames/check', [UsernameController::class, 'check'])->middleware('throttle:username-check');
 
+        Route::post('device/challenge', [DeviceController::class, 'challenge'])->middleware('throttle:device-challenge');
+        Route::post('device/android', [DeviceController::class, 'android'])->middleware('throttle:device-check');
+        Route::post('device/ios/attest', [DeviceController::class, 'iosAttest'])->middleware('throttle:device-check');
+        Route::post('device/ios/assert', [DeviceController::class, 'iosAssert'])->middleware('throttle:device-check');
+
         Route::post('runs', [RunController::class, 'store'])->middleware('throttle:run-start');
+        Route::post('runs/{runId}/checkpoint', [RunController::class, 'checkpoint'])->middleware('throttle:run-checkpoint');
         Route::post('runs/{runId}/finish', [RunController::class, 'finish'])->middleware('throttle:run-finish');
 
         Route::get('leaderboards/{board}', LeaderboardController::class)->middleware('throttle:reads');

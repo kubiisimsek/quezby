@@ -67,10 +67,10 @@ jest.mock('react-native-keychain', () => {
   };
 });
 
-/** A local debug build, so nothing under test ever points at production. */
+/** The one app; which environment it talks to comes from `@env` (src/types/env.mock.ts). */
 jest.mock('react-native-device-info', () => {
   const mock = require('react-native-device-info/jest/react-native-device-info-mock');
-  mock.getBundleId.mockReturnValue('com.kubisimsek.game.quezby.local');
+  mock.getBundleId.mockReturnValue('com.kubisimsek.game.quezby');
   mock.getVersion.mockReturnValue('1.0.0');
   mock.getBuildNumber.mockReturnValue('1');
   return { __esModule: true, default: mock, ...mock };
@@ -112,3 +112,18 @@ jest.mock('@react-native-google-signin/google-signin', () => ({
   isErrorWithCode: (error) => typeof error?.code === 'string',
   statusCodes: { IN_PROGRESS: 'IN_PROGRESS', SIGN_IN_CANCELLED: 'SIGN_IN_CANCELLED' },
 }));
+
+/**
+ * The app's own integrity module (`QuezbyIntegrity`: Play Integrity on
+ * Android, App Attest on iOS). Both platforms' methods, answering as a phone
+ * that cannot vouch for itself — a test decides what Google or Apple says.
+ */
+require('react-native/Libraries/BatchedBridge/NativeModules').default.QuezbyIntegrity = {
+  isAvailable: jest.fn(async () => false),
+  prepare: jest.fn(async () => undefined),
+  request: jest.fn(async () => 'play-integrity-token'),
+  isSupported: jest.fn(async () => false),
+  generateKey: jest.fn(async () => 'app-attest-key'),
+  attestKey: jest.fn(async () => 'app-attest-attestation'),
+  generateAssertion: jest.fn(async () => 'app-attest-assertion'),
+};

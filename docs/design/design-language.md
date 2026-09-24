@@ -111,6 +111,22 @@ knows no Turkish and turns "i" into "I". Everything else is sentence case.
   the arena — a sheet, the dock.
 - **Controls:** `CONTROL` sm 36 · md 46 · lg 58; the lobby's play slab is 74.
 
+## The mark
+
+The logo is a **Q**: a thick magenta ring whose tail is a **gold lightning
+bolt** — the reflex — with two **swipe-up chevrons** in its eye, a white one and
+its pink echo: the move the feed is made of. It is drawn like everything else
+in the arena — outline, lip, a gloss across the ring's top, a rim light — on
+the night with a magenta glow, spotlight rays and a few sparkles.
+
+`apps/mobile/design/make-brand.py` draws it from the palette (through
+`tokens.ts`) and Rubik, and writes every image of it: the App Store and Google
+Play icons, Android's adaptive layers (with a monochrome one for themed
+icons), the wide logo with **Quezby** and "Kaydırma alışkanlığın, rekabete
+dönüştü.", the Play feature graphic, `BrandMark` and the iOS launch tile — all
+in `design/brand/` or where the platform wants them. Change the mark there and
+run it again; never touch an exported PNG.
+
 ## Surfaces
 
 | Surface | What it is |

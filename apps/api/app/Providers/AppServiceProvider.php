@@ -66,6 +66,17 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('run-finish', fn (Request $request) => Limit::perMinute(20)
             ->by($request->user()?->getAuthIdentifier() ?? $request->ip()));
 
+        // A run checks in two or three times; a few more for a retry or a second run in the minute.
+        RateLimiter::for('run-checkpoint', fn (Request $request) => Limit::perMinute(12)
+            ->by($request->user()?->getAuthIdentifier() ?? $request->ip()));
+
+        RateLimiter::for('device-challenge', fn (Request $request) => Limit::perMinute(20)
+            ->by($request->user()?->getAuthIdentifier() ?? $request->ip()));
+
+        // Android, iOS attest and iOS assert share one budget: a phone proves itself every few hours.
+        RateLimiter::for('device-check', fn (Request $request) => Limit::perMinute(10)
+            ->by($request->user()?->getAuthIdentifier() ?? $request->ip()));
+
         RateLimiter::for('auth-nonce', fn (Request $request) => Limit::perMinute(20)->by($request->ip()));
 
         RateLimiter::for('social-auth', fn (Request $request) => Limit::perMinute(10)->by($request->ip()));

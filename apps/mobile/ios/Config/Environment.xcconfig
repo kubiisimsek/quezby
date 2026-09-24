@@ -1,0 +1,16 @@
+// Which environment this build is — local, staging or production — comes from
+// apps/mobile/.env (QUEZBY_ENV). `pnpm switch-local`, `pnpm switch-staging` and
+// `pnpm switch-production` set it there and write Environment.generated.xcconfig
+// next to this file; without it a build is the local one. One bundle id for
+// all three (docs/development/environments.md).
+//
+// The project-level Debug and Release configurations are based on this file;
+// the target's own are CocoaPods'.
+
+QUEZBY_ENV = local
+QUEZBY_DISPLAY_NAME = Quezby Local
+// The reversed iOS OAuth client id Google sends the player back to; a
+// placeholder until GOOGLE_IOS_CLIENT_ID is set in apps/mobile/.env.
+GOOGLE_IOS_URL_SCHEME = quezby-google
+
+#include? "Environment.generated.xcconfig"

@@ -1,47 +1,23 @@
-import Svg, {
-  Defs,
-  LinearGradient,
-  Path,
-  Rect,
-  Stop,
-  Text as SvgText,
-} from 'react-native-svg';
+import { Image } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 
-import { arena as light, marks } from '@/ui/tokens';
+import mark from '../../assets/brand/mark.png';
+import { marks } from '@/ui/tokens';
 
 /**
- * The Quezby mark — magenta running into violet, a round Q, and the swipe
- * that the whole game is made of. SVG, so no gradient module and no bitmap.
+ * The Quezby mark — a Q whose tail is a gold bolt, two swipe-up chevrons in its
+ * eye — as an Arena tile, on its lip. A bitmap made with the app icon by
+ * `design/make-brand.py` (96 pt at @1x–@3x), so the two never differ.
  */
 export function BrandMark({ size = 64 }: { size?: number }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 64 64">
-      <Defs>
-        <LinearGradient id="quezby-mark" x1="0" y1="0" x2="1" y2="1">
-          <Stop offset="0" stopColor={light.brandFrom} />
-          <Stop offset="1" stopColor={light.brandTo} />
-        </LinearGradient>
-      </Defs>
-      <Rect width={64} height={64} rx={18} fill="url(#quezby-mark)" />
-      <SvgText
-        x={29}
-        y={45}
-        fontSize={36}
-        fontFamily="Rubik-Black"
-        fill={light.onBrand}
-        textAnchor="middle"
-      >
-        Q
-      </SvgText>
-      <Path
-        d="M49 26V13m0 0-5 5m5-5 5 5"
-        stroke={light.onBrand}
-        strokeWidth={3.2}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fill="none"
-      />
-    </Svg>
+    <Image
+      source={mark}
+      style={{ width: size, height: size }}
+      resizeMode="contain"
+      accessibilityIgnoresInvertColors
+      testID="brand-mark"
+    />
   );
 }
 

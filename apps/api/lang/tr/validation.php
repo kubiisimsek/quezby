@@ -24,6 +24,7 @@ return [
         'string' => ':Attribute en az :min karakter olmalı.',
     ],
     'present' => ':Attribute gönderilmeli.',
+    'regex' => ':Attribute geçersiz.',
     'required' => ':Attribute gerekli.',
     'string' => ':Attribute bir metin olmalı.',
 

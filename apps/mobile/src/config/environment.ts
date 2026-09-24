@@ -1,14 +1,20 @@
 /**
- * Which of the three apps this is — decided by the native build, never by
- * `.env`: the bundle id is `….local`, `….staging` or the bare production id
- * (`docs/development/environments.md`). One JS bundle, three installs.
+ * Which API this build talks to. There is one app — one bundle id, one
+ * install — and `QUEZBY_ENV` in `apps/mobile/.env` names the environment:
+ * `pnpm switch-local`, `switch-staging` or `switch-production` set it
+ * (`docs/development/environments.md`).
  */
 export type AppEnvironment = 'local' | 'staging' | 'production';
 
-export function environmentFromBundleId(bundleId: string): AppEnvironment {
-  if (bundleId.endsWith('.local')) return 'local';
-  if (bundleId.endsWith('.staging')) return 'staging';
-  return 'production';
+const ENVIRONMENTS: readonly AppEnvironment[] = ['local', 'staging', 'production'];
+
+/**
+ * `QUEZBY_ENV` as `.env` gives it. Anything else — nothing, a typo — is the
+ * local environment, so a build never reaches production by accident.
+ */
+export function environmentFrom(raw: string | null | undefined): AppEnvironment {
+  const name = (raw ?? '').trim();
+  return ENVIRONMENTS.find((environment) => environment === name) ?? 'local';
 }
 
 /** `http://192.168.1.20:8081/index.bundle?…` → `192.168.1.20`. */
@@ -36,4 +42,10 @@ export function localApiUrl(
   return platform === 'android'
     ? url.replace(/(localhost|127\.0\.0\.1)/, '10.0.2.2')
     : url;
+}
+
+/** A Google Cloud project number as `.env` gives it — digits only — or null. */
+export function cloudProjectNumber(raw: string | null | undefined): string | null {
+  const number = (raw ?? '').trim();
+  return /^\d+$/.test(number) ? number : null;
 }

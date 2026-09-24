@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\DeviceVerdict;
 use App\Enums\RunMode;
 use App\Enums\RunStatus;
 use App\Game\EndReason;
@@ -25,6 +26,7 @@ use Illuminate\Support\Carbon;
  * @property int $engine_version
  * @property int $content_version
  * @property string|null $app_version
+ * @property DeviceVerdict|null $device_verdict
  * @property RunStatus $status
  * @property RunMode $mode
  * @property string|null $daily_key
@@ -51,7 +53,7 @@ use Illuminate\Support\Carbon;
  * @property array<mixed>|null $actions
  */
 #[Fillable([
-    'seed', 'engine_version', 'content_version', 'app_version', 'status', 'mode', 'daily_key', 'open_user_id',
+    'seed', 'engine_version', 'content_version', 'app_version', 'device_verdict', 'status', 'mode', 'daily_key', 'open_user_id',
     'started_at', 'finished_at',
     'score', 'reels', 'hits', 'misses', 'perfects', 'max_streak', 'max_combo', 'bonus_points', 'level',
     'accuracy', 'avg_reaction_ms', 'active_ms', 'ended_by',
@@ -73,6 +75,7 @@ class Run extends Model
             'seed' => 'integer',
             'engine_version' => 'integer',
             'content_version' => 'integer',
+            'device_verdict' => DeviceVerdict::class,
             'status' => RunStatus::class,
             'mode' => RunMode::class,
             'started_at' => 'datetime',
@@ -102,6 +105,25 @@ class Run extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Why a flagged run is off the boards, when the player can be told:
+     * `device` — the phone failed its integrity check. The other checks are
+     * not explained to the player.
+     */
+    public function flagReason(): ?string
+    {
+        if ($this->status !== RunStatus::Flagged) {
+            return null;
+        }
+        foreach ($this->flags ?? [] as $flag) {
+            if (($flag['code'] ?? null) === 'device_integrity') {
+                return 'device';
+            }
+        }
+
+        return null;
     }
 
     public function hasExpired(CarbonInterface $now): bool

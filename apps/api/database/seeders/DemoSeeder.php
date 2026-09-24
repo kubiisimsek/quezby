@@ -3,17 +3,22 @@
 namespace Database\Seeders;
 
 use App\Content\Catalog;
+use App\Enums\Platform;
 use App\Enums\RunMode;
 use App\Enums\RunStatus;
+use App\Game\Checkpoint;
 use App\Game\Gesture;
 use App\Game\ReelKind;
+use App\Game\Replay;
 use App\Game\Rules;
 use App\Game\Run as Engine;
-use App\Game\RunSummary;
 use App\Models\LeagueGroup;
 use App\Models\Run;
 use App\Models\User;
 use App\Services\FollowService;
+use App\Services\Integrity\DeviceCheckResult;
+use App\Services\Integrity\DeviceIntegrity;
+use App\Services\RunClock;
 use App\Services\RunService;
 use App\Support\Username;
 use Carbon\CarbonImmutable;
@@ -31,7 +36,9 @@ use RuntimeException;
  * server replays it, and the boards, today's "Günün akışı", the leagues and
  * the lifetime numbers fill exactly as they would in production. A small bot
  * plays for the players — the engine's own thumbs, casual to pro — while the
- * clock is moved on so every run took as long as it would on a phone.
+ * clock is moved on so every run took as long as it would on a phone: it
+ * checks in at the run's checkpoints on time, and every phone passes its
+ * device check when the player opens the app.
  *
  *     php artisan db:seed --class=DemoSeeder
  *
@@ -61,7 +68,7 @@ final class DemoSeeder extends Seeder
         public int $days = 8,
     ) {}
 
-    public function run(RunService $runs, FollowService $follows): void
+    public function run(RunService $runs, FollowService $follows, DeviceIntegrity $devices, RunClock $clock): void
     {
         if (! app()->environment('local')) {
             throw new RuntimeException('DemoSeeder only runs locally (APP_ENV=local): it plays hundreds of made-up runs onto the boards.');
@@ -74,7 +81,7 @@ final class DemoSeeder extends Seeder
             return;
         }
 
-        $clock = hrtime(true);
+        $began = hrtime(true);
         $testNow = Carbon::getTestNow();
         $now = CarbonImmutable::now('UTC');
         $timezone = (string) config('quezby.leaderboard.timezone');
@@ -82,13 +89,13 @@ final class DemoSeeder extends Seeder
         $first = $today->subDays(max(1, $this->days) - 1);
 
         try {
-            DB::transaction(function () use ($runs, $follows, $names, $now, $today, $first) {
+            DB::transaction(function () use ($runs, $follows, $devices, $clock, $names, $now, $today, $first) {
                 $players = $this->createPlayers($names, $first);
                 $this->follow($players, $follows, $first);
 
                 for ($day = $first; $day->lessThanOrEqualTo($today); $day = $day->addDay()) {
                     foreach ($players as $player) {
-                        $this->playDay($runs, $player, $day, $day->equalTo($today), $now);
+                        $this->playDay($runs, $devices, $clock, $player, $day, $day->equalTo($today), $now);
                     }
                 }
             });
@@ -96,7 +103,7 @@ final class DemoSeeder extends Seeder
             Carbon::setTestNow($testNow);
         }
 
-        $this->report($names, (hrtime(true) - $clock) / 1e9);
+        $this->report($names, (hrtime(true) - $began) / 1e9);
     }
 
     /**
@@ -158,13 +165,13 @@ final class DemoSeeder extends Seeder
     }
 
     /**
-     * One player's session on one day: today's challenge first, then a free
-     * run or two. Everyone plays today; on other days the better players show
-     * up more often and stay longer.
+     * One player's session on one day: the app checks the phone on launch,
+     * then today's challenge, then a free run or two. Everyone plays today;
+     * on other days the better players show up more often and stay longer.
      *
      * @param  array{user: User, skill: float, top: bool}  $player
      */
-    private function playDay(RunService $runs, array $player, CarbonImmutable $day, bool $isToday, CarbonImmutable $now): void
+    private function playDay(RunService $runs, DeviceIntegrity $devices, RunClock $clock, array $player, CarbonImmutable $day, bool $isToday, CarbonImmutable $now): void
     {
         $dice = self::dice(crc32($player['user']->username.'|'.$day->format('Y-m-d')));
         $skill = $player['skill'];
@@ -198,8 +205,14 @@ final class DemoSeeder extends Seeder
             $deadline = $day->setTime(23, 50);
         }
 
+        if ($at->lessThan($deadline)) {
+            // A real phone, running the app from the store: Play Integrity and App Attest vouch for it.
+            Carbon::setTestNow($at->utc());
+            $devices->record($player['user'], Platform::from((string) $player['user']->platform), DeviceCheckResult::pass(['demo' => true]));
+        }
+
         foreach ($plan as [$mode, $hand]) {
-            $finishedAt = $this->playRun($runs, $player['user'], $mode, $hand, $at->utc(), $deadline->utc());
+            $finishedAt = $this->playRun($runs, $clock, $player['user'], $mode, $hand, $at->utc(), $deadline->utc());
             if ($finishedAt === null) {
                 return;
             }
@@ -208,12 +221,14 @@ final class DemoSeeder extends Seeder
     }
 
     /**
-     * Starts a run at `$at`, lets the bot play it, and finishes it once the
-     * clock shows the time that took. Null when there is no time left for it.
+     * Starts a run at `$at`, lets the bot play it — checking in at each
+     * checkpoint mark as it passes, the way the app does — and finishes it
+     * once the clock shows the time that took. Null when there is no time
+     * left for it.
      *
      * @param  array{reaction: int, reactionSd: int, slip: float, reflex: float, holdSd: int, tapGap: int}  $thumb
      */
-    private function playRun(RunService $runs, User $user, RunMode $mode, array $thumb, CarbonImmutable $at, CarbonImmutable $deadline): ?CarbonImmutable
+    private function playRun(RunService $runs, RunClock $clock, User $user, RunMode $mode, array $thumb, CarbonImmutable $at, CarbonImmutable $deadline): ?CarbonImmutable
     {
         $budgetMs = $deadline->getTimestampMs() - $at->getTimestampMs() - self::SLACK_MS;
         if ($budgetMs < self::MIN_RUN_MS) {
@@ -224,33 +239,39 @@ final class DemoSeeder extends Seeder
         $run = $runs->start($user, $mode, Rules::ENGINE_VERSION, Catalog::LATEST, '1.0.0');
 
         $dice = self::dice($run->seed ^ crc32($user->id));
-        [$actions, $summary, $neededMs] = $this->play($run->seed, $thumb, $dice, $budgetMs);
+        [$actions, $replay] = $this->play($run->seed, $thumb, $dice, $budgetMs, $clock);
 
+        $receipts = [];
+        foreach ($clock->checkIns($replay, config('quezby.plausibility.checkpoints.marks_ms')) as ['reel' => $reel, 'atMs' => $atMs]) {
+            // The request reaches the API a moment after the verdict that passed the mark.
+            Carbon::setTestNow($at->addMilliseconds($clock->countdownMs() + $atMs + $dice->getInt(60, 400)));
+            $receipts[] = $runs->checkpoint($user, $run->id, $reel, Checkpoint::prefixHash($actions, $reel));
+        }
+
+        $neededMs = $clock->needed($replay)[count($actions)];
         $finishedAt = $at->addMilliseconds($neededMs + $dice->getInt(1500, self::SLACK_MS));
         Carbon::setTestNow($finishedAt);
-        $runs->finish($user, $run->id, $actions, $summary->score, $summary->reels);
+        $runs->finish($user, $run->id, $actions, $replay->summary->score, $replay->summary->reels, $receipts);
 
         return $finishedAt;
     }
 
     /**
      * The bot: plays reel by reel on its own engine until the run is over, or
-     * until the next reel would not fit in `$budgetMs` — then it quits. Also
-     * says how long the app needs at the least for that log, ms: the sum
-     * `RunVerifier::wallClock` checks, without its tolerance.
+     * until the next reel would not fit in `$budgetMs` — then it quits. The
+     * replay it hands back is what the app's pace (`RunClock`) times.
      *
      * @param  array{reaction: int, reactionSd: int, slip: float, reflex: float, holdSd: int, tapGap: int}  $thumb
-     * @return array{0: list<array{int, int, int}>, 1: RunSummary, 2: int}
+     * @return array{0: list<array{int, int, int}>, 1: Replay}
      */
-    private function play(int $seed, array $thumb, Randomizer $dice, int $budgetMs): array
+    private function play(int $seed, array $thumb, Randomizer $dice, int $budgetMs, RunClock $clock): array
     {
         $pace = config('quezby.plausibility.pace');
-        $countdownMs = $pace['countdown_step_ms'] * $pace['countdown_steps'];
         $engine = new Engine($seed);
         $actions = [];
         $steps = [];
 
-        $boundMs = $countdownMs;
+        $boundMs = $clock->countdownMs();
         while (! $engine->isOver()) {
             $reel = $engine->current();
             $action = $this->decide($engine, $thumb, $dice);
@@ -267,18 +288,8 @@ final class DemoSeeder extends Seeder
             $actions[] = $action;
         }
         $engine->quit();
-        $summary = $engine->summary();
 
-        $neededMs = $countdownMs + $summary->activeMs;
-        foreach ($steps as $step) {
-            $neededMs += $pace['slide_ms'] + match (true) {
-                ! $step->verdict->isHit() => $pace['exit_ms']['miss'],
-                $step->reel->kind === ReelKind::Skip => $pace['exit_ms']['skip_hit'],
-                default => $pace['exit_ms']['hit'],
-            };
-        }
-
-        return [$actions, $summary, $neededMs];
+        return [$actions, new Replay($engine->summary(), $steps)];
     }
 
     /**

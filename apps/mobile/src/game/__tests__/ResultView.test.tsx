@@ -49,6 +49,7 @@ function response(
         bestReactionMs: 301,
         levelMisses: [0, 1, 3, 2, 4],
       },
+      flagReason: null,
     },
     best: {
       score: 104_560,
@@ -209,6 +210,23 @@ describe('ResultView', () => {
     }).render();
 
     expect(screen.getByText('Sıralamaya girmedi')).toBeTruthy();
+    expect(screen.queryByText('Bu cihazda skorlar sıralamaya girmiyor')).toBeNull();
+  });
+
+  it('tells a phone that failed the integrity check that its runs never rank, and why', async () => {
+    const onDevice = response({
+      isNewBest: true,
+      run: { ...response().run, status: 'flagged', flagReason: 'device' },
+    });
+    await view({ mode: 'verified', response: onDevice }).render();
+
+    expect(screen.getByText('Bu cihazda skorlar sıralamaya girmiyor')).toBeTruthy();
+    expect(
+      screen.getByText(/güvenlik kontrolü bu cihazı onaylamadı: .*değiştirilmiş bir uygulama olabilir\. Oynamaya devam edebilirsin\./),
+    ).toBeTruthy();
+    expect(screen.queryByText('Sıralamaya girmedi')).toBeNull();
+    expect(screen.queryByText('YENİ REKOR!')).toBeNull();
+    expect(screen.queryByText('▲8')).toBeNull();
   });
 
   it('offers free play after the daily run, with its card and board', async () => {

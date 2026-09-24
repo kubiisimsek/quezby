@@ -77,3 +77,18 @@ export const BONUS_GUIDE: Record<BonusKind, { name: string; toast: string; body:
 };
 
 export const BONUS_ORDER: readonly BonusKind[] = ['flawless', 'lightning', 'coolHead', 'comeback'];
+
+/**
+ * A phone that failed Google’s or Apple’s integrity check — rooted or
+ * jailbroken, an emulator, a changed app — plays on, but its runs never rank.
+ * The result of such a run (`flagReason: 'device'`) and the lobby say so, in
+ * these words.
+ */
+export const DEVICE_FAILED = {
+  title: 'Bu cihazda skorlar sıralamaya girmiyor',
+  why: {
+    android:
+      'Google’ın güvenlik kontrolü bu cihazı onaylamadı: root’lu bir telefon, emülatör ya da değiştirilmiş bir uygulama olabilir.',
+    ios: 'Apple’ın güvenlik kontrolü bu cihazı onaylamadı: jailbreak’li bir telefon ya da değiştirilmiş bir uygulama olabilir.',
+  },
+} as const;

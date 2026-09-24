@@ -8,12 +8,10 @@ require Pod::Executable.execute_command('node', ['-p',
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
-# Three app environments (docs/development/environments.md): the two staging
-# configurations build like their Debug and Release namesakes.
+# One app, two configurations. Which environment a build talks to comes from
+# apps/mobile/.env, not from a configuration (docs/development/environments.md).
 project 'Quezby',
   'Debug' => :debug,
-  'Staging.Debug' => :debug,
-  'Staging.Release' => :release,
   'Release' => :release
 
 linkage = ENV['USE_FRAMEWORKS']

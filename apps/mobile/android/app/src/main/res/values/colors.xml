@@ -1,4 +1,5 @@
 <resources>
-    <!-- brandFrom in apps/mobile/design/palette.mjs -->
-    <color name="brand">#C91B86</color>
+    <!-- canvas in apps/mobile/design/palette.mjs: the arena's first frame. Android 12+
+         shows the adaptive launcher icon on it while the app starts. -->
+    <color name="brand">#240554</color>
 </resources>

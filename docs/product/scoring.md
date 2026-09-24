@@ -187,7 +187,41 @@ görünen her sayı sunucudan gelir.
 7. Moderasyon: `php artisan quezby:review`, `quezby:run:approve|reject`,
    `quezby:user:ban|unban`, `quezby:runs:expire`; SSH'sız hostlarda
    `POST /api/v1/ops/moderate` (`MODERATION_TOKEN`).
+8. **Kontrol noktaları — yavaşlatılmış oyuna karşı.** `wall_clock` yalnızca alt
+   sınırdır: yavaşlatılmış (speed-hack) bir oyun onu geçer. Bu yüzden sıralı bir
+   turda uygulama, geri sayımdan sonraki oyun saatinin 45., 120. ve 240.
+   saniyelerinde (`CHECKPOINTS.marksMs`) sunucuya kaç reel oynadığını ve tam o
+   hareketlerin SHA-256 özetini (`prefixHash`) bildirir. Sunucu gördüğü anı
+   imzalayıp **veritabanına yazmadan** bir makbuz döner; bitiş bu makbuzları
+   taşır. Bitişte sunucu her makbuz için kaydın o kısmını yeniden özetler ve o
+   hareketlerin uygulamanın temposuyla gerektirdiği süreyi, gerçekte geçen süreyle
+   karşılaştırır:
+   - sahte ya da başka turun makbuzu → sert `checkpoint_forged`; özet tutmuyor
+     (geçmiş sonradan değiştirilmiş) → sert `checkpoint_mismatch`;
+   - gerçek süre, gereken sürenin 1,35 katı + 10 sn'den uzun → sert `slow_motion`;
+     1,2 katı + 6 sn'den uzun → yumuşak `slow_timing`;
+   - beklenen makbuz eksik (bağlantı yok) → yumuşak `checkpoint_missing`.
+   Maliyet: bir turda en fazla üç küçük istek; bir tur bitişinin tamamı
+   (tekrar oynatma dahil) yerelde ~7 ms, en uzun turun tekrarı ~2,5 ms.
+9. **Cihaz bütünlüğü — rootlu cihaz, emülatör, değiştirilmiş uygulama.**
+   Uygulama, tek kullanımlık bir sunucu challenge'ına karşı Android'de **Google
+   Play Integrity** (standard request, `requestHash = sha256Hex(challenge)`), iOS'ta
+   **App Attest** (kurulumda anahtar onayı, sonra imzalı assertion) belgesi
+   üretir; sunucu doğrular ve kararı saklar (`pass` 6 sa, `fail` 12 sa geçerli).
+   Tur başlarken oyuncunun geçerli kararı tura yazılır (`runs.device_verdict`).
+   `QUEZBY_INTEGRITY_MODE=enforce` iken:
+   - `fail` → sert `device_integrity`: oyuncu oynar ama turları **hiçbir tabloya
+     girmez**; sonuç ekranı "Bu cihazda skorlar sıralamaya girmiyor" der
+     (`flagReason: 'device'`).
+   - karar yok (Google servisleri olmayan Huawei'ler, eski cihazlar, simülatör,
+     Google/Apple'a ulaşılamadı) → yumuşak `device_unverified`: turlar sıralamaya
+     girer, zirveye girecek skor incelemeye düşer.
+   `log` (yerel/staging) kararları tura yazar ama durumu değiştirmez; `off` kapatır.
+   Doğrulama tur başına değil, cihaz başına aralıklarla yapılır (Google'ın
+   günlük kotası ve sunucu yükü için).
 
-Bu, "skoru elle POST etmek" türü hileyi tamamen, bot yazmayı ise ciddi biçimde
-zorlaştırır. Tam koruma istemci tarafında imkânsızdır; şüpheli turlar
-`runs.flags` alanında (sert/yumuşak) saklanır.
+Bu, "skoru elle POST etmek" türü hileyi tamamen, rootlu cihaz/emülatör ve
+yavaşlatma hilesini büyük ölçüde engeller; insan gibi davranan iyi bir botu ise
+yalnızca zorlaştırır (zirvede incelemeyle yakalanır). Tam koruma istemci
+tarafında imkânsızdır; şüpheli turlar `runs.flags` alanında (sert/yumuşak)
+saklanır.

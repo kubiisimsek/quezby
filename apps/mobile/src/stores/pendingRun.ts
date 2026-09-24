@@ -6,8 +6,9 @@ const KEY = 'quezby.pendingRun.v1';
 
 /**
  * A finished run the API has not heard about yet — the network dropped as it
- * ended. The log is kept on the phone so the finish can be sent again, even
- * after the app restarts, while the server still holds the run open.
+ * ended. The log, with its checkpoint receipts, is kept on the phone so the
+ * finish can be sent again, even after the app restarts, while the server
+ * still holds the run open.
  */
 export type PendingRun = FinishRunRequest & { runId: string; savedAt: number };
 

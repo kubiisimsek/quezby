@@ -100,6 +100,14 @@ describe('HelpScreen', () => {
     }
   });
 
+  it('says a phone that fails Google’s or Apple’s check can play but not rank', async () => {
+    await renderWithProviders(<HelpScreen {...props} />);
+
+    expect(
+      screen.getByText(/onaylamayan bir cihazda .* oynayabilirsin ama skorlar sıralamaya girmez/),
+    ).toBeOnTheScreen();
+  });
+
   it('explains levels and the combo with the engine’s own numbers', async () => {
     await renderWithProviders(<HelpScreen {...props} />);
 

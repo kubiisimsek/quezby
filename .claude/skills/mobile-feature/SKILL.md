@@ -1,6 +1,6 @@
 ---
 name: mobile-feature
-description: Work on apps/mobile — bare React Native 0.86 with committed ios/ and android/ folders and three environments. Use when adding a screen, touching the game screen, adding a native dependency, changing env values, or when a mobile build fails.
+description: Work on apps/mobile — bare React Native 0.86 with committed ios/ and android/ folders, one app id (com.kubisimsek.game.quezby) and three environments switched through .env. Use when adding a screen, touching the game screen, adding a native dependency, changing env values, or when a mobile build fails.
 ---
 
 # Mobile (bare React Native)
@@ -24,7 +24,7 @@ src/
   api/client.ts      the @quezby/sdk instance — every network call
   auth/session.ts    token (keychain) + user + ranks (zustand)
   stores/            settings (zustand + AsyncStorage)
-  config/            env.ts (the only @env reader), environment.ts (bundle id → env)
+  config/            env.ts (the only @env reader), environment.ts (QUEZBY_ENV → env)
   ui/                tokens (generated), theme, motion, kit, sheet, icons, brand-mark
 ```
 
@@ -54,10 +54,12 @@ pnpm ios        # full rebuild
 
 ## Environments
 
-Bundle ids `com.kubisimsek.game.quezby.local` / `.staging` / bare. iOS schemes
-`Quezby` (Debug = local, Release = production) and `Quezby Staging`; Android
-flavors `local`, `staging`, `prod`. `src/config/environment.ts` maps the bundle
-id to the environment; `.env` only holds the three public API origins.
+One app id, `com.kubisimsek.game.quezby`, on iOS and Android. `QUEZBY_ENV` in
+`apps/mobile/.env` picks the API: `pnpm switch-local | switch-staging |
+switch-production` sets it and writes `ios/Config/Environment.generated.xcconfig`
+(name, Google URL scheme); Gradle reads `.env` itself. iOS has Debug and
+Release only, Android no flavors. `.env` holds public values only; Jest uses
+`src/types/env.mock.ts`. See `docs/development/environments.md`.
 
 ## Verify
 

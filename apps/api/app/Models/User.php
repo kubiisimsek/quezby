@@ -73,6 +73,18 @@ class User extends Authenticatable
         return $this->hasMany(SocialIdentity::class);
     }
 
+    /** @return HasMany<DeviceCheck, $this> What Play Integrity and App Attest said about this player's phones. */
+    public function deviceChecks(): HasMany
+    {
+        return $this->hasMany(DeviceCheck::class);
+    }
+
+    /** @return HasMany<AppAttestKey, $this> */
+    public function appAttestKeys(): HasMany
+    {
+        return $this->hasMany(AppAttestKey::class);
+    }
+
     /** @return HasOne<PlayerStat, $this> */
     public function stats(): HasOne
     {

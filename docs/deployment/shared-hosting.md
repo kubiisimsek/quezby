@@ -37,12 +37,23 @@ openssl rand -hex 32                                # çıktıyı OPS_TOKEN= sat
   açılmaz: her istek 500 döner, sebebi log'a yazılır.
 - `QUEZBY_DAILY_SECRET`: `openssl rand -hex 32` — Günün akışı tohumunun anahtarı.
   Bir kez koy, sezon ortasında değiştirme (o günün akışı oyuncuların altından değişir).
-- Apple/Google girişi için `APPLE_BUNDLE_IDS`, `GOOGLE_CLIENT_IDS` ve (hesap
-  silmede Apple iznini geri almak için) `APPLE_TEAM_ID`, `APPLE_KEY_ID`,
-  `APPLE_PRIVATE_KEY_PATH` — ayrıntı: `docs/development/environments.md`.
+- Apple/Google girişi için `GOOGLE_CLIENT_IDS` ve (hesap silmede Apple iznini
+  geri almak için) `APPLE_TEAM_ID`, `APPLE_KEY_ID`, `APPLE_PRIVATE_KEY_PATH` —
+  ayrıntı: `docs/development/environments.md`. `APPLE_BUNDLE_IDS` boş kalır:
+  her ortamda tek uygulama, `com.kubisimsek.game.quezby`.
   `.p8` dosyasını zip'e koyma; File Manager ile `storage/app/private/`'a yükle.
   Hostun `appleid.apple.com` ve `googleapis.com`'a HTTPS çıkışına izin verdiğini
   cPanel Terminal'den `curl -I https://appleid.apple.com/auth/keys` ile doğrula.
+- Cihaz doğrulaması (ayrıntı: `docs/development/environments.md` → "Device
+  integrity"): production'da `QUEZBY_INTEGRITY_MODE=enforce`, staging'de `log`.
+  Google Play Integrity servis hesabının JSON anahtarını zip'e koyma; File
+  Manager ile `storage/app/private/`'a yükle ve yolunu
+  `GOOGLE_PLAY_INTEGRITY_CREDENTIALS`'a yaz. `PLAY_INTEGRITY_PACKAGES` boş kalır
+  (tek paket: `com.kubisimsek.game.quezby`), `APP_ATTEST_ENVIRONMENTS` production'da
+  `production`. Adım adım konsol kurulumu:
+  `docs/development/device-integrity-setup.md`. Hostun
+  `playintegrity.googleapis.com` ve `oauth2.googleapis.com`'a HTTPS çıkışı açık
+  olmalı: `curl -I https://playintegrity.googleapis.com`.
 - `MODERATION_TOKEN` yalnızca moderasyon yaparken dolu olsun (aşağıda 6b).
 - Yayında `QUEZBY_IOS_MIN_VERSION` / `QUEZBY_ANDROID_MIN_VERSION`'ı v2
   uygulamanın sürümüne yükselt: eski uygulamalar sıralamaya zaten giremez

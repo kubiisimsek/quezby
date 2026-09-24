@@ -11,6 +11,14 @@ export {
 } from './username';
 export { PACE, countdownMs, exitDelayMs, type PaceKind } from './pace';
 export {
+  CHECKPOINTS,
+  prefixHash,
+  prefixText,
+  sha256,
+  sha256Hex,
+  utf8Bytes,
+} from './checkpoints';
+export {
   CATALOGS,
   CONTENT_VERSION,
   SALT,

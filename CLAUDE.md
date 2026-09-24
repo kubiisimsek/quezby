@@ -19,6 +19,7 @@ monthly and all-time boards, a daily challenge everyone plays on one seed
 | Anything with a UI | `docs/design/design-language.md`, then `docs/design/mobile-design-system.md` |
 | Anything user-visible | `docs/design/ui-writing.md` |
 | Game rules, scoring, difficulty | `docs/product/scoring.md` |
+| Anti-cheat, device integrity, checkpoints | `docs/product/scoring.md` → "Hile koruması" |
 | Usernames | `docs/product/usernames.md` |
 | API work | `docs/backend/api-contract.md` |
 | Mobile | `docs/rules/react-native-rules.md` |
@@ -52,12 +53,19 @@ packages/sdk    the typed API client
   `pnpm engine:simulate` (the ±20 % promise must hold) + `pnpm engine:fixtures`
   + `pnpm engine:lock` + `apps/api/app/Game/Rules.php` (`Rules::ENGINE_VERSION`;
   the config reads it). `php artisan test` proves parity and the lock.
-- **The design language is not optional.** Screens are built from
+- **The design language is not optional — and it is a game's.** Quezby must
+  look like a mobile game, never an app ("Arena": the dark arena, outlined
+  tiles, slab buttons with one gold play per screen, Rubik display type, no
+  navigation bars, the dock). Screens are built from
   `apps/mobile/src/ui/kit.tsx` and `sheet.tsx`; `src/ui/tokens.ts` is generated
-  from `apps/mobile/design/palette.mjs` (`pnpm tokens`).
+  from `apps/mobile/design/palette.mjs` (`pnpm tokens`). The enforceable list
+  is in `docs/rules/react-native-rules.md` → "Quezby looks like a game".
 - **Mobile is bare RN, not Expo.** Never add `expo*` packages. Never regenerate
   or gitignore `apps/mobile/ios` / `android`.
 - **A contract change is one commit:** `packages/types` → Laravel → `packages/sdk` → screen.
+- **The phone's word about itself counts for nothing.** Whether a device may
+  rank comes only from Google Play Integrity / Apple App Attest verified on the
+  API, and a run's timing from server-signed checkpoints.
 - **Secrets never reach the app bundle.** `apps/mobile/.env` ships to users.
 - **Never commit `.env`**; update the matching `.env*.example` when adding a variable.
 - **Never run `git commit`, `git branch` or `git push`.** Leave finished work in
@@ -67,7 +75,8 @@ packages/sdk    the typed API client
 
 ```bash
 pnpm install
-pnpm dev:api | dev:mobile | ios | ios:staging | android | android:staging
+pnpm switch-local | switch-staging | switch-production   # the app's API (one bundle id)
+pnpm dev:api | dev:mobile | ios | android
 pnpm lint && pnpm typecheck && pnpm test && pnpm test:api
 pnpm engine:simulate | engine:fixtures | tokens
 pnpm api:package:staging | api:package:production

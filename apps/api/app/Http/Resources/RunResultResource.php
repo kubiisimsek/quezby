@@ -61,6 +61,7 @@ class RunResultResource extends JsonResource
                 'bestReactionMs' => $stats['bestReactionMs'] ?? null,
                 'levelMisses' => $stats['levelMisses'] ?? [],
             ],
+            'flagReason' => $this->resource->flagReason(),
         ];
     }
 }

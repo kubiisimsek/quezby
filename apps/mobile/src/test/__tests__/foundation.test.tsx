@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { screen } from '@testing-library/react-native';
 import { trigger } from 'react-native-haptic-feedback';
 import * as Keychain from 'react-native-keychain';
+import { NativeModules } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { APP_ENV, APP_VERSION } from '@/config/env';
@@ -42,6 +43,15 @@ describe('native modules under test', () => {
   it('runs as a local debug build', () => {
     expect(APP_ENV).toBe('local');
     expect(APP_VERSION).toBe('1.0.0');
+  });
+
+  it('answers as a phone that cannot vouch for itself unless a test says otherwise', async () => {
+    const integrity = (NativeModules as {
+      QuezbyIntegrity: { isAvailable: () => Promise<boolean>; isSupported: () => Promise<boolean> };
+    }).QuezbyIntegrity;
+
+    await expect(integrity.isAvailable()).resolves.toBe(false);
+    await expect(integrity.isSupported()).resolves.toBe(false);
   });
 
   it('records haptics instead of buzzing', () => {

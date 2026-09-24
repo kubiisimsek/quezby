@@ -4,13 +4,16 @@ namespace App\Services;
 
 use App\Content\Catalog;
 use App\Enums\ErrorCode;
+use App\Enums\IntegrityMode;
 use App\Enums\LeaderboardPeriod;
 use App\Enums\RunMode;
 use App\Enums\RunStatus;
 use App\Exceptions\ApiException;
+use App\Game\Checkpoint;
 use App\Game\EngineError;
 use App\Models\Run;
 use App\Models\User;
+use App\Services\Integrity\DeviceIntegrity;
 use Carbon\CarbonInterface;
 use Illuminate\Container\Attributes\Config;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -34,13 +37,16 @@ final class RunService
         private readonly PlayerStatsService $playerStats,
         private readonly DailyService $daily,
         private readonly LeagueService $leagues,
+        private readonly DeviceIntegrity $devices,
+        private readonly Checkpoint $checkpoints,
         #[Config('quezby.plausibility')]
         private readonly array $plausibility,
     ) {}
 
     /**
      * Hands out a seed. A player has one open run at a time — starting
-     * another abandons it — and one daily run per Istanbul day.
+     * another abandons it — and one daily run per Istanbul day. The run
+     * records the player's device verdict standing now; the finish judges it.
      */
     public function start(User $user, RunMode $mode, int $engineVersion, int $contentVersion, ?string $appVersion): Run
     {
@@ -60,10 +66,11 @@ final class RunService
         if ($dayKey !== null && $user->runs()->where('daily_key', $dayKey)->exists()) {
             throw ApiException::of(ErrorCode::DailyAlreadyPlayed);
         }
+        $deviceVerdict = IntegrityMode::current() === IntegrityMode::Off ? null : $this->devices->verdictAt($user, $now);
 
         for ($attempt = 0; ; $attempt++) {
             try {
-                return DB::transaction(function () use ($user, $mode, $dayKey, $contentVersion, $appVersion, $now) {
+                return DB::transaction(function () use ($user, $mode, $dayKey, $contentVersion, $appVersion, $deviceVerdict, $now) {
                     Run::query()
                         ->where('open_user_id', $user->id)
                         ->where('status', RunStatus::Started)
@@ -74,6 +81,7 @@ final class RunService
                         'engine_version' => config('quezby.engine_version'),
                         'content_version' => $contentVersion,
                         'app_version' => $appVersion === null ? null : mb_substr($appVersion, 0, 32),
+                        'device_verdict' => $deviceVerdict,
                         'status' => RunStatus::Started,
                         'mode' => $mode,
                         'daily_key' => $dayKey,
@@ -94,15 +102,39 @@ final class RunService
     }
 
     /**
+     * Signs how far a started run has got — its reels and the hash of those
+     * moves — with the time the API saw it. Nothing is written: the receipt
+     * goes back to the app and comes back with the finish, where the
+     * verifier holds it against the log and the clock.
+     *
+     * @throws ApiException not_found, run_already_finished, run_expired
+     */
+    public function checkpoint(User $user, string $runId, int $reel, string $prefixHash): string
+    {
+        $run = $user->runs()->find($runId) ?? throw ApiException::of(ErrorCode::NotFound);
+        $now = now();
+
+        if ($run->status !== RunStatus::Started) {
+            throw ApiException::of(ErrorCode::RunAlreadyFinished);
+        }
+        if ($run->hasExpired($now)) {
+            throw ApiException::of(ErrorCode::RunExpired);
+        }
+
+        return $this->checkpoints->sign($run->id, $reel, $prefixHash, $now->getTimestampMs());
+    }
+
+    /**
      * Replays the player's log and stores the server's result. Only a
      * `ranked` run touches the boards, the league and the lifetime numbers;
      * a run quit before the first point is kept but places nobody.
      *
      * @param  array<mixed>  $actions
+     * @param  list<string>  $checkpoints  the receipts the app collected on the way
      *
      * @throws ApiException
      */
-    public function finish(User $user, string $runId, array $actions, int $clientScore, int $clientReels): FinishedRun
+    public function finish(User $user, string $runId, array $actions, int $clientScore, int $clientReels, array $checkpoints = []): FinishedRun
     {
         $run = $user->runs()->find($runId) ?? throw ApiException::of(ErrorCode::NotFound);
         $run->setRelation('user', $user);
@@ -128,7 +160,7 @@ final class RunService
         ];
 
         try {
-            $verification = $this->verifier->verify($run, $actions, $clientScore, $clientReels, $now, $user->isBanned());
+            $verification = $this->verifier->verify($run, $actions, $clientScore, $clientReels, $now, $user->isBanned(), $checkpoints);
         } catch (EngineError $error) {
             $closed = $this->close($run, $claim + [
                 'status' => RunStatus::Rejected,

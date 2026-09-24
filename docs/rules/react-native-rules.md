@@ -6,9 +6,13 @@
   gitignore them; edit native config deliberately and review the diff.
 - After any native dependency change: `pnpm pods` for iOS and a full rebuild.
   Metro reload does not apply native changes.
-- The environment comes from the native build (bundle id), never from `.env`.
-  `apps/mobile/.env` ships inside the bundle — public values only, read in
-  exactly one place, `src/config/env.ts`, each with a fallback.
+- One app id, `com.kubisimsek.game.quezby`, on both platforms — never a suffix, a
+  flavor or a per-environment configuration. The environment is `QUEZBY_ENV`
+  in `apps/mobile/.env`, changed only with `pnpm switch-local | switch-staging
+  | switch-production` (they also write the iOS settings). `apps/mobile/.env`
+  ships inside the bundle — public values only, read in exactly one place,
+  `src/config/env.ts`, each with a fallback. No `.env.local` /
+  `.env.production` next to it; tests read `src/types/env.mock.ts`.
 - `StyleSheet.create` for layout. A theme colour may be passed inline in a
   style array; a static size or spacing may not.
 - Never `textTransform: 'uppercase'`.
@@ -20,6 +24,10 @@
   a screen-level `fetch`. Server state is `@tanstack/react-query`; session and
   settings are Zustand stores.
 - The token lives in the keychain (`react-native-keychain`), not AsyncStorage.
+- Device integrity is native: `QuezbyIntegrity` (Kotlin, Play Integrity standard
+  API; Objective-C, App Attest) behind `src/lib/integrity.ts`, which degrades to
+  "unavailable" when the module or support is missing. The app only carries the
+  proof; the API decides. App Attest does not run in the Simulator.
 - Every screen is built from `src/ui/kit.tsx` and `src/ui/sheet.tsx`
   (see `docs/design/mobile-design-system.md`). A missing shape goes into the
   kit, not into a screen.
@@ -29,3 +37,41 @@
   `metro.config.js` (`resolveRequest`). Change one, change all three.
 - Strict TypeScript, no `any`. No narration comments; a short doc comment only
   where a contract is not obvious.
+
+## Quezby looks like a game ("Arena")
+
+The owner judges every screen as a game. These are the rules that keep it one
+(`docs/design/design-language.md` explains them):
+
+- **No app chrome.** No navigation bars: every navigator uses
+  `headerShown: false`, and a screen that needs a head draws `TopBar` (or its
+  own stage). No iOS chevron rows (a `Row` that opens something ends in
+  `ArrowNub`), no platform `Switch` (use `SwitchRow` / `Toggle`), no system
+  segmented control (use `Segmented`).
+- **The arena behind everything.** Screens stand on `Screen` / `Arena`; lists
+  on them stay transparent. No white or grey canvases, and never
+  `theme.canvas` or `theme.brandFrom` as a list background. The app has one
+  look and does not follow the phone's light/dark setting.
+- **Tiles and slabs.** Surfaces are `Panel` / `Card` / `LobbyCard` tiles
+  (outline + lip); anything pressable that is not a row is a slab (`Button`,
+  `IconButton`, `Slab`). **One gold `play` button per screen** — the action
+  that starts a game. Magenta and violet do everything else; red takes
+  something away.
+- **Type.** Titles, numbers and button labels are Rubik through `Txt`
+  (`hero`, `display`, `title`, `score`) or `embossed()`; body text is Nunito.
+  Capitals only for ribbons and tile names (`TYPE.label`), typed in capitals
+  in the source with the Turkish **İ** — never `textTransform`.
+- **Fonts carry Turkish.** A face is allowed only if it has ğ Ğ ş Ş ı İ ç Ç ö Ö
+  ü Ü and draws a lower-case i with its dot (Lilita One, Fredoka, Titan One,
+  Luckiest Guy and other caps-only faces fail). A new weight goes into
+  `assets/fonts`, `Info.plist` `UIAppFonts`, the Xcode project's resources and
+  `android/app/src/main/assets/fonts`, then a native rebuild.
+- **Colour is a job.** Gold: play, records, your rank numbers. Magenta: brand,
+  you, likes. Violet: quiet. Cyan (`accent`): time only. Green / red: good /
+  bad, never alone — with a glyph or a word. Roles only, `withAlpha` for
+  opacity, no hex.
+- **Juice plays once and respects reduced motion.** `Stamp`, `CountUp`,
+  `Confetti`, `useShake`, `useEntrance` stand down under
+  `useReducedMotion()`. The only loops: a playing reel and the lobby's
+  `PlayButton`.
+

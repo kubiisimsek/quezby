@@ -25,7 +25,8 @@ final class FakeIdentityProvider
 {
     public const APPLE_BUNDLE_ID = 'com.kubisimsek.game.quezby';
 
-    public const APPLE_STAGING_BUNDLE_ID = 'com.kubisimsek.game.quezby.staging';
+    /** A second app `APPLE_BUNDLE_IDS` may name. */
+    public const APPLE_OTHER_BUNDLE_ID = 'com.kubisimsek.game.quezby.beta';
 
     public const APPLE_SUBJECT = '001234.5e8f0a7c1d2b4e6f8a9b0c1d2e3f4a5b.1234';
 
@@ -88,7 +89,7 @@ final class FakeIdentityProvider
         $provider = new self;
 
         config([
-            'quezby.social.apple.client_ids' => [self::APPLE_BUNDLE_ID, self::APPLE_STAGING_BUNDLE_ID],
+            'quezby.social.apple.client_ids' => [self::APPLE_BUNDLE_ID, self::APPLE_OTHER_BUNDLE_ID],
             'quezby.social.apple.team_id' => null,
             'quezby.social.apple.key_id' => null,
             'quezby.social.apple.private_key_path' => null,

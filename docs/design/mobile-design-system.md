@@ -29,7 +29,9 @@ screens/
   home/              the lobby: a status strip (framed portrait with the league emblem, Yardım);
                      "Günün akışı" on a stage with a fan of the four reels and its countdown (your
                      score in gold, place and Paylaş once played); the big breathing gold play slab;
-                     the league tile with its progress bar, the rival as a VS face-off, records
+                     the league tile with its progress bar, the rival as a VS face-off, records;
+                     a warn tile up top while the API keeps this phone's runs off the boards
+                     (a failed Play Integrity / App Attest check, `enforced` only)
   leaderboard/       Zirve — a stage with TopBar (countdown, players, search), Herkes / Arkadaşlar,
                      the podium on 3D metal pedestals (crown and a spotlight for #1), the period
                      tabs, the climb as tiles with "▲ fark", your floor pinned with a gold "Geç onu"
@@ -63,7 +65,8 @@ game/
                      slammed in and counting up ("YENİ REKOR!" banner and confetti on a record),
                      then bonuses stamped in, stat tiles, rank tiles (▲/▼), who you passed, the
                      league, the daily's grid — about 100 ms apart; the buttons slide up last in a
-                     tray; a tap skips to the end; review, flagged and practice states
+                     tray; a tap skips to the end; review, flagged and practice states, and
+                     "Bu cihazda skorlar sıralamaya girmiyor" when `flagReason` is `device`
   howTo.ts           the one source of rule copy: reels, bonuses, their order
   content.ts         what a reel looks like — the post the catalog picks for seed + index
 components/          screen-sized pieces shared between screens (below)
@@ -93,7 +96,8 @@ Fonts are static Latin subsets in `assets/fonts` (Rubik Black/ExtraBold,
 Nunito SemiBold/Bold/ExtraBold/Black), linked in `ios/Quezby/Info.plist`
 (`UIAppFonts`), the Xcode project's resources, and
 `android/app/src/main/assets/fonts`. Adding a weight means all three and a
-native rebuild. `design/fonts/` keeps Quicksand only for `make-icons.py`.
+native rebuild. The logo's images (icons, store art, `BrandMark`, the launch
+tile) come from `design/make-brand.py` — see design-language.md → "The mark".
 
 ## Motion — `ui/motion.ts`
 
@@ -161,8 +165,9 @@ Icons are `ui/icons.tsx` — our own 24×24 stroke set, game glyphs included
 `hourglass`, `clock`) and affordances (`help`, `search`, `grid`, …). `apple`
 is the one filled glyph: Apple's logo is solid in every colour it comes in.
 **Add a glyph there rather than importing a set.** Logos live in
-`ui/brand-mark.tsx`: our `BrandMark` and Google's four-colour `GoogleMark`,
-neither of which takes a tint.
+`ui/brand-mark.tsx`: our `BrandMark` (the app icon as an Arena tile, a bitmap
+from `design/make-brand.py`) and Google's four-colour `GoogleMark`, neither of
+which takes a tint.
 
 `components/` holds the screen-sized pieces more than one screen uses:
 
