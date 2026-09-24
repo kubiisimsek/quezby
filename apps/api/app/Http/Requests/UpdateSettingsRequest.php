@@ -1,0 +1,20 @@
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class UpdateSettingsRequest extends FormRequest
+{
+    /**
+     * Every known setting is a JSON boolean; unknown keys are ignored.
+     *
+     * @return array<string, mixed>
+     */
+    public function rules(): array
+    {
+        return [
+            'haptics' => ['sometimes', 'boolean:strict'],
+        ];
+    }
+}

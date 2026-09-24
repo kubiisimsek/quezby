@@ -1,0 +1,113 @@
+<?php
+
+namespace App\Models;
+
+use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Carbon;
+use Laravel\Sanctum\HasApiTokens;
+
+/**
+ * @property string $id
+ * @property string|null $username
+ * @property string|null $email
+ * @property string|null $password
+ * @property string|null $install_id
+ * @property string|null $platform
+ * @property array<string, mixed> $settings
+ * @property Carbon|null $banned_at
+ * @property string|null $ban_reason
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ */
+#[Fillable(['username', 'email', 'password', 'install_id', 'platform', 'settings'])]
+#[Hidden(['password'])]
+class User extends Authenticatable
+{
+    /** @use HasFactory<UserFactory> */
+    use HasApiTokens, HasFactory, HasUlids;
+
+    public const DEFAULT_SETTINGS = ['haptics' => true];
+
+    /** @var array<string, mixed> */
+    protected $attributes = [
+        'settings' => '{"haptics":true}',
+    ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'password' => 'hashed',
+            'settings' => 'array',
+            'banned_at' => 'datetime',
+        ];
+    }
+
+    /** @return HasMany<Run, $this> */
+    public function runs(): HasMany
+    {
+        return $this->hasMany(Run::class);
+    }
+
+    /** @return HasMany<LeaderboardEntry, $this> */
+    public function leaderboardEntries(): HasMany
+    {
+        return $this->hasMany(LeaderboardEntry::class);
+    }
+
+    /** @return HasMany<SocialIdentity, $this> */
+    public function identities(): HasMany
+    {
+        return $this->hasMany(SocialIdentity::class);
+    }
+
+    /** @return HasOne<PlayerStat, $this> */
+    public function stats(): HasOne
+    {
+        return $this->hasOne(PlayerStat::class);
+    }
+
+    /** @return BelongsToMany<User, $this> Players this one follows. */
+    public function following(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'follows', 'follower_id', 'followee_id');
+    }
+
+    /** @return BelongsToMany<User, $this> Players who follow this one. */
+    public function followers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'follows', 'followee_id', 'follower_id');
+    }
+
+    /** No email, Apple or Google attached yet — the account lives on one phone. */
+    public function isGuest(): bool
+    {
+        return $this->email === null && ! $this->identities()->exists();
+    }
+
+    /** Banned players keep playing; nothing of theirs ranks. */
+    public function isBanned(): bool
+    {
+        return $this->banned_at !== null;
+    }
+
+    /** @return array{haptics: bool} */
+    public function resolvedSettings(): array
+    {
+        $settings = array_merge(self::DEFAULT_SETTINGS, $this->settings ?? []);
+
+        return ['haptics' => (bool) $settings['haptics']];
+    }
+}

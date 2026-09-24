@@ -1,0 +1,26 @@
+# Quezby API — only for hosts where the document root cannot be pointed at
+# public/. Everything is served from public/; nothing else in this folder is
+# reachable over HTTP. See docs/deployment/shared-hosting.md.
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Hand the bearer token on to PHP (CGI/FastCGI hosts drop it otherwise).
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # AutoSSL / Let's Encrypt domain checks.
+    RewriteRule ^\.well-known/ - [L]
+
+    # Dotfiles (.env, .git …) and everything that is not public/ are refused.
+    RewriteRule (^|/)\. - [F,L]
+    RewriteRule ^(app|bootstrap|config|database|lang|resources|routes|storage|tests|vendor)(/|$) - [F,L]
+    RewriteRule ^(artisan|composer\.(json|lock)|phpunit\.xml|README\.md)$ - [F,L]
+
+    RewriteRule ^(?!public/)(.*)$ public/$1 [L]
+</IfModule>
+
+# Without mod_rewrite this folder would be served as is: serve nothing instead.
+<IfModule !mod_rewrite.c>
+    Require all denied
+</IfModule>
