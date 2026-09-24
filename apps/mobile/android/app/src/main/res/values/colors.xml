@@ -1,0 +1,4 @@
+<resources>
+    <!-- brandFrom in apps/mobile/design/palette.mjs -->
+    <color name="brand">#C91B86</color>
+</resources>
