@@ -1,0 +1,135 @@
+import { appleAuth } from '@invertase/react-native-apple-authentication';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { ApiError } from '@quezby/sdk';
+import { act, renderHook } from '@testing-library/react-native';
+
+import { api } from '@/api/client';
+import { useSession } from '@/auth/session';
+import { useSocialAuth } from '@/hooks/useSocialAuth';
+import { buildMe } from '@/test/factories';
+
+jest.mock('@/config/env', () => ({
+  ...jest.requireActual('@/config/env'),
+  GOOGLE_CLIENTS: {
+    webClientId: 'web-local.apps.googleusercontent.com',
+    iosClientId: 'ios-local.apps.googleusercontent.com',
+  },
+}));
+
+jest.mock('@/api/client', () => ({
+  api: {
+    auth: { nonce: jest.fn(), apple: jest.fn(), google: jest.fn() },
+    me: { linkApple: jest.fn(), linkGoogle: jest.fn(), unlink: jest.fn() },
+  },
+}));
+
+const mocked = api as unknown as {
+  auth: { nonce: jest.Mock; apple: jest.Mock; google: jest.Mock };
+  me: { linkApple: jest.Mock; linkGoogle: jest.Mock; unlink: jest.Mock };
+};
+const apple = appleAuth.performRequest as jest.Mock;
+const google = GoogleSignin.signIn as jest.Mock;
+
+async function hook() {
+  return renderHook(() => useSocialAuth());
+}
+
+describe('useSocialAuth', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    useSession.setState({ token: null, user: null, ranks: null, hydrated: true });
+    mocked.auth.nonce.mockResolvedValue({ nonce: 'raw-nonce', expiresAt: '2026-09-26T10:10:00.000Z' });
+  });
+
+  it('offers Apple on iOS and Google when this build has its client ids', async () => {
+    const { result } = await hook();
+
+    expect(result.current.available).toEqual({ apple: true, google: true });
+  });
+
+  it('signs in with Apple, carrying the nonce the API issued', async () => {
+    apple.mockResolvedValue({ identityToken: 'apple.jwt', authorizationCode: 'code-1', nonce: 'raw-nonce' });
+    mocked.auth.apple.mockResolvedValue({ token: 'tok', user: buildMe({ identities: ['apple'], isGuest: false }), created: true });
+    const { result } = await hook();
+
+    await act(async () => {
+      await result.current.signIn('apple');
+    });
+
+    expect(apple).toHaveBeenCalledWith(expect.objectContaining({ nonce: 'raw-nonce' }));
+    expect(mocked.auth.apple).toHaveBeenCalledWith(
+      expect.objectContaining({ identityToken: 'apple.jwt', nonce: 'raw-nonce', authorizationCode: 'code-1', platform: 'ios' }),
+    );
+    expect(useSession.getState().token).toBe('tok');
+    expect(result.current.error).toBeNull();
+  });
+
+  it('signs in with Google, letting the player pick the account', async () => {
+    google.mockResolvedValue({ type: 'success', data: { idToken: 'google.jwt' } });
+    mocked.auth.google.mockResolvedValue({ token: 'tok', user: buildMe(), created: false });
+    const { result } = await hook();
+
+    await act(async () => {
+      await result.current.signIn('google');
+    });
+
+    expect(GoogleSignin.configure).toHaveBeenCalledWith(
+      expect.objectContaining({ webClientId: 'web-local.apps.googleusercontent.com' }),
+    );
+    expect(GoogleSignin.signOut).toHaveBeenCalled();
+    expect(mocked.auth.google).toHaveBeenCalledWith(expect.objectContaining({ idToken: 'google.jwt' }));
+    expect(useSession.getState().token).toBe('tok');
+  });
+
+  it('says nothing when the player closes the sheet', async () => {
+    apple.mockRejectedValue(Object.assign(new Error('closed'), { code: '1001' }));
+    google.mockResolvedValue({ type: 'cancelled', data: null });
+    const { result } = await hook();
+
+    await act(async () => {
+      await result.current.signIn('apple');
+      await result.current.signIn('google');
+    });
+
+    expect(result.current.error).toBeNull();
+    expect(mocked.auth.apple).not.toHaveBeenCalled();
+    expect(mocked.auth.google).not.toHaveBeenCalled();
+  });
+
+  it('explains what the API refused, and what the provider could not do', async () => {
+    google.mockResolvedValue({ type: 'success', data: { idToken: 'google.jwt' } });
+    mocked.me.linkGoogle.mockRejectedValue(new ApiError(409, 'identity_taken', 'x'));
+    apple.mockRejectedValue(Object.assign(new Error('boom'), { code: '1004' }));
+    const { result } = await hook();
+
+    await act(async () => {
+      await result.current.link('google');
+    });
+    expect(result.current.error).toBe('Bu hesap başka bir Quezby oyuncusuna bağlı.');
+
+    await act(async () => {
+      await result.current.link('apple');
+    });
+    expect(result.current.error).toBe('Apple ile giriş şu an yapılamadı. Biraz sonra tekrar dene.');
+  });
+
+  it('links and unlinks on the current account', async () => {
+    useSession.setState({ token: 'tok', user: buildMe(), ranks: null, hydrated: true });
+    apple.mockResolvedValue({ identityToken: 'apple.jwt', authorizationCode: null, nonce: 'raw-nonce' });
+    mocked.me.linkApple.mockResolvedValue({ user: buildMe({ identities: ['apple'], isGuest: false }) });
+    mocked.me.unlink.mockResolvedValue({ user: buildMe() });
+    const { result } = await hook();
+
+    await act(async () => {
+      await result.current.link('apple');
+    });
+    expect(mocked.me.linkApple).toHaveBeenCalledWith({ identityToken: 'apple.jwt', nonce: 'raw-nonce', authorizationCode: null });
+    expect(useSession.getState().user?.identities).toEqual(['apple']);
+
+    await act(async () => {
+      await result.current.unlink('apple');
+    });
+    expect(mocked.me.unlink).toHaveBeenCalledWith('apple');
+    expect(useSession.getState().user?.identities).toEqual([]);
+  });
+});

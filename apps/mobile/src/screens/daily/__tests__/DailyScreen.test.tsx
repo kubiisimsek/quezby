@@ -1,0 +1,278 @@
+import type {
+  DailyAttempt,
+  DailyResponse,
+  LeaderboardBoard,
+  LeaderboardResponse,
+  LeaderboardScope,
+} from '@quezby/types';
+import { fireEvent, screen, waitFor } from '@testing-library/react-native';
+import type { ComponentProps } from 'react';
+import { Share } from 'react-native';
+
+import { api } from '@/api/client';
+import { DailyScreen } from '@/screens/daily/DailyScreen';
+import { buildEntries } from '@/test/factories';
+import { renderWithProviders } from '@/test/renderWithProviders';
+
+jest.mock('@/api/client', () => ({
+  api: {
+    daily: { get: jest.fn() },
+    leaderboards: { get: jest.fn() },
+    me: { following: jest.fn() },
+    users: { get: jest.fn(), follow: jest.fn(), unfollow: jest.fn() },
+  },
+}));
+
+const mocked = api as unknown as {
+  daily: { get: jest.Mock };
+  leaderboards: { get: jest.Mock };
+  me: { following: jest.Mock };
+};
+
+type Props = ComponentProps<typeof DailyScreen>;
+
+const NOW = '2026-09-24T10:00:00.000Z';
+const GRID = '🟩🟩🟨\n🟩🟥⬛';
+const SHARE_TEXT = `Quezby · Günün akışı #17\n12.345 puan · #12\n${GRID}`;
+
+function today(overrides: Partial<DailyResponse> = {}): DailyResponse {
+  return {
+    dayKey: '2026-09-24',
+    number: 17,
+    endsAt: '2026-09-24T21:00:00.000Z',
+    serverTime: NOW,
+    attempt: null,
+    top: [],
+    me: null,
+    players: 5_120,
+    ...overrides,
+  };
+}
+
+function attempt(overrides: Partial<DailyAttempt> = {}): DailyAttempt {
+  return {
+    status: 'ranked',
+    score: 12_345,
+    rank: 12,
+    grid: GRID,
+    shareText: SHARE_TEXT,
+    ...overrides,
+  };
+}
+
+/** Today's challenge board, echoing the scope it was asked for. */
+function answerChallenge() {
+  mocked.leaderboards.get.mockImplementation(
+    async (
+      board: LeaderboardBoard,
+      { scope }: { scope: LeaderboardScope },
+    ): Promise<LeaderboardResponse> => {
+      const entries = buildEntries(5, { top: 30_000 });
+      return {
+        board,
+        periodKey: '2026-09-24',
+        season: 1,
+        scope,
+        startsAt: '2026-09-23T21:00:00.000Z',
+        endsAt: '2026-09-24T21:00:00.000Z',
+        serverTime: NOW,
+        entries,
+        me: null,
+        neighbors: [],
+        rival: null,
+        nextRankProgress: null,
+        players: 5_120,
+      };
+    },
+  );
+}
+
+async function renderDaily() {
+  const navigation = {
+    navigate: jest.fn(),
+    goBack: jest.fn(),
+    setOptions: jest.fn(),
+  };
+  await renderWithProviders(
+    <DailyScreen
+      navigation={navigation as unknown as Props['navigation']}
+      route={{ key: 'Daily-test', name: 'Daily' } as Props['route']}
+    />,
+  );
+  return navigation;
+}
+
+describe('DailyScreen — Günün akışı', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    answerChallenge();
+  });
+
+  afterEach(() => jest.restoreAllMocks());
+
+  it('offers the one attempt, with the day number and the time to the next', async () => {
+    mocked.daily.get.mockResolvedValue(today());
+    const navigation = await renderDaily();
+
+    expect(await screen.findByText('#17')).toBeOnTheScreen();
+    expect(screen.getByText('Yeni akışa 11 sa 0 dk')).toBeOnTheScreen();
+    expect(
+      screen.getByText('Herkes aynı akışı oynar · tek hak'),
+    ).toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Oyna' }));
+    expect(navigation.navigate).toHaveBeenCalledWith('Game', {
+      mode: 'daily',
+    });
+  });
+
+  it('heads the stage with its name and a way back', async () => {
+    mocked.daily.get.mockResolvedValue(today());
+    const navigation = await renderDaily();
+
+    expect(await screen.findByText('#17')).toBeOnTheScreen();
+    expect(screen.getByText('Günün akışı')).toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Geri' }));
+    expect(navigation.goBack).toHaveBeenCalledTimes(1);
+  });
+
+  it('says so when the attempt was cut short', async () => {
+    mocked.daily.get.mockResolvedValue(
+      today({
+        attempt: attempt({
+          status: 'unfinished',
+          score: null,
+          rank: null,
+          grid: null,
+          shareText: null,
+        }),
+      }),
+    );
+
+    await renderDaily();
+
+    expect(await screen.findByText('Turun yarıda kaldı')).toBeOnTheScreen();
+    expect(
+      screen.queryByRole('button', { name: 'Oyna' }),
+    ).not.toBeOnTheScreen();
+  });
+
+  it('shows a ranked attempt and shares the text the server wrote', async () => {
+    const share = jest
+      .spyOn(Share, 'share')
+      .mockResolvedValue({ action: 'sharedAction' });
+    mocked.daily.get.mockResolvedValue(today({ attempt: attempt() }));
+
+    await renderDaily();
+
+    expect(await screen.findByText('12.345')).toBeOnTheScreen();
+    expect(screen.getByText('#12 / 5.120')).toBeOnTheScreen();
+    expect(
+      screen.getByRole('image', { name: `Sonuç tablosu: ${GRID}` }),
+    ).toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Paylaş' }));
+    expect(share).toHaveBeenCalledWith({ message: SHARE_TEXT });
+  });
+
+  it.each([
+    ['review', 'Skorun inceleniyor'],
+    ['flagged', 'Skorun sıralamaya girmedi'],
+    ['void', 'Tur sayılmadı'],
+  ] as const)(
+    'explains a %s attempt that did not rank',
+    async (status, title) => {
+      mocked.daily.get.mockResolvedValue(
+        today({ attempt: attempt({ status, rank: null, shareText: null }) }),
+      );
+
+      await renderDaily();
+
+      expect(await screen.findByText(title)).toBeOnTheScreen();
+      expect(
+        screen.queryByRole('button', { name: 'Paylaş' }),
+      ).not.toBeOnTheScreen();
+      expect(
+        screen.queryByRole('button', { name: 'Oyna' }),
+      ).not.toBeOnTheScreen();
+    },
+  );
+
+  it("stands today's summit under the band and switches it to friends", async () => {
+    mocked.daily.get.mockResolvedValue(today());
+
+    await renderDaily();
+
+    expect(
+      await screen.findByRole('button', { name: /^1\. sıra, @ekin, 30\.000/ }),
+    ).toBeOnTheScreen();
+    expect(
+      screen.getByRole('button', { name: /^4\. sıra, @deniz/ }),
+    ).toBeOnTheScreen();
+    expect(mocked.leaderboards.get).toHaveBeenCalledWith('challenge', {
+      scope: 'everyone',
+      limit: 100,
+    });
+
+    await fireEvent.press(screen.getByRole('tab', { name: 'Arkadaşlar' }));
+
+    await waitFor(() =>
+      expect(mocked.leaderboards.get).toHaveBeenLastCalledWith('challenge', {
+        scope: 'friends',
+        limit: 100,
+      }),
+    );
+  });
+
+  it('sends a player who follows nobody to the players tab', async () => {
+    mocked.daily.get.mockResolvedValue(today());
+    mocked.me.following.mockResolvedValue({ users: [], nextCursor: null });
+    mocked.leaderboards.get.mockImplementation(
+      async (
+        board: LeaderboardBoard,
+        { scope }: { scope: LeaderboardScope },
+      ): Promise<LeaderboardResponse> => ({
+        board,
+        periodKey: '2026-09-24',
+        season: 1,
+        scope,
+        startsAt: '2026-09-23T21:00:00.000Z',
+        endsAt: '2026-09-24T21:00:00.000Z',
+        serverTime: NOW,
+        entries: scope === 'friends' ? [] : buildEntries(5),
+        me: null,
+        neighbors: [],
+        rival: null,
+        nextRankProgress: null,
+        players: scope === 'friends' ? 0 : 5_120,
+      }),
+    );
+    const navigation = await renderDaily();
+    await screen.findByRole('button', { name: /^1\. sıra, @ekin/ });
+
+    await fireEvent.press(screen.getByRole('tab', { name: 'Arkadaşlar' }));
+
+    expect(
+      await screen.findByText('Henüz kimseyi takip etmiyorsun'),
+    ).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Oyuncu ara' }));
+    expect(navigation.navigate).toHaveBeenCalledWith('Tabs', {
+      screen: 'Search',
+    });
+  });
+
+  it('explains a failed load and tries again', async () => {
+    mocked.daily.get
+      .mockRejectedValueOnce(new Error('offline'))
+      .mockResolvedValue(today());
+    await renderDaily();
+
+    expect(
+      await screen.findByText('Günün akışı yüklenemedi'),
+    ).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Tekrar dene' }));
+
+    expect(await screen.findByText('#17')).toBeOnTheScreen();
+  });
+});

@@ -1,0 +1,9 @@
+export const API_URL_LOCAL = 'http://localhost:8000';
+export const API_URL_STAGING = 'https://staging-api.quezby.com';
+export const API_URL_PRODUCTION = 'https://api.quezby.com';
+export const GOOGLE_WEB_CLIENT_ID_LOCAL = 'web-local.apps.googleusercontent.com';
+export const GOOGLE_WEB_CLIENT_ID_STAGING = '';
+export const GOOGLE_WEB_CLIENT_ID_PRODUCTION = '';
+export const GOOGLE_IOS_CLIENT_ID_LOCAL = 'ios-local.apps.googleusercontent.com';
+export const GOOGLE_IOS_CLIENT_ID_STAGING = '';
+export const GOOGLE_IOS_CLIENT_ID_PRODUCTION = '';
