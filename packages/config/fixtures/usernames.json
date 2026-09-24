@@ -1,0 +1,166 @@
+{
+  "valid": [
+    {
+      "input": "kubi",
+      "normalized": "kubi"
+    },
+    {
+      "input": "Kubi.Simsek",
+      "normalized": "kubi.simsek"
+    },
+    {
+      "input": "  kubi*01  ",
+      "normalized": "kubi*01"
+    },
+    {
+      "input": "a.b*c.d",
+      "normalized": "a.b*c.d"
+    },
+    {
+      "input": "x1y",
+      "normalized": "x1y"
+    },
+    {
+      "input": "007bond",
+      "normalized": "007bond"
+    },
+    {
+      "input": "a*b*c*d*e",
+      "normalized": "a*b*c*d*e"
+    },
+    {
+      "input": "abcdefghijklmnopqrst",
+      "normalized": "abcdefghijklmnopqrst"
+    },
+    {
+      "input": "REELS.KRALI",
+      "normalized": "reels.krali"
+    },
+    {
+      "input": "badminton",
+      "normalized": "badminton"
+    },
+    {
+      "input": "klasik*1",
+      "normalized": "klasik*1"
+    }
+  ],
+  "invalid": [
+    {
+      "input": "",
+      "problem": "required"
+    },
+    {
+      "input": "   ",
+      "problem": "required"
+    },
+    {
+      "input": "ab",
+      "problem": "too_short"
+    },
+    {
+      "input": "abcdefghijklmnopqrstu",
+      "problem": "too_long"
+    },
+    {
+      "input": "şule",
+      "problem": "turkish_char"
+    },
+    {
+      "input": "İrmak",
+      "problem": "turkish_char"
+    },
+    {
+      "input": "ırmak",
+      "problem": "turkish_char"
+    },
+    {
+      "input": "gökhan",
+      "problem": "turkish_char"
+    },
+    {
+      "input": "kubi_01",
+      "problem": "invalid_char"
+    },
+    {
+      "input": "kubi-01",
+      "problem": "invalid_char"
+    },
+    {
+      "input": "kubi 01",
+      "problem": "invalid_char"
+    },
+    {
+      "input": "kubi@01",
+      "problem": "invalid_char"
+    },
+    {
+      "input": ".kubi",
+      "problem": "bad_start"
+    },
+    {
+      "input": "*kubi",
+      "problem": "bad_start"
+    },
+    {
+      "input": "kubi.",
+      "problem": "bad_end"
+    },
+    {
+      "input": "kubi*",
+      "problem": "bad_end"
+    },
+    {
+      "input": "ku..bi",
+      "problem": "consecutive_symbols"
+    },
+    {
+      "input": "ku**bi",
+      "problem": "consecutive_symbols"
+    },
+    {
+      "input": "ku.*bi",
+      "problem": "consecutive_symbols"
+    },
+    {
+      "input": "ku*.bi",
+      "problem": "consecutive_symbols"
+    },
+    {
+      "input": "1234",
+      "problem": "no_letter"
+    },
+    {
+      "input": "1.2*3",
+      "problem": "no_letter"
+    },
+    {
+      "input": "admin",
+      "problem": "reserved"
+    },
+    {
+      "input": "Ad.min",
+      "problem": "reserved"
+    },
+    {
+      "input": "quezby",
+      "problem": "reserved"
+    },
+    {
+      "input": "the.quezby.team",
+      "problem": "reserved"
+    },
+    {
+      "input": "misafir",
+      "problem": "reserved"
+    },
+    {
+      "input": "o.r.o.s.p.u",
+      "problem": "blocked"
+    },
+    {
+      "input": "fuck*you",
+      "problem": "blocked"
+    }
+  ]
+}
