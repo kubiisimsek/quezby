@@ -1,0 +1,65 @@
+# Quezby
+
+Reels kaydırma alışkanlığını rekabetçi bir refleks oyununa çeviren mobil oyun.
+Sonsuz bir akış: sıradan reeli **kaydır**, arkadaşının postunu **çift dokunarak
+beğen**, altın reeli **basılı tut** ve yeşilde bırak, "annen geldi" reelinde
+**dokunma**. Dopamin barın bitmeden en yüksek skoru yap — her reel biraz daha hızlı.
+
+Her gün herkes aynı **Günün akışı**nı bir kez oynar; **haftalık ligler**de
+benzer oyuncularla yarışır, takip ettiklerini **Zirve** tablosunda geçmeye
+çalışırsın. Apple, Google ya da misafir olarak girilir.
+
+```
+apps/mobile      Bare React Native 0.86 (Qesvis ile aynı yığın, Expo yok)
+apps/api         Laravel + Sanctum — hesap, kullanıcı adı, tur doğrulama, sıralama
+packages/engine  Oyun kuralları — deterministik, tam sayı; API aynısını PHP'de oynatır
+packages/config  Kullanıcı adı kuralları, akışın içerik kataloğu, uygulamanın temposu
+packages/types   API sözleşmesi
+packages/sdk     Tipli API istemcisi
+docs/            Ürün, puanlama, tasarım dili, ortamlar, deploy
+```
+
+## Hızlı başlangıç
+
+```bash
+nvm use                      # Node 22
+pnpm install
+pnpm dev:api                 # Laravel, :8000
+pnpm dev:mobile              # Metro, :8081
+pnpm ios                     # "Quezby Local" simülatörde
+```
+
+İlk kurulum adımları (Composer, `.env` dosyaları, CocoaPods):
+[docs/development/local-development.md](docs/development/local-development.md).
+
+## Üç ortam
+
+| Ortam | Bundle id | Telefondaki ad | Çalıştır |
+| --- | --- | --- | --- |
+| Local | `com.kubisimsek.game.quezby.local` | Quezby Local | `pnpm ios` · `pnpm android` |
+| Staging | `com.kubisimsek.game.quezby.staging` | Quezby Staging | `pnpm ios:staging` · `pnpm android:staging` |
+| Production | `com.kubisimsek.game.quezby` | Quezby | Xcode'da `Quezby` → Archive · `bundleProdRelease` |
+
+Üçü aynı telefona yan yana kurulur; her biri kendi API'sine bağlanır
+([docs/development/environments.md](docs/development/environments.md)).
+API'yi paylaşımlı hostinge atmak için: `pnpm api:package:staging` →
+[docs/deployment/shared-hosting.md](docs/deployment/shared-hosting.md).
+
+## Puanlama
+
+`(taban + hız/hassasiyet bonusu) × seviye çarpanı × kombo` + isimli kombolar
+(Kusursuz seviye, Şimşek, Soğukkanlı, Geri dönüş). Seviye çarpanı x1'den x3'e
+yaklaşır, kombo x1,00–x1,50 arasındadır: **aynı yetenek aynı sürede ±%20 aynı
+skoru yapar**. Kurallar `rules.lock.json` ile kilitli; değişiklik yeni sezon
+demektir. Skor istemciden kabul edilmez: sunucu tur kaydını kendi motoruyla
+yeniden oynatır, sonuç ekranındaki her sayı sunucudan gelir. Formüller, eğriler
+ve 8.000 simüle oyunluk denge tablosu: [docs/product/scoring.md](docs/product/scoring.md).
+
+## Kontroller
+
+```bash
+pnpm lint && pnpm typecheck && pnpm test   # paketler + mobil
+pnpm test:api                              # Laravel (Pest) + motor, kilit, içerik paritesi
+pnpm engine:simulate                       # denge raporu (±%20 sözü)
+pnpm engine:lock                           # kural kilidi ("current" demeli)
+```
