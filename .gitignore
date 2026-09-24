@@ -1,0 +1,79 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# Turbo
+.turbo/
+
+# build output
+dist/
+build/
+
+# React Native / Metro
+.metro-health-check*
+*.jsbundle
+apps/mobile/android/build/
+apps/mobile/android/app/build/
+apps/mobile/android/.gradle/
+apps/mobile/android/local.properties
+apps/mobile/android/**/.cxx/
+apps/mobile/ios/build/
+apps/mobile/ios/Pods/
+apps/mobile/ios/.xcode.env.local
+apps/mobile/vendor/bundle/
+.kotlin/
+*.iml
+*.hprof
+.gradle/
+xcuserdata/
+DerivedData/
+*.xcuserstate
+*.hmap
+*.ipa
+*.moved-aside
+*.pbxuser
+!default.pbxuser
+
+# native signing material — never commit
+*.jks
+*.keystore
+!debug.keystore
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Laravel
+apps/api/vendor/
+apps/api/storage/*.key
+apps/api/storage/logs/*.log
+apps/api/database/*.sqlite
+apps/api/.phpunit.result.cache
+apps/api/.phpunit.cache/
+apps/api/public/hot
+apps/api/public/storage
+
+# deploy packages built by scripts/package-api.sh
+dist-deploy/
+
+# debug
+npm-debug.*
+
+# macOS
+.DS_Store
+*.pem
+
+# IDE
+.idea/
+
+# environment / secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# typescript
+*.tsbuildinfo
+
+# test coverage
+coverage/

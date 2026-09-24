@@ -1,0 +1,15 @@
+{
+  "name": "@quezby/tsconfig",
+  "version": "0.0.0",
+  "private": true,
+  "files": [
+    "tsconfig.base.json",
+    "tsconfig.lib.json",
+    "tsconfig.lib.esm.json"
+  ],
+  "exports": {
+    "./tsconfig.base.json": "./tsconfig.base.json",
+    "./tsconfig.lib.json": "./tsconfig.lib.json",
+    "./tsconfig.lib.esm.json": "./tsconfig.lib.esm.json"
+  }
+}

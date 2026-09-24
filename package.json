@@ -1,0 +1,43 @@
+{
+  "name": "quezby",
+  "version": "0.0.0",
+  "private": true,
+  "packageManager": "pnpm@10.20.0",
+  "engines": {
+    "node": ">=22.11",
+    "pnpm": ">=10"
+  },
+  "scripts": {
+    "build:packages": "turbo run build --filter=./packages/*",
+    "dev:mobile": "pnpm --filter @quezby/mobile dev",
+    "dev:api": "cd apps/api && php artisan serve --host=0.0.0.0 --port=8000",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:api": "cd apps/api && php artisan test",
+    "clean": "turbo run clean && rm -rf .turbo",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "start": "pnpm --filter @quezby/mobile start",
+    "pods": "pnpm --filter @quezby/mobile pods",
+    "ios": "pnpm --filter @quezby/mobile ios",
+    "ios:staging": "pnpm --filter @quezby/mobile ios:staging",
+    "android": "pnpm --filter @quezby/mobile android",
+    "android:staging": "pnpm --filter @quezby/mobile android:staging",
+    "engine:fixtures": "pnpm --filter @quezby/engine fixtures",
+    "engine:simulate": "pnpm --filter @quezby/engine simulate",
+    "engine:lock": "pnpm --filter @quezby/engine lock",
+    "tokens": "node scripts/sync-design-tokens.mjs",
+    "api:package:staging": "./scripts/package-api.sh staging",
+    "api:package:production": "./scripts/package-api.sh production"
+  },
+  "devDependencies": {
+    "eslint": "^10.8.1",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.9.6",
+    "turbo": "^2.10.11",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.67.0"
+  }
+}
