@@ -36,6 +36,13 @@ pnpm ios            # Quezby Local on the simulator
 pnpm android        # debug build; run `adb reverse tcp:8000 tcp:8000` for a device
 ```
 
+The admin panel (`apps/admin`) runs next to the API:
+
+```bash
+pnpm dev:admin      # Vite on :5180 — /api is proxied to :8000
+cd apps/api && php artisan quezby:admin:create you@example.com --name="Your Name"   # prints a temporary password
+```
+
 The same install talks to staging or production after `pnpm switch-staging` /
 `pnpm switch-production` (restart Metro, then build again) —
 `docs/development/environments.md`.
@@ -46,12 +53,23 @@ today's challenge, a league group, follows):
 
 ```bash
 cd apps/api && php artisan db:seed --class=DemoSeeder   # refuses outside APP_ENV=local
+cd apps/api && php artisan db:seed --class=AdminDemoSeeder   # the panel's side: an admin per role, suspects, a ban
 ```
+
+`AdminDemoSeeder` signs you in at `http://localhost:5180` as
+`owner@quezby.test`, `moderator@quezby.test` or `viewer@quezby.test`
+(password `password`), with bots on the suspects list, a banned player, a
+phone that failed its device check and the moderation on the audit log.
+
+Never "try" a migration with `php artisan migrate:fresh` or `db:wipe`: there
+is no `.env.testing`, so it wipes `database/database.sqlite`. The Pest suite
+migrates its own in-memory database; `php artisan migrate --pretend` shows
+what a migration would do.
 
 ## Checks
 
 ```bash
-pnpm lint && pnpm typecheck && pnpm test    # packages + mobile (vitest, Jest + RNTL)
+pnpm lint && pnpm typecheck && pnpm test    # packages, mobile (Jest + RNTL), admin panel (Vitest + Testing Library)
 pnpm test:api                               # Laravel on Pest, incl. engine, lock, content and pace parity
 pnpm engine:simulate                        # balancing report — the ±20 % promise per skill
 pnpm engine:lock                            # says "current", or refuses a rules change without a version bump

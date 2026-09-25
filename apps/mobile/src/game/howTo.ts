@@ -1,16 +1,26 @@
 import { RULES, type BonusKind, type ReelKind } from '@quezby/engine';
 
 import type { IconName } from '@/ui/icons';
-import type { TagTone } from '@/ui/kit';
+import type { CoachGesture, TagTone } from '@/ui/kit';
 
 /**
- * How to play, in one place: the welcome, the help screen and the in-game
- * hints all read it. The numbers come from the engine's `RULES`, so the copy
- * can never promise a rule the game does not keep.
+ * How to play, in one place: the help screen, the practice run's coach
+ * cards and the in-game hints all read it. The numbers come from the
+ * engine's `RULES`, so the copy can never promise a rule the game does not
+ * keep.
  */
 export const REEL_GUIDE: Record<
   ReelKind,
-  { icon: IconName; tone: TagTone; title: string; body: string; badge: string | null; hint: string }
+  {
+    icon: IconName;
+    tone: TagTone;
+    title: string;
+    body: string;
+    badge: string | null;
+    hint: string;
+    /** What the coach card acts out the first time the practice run shows this kind. */
+    gesture: CoachGesture;
+  }
 > = {
   skip: {
     icon: 'arrowUp',
@@ -19,6 +29,7 @@ export const REEL_GUIDE: Record<
     body: 'Yukarı kaydır. Ne kadar hızlı, o kadar puan.',
     badge: null,
     hint: 'Sıkıcı içerik — yukarı kaydır',
+    gesture: 'swipe',
   },
   like: {
     icon: 'heart',
@@ -27,6 +38,7 @@ export const REEL_GUIDE: Record<
     body: 'Pembe postu çift dokunarak beğen. Geçersen ceza.',
     badge: 'Arkadaşın',
     hint: 'Arkadaşının postu — çift dokun',
+    gesture: 'doubleTap',
   },
   hold: {
     icon: 'hand',
@@ -35,6 +47,7 @@ export const REEL_GUIDE: Record<
     body: 'Basılı tut, çubuk yeşildeyken bırak. Tam ortası mükemmel.',
     badge: 'Altın post',
     hint: 'Basılı tut, yeşil bölgede bırak',
+    gesture: 'hold',
   },
   freeze: {
     icon: 'handStop',
@@ -43,6 +56,7 @@ export const REEL_GUIDE: Record<
     body: 'Kırmızı postta elini çek, süre bitsin. Refleksini yen.',
     badge: 'Dokunma',
     hint: 'Hiçbir şeye dokunma, geçmesini bekle',
+    gesture: 'still',
   },
 };
 

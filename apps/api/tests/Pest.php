@@ -99,6 +99,19 @@ function playedLog(int $seed, int $reels, int $decisionMs, int $jitterMs = 0): a
     return $actions;
 }
 
+/**
+ * A `GuestNames` digit source that draws `$values` in turn, then keeps
+ * drawing the last one.
+ *
+ * @return Closure(): int
+ */
+function drawn(int ...$values): Closure
+{
+    return function () use (&$values): int {
+        return count($values) > 1 ? array_shift($values) : $values[0];
+    };
+}
+
 /*
 |--------------------------------------------------------------------------
 | Identity providers

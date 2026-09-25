@@ -66,6 +66,15 @@ describe('SignInWaysSheet', () => {
     expect(screen.queryByText('Başka bir yol bağla')).not.toBeOnTheScreen();
   });
 
+  it('says why it came up, when the lobby opens it on its own', async () => {
+    await renderWithProviders(
+      <SignInWaysSheet open onClose={jest.fn()} onEmail={jest.fn()} description="Ligdesin! Bir giriş yolu bağla." />,
+    );
+
+    expect(screen.getByText('Ligdesin! Bir giriş yolu bağla.')).toBeOnTheScreen();
+    expect(screen.queryByText(/Bu hesap şu an yalnızca bu telefonda/)).not.toBeOnTheScreen();
+  });
+
   it('links Apple to the guest and says so', async () => {
     apple.mockResolvedValue({ identityToken: 'apple.jwt', authorizationCode: 'code-1', nonce: 'raw-nonce' });
     mocked.me.linkApple.mockResolvedValue({ user: buildMe({ identities: ['apple'], isGuest: false }) });

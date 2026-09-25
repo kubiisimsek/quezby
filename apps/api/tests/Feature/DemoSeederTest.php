@@ -73,9 +73,12 @@ test('locally it plays runs onto every board the real way', function () {
     $best = fn (string $username) => LeaderboardEntry::query()->where('period', 'all')->where('user_id', $players->search($username))->value('score');
     expect($best('burak07'))->toBeGreaterThan($best('ayse.nur'));
 
-    // This week's league, the lifetime numbers and follows, all filled.
+    // This week's league holds whoever has played the three counted runs that open it; the
+    // lifetime numbers and follows are all filled.
+    $opened = $ranked->groupBy('user_id')->filter(fn ($played) => $played->count() >= config('quezby.leagues.unlock_runs'));
     expect(LeagueGroup::query()->where('week_key', '2026-W39')->exists())->toBeTrue()
-        ->and(LeagueMember::query()->where('week_key', '2026-W39')->count())->toBe($boards['weekly 2026-W39'])
+        ->and(LeagueMember::query()->where('week_key', '2026-W39')->pluck('user_id')->sort()->values()->all())
+        ->toBe($opened->keys()->sort()->values()->all())
         ->and((int) PlayerStat::query()->sum('runs'))->toBe($runs->where('status', RunStatus::Ranked)->count())
         ->and(DB::table('follows')->count())->toBeGreaterThan(0)
         ->and(DB::table('follows')->whereNotIn('followee_id', $players->keys())->count())->toBe(0);

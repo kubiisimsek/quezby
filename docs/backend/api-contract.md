@@ -32,6 +32,7 @@ A contract change is one commit: `packages/types` → Laravel request/resource �
 | Status | When |
 | ------ | ---- |
 | 401 | `unauthenticated` — missing or revoked token |
+| 403 | `forbidden` — the admin panel only: the admin's role may not do this (`docs/backend/admin-api.md`) |
 | 404 | `not_found` — also another player's run, an unknown board, a banned player |
 | 409 | `username_taken`, `email_taken`, `already_linked`, `identity_taken`, `last_sign_in_method`, `run_already_finished`, `daily_already_played`, `attest_key_unknown` |
 | 410 | `run_expired` |
@@ -65,7 +66,11 @@ does not parse is `ok` — the network must never lock a player out.
 ### `POST /auth/guest` — public
 
 `{ "platform": "ios", "installId": "…" }` → `201 { "token", "user": Me }`. A
-new account with no username, email, password or identity.
+new account with no email, password or identity, named `guest` + 8 digits
+(`guest48128742`) until its player picks a name — so it can start a run at
+once. The digits are drawn at random; a taken name is drawn again, and a race
+on the unique index draws once more. Names like it are reserved: no player can
+pick one (`PUT /me/username` → `422 username_invalid`, `reserved`).
 
 ### `POST /auth/login` — public
 
@@ -79,8 +84,9 @@ with Apple hashes it into the identity token; the API consumes it once.
 ### `POST /auth/apple` — public
 
 `{ "identityToken", "nonce", "authorizationCode"?, "platform", "installId" }` →
-`201 { "token", "user", "created": true }` for a new player, `200 … "created": false`
-for a returning one. The token must be signed by Apple (JWKS, cached), issued
+`201 { "token", "user", "created": true }` for a new player — named
+`guest48128742` like a guest, and the app starts its first steps — `200 …
+"created": false` for a returning one. The token must be signed by Apple (JWKS, cached), issued
 by `https://appleid.apple.com`, for one of `APPLE_BUNDLE_IDS`, unexpired, and
 carry the SHA-256 of a nonce the API issued and has not seen used. Anything
 else → `422 identity_invalid`. With `APPLE_TEAM_ID`/`APPLE_KEY_ID`/
@@ -106,6 +112,9 @@ Revokes the current token. `204`.
 ```
 
 `Me` = `{ id, username, email, isGuest, identities: ("apple"|"google")[], settings: { haptics }, best: { score, reels, achievedAt } | null, createdAt }`.
+`username` is set from the moment the account exists — the automatic
+`guest48128742` until the player picks one; it is null only on accounts made
+before automatic names.
 `best` is this season's best (the season's all-time row). `isGuest` is true
 while no email, Apple or Google is attached. A rank is null without a ranked
 run in that period.
@@ -254,7 +263,8 @@ one (`counter`) — which then moves up.
 
 - An engine or catalog the API does not play (or no body — the v1 app) →
   `422 engine_outdated` before any run exists.
-- Needs a username (`422 validation_failed`).
+- Needs a username (`422 validation_failed`) — every account has one since
+  automatic names; only an older account with none is refused.
 - A player has **one open run**: starting another marks the previous one
   `abandoned`. Runs older than `QUEZBY_RUN_TTL_MINUTES` (120) become `expired`.
 - The run records the player's device verdict standing now (`pass`, `fail`, or
@@ -323,8 +333,8 @@ The API:
 4. Counts the run from the replay (stats, which posts were shown and liked).
 5. A `ranked` run adds to the player's lifetime stats and, when it scored,
    upserts today's, this week's, this month's and the season's rows (plus
-   today's `challenge` row for a daily run) and seats the player in this week's
-   league group.
+   today's `challenge` row for a daily run) and — once the league is open to
+   them — seats the player in this week's league group.
 
 →
 
@@ -338,6 +348,7 @@ The API:
   "passed": [{ "username": "ayse", "score": 239000, "isFollowing": true }],
   "daily": { "dayKey": "2026-09-26", "number": 3, "rank": 37, "players": 1204, "grid": "🟩🟩🟨🟥⬛", "shareText": "…" },
   "league": { "tier": "gold", "rank": 4, "members": 30, "zone": "promote", "points": 812000 },
+  "leagueUnlock": null,
   "shareText": "Quezby'de 240.310 puan yaptım! 405 post · bugün #12. Sen kaç yaparsın?"
 }
 ```
@@ -352,7 +363,10 @@ phone failed its integrity check, so its runs never rank, and the app says so
 ("Bu cihazda skorlar sıralamaya girmiyor"). It is null for every other flag:
 the other checks are not explained to the player.
 `passed` lists up to three players the run overtook on today's board. `daily`
-is null for a free run; `league` is null when the run did not rank.
+is null for a free run; `league` is null when the run did not rank, or the
+league is not open to the player yet. `leagueUnlock` is `{ required, remaining }`
+until it opens — `{ "required": 3, "remaining": 2 }` after a new player's first
+counted run — and null once it has.
 A `flagged` or `review` run still answers 200.
 
 ## Boards
@@ -395,15 +409,21 @@ rival's, per-mille. `friends` = the players you follow, and you. `limit` 1–100
 ### `GET /leagues/current`
 
 ```json
-{ "season": 2, "weekKey": "2026-W39", "tier": "gold", "endsAt": "…", "serverTime": "…", "joined": true,
+{ "season": 2, "weekKey": "2026-W39", "tier": "gold", "endsAt": "…", "serverTime": "…", "joined": true, "unlock": null,
   "members": [{ "rank": 1, "username": "…", "points": 912000, "daysPlayed": 5, "isMe": false, "isFollowing": false, "zone": "promote", "gap": null }],
   "me": LeagueMember, "promoteCount": 5, "demoteCount": 5,
   "lastWeek": { "weekKey": "2026-W38", "tier": "silver", "rank": 3, "members": 28, "outcome": "promoted", "newTier": "gold" } }
 ```
 
-Points are the sum of each day's best score this week. A player is seated on
-their first ranked run of the week (`joined: false` until then, with the tier
-they will play). Zones: ⌊members × 5 / 30⌋ up and down; none above `diamond`
+Points are the sum of each day's best score this week. **The league opens to a
+player after their first 3 counted runs** — ranked and scoring
+(`config/quezby.php` › `leagues.unlock_runs`); zero-score, flagged and held
+runs do not count, and a new player's practice run never reaches the API.
+Until then `unlock` is `{ "required": 3, "remaining": n }` and nobody is seated;
+anyone who has ever sat in a league is never locked again. A player is seated
+on their first ranked run of the week once it is open (`joined: false` until
+then, with the tier they will play); a player who opens it mid-week brings the
+week's earlier daily bests along. Zones: ⌊members × 5 / 30⌋ up and down; none above `diamond`
 or below `bronze`. Last week is settled lazily, the first time any of its
 players needs it — no cron.
 
@@ -434,12 +454,23 @@ page; pass `?cursor=` for the next.
 ## Ops (no SSH on shared hosting)
 
 - `POST /ops/migrate`, `POST /ops/optimize` — `X-Ops-Token` (`OPS_TOKEN`).
+- `POST /ops/admins` — `X-Ops-Token`: `{ "email", "name"? }` → the admin
+  panel's first owner with a temporary password (`201`), or a new temporary
+  password for an existing admin (`200`) — `docs/backend/admin-api.md`.
 - `POST /ops/moderate` — `X-Moderation-Token` (`MODERATION_TOKEN`):
   `{ "action": "held" }`, `{ "action": "approve"|"reject", "runId", "reason"? }`,
   `{ "action": "ban", "username", "reason" }`, `{ "action": "unban", "username" }`.
   The same work as `php artisan quezby:review`, `quezby:run:approve`,
   `quezby:run:reject`, `quezby:user:ban`, `quezby:user:unban`. Without the
-  token set, the route does not exist (404).
+  token set, the route does not exist (404). Every decision, here and from
+  the commands, is on the admin panel's audit log.
+
+## Admin panel
+
+`/api/v1/admin/*` is the admin panel's API — staff accounts with roles, their
+own guard (an admin token opens no route above, a player token none there), a
+`403 forbidden` for a role that may not, page-based lists and an audit log.
+Its contract is `docs/backend/admin-api.md`.
 
 ## Ranking
 

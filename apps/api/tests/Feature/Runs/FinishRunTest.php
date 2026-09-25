@@ -52,7 +52,9 @@ test('a finished run is replayed, ranked and recorded on every board', function 
         ],
         'passed' => [],
         'daily' => null,
-        'league' => ['tier' => 'bronze', 'rank' => 1, 'members' => 1, 'zone' => 'stay', 'points' => $summary['score']],
+        // A new player's first counted run: the league opens two runs later.
+        'league' => null,
+        'leagueUnlock' => ['required' => 3, 'remaining' => 2],
     ]);
 
     $bonuses = $response->json('run.breakdown.bonuses');

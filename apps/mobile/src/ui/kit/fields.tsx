@@ -63,6 +63,7 @@ export function Field({
       <Animated.View style={[styles.inputWrap, ring]}>
         {icon ? <Icon name={icon} size={17} color={theme.inkFaint} strokeWidth={2.4} /> : null}
         <TextInput
+          accessibilityLabel={label}
           placeholderTextColor={theme.inkFaint}
           {...props}
           onFocus={(event) => {

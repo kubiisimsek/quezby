@@ -64,7 +64,8 @@ final class ErrorResponse
     {
         $status = $e->getStatusCode();
         $code = match (true) {
-            $status === 401, $status === 403 => ErrorCode::Unauthenticated,
+            $status === 401 => ErrorCode::Unauthenticated,
+            $status === 403 => ErrorCode::Forbidden,
             $status === 404, $status === 405 => ErrorCode::NotFound,
             $status === 429 => ErrorCode::TooManyRequests,
             $status >= 500 => ErrorCode::ServerError,

@@ -7,10 +7,13 @@ beğen**, altın postu **basılı tut** ve yeşilde bırak, "annen geldi" postun
 
 Her gün herkes aynı **Günün akışı**nı bir kez oynar; **haftalık ligler**de
 benzer oyuncularla yarışır, takip ettiklerini **Zirve** tablosunda geçmeye
-çalışırsın. Apple, Google ya da misafir olarak girilir.
+çalışırsın. İlk açılışta önce sayılmayan bir deneme turu oynanır; ad ve hesap
+bağlama (Apple, Google ya da e-posta) sonra gelir ve ikisi de beklemeye alınabilir.
+Lig, ilk 3 sayılan oyundan sonra açılır.
 
 ```
 apps/mobile      Bare React Native 0.86 (Qesvis ile aynı yığın, Expo yok)
+apps/admin       Yönetim paneli — Vite + React, hostinge statik dosya olarak
 apps/api         Laravel + Sanctum — hesap, kullanıcı adı, tur doğrulama, sıralama
 packages/engine  Oyun kuralları — deterministik, tam sayı; API aynısını PHP'de oynatır
 packages/config  Kullanıcı adı kuralları, akışın içerik kataloğu, uygulamanın temposu
@@ -50,6 +53,16 @@ Mağaza derlemesi: geçiş → Xcode'da `Quezby` → Archive · `./gradlew bundl
 API'yi paylaşımlı hostinge atmak için: `pnpm api:package:staging` →
 [docs/deployment/shared-hosting.md](docs/deployment/shared-hosting.md).
 
+## Yönetim paneli
+
+Oyuncular, yasaklar, şüpheliler, turlar, sıralamalar, günün akışı, ligler,
+içerik, yöneticiler ve sistem — `apps/admin`. Yerelde `pnpm dev:admin`
+(`http://localhost:5180`), ilk hesap `php artisan quezby:admin:create
+sen@ornek.com`; hostinge `pnpm admin:package:production` →
+`admin.quezby.com`. Roller Sahip, Moderatör, İzleyici; her işlem denetim
+kaydına geçer. API: [docs/backend/admin-api.md](docs/backend/admin-api.md) ·
+tasarım: [docs/design/admin-design-system.md](docs/design/admin-design-system.md).
+
 ## Puanlama
 
 `(taban + hız/hassasiyet bonusu) × seviye çarpanı × kombo` + isimli kombolar
@@ -63,7 +76,7 @@ ve 8.000 simüle oyunluk denge tablosu: [docs/product/scoring.md](docs/product/s
 ## Kontroller
 
 ```bash
-pnpm lint && pnpm typecheck && pnpm test   # paketler + mobil
+pnpm lint && pnpm typecheck && pnpm test   # paketler + mobil + yönetim paneli
 pnpm test:api                              # Laravel (Pest) + motor, kilit, içerik paritesi
 pnpm engine:simulate                       # denge raporu (±%20 sözü)
 pnpm engine:lock                           # kural kilidi ("current" demeli)

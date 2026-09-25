@@ -48,11 +48,14 @@ export function SignInWaysSheet({
   onClose,
   onClosed,
   onEmail,
+  description,
 }: {
   open: boolean;
   onClose: () => void;
   onClosed?: () => void;
   onEmail: () => void;
+  /** Why now, when the sheet comes up on its own — the lobby's "Ligdesin!". */
+  description?: string;
 }) {
   const user = useSession((state) => state.user);
   const social = useSocialAuth();
@@ -89,9 +92,9 @@ export function SignInWaysSheet({
       onClosed={onClosed}
       title={user.isGuest ? 'Hesabını koru' : 'Giriş yolları'}
       description={
-        user.isGuest
+        description ?? (user.isGuest
           ? 'Bu hesap şu an yalnızca bu telefonda. Bir giriş yolu bağla; telefon değişse de skorların, ligin ve takiplerin seninle gelir.'
-          : 'Hesabına bu yollarla girersin. Birini kaldırmak için başka bir yol bağlı kalmalı.'
+          : 'Hesabına bu yollarla girersin. Birini kaldırmak için başka bir yol bağlı kalmalı.')
       }
     >
       <View style={styles.body}>

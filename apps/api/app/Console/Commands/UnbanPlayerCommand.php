@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Console\Commands\Concerns\FindsModerationTargets;
 use App\Services\ModerationService;
+use App\Support\Actor;
 use Illuminate\Console\Command;
 
 final class UnbanPlayerCommand extends Command
@@ -27,7 +28,7 @@ final class UnbanPlayerCommand extends Command
             return self::SUCCESS;
         }
 
-        $moderation->unban($player);
+        $moderation->unban($player, Actor::cli());
         $this->components->info("{$player->username} is unbanned; their ranked runs are back on the boards.");
 
         return self::SUCCESS;

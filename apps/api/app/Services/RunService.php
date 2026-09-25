@@ -207,9 +207,10 @@ final class RunService
                     $league = $this->leagues->join($run);
                 }
             }
+            $leagueUnlock = $league === null ? $this->leagues->unlock($user) : null;
             $daily = $run->mode === RunMode::Daily ? $this->daily->resultFor($run) : null;
 
-            return new FinishedRun($run, $outcome, $league, $daily);
+            return new FinishedRun($run, $outcome, $league, $leagueUnlock, $daily);
         });
     }
 

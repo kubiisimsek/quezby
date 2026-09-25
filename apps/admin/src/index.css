@@ -1,0 +1,676 @@
+@import 'tailwindcss' source('.');
+@import '@fontsource-variable/quicksand';
+
+@custom-variant dark (&:is(.dark *));
+
+/* ===========================================================================
+   Quezby Yönetim — the admin panel's design system
+   ---------------------------------------------------------------------------
+   docs/design/admin-design-system.md. A staff tool, so it is calm and dense
+   where the game is loud: the structure of the Qesvis admin language, worn
+   in Quezby's colours — the game's magenta for action, its violet as the
+   accent, and the band across every page carrying the logo's gradient.
+
+   Two layers, and components only ever touch the second one.
+
+   1. RAMPS (--n-*, --p-*, --s-*)  perceptually even OKLCH scales numbered
+      1 → 12: 1-2 canvas, 3-5 fills, 6-8 lines, 9-10 solids, 11-12 text.
+      Raw material — never referenced from a component.
+
+   2. ROLES (--color-*)  what a thing is for: canvas, surface, fill, line,
+      ink. Registered in @theme so Tailwind writes bg-surface, text-ink and
+      border-line; the only colour vocabulary a component may use.
+
+   Light and dark point the roles at different rungs of the same ramps, so no
+   component carries a per-theme class. Depth works the same way: a card is
+   lifted by a shadow in light and drawn by a hairline in dark, both through
+   `shadow-card`. `scripts/admin-tokens.test.mjs` holds the brand to the game's
+   palette and every text role to its contrast.
+   =========================================================================== */
+
+:root {
+  /* Native chrome — a date field's calendar, autofill, scrollbars — reads
+     this and nothing else. */
+  color-scheme: light;
+
+  /* --- neutral · a violet-grey, the arena at noon ------------------------- */
+  --n-0: oklch(1 0 0);
+  --n-1: oklch(0.977 0.0025 290);
+  --n-2: oklch(0.961 0.0035 290);
+  --n-3: oklch(0.945 0.0045 290);
+  --n-4: oklch(0.932 0.0055 290);
+  --n-5: oklch(0.908 0.0065 290);
+  --n-6: oklch(0.886 0.0075 290);
+  --n-7: oklch(0.843 0.0085 290);
+  --n-8: oklch(0.758 0.011 290);
+  --n-9: oklch(0.552 0.018 290);
+  --n-10: oklch(0.508 0.018 290);
+  --n-11: oklch(0.485 0.017 290);
+  --n-12: oklch(0.21 0.02 290);
+
+  /* --- primary · Quezby magenta, the game's brand ------------------------- */
+  --p-2: oklch(0.982 0.012 352);
+  --p-3: oklch(0.962 0.026 352);
+  --p-4: oklch(0.94 0.042 352);
+  --p-5: oklch(0.912 0.058 352);
+  --p-6: oklch(0.872 0.08 352);
+  --p-7: oklch(0.815 0.11 352);
+  --p-8: oklch(0.73 0.16 352);
+  --p-9: oklch(0.55 0.215 352);
+  --p-10: oklch(0.505 0.2 352);
+  --p-11: oklch(0.5 0.19 352);
+  --p-12: oklch(0.33 0.12 352);
+  --p-ink: oklch(1 0 0);
+
+  /* --- secondary · the arena's violet ------------------------------------- */
+  --s-2: oklch(0.98 0.013 290);
+  --s-3: oklch(0.962 0.025 290);
+  --s-4: oklch(0.943 0.036 290);
+  --s-5: oklch(0.92 0.048 290);
+  --s-6: oklch(0.888 0.062 290);
+  --s-7: oklch(0.835 0.085 290);
+  --s-8: oklch(0.735 0.13 290);
+  --s-9: oklch(0.545 0.2 290);
+  --s-10: oklch(0.5 0.195 290);
+  --s-11: oklch(0.51 0.19 290);
+  --s-12: oklch(0.32 0.13 290);
+  --s-ink: oklch(1 0 0);
+
+  /* --- status ------------------------------------------------------------- */
+  --ok-soft: oklch(0.955 0.035 155);
+  --ok-line: oklch(0.86 0.075 155);
+  --ok-solid: oklch(0.545 0.115 155);
+  --ok-text: oklch(0.475 0.105 155);
+
+  --warn-soft: oklch(0.966 0.045 80);
+  --warn-line: oklch(0.88 0.09 80);
+  --warn-solid: oklch(0.72 0.145 68);
+  --warn-text: oklch(0.52 0.105 68);
+
+  --bad-soft: oklch(0.962 0.02 25);
+  --bad-line: oklch(0.885 0.055 25);
+  --bad-solid: oklch(0.555 0.205 25);
+  --bad-text: oklch(0.525 0.2 25);
+
+  /* --- roles: light ------------------------------------------------------- */
+  --role-rail: var(--n-2);
+  --role-canvas: var(--n-1);
+  --role-surface: var(--n-0);
+  --role-raised: var(--n-0);
+  --role-overlay: var(--n-0);
+  --role-sunken: var(--n-2);
+
+  --role-fill: var(--n-3);
+  --role-fill-hover: var(--n-4);
+  --role-fill-active: var(--n-5);
+
+  --role-line: var(--n-6);
+  --role-line-soft: var(--n-5);
+  --role-line-strong: var(--n-7);
+
+  --role-ink: var(--n-12);
+  --role-ink-muted: var(--n-11);
+  --role-ink-faint: var(--n-9);
+  --role-ink-on-solid: var(--n-0);
+
+  --role-scrim: oklch(0.21 0.02 290 / 0.45);
+  --role-on-brand: oklch(1 0 0);
+  /* The game's own gradient (apps/mobile/design/palette.mjs → brandFrom,
+     brandTo). The same two deep values in both themes: the band always
+     carries white text. */
+  --role-brand-from: oklch(0.58 0.235 351);
+  --role-brand-to: oklch(0.5 0.23 289);
+
+  /* Depth: three elevations. Light lifts with a soft violet-tinted shadow. */
+  --shadow-card:
+    0 1px 2px oklch(0.2 0.04 290 / 0.05),
+    0 2px 10px oklch(0.2 0.04 290 / 0.07);
+  --shadow-raised:
+    0 1px 3px oklch(0.2 0.04 290 / 0.06),
+    0 6px 20px -2px oklch(0.2 0.04 290 / 0.12);
+  --shadow-overlay:
+    0 2px 8px -2px oklch(0.2 0.04 290 / 0.1),
+    0 28px 64px -16px oklch(0.2 0.04 290 / 0.32);
+  /* The one solid action carries a little of its own colour under it. */
+  --shadow-primary: 0 6px 16px -6px oklch(0.55 0.215 352 / 0.5);
+  --shadow-brand: 0 10px 30px -10px oklch(0.5 0.23 289 / 0.45);
+}
+
+.dark {
+  color-scheme: dark;
+
+  --n-0: oklch(0.145 0.006 290);
+  --n-1: oklch(0.17 0.007 290);
+  --n-2: oklch(0.199 0.008 290);
+  --n-3: oklch(0.228 0.0095 290);
+  --n-4: oklch(0.258 0.011 290);
+  --n-5: oklch(0.29 0.012 290);
+  --n-6: oklch(0.322 0.013 290);
+  --n-7: oklch(0.375 0.014 290);
+  --n-8: oklch(0.46 0.016 290);
+  --n-9: oklch(0.585 0.02 290);
+  --n-10: oklch(0.635 0.019 290);
+  --n-11: oklch(0.74 0.015 290);
+  --n-12: oklch(0.97 0.004 290);
+
+  --p-2: oklch(0.21 0.03 352);
+  --p-3: oklch(0.245 0.045 352);
+  --p-4: oklch(0.28 0.058 352);
+  --p-5: oklch(0.315 0.07 352);
+  --p-6: oklch(0.37 0.085 352);
+  --p-7: oklch(0.44 0.11 352);
+  --p-8: oklch(0.55 0.15 352);
+  --p-9: oklch(0.72 0.17 352);
+  --p-10: oklch(0.77 0.15 352);
+  --p-11: oklch(0.8 0.12 352);
+  --p-12: oklch(0.92 0.05 352);
+  --p-ink: oklch(0.145 0.006 290);
+
+  --s-2: oklch(0.215 0.033 290);
+  --s-3: oklch(0.25 0.048 290);
+  --s-4: oklch(0.285 0.06 290);
+  --s-5: oklch(0.325 0.072 290);
+  --s-6: oklch(0.375 0.088 290);
+  --s-7: oklch(0.45 0.115 290);
+  --s-8: oklch(0.56 0.16 290);
+  --s-9: oklch(0.6 0.19 290);
+  --s-10: oklch(0.655 0.185 290);
+  --s-11: oklch(0.8 0.125 290);
+  --s-12: oklch(0.91 0.06 290);
+  --s-ink: oklch(1 0 0);
+
+  --ok-soft: oklch(0.245 0.045 155);
+  --ok-line: oklch(0.365 0.07 155);
+  --ok-solid: oklch(0.72 0.145 155);
+  --ok-text: oklch(0.8 0.125 155);
+
+  --warn-soft: oklch(0.255 0.05 75);
+  --warn-line: oklch(0.375 0.075 75);
+  --warn-solid: oklch(0.8 0.15 75);
+  --warn-text: oklch(0.845 0.13 80);
+
+  --bad-soft: oklch(0.25 0.055 25);
+  --bad-line: oklch(0.37 0.095 25);
+  --bad-solid: oklch(0.6 0.2 25);
+  --bad-text: oklch(0.755 0.145 25);
+
+  /* --- roles: dark -------------------------------------------------------- */
+  --role-rail: var(--n-0);
+  --role-canvas: var(--n-1);
+  --role-surface: var(--n-2);
+  --role-raised: var(--n-3);
+  /* A dialog or a menu hosts wells, so it cannot sit on the same rung as
+     `fill` — every field inside it would vanish. Dark takes a rung down; the
+     scrim and the overlay shadow set it off the page anyway. */
+  --role-overlay: var(--n-2);
+  --role-sunken: var(--n-0);
+
+  /* A rung above `raised`: a field in a card — the sign-in form, a password
+     change — has to stand out of the card it sits in. */
+  --role-fill: var(--n-4);
+  --role-fill-hover: var(--n-5);
+  --role-fill-active: var(--n-6);
+
+  --role-line: var(--n-6);
+  --role-line-soft: var(--n-4);
+  --role-line-strong: var(--n-7);
+
+  --role-ink: var(--n-12);
+  --role-ink-muted: var(--n-11);
+  --role-ink-faint: var(--n-9);
+  --role-ink-on-solid: var(--n-12);
+
+  --role-scrim: oklch(0.1 0.006 290 / 0.7);
+  --role-on-brand: oklch(1 0 0);
+  --role-brand-from: oklch(0.58 0.235 351);
+  --role-brand-to: oklch(0.5 0.23 289);
+
+  /* Dark cannot see a shadow on near-black, so it draws the edge instead. */
+  --shadow-card: 0 0 0 1px var(--n-6);
+  --shadow-raised:
+    0 0 0 1px var(--n-6),
+    0 8px 24px -6px oklch(0 0 0 / 0.55);
+  --shadow-overlay:
+    0 0 0 1px var(--n-6),
+    0 28px 64px -16px oklch(0 0 0 / 0.75);
+  --shadow-primary: 0 6px 18px -8px oklch(0.72 0.17 352 / 0.45);
+  --shadow-brand: 0 10px 30px -12px oklch(0 0 0 / 0.7);
+}
+
+@theme inline {
+  /* surfaces, front to back */
+  --color-rail: var(--role-rail);
+  --color-canvas: var(--role-canvas);
+  --color-surface: var(--role-surface);
+  --color-raised: var(--role-raised);
+  --color-overlay: var(--role-overlay);
+  --color-sunken: var(--role-sunken);
+
+  /* interactive fills */
+  --color-fill: var(--role-fill);
+  --color-fill-hover: var(--role-fill-hover);
+  --color-fill-active: var(--role-fill-active);
+
+  /* edges */
+  --color-line: var(--role-line);
+  --color-line-soft: var(--role-line-soft);
+  --color-line-strong: var(--role-line-strong);
+
+  /* text */
+  --color-ink: var(--role-ink);
+  --color-ink-muted: var(--role-ink-muted);
+  --color-ink-faint: var(--role-ink-faint);
+  --color-ink-on-solid: var(--role-ink-on-solid);
+
+  /* primary — the action colour, one solid per view */
+  --color-primary: var(--p-9);
+  --color-primary-hover: var(--p-10);
+  --color-primary-ink: var(--p-ink);
+  --color-primary-text: var(--p-11);
+  --color-primary-line: var(--p-6);
+  --color-primary-soft: var(--p-3);
+  --color-primary-soft-hover: var(--p-4);
+  --color-primary-soft-active: var(--p-5);
+  --color-primary-wash: var(--p-2);
+
+  /* secondary — the accent, never a solid call to action */
+  --color-secondary: var(--s-9);
+  --color-secondary-hover: var(--s-10);
+  --color-secondary-ink: var(--s-ink);
+  --color-secondary-text: var(--s-11);
+  --color-secondary-line: var(--s-6);
+  --color-secondary-soft: var(--s-3);
+  --color-secondary-soft-hover: var(--s-4);
+  --color-secondary-soft-active: var(--s-5);
+  --color-secondary-wash: var(--s-2);
+
+  /* status */
+  --color-ok: var(--ok-solid);
+  --color-ok-soft: var(--ok-soft);
+  --color-ok-line: var(--ok-line);
+  --color-ok-text: var(--ok-text);
+
+  --color-warn: var(--warn-solid);
+  --color-warn-soft: var(--warn-soft);
+  --color-warn-line: var(--warn-line);
+  --color-warn-text: var(--warn-text);
+
+  --color-bad: var(--bad-solid);
+  --color-bad-soft: var(--bad-soft);
+  --color-bad-line: var(--bad-line);
+  --color-bad-text: var(--bad-text);
+
+  --color-scrim: var(--role-scrim);
+  /* the brand gradient and the white it always carries — fixed in both themes */
+  --color-on-brand: var(--role-on-brand);
+  --color-brand-from: var(--role-brand-from);
+  --color-brand-to: var(--role-brand-to);
+
+  /* type — Quicksand, self-hosted, every Turkish letter included */
+  --font-sans:
+    'Quicksand Variable', ui-rounded, ui-sans-serif, system-ui, -apple-system,
+    'Segoe UI', sans-serif;
+  --font-mono:
+    ui-monospace, 'SF Mono', 'JetBrains Mono', 'Cascadia Code', monospace;
+
+  /* The login's one big line. Nowhere past the door. */
+  --text-hero: 2.5rem;
+  --text-hero--line-height: 1.1;
+  --text-hero--letter-spacing: -0.015em;
+  --text-hero--font-weight: 700;
+
+  /* A page's title, a headline number. */
+  --text-display: 1.75rem;
+  --text-display--line-height: 1.2;
+  --text-display--letter-spacing: -0.01em;
+  --text-display--font-weight: 700;
+
+  --text-title: 1.25rem;
+  --text-title--line-height: 1.3;
+  --text-title--letter-spacing: -0.005em;
+  --text-title--font-weight: 700;
+
+  --text-heading: 0.9375rem;
+  --text-heading--line-height: 1.35;
+  --text-heading--font-weight: 650;
+
+  --text-body: 0.875rem;
+  --text-body--line-height: 1.5;
+  --text-body--font-weight: 500;
+
+  --text-meta: 0.8125rem;
+  --text-meta--line-height: 1.45;
+  --text-meta--font-weight: 500;
+
+  /* Labels, table heads, tags. 11px is the floor. */
+  --text-micro: 0.6875rem;
+  --text-micro--line-height: 1.35;
+  --text-micro--letter-spacing: 0.01em;
+  --text-micro--font-weight: 650;
+
+  /* Controls, rows, containers, overlays — and the pill. */
+  --radius-control: 0.75rem;
+  --radius-nav: 0.875rem;
+  --radius-panel: 1rem;
+  --radius-overlay: 1.625rem;
+  --radius-pill: 9999px;
+
+  --shadow-card: var(--shadow-card);
+  --shadow-raised: var(--shadow-raised);
+  --shadow-overlay: var(--shadow-overlay);
+  --shadow-primary: var(--shadow-primary);
+  --shadow-brand: var(--shadow-brand);
+
+  /* ------------------------------------------------------------------ motion
+     Two rules:
+
+       1. Anything a person moves is a spring — the pill sliding to the
+          chosen tab, a dialog landing, the drawer. `ease-spring` is a spring
+          (stiffness 220, damping 26) sampled into linear(); `ease-pop`
+          (260 / 18) is the one place overshoot is welcome.
+       2. Anything the panel does on its own is a timing curve — a list
+          arriving, a skeleton breathing, a scrim fading.
+     ------------------------------------------------------------------------ */
+  --ease-snap: cubic-bezier(0.2, 0, 0, 1);
+  --ease-out-cubic: cubic-bezier(0.33, 1, 0.68, 1);
+  --ease-spring: linear(
+    0, 0.033 3.6%, 0.112 7.1%, 0.215 10.7%, 0.326 14.3%, 0.435 17.9%,
+    0.537 21.4%, 0.627 25%, 0.706 28.6%, 0.772 32.1%, 0.826 35.7%, 0.87 39.3%,
+    0.905 42.9%, 0.932 46.4%, 0.953 50%, 0.969 53.6%, 0.98 57.1%, 0.989 60.7%,
+    0.994 64.3%, 0.998 67.9%, 1.001 71.4%, 1.002 75%, 1.003 78.6%, 1.003 85.7%,
+    1.002 96.4%, 1
+  );
+  --ease-pop: linear(
+    0, 0.053 3.6%, 0.183 7.1%, 0.35 10.7%, 0.525 14.3%, 0.688 17.9%,
+    0.828 21.4%, 0.937 25%, 1.016 28.6%, 1.066 32.1%, 1.093 35.7%, 1.102 39.3%,
+    1.097 42.9%, 1.085 46.4%, 1.068 50%, 1.05 53.6%, 1.033 57.1%, 1.019 60.7%,
+    1.007 64.3%, 0.999 67.9%, 0.994 71.4%, 0.99 78.6%, 0.991 85.7%,
+    0.995 92.9%, 1
+  );
+
+  /* A block arriving on a page that just opened. */
+  --animate-rise: rise 420ms var(--ease-out-cubic) both;
+  /* A row or a tile in a list — pair with `stagger`. */
+  --animate-enter: enter 320ms var(--ease-out-cubic) both;
+  --animate-slide: slide 260ms var(--ease-out-cubic) both;
+  /* A value appearing from nothing. */
+  --animate-pop: pop 580ms var(--ease-pop) both;
+  --animate-settle: settle 420ms var(--ease-out-cubic) both;
+  --animate-fade: fade 200ms var(--ease-out-cubic) both;
+  --animate-fade-out: fade-out 160ms ease-in both;
+  --animate-dialog-in: dialog-in 520ms var(--ease-spring) both;
+  --animate-dialog-out: dialog-out 160ms ease-in both;
+  --animate-menu-in: menu-in 220ms var(--ease-out-cubic) both;
+  --animate-menu-out: fade-out 120ms ease-in both;
+  --animate-drawer-in: drawer-in 520ms var(--ease-spring) both;
+  --animate-drawer-out: drawer-out 200ms ease-in both;
+  /* Waiting. */
+  --animate-breathe: breathe 1400ms ease-in-out infinite;
+  /* "This is happening now" — the one loop that means live. */
+  --animate-ripple: ripple 1400ms linear infinite;
+  --animate-wave: wave 2700ms var(--ease-out-cubic) infinite;
+  --animate-bob: bob 3600ms ease-in-out infinite;
+  --animate-draw: draw 1200ms var(--ease-out-cubic) both;
+  --animate-fill: fill 620ms var(--ease-out-cubic) both;
+  --animate-grow: grow 620ms var(--ease-out-cubic) both;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+  }
+  @keyframes enter {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+  }
+  @keyframes slide {
+    from {
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+  }
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: scale(0.4);
+    }
+    30% {
+      opacity: 1;
+    }
+  }
+  @keyframes settle {
+    from {
+      opacity: 0;
+      transform: scale(0.92);
+    }
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes fade-out {
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes dialog-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px) scale(0.96);
+    }
+    40% {
+      opacity: 1;
+    }
+  }
+  @keyframes dialog-out {
+    to {
+      opacity: 0;
+      transform: translateY(8px) scale(0.98);
+    }
+  }
+  @keyframes menu-in {
+    from {
+      opacity: 0;
+      transform: translateY(-4px) scale(0.97);
+    }
+  }
+  @keyframes drawer-in {
+    from {
+      transform: translateX(-100%);
+    }
+  }
+  @keyframes drawer-out {
+    to {
+      transform: translateX(-100%);
+    }
+  }
+  @keyframes breathe {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.45;
+    }
+  }
+  @keyframes ripple {
+    from {
+      opacity: 0.55;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(2.6);
+    }
+  }
+  @keyframes wave {
+    from {
+      opacity: 0.32;
+      transform: scale(0.7);
+    }
+    to {
+      opacity: 0;
+      transform: scale(2.6);
+    }
+  }
+  @keyframes bob {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-6px);
+    }
+  }
+  /* For a path with pathLength="1" and stroke-dasharray="1". */
+  @keyframes draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes fill {
+    from {
+      transform: scaleX(0);
+    }
+  }
+  /* A bar of a chart rising from its baseline. */
+  @keyframes grow {
+    from {
+      transform: scaleY(0);
+    }
+  }
+}
+
+/* Row `--i` waits `i × 45ms`, capped at the sixth, so the last row of a long
+   list does not arrive a second late. */
+@utility stagger {
+  animation-delay: calc(min(var(--i, 0), 6) * 45ms);
+}
+
+/* The page's brand band: the game's magenta, with its violet rising out of
+   the far corner and a little light at the near one. */
+@utility bg-brand-band {
+  background:
+    radial-gradient(
+      90% 160% at 100% 100%,
+      var(--color-brand-to) 0%,
+      transparent 62%
+    ),
+    radial-gradient(
+      50% 120% at 0% 0%,
+      oklch(1 0 0 / 0.1) 0%,
+      transparent 70%
+    ),
+    var(--color-brand-from);
+}
+
+/* The logo's own gradient, corner to corner. */
+@utility bg-brand-wash {
+  background: linear-gradient(
+    135deg,
+    var(--color-brand-from),
+    var(--color-brand-to)
+  );
+}
+
+/* An empty state's well — the two soft tints meeting. */
+@utility bg-tint-wash {
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-soft),
+    var(--color-secondary-soft)
+  );
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    border-color: var(--color-line);
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    font-weight: 500;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  /* Everything that takes a click says so with the hand — once, here. */
+  a[href],
+  button,
+  summary,
+  label:has(input:is([type='checkbox'], [type='radio'])),
+  [role='button'],
+  [role='combobox'],
+  [role='link'],
+  [role='menuitem'],
+  [role='menuitemcheckbox'],
+  [role='menuitemradio'],
+  [role='option'],
+  [role='switch'],
+  [role='tab'],
+  [role='radio'] {
+    cursor: pointer;
+  }
+
+  /* What refuses the click says that instead. */
+  :disabled,
+  [aria-disabled='true'],
+  [data-disabled] {
+    cursor: not-allowed;
+  }
+
+  ::selection {
+    background: var(--color-primary-soft-active);
+    color: var(--color-ink);
+  }
+
+  /* Scrollbars read as chrome, not content. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line-strong) transparent;
+  }
+
+  /* Numbers line up in tables and tiles. */
+  table,
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Motion is decoration here, never information: every state it shows is
+     also said in words. Someone who asked for less gets none of it. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 1ms !important;
+      animation-delay: 0ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 1ms !important;
+    }
+  }
+}

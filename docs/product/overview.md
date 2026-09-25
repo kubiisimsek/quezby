@@ -12,6 +12,28 @@ barı** sürekli erir; doğru hareket doldurur, hata boşaltır. Bar bitince:
 Hedef: oyuncu **her gün bir kez girip bir tur oynasın**. Her şey bu tek turu
 anlamlı kılmak için var.
 
+## İlk açılış
+
+İlk kez giren oyuncuyu önce oyun karşılar, form değil (Apple'ın _Onboarding
+for Games_ rehberi ve Unity'nin "önce anonim hesap, sonra bağla" yaklaşımı):
+
+1. **Karşılama:** marka, dört hareketin taşları, tek altın **Oyna** ve
+   **Hesabım var, giriş yap**. Oyna misafir hesabı açar; hesap açılırken
+   sunucu ona `guest48128742` gibi bir ad verir.
+2. **Deneme turu:** gerçek kurallarla bir tur, ama tamamen telefonda —
+   sunucuya hiç gitmez, **hiçbir yere sayılmaz** (tablo, lig, istatistik,
+   rekor). Her hareketin ilk postundan önce akış durur ve bir koç kartı onu
+   anlatır; postun süresi "Anladım"dan sonra başlar. Sonuç "DENEME TURU"
+   etiketlidir; turun bitmeden göremediği hareketler orada anlatılır.
+3. **Takma ad:** "Sana ne diyelim?" — seçilebilir ya da **Şimdilik geç**
+   denir; geçen oyuncu otomatik adla oynar, Profil'den istediği zaman ad seçer.
+4. **Hesabını koru:** Apple, Google ya da e-posta — ya da **Şimdi değil**.
+   Apple/Google ile yeni açılan hesap bu adımı görmez.
+
+İlk adımlar hesaba bağlıdır ve telefonda saklanır: uygulamayı kapatan oyuncu
+kaldığı adıma döner, başka bir hesaba giren görmez. **Hesabım var** ile var olan
+hesabına giren doğrudan lobiye geçer.
+
 ## Döngü
 
 1. **Lobi** (Oyna sekmesi): bugünün **Günün akışı**, ligdeki yerin, hemen
@@ -38,8 +60,12 @@ Ayrıntılar: [scoring.md](./scoring.md).
   `Quezby · Günün akışı #17 · 🟩🟩🟨🟥⬛ · 52.340 puan · #37/1.204` — kare
   başına bir seviye (🟩 hatasız, 🟨 bir-iki hata, 🟥 daha fazla, ⬛ bittiği yer).
   Metni sunucu yazar.
-- **Haftalık ligler:** Bronz · Gümüş · Altın · Platin · Elmas. Haftanın ilk
-  sıralı turunda benzer kademedeki en fazla 30 kişilik bir gruba oturursun.
+- **Haftalık ligler:** Bronz · Gümüş · Altın · Platin · Elmas. Lig, oyuncunun
+  **ilk 3 sayılan turundan** (sıralı ve puan almış; deneme turu sayılmaz)
+  sonra açılır — tek tur oynayıp bırakanlar grupları doldurmaz; lobi ve Lig
+  sekmesi "Lige 2 oyun kaldı" der. Bir kez lige girmiş oyuncu için hep açıktır.
+  Sonra haftanın ilk sıralı turunda benzer kademedeki en fazla 30 kişilik bir
+  gruba oturursun.
   **Lig puanı, haftanın her gününün en iyi skorlarının toplamıdır** — her gün
   bir tur, bir akşamda kasmaktan değerlidir. Hafta bitince ilk 5 bir üst lige
   çıkar, son 5 düşer (küçük gruplarda orantılı; Bronz'dan aşağı, Elmas'tan
@@ -63,9 +89,12 @@ Ayrıntılar: [scoring.md](./scoring.md).
 
 ## Hesap
 
-- **Apple ile / Google ile devam et** ya da **Misafir olarak başla**. Misafir
-  token'ı keychain'de tutulur (iOS'ta uygulama silinse bile kalır). İlk tur
-  öncesi tek soru: kullanıcı adı ([usernames.md](./usernames.md)).
+- Yeni oyuncu **Oyna** ile misafir başlar; var olan hesaba **Hesabım var, giriş
+  yap** (Apple, Google ya da e-posta) ile girilir. Misafir token'ı keychain'de
+  tutulur (iOS'ta uygulama silinse bile kalır). Her hesap açıldığı anda bir ad
+  alır — oyuncu seçene kadar `guest48128742` ([usernames.md](./usernames.md)).
+- Misafir kalan oyuncuya, ligi açıldığı ilk an lobide **bir kez** "Hesabını
+  koru" sorulur: kaybedecek bir şeyi olduğu an. Sonrası yalnızca Profil'dedir.
 - **Hesabını koru:** misafir hesaba Apple, Google ya da e-posta + şifre
   bağlanır; turlar hesapla kalır. Başka cihazdan girilebilir. Hesaplar e-postaya
   göre asla birleştirilmez. Korunan hesapta aynı yer **Giriş yolları** olur:

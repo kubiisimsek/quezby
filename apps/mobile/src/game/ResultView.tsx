@@ -1,9 +1,10 @@
-import type { RunSummary } from '@quezby/engine';
+import type { ReelKind, RunSummary } from '@quezby/engine';
 import type {
   DailyResult,
   FinishRunResponse,
   LeaderboardPeriod,
   LeagueStanding,
+  LeagueUnlock,
   LeagueZone,
   PassedPlayer,
   RankChange,
@@ -36,7 +37,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 
 import { APP_PLATFORM } from '@/config/env';
-import { BONUS_ORDER, DEVICE_FAILED } from '@/game/howTo';
+import { BONUS_ORDER, DEVICE_FAILED, REEL_GUIDE } from '@/game/howTo';
 import type { Outcome } from '@/game/useGame';
 import {
   formatCombo,
@@ -56,6 +57,7 @@ import {
   CountUp,
   Eyebrow,
   IconChip,
+  Meter,
   Panel,
   Ribbon,
   Screen,
@@ -67,6 +69,7 @@ import {
   TierBadge,
   Txt,
   gemColors,
+  type ButtonTone,
   type StatItem,
   type TagTone,
 } from '@/ui/kit';
@@ -146,7 +149,7 @@ const SLIDE: WithTimingConfig = {
 };
 
 type Section =
-  'status' | 'daily' | 'breakdown' | 'stats' | 'ranks' | 'passed' | 'league';
+  'status' | 'daily' | 'breakdown' | 'stats' | 'unseen' | 'ranks' | 'passed' | 'league';
 
 type Plan = {
   crown: number;
@@ -168,6 +171,7 @@ function choreograph(
     daily: 0,
     breakdown: 0,
     stats: 0,
+    unseen: 0,
     ranks: 0,
     passed: 0,
     league: 0,
@@ -201,6 +205,13 @@ function noteFor(outcome: Outcome): Note | null {
     };
   }
   if (outcome.mode === 'practice') {
+    if (outcome.reason === 'tutorial') {
+      return {
+        tone: 'info',
+        title: 'Deneme turu',
+        body: 'Bu tur hiçbir yere sayılmadı. Hareketleri gördün; sıra gerçek oyunda.',
+      };
+    }
     return {
       tone: 'info',
       title: 'Antrenman turu',
@@ -239,7 +250,9 @@ function noteFor(outcome: Outcome): Note | null {
  * The end of a run. A ranked run shows only what the API answered — the
  * score its replay found, the ranks, the league, the daily card; the phone's
  * own count never reaches this screen. Practice runs, which the API never
- * sees, show the engine's summary under a "practice" label.
+ * sees, show the engine's summary under a "practice" label. A new player's
+ * practice run ("DENEME TURU") also shows the kinds it ended before, and
+ * leads on (`onContinue`) instead of home.
  *
  * It arrives as a sequence: the score slams in and counts up, a new record
  * lands in gold with confetti, the tiles follow and the buttons come last. A
@@ -254,6 +267,7 @@ export function ResultView({
   onClose,
   onRetrySubmit,
   onOpenDaily,
+  onContinue,
 }: {
   outcome: Outcome;
   mode: 'free' | 'daily';
@@ -262,12 +276,16 @@ export function ResultView({
   onClose: () => void;
   onRetrySubmit: () => void;
   onOpenDaily: () => void;
+  /** After a new player's practice run: on to their name. */
+  onContinue?: () => void;
 }) {
   const insets = useSafeAreaInsets();
   const reduced = useReducedMotion();
   const verified = outcome.mode === 'verified' ? outcome.response : null;
   const run = verified?.run ?? null;
   const practice = outcome.mode === 'practice' ? outcome.summary : null;
+  const tutorial = outcome.mode === 'practice' && outcome.reason === 'tutorial';
+  const unseen = outcome.mode === 'practice' ? (outcome.unseen ?? []) : [];
   const score = run?.score ?? practice?.score ?? null;
   const endedBy = run?.endedBy ?? practice?.endedBy ?? null;
   const ranked = run?.status === 'ranked';
@@ -279,9 +297,10 @@ export function ResultView({
   if (verified?.daily) shown.push('daily');
   if (verified) shown.push('breakdown');
   if (verified || practice) shown.push('stats');
+  if (unseen.length > 0) shown.push('unseen');
   if (verified && ranked) shown.push('ranks');
   if (verified && verified.passed.length > 0) shown.push('passed');
-  if (verified?.league) shown.push('league');
+  if (verified?.league || verified?.leagueUnlock) shown.push('league');
   const plan = choreograph(shown, score !== null, record);
 
   const [skipped, setSkipped] = useState(reduced);
@@ -308,12 +327,18 @@ export function ResultView({
       }
     : undefined;
 
-  const main: { label: string; icon: IconName; onPress: () => void } =
-    outcome.mode === 'unsent' && outcome.canRetry
-      ? { label: 'Tekrar gönder', icon: 'refresh', onPress: onRetrySubmit }
-      : mode === 'daily'
-        ? { label: 'Serbest oyna', icon: 'play', onPress: onPlayFree }
-        : { label: 'Tekrar oyna', icon: 'play', onPress: onReplay };
+  const main: DockAction & { icon: IconName } =
+    tutorial && onContinue
+      ? { label: 'Devam et', icon: 'check', tone: 'primary', onPress: onContinue }
+      : outcome.mode === 'unsent' && outcome.canRetry
+        ? { label: 'Tekrar gönder', icon: 'refresh', tone: 'play', onPress: onRetrySubmit }
+        : mode === 'daily'
+          ? { label: 'Serbest oyna', icon: 'play', tone: 'play', onPress: onPlayFree }
+          : { label: 'Tekrar oyna', icon: 'play', tone: 'play', onPress: onReplay };
+  const leave: DockAction =
+    tutorial && onContinue
+      ? { label: 'Bir daha dene', tone: 'secondary', onPress: onReplay }
+      : { label: 'Ana sayfaya dön', tone: 'ghost', onPress: onClose };
 
   return (
     <Screen>
@@ -331,7 +356,7 @@ export function ResultView({
             top={insets.top}
             endedBy={endedBy}
             score={score}
-            practice={practice !== null}
+            practice={practice === null ? null : tutorial ? 'tutorial' : 'practice'}
             record={record}
             best={verified?.best?.score ?? null}
             crownAt={plan.crown}
@@ -381,6 +406,12 @@ export function ResultView({
                 />
               </Rise>
             ) : null}
+
+            {unseen.length > 0 ? (
+              <Rise at={plan.at.unseen} skipped={skipped}>
+                <Unseen kinds={unseen} />
+              </Rise>
+            ) : null}
           </View>
         </ScrollView>
 
@@ -394,7 +425,7 @@ export function ResultView({
               ? () => void Share.share({ message: verified.shareText })
               : undefined
           }
-          onClose={onClose}
+          leave={leave}
           onHeight={setDockHeight}
         />
       </View>
@@ -493,7 +524,8 @@ function Stage({
   top: number;
   endedBy: RunSummary['endedBy'] | null;
   score: number | null;
-  practice: boolean;
+  /** A run the API never saw: offline or outdated practice, or a new player's practice run. */
+  practice: 'practice' | 'tutorial' | null;
   record: boolean;
   best: number | null;
   crownAt: number;
@@ -521,7 +553,7 @@ function Stage({
     >
       {practice ? (
         <Rise at={0} skipped={skipped}>
-          <Ribbon label="ANTRENMAN" tone="ink" />
+          <Ribbon label={practice === 'tutorial' ? 'DENEME TURU' : 'ANTRENMAN'} tone="ink" />
         </Rise>
       ) : null}
 
@@ -566,7 +598,7 @@ function Stage({
           </Slam>
           <Rise at={BEAT.score + 160} skipped={skipped}>
             <Text style={[styles.unit, { color: theme.onBrand }, embossed(2)]}>
-              {practice ? 'antrenman puanı' : 'puan'}
+              {practice === 'tutorial' ? 'deneme puanı' : practice ? 'antrenman puanı' : 'puan'}
             </Text>
           </Rise>
         </View>
@@ -718,8 +750,54 @@ function Verified({
         <Rise at={plan.at.league} skipped={skipped}>
           <LeagueTile league={response.league} />
         </Rise>
+      ) : response.leagueUnlock ? (
+        <Rise at={plan.at.league} skipped={skipped}>
+          <LeagueUnlockTile unlock={response.leagueUnlock} />
+        </Rise>
       ) : null}
     </>
+  );
+}
+
+/** The league before it opens: how many counted runs it still waits for. */
+function LeagueUnlockTile({ unlock }: { unlock: LeagueUnlock }) {
+  const played = unlock.required - unlock.remaining;
+  return (
+    <Panel style={styles.unlock}>
+      <View style={styles.league}>
+        <IconChip icon="lock" tone="secondary" size="lg" />
+        <View style={styles.leagueText}>
+          <Txt variant="title">{`Lige ${unlock.remaining} oyun kaldı`}</Txt>
+          <Txt variant="meta" tone="muted">
+            {`Lig, ilk ${unlock.required} oyunundan sonra açılır.`}
+          </Txt>
+        </View>
+      </View>
+      <Meter value={played / unlock.required} tone="secondary" />
+    </Panel>
+  );
+}
+
+/** A practice run that ended before some kinds came up: their rules, so nothing is left unknown. */
+function Unseen({ kinds }: { kinds: readonly ReelKind[] }) {
+  return (
+    <Panel style={styles.unseen}>
+      <Eyebrow icon="info">Henüz görmediklerin</Eyebrow>
+      {kinds.map((kind) => {
+        const guide = REEL_GUIDE[kind];
+        return (
+          <View key={kind} style={styles.unseenRow}>
+            <IconChip icon={guide.icon} tone={guide.tone === 'neutral' ? 'secondary' : guide.tone} />
+            <View style={styles.leagueText}>
+              <Txt variant="heading">{guide.title}</Txt>
+              <Txt variant="meta" tone="muted">
+                {guide.body}
+              </Txt>
+            </View>
+          </View>
+        );
+      })}
+    </Panel>
   );
 }
 
@@ -1077,9 +1155,13 @@ function LeagueTile({ league }: { league: LeagueStanding }) {
   );
 }
 
+type DockAction = { label: string; tone: ButtonTone; onPress: () => void };
+
 /**
  * The way on, on a dark tray at the bottom: gold for the one that starts a
- * game, then sharing and the way home. It slides up last.
+ * game, then sharing and the way home. It slides up last. After a new
+ * player's practice run the way on is magenta — it leads to their name, not
+ * a game — and the second slab plays the practice run again.
  */
 function Dock({
   at,
@@ -1087,15 +1169,15 @@ function Dock({
   bottom,
   main,
   onShare,
-  onClose,
+  leave,
   onHeight,
 }: {
   at: number;
   skipped: boolean;
   bottom: number;
-  main: { label: string; icon: IconName; onPress: () => void };
+  main: DockAction & { icon: IconName };
   onShare?: () => void;
-  onClose: () => void;
+  leave: DockAction;
   onHeight: (height: number) => void;
 }) {
   const theme = useTheme();
@@ -1124,7 +1206,7 @@ function Dock({
       <Button
         label={main.label}
         icon={main.icon}
-        tone="play"
+        tone={main.tone}
         onPress={main.onPress}
       />
       <View style={styles.dockRow}>
@@ -1139,11 +1221,11 @@ function Dock({
           />
         ) : null}
         <Button
-          label="Ana sayfaya dön"
-          tone="ghost"
+          label={leave.label}
+          tone={leave.tone}
           size="md"
-          onPress={onClose}
-          style={onShare ? styles.grow : null}
+          onPress={leave.onPress}
+          style={onShare || leave.tone !== 'ghost' ? styles.grow : null}
         />
       </View>
     </Animated.View>
@@ -1279,6 +1361,9 @@ const styles = StyleSheet.create({
   },
   league: { alignItems: 'center', flexDirection: 'row', gap: SPACE.md },
   leagueText: { flex: 1, gap: SPACE.xs },
+  unlock: { gap: SPACE.md },
+  unseen: { gap: SPACE.md },
+  unseenRow: { alignItems: 'center', flexDirection: 'row', gap: SPACE.md },
   dock: {
     borderBottomWidth: 0,
     borderTopLeftRadius: RADIUS.overlay,

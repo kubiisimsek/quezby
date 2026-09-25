@@ -73,11 +73,32 @@ function response(
       zone: 'promote',
       points: 250_000,
     },
+    leagueUnlock: null,
     shareText:
       "Quezby'de 104.560 puan yaptım! 245 post · bugün #12. Sen kaç yaparsın?",
     ...overrides,
   };
 }
+
+/** A practice run's own count — the API never saw it. */
+const SUMMARY = {
+  engineVersion: 2,
+  seed: 1,
+  score: 900,
+  reels: 12,
+  hits: 11,
+  misses: 1,
+  perfects: 0,
+  maxStreak: 9,
+  level: 1,
+  accuracy: 916,
+  avgReactionMs: 500,
+  activeMs: 9000,
+  endedBy: 'quit' as const,
+  maxCombo: 1450,
+  bonusPoints: 0,
+  bonuses: { flawless: 0, lightning: 0, coolHead: 0, comeback: 0 },
+};
 
 function view(outcome: Outcome, mode: 'free' | 'daily' = 'free') {
   const handlers = {
@@ -280,6 +301,51 @@ describe('ResultView', () => {
     expect(screen.getByText('Antrenman turu')).toBeTruthy();
     expect(screen.getByText('antrenman puanı')).toBeTruthy();
     expect(screen.queryByText('Paylaş')).toBeNull();
+  });
+
+  it('labels a new player’s practice run, and leads on from it — or plays it again', async () => {
+    const { handlers } = view({ mode: 'practice', summary: SUMMARY, reason: 'tutorial', unseen: [] });
+    const onContinue = jest.fn();
+    await renderWithProviders(
+      <ResultView
+        outcome={{ mode: 'practice', summary: SUMMARY, reason: 'tutorial', unseen: [] }}
+        mode="free"
+        {...handlers}
+        onContinue={onContinue}
+      />,
+    );
+
+    expect(screen.getByText('DENEME TURU')).toBeTruthy();
+    expect(screen.getByText('Deneme turu')).toBeTruthy();
+    expect(screen.getByText('deneme puanı')).toBeTruthy();
+    expect(screen.getByText('Bu tur hiçbir yere sayılmadı. Hareketleri gördün; sıra gerçek oyunda.')).toBeTruthy();
+    expect(screen.queryByText('Paylaş')).toBeNull();
+    expect(screen.queryByText('Ana sayfaya dön')).toBeNull();
+    expect(screen.queryByText('Henüz görmediklerin')).toBeNull();
+
+    await fireEvent.press(screen.getByText('Devam et'));
+    expect(onContinue).toHaveBeenCalledTimes(1);
+    await fireEvent.press(screen.getByText('Bir daha dene'));
+    expect(handlers.onReplay).toHaveBeenCalledTimes(1);
+  });
+
+  it('lists the kinds a practice run ended before', async () => {
+    await view({ mode: 'practice', summary: SUMMARY, reason: 'tutorial', unseen: ['hold', 'freeze'] }).render();
+
+    expect(screen.getByText('Henüz görmediklerin')).toBeTruthy();
+    expect(screen.getByText('Altın post')).toBeTruthy();
+    expect(screen.getByText('Dokunma!')).toBeTruthy();
+    expect(screen.queryByText('Sıradan post')).toBeNull();
+  });
+
+  it('says how many counted runs the league still waits for', async () => {
+    await view({
+      mode: 'verified',
+      response: response({ league: null, leagueUnlock: { required: 3, remaining: 2 } }),
+    }).render();
+
+    expect(screen.getByText('Lige 2 oyun kaldı')).toBeTruthy();
+    expect(screen.getByText('Lig, ilk 3 oyunundan sonra açılır.')).toBeTruthy();
   });
 
   it('gives a player who reduces motion no confetti, and nothing to skip', async () => {

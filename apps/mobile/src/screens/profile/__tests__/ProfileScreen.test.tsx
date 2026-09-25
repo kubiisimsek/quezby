@@ -1,6 +1,6 @@
 import { postsOf } from '@quezby/config';
 import type { LeagueResponse, PlayerStats, StatsResponse } from '@quezby/types';
-import { act, fireEvent, screen } from '@testing-library/react-native';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 
 import { api } from '@/api/client';
 import { useSession } from '@/auth/session';
@@ -69,6 +69,7 @@ function league(overrides: Partial<LeagueResponse> = {}): LeagueResponse {
     endsAt: '2026-09-27T21:00:00.000Z',
     serverTime: '2026-09-24T10:00:00.000Z',
     joined: false,
+    unlock: null,
     members: [],
     me: null,
     promoteCount: 5,
@@ -149,6 +150,20 @@ describe('ProfileScreen', () => {
       expect(
         screen.getByLabelText('Bugün: sıralamada değilsin'),
       ).toBeOnTheScreen();
+    });
+
+    it('names no league before it has opened to the player', async () => {
+      mocked.leagues.current.mockResolvedValue(league({ unlock: { required: 3, remaining: 2 } }));
+      await renderProfile();
+      // The league's answer has landed and been drawn.
+      await waitFor(() => expect(mocked.leagues.current).toHaveBeenCalled());
+      await act(async () => {
+        await new Promise<void>((resolve) => {
+          setTimeout(() => resolve(), 20);
+        });
+      });
+
+      expect(screen.queryByLabelText(/ lig$/)).not.toBeOnTheScreen();
     });
 
     it('leaves friends to their own tab', async () => {
@@ -358,6 +373,20 @@ describe('ProfileScreen', () => {
       expect(
         screen.getByText('Sıralamadaki tüm skorların yeni adla görünür.'),
       ).toBeOnTheScreen();
+    });
+
+    it('asks a player still on the automatic name to pick one, from an empty field', async () => {
+      useSession.setState({ user: buildMe({ username: 'guest48128742' }) });
+      await renderProfile();
+      await openSettings();
+
+      await fireEvent.press(screen.getByRole('button', { name: /^Adını seç/ }));
+      await leave();
+
+      expect(
+        screen.getByText('Şimdilik @guest48128742 olarak görünüyorsun. Seçtiğin ad bütün skorlarında görünür.'),
+      ).toBeOnTheScreen();
+      expect(screen.getByPlaceholderText('ornek.kullanici').props.value ?? '').toBe('');
     });
 
     it('keeps a guest account from here too', async () => {

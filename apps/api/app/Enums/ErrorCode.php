@@ -27,12 +27,14 @@ enum ErrorCode: string
     case IntegrityInvalid = 'integrity_invalid';
     case AttestKeyUnknown = 'attest_key_unknown';
     case TooManyRequests = 'too_many_requests';
+    case Forbidden = 'forbidden';
     case ServerError = 'server_error';
 
     public function status(): int
     {
         return match ($this) {
             self::Unauthenticated => 401,
+            self::Forbidden => 403,
             self::NotFound => 404,
             self::UsernameTaken, self::EmailTaken, self::AlreadyLinked, self::IdentityTaken, self::LastSignInMethod,
             self::RunAlreadyFinished, self::DailyAlreadyPlayed, self::AttestKeyUnknown => 409,
@@ -70,6 +72,7 @@ enum ErrorCode: string
             self::IntegrityInvalid => 'Cihaz doğrulaması okunamadı, tekrar dene.',
             self::AttestKeyUnknown => 'Bu cihazın anahtarı tanınmıyor, cihazı yeniden doğrula.',
             self::TooManyRequests => 'Çok fazla istek gönderdin, biraz bekleyip tekrar dene.',
+            self::Forbidden => 'Bu işlem için yetkin yok.',
             self::ServerError => 'Bir şeyler ters gitti, birazdan tekrar dene.',
         };
     }

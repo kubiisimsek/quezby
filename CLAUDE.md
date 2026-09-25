@@ -1,6 +1,7 @@
 # Quezby — agent guide
 
-pnpm + Turborepo monorepo. One mobile app, one Laravel API, four packages.
+pnpm + Turborepo monorepo. One mobile app, one admin panel, one Laravel API,
+four packages.
 
 **Quezby turns the reels-scrolling habit into a competitive reflex game.** An
 endless vertical feed; each reel asks for one gesture — swipe up, double-tap,
@@ -16,12 +17,13 @@ monthly and all-time boards, a daily challenge everyone plays on one seed
 
 | Task | Read first |
 | --- | --- |
-| Anything with a UI | `docs/design/design-language.md`, then `docs/design/mobile-design-system.md` |
+| Anything with a UI in the game | `docs/design/design-language.md`, then `docs/design/mobile-design-system.md` |
+| The admin panel (`apps/admin`) | `docs/design/admin-design-system.md`, then `docs/rules/admin-rules.md` |
 | Anything user-visible | `docs/design/ui-writing.md` |
 | Game rules, scoring, difficulty | `docs/product/scoring.md` |
 | Anti-cheat, device integrity, checkpoints | `docs/product/scoring.md` → "Hile koruması" |
 | Usernames | `docs/product/usernames.md` |
-| API work | `docs/backend/api-contract.md` |
+| API work | `docs/backend/api-contract.md` · admin routes: `docs/backend/admin-api.md` |
 | Mobile | `docs/rules/react-native-rules.md` |
 | Local / staging / production | `docs/development/environments.md` |
 | Running it | `docs/development/local-development.md` |
@@ -31,6 +33,8 @@ monthly and all-time boards, a daily challenge everyone plays on one seed
 
 ```
 apps/mobile     Bare React Native 0.86 — ios/ and android/ are committed source
+apps/admin      Vite + React admin panel, static files for shared hosting —
+                players, bans, suspects, runs, boards, leagues, admins, audit log
 apps/api        Laravel + Sanctum — identity (guest, email, Apple, Google), run
                 verification, boards, daily challenge, leagues, follows, stats
 packages/engine the game rules: deterministic, integer-only, replayed by the API,
@@ -60,13 +64,22 @@ packages/sdk    the typed API client
   `apps/mobile/src/ui/kit.tsx` and `sheet.tsx`; `src/ui/tokens.ts` is generated
   from `apps/mobile/design/palette.mjs` (`pnpm tokens`). The enforceable list
   is in `docs/rules/react-native-rules.md` → "Quezby looks like a game".
+  This is the game's (`apps/mobile`) only: the admin panel is a staff tool with
+  its own language — Qesvis's admin language in Quezby's colours,
+  `docs/design/admin-design-system.md` — and never borrows Arena.
 - **Mobile is bare RN, not Expo.** Never add `expo*` packages. Never regenerate
   or gitignore `apps/mobile/ios` / `android`.
 - **A contract change is one commit:** `packages/types` → Laravel → `packages/sdk` → screen.
+- **The admin panel judges nothing, and everything it does is on record.** It
+  shows what `/api/v1/admin` sends and never imports the engine; every admin
+  route declares its least role (`RolesTest`), admin and player tokens never
+  open each other's routes, and every change writes the audit log —
+  `docs/rules/admin-rules.md`.
 - **The phone's word about itself counts for nothing.** Whether a device may
   rank comes only from Google Play Integrity / Apple App Attest verified on the
   API, and a run's timing from server-signed checkpoints.
-- **Secrets never reach the app bundle.** `apps/mobile/.env` ships to users.
+- **Secrets never reach the app bundle.** `apps/mobile/.env` ships to users,
+  and so does every `VITE_*` of `apps/admin` (only `VITE_API_ORIGIN` exists).
 - **Never commit `.env`**; update the matching `.env*.example` when adding a variable.
 - **Never run `git commit`, `git branch` or `git push`.** Leave finished work in
   the working tree and say what changed — the owner commits.
@@ -76,17 +89,20 @@ packages/sdk    the typed API client
 ```bash
 pnpm install
 pnpm switch-local | switch-staging | switch-production   # the app's API (one bundle id)
-pnpm dev:api | dev:mobile | ios | android
+pnpm dev:api | dev:mobile | dev:admin | ios | android
 pnpm lint && pnpm typecheck && pnpm test && pnpm test:api
 pnpm engine:simulate | engine:fixtures | tokens
 pnpm api:package:staging | api:package:production
+pnpm admin:package:staging | admin:package:production
 ```
 
 ## Definition of done
 
 1. `pnpm lint && pnpm typecheck && pnpm test && pnpm test:api` pass. Every
    operation has a test: API tests are **Pest** (`apps/api/tests`), packages use
-   vitest, the app Jest + React Native Testing Library.
+   vitest, the app Jest + React Native Testing Library, the admin panel
+   Vitest + Testing Library.
 2. Docs updated when behaviour, rules or contracts changed;
    `docs/changelog/CHANGELOG.md` has an entry.
-3. No `any`, no screen-level `fetch`, no hex outside `design/palette.mjs`.
+3. No `any`, no screen-level `fetch`, no hex outside `design/palette.mjs` (the
+   game) or the OKLCH ramps of `apps/admin/src/index.css` (the panel).

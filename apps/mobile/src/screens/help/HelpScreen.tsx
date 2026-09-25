@@ -221,7 +221,8 @@ export function HelpScreen({ navigation }: Props) {
             </View>
           </Well>
           <Txt>
-            Beş lig var, Bronz’dan Elmas’a. Haftanın ilk sıralı turunla
+            Beş lig var, Bronz’dan Elmas’a. Lig, ilk 3 sayılan oyunundan sonra
+            açılır; deneme turu sayılmaz. Sonra haftanın ilk sıralı turunla
             ligindeki 30 kişilik bir gruba katılırsın.
           </Txt>
           <Txt tone="muted">
@@ -279,7 +280,9 @@ export function HelpScreen({ navigation }: Props) {
 
         <Section icon="account" title="Hesap">
           <Txt>
-            İlk açılışta misafir olarak başlarsın; hesabın bu telefonda durur.
+            İlk açılışta bir deneme turuyla başlarsın; o tur hiçbir yere
+            sayılmaz. Hesabın misafir olarak bu telefonda durur ve bir ad
+            seçene kadar guest48128742 gibi bir adla oynarsın.
           </Txt>
           <Txt tone="muted">
             Profil’de “Hesabını koru” ile Apple, Google ya da e-posta bağla;

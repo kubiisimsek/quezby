@@ -43,12 +43,15 @@ export function ReelCard({
   seed,
   values,
   hint,
+  paused = false,
 }: {
   reel: Reel;
   seed: number;
   values: ReelValues;
   /** The intro teaches each kind once, in words. */
   hint: boolean;
+  /** Waiting under a coach card: not live yet, so it holds still. */
+  paused?: boolean;
 }) {
   const insets = useSafeAreaInsets();
   const look = useMemo(() => lookOf(seed, reel), [seed, reel]);
@@ -58,6 +61,7 @@ export function ReelCard({
   // The reel is "playing": the one loop that means live.
   useEffect(() => {
     pulse.value = 0;
+    if (paused) return undefined;
     pulse.value = withRepeat(
       withSequence(
         withTiming(1, { duration: reel.kind === 'freeze' ? 380 : 900, easing: Easing.inOut(Easing.quad) }),
@@ -67,7 +71,7 @@ export function ReelCard({
       false,
     );
     return () => cancelAnimation(pulse);
-  }, [pulse, reel.index, reel.kind]);
+  }, [paused, pulse, reel.index, reel.kind]);
 
   const cardStyle = useAnimatedStyle(() => ({
     opacity: values.enter.value,

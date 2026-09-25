@@ -14,10 +14,10 @@ it('signs up a new Apple player', function () {
 
     $response->assertCreated()
         ->assertJsonPath('created', true)
-        ->assertJsonPath('user.username', null)
         ->assertJsonPath('user.email', null)
         ->assertJsonPath('user.isGuest', false)
         ->assertJsonPath('user.identities', ['apple']);
+    $this->assertMatchesRegularExpression('/^guest\d{8}$/', $response->json('user.username'));
     $userId = $response->json('user.id');
     $this->assertDatabaseHas('users', ['id' => $userId, 'platform' => 'ios', 'install_id' => 'install-1', 'email' => null]);
     $this->assertDatabaseHas('social_identities', [
@@ -43,7 +43,8 @@ it('signs the same Apple player back in', function () {
 
     $again->assertOk()
         ->assertJsonPath('created', false)
-        ->assertJsonPath('user.id', $first->json('user.id'));
+        ->assertJsonPath('user.id', $first->json('user.id'))
+        ->assertJsonPath('user.username', $first->json('user.username'));
     $this->assertNotSame($first->json('token'), $again->json('token'));
     $this->assertSame(1, User::query()->count());
     $this->assertTrue(SocialIdentity::query()->sole()->last_used_at->equalTo(now()->startOfSecond()));

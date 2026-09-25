@@ -2,6 +2,7 @@
 
 use App\Exceptions\ApiException;
 use App\Exceptions\ErrorResponse;
+use App\Http\Middleware\EnsureAdminRole;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -17,6 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // The username rules trim exactly what JavaScript's trim() does.
         $middleware->trimStrings(except: ['username']);
+
+        // `admin.role:moderator`: the admin panel's roles, lowest first.
+        $middleware->alias(['admin.role' => EnsureAdminRole::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->dontReport(ApiException::class);

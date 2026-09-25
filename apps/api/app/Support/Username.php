@@ -12,6 +12,8 @@ namespace App\Support;
  *   - `.` and `*` never touch each other
  *   - at least one letter
  *   - case-insensitive: stored and shown in lower case
+ *   - `guest48128742`-like names are the API's: every new account gets one
+ *     until its player picks a name (`GuestNames`)
  */
 final class Username
 {
@@ -49,6 +51,15 @@ final class Username
     /** Nobody may pass for the game itself, however they spell around it. */
     private const RESERVED_FRAGMENTS = ['quezby'];
 
+    /**
+     * `guest` or `misafir` and nothing but digits, however it is dotted: the
+     * API's to give out, so a name a player picked never looks like one it gave.
+     */
+    private const RESERVED_NUMBERED = '/^(guest|misafir)\d+\z/';
+
+    /** The name a new account gets until its player picks one: `guest48128742`. */
+    private const AUTOMATIC = '/^guest\d{8}\z/';
+
     /** Matched with the symbols taken out, so `o.r.o.s.p.u` is caught too. */
     private const BLOCKED_FRAGMENTS = [
         'orospu',
@@ -83,6 +94,12 @@ final class Username
     public static function normalize(string $value): string
     {
         return self::lower(self::trim($value));
+    }
+
+    /** Whether this is still the name the API gave the account, not one its player picked. */
+    public static function isAutomatic(?string $name): bool
+    {
+        return $name !== null && preg_match(self::AUTOMATIC, $name) === 1;
     }
 
     public static function validate(string $input): UsernameValidation
@@ -128,6 +145,7 @@ final class Username
         if (
             in_array($value, self::RESERVED, true)
             || in_array($bare, self::RESERVED, true)
+            || preg_match(self::RESERVED_NUMBERED, $bare) === 1
             || self::containsAny($bare, self::RESERVED_FRAGMENTS)
         ) {
             return UsernameValidation::invalid(UsernameProblem::Reserved);

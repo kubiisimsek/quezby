@@ -16,6 +16,8 @@ use Illuminate\Support\Carbon;
 
 beforeEach(function () {
     Carbon::setTestNow(Carbon::parse('2026-09-23 12:00', 'Europe/Istanbul')); // Wednesday, 2026-W39
+    // The league opens on the first counted run here; how it opens is LeagueUnlockTest's.
+    config(['quezby.leagues.unlock_runs' => 1]);
 });
 
 /** A ranked run of `$score` for `$player`, on the boards and seated in the league. */

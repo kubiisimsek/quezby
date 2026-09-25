@@ -3,6 +3,7 @@ import { CHECKPOINTS, CONTENT_VERSION, PACE, exitDelayMs, prefixHash } from '@qu
 import { ApiError } from '@quezby/sdk';
 import type { CheckpointRequest, FinishRunRequest } from '@quezby/types';
 import { act, renderHook, type RenderHookResult } from '@testing-library/react-native';
+import { AppState, type AppStateStatus, type NativeEventSubscription } from 'react-native';
 
 import { api } from '@/api/client';
 import { useGame } from '@/game/useGame';
@@ -381,5 +382,183 @@ describe('useGame checkpoints', () => {
     expect(runs.checkpoint).toHaveBeenCalledTimes(1);
     expect(finished()).not.toHaveProperty('checkpoints');
     expect(game.result.current.outcome).toEqual({ mode: 'verified', response: answer });
+  });
+});
+
+/** Answers the reel that is up the right way, `REACTION_MS` after it goes live, and waits for the next. */
+async function answerRight(game: Game) {
+  const reel = game.result.current.reel;
+  const { touches } = game.result.current;
+  if (!reel) throw new Error('No reel is up.');
+  if (reel.kind === 'freeze') {
+    await advance(reel.window);
+  } else {
+    await advance(REACTION_MS);
+    await act(async () => {
+      if (reel.kind === 'skip') {
+        touches.onTouchStart(600);
+        touches.onTouchMove(520);
+        touches.onTouchEnd(480);
+      } else if (reel.kind === 'like') {
+        touches.onTouchStart(600);
+        touches.onTouchEnd(600);
+        touches.onTouchStart(600);
+      } else {
+        touches.onTouchStart(600);
+      }
+    });
+    if (reel.kind === 'hold') {
+      await advance(Math.round((reel.zoneCenter * reel.holdFill) / 1000));
+      await act(async () => {
+        touches.onTouchEnd(600);
+      });
+    }
+  }
+  await advance(exitDelayMs(true, reel.kind) + PACE.slideMs);
+}
+
+/** Starts a new player's practice run: its first card is up, before the countdown. */
+async function practiceRun(): Promise<Game> {
+  const game = await renderHook(() => useGame('free'));
+  await act(async () => {
+    await game.result.current.start('tutorial');
+  });
+  return game;
+}
+
+async function dismiss(game: Game) {
+  await act(async () => {
+    game.result.current.dismissCoach();
+  });
+}
+
+describe('useGame practice run', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.clearAllMocks();
+    usePendingRun.setState({ run: null, hydrated: true });
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+    jest.restoreAllMocks();
+  });
+
+  it('explains the first post before the countdown, and waits for the player', async () => {
+    const game = await practiceRun();
+
+    expect(game.result.current.phase).toBe('coach');
+    expect(game.result.current.coach).toBe('skip');
+    await advance(10_000);
+    expect(game.result.current.phase).toBe('coach');
+
+    await dismiss(game);
+    expect(game.result.current.phase).toBe('countdown');
+    expect(game.result.current.coach).toBeNull();
+    await advance(COUNTDOWN_MS);
+    expect(game.result.current.phase).toBe('playing');
+    expect(game.result.current.reel?.index).toBe(0);
+  });
+
+  it('coaches each kind once, before its first post, and the pause never counts', async () => {
+    const game = await practiceRun();
+    await dismiss(game);
+    await advance(COUNTDOWN_MS);
+    const coached: string[] = ['skip'];
+
+    while ((game.result.current.reel?.index ?? 0) < 8) {
+      if (game.result.current.phase === 'coach') {
+        const kind = game.result.current.coach;
+        if (!kind) throw new Error('A card is up without a kind.');
+        coached.push(kind);
+        // Far longer than any window: under a card, no clock runs.
+        await advance(10_000);
+        expect(game.result.current.phase).toBe('coach');
+        await dismiss(game);
+        expect(game.result.current.phase).toBe('playing');
+      }
+      const index = game.result.current.reel?.index;
+      await answerRight(game);
+      expect(game.result.current.feedback?.verdict).toMatch(/^(hit|perfect)$/);
+      expect(game.result.current.reel?.index).toBe((index ?? 0) + 1);
+    }
+
+    expect(coached).toEqual(['skip', 'like', 'hold', 'freeze']);
+    expect(runs.start).not.toHaveBeenCalled();
+    expect(runs.checkpoint).not.toHaveBeenCalled();
+    expect(runs.finish).not.toHaveBeenCalled();
+  });
+
+  it('ignores touches while a card is up', async () => {
+    const game = await practiceRun();
+    await dismiss(game);
+    await advance(COUNTDOWN_MS);
+    await answerRight(game);
+    await answerRight(game);
+    expect(game.result.current.coach).toBe('like');
+
+    await act(async () => {
+      game.result.current.touches.onTouchStart(600);
+      game.result.current.touches.onTouchEnd(600);
+      game.result.current.touches.onTouchStart(600);
+    });
+
+    expect(game.result.current.phase).toBe('coach');
+    expect(game.result.current.reel?.index).toBe(2);
+  });
+
+  it('closing ends it in its result — even in the countdown — with the kinds it never reached', async () => {
+    const game = await practiceRun();
+    await dismiss(game);
+    expect(game.result.current.phase).toBe('countdown');
+
+    await act(async () => {
+      game.result.current.quit();
+    });
+
+    expect(game.result.current.phase).toBe('result');
+    expect(game.result.current.outcome).toMatchObject({
+      mode: 'practice',
+      reason: 'tutorial',
+      unseen: ['like', 'hold', 'freeze'],
+      summary: { reels: 0, score: 0 },
+    });
+  });
+
+  it('shows the cards again on a second try', async () => {
+    const game = await practiceRun();
+    await act(async () => {
+      game.result.current.quit();
+    });
+
+    await act(async () => {
+      await game.result.current.start('tutorial');
+    });
+
+    expect(game.result.current.phase).toBe('coach');
+    expect(game.result.current.coach).toBe('skip');
+  });
+
+  it('keeps going when the app is left under a card, and ends when it is left mid-post', async () => {
+    const listeners: Array<(state: AppStateStatus) => void> = [];
+    jest.spyOn(AppState, 'addEventListener').mockImplementation((_type, listener) => {
+      listeners.push(listener);
+      return { remove: jest.fn() } as unknown as NativeEventSubscription;
+    });
+    const game = await practiceRun();
+    const leave = async () => {
+      await act(async () => {
+        for (const listener of listeners) listener('background');
+      });
+    };
+
+    await leave();
+    expect(game.result.current.phase).toBe('coach');
+
+    await dismiss(game);
+    await advance(COUNTDOWN_MS);
+    await leave();
+    expect(game.result.current.phase).toBe('result');
+    expect(game.result.current.outcome).toMatchObject({ mode: 'practice', reason: 'tutorial' });
   });
 });

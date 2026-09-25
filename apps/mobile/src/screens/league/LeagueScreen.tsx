@@ -138,6 +138,15 @@ export function LeagueScreen({ navigation }: Props) {
         ) : null}
         {data.joined ? (
           <Group members={data.members} onPress={open} />
+        ) : data.unlock ? (
+          <EmptyState
+            icon="lock"
+            title={`Lige ${data.unlock.remaining} oyun kaldı`}
+            hint={`Lig, ilk ${data.unlock.required} oyunundan sonra açılır; deneme turu sayılmaz. Sonra her haftanın ilk turu seni bir gruba yerleştirir.`}
+            action={
+              <Button label="Oyna" icon="play" tone="play" onPress={play} />
+            }
+          />
         ) : (
           <EmptyState
             icon="shield"

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\LeaderboardPeriod;
 use App\Enums\LeagueOutcome;
 use App\Enums\LeagueTier;
+use App\Enums\RunStatus;
 use App\Models\LeaderboardEntry;
 use App\Models\LeagueGroup;
 use App\Models\LeagueMember;
@@ -18,10 +19,11 @@ use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
 /**
- * Weekly leagues, with no cron. A player takes a seat in a group of their
- * tier on their first ranked run of the ISO week; last week's group is
- * settled the first time any of its players needs it. League points are the
- * sum of a player's best score of each day of the week — showing up every
+ * Weekly leagues, with no cron. The league opens to a player after their
+ * first few counted runs (`unlock`); from then on they take a seat in a group
+ * of their tier on their first ranked run of the ISO week. Last week's group
+ * is settled the first time any of its players needs it. League points are
+ * the sum of a player's best score of each day of the week — showing up every
  * day pays, grinding one evening does not.
  */
 final class LeagueService
@@ -32,6 +34,8 @@ final class LeagueService
         private readonly int $groupSize,
         #[Config('quezby.leagues.zone_per_30')]
         private readonly int $zonePer30,
+        #[Config('quezby.leagues.unlock_runs')]
+        private readonly int $unlockRuns,
     ) {}
 
     public function weekKey(CarbonInterface $at): string
@@ -41,17 +45,46 @@ final class LeagueService
 
     /**
      * Seats the player of a ranked run in this week's group, once, and says
-     * where they stand now (`LeagueStanding` in `packages/types`).
+     * where they stand now (`LeagueStanding` in `packages/types`) — or null
+     * while the league is not open to them yet.
      *
-     * @return array{tier: string, rank: int, members: int, zone: string, points: int}
+     * @return array{tier: string, rank: int, members: int, zone: string, points: int}|null
      */
-    public function join(Run $run): array
+    public function join(Run $run): ?array
     {
         $week = $this->weekKey($run->finished_at);
-        $member = $this->membership($run->user, $week)
-            ?? $this->seat($run->user, $week, $this->tierFor($run->user, $week), $run->finished_at);
+        $member = $this->membership($run->user, $week);
+        if ($member === null) {
+            if ($this->unlock($run->user) !== null) {
+                return null;
+            }
+            $member = $this->seat($run->user, $week, $this->tierFor($run->user, $week), $run->finished_at);
+        }
 
         return $this->standingOf($member);
+    }
+
+    /**
+     * `LeagueUnlock` in `packages/types`: how many counted runs — ranked, and
+     * scoring — the player still has to play before the league opens to
+     * them. Null once it is open; it stays open to anyone who has ever sat
+     * in a league. A run being finished counts as soon as it is stored.
+     *
+     * @return array{required: int, remaining: int}|null
+     */
+    public function unlock(User $user): ?array
+    {
+        if (LeagueMember::query()->where('user_id', $user->id)->exists()) {
+            return null;
+        }
+        $counted = Run::query()
+            ->where('user_id', $user->id)
+            ->where('status', RunStatus::Ranked)
+            ->where('score', '>', 0)
+            ->count();
+        $remaining = max(0, $this->unlockRuns - $counted);
+
+        return $remaining === 0 ? null : ['required' => $this->unlockRuns, 'remaining' => $remaining];
     }
 
     /** The tier a player plays `$week` in: last league's outcome applied; Bronz for a newcomer. */
@@ -91,6 +124,7 @@ final class LeagueService
             'endsAt' => Timestamp::iso($bounds[1] ?? null),
             'serverTime' => Timestamp::iso(now()),
             'joined' => $member !== null,
+            'unlock' => $member === null ? $this->unlock($user) : null,
             'members' => [],
             'me' => null,
             'promoteCount' => 0,
@@ -384,5 +418,36 @@ final class LeagueService
         $monday = CarbonImmutable::now($this->leaderboards->timezone())->setISODate($year, $number, 1)->startOfDay();
 
         return [$monday->utc(), $monday->addWeek()->utc()];
+    }
+
+    /**
+     * A group's table for the admin panel: every member's standing and zone,
+     * and how many go up and down.
+     *
+     * @return array{standings: list<array{userId: string, username: string, points: int, days: int, rank: int, zone: string}>, promote: int, demote: int}
+     */
+    public function table(LeagueGroup $group): array
+    {
+        $standings = $this->standings($group);
+        [$promote, $demote] = $this->zones($group->tier, count($standings));
+
+        return [
+            'standings' => array_map(
+                fn (array $row) => $row + ['zone' => $this->zoneOf($row['rank'], count($standings), $promote, $demote)],
+                $standings,
+            ),
+            'promote' => $promote,
+            'demote' => $demote,
+        ];
+    }
+
+    /**
+     * When an ISO week key starts and ends, in UTC.
+     *
+     * @return array{0: CarbonImmutable, 1: CarbonImmutable}
+     */
+    public function boundsOfWeek(string $week): array
+    {
+        return $this->weekBounds($week);
     }
 }

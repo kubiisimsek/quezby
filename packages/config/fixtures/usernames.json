@@ -43,6 +43,14 @@
     {
       "input": "klasik*1",
       "normalized": "klasik*1"
+    },
+    {
+      "input": "guest.kubi",
+      "normalized": "guest.kubi"
+    },
+    {
+      "input": "guesthouse7",
+      "normalized": "guesthouse7"
     }
   ],
   "invalid": [
@@ -155,12 +163,54 @@
       "problem": "reserved"
     },
     {
+      "input": "guest48128742",
+      "problem": "reserved"
+    },
+    {
+      "input": "Guest.4812",
+      "problem": "reserved"
+    },
+    {
+      "input": "misafir*7",
+      "problem": "reserved"
+    },
+    {
       "input": "o.r.o.s.p.u",
       "problem": "blocked"
     },
     {
       "input": "fuck*you",
       "problem": "blocked"
+    }
+  ],
+  "automatic": [
+    {
+      "name": "guest48128742",
+      "automatic": true
+    },
+    {
+      "name": "guest00000001",
+      "automatic": true
+    },
+    {
+      "name": "guest4812874",
+      "automatic": false
+    },
+    {
+      "name": "guest481287420",
+      "automatic": false
+    },
+    {
+      "name": "guest.48128742",
+      "automatic": false
+    },
+    {
+      "name": "misafir48128742",
+      "automatic": false
+    },
+    {
+      "name": "kubi.01",
+      "automatic": false
     }
   ]
 }

@@ -26,7 +26,11 @@ export type BestScore = {
 
 export type Me = {
   id: string;
-  /** Null until the player picks one; nothing ranked is shown without it. */
+  /**
+   * Given when the account is made — `guest48128742` until the player picks
+   * one (`isAutoUsername` in `@quezby/config`). Null only on accounts from
+   * before automatic names; nothing ranked is shown without it.
+   */
   username: string | null;
   /** The email a password sign-in uses, when one is linked. */
   email: string | null;
@@ -251,6 +255,13 @@ export type LeagueStanding = {
   points: number;
 };
 
+/**
+ * The league opens after a player's first few counted runs — ranked, and
+ * scoring. `remaining` of `required` are still to play; once a player has
+ * sat in a league, it stays open to them.
+ */
+export type LeagueUnlock = { required: number; remaining: number };
+
 export type FinishRunResponse = {
   run: RunResult;
   /** This season's best, after this run. */
@@ -261,8 +272,10 @@ export type FinishRunResponse = {
   passed: PassedPlayer[];
   /** Set for a daily run. */
   daily: DailyResult | null;
-  /** Where this week's league stands after the run; null when it did not rank. */
+  /** Where this week's league stands after the run; null when it did not rank, or the league is not open yet. */
   league: LeagueStanding | null;
+  /** How far the league still is after this run; null once it is open. */
+  leagueUnlock: LeagueUnlock | null;
   /** What "Paylaş" sends, written by the API from its own numbers. */
   shareText: string;
 };
@@ -356,8 +369,10 @@ export type LeagueResponse = {
   tier: LeagueTier;
   endsAt: string;
   serverTime: string;
-  /** False until the week's first ranked run seats the player in a group. */
+  /** False until the week's first ranked run seats the player in a group — never before the league is open. */
   joined: boolean;
+  /** Counted runs still to play before the league opens; null once it is open. */
+  unlock: LeagueUnlock | null;
   members: LeagueMember[];
   me: LeagueMember | null;
   promoteCount: number;
@@ -515,6 +530,8 @@ export type ApiErrorCode =
   /** An App Attest key the API has never seen: attest a new one. */
   | 'attest_key_unknown'
   | 'too_many_requests'
+  /** Signed in, but the role may not do this — the admin panel only. */
+  | 'forbidden'
   | 'server_error';
 
 export type ApiErrorBody = {
@@ -524,3 +541,7 @@ export type ApiErrorBody = {
     fields?: Record<string, string[]>;
   };
 };
+
+/* -------------------------------------------------------------- admin -- */
+
+export type * from './admin';

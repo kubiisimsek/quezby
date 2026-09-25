@@ -3,10 +3,12 @@
 namespace Tests;
 
 use App\Content\Catalog;
+use App\Enums\AdminRole;
 use App\Game\Checkpoint;
 use App\Game\EngineError;
 use App\Game\Rules;
 use App\Game\Run as Engine;
+use App\Models\Admin;
 use App\Models\Run;
 use App\Models\User;
 use App\Services\LeaderboardService;
@@ -31,6 +33,20 @@ abstract class TestCase extends BaseTestCase
         Sanctum::actingAs($user);
 
         return $user;
+    }
+
+    /**
+     * An admin of `$role` who has chosen their own password, signed in to the
+     * panel by token.
+     *
+     * @param  array<string, mixed>  $attributes
+     */
+    protected function signInAdmin(AdminRole $role = AdminRole::Owner, array $attributes = []): Admin
+    {
+        $admin = Admin::factory()->role($role)->create($attributes);
+        Sanctum::actingAs($admin, ['admin'], 'admin');
+
+        return $admin;
     }
 
     /**

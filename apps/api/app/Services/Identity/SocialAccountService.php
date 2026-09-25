@@ -18,12 +18,16 @@ use Illuminate\Support\Facades\DB;
  */
 final class SocialAccountService
 {
-    public function __construct(private readonly AppleTokenRevoker $apple) {}
+    public function __construct(
+        private readonly AppleTokenRevoker $apple,
+        private readonly GuestNames $names,
+    ) {}
 
     /**
-     * The player the account belongs to, or a new one on this phone with no
-     * username yet. When two first sign-ins of one account race, the loser
-     * signs in to the player the winner created.
+     * The player the account belongs to, or a new one on this phone, playing
+     * as `guest48128742` until they pick a name. When two first sign-ins of
+     * one account race, the loser signs in to the player the winner created;
+     * a new player whose drawn name was just taken draws again.
      *
      * @return array{user: User, created: bool}
      */
@@ -110,7 +114,11 @@ final class SocialAccountService
     /** @return array{user: User, created: bool} */
     private function signUp(VerifiedIdentity $identity, Platform $platform, string $installId, ?string $refreshToken): array
     {
-        $user = User::create(['platform' => $platform->value, 'install_id' => $installId]);
+        $user = User::create([
+            'username' => $this->names->mint(),
+            'platform' => $platform->value,
+            'install_id' => $installId,
+        ]);
         $this->attach($user, $identity, $refreshToken);
 
         return ['user' => $user, 'created' => true];

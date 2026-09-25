@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="oklch(0.58 0.235 351)" />
+      <stop offset="1" stop-color="oklch(0.5 0.23 289)" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="18" fill="url(#brand)" />
+  <text x="32" y="44" text-anchor="middle" font-family="ui-rounded, 'Quicksand', system-ui, sans-serif" font-size="36" font-weight="700" fill="white">Q</text>
+</svg>

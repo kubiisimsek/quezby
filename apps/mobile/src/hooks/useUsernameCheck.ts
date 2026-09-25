@@ -1,4 +1,4 @@
-import { USERNAME_MESSAGES, validateUsername } from '@quezby/config';
+import { USERNAME_MESSAGES, normalizeUsername, validateUsername } from '@quezby/config';
 import { useEffect, useState } from 'react';
 
 import { api } from '@/api/client';
@@ -17,7 +17,9 @@ const DEBOUNCE_MS = 350;
 /**
  * The rules first, on the phone, as the player types — the same function the
  * API runs — and only a well-formed name goes to the API to ask whether it is
- * free. `current` is the player's own name, which is never "taken" by them.
+ * free. `current` is the player's own name, which is never "taken" by them —
+ * and never refused either, though the automatic `guest48128742` is a name
+ * the rules keep from anyone picking it.
  */
 export function useUsernameCheck(value: string, current?: string | null): UsernameCheck {
   const [check, setCheck] = useState<UsernameCheck>({ state: 'empty' });
@@ -27,16 +29,16 @@ export function useUsernameCheck(value: string, current?: string | null): Userna
       setCheck({ state: 'empty' });
       return;
     }
+    if (current && normalizeUsername(value) === current) {
+      setCheck({ state: 'current', normalized: current });
+      return;
+    }
     const result = validateUsername(value);
     if (!result.ok) {
       setCheck({ state: 'invalid', message: USERNAME_MESSAGES[result.problem] });
       return;
     }
     const normalized = result.normalized;
-    if (current && normalized === current) {
-      setCheck({ state: 'current', normalized });
-      return;
-    }
 
     setCheck({ state: 'checking', normalized });
     let cancelled = false;

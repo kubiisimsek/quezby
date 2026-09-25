@@ -5,7 +5,11 @@ import type { RunMode } from '@quezby/types';
 export type RootStackParamList = {
   Welcome: undefined;
   Login: undefined;
+  /** A new player's practice run: the game, coached, counted nowhere. */
+  Tutorial: undefined;
   Username: undefined;
+  /** A new guest's offer to keep the account: Apple, Google or an email. */
+  Protect: undefined;
   Tabs: NavigatorScreenParams<TabParamList> | undefined;
   Game: { mode: RunMode };
   Help: undefined;

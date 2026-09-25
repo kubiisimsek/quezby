@@ -8,33 +8,33 @@ import { api } from '@/api/client';
 import { installId, useSession } from '@/auth/session';
 import { APP_PLATFORM } from '@/config/env';
 import { REEL_GUIDE, REEL_ORDER } from '@/game/howTo';
-import { useSocialAuth } from '@/hooks/useSocialAuth';
 import { messageFor } from '@/lib/errors';
 import type { RootStackParamList } from '@/navigation/types';
+import { useOnboarding } from '@/stores/onboarding';
 import { BrandMark } from '@/ui/brand-mark';
-import { Button, Callout, IconChip, Screen, SocialButton, Stamp, Txt } from '@/ui/kit';
+import { Button, Callout, IconChip, Screen, Stamp, Txt } from '@/ui/kit';
 import { useEntrance } from '@/ui/motion';
-import { DEPTH, RADIUS, SPACE, useTheme } from '@/ui/theme';
+import { SPACE, useTheme } from '@/ui/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Welcome'>;
 
 /**
- * The first screen: what the game is in four lines, and the ways in. Apple
- * or Google keep the account from the first run; "Misafir olarak başla" puts
- * no form between a new player and that run — a guest can keep the account
- * later.
+ * The first screen: the game's name, its four moves as gems, and one way in —
+ * **Oyna** opens a guest account and goes straight into a practice run that
+ * teaches the moves and counts nowhere. A name and a way to keep the account
+ * come after it, and both can wait. A player who already has an account
+ * signs in instead.
  */
 export function WelcomeScreen({ navigation }: Props) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const social = useSocialAuth();
   const hero = useEntrance(0, 24);
-  const rules = useEntrance(1);
+  const moves = useEntrance(1);
   const actions = useEntrance(2);
 
-  const startAsGuest = async () => {
+  const play = async () => {
     setPending(true);
     setError(null);
     try {
@@ -42,6 +42,8 @@ export function WelcomeScreen({ navigation }: Props) {
         platform: APP_PLATFORM,
         installId: await installId(),
       });
+      // The first steps are set before the session, so the lobby never flashes by.
+      useOnboarding.getState().begin(auth.user.id);
       await useSession.getState().signIn(auth.token, auth.user);
     } catch (caught) {
       setError(messageFor(caught));
@@ -61,7 +63,7 @@ export function WelcomeScreen({ navigation }: Props) {
         <Animated.View style={[styles.hero, hero]}>
           <Stamp from={0.4}>
             <View style={[styles.mark, { shadowColor: theme.glow }]}>
-              <BrandMark size={96} />
+              <BrandMark size={112} />
             </View>
           </Stamp>
           <Txt variant="hero" align="center" style={styles.name}>
@@ -72,68 +74,40 @@ export function WelcomeScreen({ navigation }: Props) {
           </Txt>
         </Animated.View>
 
-        <Animated.View style={[styles.rules, rules]}>
-          {REEL_ORDER.map((kind, index) => {
-            const rule = REEL_GUIDE[kind];
-            return (
-              <View
-                key={kind}
-                style={[
-                  styles.rule,
-                  {
-                    backgroundColor: theme.tile,
-                    borderColor: theme.outline,
-                    transform: [{ rotate: index % 2 === 0 ? '-1.2deg' : '1.2deg' }],
-                  },
-                ]}
-              >
-                <View style={[styles.ruleEdge, { backgroundColor: theme.tileHi }]} />
-                <IconChip icon={rule.icon} tone={rule.tone === 'neutral' ? 'secondary' : rule.tone} />
-                <View style={styles.ruleText}>
-                  <Txt variant="heading">{rule.title}</Txt>
-                  <Txt variant="meta" tone="muted">
-                    {rule.body}
-                  </Txt>
-                </View>
-              </View>
-            );
-          })}
-          <Txt variant="meta" tone="muted" align="center" style={styles.goal}>
-            Dopamin barın bitmeden en yüksek skoru yap. Her tur biraz daha hızlı.
+        <Animated.View style={[styles.moves, moves]}>
+          <View style={styles.gems}>
+            {REEL_ORDER.map((kind) => {
+              const guide = REEL_GUIDE[kind];
+              return (
+                <IconChip
+                  key={kind}
+                  icon={guide.icon}
+                  tone={guide.tone === 'neutral' ? 'secondary' : guide.tone}
+                  size="lg"
+                />
+              );
+            })}
+          </View>
+          <Txt variant="meta" tone="muted" align="center">
+            Dört hareket, tek refleks. Önce bir deneme turunda oynayarak öğren — o tur sayılmaz.
           </Txt>
         </Animated.View>
 
         <Animated.View style={[styles.actions, actions]}>
-          {error ?? social.error ? <Callout tone="bad">{error ?? social.error}</Callout> : null}
+          {error ? <Callout tone="bad">{error}</Callout> : null}
           <Button
-            label="Misafir olarak başla"
+            label="Oyna"
             icon="play"
             tone="play"
             size="xl"
-            onPress={() => void startAsGuest()}
+            onPress={() => void play()}
             loading={pending}
-            disabled={social.busy !== null}
           />
-          {social.available.apple ? (
-            <SocialButton
-              provider="apple"
-              loading={social.busy === 'apple'}
-              disabled={social.busy !== null || pending}
-              onPress={() => void social.signIn('apple')}
-            />
-          ) : null}
-          {social.available.google ? (
-            <SocialButton
-              provider="google"
-              loading={social.busy === 'google'}
-              disabled={social.busy !== null || pending}
-              onPress={() => void social.signIn('google')}
-            />
-          ) : null}
           <Button
             label="Hesabım var, giriş yap"
             tone="secondary"
             onPress={() => navigation.navigate('Login')}
+            disabled={pending}
           />
         </Animated.View>
       </ScrollView>
@@ -143,26 +117,14 @@ export function WelcomeScreen({ navigation }: Props) {
 
 const styles = StyleSheet.create({
   content: { flexGrow: 1, gap: SPACE.xxl, justifyContent: 'space-between', paddingHorizontal: SPACE.xl },
-  hero: { alignItems: 'center', gap: SPACE.sm },
+  hero: { alignItems: 'center', gap: SPACE.sm, marginTop: SPACE.xxl },
   mark: {
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.9,
     shadowRadius: 28,
   },
   name: { fontSize: 54, lineHeight: 60, marginTop: SPACE.sm },
-  rules: { gap: SPACE.ms },
-  rule: {
-    alignItems: 'center',
-    borderBottomWidth: DEPTH.outline + DEPTH.lipSm,
-    borderRadius: RADIUS.panel,
-    borderWidth: DEPTH.outline,
-    flexDirection: 'row',
-    gap: SPACE.md,
-    overflow: 'hidden',
-    padding: SPACE.md,
-  },
-  ruleEdge: { height: 3, left: 0, position: 'absolute', right: 0, top: 0 },
-  ruleText: { flex: 1, gap: SPACE.xxs },
-  goal: { marginTop: SPACE.xs },
+  moves: { alignItems: 'center', gap: SPACE.md },
+  gems: { flexDirection: 'row', gap: SPACE.md },
   actions: { gap: SPACE.md },
 });

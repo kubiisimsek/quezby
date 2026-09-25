@@ -226,6 +226,8 @@ return [
         'group_size' => 30,
         // Promoted and demoted per 30 members, scaled down for smaller groups.
         'zone_per_30' => 5,
+        // Counted runs (ranked, scoring) before the league opens to a new player.
+        'unlock_runs' => 3,
     ],
 
     'follows' => [
@@ -298,5 +300,21 @@ return [
     */
 
     'moderation_token' => env('MODERATION_TOKEN', ''),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin panel
+    |--------------------------------------------------------------------------
+    |
+    | `apps/admin`, behind `/api/v1/admin`. A panel session ends after
+    | `token_hours` however busy it is; lists come a page at a time.
+    |
+    */
+
+    'admin' => [
+        'token_hours' => (int) env('QUEZBY_ADMIN_TOKEN_HOURS', 12),
+        'per_page' => 25,
+        'max_per_page' => 100,
+    ],
 
 ];

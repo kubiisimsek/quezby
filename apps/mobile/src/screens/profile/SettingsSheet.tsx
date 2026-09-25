@@ -1,3 +1,4 @@
+import { isAutoUsername } from '@quezby/config';
 import type { Me } from '@quezby/types';
 import { StyleSheet, View } from 'react-native';
 
@@ -105,7 +106,7 @@ export function SettingsSheet({
         <Panel tone="sunken" elevation="flat" style={styles.group}>
           <Row
             leading={<IconChip icon="edit" tone="primary" size="sm" />}
-            title="Kullanıcı adını değiştir"
+            title={isAutoUsername(user.username) ? 'Adını seç' : 'Kullanıcı adını değiştir'}
             subtitle={`Şu an @${user.username}`}
             onPress={() => onPick('username')}
           />

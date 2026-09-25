@@ -12,24 +12,37 @@
 
 ```
 navigation/
-  RootNavigator.tsx  update required → splash → Welcome/Login → Username → Tabs
-                     (Zirve · Lig · Oyna · Arkadaşlar · Profil) + Game, Help, Daily.
+  RootNavigator.tsx  update required → splash → Welcome/Login → a new account's first
+                     steps (Tutorial → Username → Protect) → Username (an old account
+                     with no name) → Tabs (Zirve · Lig · Oyna · Arkadaşlar · Profil)
+                     + Game, Help, Daily. `gate.ts` decides which, from the session and
+                     `stores/onboarding` (the steps, kept on the phone per account).
                      No navigation bars anywhere (`headerShown: false`); a screen that
                      needs a head draws `TopBar`
   TabBar.tsx         the dock: five slots on a dark slab, the lobby in the middle as a gold
                      play slab standing out of it; the slot you are on lifts into a magenta tile
   options.tsx        stack options (no header, night behind transitions), tab(), nav theme
   types.ts           one param list per navigator; Game takes { mode: 'free' | 'daily' };
+                     Tutorial is the same GameScreen, as a new player's practice run;
                      `Search` is a tab — from a stack screen: navigate('Tabs', { screen: 'Search' })
 screens/
-  welcome/           the arena, the mark stamped in, "Quezby" in Rubik, the four reels as tiles,
-                     a gold "Misafir olarak başla", Apple / Google, "Hesabım var, giriş yap"
+  welcome/           the arena, the mark stamped in, "Quezby" in Rubik, the four moves as gems,
+                     one gold "Oyna" (a guest account, then the practice run) and "Hesabım var,
+                     giriş yap"
   auth/              Login (TopBar "Tekrar hoş geldin") — Apple / Google, then "ya da e-postayla"
-  username/          the one question before the first run, the field in a tile, gold "Devam"
+  username/          after the practice run "Sana ne diyelim?" — the field in a tile, magenta
+                     "Kaydet", ghost "Şimdilik geç" (the account keeps `guest48128742`); for an
+                     old account with no name, the one question before the game, gold "Devam"
+  onboarding/        Protect — "Hesabını koru" after the name: Apple / Google, "E-postayla
+                     koru", ghost "Şimdi değil"; a kept account says so before "Devam et", and
+                     an Apple / Google account that is another player's can be switched to
   home/              the lobby: a status strip (framed portrait with the league emblem, Yardım);
                      "Günün akışı" on a stage with a fan of the four reels and its countdown (your
                      score in gold, place and Paylaş once played); the big breathing gold play slab;
-                     the league tile with its progress bar, the rival as a VS face-off, records;
+                     the league tile with its progress bar ("KİLİTLİ · Lige 2 oyun kaldı" before a
+                     new player's first 3 counted runs), the rival as a VS face-off, records;
+                     a guest just seated in a league is asked once to keep the account
+                     (SignInWaysSheet, "Ligdesin!");
                      a warn tile up top while the API keeps this phone's runs off the boards
                      (a failed Play Integrity / App Attest check, `enforced` only)
   leaderboard/       Zirve — a stage with TopBar (countdown, players, search), Herkes / Arkadaşlar,
@@ -37,7 +50,8 @@ screens/
                      tabs, the climb as tiles with "▲ fark", your floor pinned with a gold "Geç onu"
   league/            the week's league: "HAFTALIK LİG", your tier's emblem big between the tiers
                      below and above, TERFİ / DÜŞME BÖLGESİ banners over their rows, last week's
-                     result (confetti on a promotion), your floor pinned
+                     result (confetti on a promotion), your floor pinned; before a new
+                     player's first 3 counted runs, "Lige N oyun kaldı" with a gold "Oyna"
   daily/             Günün akışı: TopBar with a back slab, "AKIŞ #17", your score and place in a
                      well with the share grid, then "GÜNÜN ZİRVESİ" — its podium and climb
   profile/           a player card (framed portrait, tier, season best in gold, place on each
@@ -51,10 +65,15 @@ screens/
                      combos, the daily, leagues, boards, fair play, account, Sık sorulanlar
   search/            Arkadaşlar — a dock tab: search by the start of a name, follow from the
                      tile, who you follow / who follows you, a player's card (PlayerSheet)
-  game/GameScreen    the game — a root screen over the tabs, no swipe-back
+  game/GameScreen    the game — a root screen over the tabs, no swipe-back; as `Tutorial`, a
+                     new player's practice run: a CoachCard before each kind's first post,
+                     closing always ends in its result, which leads on to the name
 game/
   useGame.ts         engine + clock + touches → what the screen draws; starts the run
-                     with the engine and content versions, keeps an unsent finish
+                     with the engine and content versions, keeps an unsent finish; a practice
+                     run (`offline`, `outdated`, `tutorial`) stays on the phone — the coached
+                     one waits under each card (phase `coach`) and starts the post's clock
+                     only when it is put away
   gesture.ts         raw touches → swipe / like / hold / touch (pure, tested)
   ReelCard.tsx       one reel, full screen
   Hud.tsx            a close slab · the chunky dopamine meter (notched, labelled) · the score in
@@ -66,8 +85,12 @@ game/
                      then bonuses stamped in, stat tiles, rank tiles (▲/▼), who you passed, the
                      league, the daily's grid — about 100 ms apart; the buttons slide up last in a
                      tray; a tap skips to the end; review, flagged and practice states, and
-                     "Bu cihazda skorlar sıralamaya girmiyor" when `flagReason` is `device`
-  howTo.ts           the one source of rule copy: reels, bonuses, their order
+                     "Bu cihazda skorlar sıralamaya girmiyor" when `flagReason` is `device`;
+                     "Lige N oyun kaldı" while the league is locked; the practice run as
+                     "DENEME TURU" with the kinds it never reached, magenta "Devam et" and
+                     "Bir daha dene"
+  howTo.ts           the one source of rule copy: reels (and the move each coach card acts
+                     out), bonuses, their order
   content.ts         what a reel looks like — the post the catalog picks for seed + index
 components/          screen-sized pieces shared between screens (below)
 ```
@@ -111,7 +134,7 @@ each plays once and stands down under reduced motion.
 One import for every screen: `@/ui/kit`. The pieces live a family per file in
 `ui/kit/` (`text`, `surfaces`, `slab`, `topbar`, `identity`, `buttons`, `rows`,
 `status`, `fields`, `loading`, `segmented`, `meter`, `badges`, `countdown`,
-`podium`, `climb`, `result`, `lobby`, `juice`); `ui/kit.tsx` re-exports them.
+`podium`, `climb`, `result`, `lobby`, `coach`, `juice`); `ui/kit.tsx` re-exports them.
 A new shape goes into the family it belongs to and into that list.
 
 | Component | Role |
@@ -148,6 +171,7 @@ A new shape goes into the family it belongs to and into that list.
 | `LobbyCard` | A door in the lobby: a gem, its capital name over a Rubik title, live state on the right, an arrow slab when it opens something; sinks under the thumb |
 | `PlayButton` | The lobby's gold play slab: breathes 1 → 1.04 → 1 (1.6 s each way) with a glint crossing it — the only loop outside a reel; `breathing` pauses it, reduced motion never starts it |
 | `RankChips` | Your place on each board in gold, one well per board; "—" where you have not placed |
+| `CoachCard` | A new kind of post, before it starts: "YENİ POST · 2/4", its gem, a hand acting the move out (swipe, double-tap, hold into the green zone, keep still — twice, then still), its name and line, the gold "Anladım" that starts the post |
 | `Stamp`, `CountUp`, `Confetti`, `useShake` | Juice: slam a value in; count a number up (the final value is its accessibility label); a burst of confetti on a key; a small shake |
 
 Overlays are `ui/sheet.tsx`: `Sheet` (a dark tile rising from the bottom, a
@@ -176,7 +200,8 @@ which takes a tint.
 | `UsernameField` | The username input everywhere: lower case as typed, the rules ticking off under it, availability in the trailing slot |
 | `PlayerSheet` | A player's card from any row: portrait, tier, season best in gold, weekly and all-time place, a few lifetime counts, followers, "Takip et" / "Takibi bırak" |
 | `PlayerCard` | `Portrait` (the 72/92pt framed portrait of a profile) and `SeasonBest` (the gold record well) |
-| `SignInWaysSheet` | "Hesabını koru" for a guest, "Giriş yolları" once kept: the attached ways (Apple / Google with "Bağı kaldır" — the API keeps the last one), `SocialButton`s for the rest, and "E-postayla koru", which hands over to the email `FormSheet` |
+| `SignInWaysSheet` | "Hesabını koru" for a guest, "Giriş yolları" once kept: the attached ways (Apple / Google with "Bağı kaldır" — the API keeps the last one), `SocialButton`s for the rest, and "E-postayla koru", which hands over to the email `FormSheet`; `description` says why when it comes up on its own |
+| `CredentialsSheet` | The email and password `FormSheet` — a guest's "Hesabı koru", or one more way in; opened from the profile, the Protect step and the lobby's reminder |
 | `ScopeSwitch` | Herkes / Arkadaşlar — a dark well with a magenta slab that springs to the side that is on |
 | `SummitBoard` | `layoutBoard()` — which entries stand on the podium, which climb, where the break before your own rows goes — and the podium stage that holds its place while a board loads |
 | `BoardStage` | The magenta stage a board stands on (`BoardStage`), the players pill, and `useArrival` |

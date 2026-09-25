@@ -10,6 +10,7 @@
   "scripts": {
     "build:packages": "turbo run build --filter=./packages/*",
     "dev:mobile": "pnpm --filter @quezby/mobile dev",
+    "dev:admin": "turbo run dev --filter=@quezby/admin",
     "dev:api": "cd apps/api && php artisan serve --host=0.0.0.0 --port=8000",
     "build": "turbo run build",
     "lint": "turbo run lint",
@@ -32,7 +33,9 @@
     "engine:lock": "pnpm --filter @quezby/engine lock",
     "tokens": "node scripts/sync-design-tokens.mjs",
     "api:package:staging": "./scripts/package-api.sh staging",
-    "api:package:production": "./scripts/package-api.sh production"
+    "api:package:production": "./scripts/package-api.sh production",
+    "admin:package:staging": "node scripts/package-admin.mjs staging",
+    "admin:package:production": "node scripts/package-admin.mjs production"
   },
   "devDependencies": {
     "eslint": "^10.8.1",

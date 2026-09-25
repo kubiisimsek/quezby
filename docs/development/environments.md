@@ -11,6 +11,25 @@ API it talks to.
 | staging | `staging` | Quezby Staging | `API_URL_STAGING` (default `https://staging-api.quezby.com`) | `staging` — `.env.staging.example` |
 | production | `production` | Quezby | `API_URL_PRODUCTION` (default `https://api.quezby.com`) | `production` — `.env.production.example` |
 
+## The admin panel
+
+`apps/admin` is built per environment, not switched: its API origin is fixed
+at build time from `apps/admin/deploy/environments.mjs`.
+
+| Environment | Build | Panel | API |
+| --- | --- | --- | --- |
+| local | `pnpm dev:admin` (Vite, `:5180`) | `http://localhost:5180` | `/api` proxied to `http://localhost:8000` — same origin, no CORS |
+| staging | `pnpm admin:package:staging` | `https://staging-admin.quezby.com` | `https://staging-api.quezby.com` |
+| production | `pnpm admin:package:production` | `https://admin.quezby.com` | `https://api.quezby.com` |
+
+`VITE_API_ORIGIN` (`apps/admin/.env`, git-ignored; `.env.example`) points a
+local panel at another API; it is the panel's only variable, and public — the
+packaging script refuses any other `VITE_*`. On the API side the panel adds
+`QUEZBY_ADMIN_TOKEN_HOURS` (12: how long a panel session lasts) to every
+`.env*.example`. Admin accounts live in the API's database; the first owner
+is made with `php artisan quezby:admin:create` or `POST /api/v1/ops/admins`
+(`docs/deployment/shared-hosting.md`).
+
 ## Switching
 
 ```bash

@@ -30,8 +30,14 @@ Captions on reels are jokes and may be silly; nothing else may be.
 | **Kombo x1,25** | Always two decimals, comma |
 | **Doğrulanıyor…** | While the API replays a run — no number before it answers |
 | **Skorun inceleniyor** | A held top score; never "şüpheli" or "hile" to the player |
-| **Apple ile devam et / Google ile devam et / Misafir olarak başla** | The ways in |
-| **Hesabını koru** | Attach Apple, Google or an email to a guest account |
+| **Oyna / Hesabım var, giriş yap** | The ways in, on the welcome: a new player plays first (a guest account and the practice run); **Apple ile devam et / Google ile devam et** and "ya da e-postayla" are on the login |
+| **Deneme turu** (DENEME TURU) | A new player's first run: coached, played on the phone, counted nowhere — "Bu tur hiçbir yere sayılmadı." Its score is the "deneme puanı". Never "tutorial" to the player |
+| **YENİ POST · 2/4** · **Anladım** | A coach card's ribbon, and the gold slab that starts the post it explained |
+| **Sana ne diyelim?** · **Şimdilik geç** | The name, right after the practice run, and the way past it; until then the account is `@guest48128742` ("Şimdilik adın @guest48128742") |
+| **Adını seç** | The profile's name door while the name is still the automatic one; "Kullanıcı adını değiştir" after |
+| **Lige 2 oyun kaldı** · **KİLİTLİ** | The league before a new player's first 3 counted runs: "Lig, ilk 3 oyunundan sonra açılır. Deneme turu sayılmaz." |
+| **Hesabını koru** | Attach Apple, Google or an email to a guest account — a step after the name ("Şimdi değil" skips it), and once, when a guest's league opens ("Ligdesin!…") |
+| **Apple hesabıma geç** | An Apple or Google account already belongs to another player: switch to it, leaving the fresh guest behind |
 | **Giriş yolları** | The same place once the account is kept: what is attached ("Apple ve e-posta bağlı"), **Bağı kaldır** to take Apple or Google off |
 
 ## Rules

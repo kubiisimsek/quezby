@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 use RuntimeException;
 
 class AppServiceProvider extends ServiceProvider
@@ -98,6 +99,16 @@ class AppServiceProvider extends ServiceProvider
             : Limit::none());
 
         // Counts failed tokens too; unlimited while the ops routes are switched off (they answer 404).
+        // Guessing an admin's password: five tries a minute from one address,
+        // and ten in a quarter of an hour at one account from it.
+        RateLimiter::for('admin-login', fn (Request $request) => [
+            Limit::perMinute(5)->by('ip:'.$request->ip()),
+            Limit::perMinutes(15, 10)->by('email:'.Str::lower((string) $request->input('email')).'|'.$request->ip()),
+        ]);
+
+        RateLimiter::for('admin', fn (Request $request) => Limit::perMinute(240)
+            ->by('admin:'.($request->user()?->getAuthIdentifier() ?? $request->ip())));
+
         RateLimiter::for('ops', fn (Request $request) => OpsToken::current() !== ''
             ? Limit::perHour(10)->by($request->ip())
             : Limit::none());

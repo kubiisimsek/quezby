@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\DeviceVerdict;
+use App\Enums\RunFlag;
 use App\Enums\RunMode;
 use App\Enums\RunStatus;
 use App\Game\EndReason;
@@ -10,6 +11,7 @@ use App\Support\Timestamp;
 use Carbon\CarbonInterface;
 use Database\Factories\RunFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -49,6 +51,7 @@ use Illuminate\Support\Carbon;
  * @property int|null $client_score
  * @property int|null $client_reels
  * @property list<array<string, mixed>>|null $flags
+ * @property string|null $flag_codes
  * @property array<string, mixed>|null $stats
  * @property array<mixed>|null $actions
  */
@@ -63,6 +66,15 @@ class Run extends Model
 {
     /** @use HasFactory<RunFactory> */
     use HasFactory, HasUlids;
+
+    /** Every column but the action log and the replay's stats: what a list of runs needs. */
+    public const LIST_COLUMNS = [
+        'id', 'user_id', 'seed', 'engine_version', 'content_version', 'app_version', 'device_verdict',
+        'status', 'mode', 'daily_key', 'open_user_id', 'started_at', 'finished_at',
+        'score', 'reels', 'hits', 'misses', 'perfects', 'max_streak', 'max_combo', 'bonus_points', 'level',
+        'accuracy', 'avg_reaction_ms', 'active_ms', 'ended_by', 'client_score', 'client_reels',
+        'flags', 'flag_codes', 'created_at', 'updated_at',
+    ];
 
     protected $dateFormat = Timestamp::STORAGE_FORMAT;
 
@@ -131,5 +143,33 @@ class Run extends Model
         $ttl = (int) config('quezby.runs.ttl_minutes');
 
         return $now->greaterThan($this->started_at->copy()->addMinutes($ttl));
+    }
+
+    /**
+     * Keeps `flag_codes` in step with `flags`, whichever way they are set —
+     * `fill`, `forceFill`, a factory — so a run can be found by its flags.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function setAttribute($key, $value)
+    {
+        parent::setAttribute($key, $value);
+        if ($key === 'flags') {
+            $this->attributes['flag_codes'] = RunFlag::codesOf($value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * The runs that carry `$flag`.
+     *
+     * @param  Builder<Run>  $query
+     */
+    public function scopeWithFlag(Builder $query, RunFlag $flag): void
+    {
+        $query->whereRaw("runs.flag_codes like ? escape '!'", [$flag->pattern()]);
     }
 }

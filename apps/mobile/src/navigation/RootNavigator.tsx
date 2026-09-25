@@ -10,6 +10,7 @@ import { useDeviceCheck } from '@/hooks/useDeviceCheck';
 import { useMe } from '@/hooks/useMe';
 import { usePendingRunSender } from '@/hooks/usePendingRunSender';
 import { messageFor } from '@/lib/errors';
+import { gateFor } from '@/navigation/gate';
 import { tab, useNavTheme, useStackOptions } from '@/navigation/options';
 import { TabBar } from '@/navigation/TabBar';
 import type { RootStackParamList, TabParamList } from '@/navigation/types';
@@ -20,10 +21,12 @@ import { HelpScreen } from '@/screens/help/HelpScreen';
 import { HomeScreen } from '@/screens/home/HomeScreen';
 import { LeaderboardScreen } from '@/screens/leaderboard/LeaderboardScreen';
 import { LeagueScreen } from '@/screens/league/LeagueScreen';
+import { ProtectScreen } from '@/screens/onboarding/ProtectScreen';
 import { ProfileScreen } from '@/screens/profile/ProfileScreen';
 import { SearchScreen } from '@/screens/search/SearchScreen';
 import { UsernameScreen } from '@/screens/username/UsernameScreen';
 import { WelcomeScreen } from '@/screens/welcome/WelcomeScreen';
+import { useOnboarding } from '@/stores/onboarding';
 import { useSettings } from '@/stores/settings';
 import { BrandMark } from '@/ui/brand-mark';
 import { Button, Screen, Stamp, Txt } from '@/ui/kit';
@@ -49,9 +52,11 @@ function TabsShell() {
 }
 
 /**
- * What mounts, in order: a build the API no longer accepts → the update
- * screen; storage not read yet → the splash; no account → the welcome;
- * an account with no username → the one question; otherwise the game.
+ * What mounts is `gateFor`'s answer: a build the API no longer accepts → the
+ * update screen; storage not read yet → the splash; no account → the
+ * welcome; a new account's first steps — the practice run, the name, keeping
+ * the account — one screen at a time; an account from before automatic names
+ * → the name question; otherwise the game.
  */
 export function RootNavigator() {
   const navTheme = useNavTheme();
@@ -59,6 +64,9 @@ export function RootNavigator() {
   const token = useSession((state) => state.token);
   const user = useSession((state) => state.user);
   const hydrated = useSession((state) => state.hydrated);
+  const onboardingHydrated = useOnboarding((state) => state.hydrated);
+  const onboardingUser = useOnboarding((state) => state.userId);
+  const onboardingStep = useOnboarding((state) => state.step);
   const status = useAppStatus();
   const me = useMe();
   usePendingRunSender();
@@ -66,8 +74,18 @@ export function RootNavigator() {
 
   useEffect(() => {
     void useSession.getState().hydrate();
+    void useOnboarding.getState().hydrate();
     void useSettings.getState().hydrate();
   }, []);
+
+  const gate = gateFor({
+    updateRequired: status?.status === 'update_required',
+    hydrated: hydrated && onboardingHydrated,
+    token,
+    user,
+    meFailed: me.isError,
+    onboarding: { userId: onboardingUser, step: onboardingStep },
+  });
 
   if (status?.status === 'update_required') {
     return (
@@ -87,9 +105,9 @@ export function RootNavigator() {
     );
   }
 
-  if (!hydrated || (token && !user && !me.isError)) return <Splash />;
+  if (gate === 'splash') return <Splash />;
 
-  if (token && !user && me.isError) {
+  if (gate === 'offline') {
     return (
       <Splash
         title="Bağlanamadık"
@@ -102,13 +120,21 @@ export function RootNavigator() {
   return (
     <NavigationContainer theme={navTheme}>
       <Stack.Navigator screenOptions={stackOptions}>
-        {!token || !user ? (
+        {gate === 'welcome' ? (
           <>
             <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
             <Stack.Screen name="Login" component={LoginScreen} />
           </>
-        ) : !user.username ? (
+        ) : gate === 'tutorial' ? (
+          <Stack.Screen
+            name="Tutorial"
+            component={GameScreen}
+            options={{ headerShown: false, gestureEnabled: false, animation: 'fade' }}
+          />
+        ) : gate === 'nickname' || gate === 'username' ? (
           <Stack.Screen name="Username" component={UsernameScreen} options={{ headerShown: false }} />
+        ) : gate === 'protect' ? (
+          <Stack.Screen name="Protect" component={ProtectScreen} options={{ headerShown: false }} />
         ) : (
           <>
             <Stack.Screen name="Tabs" component={TabsShell} options={{ headerShown: false }} />

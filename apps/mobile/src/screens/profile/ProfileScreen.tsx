@@ -1,4 +1,4 @@
-import { postsOf } from '@quezby/config';
+import { isAutoUsername, postsOf } from '@quezby/config';
 import type { LeagueTier, Me, Ranks } from '@quezby/types';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { CompositeScreenProps } from '@react-navigation/native';
@@ -11,6 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { api } from '@/api/client';
 import { useSession } from '@/auth/session';
 import { Portrait, SeasonBest } from '@/components/PlayerCard';
+import { CredentialsSheet } from '@/components/CredentialsSheet';
 import { SignInWaysSheet, signInWays } from '@/components/SignInWaysSheet';
 import { UsernameField } from '@/components/UsernameField';
 import { BONUS_ORDER } from '@/game/howTo';
@@ -42,7 +43,6 @@ import {
   IconButton,
   IconChip,
   Panel,
-  PasswordField,
   RankChips,
   Ribbon,
   Screen,
@@ -129,7 +129,7 @@ export function ProfileScreen({ navigation }: Props) {
         <PlayerHero
           user={user}
           ranks={ranks}
-          tier={league.data?.tier ?? null}
+          tier={league.data && !league.data.unlock ? league.data.tier : null}
           onSettings={() => setSheet('settings')}
         />
 
@@ -448,6 +448,10 @@ function LikedPost({
   );
 }
 
+/**
+ * The player's name. An automatic one (`guest48128742`) was never picked, so
+ * the sheet asks for a first name, empty, instead of offering to change it.
+ */
 function UsernameSheet({
   open,
   current,
@@ -457,7 +461,8 @@ function UsernameSheet({
   current: string | null;
   onClose: () => void;
 }) {
-  const [value, setValue] = useState(current ?? '');
+  const automatic = isAutoUsername(current);
+  const [value, setValue] = useState(automatic ? '' : (current ?? ''));
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const check = useUsernameCheck(value, current);
@@ -485,8 +490,12 @@ function UsernameSheet({
     <FormSheet
       open={open}
       onClose={onClose}
-      title="Kullanıcı adını değiştir"
-      description="Sıralamadaki tüm skorların yeni adla görünür."
+      title={automatic ? 'Adını seç' : 'Kullanıcı adını değiştir'}
+      description={
+        automatic
+          ? `Şimdilik @${current ?? ''} olarak görünüyorsun. Seçtiğin ad bütün skorlarında görünür.`
+          : 'Sıralamadaki tüm skorların yeni adla görünür.'
+      }
       submitLabel="Kaydet"
       onSubmit={() => void save()}
       pending={pending}
@@ -494,83 +503,6 @@ function UsernameSheet({
       error={error}
     >
       <UsernameField value={value} onChange={setValue} check={check} />
-    </FormSheet>
-  );
-}
-
-/** An email and password to sign in with — the guest's way to keep the account, or one more way in. */
-function CredentialsSheet({
-  open,
-  guest,
-  onClose,
-}: {
-  open: boolean;
-  guest: boolean;
-  onClose: () => void;
-}) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [pending, setPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const emailOk = /\S+@\S+\.\S+/.test(email.trim());
-  const passwordOk = password.length >= 8;
-
-  const save = async () => {
-    if (!emailOk || !passwordOk) {
-      setError('Geçerli bir e-posta ve en az 8 karakterlik bir şifre yaz.');
-      return;
-    }
-    setPending(true);
-    setError(null);
-    try {
-      const { user } = await api.me.linkCredentials({
-        email: email.trim(),
-        password,
-      });
-      rememberMe(user);
-      onClose();
-    } catch (caught) {
-      setError(messageFor(caught));
-    } finally {
-      setPending(false);
-    }
-  };
-
-  return (
-    <FormSheet
-      open={open}
-      onClose={onClose}
-      title={guest ? 'Hesabını koru' : 'E-posta bağla'}
-      description={
-        guest
-          ? 'Bu hesap şu an yalnızca bu telefonda. E-posta bağlarsan başka cihazdan da girersin.'
-          : 'Bu e-posta ve şifreyle de girersin.'
-      }
-      submitLabel={guest ? 'Hesabı koru' : 'E-postayı bağla'}
-      submitIcon="shield"
-      onSubmit={() => void save()}
-      pending={pending}
-      error={error}
-    >
-      <Field
-        label="E-posta"
-        icon="mail"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        autoCorrect={false}
-        keyboardType="email-address"
-        textContentType="emailAddress"
-        autoComplete="email"
-      />
-      <PasswordField
-        label="Şifre"
-        isNew
-        value={password}
-        onChangeText={setPassword}
-        hint="En az 8 karakter."
-      />
     </FormSheet>
   );
 }

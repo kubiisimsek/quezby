@@ -101,6 +101,7 @@ function league(overrides: Partial<LeagueResponse> = {}): LeagueResponse {
     endsAt: '2026-09-27T21:00:00.000Z',
     serverTime: NOW,
     joined: true,
+    unlock: null,
     members: GROUP,
     me: GROUP[2] ?? null,
     promoteCount: 2,
@@ -187,6 +188,20 @@ describe('LeagueScreen — Lig', () => {
     await fireEvent.press(
       screen.getByRole('button', { name: 'Oyna, ligine katıl' }),
     );
+    expect(navigation.navigate).toHaveBeenCalledWith('Game', { mode: 'free' });
+  });
+
+  it('says how many counted runs a new player has left before the league opens', async () => {
+    mocked.leagues.current.mockResolvedValue(
+      league({ joined: false, members: [], me: null, unlock: { required: 3, remaining: 1 } }),
+    );
+    const navigation = await renderLeague();
+
+    expect(await screen.findByText('Lige 1 oyun kaldı')).toBeOnTheScreen();
+    expect(screen.getByText(/Lig, ilk 3 oyunundan sonra açılır; deneme turu sayılmaz\./)).toBeOnTheScreen();
+    expect(screen.queryByText('Bu hafta henüz oynamadın')).not.toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Oyna' }));
     expect(navigation.navigate).toHaveBeenCalledWith('Game', { mode: 'free' });
   });
 

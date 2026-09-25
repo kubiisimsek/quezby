@@ -34,6 +34,17 @@ edilmez.
 skip, freeze, skip`. Sonrası seed'den gelir. Reel türü dağılımında şans payı
 ölçüldü ve önemsiz çıktı; "torba" karıştırıcısına gerek yok.
 
+### Deneme turu (ilk açılış)
+
+Yeni oyuncunun ilk turu aynı motorla, aynı kurallarla oynanır ama **yalnızca
+telefonda** kalır: sunucuya gitmez, tabloya, lige, istatistiğe ya da rekora
+yazılmaz — çevrimdışı antrenman gibi. Her türün ilk reelinden (0, 2, 4 ve 6.)
+önce akış bir koç kartıyla durur; reel ancak kart kapanınca aktif olur. Motor
+`t`'yi reelin aktif olduğu andan saydığı ve bar yalnızca aktif sürede eridiği
+için bu duraklama sonucu hiç değiştirmez — kurallar kilitli kalır. Sıralı bir
+turda aynı duraklama checkpoint'lerde `slow_motion` olurdu; bu yüzden koç
+kartı yalnızca yerel deneme turunda vardır.
+
 ## Zorluk eğrileri (reel `n`, 0'dan başlar)
 
 Pencere, altın çubuğun dolum süresi ve yeşil bölge aynı hiperbolik eğriyi izler:
@@ -184,9 +195,12 @@ görünen her sayı sunucudan gelir.
    tabloya çıkmaz.
 6. Eşikler 8.000 simüle tura karşı kalibre edildi; hiçbir dürüst profil
    yakalanmaz (`tests/Unit/RunVerifierTest.php`).
-7. Moderasyon: `php artisan quezby:review`, `quezby:run:approve|reject`,
-   `quezby:user:ban|unban`, `quezby:runs:expire`; SSH'sız hostlarda
-   `POST /api/v1/ops/moderate` (`MODERATION_TOKEN`).
+7. Moderasyon: **yönetim paneli** (`apps/admin` — Şüpheliler: inceleme
+   kuyruğu, bayraklı turlar, risk sırasıyla şüpheli oyuncular;
+   `docs/backend/admin-api.md`), ya da `php artisan quezby:review`,
+   `quezby:run:approve|reject`, `quezby:user:ban|unban`, `quezby:runs:expire`;
+   SSH'sız hostlarda `POST /api/v1/ops/moderate` (`MODERATION_TOKEN`). Hangi
+   yoldan yapılırsa yapılsın her karar, kimin verdiğiyle denetim kaydına geçer.
 8. **Kontrol noktaları — yavaşlatılmış oyuna karşı.** `wall_clock` yalnızca alt
    sınırdır: yavaşlatılmış (speed-hack) bir oyun onu geçer. Bu yüzden sıralı bir
    turda uygulama, geri sayımdan sonraki oyun saatinin 45., 120. ve 240.

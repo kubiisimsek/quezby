@@ -17,3 +17,9 @@ dataset('invalid usernames', function () {
         yield json_encode($case['input'], JSON_UNESCAPED_UNICODE) => [$case['input'], $case['problem']];
     }
 });
+
+dataset('automatic usernames', function () {
+    foreach (sharedFixture('packages/config/fixtures/usernames.json')['automatic'] as $case) {
+        yield $case['name'] => [$case['name'], $case['automatic']];
+    }
+});

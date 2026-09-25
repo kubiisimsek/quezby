@@ -18,7 +18,9 @@ class UserFactory extends Factory
     protected static ?string $password;
 
     /**
-     * A guest, as `POST /auth/guest` creates one.
+     * A guest with no name yet — an account from before automatic names.
+     * `POST /auth/guest` now names one `guest` and eight digits; give it one
+     * with `withUsername('guest00000007')`.
      *
      * @return array<string, mixed>
      */

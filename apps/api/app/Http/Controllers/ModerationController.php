@@ -7,6 +7,7 @@ use App\Exceptions\ApiException;
 use App\Models\Run;
 use App\Models\User;
 use App\Services\ModerationService;
+use App\Support\Actor;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -35,10 +36,10 @@ class ModerationController extends Controller
                 'flags' => $run->flags ?? [],
                 'finishedAt' => $run->finished_at?->toISOString(),
             ])->values()]),
-            'approve' => response()->json(['done' => $moderation->approve($this->run($input['runId']))]),
-            'reject' => response()->json(['done' => $moderation->reject($this->run($input['runId']), $input['reason'])]),
-            'ban' => $this->done(fn () => $moderation->ban($this->user($input['username']), $input['reason'])),
-            'unban' => $this->done(fn () => $moderation->unban($this->user($input['username']))),
+            'approve' => response()->json(['done' => $moderation->approve($this->run($input['runId']), Actor::ops($request))]),
+            'reject' => response()->json(['done' => $moderation->reject($this->run($input['runId']), $input['reason'], Actor::ops($request))]),
+            'ban' => $this->done(fn () => $moderation->ban($this->user($input['username']), $input['reason'], Actor::ops($request))),
+            'unban' => $this->done(fn () => $moderation->unban($this->user($input['username']), Actor::ops($request))),
         };
     }
 

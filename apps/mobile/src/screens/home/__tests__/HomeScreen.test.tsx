@@ -20,6 +20,7 @@ import { useSession } from '@/auth/session';
 import { REEL_GUIDE } from '@/game/howTo';
 import { HomeScreen } from '@/screens/home/HomeScreen';
 import { useDeviceVerdict } from '@/stores/deviceVerdict';
+import { useOnboarding } from '@/stores/onboarding';
 import { buildEntry, buildMe, buildRanks } from '@/test/factories';
 import { renderWithProviders } from '@/test/renderWithProviders';
 
@@ -105,6 +106,7 @@ function league(overrides: Partial<LeagueResponse> = {}): LeagueResponse {
     endsAt: '2026-09-27T21:00:00.000Z',
     serverTime: NOW,
     joined: false,
+    unlock: null,
     members: [],
     me: null,
     promoteCount: 0,
@@ -184,6 +186,8 @@ describe('HomeScreen', () => {
     mocked.leagues.current.mockResolvedValue(league());
     mocked.leaderboards.get.mockResolvedValue(weekly());
     useDeviceVerdict.setState({ userId: null, verdict: null, validUntil: null, hydrated: true });
+    // Asked already — the reminder has tests of its own below.
+    useOnboarding.setState({ userId: null, step: null, remindedFor: 'player-1', hydrated: true });
   });
 
   it('is a lobby, not a manual: the how-to section is gone', async () => {
@@ -320,6 +324,45 @@ describe('HomeScreen', () => {
       await screen.findByText('Bu hafta ilk turunu oyna, ligine katıl.'),
     ).toBeOnTheScreen();
     expect(screen.queryByText(/Terfi/)).not.toBeOnTheScreen();
+  });
+
+  it('shows a locked league with the runs it waits for, and no tier yet', async () => {
+    mocked.leagues.current.mockResolvedValue(league({ unlock: { required: 3, remaining: 2 } }));
+    await renderLobby();
+
+    expect(await screen.findByText('Lige 2 oyun kaldı')).toBeOnTheScreen();
+    expect(screen.getByText('KİLİTLİ')).toBeOnTheScreen();
+    expect(screen.getByText('Lig, ilk 3 oyunundan sonra açılır. Deneme turu sayılmaz.')).toBeOnTheScreen();
+    expect(screen.queryByText('Altın lig')).not.toBeOnTheScreen();
+    expect(screen.queryByText('Bu hafta ilk turunu oyna, ligine katıl.')).not.toBeOnTheScreen();
+  });
+
+  describe('once a guest\'s league opens', () => {
+    beforeEach(() => {
+      useOnboarding.setState({ userId: null, step: null, remindedFor: null, hydrated: true });
+      mocked.leagues.current.mockResolvedValue(joined(7, 'stay'));
+    });
+
+    it('asks, once, to keep the account', async () => {
+      const first = await renderLobby();
+
+      expect(await screen.findByText(/^Ligdesin! Telefonun değişirse/)).toBeOnTheScreen();
+      expect(useOnboarding.getState().remindedFor).toBe('player-1');
+
+      await first.unmount();
+      await renderLobby();
+      expect(screen.queryByText(/^Ligdesin!/)).not.toBeOnTheScreen();
+    });
+
+    it('never asks an account that is kept already', async () => {
+      const kept = buildMe({ isGuest: false, identities: ['apple'] });
+      useSession.setState({ user: kept });
+      mocked.me.get.mockResolvedValue({ user: kept, ranks: buildRanks() });
+      await renderLobby();
+
+      expect(screen.queryByText(/^Ligdesin!/)).not.toBeOnTheScreen();
+      expect(useOnboarding.getState().remindedFor).toBeNull();
+    });
   });
 
   it('points at the player to pass this week', async () => {

@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Console\Commands\Concerns\FindsModerationTargets;
 use App\Services\ModerationService;
+use App\Support\Actor;
 use Illuminate\Console\Command;
 
 final class RejectRunCommand extends Command
@@ -27,7 +28,7 @@ final class RejectRunCommand extends Command
             return self::FAILURE;
         }
 
-        if (! $moderation->reject($run, $reason)) {
+        if (! $moderation->reject($run, $reason, Actor::cli())) {
             $this->components->error("Run {$run->id} cannot be rejected: it is {$run->status->value}.");
 
             return self::FAILURE;

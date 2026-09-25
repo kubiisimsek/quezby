@@ -6,6 +6,7 @@ import { act, renderHook } from '@testing-library/react-native';
 import { api } from '@/api/client';
 import { useSession } from '@/auth/session';
 import { useSocialAuth } from '@/hooks/useSocialAuth';
+import { useOnboarding } from '@/stores/onboarding';
 import { buildMe } from '@/test/factories';
 
 jest.mock('@/config/env', () => ({
@@ -38,6 +39,7 @@ describe('useSocialAuth', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     useSession.setState({ token: null, user: null, ranks: null, hydrated: true });
+    useOnboarding.setState({ userId: null, step: null, remindedFor: null, hydrated: true });
     mocked.auth.nonce.mockResolvedValue({ nonce: 'raw-nonce', expiresAt: '2026-09-26T10:10:00.000Z' });
   });
 
@@ -47,9 +49,9 @@ describe('useSocialAuth', () => {
     expect(result.current.available).toEqual({ apple: true, google: true });
   });
 
-  it('signs in with Apple, carrying the nonce the API issued', async () => {
+  it('signs a new player up with Apple, carrying the nonce the API issued, and starts their first steps', async () => {
     apple.mockResolvedValue({ identityToken: 'apple.jwt', authorizationCode: 'code-1', nonce: 'raw-nonce' });
-    mocked.auth.apple.mockResolvedValue({ token: 'tok', user: buildMe({ identities: ['apple'], isGuest: false }), created: true });
+    mocked.auth.apple.mockResolvedValue({ token: 'tok', user: buildMe({ id: 'new-1', identities: ['apple'], isGuest: false }), created: true });
     const { result } = await hook();
 
     await act(async () => {
@@ -61,10 +63,11 @@ describe('useSocialAuth', () => {
       expect.objectContaining({ identityToken: 'apple.jwt', nonce: 'raw-nonce', authorizationCode: 'code-1', platform: 'ios' }),
     );
     expect(useSession.getState().token).toBe('tok');
+    expect(useOnboarding.getState()).toMatchObject({ userId: 'new-1', step: 'tutorial' });
     expect(result.current.error).toBeNull();
   });
 
-  it('signs in with Google, letting the player pick the account', async () => {
+  it('signs a returning player in with Google, letting them pick the account — no first steps', async () => {
     google.mockResolvedValue({ type: 'success', data: { idToken: 'google.jwt' } });
     mocked.auth.google.mockResolvedValue({ token: 'tok', user: buildMe(), created: false });
     const { result } = await hook();
@@ -79,6 +82,7 @@ describe('useSocialAuth', () => {
     expect(GoogleSignin.signOut).toHaveBeenCalled();
     expect(mocked.auth.google).toHaveBeenCalledWith(expect.objectContaining({ idToken: 'google.jwt' }));
     expect(useSession.getState().token).toBe('tok');
+    expect(useOnboarding.getState().step).toBeNull();
   });
 
   it('says nothing when the player closes the sheet', async () => {
@@ -106,11 +110,13 @@ describe('useSocialAuth', () => {
       await result.current.link('google');
     });
     expect(result.current.error).toBe('Bu hesap başka bir Quezby oyuncusuna bağlı.');
+    expect(result.current.errorCode).toBe('identity_taken');
 
     await act(async () => {
       await result.current.link('apple');
     });
     expect(result.current.error).toBe('Apple ile giriş şu an yapılamadı. Biraz sonra tekrar dene.');
+    expect(result.current.errorCode).toBeNull();
   });
 
   it('links and unlinks on the current account', async () => {

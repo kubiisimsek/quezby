@@ -8,6 +8,8 @@
  *   - `.` and `*` never touch each other (`..`, `**`, `.*`, `*.` are out)
  *   - at least one letter
  *   - case-insensitive: stored and shown in lower case
+ *   - `guest48128742`-like names are the API's: every new account gets one
+ *     until its player picks a name
  *
  * Turkish letters are refused on purpose, with a message of their own: `İ`
  * lower-cases differently by locale, and a leaderboard where `şule` and
@@ -64,6 +66,20 @@ export const RESERVED_USERNAMES: readonly string[] = [
 const RESERVED_FRAGMENTS: readonly string[] = ['quezby'];
 
 /**
+ * `guest` or `misafir` and nothing but digits, however it is dotted: the
+ * API's to give out, so a name a player picked never looks like one it gave.
+ */
+const RESERVED_NUMBERED = /^(guest|misafir)\d+$/;
+
+/** The name the API gives a new account until its player picks one: `guest48128742`. */
+const AUTOMATIC = /^guest\d{8}$/;
+
+/** Whether this is still the name the API gave the account, not one its player picked. */
+export function isAutoUsername(name: string | null | undefined): boolean {
+  return typeof name === 'string' && AUTOMATIC.test(name);
+}
+
+/**
  * A short list of words a public leaderboard will not show. Matched with the
  * symbols taken out, so `o.r.o.s.p.u` is caught too. Kept to words that do
  * not hide inside ordinary names — extend it in both languages at once.
@@ -116,6 +132,7 @@ export function validateUsername(input: string): UsernameValidation {
   if (
     RESERVED_USERNAMES.includes(value) ||
     RESERVED_USERNAMES.includes(bare) ||
+    RESERVED_NUMBERED.test(bare) ||
     RESERVED_FRAGMENTS.some((fragment) => bare.includes(fragment))
   ) {
     return { ok: false, problem: 'reserved' };

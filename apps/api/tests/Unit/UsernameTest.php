@@ -41,6 +41,20 @@ it('normalizes to lower case, so uniqueness ignores case', function () {
     $this->assertSame('kubi.01', Username::normalize('  KuBi.01 '));
 });
 
+it('keeps every guest-and-digits name for the API, however it is dotted', function () {
+    foreach (['guest1', 'gu.est.123', 'misafir*2026', 'Guest48128742'] as $name) {
+        $this->assertSame(UsernameProblem::Reserved, Username::validate($name)->problem);
+    }
+});
+
+it('knows a name the API gave out', function (string $name, bool $automatic) {
+    $this->assertSame($automatic, Username::isAutomatic($name));
+})->with('automatic usernames');
+
+it('never calls a missing name automatic', function () {
+    $this->assertFalse(Username::isAutomatic(null));
+});
+
 it('trims exactly what JavaScript trims', function () {
     // No-break and ideographic spaces are whitespace to JavaScript's trim()…
     $this->assertSame('kubi', Username::validate("\u{00A0}kubi\u{3000}")->normalized);

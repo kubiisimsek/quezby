@@ -76,6 +76,7 @@ class RunController extends Controller
             'passed' => $outcome?->passed ?? [],
             'daily' => $finished->daily,
             'league' => $finished->league,
+            'leagueUnlock' => $finished->leagueUnlock,
             'shareText' => $finished->daily['shareText'] ?? $this->shareText($finished->run->score ?? 0, $finished->run->reels ?? 0, $ranks['daily']),
         ]);
     }

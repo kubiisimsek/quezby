@@ -49,5 +49,6 @@ export { Podium, Spotlight, type PodiumEntry } from '@/ui/kit/podium';
 export { ClimbRow, FloorCard } from '@/ui/kit/climb';
 export { BONUS_LABELS, BonusChip, ShareGrid } from '@/ui/kit/result';
 export { LobbyCard, PlayButton, RankChips } from '@/ui/kit/lobby';
+export { CoachCard, type CoachGesture } from '@/ui/kit/coach';
 export { Confetti, CountUp, Stamp, useShake } from '@/ui/kit/juice';
 export { SPRING_POP, stagger } from '@/ui/motion';

@@ -8,6 +8,8 @@ use App\Http\Requests\GuestSignUpRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Resources\MeResource;
 use App\Models\User;
+use App\Services\Identity\GuestNames;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -16,13 +18,24 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    /** A new account with no username, email or password; the token is its only key. */
-    public function guest(GuestSignUpRequest $request): JsonResponse
+    /**
+     * A new account with no email or password — the token is its only key —
+     * playing as `guest48128742` until its player picks a name. Two sign-ups
+     * that drew the same name at once: the loser draws again.
+     */
+    public function guest(GuestSignUpRequest $request, GuestNames $names): JsonResponse
     {
-        $user = User::create([
+        $create = fn () => User::create([
+            'username' => $names->mint(),
             'platform' => $request->validated('platform'),
             'install_id' => $request->validated('installId'),
         ]);
+
+        try {
+            $user = $create();
+        } catch (UniqueConstraintViolationException) {
+            $user = $create();
+        }
 
         return response()->json([
             'token' => $user->createToken($user->platform ?? 'app')->plainTextToken,

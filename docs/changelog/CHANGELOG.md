@@ -1,5 +1,83 @@
 # Changelog
 
+## 2026-09-25 — The admin panel
+
+- **`apps/admin`: the game's admin panel** — a static single-page app (Vite +
+  React 19 + Tailwind v4 + TanStack Query) for shared hosting, on its own
+  subdomain (`admin.quezby.com`, `staging-admin.quezby.com`). Pages: Genel
+  bakış (today and 30 days, the queue, the week's signals), Oyuncular (search
+  by name, email, id or install; ban, unban, reset a name, sign out, delete),
+  Şüpheliler (the review queue, flagged runs, suspect players by risk), Turlar
+  (every run, and a run post by post as the API's engine replays it),
+  Sıralamalar, Günün akışı, Ligler, İçerik (how each post fares), Denetim
+  kaydı, Yöneticiler and Sistem (migrations, caches and stale runs without SSH).
+- **Its look is Qesvis's admin language in Quezby's colours** — a kit written
+  from scratch in `apps/admin/src/components`, tokens in
+  `apps/admin/src/index.css` (magenta primary, violet accent, the game's
+  gradient on every page's band, light and dark), held to the game's palette
+  and to contrast by `scripts/admin-tokens.test.mjs` (with `scripts/lib/oklch.mjs`,
+  now shared with `pnpm tokens`). `docs/design/admin-design-system.md`,
+  `docs/rules/admin-rules.md`. Arena stays the game's alone.
+- **`/api/v1/admin`** (`docs/backend/admin-api.md`): staff accounts
+  (`admins`) with roles — Sahip, Moderatör, İzleyici — on their own guard:
+  an admin token opens no player route and a player token no admin route;
+  `config/auth.php` pins the `sanctum` guard to players. Sessions end after
+  `QUEZBY_ADMIN_TOKEN_HOURS` (12); a new admin starts on a temporary password
+  shown once. A role that may not gets the new **`403 forbidden`** error code.
+  Every route declares its least role and `RolesTest` holds the list.
+- **The audit log** (`audit_entries`) records every moderation and admin
+  action with who made it, from where and why — from the panel, `php artisan`
+  and the ops routes alike: `ModerationService` now takes an `Actor` and writes
+  the entry in the same transaction; a ban of a banned player changes nothing.
+- **`runs.flag_codes`** (`,wall_clock,reaction_cv,`) keeps a run's flag codes
+  findable in any database, in step with `flags` through the `Run` model;
+  `App\Enums\RunFlag` lists every code with its severity and the weight the
+  suspects list gives it. Indexes on `runs.started_at`, `runs.finished_at`
+  and `users.created_at`.
+- The first owner: `php artisan quezby:admin:create`, or `POST /ops/admins`
+  behind the ops token. Account deletion moved into `AccountDeletion`, shared
+  by `DELETE /me` and the panel; the ops chores into `OpsChores`, shared by
+  `/ops/*` and the system page. `config/cors.php` lets browsers remember a
+  preflight for two hours.
+- **`@quezby/sdk/admin`** (`createAdminClient`), on the request core now in
+  `packages/sdk/src/http.ts` — the app's client is unchanged and ships none of
+  it; `packages/types/src/admin.ts` is the contract. Local demo data:
+  `php artisan db:seed --class=AdminDemoSeeder` (an admin per role, bots, a ban).
+  Hosting: `pnpm admin:package:staging|production` → one zip with its
+  `.htaccess` (SPA routing, caching, a CSP naming the API) —
+  `docs/deployment/shared-hosting.md` → "Yönetim paneli".
+
+## 2026-09-25 — First launch: a practice run, a name, a way to keep the account
+
+- **Play first.** The welcome has one gold **Oyna** — a guest account and
+  straight into a **practice run** ("DENEME TURU") — and "Hesabım var, giriş
+  yap". The practice run is the real game on the phone alone: nothing reaches
+  the API, nothing counts (boards, league, stats, best). Before the first post
+  of each kind the feed stops for a **coach card** (`CoachCard`, a new kit
+  family) whose hand acts the move out; the post's clock starts on "Anladım".
+  The engine only times a reel once it is live, so the locked rules are
+  untouched (`useGame`: phase `coach`, `start('tutorial')`, `unseen` kinds on
+  the result).
+- **Then a name, which can wait.** Every account is named at birth —
+  `guest48128742` (`GuestNames`, guests and new Apple/Google players alike) —
+  so "Sana ne diyelim?" has a **Şimdilik geç**. Names that look automatic
+  (`guest`/`misafir` + digits) are reserved in both copies of the rules and the
+  shared fixture; `isAutoUsername` / `Username::isAutomatic` tell one apart, and
+  the profile says "Adını seç" for it.
+- **Then keeping the account, which can wait too** — `ProtectScreen`: Apple,
+  Google, "E-postayla koru" (`CredentialsSheet`, out of the profile) or "Şimdi
+  değil". An Apple/Google account that is someone else's can be switched to.
+  A guest is asked once more, in the lobby, the moment their league opens.
+- **The league opens after 3 counted runs** (ranked and scoring,
+  `leagues.unlock_runs`): `LeagueResponse.unlock` and
+  `FinishRunResponse.leagueUnlock` say how many are left ("Lige 2 oyun
+  kaldı"); `LeagueService::join` seats nobody before. Anyone who has ever sat
+  in a league is never locked again. There is still no player level or XP.
+- The first steps live in `stores/onboarding` (per account, on the phone) and
+  `navigation/gate.ts` decides what mounts. `docs/product/overview.md`
+  ("İlk açılış"), `usernames.md`, `scoring.md`, `api-contract.md`, the design
+  docs and `ui-writing.md` carry the rules.
+
 ## 2026-09-25 — Posts, not reels
 
 - What comes down the feed is a **post** to the player everywhere they read

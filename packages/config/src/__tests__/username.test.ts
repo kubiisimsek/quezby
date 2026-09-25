@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   USERNAME_MESSAGES,
+  isAutoUsername,
   normalizeUsername,
   usernameChecklist,
   validateUsername,
@@ -13,6 +14,7 @@ import {
 type Fixtures = {
   valid: Array<{ input: string; normalized: string }>;
   invalid: Array<{ input: string; problem: string }>;
+  automatic: Array<{ name: string; automatic: boolean }>;
 };
 
 /** Shared with `apps/api/tests/Unit/UsernameTest.php`. */
@@ -46,6 +48,29 @@ describe('validateUsername', () => {
 
   it('normalizes to lower case so uniqueness ignores case', () => {
     expect(normalizeUsername('  KuBi.01 ')).toBe('kubi.01');
+  });
+
+  it('keeps every guest-and-digits name for the API, however it is dotted', () => {
+    for (const name of ['guest1', 'gu.est.123', 'misafir*2026', 'Guest48128742']) {
+      expect(validateUsername(name)).toEqual({ ok: false, problem: 'reserved' });
+    }
+  });
+});
+
+describe('isAutoUsername', () => {
+  it.each(fixtures.automatic)('says "$name" is automatic: $automatic', ({ name, automatic }) => {
+    expect(isAutoUsername(name)).toBe(automatic);
+  });
+
+  it('is false when there is no name at all', () => {
+    expect(isAutoUsername(null)).toBe(false);
+    expect(isAutoUsername(undefined)).toBe(false);
+  });
+
+  it('only ever matches a name the rules keep from players', () => {
+    for (const { name, automatic } of fixtures.automatic) {
+      if (automatic) expect(validateUsername(name)).toEqual({ ok: false, problem: 'reserved' });
+    }
   });
 });
 

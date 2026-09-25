@@ -1,7 +1,8 @@
 # Quezby "Arena" Design Language
 
 **Status:** Source of truth for everything a Quezby player looks at
-**Surface:** `apps/mobile`
+**Surface:** `apps/mobile` — the admin panel (`apps/admin`) is staff-only and
+has its own language: `docs/design/admin-design-system.md`
 **Authored in:** `apps/mobile/design/palette.mjs` → generated into
 `apps/mobile/src/ui/tokens.ts` by `pnpm tokens`
 **Replaces:** "Akış" (2026-09-24), which dressed an app's system — white
@@ -156,7 +157,9 @@ sheet.
 4. **What loops:** a playing reel (it is live), the lobby's play slab — it
    breathes 1 → 1.04 → 1, 1.6 s each way, and a glint crosses it every few
    seconds, because the game is waiting — and nothing else. Loops pause while
-   covered.
+   covered: a reel under a coach card holds still, since it is not live yet.
+   The coach card's hand acts its move out **twice** and rests on the last
+   frame — a demonstration, not a loop.
 
 **Reduced motion** (`useReducedMotion()`) stops every loop and every piece of
 juice; the end state shows at once.

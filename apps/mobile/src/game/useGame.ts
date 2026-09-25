@@ -3,6 +3,7 @@ import {
   ENGINE_VERSION,
   EngineError,
   GESTURE,
+  REEL_KINDS,
   Run,
   type Action,
   type BonusHit,
@@ -40,7 +41,14 @@ import { feel } from '@/lib/haptics';
 import { usePendingRun } from '@/stores/pendingRun';
 import { SPRING } from '@/ui/motion';
 
-export type Phase = 'starting' | 'error' | 'countdown' | 'playing' | 'finishing' | 'result';
+/** `coach`: a practice run's card is up and nothing is live — before the countdown, or between reels. */
+export type Phase = 'starting' | 'error' | 'coach' | 'countdown' | 'playing' | 'finishing' | 'result';
+
+/**
+ * Why a run is played on the phone alone: no connection, an app the API no
+ * longer plays with, or a new player's coached practice run.
+ */
+export type PracticeReason = 'offline' | 'outdated' | 'tutorial';
 
 export type Feedback = {
   id: number;
@@ -54,11 +62,18 @@ export type Feedback = {
 /**
  * How a run ended, as far as the player may be told. A ranked run shows only
  * what the API answered — never the phone's own count. Practice runs never
- * reach the API, so they show the engine's summary, marked as practice.
+ * reach the API, so they show the engine's summary, marked as practice; a
+ * coached one also says which kinds it never got to.
  */
 export type Outcome =
   | { mode: 'verified'; response: FinishRunResponse }
-  | { mode: 'practice'; summary: RunSummary; reason: 'offline' | 'outdated' }
+  | {
+      mode: 'practice';
+      summary: RunSummary;
+      reason: PracticeReason;
+      /** The kinds a coached run ended before — they never had their card. */
+      unseen?: readonly ReelKind[];
+    }
   | { mode: 'unsent'; message: string; canRetry: boolean };
 
 /** A finish worth sending again: the API never got it, or could not take it right then. */
@@ -69,7 +84,7 @@ function retryable(error: unknown): boolean {
   );
 }
 
-type Mode = 'idle' | 'live' | 'transition' | 'over';
+type Mode = 'idle' | 'coach' | 'live' | 'transition' | 'over';
 
 /** How long a drag that began in time may keep the reel after its window. */
 const DRAG_GRACE_MS = 1200;
@@ -110,7 +125,9 @@ export function useGame(mode: RunMode = 'free') {
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [outcome, setOutcome] = useState<Outcome | null>(null);
   const [startError, setStartError] = useState<{ message: string; code: string | null } | null>(null);
-  const [practice, setPractice] = useState<'offline' | 'outdated' | null>(null);
+  const [practice, setPractice] = useState<PracticeReason | null>(null);
+  /** The kind whose coach card is up, in a practice run. */
+  const [coach, setCoach] = useState<ReelKind | null>(null);
 
   const dragY = useSharedValue(0);
   const enter = useSharedValue(1);
@@ -121,6 +138,10 @@ export function useGame(mode: RunMode = 'free') {
 
   const runRef = useRef<Run | null>(null);
   const runIdRef = useRef<string | null>(null);
+  /** Why this run stays on the phone — read by callbacks, which may run before a render. */
+  const practiceRef = useRef<PracticeReason | null>(null);
+  /** The kinds a coached run has shown its card for. */
+  const coachedRef = useRef<Set<ReelKind>>(new Set());
   const actionsRef = useRef<Action[]>([]);
   /** When the countdown ended — the game clock's zero. */
   const goAtRef = useRef<number | null>(null);
@@ -263,20 +284,36 @@ export function useGame(mode: RunMode = 'free') {
     cancelAnimation(timer);
     cancelAnimation(meter);
     run.quit();
+    setCoach(null);
     const summary = run.summary();
     if (runIdRef.current) {
       submit(summary);
-    } else {
-      setOutcome({ mode: 'practice', summary, reason: practice ?? 'offline' });
-      setPhase('result');
+      return;
     }
-  }, [clearTimers, meter, practice, submit, timer]);
+    const reason = practiceRef.current ?? 'offline';
+    setOutcome(
+      reason === 'tutorial'
+        ? {
+            mode: 'practice',
+            summary,
+            reason,
+            unseen: REEL_KINDS.filter((kind) => !coachedRef.current.has(kind)),
+          }
+        : { mode: 'practice', summary, reason },
+    );
+    setPhase('result');
+  }, [clearTimers, meter, submit, timer]);
 
   /* ------------------------------------------------------------- reels -- */
 
   const commitRef = useRef<(action: Action) => void>(() => undefined);
 
-  const beginReel = useCallback(() => {
+  /**
+   * The current reel goes live: its clock starts now. `shown` when it is
+   * already on screen — it slid in under a coach card — so it does not slide
+   * in again.
+   */
+  const beginReel = useCallback((shown = false) => {
     const run = runRef.current;
     if (!run || run.over) return;
     const current = run.current;
@@ -288,8 +325,10 @@ export function useGame(mode: RunMode = 'free') {
     reelStartRef.current = now();
 
     dragY.value = 0;
-    enter.value = 0;
-    enter.value = withTiming(1, { duration: 160, easing: Easing.out(Easing.cubic) });
+    if (!shown) {
+      enter.value = 0;
+      enter.value = withTiming(1, { duration: 160, easing: Easing.out(Easing.cubic) });
+    }
     holding.value = 0;
     holdFill.value = 0;
     timer.value = 1;
@@ -324,6 +363,41 @@ export function useGame(mode: RunMode = 'free') {
       commitRef.current([GESTURE.none, 0, 0]);
     });
   }, [dragY, enter, holdFill, holding, meter, schedule, timer]);
+
+  /**
+   * A coach card over the current reel: the reel slides in and waits, its
+   * timer full, the meter still — nothing is live, so nothing is judged or
+   * drained. `dismissCoach` starts it.
+   */
+  const enterCoach = useCallback((run: Run) => {
+    const current = run.current;
+    coachedRef.current.add(current.kind);
+    clearTimers();
+    modeRef.current = 'coach';
+    touchRef.current = IDLE;
+    holdRef.current = null;
+    setReel(current);
+    dragY.value = 0;
+    enter.value = 0;
+    enter.value = withTiming(1, { duration: 160, easing: Easing.out(Easing.cubic) });
+    holding.value = 0;
+    holdFill.value = 0;
+    timer.value = 1;
+    meter.value = run.meter;
+    setCoach(current.kind);
+    setPhase('coach');
+  }, [clearTimers, dragY, enter, holdFill, holding, meter, timer]);
+
+  /** The next reel — after its card, the first time a practice run meets its kind. */
+  const advanceReel = useCallback(() => {
+    const run = runRef.current;
+    if (!run || run.over) return;
+    if (practiceRef.current === 'tutorial' && !coachedRef.current.has(run.current.kind)) {
+      enterCoach(run);
+      return;
+    }
+    beginReel();
+  }, [beginReel, enterCoach]);
 
   const commit = useCallback(
     (action: Action) => {
@@ -373,11 +447,11 @@ export function useGame(mode: RunMode = 'free') {
         });
         schedule('next', PACE.slideMs, () => {
           if (step.over) finish();
-          else beginReel();
+          else advanceReel();
         });
       });
     },
-    [beginReel, checkIn, clearTimers, dragY, finish, holding, meter, schedule, timer],
+    [advanceReel, checkIn, clearTimers, dragY, finish, holding, meter, schedule, timer],
   );
   commitRef.current = commit;
 
@@ -506,6 +580,20 @@ export function useGame(mode: RunMode = 'free') {
 
   /* ------------------------------------------------------------- start -- */
 
+  /** 3, 2, 1 — then the game clock starts and the first reel goes live. */
+  const countDown = useCallback(() => {
+    modeRef.current = 'idle';
+    setCountdown(3);
+    setPhase('countdown');
+    schedule('count2', PACE.countdownStepMs, () => setCountdown(2));
+    schedule('count1', PACE.countdownStepMs * 2, () => setCountdown(1));
+    schedule('go', PACE.countdownStepMs * PACE.countdownSteps, () => {
+      goAtRef.current = now();
+      setPhase('playing');
+      advanceReel();
+    });
+  }, [advanceReel, schedule]);
+
   const begin = useCallback(
     (runSeed: number, runId: string | null) => {
       runRef.current = new Run(runSeed);
@@ -515,6 +603,8 @@ export function useGame(mode: RunMode = 'free') {
       markRef.current = 0;
       receiptsRef.current = [];
       checkingInRef.current = new Set();
+      coachedRef.current = new Set();
+      setCoach(null);
       setSeed(runSeed);
       setScore(0);
       setCombo(1000);
@@ -525,23 +615,33 @@ export function useGame(mode: RunMode = 'free') {
       timer.value = 1;
       dragY.value = 0;
       enter.value = 1;
-      setCountdown(3);
-      setPhase('countdown');
-      schedule('count2', PACE.countdownStepMs, () => setCountdown(2));
-      schedule('count1', PACE.countdownStepMs * 2, () => setCountdown(1));
-      schedule('go', PACE.countdownStepMs * PACE.countdownSteps, () => {
-        goAtRef.current = now();
-        setPhase('playing');
-        beginReel();
-      });
+      // A coached run explains its first reel before the countdown, so the 3-2-1 is for playing.
+      if (practiceRef.current === 'tutorial') {
+        enterCoach(runRef.current);
+        return;
+      }
+      countDown();
     },
-    [beginReel, dragY, enter, meter, schedule, timer],
+    [countDown, dragY, enter, enterCoach, meter, timer],
   );
 
+  /** The card is put away: the countdown, if the run has not started yet, or else the reel goes live. */
+  const dismissCoach = useCallback(() => {
+    if (modeRef.current !== 'coach') return;
+    setCoach(null);
+    if (goAtRef.current === null) {
+      countDown();
+      return;
+    }
+    setPhase('playing');
+    beginReel(true);
+  }, [beginReel, countDown]);
+
   const start = useCallback(
-    async (practiceReason: 'offline' | 'outdated' | null = null) => {
+    async (practiceReason: PracticeReason | null = null) => {
       clearTimers();
       modeRef.current = 'idle';
+      practiceRef.current = practiceReason;
       setStartError(null);
       setPhase('starting');
       setPractice(practiceReason);
@@ -560,6 +660,7 @@ export function useGame(mode: RunMode = 'free') {
       } catch (error) {
         if (!aliveRef.current) return;
         if (error instanceof ApiError && error.code === 'engine_outdated') {
+          practiceRef.current = 'outdated';
           setPractice('outdated');
           begin(localSeed(), null);
           return;
@@ -574,9 +675,14 @@ export function useGame(mode: RunMode = 'free') {
     [begin, clearTimers, mode],
   );
 
+  /**
+   * Closing ends the run and scores it. Only a countdown just walks away —
+   * except in a coached run, which has nothing behind it to go back to: it
+   * always ends in its result.
+   */
   const quit = useCallback(() => {
     if (modeRef.current === 'over' || !runRef.current) return;
-    if (phase === 'countdown') {
+    if (phase === 'countdown' && practiceRef.current !== 'tutorial') {
       clearTimers();
       modeRef.current = 'over';
       return;
@@ -594,7 +700,9 @@ export function useGame(mode: RunMode = 'free') {
   useEffect(() => {
     const subscription = AppState.addEventListener('change', (state) => {
       // Leaving the app ends the run: a paused reel could be studied at leisure.
-      if (state === 'background' && modeRef.current !== 'over' && modeRef.current !== 'idle') {
+      // Nothing is live under a coach card, so there is nothing to study.
+      const live = modeRef.current === 'live' || modeRef.current === 'transition';
+      if (state === 'background' && live) {
         finish();
       }
     });
@@ -620,9 +728,11 @@ export function useGame(mode: RunMode = 'free') {
     outcome,
     startError,
     practice,
+    coach,
     values: { dragY, enter, timer, holdFill, holding, meter },
     start,
     quit,
+    dismissCoach,
     retrySubmit,
     touches: { onTouchStart, onTouchMove, onTouchEnd },
   };

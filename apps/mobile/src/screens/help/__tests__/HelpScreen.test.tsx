@@ -150,6 +150,7 @@ describe('HelpScreen', () => {
       expect(screen.getByText(tier)).toBeOnTheScreen();
     }
     expect(screen.getByText(/30 kişilik bir gruba/)).toBeOnTheScreen();
+    expect(screen.getByText(/Lig, ilk 3 sayılan oyunundan sonra\s+açılır; deneme turu sayılmaz/)).toBeOnTheScreen();
     expect(
       screen.getByText(/her gününde yaptığın en iyi skorların\s+toplamı/),
     ).toBeOnTheScreen();
@@ -170,5 +171,12 @@ describe('HelpScreen', () => {
     expect(screen.getByText(/“Skorun inceleniyor” yazar/)).toBeOnTheScreen();
     expect(screen.queryByText(/şüpheli|hile/i)).not.toBeOnTheScreen();
     expect(screen.getByText(/Apple, Google ya da e-posta/)).toBeOnTheScreen();
+  });
+
+  it('says the first practice run counts nowhere, and what a new account is called', async () => {
+    await renderWithProviders(<HelpScreen {...props} />);
+
+    expect(screen.getByText(/deneme turuyla başlarsın; o tur hiçbir yere\s+sayılmaz/)).toBeOnTheScreen();
+    expect(screen.getByText(/guest48128742 gibi bir adla oynarsın/)).toBeOnTheScreen();
   });
 });

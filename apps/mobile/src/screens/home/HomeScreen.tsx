@@ -12,7 +12,7 @@ import type {
   LeagueResponse,
 } from '@quezby/types';
 import type { UseQueryResult } from '@tanstack/react-query';
-import { useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import {
   RefreshControl,
   ScrollView,
@@ -26,6 +26,8 @@ import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useSession } from '@/auth/session';
+import { CredentialsSheet } from '@/components/CredentialsSheet';
+import { SignInWaysSheet } from '@/components/SignInWaysSheet';
 import { APP_PLATFORM } from '@/config/env';
 import { DEVICE_FAILED, REEL_GUIDE, REEL_ORDER } from '@/game/howTo';
 import { useDaily, useLeaderboard, useLeague } from '@/hooks/useBoards';
@@ -34,6 +36,7 @@ import { messageFor } from '@/lib/errors';
 import { dativeOf, formatGap, formatRank, formatScore } from '@/lib/format';
 import type { RootStackParamList, TabParamList } from '@/navigation/types';
 import { deviceFailed, useDeviceVerdict } from '@/stores/deviceVerdict';
+import { useOnboarding } from '@/stores/onboarding';
 import { Icon, type IconName } from '@/ui/icons';
 import {
   Arena,
@@ -94,6 +97,21 @@ export function HomeScreen({ navigation }: Props) {
   const daily = useDaily();
   const league = useLeague();
   const weekly = useLeaderboard('weekly', 'everyone', 3);
+  const remindersRead = useOnboarding((state) => state.hydrated);
+  const remindedFor = useOnboarding((state) => state.remindedFor);
+  const [keep, setKeep] = useState<'ways' | 'email' | null>(null);
+  /** The email form waits for the ways sheet to leave the screen. */
+  const toEmail = useRef(false);
+  const joined = league.data?.joined === true;
+
+  // A guest who has just been seated in a league has something to lose: ask
+  // once to keep the account. Never over the game's result — only here.
+  useEffect(() => {
+    if (!focused || !remindersRead || !joined || !user?.isGuest) return;
+    if (remindedFor === user.id) return;
+    useOnboarding.getState().markReminded(user.id);
+    setKeep('ways');
+  }, [focused, joined, remindedFor, remindersRead, user?.id, user?.isGuest]);
 
   const strip = useEntrance(0, 10);
   const warning = useEntrance(0, 10);
@@ -123,7 +141,7 @@ export function HomeScreen({ navigation }: Props) {
     }
   };
 
-  const tier = league.data?.tier ?? null;
+  const tier = league.data && !league.data.unlock ? league.data.tier : null;
   const best = user?.best ?? null;
 
   return (
@@ -218,6 +236,22 @@ export function HomeScreen({ navigation }: Props) {
           </LobbyCard>
         </Animated.View>
       </ScrollView>
+
+      <SignInWaysSheet
+        open={keep === 'ways'}
+        description="Ligdesin! Telefonun değişirse ligin ve skorların kaybolmasın: bir giriş yolu bağla."
+        onClose={() => setKeep(null)}
+        onEmail={() => {
+          toEmail.current = true;
+          setKeep(null);
+        }}
+        onClosed={() => {
+          if (!toEmail.current) return;
+          toEmail.current = false;
+          setKeep('email');
+        }}
+      />
+      <CredentialsSheet open={keep === 'email'} guest onClose={() => setKeep(null)} />
     </View>
   );
 }
@@ -491,6 +525,8 @@ function Attempt({
 /**
  * This week's league: your tier, place and zone, and how long the week has
  * left — or, before your first ranked run, the invitation to take a seat.
+ * Before a new player's first few counted runs it is locked, and says how
+ * many runs are left.
  */
 function LeagueDoor({
   league,
@@ -517,6 +553,21 @@ function LeagueDoor({
         ) : (
           <Skeleton height={14} width="60%" />
         )}
+      </LobbyCard>
+    );
+  }
+
+  if (data.unlock) {
+    const { required, remaining } = data.unlock;
+    return (
+      <LobbyCard title="Lig" eyebrow="KİLİTLİ" icon="lock" tone="secondary" onPress={onPress}>
+        <Txt variant="title" style={styles.leagueLine}>
+          {`Lige ${remaining} oyun kaldı`}
+        </Txt>
+        <Meter value={(required - remaining) / required} tone="secondary" />
+        <Txt variant="meta" tone="muted">
+          {`Lig, ilk ${required} oyunundan sonra açılır. Deneme turu sayılmaz.`}
+        </Txt>
       </LobbyCard>
     );
   }

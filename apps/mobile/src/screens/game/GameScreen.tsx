@@ -16,16 +16,20 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
+import { useSession } from '@/auth/session';
 import { FeedbackLayer } from '@/game/FeedbackLayer';
 import { Hud } from '@/game/Hud';
+import { REEL_GUIDE, REEL_ORDER } from '@/game/howTo';
 import { ReelCard } from '@/game/ReelCard';
 import { ResultView } from '@/game/ResultView';
 import { useGame } from '@/game/useGame';
 import type { RootStackParamList } from '@/navigation/types';
+import { useOnboarding } from '@/stores/onboarding';
 import type { IconName } from '@/ui/icons';
 import {
   Arena,
   Button,
+  CoachCard,
   IconChip,
   Panel,
   Stamp,
@@ -44,33 +48,39 @@ import {
 } from '@/ui/theme';
 import { reel as REEL } from '@/ui/tokens';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Game'>;
+type Props = NativeStackScreenProps<RootStackParamList, 'Game' | 'Tutorial'>;
 
 /**
  * The game. Full screen, over the tabs, with no swipe-back: the only ways out
  * are the close button, which ends the run and scores it, or leaving the app,
  * which does the same. While a run is being prepared or verified, and when
  * one cannot start, the arena covers the feed.
+ *
+ * As `Tutorial` it is a new player's practice run: played on the phone,
+ * counted nowhere, with a coach card before the first post of each kind.
+ * Nothing is behind it, so closing it always ends in its result, and its
+ * result leads on to the player's name.
  */
 export function GameScreen({ navigation, route }: Props) {
+  const tutorial = route.name === 'Tutorial';
   const mode = route.params?.mode ?? 'free';
   const game = useGame(mode);
   const queryClient = useQueryClient();
   const { start } = game;
 
   useEffect(() => {
-    void start();
-  }, [start]);
+    void start(tutorial ? 'tutorial' : null);
+  }, [start, tutorial]);
 
   useEffect(() => {
-    if (game.phase !== 'result') return;
+    if (game.phase !== 'result' || tutorial) return;
     for (const key of ['leaderboard', 'me', 'daily', 'league', 'stats']) {
       void queryClient.invalidateQueries({ queryKey: [key] });
     }
-  }, [game.phase, queryClient]);
+  }, [game.phase, queryClient, tutorial]);
 
   const close = () => {
-    if (game.phase === 'playing') {
+    if (game.phase === 'playing' || tutorial) {
       game.quit();
       return;
     }
@@ -85,15 +95,22 @@ export function GameScreen({ navigation, route }: Props) {
         <ResultView
           outcome={game.outcome}
           mode={mode}
-          onReplay={() => void game.start()}
+          onReplay={() => void game.start(tutorial ? 'tutorial' : null)}
           onPlayFree={() => navigation.replace('Game', { mode: 'free' })}
           onClose={() => navigation.goBack()}
           onRetrySubmit={game.retrySubmit}
           onOpenDaily={() => navigation.replace('Daily')}
+          onContinue={
+            tutorial
+              ? () => useOnboarding.getState().advance(useSession.getState().user?.isGuest ?? true)
+              : undefined
+          }
         />
       </>
     );
   }
+
+  const coach = game.coach ? REEL_GUIDE[game.coach] : null;
 
   return (
     <View style={styles.root}>
@@ -106,6 +123,7 @@ export function GameScreen({ navigation, route }: Props) {
           hint={
             game.phase === 'playing' && game.reel.index < RULES.intro.length
           }
+          paused={game.coach !== null}
         />
       ) : null}
 
@@ -129,6 +147,21 @@ export function GameScreen({ navigation, route }: Props) {
       />
 
       <FeedbackLayer feedback={game.feedback} />
+
+      {game.coach && coach ? (
+        <View style={styles.coach}>
+          <CoachCard
+            gesture={coach.gesture}
+            icon={coach.icon}
+            tone={coach.tone === 'neutral' ? 'secondary' : coach.tone}
+            title={coach.title}
+            line={coach.body}
+            step={REEL_ORDER.indexOf(game.coach) + 1}
+            of={REEL_ORDER.length}
+            onDismiss={game.dismissCoach}
+          />
+        </View>
+      ) : null}
 
       <Hud
         meter={game.values.meter}
@@ -376,6 +409,12 @@ const styles = StyleSheet.create({
     padding: SPACE.xl,
   },
   centred: { alignItems: 'center' },
+  coach: {
+    ...StyleSheet.absoluteFill,
+    backgroundColor: withAlpha(REEL.outline, 0.6),
+    justifyContent: 'center',
+    padding: SPACE.xl,
+  },
   countdown: {
     ...StyleSheet.absoluteFill,
     alignItems: 'center',

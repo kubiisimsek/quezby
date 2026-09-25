@@ -1,6 +1,7 @@
-# API'yi paylaşımlı hostinge kurmak (cPanel)
+# API'yi ve yönetim panelini paylaşımlı hostinge kurmak (cPanel)
 
-API tek bir zip olarak yüklenir; SSH gerekmez. Adımlar staging için yazıldı —
+API tek bir zip olarak yüklenir; SSH gerekmez. Yönetim paneli ayrı, statik
+bir zip'tir ve kendi alt alan adında durur (aşağıda **Yönetim paneli**). Adımlar staging için yazıldı —
 production'da `staging` yerine `production`, alan adı olarak `api.quezby.com`
 kullan.
 
@@ -127,6 +128,9 @@ curl … -d '{"action":"reject","runId":"01J…","reason":"bot"}'               
 curl … -d '{"action":"ban","username":"hileci","reason":"bot"}'                             # sessiz yasak
 ```
 
+**Yönetim paneli kuruluysa** (aşağıda) bu işlerin hepsini oradan, kimin
+yaptığı kayda geçerek yaparsın; `MODERATION_TOKEN`'ı boş bırak.
+
 SSH varsa: `php artisan quezby:review`, `quezby:run:approve {run}`,
 `quezby:run:reject {run} --reason=…`, `quezby:user:ban {username} --reason=…`,
 `quezby:user:unban {username}`. İşin bitince `MODERATION_TOKEN=` satırını boşalt.
@@ -147,6 +151,65 @@ migration gerektiren bir sonraki sürümde yeniden doldurursun.
 3 → 4 → 6 → 7. Yeni sürüm açıldıktan sonra `optimize`'ı mutlaka yeniden
 çağır: eski önbellek yeni kodla çalışmaya devam eder.
 
+## Yönetim paneli (admin.quezby.com)
+
+Panel (`apps/admin`) statik dosyalardan oluşur: PHP ya da Node gerekmez,
+kendi alt alan adında durur ve API'ye tarayıcıdan bağlanır. Staging için
+`staging` / `staging-admin.quezby.com`, production için `production` /
+`admin.quezby.com` kullan.
+
+1. **Önce API.** Panelin tabloları (`admins`, `audit_entries`) API'nin
+   migration'larıyla gelir: API'nin yeni sürümünü yükle ve 6. adımdaki
+   `migrate` + `optimize`'ı çalıştır.
+2. **İlk Sahip hesabı.** Panelde kayıt olunmaz; ilk hesap API'nin durduğu
+   yerde açılır:
+
+   ```bash
+   # SSH varsa
+   php artisan quezby:admin:create sen@ornek.com --name="Adın Soyadın"
+
+   # SSH yoksa (.env'de OPS_TOKEN dolu olmalı)
+   curl -X POST https://api.quezby.com/api/v1/ops/admins -H "X-Ops-Token: <OPS_TOKEN>" \
+     -H "Content-Type: application/json" -d '{"email":"sen@ornek.com","name":"Adın Soyadın"}'
+   ```
+
+   İkisi de **geçici şifreyi bir kez** gösterir; not al. Aynı e-postayla
+   tekrar çağırırsan (komutta `--reset`) yeni bir geçici şifre verir — şifreni
+   unutursan böyle dönersin. İşin bitince `OPS_TOKEN=` satırını boşalt (7. adım).
+3. **Paketle** (kendi bilgisayarında, depo kökünde):
+
+   ```bash
+   pnpm admin:package:production    # ya da: pnpm admin:package:staging
+   ```
+
+   Çıktı: `dist-deploy/quezby-admin-production-<tarih>.zip` — `index.html`,
+   `assets/`, `.htaccess` (yönlendirme, önbellek, güvenlik başlıkları; hangi
+   API'ye bağlanacağını da yazar), `robots.txt`, `favicon.svg`.
+   `VITE_API_ORIGIN` dışında bir `VITE_*` değişkeni doluysa betik paketlemez:
+   o değerler herkese açık pakete girerdi.
+4. **Alan adı.** cPanel → **Domains** → `admin.quezby.com` oluştur. Document
+   Root için boş bir klasör seç (ör. `admin.quezby.com`); statik dosyalar
+   olduğu için `public_html` altında olabilir. SSL: **SSL/TLS Status** →
+   AutoSSL.
+5. **Yükle.** File Manager → o klasör → zip'i yükle → **Extract**. `.htaccess`
+   gizli bir dosyadır (File Manager → Settings → *Show Hidden Files*); orada
+   olduğundan emin ol. Güncellemede önce eski `assets/` klasörünü sil, sonra
+   yeni zip'i açıp üzerine yaz.
+6. **Gir.** `https://admin.quezby.com` → geçici şifreyle giriş → panel önce
+   kendi şifreni seçtirir. Başka yöneticileri panelden eklersin: **Yöneticiler
+   → Yönetici ekle** (Sahip, Moderatör ya da İzleyici; geçici şifreyi bir kez
+   gösterir).
+
+Kontrol: tarayıcıda panel açılıyorsa ve bir alt sayfayı yenileyince
+(`/players`) yine açılıyorsa `.htaccess` çalışıyor demektir. Giriş "Sunucuya
+ulaşılamadı" diyorsa API'nin adresi yanlış paketlenmiştir ya da API
+kapalıdır: `curl https://api.quezby.com/api/v1/health`.
+
+Panel oturumu 12 saat sürer (`QUEZBY_ADMIN_TOKEN_HOURS`). Yöneticilerin her
+işlemi — yasak, ad sıfırlama, tur onay/ret, hesap silme, migration —
+**Denetim kaydı**nda kimin yaptığıyla durur; komut satırından ve ops
+uçlarından yapılanlar da.
+
 ## Sorun giderme
 
 - **500 / `server_error`**: `storage/logs/laravel-<tarih>.log`.
@@ -155,3 +218,7 @@ migration gerektiren bir sonraki sürümde yeniden doldurursun.
   muaf, her istekte `.env`'den okunur.)
 - **Her istek 401**: `Authorization` başlığı PHP'ye ulaşmıyor.
   `public/.htaccess` ve kökteki `.htaccess` bu başlığı iletir; silme.
+- **Panelde bir alt sayfa 404 veriyor**: panelin `.htaccess`'i yüklenmemiş ya
+  da hostta `mod_rewrite` kapalı. Zip'i gizli dosyalarla birlikte yeniden aç.
+- **Panel "Bu işlem için yetkin yok" diyor**: rolün yetmiyor; bir Sahip
+  **Yöneticiler**'den rolünü değiştirebilir.

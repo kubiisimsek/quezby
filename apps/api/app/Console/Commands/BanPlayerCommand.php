@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Console\Commands\Concerns\FindsModerationTargets;
 use App\Services\ModerationService;
+use App\Support\Actor;
 use Illuminate\Console\Command;
 
 /** A silent ban: the player keeps playing, nothing of theirs ranks or shows. */
@@ -34,7 +35,7 @@ final class BanPlayerCommand extends Command
             return self::SUCCESS;
         }
 
-        $moderation->ban($player, $reason);
+        $moderation->ban($player, $reason, Actor::cli());
         $this->components->info("{$player->username} is banned: off every board, and every run from now on is flagged.");
 
         return self::SUCCESS;

@@ -72,6 +72,24 @@ test('a name the rules refuse is username_invalid, with the problem', function (
         ->assertJsonPath('error.fields.username', ['required']);
 });
 
+test('a player on an automatic name picks a name of their own', function () {
+    $user = $this->signIn(User::factory()->withUsername('guest00000007')->create());
+
+    $this->putJson('/api/v1/me/username', ['username' => 'ekin.su'])
+        ->assertOk()
+        ->assertJsonPath('user.username', 'ekin.su');
+    $this->assertSame('ekin.su', $user->fresh()->username);
+});
+
+test('a player cannot pick a name that looks automatic', function () {
+    $this->signIn();
+
+    $this->assertApiError($this->putJson('/api/v1/me/username', ['username' => 'guest12345678']), 422, 'username_invalid')
+        ->assertJsonPath('error.fields.username', ['reserved']);
+    $this->getJson('/api/v1/usernames/check?username=Misafir.2026')
+        ->assertExactJson(['username' => 'misafir.2026', 'available' => false, 'reason' => 'reserved']);
+});
+
 test('a name that is not a string fails validation', function () {
     $this->signIn();
 

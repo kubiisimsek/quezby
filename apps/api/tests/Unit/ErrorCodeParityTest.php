@@ -25,3 +25,8 @@ it('says a device proof problem the way the contract does', function (ErrorCode 
     [ErrorCode::IntegrityInvalid, 422],
     [ErrorCode::AttestKeyUnknown, 409],
 ]);
+
+it('forbids an admin a role may not use with its own code', function () {
+    expect(ErrorCode::Forbidden->status())->toBe(403)
+        ->and(ErrorCode::Forbidden->message())->toBe('Bu işlem için yetkin yok.');
+});

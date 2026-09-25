@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Console\Commands\Concerns\FindsModerationTargets;
 use App\Services\ModerationService;
+use App\Support\Actor;
 use Illuminate\Console\Command;
 
 final class ApproveRunCommand extends Command
@@ -21,7 +22,7 @@ final class ApproveRunCommand extends Command
             return self::FAILURE;
         }
 
-        if (! $moderation->approve($run)) {
+        if (! $moderation->approve($run, Actor::cli())) {
             $this->components->error("Run {$run->id} is not waiting for review: it is {$run->status->value}.");
 
             return self::FAILURE;

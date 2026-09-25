@@ -1,22 +1,23 @@
 <?php
 
 use App\Models\User;
+use App\Services\Identity\GuestNames;
 
 test('a guest signs up and the token works', function () {
     $response = $this->postJson('/api/v1/auth/guest', ['platform' => 'ios', 'installId' => 'install-123']);
 
     $response->assertCreated()
-        ->assertJsonPath('user.username', null)
         ->assertJsonPath('user.email', null)
         ->assertJsonPath('user.isGuest', true)
         ->assertJsonPath('user.settings', ['haptics' => true])
         ->assertJsonPath('user.best', null);
+    $this->assertMatchesRegularExpression('/^guest\d{8}$/', $response->json('user.username'));
     $this->assertMatchesRegularExpression('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/', $response->json('user.createdAt'));
     $this->assertDatabaseHas('users', [
         'id' => $response->json('user.id'),
         'platform' => 'ios',
         'install_id' => 'install-123',
-        'username' => null,
+        'username' => $response->json('user.username'),
         'password' => null,
     ]);
 
@@ -24,6 +25,39 @@ test('a guest signs up and the token works', function () {
         ->assertOk()
         ->assertJsonPath('user.id', $response->json('user.id'))
         ->assertJsonPath('ranks', ['daily' => null, 'weekly' => null, 'monthly' => null, 'all' => null]);
+});
+
+test('a guest plays under its automatic name straight away', function () {
+    $token = $this->postJson('/api/v1/auth/guest', ['platform' => 'android', 'installId' => 'install-1'])
+        ->assertCreated()
+        ->json('token');
+
+    $this->withToken($token)->startRun()->assertCreated();
+});
+
+test('two guests never share a name', function () {
+    $this->app->instance(GuestNames::class, new GuestNames(drawn(7, 7, 8)));
+
+    $first = $this->postJson('/api/v1/auth/guest', ['platform' => 'ios', 'installId' => 'install-1'])->assertCreated();
+    $second = $this->postJson('/api/v1/auth/guest', ['platform' => 'ios', 'installId' => 'install-2'])->assertCreated();
+
+    expect($first->json('user.username'))->toBe('guest00000007')
+        ->and($second->json('user.username'))->toBe('guest00000008');
+});
+
+test('a guest whose name was taken in the same instant draws another', function () {
+    $this->app->instance(GuestNames::class, new GuestNames(drawn(7, 8)));
+    $raced = false;
+    User::creating(function (User $user) use (&$raced) {
+        if (! $raced && $user->username === 'guest00000007') {
+            $raced = true;
+            User::factory()->withUsername('guest00000007')->create();
+        }
+    });
+
+    $this->postJson('/api/v1/auth/guest', ['platform' => 'ios', 'installId' => 'install-1'])
+        ->assertCreated()
+        ->assertJsonPath('user.username', 'guest00000008');
 });
 
 test('guest signup needs a known platform and an install id', function () {

@@ -13,6 +13,13 @@
       "import": "./dist/esm/index.js",
       "require": "./dist/index.js",
       "default": "./dist/index.js"
+    },
+    "./admin": {
+      "react-native": "./src/admin.ts",
+      "types": "./dist/admin.d.ts",
+      "import": "./dist/esm/admin.js",
+      "require": "./dist/admin.js",
+      "default": "./dist/admin.js"
     }
   },
   "scripts": {
