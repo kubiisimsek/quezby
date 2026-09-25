@@ -24,7 +24,7 @@ class CheckpointRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'reel' => 'reel sayısı',
+            'reel' => 'post sayısı',
             'prefixHash' => 'hamle özeti',
         ];
     }

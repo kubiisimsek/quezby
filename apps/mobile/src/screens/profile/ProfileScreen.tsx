@@ -321,7 +321,7 @@ function Statistics() {
       <StatGrid
         items={[
           { label: 'Tur', value: formatScore(counts.runs), icon: 'play' },
-          { label: 'Reel', value: formatScore(counts.reels), icon: 'grid' },
+          { label: 'Post', value: formatScore(counts.reels), icon: 'grid' },
           {
             label: 'Kaydırma',
             value: formatScore(counts.swipes),

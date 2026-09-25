@@ -69,6 +69,17 @@ describe('HelpScreen', () => {
     expect(screen.queryByText(/şüpheli|hile/i)).not.toBeOnTheScreen();
   });
 
+  it('calls what comes down the feed a post, never a reel, answers included', async () => {
+    await renderWithProviders(<HelpScreen {...props} />);
+
+    for (const question of screen.getAllByRole('button', { name: /\?$/ })) {
+      await fireEvent.press(question);
+    }
+
+    expect(screen.getByText('Dört post')).toBeOnTheScreen();
+    expect(screen.queryByText(/\breel/i)).not.toBeOnTheScreen();
+  });
+
   it('teaches the four reels from the one guide, in order', async () => {
     await renderWithProviders(<HelpScreen {...props} />);
 
@@ -87,7 +98,7 @@ describe('HelpScreen', () => {
     await renderWithProviders(<HelpScreen {...props} />);
 
     for (const title of [
-      'Dört reel',
+      'Dört post',
       'Dopamin barı',
       'Puan ve kombolar',
       'Günün akışı',
@@ -113,7 +124,7 @@ describe('HelpScreen', () => {
 
     expect(
       screen.getByText(
-        `Her ${RULES.levelEvery} reelde bir seviye atlarsın. Her seviyede puan çarpanın büyür.`,
+        `Her ${RULES.levelEvery} postta bir seviye atlarsın. Her seviyede puan çarpanın büyür.`,
       ),
     ).toBeOnTheScreen();
     expect(

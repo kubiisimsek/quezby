@@ -58,7 +58,7 @@ test('a finished run is replayed, ranked and recorded on every board', function 
     $bonuses = $response->json('run.breakdown.bonuses');
     expect(array_map(fn (array $bonus) => $bonus['count'], $bonuses))->toBe($summary['bonuses'])
         ->and(array_sum(array_column($bonuses, 'points')))->toBe($summary['bonusPoints'])
-        ->and($response->json('shareText'))->toBe("Quezby'de ".number_format($summary['score'], 0, ',', '.')." puan yaptım! {$summary['reels']} reel · bugün #1. Sen kaç yaparsın?");
+        ->and($response->json('shareText'))->toBe("Quezby'de ".number_format($summary['score'], 0, ',', '.')." puan yaptım! {$summary['reels']} post · bugün #1. Sen kaç yaparsın?");
 
     $stats = $response->json('run.stats');
     expect($stats['swipes'] + $stats['likes'] + $stats['holds'] + $stats['freezes'])->toBe($summary['hits'])

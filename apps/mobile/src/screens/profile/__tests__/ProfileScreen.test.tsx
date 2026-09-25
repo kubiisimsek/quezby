@@ -128,7 +128,7 @@ describe('ProfileScreen', () => {
       expect(await screen.findByLabelText('Altın lig')).toBeOnTheScreen();
       expect(screen.getByText('Misafir hesap')).toBeOnTheScreen();
       expect(screen.getByLabelText('Sezon rekoru: 12.345')).toBeOnTheScreen();
-      expect(screen.getByText('87 reel')).toBeOnTheScreen();
+      expect(screen.getByText('87 post')).toBeOnTheScreen();
       for (const [board, rank] of [
         ['Bugün', '#44'],
         ['Hafta', '#120'],
@@ -166,7 +166,7 @@ describe('ProfileScreen', () => {
 
       const shown: Array<[string, string]> = [
         ['Tur', '42'],
-        ['Reel', '5.210'],
+        ['Post', '5.210'],
         ['Kaydırma', '3.904'],
         ['Beğeni', '610'],
         ['Mükemmel', '95'],

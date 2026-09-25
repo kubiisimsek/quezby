@@ -22,8 +22,6 @@ const words = (text, locale) =>
     .filter(Boolean);
 
 const EMOJI = /\p{Extended_Pictographic}/u;
-/** A few emoji read friendly; one on every line reads like a bot (README → Ses tonu). */
-const emojiIn = (text) => (text.match(/\p{Extended_Pictographic}/gu) ?? []).length;
 /** Other companies' names, prices and rank claims — refused in names and keywords. */
 const REFUSED = ['instagram', 'tiktok', 'reels', 'youtube', 'shorts', 'ücretsiz', 'bedava', 'free', 'best', 'top'];
 const RANK_CLAIMS = /#1|1 numara|en iyi oyun|best game/i;
@@ -54,12 +52,6 @@ describe('the App Store listing', () => {
         for (const name of ['name', 'subtitle']) assert.doesNotMatch(file(name), EMOJI);
       });
 
-      it('keeps emoji to a few', () => {
-        assert.ok(emojiIn(file('description')) <= 3, 'description: three at most');
-        for (const name of ['promotional_text', 'release_notes']) {
-          assert.ok(emojiIn(file(name)) <= 1, `${name}: one at most`);
-        }
-      });
 
       it('spends every keyword byte on a new word', () => {
         const keywords = file('keywords').split(',');
@@ -99,8 +91,6 @@ describe('the Google Play listing', () => {
   it('keeps the title plain, as Play’s metadata policy asks — emoji belong in the descriptions', () => {
     assert.match(file('title'), /^Quezby: /);
     assert.doesNotMatch(file('title'), EMOJI);
-    assert.ok(emojiIn(file('full_description')) <= 3, 'full description: three emoji at most');
-    assert.ok(emojiIn(file('short_description')) <= 1, 'short description: one emoji at most');
     for (const name of ['title', 'short_description']) {
       for (const word of words(file(name), 'tr')) assert.ok(!REFUSED.includes(word), word);
     }
@@ -122,5 +112,33 @@ describe('every listing', () => {
 
     assert.ok(files.length >= 14 && existsSync(join(STORE, 'README.md')));
     for (const path of files) assert.doesNotMatch(read(path), /QUEZBY/, path);
+  });
+
+  it('uses no emoji, the owner’s call (README → Ses tonu)', () => {
+    const texts = [];
+    const walk = (dir) => {
+      for (const entry of readdirSync(join(STORE, dir), { withFileTypes: true })) {
+        const path = join(dir, entry.name);
+        if (entry.isDirectory()) walk(path);
+        else if (entry.name.endsWith('.txt')) texts.push(path);
+      }
+    };
+    walk('.');
+
+    for (const path of texts) assert.doesNotMatch(read(path), EMOJI, path);
+  });
+
+  it('calls what comes down the feed a post, never a reel', () => {
+    const texts = [];
+    const walk = (dir) => {
+      for (const entry of readdirSync(join(STORE, dir), { withFileTypes: true })) {
+        const path = join(dir, entry.name);
+        if (entry.isDirectory()) walk(path);
+        else if (entry.name.endsWith('.txt')) texts.push(path);
+      }
+    };
+    walk('.');
+
+    for (const path of texts) assert.doesNotMatch(read(path), /\breel/i, path);
   });
 });

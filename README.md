@@ -1,9 +1,9 @@
 # Quezby
 
-Reels kaydırma alışkanlığını rekabetçi bir refleks oyununa çeviren mobil oyun.
-Sonsuz bir akış: sıradan reeli **kaydır**, arkadaşının postunu **çift dokunarak
-beğen**, altın reeli **basılı tut** ve yeşilde bırak, "annen geldi" reelinde
-**dokunma**. Dopamin barın bitmeden en yüksek skoru yap — her reel biraz daha hızlı.
+Kaydırma alışkanlığını rekabetçi bir refleks oyununa çeviren mobil oyun.
+Sonsuz bir akış: sıradan postu **kaydır**, arkadaşının postunu **çift dokunarak
+beğen**, altın postu **basılı tut** ve yeşilde bırak, "annen geldi" postunda
+**dokunma**. Dopamin barın bitmeden en yüksek skoru yap — her post biraz daha hızlı.
 
 Her gün herkes aynı **Günün akışı**nı bir kez oynar; **haftalık ligler**de
 benzer oyuncularla yarışır, takip ettiklerini **Zirve** tablosunda geçmeye

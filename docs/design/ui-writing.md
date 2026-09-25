@@ -17,6 +17,7 @@ Captions on reels are jokes and may be silly; nothing else may be.
 
 | Word | Use |
 | --- | --- |
+| **Post** | What comes down the feed, as the player sees it: "Sıradan post", "Altın post", "Kırmızı postta elini çek", "64 post". Never "reel" in the app, the share text or the store — the code and the product docs keep *reel* as the domain term |
 | **Günün akışı** (#17) | The daily challenge: "Herkes aynı akışı oynar · tek hak" |
 | **Serbest oyun** | Any number of runs; the button is just "Oyna" |
 | **Zirve** | The leaderboard screen and its dock slot; **Senin katın** is the player's own row card |

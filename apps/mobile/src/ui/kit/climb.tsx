@@ -102,7 +102,7 @@ export function ClimbRow({
     .join(', ');
 
   const facts = [
-    reels === undefined ? null : `${formatScore(reels)} reel`,
+    reels === undefined ? null : `${formatScore(reels)} post`,
     detail || null,
   ]
     .filter(Boolean)

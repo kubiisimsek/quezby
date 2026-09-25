@@ -49,7 +49,7 @@ describe('PlayerSheet', () => {
 
     expect(await screen.findByText('41.200')).toBeTruthy();
     expect(screen.getByLabelText('Sezon rekoru: 41.200')).toBeTruthy();
-    expect(screen.getByText('210 reel')).toBeTruthy();
+    expect(screen.getByText('210 post')).toBeTruthy();
     expect(screen.getByLabelText('Altın lig')).toBeTruthy();
     expect(screen.getByText('#12')).toBeTruthy();
     expect(screen.getByText('#311')).toBeTruthy();

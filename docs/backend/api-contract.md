@@ -338,7 +338,7 @@ The API:
   "passed": [{ "username": "ayse", "score": 239000, "isFollowing": true }],
   "daily": { "dayKey": "2026-09-26", "number": 3, "rank": 37, "players": 1204, "grid": "🟩🟩🟨🟥⬛", "shareText": "…" },
   "league": { "tier": "gold", "rank": 4, "members": 30, "zone": "promote", "points": 812000 },
-  "shareText": "Quezby'de 240.310 puan yaptım! 405 reel · bugün #12. Sen kaç yaparsın?"
+  "shareText": "Quezby'de 240.310 puan yaptım! 405 post · bugün #12. Sen kaç yaparsın?"
 }
 ```
 

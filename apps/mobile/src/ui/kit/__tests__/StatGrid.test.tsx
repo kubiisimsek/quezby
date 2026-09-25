@@ -9,7 +9,7 @@ describe('StatGrid', () => {
       <StatGrid
         columns={3}
         items={[
-          { label: 'Reel', value: 128 },
+          { label: 'Post', value: 128 },
           { label: 'İsabet', value: '%94,2', tone: 'ok' },
           { label: 'Tepki', value: '312 ms', icon: 'bolt' },
           { label: 'Kombo', value: 'x2,50' },
@@ -17,7 +17,7 @@ describe('StatGrid', () => {
       />,
     );
 
-    ['Reel', 'İsabet', 'Tepki', 'Kombo'].forEach((label) => {
+    ['Post', 'İsabet', 'Tepki', 'Kombo'].forEach((label) => {
       expect(screen.getByText(label)).toBeOnTheScreen();
     });
     expect(screen.getByText('128')).toBeOnTheScreen();
@@ -30,7 +30,7 @@ describe('StatGrid', () => {
     await render(
       <StatGrid
         columns={3}
-        items={['Reel', 'İsabet', 'Tepki', 'Kombo'].map((label) => ({
+        items={['Post', 'İsabet', 'Tepki', 'Kombo'].map((label) => ({
           label,
           value: 1,
         }))}

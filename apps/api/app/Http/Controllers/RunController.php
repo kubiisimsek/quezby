@@ -85,6 +85,6 @@ class RunController extends Controller
     {
         $rank = $dailyRank === null ? '' : ' · bugün #'.number_format($dailyRank, 0, ',', '.');
 
-        return "Quezby'de ".number_format($score, 0, ',', '.')." puan yaptım! {$reels} reel{$rank}. Sen kaç yaparsın?";
+        return "Quezby'de ".number_format($score, 0, ',', '.')." puan yaptım! {$reels} post{$rank}. Sen kaç yaparsın?";
     }
 }

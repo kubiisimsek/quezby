@@ -7,7 +7,7 @@ describe('LobbyCard', () => {
     await render(
       <LobbyCard
         title="Günün akışı"
-        eyebrow="Herkese aynı reeller"
+        eyebrow="Herkese aynı postlar"
         icon="calendar"
         right={<Txt variant="meta">Yeni</Txt>}
       >
@@ -16,7 +16,7 @@ describe('LobbyCard', () => {
     );
 
     expect(screen.getByText('Günün akışı')).toBeOnTheScreen();
-    expect(screen.getByText('Herkese aynı reeller')).toBeOnTheScreen();
+    expect(screen.getByText('Herkese aynı postlar')).toBeOnTheScreen();
     expect(screen.getByText('Yeni')).toBeOnTheScreen();
     expect(screen.getByText('Bugün tek hakkın var.')).toBeOnTheScreen();
   });

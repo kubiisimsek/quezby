@@ -362,7 +362,7 @@ export function ResultView({
                   columns={3}
                   items={[
                     {
-                      label: 'Reel',
+                      label: 'Post',
                       value: formatScore(practice.reels),
                       icon: 'arrowUp',
                     },
@@ -783,7 +783,7 @@ function Breakdown({
       <Eyebrow icon="sparkle">Puanın nereden geldi</Eyebrow>
       <View style={styles.sources}>
         <Source
-          label="Reellerden"
+          label="Postlardan"
           value={formatScore(run.breakdown.reelPoints)}
         />
         <Source
@@ -849,7 +849,7 @@ function Source({
 
 function runStats(run: RunResult): StatItem[] {
   return [
-    { label: 'Reel', value: formatScore(run.reels), icon: 'arrowUp' },
+    { label: 'Post', value: formatScore(run.reels), icon: 'arrowUp' },
     { label: 'İsabet', value: formatPerMille(run.accuracy), icon: 'check' },
     {
       label: 'En yüksek kombo',

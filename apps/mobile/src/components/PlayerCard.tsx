@@ -120,7 +120,7 @@ export function SeasonBest({
       </Stamp>
       {best ? (
         <Txt variant="micro" tone="faint">
-          {`${formatScore(best.reels)} reel`}
+          {`${formatScore(best.reels)} post`}
         </Txt>
       ) : null}
     </View>

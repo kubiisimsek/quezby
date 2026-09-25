@@ -28,13 +28,13 @@ describe('SeasonBest', () => {
     expect(screen.getByLabelText('Sezon rekoru: 41.200')).toBeTruthy();
     expect(screen.getByText('Sezon rekoru')).toBeTruthy();
     expect(screen.getByText('41.200')).toBeTruthy();
-    expect(screen.getByText('210 reel')).toBeTruthy();
+    expect(screen.getByText('210 post')).toBeTruthy();
   });
 
   it('says "—" before the season’s first ranked run', async () => {
     await render(<SeasonBest best={null} />);
 
     expect(screen.getByLabelText('Sezon rekoru: —')).toBeTruthy();
-    expect(screen.queryByText(/reel$/)).toBeNull();
+    expect(screen.queryByText(/post$/)).toBeNull();
   });
 });

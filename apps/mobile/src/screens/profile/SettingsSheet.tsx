@@ -96,7 +96,7 @@ export function SettingsSheet({
           <Row
             leading={<IconChip icon="help" tone="neutral" size="sm" />}
             title="Yardım"
-            subtitle="Reeller, puanlar, ligler ve hesabın."
+            subtitle="Postlar, puanlar, ligler ve hesabın."
             onPress={() => onPick('help')}
           />
         </Panel>

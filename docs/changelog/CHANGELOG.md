@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-25 — Posts, not reels
+
+- What comes down the feed is a **post** to the player everywhere they read
+  it: the how-to guide ("Sıradan post", "Altın post", "Kırmızı postta elini
+  çek"), the help screen, stats labels ("Post", "Postlardan"), league and
+  player rows ("64 post"), the settings line and the API's share text
+  ("… 245 post · bugün #12 …"). `docs/design/ui-writing.md` has the rule; the
+  code and the product docs keep *reel* as the domain term.
+
 ## 2026-09-25 — Store listing
 
 - `apps/mobile/store/`: the App Store (Turkish, plus an optional English (U.K.)

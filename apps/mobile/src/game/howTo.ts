@@ -15,7 +15,7 @@ export const REEL_GUIDE: Record<
   skip: {
     icon: 'arrowUp',
     tone: 'neutral',
-    title: 'Sıradan reel',
+    title: 'Sıradan post',
     body: 'Yukarı kaydır. Ne kadar hızlı, o kadar puan.',
     badge: null,
     hint: 'Sıkıcı içerik — yukarı kaydır',
@@ -24,23 +24,23 @@ export const REEL_GUIDE: Record<
     icon: 'heart',
     tone: 'primary',
     title: 'Arkadaşın',
-    body: 'Pembe reeli çift dokunarak beğen. Geçersen ceza.',
+    body: 'Pembe postu çift dokunarak beğen. Geçersen ceza.',
     badge: 'Arkadaşın',
     hint: 'Arkadaşının postu — çift dokun',
   },
   hold: {
     icon: 'hand',
     tone: 'warn',
-    title: 'Altın reel',
+    title: 'Altın post',
     body: 'Basılı tut, çubuk yeşildeyken bırak. Tam ortası mükemmel.',
-    badge: 'Altın reel',
+    badge: 'Altın post',
     hint: 'Basılı tut, yeşil bölgede bırak',
   },
   freeze: {
     icon: 'handStop',
     tone: 'bad',
     title: 'Dokunma!',
-    body: 'Kırmızı reelde elini çek, süre bitsin. Refleksini yen.',
+    body: 'Kırmızı postta elini çek, süre bitsin. Refleksini yen.',
     badge: 'Dokunma',
     hint: 'Hiçbir şeye dokunma, geçmesini bekle',
   },
@@ -53,7 +53,7 @@ export const BONUS_GUIDE: Record<BonusKind, { name: string; toast: string; body:
   flawless: {
     name: 'Kusursuz seviye',
     toast: 'Kusursuz seviye!',
-    body: `Bir seviyenin ${RULES.levelEvery} reelini hiç hata yapmadan bitir.`,
+    body: `Bir seviyenin ${RULES.levelEvery} postunu hiç hata yapmadan bitir.`,
     icon: 'star',
   },
   lightning: {
@@ -65,7 +65,7 @@ export const BONUS_GUIDE: Record<BonusKind, { name: string; toast: string; body:
   coolHead: {
     name: 'Soğukkanlı',
     toast: 'Soğukkanlı!',
-    body: 'Beğeniden ya da altın reelden hemen sonra gelen kırmızı reele dokunma.',
+    body: 'Beğeniden ya da altın posttan hemen sonra gelen kırmızı postta elini çek.',
     icon: 'handStop',
   },
   comeback: {

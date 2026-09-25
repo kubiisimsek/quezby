@@ -74,7 +74,7 @@ describe('@/ui/kit', () => {
         </Card>
         <Field label="Kullanıcı adı" placeholder="ekin" />
         <Meter value={0.5} />
-        <Stat label="Reel" value={12} />
+        <Stat label="Post" value={12} />
         <Segmented
           value="daily"
           onChange={onChange}

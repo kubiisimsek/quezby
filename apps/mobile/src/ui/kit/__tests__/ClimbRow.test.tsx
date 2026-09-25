@@ -18,7 +18,7 @@ describe('ClimbRow', () => {
     expect(screen.getByText('4')).toBeOnTheScreen();
     expect(screen.getByText('@deniz')).toBeOnTheScreen();
     expect(screen.getByText('9.870')).toBeOnTheScreen();
-    expect(screen.getByText('64 reel')).toBeOnTheScreen();
+    expect(screen.getByText('64 post')).toBeOnTheScreen();
     expect(screen.getByText('▲ 1.240')).toBeOnTheScreen();
     expect(
       screen.getByLabelText(
@@ -48,7 +48,7 @@ describe('ClimbRow', () => {
     );
 
     expect(screen.getByText('1.204')).toBeOnTheScreen();
-    expect(screen.queryByText(/reel/)).not.toBeOnTheScreen();
+    expect(screen.queryByText(/post/)).not.toBeOnTheScreen();
   });
 
   it('says one more fact under the name when given a detail', async () => {
@@ -64,7 +64,7 @@ describe('ClimbRow', () => {
     );
 
     expect(screen.getByText('3 gün')).toBeOnTheScreen();
-    expect(screen.queryByText(/reel/)).not.toBeOnTheScreen();
+    expect(screen.queryByText(/post/)).not.toBeOnTheScreen();
     expect(
       screen.getByLabelText(
         '2. sıra, @oya, 31.400 puan, 3 gün, geçmek için 120 puan',
@@ -75,7 +75,7 @@ describe('ClimbRow', () => {
   it('keeps the reels first when a detail comes with them', async () => {
     await render(<ClimbRow {...buildEntry({ reels: 64 })} detail="3 gün" />);
 
-    expect(screen.getByText('64 reel · 3 gün')).toBeOnTheScreen();
+    expect(screen.getByText('64 post · 3 gün')).toBeOnTheScreen();
   });
 
   it('marks your own row as a magenta tile, with your place in gold', async () => {

@@ -100,7 +100,7 @@ export function PlayerSheet({
                 icon: 'play',
               },
               {
-                label: 'Reel',
+                label: 'Post',
                 value: formatScore(card.stats.reels),
                 icon: 'arrowUp',
               },

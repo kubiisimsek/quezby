@@ -107,9 +107,9 @@ export function HelpScreen({ navigation }: Props) {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <Section icon="grid" title="Dört reel">
+        <Section icon="grid" title="Dört post">
           <Txt tone="muted">
-            Her reel tek bir hareket ister, süresi dolmadan. Hangisi olduğunu
+            Her post tek bir hareket ister, süresi dolmadan. Hangisi olduğunu
             rengi ve rozeti söyler.
           </Txt>
           {REEL_ORDER.map((kind) => {
@@ -130,7 +130,7 @@ export function HelpScreen({ navigation }: Props) {
 
         <Section icon="flame" title="Dopamin barı">
           <Txt>
-            Ekranın üstündeki dopamin barı her saniye eriyor; reeller
+            Ekranın üstündeki dopamin barı her saniye eriyor; postlar
             ilerledikçe daha da hızlı.
           </Txt>
           <View
@@ -150,7 +150,7 @@ export function HelpScreen({ navigation }: Props) {
             ))}
           </View>
           <Txt tone="muted">
-            Doğru hareket barı doldurur, mükemmel bir altın reel biraz daha
+            Doğru hareket barı doldurur, mükemmel bir altın post biraz daha
             fazla. Hata yaparsan ya da süreyi kaçırırsan boşalır.
           </Txt>
           <Txt tone="muted">
@@ -162,13 +162,13 @@ export function HelpScreen({ navigation }: Props) {
         <Section icon="sparkle" title="Puan ve kombolar">
           <Txt tone="muted">
             Her doğru hareket puan getirir. Kaydırma ve beğenide ne kadar
-            hızlıysan, altın reelde yeşilin ortasına ne kadar yakın bırakırsan o
+            hızlıysan, altın postta yeşilin ortasına ne kadar yakın bırakırsan o
             kadar çok.
           </Txt>
           <Row
             leading={<IconChip icon="mountain" tone="secondary" />}
             title="Seviye"
-            subtitle={`Her ${RULES.levelEvery} reelde bir seviye atlarsın. Her seviyede puan çarpanın büyür.`}
+            subtitle={`Her ${RULES.levelEvery} postta bir seviye atlarsın. Her seviyede puan çarpanın büyür.`}
           />
           <Divider />
           <Row
@@ -180,7 +180,7 @@ export function HelpScreen({ navigation }: Props) {
           <View style={styles.lead}>
             <Txt variant="heading">İsimli kombolar</Txt>
             <Txt variant="meta" tone="muted">
-              Denk getirirsen reelin puanına ek puan kazanırsın; seviye
+              Denk getirirsen postun puanına ek puan kazanırsın; seviye
               büyüdükçe bu ek de büyür.
             </Txt>
           </View>
@@ -196,7 +196,7 @@ export function HelpScreen({ navigation }: Props) {
 
         <Section icon="calendar" title="Günün akışı">
           <Txt>
-            Her gün herkes aynı akışı oynar: aynı reeller, aynı sırayla.
+            Her gün herkes aynı akışı oynar: aynı postlar, aynı sırayla.
           </Txt>
           <Txt tone="muted">
             Tek hakkın var; akışı başlattığın an hakkını kullanmış olursun. Yeni

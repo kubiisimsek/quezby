@@ -35,7 +35,7 @@ alandaki "oyunları", "refleks oyunları" aramasında eşleşir. Bu yüzden:
   aranan "refleks oyunu" kaçmasın.
 
 **Google Play** başlığı, kısa açıklamayı ve **uzun açıklamayı** aramada
-kullanır. Uzun açıklama bilerek kısa tutuldu; *kaydır*, *reel*, *refleks*,
+kullanır. Uzun açıklama bilerek kısa tutuldu; *kaydır*, *post*, *refleks*,
 *lig*, *sıralama* ve *arkadaş* kelimeleri cümlelerin içinde kendiliğinden
 geçer. Anahtar kelime doldurmak Play politikasına aykırıdır. İki mağazada
 açıklama aynıdır.
@@ -46,10 +46,12 @@ Oyunu bir arkadaşına anlatır gibi yaz: kısa, samimi, sen diliyle, düz
 paragraflarla. Her özelliği sayma; açıklama oyunun ne olduğunu, Günün akışını,
 ligi ve sıralamaları anlatır, gerisini oyuncu oyunda bulur.
 
-Emoji az olur: açıklamada iki üç tane (biri başta, biri sonda gibi), kısa
-metinlerde en fazla bir tane. Paragraf başlarına emoji koyma, listeyi emojiyle
-süsleme. Ad, alt başlık ve Play başlığında emoji hiç olmaz, iki mağaza da
-reddeder. Test bu sınırları da denetler.
+Mağaza metinlerinde emoji yok; test de bunu denetler. (Ad, alt başlık ve
+Play başlığında zaten olamaz, iki mağaza da reddeder.)
+
+Açıklamanın son satırı ("Reklam yok. Abonelik yok. Ücret yok.") bir sözdür:
+oyuna reklam, abonelik ya da uygulama içi satın alma gelirse o sürümle
+birlikte bu satır da değişir.
 
 Okuyan "bunu yapay zekâ yazmış" demesin diye şunlardan da kaçın: uzun tire,
 "X değil, Y" kalıbı, büyük harfli başlıklar, madde madde listeler, üçlü sıfat
@@ -66,6 +68,8 @@ Bilinçli olarak kullanılmayan kelimeler:
 - **lig** (App Store alanında): futbol aramaları. Açıklamada geçmesi sorun
   değildir.
 - **video:** oyunda gerçek video yok.
+- **reel:** akıştan gelen her şeyin adı, uygulamada da mağazada da
+  **post**'tur (`docs/design/ui-writing.md`). "Reel" Instagram'ı çağrıştırır.
 
 ## İngilizce (U.K.) yerelleştirme (isteğe bağlı)
 
@@ -99,8 +103,8 @@ yazmak zarar vermez.
 | Başlık | Ekran |
 | --- | --- |
 | Nasılsa kaydırıyorsun, bari puan topla | Oyun ekranı, akışın ortası |
-| Kırmızı gelince sakın dokunma! | Dokunma reeli |
-| Arkadaşının gönderisi mi? Çift dokun | Pembe reel |
+| Kırmızı gelince sakın dokunma! | Kırmızı post |
+| Arkadaşının postu mu? Çift dokun | Pembe post |
 | Her gün aynı akış, tek hak | Günün akışı ve paylaşım kareleri |
 | Haftalık ligde bir üste çık | Lig ekranı |
 | Arkadaşlarını geç | Zirve podyumu |

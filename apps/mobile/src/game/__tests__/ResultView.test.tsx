@@ -74,7 +74,7 @@ function response(
       points: 250_000,
     },
     shareText:
-      "Quezby'de 104.560 puan yaptım! 245 reel · bugün #12. Sen kaç yaparsın?",
+      "Quezby'de 104.560 puan yaptım! 245 post · bugün #12. Sen kaç yaparsın?",
     ...overrides,
   };
 }
@@ -160,7 +160,7 @@ describe('ResultView', () => {
 
     expect(share).toHaveBeenCalledWith({
       message:
-        "Quezby'de 104.560 puan yaptım! 245 reel · bugün #12. Sen kaç yaparsın?",
+        "Quezby'de 104.560 puan yaptım! 245 post · bugün #12. Sen kaç yaparsın?",
     });
   });
 
