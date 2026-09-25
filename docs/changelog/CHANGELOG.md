@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-09-25 — Store listing
+
+- `apps/mobile/store/`: the App Store (Turkish, plus an optional English (U.K.)
+  localization that the Turkish storefront also indexes) and Google Play
+  (`tr-TR`) texts, one field per file in fastlane's `deliver` / `supply`
+  layout. The README explains the keyword strategy, categories, screenshot
+  captions and what is left out on purpose (other brands, price and rank
+  claims).
+- `scripts/store-listing.test.mjs` (run by `pnpm test`) holds them to the
+  stores' limits — the App Store keyword field is 100 **bytes**, and Turkish
+  letters take two — and to the brand's spelling.
+
 ## 2026-09-24 — One bundle id; the environment comes from `.env`
 
 - iOS and Android ship one id, **`com.kubisimsek.game.quezby`** — the

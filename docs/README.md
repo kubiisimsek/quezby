@@ -11,6 +11,7 @@
 | [design/ui-writing.md](design/ui-writing.md) | Voice and copy |
 | [development/environments.md](development/environments.md) | Local / staging / production |
 | [development/device-integrity-setup.md](development/device-integrity-setup.md) | App Attest and Play Integrity, console by console (Turkish) |
+| [../apps/mobile/store/README.md](../apps/mobile/store/README.md) | App Store and Google Play listing texts, keywords (Turkish) |
 | [development/local-development.md](development/local-development.md) | Running it |
 | [deployment/shared-hosting.md](deployment/shared-hosting.md) | Uploading the API to shared hosting |
 | [rules/react-native-rules.md](rules/react-native-rules.md) | Enforceable mobile rules |
