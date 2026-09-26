@@ -104,6 +104,9 @@ final class DemoSeeder extends Seeder
         }
 
         $this->report($names, (hrtime(true) - $began) / 1e9);
+
+        // How the demo players use the app, for the admin panel's analytics.
+        $this->call(AnalyticsDemoSeeder::class);
     }
 
     /**

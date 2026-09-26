@@ -1,12 +1,16 @@
-import type { AdminDeviceCheck, AdminPlayerResponse, AdminRunRow } from '@quezby/types';
+import type { AdminDeviceCheck, AdminPlayerDevice, AdminPlayerResponse, AdminRunRow, AdminVisit } from '@quezby/types';
 import {
+  Activity,
   Ban,
   CalendarDays,
   Fingerprint,
   Gamepad2,
   LogOut,
+  Milestone,
+  MonitorSmartphone,
   MoreHorizontal,
   RotateCcw,
+  Route,
   ScrollText,
   ShieldAlert,
   ShieldCheck,
@@ -25,6 +29,7 @@ import { Panel } from '@/components/base/panel';
 import { Segmented } from '@/components/base/segmented';
 import { Skeleton } from '@/components/base/skeleton';
 import { Tag } from '@/components/base/tag';
+import { Journey } from '@/components/analytics/journey';
 import {
   BanPlayerDialog,
   DeletePlayerDialog,
@@ -32,6 +37,7 @@ import {
   SignOutPlayerDialog,
   UnbanPlayerDialog,
 } from '@/components/moderation/player-dialogs';
+import { ActivityStrip } from '@/components/patterns/activity-strip';
 import { BandStats } from '@/components/patterns/band-stats';
 import { Callout } from '@/components/patterns/callout';
 import { DataTable, type Column } from '@/components/patterns/data-table';
@@ -39,18 +45,22 @@ import { EmptyState } from '@/components/patterns/empty-state';
 import { Facts } from '@/components/patterns/facts';
 import { Page } from '@/components/patterns/page';
 import { ShareList } from '@/components/patterns/share-list';
+import { usePlayerActivity } from '@/hooks/api/analytics';
 import { usePlayer } from '@/hooks/api/players';
 import { auditColumns, FlagTags, RunStatusTag, When } from '@/lib/columns';
 import { errorMessage, isApiError } from '@/lib/errors';
 import {
+  ACTIVITY_STATUS,
   DEVICE_VERDICT,
   formatCombo,
   formatDate,
   formatDateTime,
+  formatDuration,
   formatNumber,
   formatRelative,
   LEAGUE_TIER,
   LEAGUE_ZONE,
+  MILESTONE,
   PLATFORM,
   playerName,
   PROVIDER,
@@ -61,7 +71,7 @@ import {
 import { can } from '@/lib/permissions';
 import { useSession } from '@/stores/session';
 
-type Tab = 'summary' | 'devices' | 'log';
+type Tab = 'summary' | 'activity' | 'devices' | 'log';
 type Dialog = 'ban' | 'unban' | 'rename' | 'signOut' | 'delete' | null;
 
 const RUN_COLUMNS: Column<AdminRunRow>[] = [
@@ -71,6 +81,59 @@ const RUN_COLUMNS: Column<AdminRunRow>[] = [
   { key: 'score', header: 'Skor', cell: (run) => formatNumber(run.score), align: 'end', tone: 'strong' },
   { key: 'flags', header: 'Sinyaller', cell: (run) => <FlagTags flags={run.flags} max={2} />, hideBelow: 'lg' },
   { key: 'when', header: 'Ne zaman', cell: (run) => <When at={run.finishedAt ?? run.startedAt} />, tone: 'muted' },
+];
+
+const INSTALL_COLUMNS: Column<AdminPlayerDevice>[] = [
+  {
+    key: 'phone',
+    header: 'Telefon',
+    cell: (device) => (
+      <span className="min-w-0">
+        <span className="block truncate font-semibold text-ink">{device.model ?? 'Bilinmeyen model'}</span>
+        <span className="block truncate text-micro text-ink-faint">
+          {device.platform ? PLATFORM[device.platform] : '—'} {device.osVersion ?? ''}
+        </span>
+      </span>
+    ),
+  },
+  {
+    key: 'app',
+    header: 'Uygulama',
+    cell: (device) => (device.appVersion ? `${device.appVersion}${device.appBuild ? ` (${device.appBuild})` : ''}` : '—'),
+    tone: 'mono',
+  },
+  { key: 'first', header: 'İlk görülme', cell: (device) => <When at={device.firstSeenAt} as="date" />, tone: 'muted', hideBelow: 'md' },
+  { key: 'last', header: 'Son görüldüğü gün', cell: (device) => <When at={device.lastSeenAt} as="date" />, tone: 'muted' },
+  {
+    key: 'others',
+    header: 'Aynı telefonda',
+    cell: (device) =>
+      device.others.length > 0 ? (
+        <span className="flex flex-wrap gap-1.5">
+          {device.others.map((other) => (
+            <Link key={other.id} to={`/players/${other.id}`} className="font-semibold text-ink hover:text-primary-text hover:underline">
+              {playerName(other.username)}
+            </Link>
+          ))}
+        </span>
+      ) : (
+        '—'
+      ),
+    hideBelow: 'lg',
+  },
+];
+
+const VISIT_COLUMNS: Column<AdminVisit>[] = [
+  { key: 'when', header: 'Başladı', cell: (visit) => <When at={visit.startedAt} as="dateTime" />, tone: 'muted' },
+  { key: 'length', header: 'Süre', cell: (visit) => formatDuration(visit.seconds * 1000), align: 'end', tone: 'strong' },
+  { key: 'journey', header: 'Yolculuk', cell: (visit) => <Journey steps={visit.journey} />, hideBelow: 'md' },
+  {
+    key: 'app',
+    header: 'Sürüm',
+    cell: (visit) => `${visit.platform ? PLATFORM[visit.platform] : ''} ${visit.appVersion ?? ''}`.trim() || '—',
+    tone: 'muted',
+    hideBelow: 'lg',
+  },
 ];
 
 const DEVICE_COLUMNS: Column<AdminDeviceCheck>[] = [
@@ -185,7 +248,8 @@ export function PlayerPage() {
           onChange={setTab}
           options={[
             { value: 'summary', label: 'Özet', icon: <UserRound /> },
-            { value: 'devices', label: 'Cihazlar', icon: <Smartphone />, count: data.devices.length },
+            { value: 'activity', label: 'Etkinlik', icon: <Activity /> },
+            { value: 'devices', label: 'Cihazlar', icon: <Smartphone />, count: data.installs.length },
             { value: 'log', label: 'Kayıt', icon: <ScrollText />, count: data.audit.length },
           ]}
         />
@@ -198,16 +262,28 @@ export function PlayerPage() {
       ) : null}
 
       {tab === 'summary' ? <Summary data={data} /> : null}
+      {tab === 'activity' ? <ActivityTab playerId={me.id} /> : null}
       {tab === 'devices' ? (
-        <DataTable
-          title="Cihaz kontrolleri"
-          description="Play Integrity ve App Attest’in bu oyuncunun telefonları için verdiği kararlar."
-          icon={<Smartphone />}
-          columns={DEVICE_COLUMNS}
-          rows={data.devices}
-          rowKey={(check) => String(check.id)}
-          empty={{ title: 'Cihaz kontrolü yok', hint: 'Oyuncu henüz sıralı bir tur açmamış ya da cihaz doğrulaması kapalı.', icon: <Smartphone /> }}
-        />
+        <div className="space-y-6">
+          <DataTable
+            title="Cihaz kaydı"
+            description="Oyuncunun kullandığı telefonlar; izin verip vermediğine bakmadan, destek ve güvenlik için tutulur."
+            icon={<MonitorSmartphone />}
+            columns={INSTALL_COLUMNS}
+            rows={data.installs}
+            rowKey={(device) => device.installId}
+            empty={{ title: 'Kayıtlı telefon yok', hint: 'Uygulama API’ye bağlandığında telefon günde bir kez kaydedilir.', icon: <MonitorSmartphone /> }}
+          />
+          <DataTable
+            title="Cihaz kontrolleri"
+            description="Play Integrity ve App Attest’in bu oyuncunun telefonları için verdiği kararlar."
+            icon={<Smartphone />}
+            columns={DEVICE_COLUMNS}
+            rows={data.devices}
+            rowKey={(check) => String(check.id)}
+            empty={{ title: 'Cihaz kontrolü yok', hint: 'Oyuncu henüz sıralı bir tur açmamış ya da cihaz doğrulaması kapalı.', icon: <Smartphone /> }}
+          />
+        </div>
       ) : null}
       {tab === 'log' ? (
         <DataTable
@@ -291,6 +367,11 @@ function Summary({ data }: { data: AdminPlayerResponse }) {
               { label: 'Kurulum kimliği', value: me.installId ? <span className="font-mono text-meta">{me.installId}</span> : null },
               { label: 'Katıldı', value: formatDateTime(me.createdAt) },
               { label: 'Son görülme', value: formatRelative(me.lastSeenAt) },
+              {
+                label: 'Kullanım verisi',
+                value: me.analyticsAt ? `İzinli · ${formatDate(me.analyticsAt)}` : 'İzin yok',
+                hint: me.analyticsAt ? undefined : 'Yalnızca cihaz kaydı ve oyun verisi tutulur.',
+              },
               { label: 'Açık oturum', value: formatNumber(me.sessions) },
               { label: 'Takip', value: `${formatNumber(data.follows.followers)} takipçi · ${formatNumber(data.follows.following)} takip` },
             ]}
@@ -345,6 +426,77 @@ function Summary({ data }: { data: AdminPlayerResponse }) {
             </ul>
           </Panel>
         ) : null}
+      </div>
+    </div>
+  );
+}
+
+/** The player's use of the game: their last 30 days, their latest visits and their firsts. */
+function ActivityTab({ playerId }: { playerId: string }) {
+  const activity = usePlayerActivity(playerId);
+
+  if (activity.isPending) {
+    return (
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_24rem]">
+        <Skeleton className="h-72 rounded-panel" />
+        <Skeleton className="h-72 rounded-panel" />
+      </div>
+    );
+  }
+  if (activity.error || !activity.data) {
+    return (
+      <Callout tone="bad" title="Etkinlik alınamadı">
+        {errorMessage(activity.error)}
+      </Callout>
+    );
+  }
+
+  const data = activity.data;
+  const status = ACTIVITY_STATUS[data.status];
+
+  return (
+    <div className="space-y-6">
+      {data.status === 'tracked' ? null : (
+        <Callout tone={data.status === 'disabled' ? 'bad' : 'info'} title={status.label}>
+          {status.hint}
+        </Callout>
+      )}
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_24rem]">
+        <div className="min-w-0 space-y-6">
+          <Panel title="Son 30 gün" description="Her gün bir kare: gelmediği günler gri, kaldıkça yeşil." icon={<Activity />} tone="ok">
+            <div className="space-y-5">
+              <ActivityStrip days={data.days} label="Son 30 günün etkinliği" />
+              <Facts
+                facts={[
+                  { label: 'Aktif gün', value: `${formatNumber(data.summary.activeDays)} / 30` },
+                  { label: 'Ziyaret', value: formatNumber(data.summary.visits) },
+                  { label: 'Oyunda geçen süre', value: formatDuration(data.summary.seconds * 1000) },
+                  {
+                    label: 'Ortalama ziyaret',
+                    value: data.summary.avgVisitSeconds === null ? null : formatDuration(data.summary.avgVisitSeconds * 1000),
+                  },
+                  { label: 'Kayıtlı ilk ve son gün', value: data.summary.firstDay ? `${formatDate(data.summary.firstDay)} – ${formatDate(data.summary.lastDay)}` : null },
+                ]}
+              />
+            </div>
+          </Panel>
+          <DataTable
+            title="Son ziyaretler"
+            description="Uygulamanın ön plana her gelişi, gezdiği ekranlar ve anlarıyla. 30 gün tutulur."
+            icon={<Route />}
+            columns={VISIT_COLUMNS}
+            rows={data.visits}
+            rowKey={(visit) => String(visit.id)}
+            empty={{
+              title: 'Ziyaret yok',
+              hint: data.status === 'tracked' ? 'Uygulamayı arka plana attığında ziyareti gelir.' : 'Bu oyuncunun ziyareti tutulmuyor.',
+              icon: <Route />,
+            }}
+          />
+        </div>
+        <Panel title="İlkler" description="Oyuncunun hayatındaki ilk kezler, eskiden yeniye." icon={<Milestone />} tone="secondary">
+          <Facts facts={data.milestones.map((first) => ({ label: MILESTONE[first.milestone], value: formatDateTime(first.at) }))} />
+        </Panel>
       </div>
     </div>
   );

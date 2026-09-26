@@ -1,4 +1,6 @@
 import type {
+  AnalyticsVisitsRequest,
+  AnalyticsVisitsResponse,
   AndroidIntegrityRequest,
   AppConfigResponse,
   AppleLinkRequest,
@@ -42,6 +44,37 @@ import { createRequest } from './http';
 
 export { ApiError, type RequestOptions } from './http';
 
+/**
+ * The phone the app runs on, as every call tells the API (`X-Device`): the
+ * device registry the API keeps for support and security, consent or not —
+ * no names, no IP, nothing about how the game is played.
+ */
+export type ClientDevice = {
+  /** The random id this install minted on its first launch. */
+  installId: string;
+  platform: Platform;
+  /** The system's version, `18.2`. */
+  os: string;
+  model: string;
+  /** The app's build number. */
+  build: string;
+};
+
+/**
+ * `install=…; platform=ios; os=18.2; model=iPhone%2015; build=42` — every
+ * value URI-encoded, so no `;`, `=` or line break can slip into the header.
+ */
+export function deviceHeader(device: ClientDevice): string {
+  const fields: Array<[string, string]> = [
+    ['install', device.installId],
+    ['platform', device.platform],
+    ['os', device.os],
+    ['model', device.model],
+    ['build', device.build],
+  ];
+  return fields.map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('; ');
+}
+
 export type ApiClientOptions = {
   /** The API's origin, e.g. `https://api.quezby.com` — no `/api` suffix. */
   baseUrl: string;
@@ -52,14 +85,23 @@ export type ApiClientOptions = {
   timeoutMs?: number;
   /** Sent as `X-App-Version` so the API can tell builds apart. */
   appVersion?: string;
+  /** The phone, sent as `X-Device` with every call once it is known. */
+  device?: () => ClientDevice | null;
 };
 
 /**
  * The player API, `/api/v1`. The admin panel's client is a separate entry,
  * `@quezby/sdk/admin`, so none of it ships in the app.
  */
-export function createApiClient(options: ApiClientOptions) {
-  const request = createRequest({ ...options, prefix: '/api/v1' });
+export function createApiClient({ device, ...options }: ApiClientOptions) {
+  const request = createRequest({
+    ...options,
+    prefix: '/api/v1',
+    device: () => {
+      const phone = device?.();
+      return phone ? deviceHeader(phone) : null;
+    },
+  });
 
   return {
     request,
@@ -186,6 +228,14 @@ export function createApiClient(options: ApiClientOptions) {
     },
     leagues: {
       current: () => request<LeagueResponse>('/leagues/current'),
+    },
+    analytics: {
+      /**
+       * Finished visits, only with the player's consent. `record: false`
+       * means keep nothing for a day.
+       */
+      send: (input: AnalyticsVisitsRequest) =>
+        request<AnalyticsVisitsResponse>('/analytics/visits', { method: 'POST', body: input }),
     },
     users: {
       search: (query: string) =>

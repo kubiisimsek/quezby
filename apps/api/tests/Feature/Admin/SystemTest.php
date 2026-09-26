@@ -5,8 +5,10 @@ use App\Enums\AuditAction;
 use App\Enums\RunStatus;
 use App\Models\AuditEntry;
 use App\Models\Run;
+use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 
 beforeEach(function () {
     Carbon::setTestNow(Carbon::parse('2026-09-25 12:00', 'Europe/Istanbul'));
@@ -51,6 +53,23 @@ test('closes the runs left open past their time, and it is on record', function 
     expect($stale->fresh()->status)->toBe(RunStatus::Expired)
         ->and(AuditEntry::query()->sole())
         ->action->toBe(AuditAction::SystemExpireRuns)
+        ->subject_type->toBe('system');
+});
+
+test('prunes old analytics, and it is on record', function () {
+    $player = User::factory()->withUsername()->create();
+    $old = now()->subDays(40)->utc()->format('Y-m-d H:i:s');
+    DB::table('analytics_visits')->insert([
+        'user_id' => $player->id, 'client_id' => str_repeat('a', 32), 'day' => '2026-08-16',
+        'started_at' => $old, 'seconds' => 60, 'journey' => '[]', 'created_at' => $old,
+    ]);
+
+    $this->postJson('/api/v1/admin/system/analytics-prune')->assertOk()
+        ->assertJsonPath('output', fn (string $output) => str_contains($output, 'Pruned 1 visits'));
+
+    expect(DB::table('analytics_visits')->count())->toBe(0)
+        ->and(AuditEntry::query()->sole())
+        ->action->toBe(AuditAction::SystemAnalyticsPrune)
         ->subject_type->toBe('system');
 });
 

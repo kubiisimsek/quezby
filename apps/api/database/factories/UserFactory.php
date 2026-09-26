@@ -39,6 +39,12 @@ class UserFactory extends Factory
         ]);
     }
 
+    /** Said yes to usage analytics — at `$at`, or now. */
+    public function consenting(?\DateTimeInterface $at = null): static
+    {
+        return $this->state(fn () => ['analytics_at' => $at ?? now()]);
+    }
+
     /** Email and password attached. */
     public function linked(?string $email = null, string $password = 'password'): static
     {

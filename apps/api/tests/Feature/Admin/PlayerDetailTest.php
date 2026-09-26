@@ -64,6 +64,41 @@ test('shows everything about a player on one page', function () {
         ->and($response->json('recentRuns.0'))->not->toHaveKey('actions');
 });
 
+test('shows the phones the player used, with the other accounts seen on them, and the consent', function () {
+    $this->signInAdmin(AdminRole::Viewer);
+    $player = User::factory()->withUsername('kerem.35')->consenting()->create();
+    $other = User::factory()->withUsername('kerem.yedek')->create();
+    $seen = fn (int $daysAgo) => now()->subDays($daysAgo)->utc()->format('Y-m-d H:i:s');
+    DB::table('player_devices')->insert([
+        ['user_id' => $player->id, 'install_id' => 'install-old', 'platform' => 'ios', 'os_version' => '17.5', 'model' => 'iPhone 12', 'app_version' => '0.9.0', 'app_build' => '30', 'first_seen_at' => $seen(40), 'last_seen_at' => $seen(20)],
+        ['user_id' => $player->id, 'install_id' => 'install-new', 'platform' => 'ios', 'os_version' => '18.2', 'model' => 'iPhone 15 Pro', 'app_version' => '1.0.0', 'app_build' => '42', 'first_seen_at' => $seen(3), 'last_seen_at' => $seen(0)],
+        ['user_id' => $other->id, 'install_id' => 'install-new', 'platform' => 'ios', 'os_version' => '18.2', 'model' => 'iPhone 15 Pro', 'app_version' => '1.0.0', 'app_build' => '42', 'first_seen_at' => $seen(1), 'last_seen_at' => $seen(1)],
+    ]);
+
+    $response = adminPlayerDetail($player)->assertOk()
+        ->assertJsonPath('player.analyticsAt', '2026-09-25T09:00:00.000Z');
+
+    expect(array_column($response->json('installs'), 'installId'))->toBe(['install-new', 'install-old'])
+        ->and($response->json('installs.0'))->toMatchArray([
+            'platform' => 'ios',
+            'osVersion' => '18.2',
+            'model' => 'iPhone 15 Pro',
+            'appVersion' => '1.0.0',
+            'appBuild' => '42',
+            'firstSeenAt' => '2026-09-22T09:00:00.000Z',
+            'lastSeenAt' => '2026-09-25T09:00:00.000Z',
+        ])
+        ->and($response->json('installs.0.others'))->toBe([['id' => $other->id, 'username' => 'kerem.yedek', 'bannedAt' => null]])
+        ->and($response->json('installs.1.others'))->toBe([]);
+});
+
+test('a player who has not said yes shows no consent', function () {
+    $this->signInAdmin(AdminRole::Viewer);
+    $player = User::factory()->withUsername()->create();
+
+    adminPlayerDetail($player)->assertOk()->assertJsonPath('player.analyticsAt', null)->assertJsonPath('installs', []);
+});
+
 test('a banned player shows why, and sits in no league', function () {
     $this->signInAdmin(AdminRole::Viewer);
     $player = User::factory()->withUsername('hileci')->create(['banned_at' => now(), 'ban_reason' => 'Hız hilesi']);

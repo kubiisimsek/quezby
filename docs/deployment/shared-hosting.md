@@ -66,6 +66,14 @@ openssl rand -hex 32                                # çıktıyı OPS_TOKEN= sat
   `playintegrity.googleapis.com` ve `oauth2.googleapis.com`'a HTTPS çıkışı açık
   olmalı: `curl -I https://playintegrity.googleapis.com`.
 - `MODERATION_TOKEN` yalnızca moderasyon yaparken dolu olsun (aşağıda 6b).
+- Analitik (`docs/product/analytics.md`): `QUEZBY_ANALYTICS_ENABLED=true`,
+  `QUEZBY_ANALYTICS_SAMPLE=1000`, `QUEZBY_ANALYTICS_VISIT_DAYS=30`,
+  `QUEZBY_ANALYTICS_DAY_DAYS=90`, `QUEZBY_DEVICE_DAYS=180` varsayılanları
+  olduğu gibi kalabilir. Sunucu zorlanırsa önce `QUEZBY_ANALYTICS_SAMPLE`'ı
+  düşür (ör. `250`), gerekirse `QUEZBY_ANALYTICS_ENABLED=false` yap; ikisi de
+  `optimize` sonrası hemen geçerli olur ve uygulamalar bir gün boyunca
+  göndermeyi keser. Panelin **Analitik → Veri hacmi** kutusu her katmanın ne
+  kadar tuttuğunu gösterir.
 - Yayında `QUEZBY_IOS_MIN_VERSION` / `QUEZBY_ANDROID_MIN_VERSION`'ı v2
   uygulamanın sürümüne yükselt: eski uygulamalar sıralamaya zaten giremez
   (`engine_outdated`), güncelleme ekranı onlara nedenini söyler.
@@ -154,6 +162,12 @@ SSH varsa: `php artisan quezby:review`, `quezby:run:approve {run}`,
 İsteğe bağlı cron (günde bir): `php artisan quezby:runs:expire` — yarım kalan
 eski turları kapatır. Gerekli değil: her oyuncunun eski turu bir sonraki
 turunda zaten kapanır; ligler de cron'suz, tembel kapanır.
+
+Aynı şekilde isteğe bağlı: `php artisan quezby:analytics:prune` — süresi dolan
+analitik satırlarını ve uzun süredir görülmeyen telefonları siler. API bunu
+kendisi de yapar (saatte en çok bir kez, bir isteğin yanıtından sonra, küçük
+parçalarla); panelde **Sistem → Analitiği temizle** aynısını hemen yapar.
+Cron `schedule:run` çağırıyorsa ikisi de kendiliğinden çalışır.
 
 ## 7. `OPS_TOKEN`'ı kapat
 

@@ -11,3 +11,6 @@ Artisan::command('inspire', function () {
 // Optional: only runs where the host has a cron calling `schedule:run`. Players'
 // own stale runs close on their next start anyway.
 Schedule::command('quezby:runs:expire')->hourly();
+
+// Optional too: the API prunes analytics a chunk an hour by itself.
+Schedule::command('quezby:analytics:prune')->dailyAt('04:30');

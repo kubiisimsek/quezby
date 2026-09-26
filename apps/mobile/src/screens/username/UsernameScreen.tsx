@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StatusBar, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { track } from '@/analytics/track';
 import { api } from '@/api/client';
 import { useSession } from '@/auth/session';
 import { UsernameField } from '@/components/UsernameField';
@@ -98,7 +99,15 @@ export function UsernameScreen() {
                 disabled={!ready}
               />
               {canSkip ? (
-                <Button label="Şimdilik geç" tone="ghost" onPress={next} disabled={pending} />
+                <Button
+                  label="Şimdilik geç"
+                  tone="ghost"
+                  onPress={() => {
+                    track('nickname_skip');
+                    next();
+                  }}
+                  disabled={pending}
+                />
               ) : null}
             </>
           ) : (

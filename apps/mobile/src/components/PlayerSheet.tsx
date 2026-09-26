@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 
+import { track } from '@/analytics/track';
 import { Portrait, SeasonBest } from '@/components/PlayerCard';
 import { useFollow, usePlayer } from '@/hooks/useBoards';
 import { messageFor } from '@/lib/errors';
@@ -34,6 +36,10 @@ export function PlayerSheet({
   const player = usePlayer(username);
   const follow = useFollow();
   const card = player.data?.player;
+
+  useEffect(() => {
+    if (username) track('player_card');
+  }, [username]);
 
   return (
     <Sheet

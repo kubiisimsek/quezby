@@ -5,6 +5,7 @@ use App\Models\Run;
 use App\Models\User;
 use App\Services\LeaderboardService;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 test('me shows the player and their ranks', function () {
     Carbon::setTestNow(Carbon::parse('2026-09-23 12:00', 'Europe/Istanbul'));
@@ -32,13 +33,13 @@ test('settings update known keys and ignore the rest', function () {
 
     $this->putJson('/api/v1/me/settings', ['haptics' => false, 'theme' => 'dark'])
         ->assertOk()
-        ->assertExactJson(['settings' => ['haptics' => false]]);
+        ->assertExactJson(['settings' => ['haptics' => false, 'analytics' => false]]);
     $this->assertSame(['haptics' => false], $user->fresh()->settings);
 
     $this->putJson('/api/v1/me/settings', ['theme' => 'light'])
         ->assertOk()
-        ->assertExactJson(['settings' => ['haptics' => false]]);
-    $this->getJson('/api/v1/me')->assertJsonPath('user.settings', ['haptics' => false]);
+        ->assertExactJson(['settings' => ['haptics' => false, 'analytics' => false]]);
+    $this->getJson('/api/v1/me')->assertJsonPath('user.settings', ['haptics' => false, 'analytics' => false]);
 });
 
 test('a setting must be a JSON boolean', function () {
@@ -115,6 +116,26 @@ test('deleting the account removes its runs, rows and tokens', function () {
 
     $this->app['auth']->forgetGuards();
     $this->assertApiError($this->withToken($token)->getJson('/api/v1/me'), 401, 'unauthenticated');
+});
+
+test('deleting the account takes its analytics and its phones along, not the anonymous totals', function () {
+    Carbon::setTestNow(Carbon::parse('2026-09-26 12:00', 'Europe/Istanbul'));
+    $user = User::factory()->withUsername()->consenting()->create();
+    $token = $user->createToken('ios')->plainTextToken;
+    $this->withToken($token)->withHeaders(['X-Device' => deviceHeaderOf()])
+        ->postJson('/api/v1/analytics/visits', analyticsBatch(analyticsVisit(['journey' => [['tutorial_done', 1]], 'counts' => ['tutorial_done' => 1]])))
+        ->assertExactJson(['record' => true]);
+    $totals = analyticsTotals('2026-09-26');
+    expect(DB::table('player_devices')->count())->toBe(1)
+        ->and(DB::table('analytics_milestones')->count())->toBe(1);
+
+    app('auth')->forgetGuards();
+    $this->withToken($token)->deleteJson('/api/v1/me')->assertNoContent();
+
+    foreach (['analytics_visits', 'analytics_player_days', 'analytics_milestones', 'player_devices'] as $table) {
+        expect(DB::table($table)->where('user_id', $user->id)->count())->toBe(0);
+    }
+    expect(analyticsTotals('2026-09-26'))->toBe($totals);
 });
 
 test('the database cascades a deleted user', function () {

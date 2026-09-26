@@ -1,5 +1,6 @@
 import type {
   AdminAccount,
+  AdminAnalytics,
   AdminAuditEntry,
   AdminBoardKeysResponse,
   AdminBoardResponse,
@@ -10,6 +11,7 @@ import type {
   AdminOverview,
   AdminMe,
   AdminPage,
+  AdminPlayerActivity,
   AdminPlayerResponse,
   AdminPlayerRow,
   AdminPlayersResponse,
@@ -111,6 +113,7 @@ export function playerResponse(overrides: Partial<AdminPlayerResponse> = {}, pla
       sessions: 2,
       lastSeenAt: '2026-09-25T08:30:00.000Z',
       identityDetails: [{ provider: 'apple', email: 'k@privaterelay.appleid.com', emailVerified: true, lastUsedAt: null }],
+      analyticsAt: '2026-09-20T10:05:00.000Z',
       ...player,
     },
     season: 2,
@@ -137,6 +140,19 @@ export function playerResponse(overrides: Partial<AdminPlayerResponse> = {}, pla
     flags: [{ code: 'reaction_cv', severity: 'soft', count: 2 }],
     devices: [],
     sameInstall: [],
+    installs: [
+      {
+        installId: 'install-1',
+        platform: 'ios',
+        osVersion: '18.2',
+        model: 'iPhone 15 Pro',
+        appVersion: '1.0.0',
+        appBuild: '42',
+        firstSeenAt: '2026-09-20T10:00:00.000Z',
+        lastSeenAt: '2026-09-25T07:00:00.000Z',
+        others: [{ id: '01jplayer00000000000000000b', username: 'kerem.yedek', bannedAt: null }],
+      },
+    ],
     follows: { following: 3, followers: 9 },
     audit: [],
     ...overrides,
@@ -366,6 +382,114 @@ export function system(overrides: Partial<AdminSystem> = {}): AdminSystem {
     pendingMigrations: [],
     runs: { open: 4, stale: 1 },
     limits: { reviewTopAll: 10, reviewTopWeekly: 3, leagueGroupSize: 30, leagueUnlockRuns: 3, runTtlMinutes: 120, adminTokenHours: 12 },
+    ...overrides,
+  };
+}
+
+/** Thirty days of a game in use: 40 players a day, rising, a few new ones each. */
+export function analytics(overrides: Partial<AdminAnalytics> = {}): AdminAnalytics {
+  const days = Array.from({ length: 30 }, (_, index) => `2026-09-${String(index + 1).padStart(2, '0')}`);
+  return {
+    serverTime: '2026-09-30T09:00:00.000Z',
+    today: '2026-09-30',
+    days: 30,
+    collecting: { enabled: true, sample: 1000 },
+    consent: { players: 1200, granted: 900, rate: 750, newPlayers: 200, newGranted: 170, newRate: 850 },
+    now: { online: 17, active: 69, weekly: 240, monthly: 610, stickiness: 113 },
+    series: {
+      days,
+      active: days.map((_, index) => 40 + index),
+      newcomers: days.map((_, index) => index % 4),
+      returning: days.map((_, index) => 40 + index - (index % 4)),
+      visits: days.map((_, index) => 80 + index * 2),
+      minutes: days.map((_, index) => 300 + index * 5),
+      avgVisitSeconds: days.map((_, index) => (index === 0 ? null : 240 + index)),
+    },
+    retention: [
+      { week: '2026-W40', players: 12, d1: 500, d3: null, d7: null, d14: null, d30: null },
+      { week: '2026-W39', players: 20, d1: 450, d3: 300, d7: 150, d14: null, d30: null },
+      { week: '2026-W38', players: 0, d1: null, d3: null, d7: null, d14: null, d30: null },
+    ],
+    funnel: [
+      { step: 'joined', players: 170, rate: 1000 },
+      { step: 'tutorial', players: 150, rate: 882 },
+      { step: 'named', players: 120, rate: 706 },
+      { step: 'protected', players: 40, rate: 235 },
+      { step: 'first_run', players: 110, rate: 647 },
+      { step: 'league', players: 60, rate: 353 },
+      { step: 'returned', players: 70, rate: 438 },
+    ],
+    screens: [
+      { screen: 'game', views: 900 },
+      { screen: 'home', views: 800 },
+      { screen: 'leaderboard', views: 300 },
+    ],
+    events: [
+      { event: 'share_result', count: 40 },
+      { event: 'rival', count: 25 },
+      { event: 'unsent_run', count: 3 },
+    ],
+    devices: {
+      total: 300,
+      versions: [
+        { platform: 'ios', value: '1.0.0', devices: 200, share: 667 },
+        { platform: 'android', value: '1.0.0', devices: 100, share: 333 },
+      ],
+      systems: [
+        { platform: 'ios', value: '18', devices: 180, share: 600 },
+        { platform: 'android', value: '14', devices: 100, share: 333 },
+        { platform: 'ios', value: '17', devices: 20, share: 67 },
+      ],
+      models: [
+        { platform: 'ios', value: 'iPhone 15 Pro', devices: 90, share: 300 },
+        { platform: 'android', value: 'Pixel 8', devices: 40, share: 133 },
+      ],
+    },
+    storage: {
+      visits: { rows: 5400, oldest: '2026-09-01T05:00:00.000Z', keepDays: 30 },
+      days: { rows: 1800, oldest: '2026-07-03T21:00:00.000Z', keepDays: 90 },
+      totals: { rows: 2100, oldest: '2026-06-01T21:00:00.000Z', keepDays: null },
+      devices: { rows: 320, oldest: '2026-04-01T09:00:00.000Z', keepDays: 180 },
+      milestones: 700,
+      dropped: 4,
+    },
+    ...overrides,
+  };
+}
+
+/** A player who said yes: two visits, a few active days and their firsts. */
+export function playerActivity(overrides: Partial<AdminPlayerActivity> = {}): AdminPlayerActivity {
+  const days = Array.from({ length: 30 }, (_, index) => `2026-09-${String(index + 1).padStart(2, '0')}`);
+  return {
+    status: 'tracked',
+    consentAt: '2026-09-20T10:05:00.000Z',
+    summary: { activeDays: 3, visits: 4, seconds: 1500, avgVisitSeconds: 375, firstDay: '2026-09-20', lastDay: '2026-09-25' },
+    days: days.map((day) => ({
+      day,
+      visits: day === '2026-09-25' ? 2 : day === '2026-09-20' ? 1 : 0,
+      seconds: day === '2026-09-25' ? 900 : day === '2026-09-20' ? 300 : 0,
+    })),
+    visits: [
+      {
+        id: 12,
+        startedAt: '2026-09-25T08:00:00.000Z',
+        seconds: 600,
+        platform: 'ios',
+        appVersion: '1.0.0',
+        journey: [
+          { code: 'home', at: 0 },
+          { code: 'game', at: 10 },
+          { code: 'share_result', at: 400 },
+          { code: 'leaderboard', at: 420 },
+        ],
+      },
+      { id: 11, startedAt: '2026-09-20T10:00:00.000Z', seconds: 300, platform: 'ios', appVersion: '1.0.0', journey: [] },
+    ],
+    milestones: [
+      { milestone: 'joined', at: '2026-09-20T10:00:00.000Z' },
+      { milestone: 'tutorial_done', at: '2026-09-20T10:03:00.000Z' },
+      { milestone: 'first_run', at: '2026-09-20T10:10:00.000Z' },
+    ],
     ...overrides,
   };
 }

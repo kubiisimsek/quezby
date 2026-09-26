@@ -1,8 +1,11 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 
+import { track } from '@/analytics/track';
 import { api } from '@/api/client';
 import { PlayerSheet } from '@/components/PlayerSheet';
 import { renderWithProviders } from '@/test/renderWithProviders';
+
+jest.mock('@/analytics/track', () => ({ track: jest.fn() }));
 
 jest.mock('@/api/client', () => ({
   api: {
@@ -58,6 +61,7 @@ describe('PlayerSheet', () => {
     expect(screen.getByText('Seni takip ediyor')).toBeTruthy();
     expect(screen.getByText('8 takipçi · 3 takip')).toBeTruthy();
     expect(mocked.users.get).toHaveBeenCalledWith('ekin');
+    expect(track).toHaveBeenCalledWith('player_card');
   });
 
   it('shows "—" before a season best and no emblem without a league', async () => {
@@ -136,5 +140,6 @@ describe('PlayerSheet', () => {
     );
 
     expect(mocked.users.get).not.toHaveBeenCalled();
+    expect(track).not.toHaveBeenCalled();
   });
 });

@@ -1,10 +1,11 @@
+import { ANALYTICS, ANALYTICS_EVENTS, ANALYTICS_MILESTONES, ANALYTICS_SCREENS } from './analytics';
 import { CHECKPOINTS, prefixHash, sha256Hex } from './checkpoints';
 import { CATALOGS, SALT, mix, postFor, type ContentKind } from './content';
 import { PACE } from './pace';
 
 /**
  * Fixtures the API's PHP twins are tested against (`tests/Unit/ContentParityTest.php`,
- * `PaceParityTest.php`, `CheckpointParityTest.php`), built deterministically
+ * `PaceParityTest.php`, `CheckpointParityTest.php`, `AnalyticsParityTest.php`), built deterministically
  * so a test can rebuild them and fail when the committed files have gone stale.
  */
 const KINDS: ContentKind[] = ['skip', 'like', 'hold', 'freeze'];
@@ -31,6 +32,22 @@ export function buildContent() {
 
 export function buildPace() {
   return PACE;
+}
+
+/** The analytics catalog and limits, for `tests/Unit/AnalyticsParityTest.php`. */
+export function buildAnalytics() {
+  return {
+    screens: ANALYTICS_SCREENS,
+    events: ANALYTICS_EVENTS,
+    milestones: ANALYTICS_MILESTONES,
+    limits: {
+      visitsPerBatch: ANALYTICS.visitsPerBatch,
+      journeySteps: ANALYTICS.journeySteps,
+      maxCount: ANALYTICS.maxCount,
+      maxAgeDays: ANALYTICS.maxAgeDays,
+      maxVisitSeconds: ANALYTICS.maxVisitSeconds,
+    },
+  };
 }
 
 /** A log that looks like play — every gesture, times and holds — from a fixed stream. */

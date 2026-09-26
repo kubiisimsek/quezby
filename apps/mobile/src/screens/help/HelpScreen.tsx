@@ -92,6 +92,11 @@ const FAQ: ReadonlyArray<{ question: string; answer: string }> = [
     answer:
       'Profil’de sağ üstteki ayarlar düğmesine dokun, oradan kapat. Oyun sessizce oynanır.',
   },
+  {
+    question: 'Hangi verileri topluyorsunuz?',
+    answer:
+      'İzin verirsen hangi ekranlara girdiğini, ne kadar kaldığını ve paylaşım gibi birkaç hareketi sayarız; bunlar 30 gün sonra yalnızca günlük özete döner. İzin vermesen de oyunun çalışması ve güvenliği için telefonunun modeli, sistem ve uygulama sürümü kaydedilir. Adın, e-postan ya da konumun bu sayımlara girmez. Kararını Profil’deki Ayarlar’dan, Kullanım verisi ile değiştirirsin.',
+  },
 ];
 
 /**

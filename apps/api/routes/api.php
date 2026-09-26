@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin;
+use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AppConfigController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CredentialsController;
@@ -38,7 +39,8 @@ Route::prefix('v1')->group(function () {
     Route::post('auth/apple', [SocialAuthController::class, 'apple'])->middleware('throttle:social-auth');
     Route::post('auth/google', [SocialAuthController::class, 'google'])->middleware('throttle:social-auth');
 
-    Route::middleware('auth:sanctum')->group(function () {
+    // `presence`: a token's first request of the day records the phone and, with consent, the player's day.
+    Route::middleware(['auth:sanctum', 'presence'])->group(function () {
         Route::post('auth/logout', [AuthController::class, 'logout']);
 
         Route::get('me', [MeController::class, 'show']);
@@ -66,6 +68,8 @@ Route::prefix('v1')->group(function () {
         Route::get('leaderboards/{board}', LeaderboardController::class)->middleware('throttle:reads');
         Route::get('daily', DailyController::class)->middleware('throttle:reads');
         Route::get('leagues/current', LeagueController::class)->middleware('throttle:reads');
+
+        Route::post('analytics/visits', AnalyticsController::class)->middleware('throttle:analytics');
 
         Route::get('users', [UserController::class, 'search'])->middleware('throttle:search');
         Route::get('users/{username}', [UserController::class, 'show'])->middleware('throttle:reads');
@@ -96,12 +100,14 @@ Route::prefix('v1')->group(function () {
 
                 Route::get('players', [Admin\PlayerController::class, 'index'])->name('players.index');
                 Route::get('players/{player}', [Admin\PlayerController::class, 'show'])->whereUlid('player')->name('players.show');
+                Route::get('players/{player}/activity', [Admin\PlayerController::class, 'activity'])->whereUlid('player')->name('players.activity');
                 Route::get('audit', Admin\AuditController::class)->name('audit');
                 Route::get('counts', Admin\CountsController::class)->name('counts');
                 Route::get('runs', [Admin\RunController::class, 'index'])->name('runs.index');
                 Route::get('runs/{run}', [Admin\RunController::class, 'show'])->whereUlid('run')->name('runs.show');
                 Route::get('suspects', Admin\SuspectController::class)->name('suspects');
                 Route::get('overview', Admin\OverviewController::class)->name('overview');
+                Route::get('analytics', Admin\AnalyticsController::class)->name('analytics');
                 Route::get('boards', [Admin\BoardController::class, 'index'])->name('boards.index');
                 Route::get('boards/keys', [Admin\BoardController::class, 'keys'])->name('boards.keys');
                 Route::get('leagues', [Admin\LeagueController::class, 'index'])->name('leagues.index');
@@ -127,7 +133,7 @@ Route::prefix('v1')->group(function () {
                 Route::post('admins/{admin}/reset-password', [Admin\AdminController::class, 'resetPassword'])->whereUlid('admin')->name('admins.reset-password');
 
                 Route::get('system', [Admin\SystemController::class, 'show'])->name('system.show');
-                Route::post('system/{action}', [Admin\SystemController::class, 'run'])->whereIn('action', ['migrate', 'optimize', 'expire-runs'])->name('system.run');
+                Route::post('system/{action}', [Admin\SystemController::class, 'run'])->whereIn('action', ['migrate', 'optimize', 'expire-runs', 'analytics-prune'])->name('system.run');
             });
         });
     });

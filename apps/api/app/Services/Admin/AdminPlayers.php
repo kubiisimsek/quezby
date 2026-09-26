@@ -10,6 +10,7 @@ use App\Models\LeagueMember;
 use App\Models\Run;
 use App\Models\SocialIdentity;
 use App\Models\User;
+use App\Services\Devices\DeviceRegistry;
 use App\Services\FollowService;
 use App\Services\LeaderboardService;
 use App\Services\LeagueService;
@@ -33,6 +34,7 @@ final class AdminPlayers
         private readonly FollowService $follows,
         private readonly AdminRuns $runs,
         private readonly AuditLog $audit,
+        private readonly DeviceRegistry $devices,
     ) {}
 
     /**
@@ -96,6 +98,7 @@ final class AdminPlayers
                     'emailVerified' => (bool) $identity->email_verified,
                     'lastUsedAt' => Timestamp::iso($identity->last_used_at),
                 ])->values()->all(),
+                'analyticsAt' => Timestamp::iso($player->analytics_at),
             ],
             'season' => $this->leaderboards->season(),
             'best' => $best === null ? null : [
@@ -138,6 +141,7 @@ final class AdminPlayers
                 ->map(fn (User $other) => AdminRuns::ref($other))
                 ->values()
                 ->all(),
+            'installs' => $this->devices->of($player),
             'follows' => $this->follows->counts($player),
             'audit' => $this->audit->about('player', $player->id)->map(fn ($entry) => $this->audit->present($entry, $withIp))->values()->all(),
         ];

@@ -33,6 +33,7 @@ describe('FloorCard', () => {
 
     await fireEvent.press(screen.getByRole('button', { name: 'Geç onu' }));
     expect(onPlay).toHaveBeenCalledTimes(1);
+    expect(onPlay).toHaveBeenCalledWith(true);
   });
 
   it('bends the suffix to the name', async () => {
@@ -90,6 +91,7 @@ describe('FloorCard', () => {
 
     await fireEvent.press(screen.getByRole('button', { name: 'Oyna' }));
     expect(onPlay).toHaveBeenCalledTimes(1);
+    expect(onPlay).toHaveBeenCalledWith(false);
   });
 
   it('keeps the progress inside its range', async () => {

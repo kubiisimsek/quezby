@@ -36,6 +36,16 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
+     * A player's real token, as the app holds one: Sanctum then moves the
+     * token's `last_used_at` on every request, which the presence gate reads
+     * (`Sanctum::actingAs` does not). Call `forgetGuards()` between requests.
+     */
+    protected function tokenFor(User $user): string
+    {
+        return $user->createToken('ios')->plainTextToken;
+    }
+
+    /**
      * An admin of `$role` who has chosen their own password, signed in to the
      * panel by token.
      *

@@ -21,6 +21,7 @@ import {
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { track } from '@/analytics/track';
 import { BoardStage, useArrival } from '@/components/BoardStage';
 import { FloorDock } from '@/components/FloorDock';
 import { PlayerSheet } from '@/components/PlayerSheet';
@@ -91,6 +92,13 @@ export function LeagueScreen({ navigation }: Props) {
   const play = useCallback(
     () => navigation.navigate('Game', { mode: 'free' }),
     [navigation],
+  );
+  const chase = useCallback(
+    (chasing: boolean) => {
+      if (chasing) track('rival');
+      play();
+    },
+    [play],
   );
   const open = useCallback(
     (member: LeagueMember) => setSelected(member.username),
@@ -205,7 +213,7 @@ export function LeagueScreen({ navigation }: Props) {
             targetUsername={above?.username ?? null}
             gapToNext={me.gap}
             progress={data?.nextRankProgress ?? null}
-            onPlay={play}
+            onPlay={chase}
           />
         </FloorDock>
       ) : null}

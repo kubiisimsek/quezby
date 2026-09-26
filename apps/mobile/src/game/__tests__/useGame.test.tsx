@@ -5,9 +5,12 @@ import type { CheckpointRequest, FinishRunRequest } from '@quezby/types';
 import { act, renderHook, type RenderHookResult } from '@testing-library/react-native';
 import { AppState, type AppStateStatus, type NativeEventSubscription } from 'react-native';
 
+import { track } from '@/analytics/track';
 import { api } from '@/api/client';
 import { useGame } from '@/game/useGame';
 import { usePendingRun } from '@/stores/pendingRun';
+
+jest.mock('@/analytics/track', () => ({ track: jest.fn() }));
 
 jest.mock('@/api/client', () => ({
   api: { runs: { start: jest.fn(), finish: jest.fn(), checkpoint: jest.fn() } },
@@ -71,6 +74,7 @@ describe('useGame', () => {
 
     expect(hook.result.current.practice).toBe('outdated');
     expect(hook.result.current.phase).toBe('playing');
+    expect(track).toHaveBeenCalledWith('outdated_run');
   });
 
   it('tells the screen when today\'s one attempt is gone', async () => {
@@ -114,6 +118,7 @@ describe('useGame', () => {
 
     expect(hook.result.current.outcome).toMatchObject({ mode: 'unsent', canRetry: true });
     expect(usePendingRun.getState().run).toMatchObject({ runId: 'run-1', actions: [] });
+    expect(track).toHaveBeenCalledWith('unsent_run');
 
     const answer = { run: { score: 1 }, best: null, ranks: {}, isNewBest: false };
     runs.finish.mockResolvedValueOnce(answer);
@@ -327,6 +332,7 @@ describe('useGame checkpoints', () => {
   it('never checks a practice run in', async () => {
     stampCheckpoints();
     const { game, goAt } = await afterCountdown((hook) => hook.result.current.start('offline'));
+    expect(track).toHaveBeenCalledWith('offline_run');
 
     await playPerfectly(game, goAt, FIRST_MARK + 2_000);
     await act(async () => {

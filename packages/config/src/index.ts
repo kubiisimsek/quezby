@@ -13,6 +13,15 @@ export {
 } from './username';
 export { PACE, countdownMs, exitDelayMs, type PaceKind } from './pace';
 export {
+  ANALYTICS,
+  ANALYTICS_EVENTS,
+  ANALYTICS_MILESTONES,
+  ANALYTICS_SCREENS,
+  isAnalyticsCode,
+  isAnalyticsEvent,
+  isAnalyticsScreen,
+} from './analytics';
+export {
   CHECKPOINTS,
   prefixHash,
   prefixText,

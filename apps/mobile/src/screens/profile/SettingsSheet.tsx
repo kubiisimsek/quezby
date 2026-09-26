@@ -46,6 +46,15 @@ export function keepHint(): string {
   return `${formatList(offered, 'ya da')} bağla; telefon değişse de skorların kaybolmaz.`;
 }
 
+/**
+ * Kullanım verisi on or off: on the phone at once — off, nothing more is
+ * recorded and nothing waiting is sent — then on the account
+ * (`useConsentSync`), which forgets what it kept about the player on a no.
+ */
+function setAnalytics(value: boolean) {
+  useSettings.getState().answer(value);
+}
+
 /** Titreşim on or off: on the phone at once, then on the account. */
 function setHaptics(user: Me, value: boolean) {
   useSettings.getState().apply({ haptics: value });
@@ -80,7 +89,7 @@ function NameRow({ username, onPick }: { username: string | null; onPick: () => 
 
 /**
  * Ayarlar — what a player opens now and then, kept off the profile's face:
- * the one setting the game has, Yardım, and the account's doors. A door
+ * the game's two settings, Yardım, and the account's doors. A door
  * never opens over this sheet: `onPick` names it, and the profile opens it
  * once this sheet has left the screen.
  */
@@ -97,6 +106,7 @@ export function SettingsSheet({
 }) {
   const user = useSession((state) => state.user);
   const haptics = useSettings((state) => state.haptics);
+  const analytics = useSettings((state) => state.analytics);
 
   if (!user) return null;
 
@@ -117,6 +127,18 @@ export function SettingsSheet({
             }
             value={haptics}
             onChange={(value) => setHaptics(user, value)}
+          />
+          <Divider />
+          <SwitchRow
+            leading={<IconChip icon="trendUp" tone="secondary" size="sm" />}
+            title="Kullanım verisi"
+            subtitle={
+              analytics
+                ? 'Hangi ekranlara girdiğini ve ne kadar oynadığını sayarız.'
+                : 'Yalnızca oyunun çalışması için gereken cihaz bilgisi gider.'
+            }
+            value={analytics}
+            onChange={setAnalytics}
           />
           <Divider />
           <Row

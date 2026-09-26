@@ -3,6 +3,7 @@
 use App\Exceptions\ApiException;
 use App\Exceptions\ErrorResponse;
 use App\Http\Middleware\EnsureAdminRole;
+use App\Http\Middleware\RecordPresence;
 use App\Http\Middleware\RequireAppKey;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -20,8 +21,13 @@ return Application::configure(basePath: dirname(__DIR__))
         // The username rules trim exactly what JavaScript's trim() does.
         $middleware->trimStrings(except: ['username']);
 
-        // `admin.role:moderator`: the admin panel's roles, lowest first.
-        $middleware->alias(['admin.role' => EnsureAdminRole::class]);
+        // `admin.role:moderator`: the admin panel's roles, lowest first. `presence`: the
+        // device registry and, with consent, the player's day — once a day per token.
+        // One call: `alias()` replaces the list it was given before.
+        $middleware->alias([
+            'admin.role' => EnsureAdminRole::class,
+            'presence' => RecordPresence::class,
+        ]);
 
         // No player request without APP_KEY; the panel and the ops routes stay open to put it right.
         $middleware->api(prepend: [RequireAppKey::class]);

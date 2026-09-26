@@ -16,6 +16,8 @@ export type HttpOptions = {
   timeoutMs?: number;
   /** Sent as `X-App-Version` so the API can tell builds apart. */
   appVersion?: string;
+  /** Sent as `X-Device` when it answers — the phone the app runs on, for the API's device registry. */
+  device?: () => string | null;
 };
 
 export class ApiError extends Error {
@@ -71,6 +73,8 @@ export function createRequest(options: HttpOptions) {
     const headers: Record<string, string> = { Accept: 'application/json' };
     if (body !== undefined) headers['Content-Type'] = 'application/json';
     if (options.appVersion) headers['X-App-Version'] = options.appVersion;
+    const device = options.device?.();
+    if (device) headers['X-Device'] = device;
     const token = auth ? options.getToken?.() : null;
     if (token) headers.Authorization = `Bearer ${token}`;
 

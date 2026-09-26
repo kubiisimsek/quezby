@@ -1,6 +1,8 @@
 import type {
   AdminAccountsResponse,
   AdminActionResponse,
+  AdminAnalytics,
+  AdminAnalyticsQuery,
   AdminAuditQuery,
   AdminAuditEntry,
   AdminBoardKeysQuery,
@@ -20,6 +22,7 @@ import type {
   AdminOverview,
   AdminPage,
   AdminPasswordRequest,
+  AdminPlayerActivity,
   AdminPlayerResponse,
   AdminPlayersQuery,
   AdminPlayersResponse,
@@ -82,6 +85,9 @@ export function createAdminClient(options: AdminClientOptions) {
       list: (query: AdminPlayersQuery = {}) =>
         request<AdminPlayersResponse>('/players', { query }),
       get: (playerId: string) => request<AdminPlayerResponse>(`/players/${id(playerId)}`),
+      /** Visits, days and firsts — only for a player who said yes to usage analytics. */
+      activity: (playerId: string) =>
+        request<AdminPlayerActivity>(`/players/${id(playerId)}/activity`),
       ban: (playerId: string, input: AdminReasonRequest) =>
         request<AdminActionResponse>(`/players/${id(playerId)}/ban`, { method: 'POST', body: input }),
       unban: (playerId: string) =>
@@ -117,6 +123,9 @@ export function createAdminClient(options: AdminClientOptions) {
       list: (query: AdminLeaguesQuery = {}) => request<AdminLeaguesResponse>('/leagues', { query }),
       group: (groupId: number) =>
         request<AdminLeagueGroupResponse>(`/leagues/groups/${id(groupId)}`),
+    },
+    analytics: {
+      get: (query: AdminAnalyticsQuery = {}) => request<AdminAnalytics>('/analytics', { query }),
     },
     content: {
       list: (query: AdminContentQuery = {}) => request<AdminContentResponse>('/content', { query }),

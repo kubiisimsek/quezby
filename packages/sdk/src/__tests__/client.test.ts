@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { ApiError, createApiClient } from '../index';
+import { ApiError, createApiClient, deviceHeader } from '../index';
 
 function respond(status: number, body?: unknown) {
   return vi.fn(async () =>
@@ -30,6 +30,37 @@ describe('createApiClient', () => {
       Authorization: 'Bearer tok',
       'X-App-Version': '1.0.0',
     });
+  });
+
+  it('names the phone in X-Device once it is known, and not before', async () => {
+    const fetchMock = respond(200, { user: { id: '1' }, ranks: {} });
+    vi.stubGlobal('fetch', fetchMock);
+    let known = false;
+    const api = createApiClient({
+      baseUrl: 'http://x',
+      getToken: () => 'tok',
+      device: () =>
+        known
+          ? { installId: 'c0ffee00c0ffee00', platform: 'ios', os: '18.2', model: 'iPhone 15 Pro', build: '42' }
+          : null,
+    });
+
+    await api.me.get();
+    known = true;
+    await api.me.get();
+
+    const [, before] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
+    const [, after] = fetchMock.mock.calls[1] as unknown as [string, RequestInit];
+    expect(before.headers).not.toHaveProperty('X-Device');
+    expect(after.headers).toMatchObject({
+      'X-Device': 'install=c0ffee00c0ffee00; platform=ios; os=18.2; model=iPhone%2015%20Pro; build=42',
+    });
+  });
+
+  it('encodes every device value, so nothing can break the header apart', () => {
+    expect(
+      deviceHeader({ installId: 'a;b', platform: 'android', os: '14', model: 'Pixel=8\nPro', build: '7' }),
+    ).toBe('install=a%3Bb; platform=android; os=14; model=Pixel%3D8%0APro; build=7');
   });
 
   it('never sends the token to a public route', async () => {

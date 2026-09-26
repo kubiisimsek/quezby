@@ -1,9 +1,13 @@
 import '@testing-library/jest-dom/vitest';
 
-import { cleanup } from '@testing-library/react';
+import { cleanup, configure } from '@testing-library/react';
 import { afterEach, beforeEach } from 'vitest';
 
 import { useSession } from '@/stores/session';
+
+// Every page loads lazily on first use: the first test of a page file pays for
+// its chunk, which takes more than the default second on a busy parallel run.
+configure({ asyncUtilTimeout: 3000 });
 
 // Vitest runs without `globals`, so Testing Library's own cleanup never
 // registers — without this every test renders on top of the last one's DOM.

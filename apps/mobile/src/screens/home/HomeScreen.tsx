@@ -25,6 +25,7 @@ import {
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { track } from '@/analytics/track';
 import { useSession } from '@/auth/session';
 import { CredentialsSheet } from '@/components/CredentialsSheet';
 import { SignInWaysSheet } from '@/components/SignInWaysSheet';
@@ -37,12 +38,14 @@ import { dativeOf, formatGap, formatRank, formatScore } from '@/lib/format';
 import type { RootStackParamList, TabParamList } from '@/navigation/types';
 import { deviceFailed, useDeviceVerdict } from '@/stores/deviceVerdict';
 import { useOnboarding } from '@/stores/onboarding';
+import { useSettings } from '@/stores/settings';
 import { Icon, type IconName } from '@/ui/icons';
 import {
   Arena,
   Avatar,
   BrandBand,
   Button,
+  ConsentCard,
   CountdownChip,
   IconButton,
   LobbyCard,
@@ -100,18 +103,23 @@ export function HomeScreen({ navigation }: Props) {
   const remindersRead = useOnboarding((state) => state.hydrated);
   const remindedFor = useOnboarding((state) => state.remindedFor);
   const [keep, setKeep] = useState<'ways' | 'email' | null>(null);
+  const settingsRead = useSettings((state) => state.hydrated);
+  // A phone that never saw the question — installed before it existed — is asked once, here.
+  const asking = useSettings((state) => state.hydrated && state.consent === 'unasked');
   /** The email form waits for the ways sheet to leave the screen. */
   const toEmail = useRef(false);
   const joined = league.data?.joined === true;
 
   // A guest who has just been seated in a league has something to lose: ask
   // once to keep the account. Never over the game's result — only here.
+  // After the usage question, never on top of it.
   useEffect(() => {
-    if (!focused || !remindersRead || !joined || !user?.isGuest) return;
+    if (!focused || !remindersRead || !settingsRead || asking || !joined || !user?.isGuest) return;
     if (remindedFor === user.id) return;
     useOnboarding.getState().markReminded(user.id);
+    track('protect_reminder');
     setKeep('ways');
-  }, [focused, joined, remindedFor, remindersRead, user?.id, user?.isGuest]);
+  }, [asking, focused, joined, remindedFor, remindersRead, settingsRead, user?.id, user?.isGuest]);
 
   const strip = useEntrance(0, 10);
   const warning = useEntrance(0, 10);
@@ -188,6 +196,12 @@ export function HomeScreen({ navigation }: Props) {
           />
         </Animated.View>
 
+        {asking ? (
+          <Animated.View style={warning}>
+            <ConsentCard onAnswer={(yes) => useSettings.getState().answer(yes)} />
+          </Animated.View>
+        ) : null}
+
         {unranked ? (
           <Animated.View style={warning}>
             <DeviceWarning />
@@ -213,7 +227,10 @@ export function HomeScreen({ navigation }: Props) {
           <RivalDoor
             name={user?.username ?? '?'}
             rival={weekly.data?.rival ?? null}
-            onPlay={() => navigation.navigate('Game', { mode: 'free' })}
+            onPlay={() => {
+              track('rival');
+              navigation.navigate('Game', { mode: 'free' });
+            }}
           />
         </Animated.View>
 
@@ -506,7 +523,10 @@ function Attempt({
             tone="primary"
             size="md"
             style={styles.flex}
-            onPress={() => void Share.share({ message: shareText })}
+            onPress={() => {
+              track('share_daily');
+              void Share.share({ message: shareText });
+            }}
           />
         ) : null}
         <Button

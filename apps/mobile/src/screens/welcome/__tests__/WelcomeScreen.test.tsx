@@ -5,6 +5,7 @@ import { api } from '@/api/client';
 import { useSession } from '@/auth/session';
 import { WelcomeScreen } from '@/screens/welcome/WelcomeScreen';
 import { useOnboarding } from '@/stores/onboarding';
+import { useSettings } from '@/stores/settings';
 import { buildMe } from '@/test/factories';
 import { renderWithProviders } from '@/test/renderWithProviders';
 
@@ -20,6 +21,39 @@ describe('WelcomeScreen', () => {
     jest.clearAllMocks();
     useSession.setState({ token: null, user: null, ranks: null, hydrated: true });
     useOnboarding.setState({ userId: null, step: null, remindedFor: null, hydrated: true });
+    useSettings.setState({ hydrated: true, consent: 'synced', analytics: false });
+  });
+
+  it('asks first whether the game may count how it is used, and counts nothing before', async () => {
+    useSettings.setState({ consent: 'unasked' });
+    await renderWithProviders(<WelcomeScreen {...props} />);
+
+    expect(screen.getByText('SENİN SEÇİMİN')).toBeTruthy();
+    expect(screen.getByText('Oyunu birlikte geliştirelim mi?')).toBeTruthy();
+    expect(screen.queryByText('Oyna')).toBeNull();
+    expect(screen.queryByText('Hesabım var, giriş yap')).toBeNull();
+    expect(useSettings.getState().analytics).toBe(false);
+  });
+
+  it.each([
+    ['İzin ver', true],
+    ['İzin verme', false],
+  ])('takes "%s" for an answer, then lets the player in', async (label, yes) => {
+    useSettings.setState({ consent: 'unasked' });
+    await renderWithProviders(<WelcomeScreen {...props} />);
+
+    await fireEvent.press(screen.getByRole('button', { name: label }));
+
+    expect(useSettings.getState()).toMatchObject({ analytics: yes, consent: 'pending' });
+    expect(screen.getByText('Oyna')).toBeTruthy();
+    expect(screen.getByText('Hesabım var, giriş yap')).toBeTruthy();
+  });
+
+  it('waits for the phone\'s answer to be read before asking', async () => {
+    useSettings.setState({ hydrated: false, consent: 'unasked' });
+    await renderWithProviders(<WelcomeScreen {...props} />);
+
+    expect(screen.queryByText('Oyna')).toBeNull();
   });
 
   it('has one way in to play, and one back in for a player with an account', async () => {

@@ -20,4 +20,5 @@ enum AuditAction: string
     case SystemMigrate = 'system.migrate';
     case SystemOptimize = 'system.optimize';
     case SystemExpireRuns = 'system.expire_runs';
+    case SystemAnalyticsPrune = 'system.analytics_prune';
 }

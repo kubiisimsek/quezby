@@ -121,6 +121,10 @@ exceptions). Numbers are tabular in tables and tiles.
 | `patterns/confirm-modal`, `form-modal` | every destructive act asks first, focus on "Vazgeç"; small forms read with `FormData` |
 | `patterns/callout`, `empty-state`, `facts`, `share-list`, `bar-chart` | messages, missing things, records, shares, 30-day charts (SVG, a table for screen readers) |
 | `patterns/run-timeline` | a run post by post: decision times and a cell per verdict (its colours below) |
+| `patterns/retention-table` | weekly cohorts × day 1/3/7/14/30: every cell writes its per-mille out, tinted only greener for more; a day not over yet is "—" |
+| `patterns/funnel-list` | rows with a count and the API's per-mille on a bar of that length — numbered steps (a funnel) or slices of a whole; never sums anything itself, unlike `share-list` |
+| `patterns/activity-strip` | a player's days as cells: grey when they did not come, greener the longer they stayed; each cell says its day in words |
+| `analytics/journey` | a visit's path: screens as quiet chips joined by arrows, the moments between them as tags in their own colour; the rest as "+N adım" |
 | `patterns/secret-reveal` | a temporary password, shown once |
 | `layout/shell`, `sidebar`, `login-layout`, `gate` | the frame and the doors |
 | `moderation/*`, `boards/board-table` | the moderation dialogs and the board table every page shares |

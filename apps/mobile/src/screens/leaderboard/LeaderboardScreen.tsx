@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 
+import { track } from '@/analytics/track';
 import { BoardStage, useArrival } from '@/components/BoardStage';
 import { FloorDock } from '@/components/FloorDock';
 import { FriendsEmpty } from '@/components/FriendsEmpty';
@@ -94,6 +95,13 @@ export function LeaderboardScreen({ navigation }: Props) {
   const play = useCallback(
     () => navigation.navigate('Game', { mode: 'free' }),
     [navigation],
+  );
+  const chase = useCallback(
+    (chasing: boolean) => {
+      if (chasing) track('rival');
+      play();
+    },
+    [play],
   );
   const search = useCallback(() => navigation.navigate('Search'), [navigation]);
   const open = useCallback(
@@ -246,7 +254,7 @@ export function LeaderboardScreen({ navigation }: Props) {
             targetUsername={data.rival?.entry.username ?? null}
             gapToNext={data.rival?.gap ?? null}
             progress={data.nextRankProgress}
-            onPlay={play}
+            onPlay={chase}
           />
         </FloorDock>
       ) : null}

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { ScrollView, StatusBar, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { track } from '@/analytics/track';
 import { useSession } from '@/auth/session';
 import { CredentialsSheet } from '@/components/CredentialsSheet';
 import { PROVIDER_NAMES } from '@/components/SignInWaysSheet';
@@ -118,7 +119,15 @@ export function ProtectScreen() {
               disabled={busy}
               onPress={() => setEmailOpen(true)}
             />
-            <Button label="Şimdi değil" tone="ghost" disabled={busy} onPress={finish} />
+            <Button
+              label="Şimdi değil"
+              tone="ghost"
+              disabled={busy}
+              onPress={() => {
+                track('protect_skip');
+                finish();
+              }}
+            />
           </View>
         )}
       </ScrollView>

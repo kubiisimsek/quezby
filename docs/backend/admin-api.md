@@ -90,10 +90,22 @@ the search and platform: `{ all, active, banned, guest }`.
 ### `GET /players/{id}` — viewer
 
 `AdminPlayerResponse`: the player (identities without their Apple tokens,
-sessions, last seen), this season's best and ranks, lifetime stats, this
-week's league seat (none while banned), runs by status, the ten latest runs,
-the flag codes of the last 30 days, device checks (20 latest), other accounts
-on the same install, follows and the audit entries about them.
+sessions, last seen, `analyticsAt` — when they said yes to usage analytics),
+this season's best and ranks, lifetime stats, this week's league seat (none
+while banned), runs by status, the ten latest runs, the flag codes of the last
+30 days, device checks (20 latest), other accounts on the same install,
+`installs` — the phones the player used, from the device registry, each with
+the other accounts seen on it — follows and the audit entries about them.
+
+### `GET /players/{id}/activity` — viewer
+
+`AdminPlayerActivity`: whether the player's activity is kept (`tracked`,
+`no_consent`, `not_sampled`, `disabled`), their consent's moment, the last 30
+Istanbul days (active days, visits, time, one entry a day), the 20 latest
+visits with their journeys (`{ code, at }`), and their firsts — from the app
+with consent (`tutorial_done`, `nickname_skip`, `protect_skip`,
+`protect_reminder`) and from what the API keeps anyway (`joined`, `protected`,
+`first_run`, `league`). The panel asks only when its Etkinlik tab opens.
 
 ### `POST /players/{id}/ban` — moderator
 
@@ -207,6 +219,34 @@ runs. Days are Istanbul days: each series is one query that buckets rows with
 
 `{ "review": n }` — the sidebar's badge.
 
+## Analytics
+
+### `GET /analytics?days=30|90` — viewer
+
+`AdminAnalytics` — `docs/product/analytics.md`. Everything but `now.online`
+and `devices` counts only the players who said yes to usage analytics:
+
+- `collecting` — the kill switch and the sample (per-mille);
+- `consent` — who said yes, of all and of the window's newcomers, per-mille;
+- `now` — `online` (tokens used in the last 5 minutes, every player),
+  active today, over the last 7 and 30 days (rolling), stickiness;
+- `series` — one entry per Istanbul day: active, newcomers, returning,
+  visits, minutes, average visit;
+- `retention` — weekly cohorts of players active on the day they joined,
+  newest first (8 weeks; 12 for 90 days), back on day 1, 3, 7, 14 and 30 —
+  per-mille, `null` until the day is over for someone in the week;
+- `funnel` — the window's newcomers who were active on their first day,
+  through `joined → tutorial → named → protected → first_run → league →
+  returned`; `returned` is of those who joined before today;
+- `screens`, `events` — the window's totals, most first;
+- `devices` — every player's phones seen in the last 7 days: app versions,
+  systems (by major version) and models, each with its share per-mille;
+- `storage` — each layer's rows, oldest and keep, and what was turned away
+  in the last 7 days.
+
+The API keeps the answer for a minute under one cache key per window. A
+`days` it does not know is `422` on `days`.
+
 ## Boards
 
 ### `GET /boards?board=&key=&season=` — viewer
@@ -264,7 +304,7 @@ subject { type, id, label }, reason, details, ip` — `ip` only for an owner.
   `player.unban`, `player.rename`, `player.sign_out`, `player.delete`,
   `run.approve`, `run.reject`, `admin.create`, `admin.update`,
   `admin.reset_password`, `system.migrate`, `system.optimize`,
-  `system.expire_runs`.
+  `system.expire_runs`, `system.analytics_prune`.
 - The log only grows (`AuditEntry` refuses updates and deletes) and outlives
   the player it names: the subject is an id and a label, not a foreign key.
 - Moderation from the command line and the ops route is recorded too:
@@ -296,10 +336,10 @@ subject { type, id, label }, reason, details, ip` — `ip` only for an owner.
   false: without the key the API answers every player 500 (`RequireAppKey`),
   while `/admin/*` and `/ops/*` stay open so the key can be put right and the
   cache rebuilt.
-- `POST /system/migrate | optimize | expire-runs` → `{ "output" }`: the same
-  chores as `/ops/migrate`, `/ops/optimize` and `quezby:runs:expire`
-  (`OpsChores`). A failure is `500 server_error` with what failed; both are
-  recorded with the output.
+- `POST /system/migrate | optimize | expire-runs | analytics-prune` →
+  `{ "output" }`: the same chores as `/ops/migrate`, `/ops/optimize`,
+  `quezby:runs:expire` and `quezby:analytics:prune` (`OpsChores`). A failure
+  is `500 server_error` with what failed; both are recorded with the output.
 
 ## The first owner
 

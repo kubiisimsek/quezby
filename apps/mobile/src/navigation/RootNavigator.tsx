@@ -1,11 +1,14 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useEffect } from 'react';
 import { ActivityIndicator, Linking, StatusBar, StyleSheet } from 'react-native';
 
+import { track, trackScreen } from '@/analytics/track';
 import { useSession } from '@/auth/session';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import { useAppStatus } from '@/hooks/useAppStatus';
+import { useConsentSync } from '@/hooks/useConsentSync';
 import { useDeviceCheck } from '@/hooks/useDeviceCheck';
 import { useMe } from '@/hooks/useMe';
 import { usePendingRunSender } from '@/hooks/usePendingRunSender';
@@ -34,6 +37,11 @@ import { SPACE, useTheme } from '@/ui/theme';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tabs = createBottomTabNavigator<TabParamList>();
+
+/** The screen on show, for the visit's journey. */
+const navigationRef = createNavigationContainerRef<RootStackParamList>();
+
+const onScreen = () => trackScreen(navigationRef.getCurrentRoute()?.name);
 
 function TabsShell() {
   return (
@@ -71,6 +79,8 @@ export function RootNavigator() {
   const me = useMe();
   usePendingRunSender();
   useDeviceCheck();
+  useConsentSync();
+  useAnalytics();
 
   useEffect(() => {
     void useSession.getState().hydrate();
@@ -86,6 +96,12 @@ export function RootNavigator() {
     meFailed: me.isError,
     onboarding: { userId: onboardingUser, step: onboardingStep },
   });
+
+  // The two screens outside the navigator, counted as moments of the visit.
+  useEffect(() => {
+    if (gate === 'offline') track('offline_gate');
+    if (gate === 'update') track('update_gate');
+  }, [gate]);
 
   if (status?.status === 'update_required') {
     return (
@@ -118,7 +134,7 @@ export function RootNavigator() {
   }
 
   return (
-    <NavigationContainer theme={navTheme}>
+    <NavigationContainer ref={navigationRef} theme={navTheme} onReady={onScreen} onStateChange={onScreen}>
       <Stack.Navigator screenOptions={stackOptions}>
         {gate === 'welcome' ? (
           <>

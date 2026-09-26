@@ -10,6 +10,9 @@ export default defineConfig({
     environment: 'jsdom',
     include: ['src/**/*.test.{ts,tsx}', 'deploy/**/*.test.ts'],
     setupFiles: ['./src/test/setup.ts'],
+    // A page's first test pays for its lazy chunk; beside the app's Jest in
+    // `pnpm test` that can take longer than the default five seconds.
+    testTimeout: 15_000,
     server: {
       deps: {
         // The workspace packages are linked builds, not published deps: let

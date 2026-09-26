@@ -1,8 +1,11 @@
 <?php
 
+use App\Enums\ActivityStatus;
 use App\Enums\AdminRole;
 use App\Enums\AuditAction;
 use App\Enums\AuditVia;
+use App\Enums\FunnelStep;
+use App\Enums\PlayerMilestone;
 
 /*
 | The admin contract's closed lists are one list on each side: the PHP enums
@@ -42,4 +45,16 @@ it('names the same audit actions', function () {
 
 it('names the same audit channels', function () {
     expect(adminContractUnion('AdminAuditVia'))->not->toBeEmpty()->toBe(adminContractCases(AuditVia::class));
+});
+
+it('names the same first steps', function () {
+    expect(adminContractUnion('AdminFunnelStep'))->not->toBeEmpty()->toBe(adminContractCases(FunnelStep::class));
+});
+
+it('names the same firsts', function () {
+    expect(adminContractUnion('AdminMilestone'))->not->toBeEmpty()->toBe(adminContractCases(PlayerMilestone::class));
+});
+
+it('names the same activity states', function () {
+    expect(adminContractUnion('AdminActivityStatus'))->not->toBeEmpty()->toBe(adminContractCases(ActivityStatus::class));
 });

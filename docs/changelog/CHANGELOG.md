@@ -1,5 +1,56 @@
 # Changelog
 
+## 2026-09-26 — Usage analytics with consent, and the device registry
+
+- **Analytics, self-hosted, without the bloat** (`docs/product/analytics.md`).
+  The phone sums each visit up — how long the app was in front, the screens
+  in order (40 steps at most) and a closed catalog of moments (shares, "Geç
+  onu", the practice run's end, skipping the name or the protection, offline
+  and unsent runs) — and sends it in **one request as the app goes to the
+  background**, never a request per tap. `POST /analytics/visits` (≤ 10 a
+  request, idempotent by the phone's visit id, clock skew corrected from
+  `sentAt`, stale or unknown codes counted and dropped, 50 visits a player a
+  day, 12 requests a minute) answers `{ record }`; `false` stops the app for a
+  day. The API keeps three layers that stop growing: visits with journeys (30
+  days), one row per player and active day (90 days), anonymous daily totals
+  (for good, a few dozen rows a day) — plus a player's firsts. Counters move as
+  things happen, so no job adds them up later; pruning runs by itself after a
+  response at most once an hour (`defer`, one cache key), with
+  `quezby:analytics:prune` and the panel's **Sistem → Analitiği temizle**
+  (audited `system.analytics_prune`). No cron needed, no transaction around a
+  batch (MySQL's `INSERT IGNORE` would deadlock two), and no cache file per
+  player and day: "seen today" rides on Sanctum's previous `last_used_at`.
+  Valves: `QUEZBY_ANALYTICS_ENABLED`, `QUEZBY_ANALYTICS_SAMPLE`.
+- **Consent first** (`settings.analytics`, `users.analytics_at`): the welcome
+  asks once — "Oyunu birlikte geliştirelim mi?", **İzin ver / İzin verme**
+  (`ConsentCard`) — before anything is counted; a phone from before it is
+  asked once in the lobby, and the league reminder waits for the answer.
+  Ayarlar has **Kullanım verisi**; a no deletes the player's visits, days and
+  firsts. Signing out forgets the answer on the phone. Yardım says what is
+  collected. The settings store no longer resets a setting it was not given.
+- **Device registry, for every player** (`player_devices`): every call names
+  the phone (`X-Device`: install, platform, system, model, build — no IP); a
+  token's first request of the day writes it. Ten phones a player at most,
+  180 days unseen and it goes. The panel's player page lists the phones and
+  the other accounts seen on each.
+- **Panel:** new **Analitik** page — online now, active today / 7 / 30 days,
+  stickiness, active players (returning and new), visits, minutes, weekly
+  retention (day 1/3/7/14/30), the newcomers' first steps, screens, moments,
+  phones by version, system and model, and what each layer holds. The player
+  page gets an **Etkinlik** tab (30-day strip, latest visits with journeys,
+  firsts), the phones on **Cihazlar**, and the consent under Hesap. New kit
+  pieces: `RetentionTable`, `FunnelList`, `ActivityStrip`, `Journey`.
+- **Contract:** `AnalyticsScreen`, `AnalyticsEvent`, `AnalyticsVisit(s…)`,
+  `UserSettings.analytics`; admin `AdminAnalytics`, `AdminPlayerActivity`,
+  `AdminPlayerDevice`, `AdminPlayerDetail.analyticsAt`,
+  `AdminPlayerResponse.installs`, `system.analytics_prune`, `analytics-prune`;
+  SDK `analytics.send`, `deviceHeader`, admin `analytics.get`,
+  `players.activity`. `@quezby/config` holds the catalog and its limits
+  (`fixtures/analytics.json`, held to the API's enums).
+- iOS privacy manifest declares Product Interaction, Device ID and diagnostics;
+  `apps/mobile/store/README.md` lists what the store labels must say.
+  `AnalyticsDemoSeeder` fills the local panel (DemoSeeder calls it).
+
 ## 2026-09-26 — Staging fixes: APP_KEY, permanent names, verdict colours
 
 - **Staging went out without `APP_KEY`** (and with `APP_ENV=local`), which

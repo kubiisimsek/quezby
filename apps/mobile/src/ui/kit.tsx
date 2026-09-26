@@ -50,5 +50,6 @@ export { ClimbRow, FloorCard } from '@/ui/kit/climb';
 export { BONUS_LABELS, BonusChip, ShareGrid } from '@/ui/kit/result';
 export { LobbyCard, PlayButton, RankChips } from '@/ui/kit/lobby';
 export { CoachCard, type CoachGesture } from '@/ui/kit/coach';
+export { ConsentCard } from '@/ui/kit/consent';
 export { Confetti, CountUp, Stamp, useShake } from '@/ui/kit/juice';
 export { SPRING_POP, stagger } from '@/ui/motion';

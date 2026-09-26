@@ -1,12 +1,17 @@
 import type {
+  AdminActivityStatus,
   AdminAuditAction,
   AdminAuditVia,
   AdminDeviceVerdict,
+  AdminFunnelStep,
   AdminGesture,
+  AdminMilestone,
   AdminPostKind,
   AdminRole,
   AdminRunStatus,
   AdminVerdict,
+  AnalyticsEvent,
+  AnalyticsScreen,
   LeaderboardBoard,
   LeagueOutcome,
   LeagueTier,
@@ -236,6 +241,7 @@ export const AUDIT_ACTION: Record<AdminAuditAction, Label> = {
   'system.migrate': { tone: 'primary', label: 'Migration çalıştırdı' },
   'system.optimize': { tone: 'primary', label: 'Önbelleği yeniledi' },
   'system.expire_runs': { tone: 'primary', label: 'Yarım turları kapattı' },
+  'system.analytics_prune': { tone: 'primary', label: 'Analitiği temizledi' },
 };
 
 export const AUDIT_VIA: Record<AdminAuditVia, string> = {
@@ -321,4 +327,79 @@ export const END_REASON: Record<'drained' | 'penalty' | 'quit', string> = {
   drained: 'Dopamin bitti',
   penalty: 'Cezayla bitti',
   quit: 'Oyuncu çıktı',
+};
+
+/* ------------------------------------------------------------ analytics -- */
+
+/** The screens a visit goes through, by the game's own names for them. */
+export const ANALYTICS_SCREEN: Record<AnalyticsScreen, string> = {
+  welcome: 'Karşılama',
+  login: 'Giriş',
+  tutorial: 'Deneme turu',
+  username: 'Ad seçimi',
+  protect: 'Hesabı koru',
+  home: 'Lobi',
+  leaderboard: 'Zirve',
+  league: 'Lig',
+  search: 'Arkadaşlar',
+  profile: 'Profil',
+  game: 'Oyun',
+  help: 'Yardım',
+  daily: 'Günün akışı',
+};
+
+/** The moments a visit counts. Only a failure is bad news. */
+export const ANALYTICS_EVENT: Record<AnalyticsEvent, Label> = {
+  share_result: { tone: 'ok', label: 'Turu paylaştı' },
+  share_daily: { tone: 'ok', label: 'Günün akışını paylaştı' },
+  rival: { tone: 'secondary', label: 'Geç onu' },
+  player_card: { tone: 'secondary', label: 'Oyuncu kartına baktı' },
+  offline_run: { tone: 'warn', label: 'Çevrimdışı tur' },
+  outdated_run: { tone: 'warn', label: 'Eski sürümle tur' },
+  unsent_run: { tone: 'bad', label: 'Gönderilemeyen tur' },
+  offline_gate: { tone: 'bad', label: '“Bağlanamadık” ekranı' },
+  update_gate: { tone: 'warn', label: '“Güncelleme gerekli” ekranı' },
+  tutorial_done: { tone: 'ok', label: 'Deneme turunu bitirdi' },
+  nickname_skip: { tone: 'neutral', label: 'Ad seçmeyi geçti' },
+  protect_skip: { tone: 'neutral', label: 'Hesap korumayı geçti' },
+  protect_reminder: { tone: 'neutral', label: 'Koruma hatırlatmasını gördü' },
+};
+
+/** A new player's first steps, in the order they usually come. */
+export const FUNNEL_STEP: Record<AdminFunnelStep, { label: string; hint: string }> = {
+  joined: { label: 'Katıldı', hint: 'İlk gününde izin verip oyunu açanlar' },
+  tutorial: { label: 'Deneme turunu bitirdi', hint: 'Koçlu ilk tur' },
+  named: { label: 'Adını seçti', hint: 'Otomatik adda kalmadı' },
+  protected: { label: 'Hesabını korudu', hint: 'Apple, Google ya da e-posta' },
+  first_run: { label: 'İlk sayılan tur', hint: 'Sıralamaya giren, puan alan' },
+  league: { label: 'Lige girdi', hint: 'Bir gruba oturdu' },
+  returned: { label: 'Ertesi gün döndü', hint: 'Dünden önce katılanlardan' },
+};
+
+/** A first in a player's life. */
+export const MILESTONE: Record<AdminMilestone, string> = {
+  joined: 'Hesap açıldı',
+  tutorial_done: 'Deneme turunu bitirdi',
+  nickname_skip: 'Ad seçmeyi geçti',
+  protect_skip: 'Hesap korumayı geçti',
+  protect_reminder: 'Koruma hatırlatmasını gördü',
+  protected: 'Hesabını korudu',
+  first_run: 'İlk sayılan tur',
+  league: 'Lige girdi',
+};
+
+/** Whether a player's activity is kept, and why not. */
+export const ACTIVITY_STATUS: Record<AdminActivityStatus, Label & { hint: string }> = {
+  tracked: { tone: 'ok', label: 'Kullanım verisi açık', hint: 'Oyuncu izin verdi; ziyaretleri 30 gün, günleri 90 gün tutulur.' },
+  no_consent: {
+    tone: 'neutral',
+    label: 'İzin vermedi',
+    hint: 'Oyuncu kullanım verisine izin vermedi: ziyareti ya da günü tutulmaz. Cihaz kaydı ve oyun verisi durur.',
+  },
+  not_sampled: {
+    tone: 'warn',
+    label: 'Örneklem dışında',
+    hint: 'Analitik şu an izin verenlerin bir kısmı için tutuluyor (QUEZBY_ANALYTICS_SAMPLE); bu oyuncu dışarıda.',
+  },
+  disabled: { tone: 'bad', label: 'Analitik kapalı', hint: 'QUEZBY_ANALYTICS_ENABLED kapalı: şu an kimsenin kullanım verisi tutulmuyor.' },
 };

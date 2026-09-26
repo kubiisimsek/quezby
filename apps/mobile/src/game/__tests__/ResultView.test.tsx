@@ -3,9 +3,12 @@ import { act, fireEvent, screen } from '@testing-library/react-native';
 import { Share } from 'react-native';
 import { useReducedMotion } from 'react-native-reanimated';
 
+import { track } from '@/analytics/track';
 import { ResultView } from '@/game/ResultView';
 import type { Outcome } from '@/game/useGame';
 import { renderWithProviders } from '@/test/renderWithProviders';
+
+jest.mock('@/analytics/track', () => ({ track: jest.fn() }));
 
 function response(
   overrides: Partial<FinishRunResponse> = {},
@@ -183,6 +186,18 @@ describe('ResultView', () => {
       message:
         "Quezby'de 104.560 puan yaptım! 245 post · bugün #12. Sen kaç yaparsın?",
     });
+    expect(track).toHaveBeenCalledWith('share_result');
+  });
+
+  it('counts a shared daily result as the daily\'s', async () => {
+    jest.spyOn(Share, 'share').mockResolvedValue({ action: 'sharedAction' });
+    const daily = response();
+    daily.run.mode = 'daily';
+    await view({ mode: 'verified', response: daily }).render();
+
+    await fireEvent.press(screen.getByText('Paylaş'));
+
+    expect(track).toHaveBeenCalledWith('share_daily');
   });
 
   it('plays again from the gold button, or goes home', async () => {

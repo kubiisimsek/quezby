@@ -100,6 +100,10 @@ installs on a phone, Google Play refuses it. Making the key:
 
 ## The API
 
+Usage analytics and the device registry (`QUEZBY_ANALYTICS_*`,
+`QUEZBY_DEVICE_DAYS`) have the same defaults in every environment — what they
+do and when to turn them: `docs/product/analytics.md`.
+
 `apps/api/.env.example` is local development (SQLite, debug on).
 `.env.staging.example` and `.env.production.example` are the hosting
 templates (MySQL, debug off); the API refuses to boot with `APP_DEBUG=true`

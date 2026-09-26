@@ -120,3 +120,21 @@ yazmak zarar vermez.
 - **Tanıtım metni (Promotional Text)** yeni sürüm gerektirmeden değişir:
   sezon ya da hafta sonu etkinliği duyurusu için kullan. Ad, alt başlık ve
   anahtar kelimeler yalnızca yeni bir sürümle değişir.
+
+## Gizlilik etiketleri (analitik)
+
+Uygulama, izin veren oyuncular için kullanım verisi, herkes için cihaz kaydı
+tutar (`docs/product/analytics.md`). Mağaza beyanları buna uymalı:
+
+- **App Store → App Privacy:** *Usage Data → Product Interaction* (Analytics;
+  kullanıcıya bağlı; izleme için değil), *Identifiers → Device ID* ve
+  *Diagnostics → Other Diagnostic Data* (App Functionality; kullanıcıya
+  bağlı). Önceden beyan edilen e-posta ve kullanıcı kimliği de kalır.
+  `ios/Quezby/PrivacyInfo.xcprivacy` aynı türleri beyan eder.
+- **Google Play → Veri güvenliği:** *Uygulama etkinliği → Uygulama
+  etkileşimleri* (toplanır, isteğe bağlı, analitik) ve *Cihaz veya diğer
+  kimlikler* (toplanır, zorunlu, uygulama işlevi ve güvenlik). Veriler
+  aktarılırken şifrelenir; kullanıcı silinmesini isteyebilir (Hesabı sil).
+- App Tracking Transparency gerekmez: veri başka şirketlerle birleştirilmez,
+  reklam için kullanılmaz.
+

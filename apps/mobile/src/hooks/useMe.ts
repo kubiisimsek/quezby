@@ -16,7 +16,8 @@ let appliedAt = 0;
  * Who the API says the player is. The session mirrors the answer so every
  * screen reads one `user`, and the account's settings win over the phone's —
  * but only for an answer newer than the last one applied: a screen mounting
- * later must not copy an old cached answer over a fresher session.
+ * later must not copy an old cached answer over a fresher session — and never
+ * over an answer to usage analytics still on its way (`fromAccount`).
  */
 export function useMe() {
   const token = useSession((state) => state.token);
@@ -31,7 +32,7 @@ export function useMe() {
     if (!query.data || query.dataUpdatedAt <= appliedAt) return;
     appliedAt = query.dataUpdatedAt;
     useSession.getState().setMe(query.data.user, query.data.ranks);
-    useSettings.getState().apply(query.data.user.settings);
+    useSettings.getState().fromAccount(query.data.user.settings);
   }, [query.data, query.dataUpdatedAt]);
 
   return query;

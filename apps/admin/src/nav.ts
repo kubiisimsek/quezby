@@ -1,6 +1,7 @@
 import type { AdminRole } from '@quezby/types';
 import {
   CalendarDays,
+  ChartLine,
   Gamepad2,
   GalleryVerticalEnd,
   LayoutDashboard,
@@ -34,6 +35,7 @@ export type NavItem = {
 /** The panel's one menu. Nothing here links to a page its admin cannot open. */
 export const NAV: NavItem[] = [
   { href: '/', label: 'Genel bakış', icon: LayoutDashboard, section: 'Genel' },
+  { href: '/analytics', label: 'Analitik', icon: ChartLine, section: 'Genel' },
   { href: '/players', label: 'Oyuncular', icon: Users, section: 'Oyuncular' },
   { href: '/suspects', label: 'Şüpheliler', icon: ShieldAlert, section: 'Oyuncular', badge: 'review' },
   { href: '/runs', label: 'Turlar', icon: Gamepad2, section: 'Oyuncular' },

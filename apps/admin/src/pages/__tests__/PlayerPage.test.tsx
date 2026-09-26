@@ -2,7 +2,7 @@ import { ApiError } from '@quezby/sdk/admin';
 import { screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { adminSession, playerResponse, playersPage } from '@/test/factories';
+import { adminSession, playerActivity, playerResponse, playersPage } from '@/test/factories';
 import { fakeApi } from '@/test/fake-api';
 import { renderApp } from '@/test/render';
 
@@ -135,4 +135,52 @@ describe('PlayerPage', () => {
 
     expect(await screen.findByText('Böyle bir oyuncu yok')).toBeInTheDocument();
   });
+
+  it('says in the account whether the player said yes to usage analytics', async () => {
+    renderApp({ path: `/players/${ID}`, api: withPlayer() });
+
+    expect((await screen.findByText('Kullanım verisi', { selector: 'dt' })).parentElement).toHaveTextContent('İzinli · 20 Eyl 2026');
+  });
+
+  it('shows the player\'s days, visits and firsts on its own tab, asked for only then', async () => {
+    const api = withPlayer();
+    api.players.activity.mockResolvedValue(playerActivity());
+    const { user } = renderApp({ path: `/players/${ID}`, api });
+
+    await screen.findByRole('heading', { name: '@kerem.35' });
+    expect(api.players.activity).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('tab', { name: /Etkinlik/ }));
+
+    expect(await screen.findByRole('list', { name: 'Son 30 günün etkinliği' })).toBeInTheDocument();
+    expect(api.players.activity).toHaveBeenCalledWith(ID);
+    expect(screen.getByText('Aktif gün', { selector: 'dt' }).parentElement).toHaveTextContent('3 / 30');
+    expect(screen.getByText('Ortalama ziyaret', { selector: 'dt' }).parentElement).toHaveTextContent('6 dk 15 sn');
+    expect(screen.getByText('Son ziyaretler')).toBeInTheDocument();
+    expect(within(screen.getByRole('list', { name: 'Yolculuk' })).getByText('Turu paylaştı')).toBeInTheDocument();
+    expect(screen.getByText('Yolculuk yok')).toBeInTheDocument();
+    expect(screen.getByText('Deneme turunu bitirdi', { selector: 'dt' })).toBeInTheDocument();
+  });
+
+  it('says why a player\'s activity is not kept', async () => {
+    const api = withPlayer();
+    api.players.activity.mockResolvedValue(playerActivity({ status: 'no_consent', consentAt: null, visits: [] }));
+    const { user } = renderApp({ path: `/players/${ID}`, api });
+
+    await user.click(await screen.findByRole('tab', { name: /Etkinlik/ }));
+
+    expect(await screen.findByText('İzin vermedi')).toBeInTheDocument();
+    expect(screen.getByText('Bu oyuncunun ziyareti tutulmuyor.')).toBeInTheDocument();
+  });
+
+  it('lists the phones the player used, with the other accounts seen on them', async () => {
+    const { user } = renderApp({ path: `/players/${ID}`, api: withPlayer() });
+
+    await user.click(await screen.findByRole('tab', { name: /Cihazlar/ }));
+
+    expect(await screen.findByText('Cihaz kaydı')).toBeInTheDocument();
+    expect(screen.getByText('iPhone 15 Pro')).toBeInTheDocument();
+    expect(screen.getByText('1.0.0 (42)')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: '@kerem.yedek' })).toHaveAttribute('href', '/players/01jplayer00000000000000000b');
+  });
 });
+

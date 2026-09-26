@@ -11,8 +11,9 @@ import { REEL_GUIDE, REEL_ORDER } from '@/game/howTo';
 import { messageFor } from '@/lib/errors';
 import type { RootStackParamList } from '@/navigation/types';
 import { useOnboarding } from '@/stores/onboarding';
+import { useSettings } from '@/stores/settings';
 import { BrandMark } from '@/ui/brand-mark';
-import { Button, Callout, IconChip, Screen, Stamp, Txt } from '@/ui/kit';
+import { Button, Callout, ConsentCard, IconChip, Screen, Stamp, Txt } from '@/ui/kit';
 import { useEntrance } from '@/ui/motion';
 import { SPACE, useTheme } from '@/ui/theme';
 
@@ -23,13 +24,15 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Welcome'>;
  * **Oyna** opens a guest account and goes straight into a practice run that
  * teaches the moves and counts nowhere. A name and a way to keep the account
  * come after it, and both can wait. A player who already has an account
- * signs in instead.
+ * signs in instead. Before either, once: whether the game may count how it
+ * is used — nothing is counted before the answer.
  */
 export function WelcomeScreen({ navigation }: Props) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const asking = useSettings((state) => !state.hydrated || state.consent === 'unasked');
   const hero = useEntrance(0, 24);
   const moves = useEntrance(1);
   const actions = useEntrance(2);
@@ -94,21 +97,27 @@ export function WelcomeScreen({ navigation }: Props) {
         </Animated.View>
 
         <Animated.View style={[styles.actions, actions]}>
-          {error ? <Callout tone="bad">{error}</Callout> : null}
-          <Button
-            label="Oyna"
-            icon="play"
-            tone="play"
-            size="xl"
-            onPress={() => void play()}
-            loading={pending}
-          />
-          <Button
-            label="Hesabım var, giriş yap"
-            tone="secondary"
-            onPress={() => navigation.navigate('Login')}
-            disabled={pending}
-          />
+          {asking ? (
+            <ConsentCard onAnswer={(yes) => useSettings.getState().answer(yes)} />
+          ) : (
+            <>
+              {error ? <Callout tone="bad">{error}</Callout> : null}
+              <Button
+                label="Oyna"
+                icon="play"
+                tone="play"
+                size="xl"
+                onPress={() => void play()}
+                loading={pending}
+              />
+              <Button
+                label="Hesabım var, giriş yap"
+                tone="secondary"
+                onPress={() => navigation.navigate('Login')}
+                disabled={pending}
+              />
+            </>
+          )}
         </Animated.View>
       </ScrollView>
     </Screen>

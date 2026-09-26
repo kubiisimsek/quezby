@@ -8,6 +8,7 @@
 return [
     'array' => ':Attribute bir liste olmalı.',
     'boolean' => ':Attribute true ya da false olmalı.',
+    'date' => ':Attribute geçerli bir tarih olmalı.',
     'date_format' => ':Attribute :format biçiminde olmalı.',
     'different' => ':Attribute ile :other farklı olmalı.',
     'email' => ':Attribute geçerli bir e-posta adresi olmalı.',
@@ -30,12 +31,16 @@ return [
     'required' => ':Attribute gerekli.',
     'required_if' => ':Attribute gerekli.',
     'same' => ':Attribute ile :other aynı olmalı.',
+    'size' => [
+        'array' => ':Attribute :size öge içermeli.',
+    ],
     'string' => ':Attribute bir metin olmalı.',
     'ulid' => ':Attribute geçersiz.',
     'unique' => 'Bu :attribute zaten kullanılıyor.',
 
     'attributes' => [
         'actions' => 'hamle kaydı',
+        'analytics' => 'kullanım verisi izni',
         'clientReels' => 'reel sayısı',
         'clientScore' => 'skor',
         'email' => 'e-posta',
@@ -44,8 +49,10 @@ return [
         'limit' => 'limit',
         'password' => 'şifre',
         'platform' => 'platform',
+        'sentAt' => 'gönderim anı',
         'username' => 'kullanıcı adı',
         'version' => 'sürüm',
+        'visits' => 'ziyaretler',
 
         // The admin panel.
         'action' => 'eylem',

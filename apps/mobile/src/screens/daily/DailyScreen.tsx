@@ -19,6 +19,7 @@ import {
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { track } from '@/analytics/track';
 import { BoardStage, PlayersPill, useArrival } from '@/components/BoardStage';
 import { FriendsEmpty } from '@/components/FriendsEmpty';
 import { PlayerSheet } from '@/components/PlayerSheet';
@@ -105,6 +106,7 @@ export function DailyScreen({ navigation }: Props) {
     [],
   );
   const share = useCallback((message: string) => {
+    track('share_daily');
     Share.share({ message }).catch(() => undefined);
   }, []);
   const newDay = useCallback(() => {

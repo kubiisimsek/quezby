@@ -9,10 +9,13 @@ import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import type { ComponentProps } from 'react';
 import { Share } from 'react-native';
 
+import { track } from '@/analytics/track';
 import { api } from '@/api/client';
 import { DailyScreen } from '@/screens/daily/DailyScreen';
 import { buildEntries } from '@/test/factories';
 import { renderWithProviders } from '@/test/renderWithProviders';
+
+jest.mock('@/analytics/track', () => ({ track: jest.fn() }));
 
 jest.mock('@/api/client', () => ({
   api: {
@@ -174,6 +177,7 @@ describe('DailyScreen — Günün akışı', () => {
 
     await fireEvent.press(screen.getByRole('button', { name: 'Paylaş' }));
     expect(share).toHaveBeenCalledWith({ message: SHARE_TEXT });
+    expect(track).toHaveBeenCalledWith('share_daily');
   });
 
   it.each([

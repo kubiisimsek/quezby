@@ -317,4 +317,67 @@ return [
         'max_per_page' => 100,
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Usage analytics and the device registry
+    |--------------------------------------------------------------------------
+    |
+    | `docs/product/analytics.md`. Analytics is kept only for players who said
+    | yes (`users.analytics_at`), in layers that stop growing: visits with
+    | their screen journeys, one row per player and active day, and anonymous
+    | daily totals kept for good. The device registry is kept for every
+    | player, consent or not: one row per phone, no IP.
+    |
+    */
+
+    'analytics' => [
+        // The kill switch: off, nothing is kept and the app is told to keep
+        // nothing for a day.
+        'enabled' => (bool) env('QUEZBY_ANALYTICS_ENABLED', true),
+
+        // Of every 1000 consenting players, how many are kept — the valve for
+        // a flood. The same players stay in, by a hash of their id.
+        'sample' => max(0, min(1000, (int) env('QUEZBY_ANALYTICS_SAMPLE', 1000))),
+
+        // How long visits (with their journeys) stay — never under 8 days: the
+        // app may send a visit up to 7 days late, and a visit forgotten
+        // sooner could be taken twice.
+        'keep_visits_days' => max(8, (int) env('QUEZBY_ANALYTICS_VISIT_DAYS', 30)),
+
+        // How long a player's active days stay: the last 7 and 30 days, a
+        // player's 30-day strip and the day-1 step of the funnel read them.
+        'keep_days_days' => max(62, (int) env('QUEZBY_ANALYTICS_DAY_DAYS', 90)),
+
+        // Visits kept per player and Istanbul day; any more are turned away.
+        'visits_per_day' => 50,
+
+        // Retention counts come back this many days after a player joined.
+        'max_age' => 60,
+
+        // Pruning runs after a response at most this often, in rows at a time.
+        'upkeep_every_minutes' => 60,
+        'upkeep_chunk' => 500,
+
+        // Players whose app talked to the API this recently are "online".
+        'online_minutes' => 5,
+
+        // The twin of `@quezby/config`'s ANALYTICS, checked against
+        // `packages/config/fixtures/analytics.json`.
+        'limits' => [
+            'visits_per_batch' => 10,
+            'journey_steps' => 40,
+            'max_count' => 999,
+            'max_age_days' => 7,
+            'max_visit_seconds' => 14400,
+        ],
+    ],
+
+    'devices' => [
+        // A phone not seen for this many days leaves the registry.
+        'keep_days' => max(30, (int) env('QUEZBY_DEVICE_DAYS', 180)),
+
+        // The most phones kept per player; a new one pushes out the longest unseen.
+        'per_player' => 10,
+    ],
+
 ];

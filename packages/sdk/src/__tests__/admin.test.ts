@@ -65,6 +65,7 @@ const CALLS: Call[] = [
     body: { reason: 'Küfürlü ad' },
     auth: true,
   },
+  { name: 'players.activity', call: (api) => api.players.activity(PLAYER), method: 'GET', url: `/players/${PLAYER}/activity`, auth: true },
   { name: 'players.signOut', call: (api) => api.players.signOut(PLAYER), method: 'POST', url: `/players/${PLAYER}/sign-out`, auth: true },
   {
     name: 'players.remove',
@@ -121,6 +122,8 @@ const CALLS: Call[] = [
     auth: true,
   },
   { name: 'leagues.group', call: (api) => api.leagues.group(12), method: 'GET', url: '/leagues/groups/12', auth: true },
+  { name: 'analytics.get with defaults', call: (api) => api.analytics.get(), method: 'GET', url: '/analytics', auth: true },
+  { name: 'analytics.get for 90 days', call: (api) => api.analytics.get({ days: 90 }), method: 'GET', url: '/analytics?days=90', auth: true },
   {
     name: 'content.list',
     call: (api) => api.content.list({ kind: 'like', sort: 'missRate' }),
@@ -161,6 +164,13 @@ const CALLS: Call[] = [
   },
   { name: 'system.get', call: (api) => api.system.get(), method: 'GET', url: '/system', auth: true },
   { name: 'system.run', call: (api) => api.system.run('expire-runs'), method: 'POST', url: '/system/expire-runs', auth: true },
+  {
+    name: 'system.run prunes analytics',
+    call: (api) => api.system.run('analytics-prune'),
+    method: 'POST',
+    url: '/system/analytics-prune',
+    auth: true,
+  },
 ];
 
 function respond(status: number, body?: unknown) {
@@ -186,6 +196,7 @@ describe('createAdminClient', () => {
     if (auth) expect(init.headers).toMatchObject({ Authorization: 'Bearer tok' });
     else expect(init.headers).not.toHaveProperty('Authorization');
     expect(init.headers).not.toHaveProperty('X-App-Version');
+    expect(init.headers).not.toHaveProperty('X-Device');
   });
 
   it('calls the dev proxy on the same origin when the base URL is empty', async () => {

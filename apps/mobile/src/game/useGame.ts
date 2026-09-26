@@ -25,6 +25,7 @@ import {
   withTiming,
 } from 'react-native-reanimated';
 
+import { track } from '@/analytics/track';
 import { api } from '@/api/client';
 import { useSession } from '@/auth/session';
 import { rememberMe } from '@/hooks/useMe';
@@ -227,6 +228,7 @@ export function useGame(mode: RunMode = 'free') {
       } else {
         usePendingRun.getState().clear();
       }
+      track('unsent_run');
       setOutcome({ mode: 'unsent', message: messageFor(error), canRetry });
     }
     setPhase('result');
@@ -683,6 +685,7 @@ export function useGame(mode: RunMode = 'free') {
       setPhase('starting');
       setPractice(practiceReason);
       if (practiceReason) {
+        if (practiceReason === 'offline') track('offline_run');
         begin(localSeed(), null);
         return;
       }
@@ -699,6 +702,7 @@ export function useGame(mode: RunMode = 'free') {
         if (error instanceof ApiError && error.code === 'engine_outdated') {
           practiceRef.current = 'outdated';
           setPractice('outdated');
+          track('outdated_run');
           begin(localSeed(), null);
           return;
         }

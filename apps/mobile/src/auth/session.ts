@@ -3,6 +3,7 @@ import * as Keychain from 'react-native-keychain';
 import { create } from 'zustand';
 
 import { queryClient } from '@/api/queryClient';
+import { useSettings } from '@/stores/settings';
 import type { Me, Ranks } from '@quezby/types';
 
 const TOKEN_SERVICE = 'quezby.auth';
@@ -34,14 +35,12 @@ export const useSession = create<SessionState>((set, get) => ({
 
   hydrate: async () => {
     if (get().hydrated) return;
-    let token: string | null = null;
-    try {
-      const stored = await Keychain.getGenericPassword({ service: TOKEN_SERVICE });
-      token = stored ? stored.password : null;
-    } catch {
-      token = null;
-    }
-    set({ token, hydrated: true });
+    // The install id is read with the token, so the first signed-in call already names the phone (`X-Device`).
+    const [stored] = await Promise.all([
+      Keychain.getGenericPassword({ service: TOKEN_SERVICE }).catch(() => false as const),
+      installId().catch(() => null),
+    ]);
+    set({ token: stored ? stored.password : null, hydrated: true });
   },
 
   signIn: async (token, user) => {
@@ -58,21 +57,37 @@ export const useSession = create<SessionState>((set, get) => ({
   signOut: async () => {
     set({ token: null, user: null, ranks: null });
     queryClient.clear();
+    // Whoever uses this phone next answers for themselves.
+    useSettings.getState().forgetConsent();
     await Keychain.resetGenericPassword({ service: TOKEN_SERVICE }).catch(
       () => undefined,
     );
   },
 }));
 
-/** A random id for this install, minted once. Rate limiting only. */
+let knownInstall: string | null = null;
+
+/**
+ * A random id for this install, minted once: rate limiting, and the phone's
+ * row in the API's device registry (`X-Device`).
+ */
 export async function installId(): Promise<string> {
   const existing = await AsyncStorage.getItem(INSTALL_KEY);
-  if (existing) return existing;
+  if (existing) {
+    knownInstall = existing;
+    return existing;
+  }
   const fresh = Array.from({ length: 4 }, () =>
     Math.floor(Math.random() * 0x100000000)
       .toString(16)
       .padStart(8, '0'),
   ).join('');
   await AsyncStorage.setItem(INSTALL_KEY, fresh);
+  knownInstall = fresh;
   return fresh;
+}
+
+/** This install's id once `installId()` has read it; null before. */
+export function currentInstallId(): string | null {
+  return knownInstall;
 }

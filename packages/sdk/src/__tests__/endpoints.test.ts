@@ -113,6 +113,49 @@ const CALLS: Call[] = [
     auth: true,
   },
   { name: 'daily.get', call: (api) => api.daily.get(), method: 'GET', url: '/daily', auth: true },
+  {
+    name: 'analytics.send',
+    call: (api) =>
+      api.analytics.send({
+        sentAt: '2026-09-26T10:00:00.000Z',
+        platform: 'ios',
+        visits: [
+          {
+            id: 'ab'.repeat(16),
+            startedAt: '2026-09-26T09:55:00.000Z',
+            seconds: 240,
+            appVersion: '1.0.0',
+            journey: [
+              ['home', 0],
+              ['game', 12],
+              ['share_result', 230],
+            ],
+            counts: { home: 1, game: 1, share_result: 1 },
+          },
+        ],
+      }),
+    method: 'POST',
+    url: '/analytics/visits',
+    body: {
+      sentAt: '2026-09-26T10:00:00.000Z',
+      platform: 'ios',
+      visits: [
+        {
+          id: 'ab'.repeat(16),
+          startedAt: '2026-09-26T09:55:00.000Z',
+          seconds: 240,
+          appVersion: '1.0.0',
+          journey: [
+            ['home', 0],
+            ['game', 12],
+            ['share_result', 230],
+          ],
+          counts: { home: 1, game: 1, share_result: 1 },
+        },
+      ],
+    },
+    auth: true,
+  },
   { name: 'leagues.current', call: (api) => api.leagues.current(), method: 'GET', url: '/leagues/current', auth: true },
   { name: 'users.search', call: (api) => api.users.search('ku.b'), method: 'GET', url: '/users?search=ku.b', auth: true },
   { name: 'users.get', call: (api) => api.users.get('mert*34'), method: 'GET', url: '/users/mert*34', auth: true },

@@ -8,7 +8,7 @@ use Throwable;
 
 /**
  * The deploy chores a host without SSH cannot run by hand — migrations, the
- * caches, stale runs — for `POST /ops/*` and the admin panel's system page.
+ * caches, stale runs, old analytics — for `POST /ops/*` and the admin panel's system page.
  * A failure says which command failed and what it printed: only whoever holds
  * the ops token or the owner role ever sees it.
  */
@@ -38,6 +38,17 @@ final class OpsChores
     public function expireRuns(): string
     {
         return $this->run(['quezby:runs:expire' => []]);
+    }
+
+    /**
+     * Deletes the analytics rows and registry phones past their keep —
+     * `quezby:analytics:prune`.
+     *
+     * @throws RuntimeException
+     */
+    public function pruneAnalytics(): string
+    {
+        return $this->run(['quezby:analytics:prune' => []]);
     }
 
     /**

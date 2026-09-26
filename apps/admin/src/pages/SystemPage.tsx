@@ -1,5 +1,5 @@
 import type { AdminSystemAction } from '@quezby/types';
-import { Database, Gauge, Gamepad2, Hourglass, RefreshCw, Server, ShieldCheck, Terminal, Wrench } from 'lucide-react';
+import { Database, Eraser, Gauge, Gamepad2, Hourglass, RefreshCw, Server, ShieldCheck, Terminal, Wrench } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -34,6 +34,13 @@ const CHORES: Record<AdminSystemAction, { title: string; description: string; la
     description: 'Süresi dolmuş açık turlar “süresi doldu” olarak kapanır. Oyuncuların sonraki turları bunu zaten yapar; bu yalnızca listeyi temizler.',
     label: 'Yarım turları kapat',
     done: 'Yarım turlar kapandı',
+  },
+  'analytics-prune': {
+    title: 'Eski analitik temizlensin mi?',
+    description:
+      'Saklama süresini geçen ziyaretler, oyuncu günleri ve uzun süredir görülmeyen telefonlar hemen silinir. API bunu saatte bir parça kendisi de yapar; anonim günlük toplamlar kalır.',
+    label: 'Analitiği temizle',
+    done: 'Eski analitik temizlendi',
   },
 };
 
@@ -188,6 +195,9 @@ export function SystemPage() {
           </Button>
           <Button tone="neutral" icon={<Hourglass />} onClick={() => setAsking('expire-runs')}>
             Yarım turları kapat{data.runs.stale > 0 ? ` (${formatNumber(data.runs.stale)})` : ''}
+          </Button>
+          <Button tone="neutral" icon={<Eraser />} onClick={() => setAsking('analytics-prune')}>
+            Analitiği temizle
           </Button>
         </div>
         {output ? (

@@ -175,6 +175,7 @@ A new shape goes into the family it belongs to and into that list.
 | `PlayButton` | The lobby's gold play slab: breathes 1 → 1.04 → 1 (1.6 s each way) with a glint crossing it — the only loop outside a reel; `breathing` pauses it, reduced motion never starts it |
 | `RankChips` | Your place on each board in gold, one well per board; "—" where you have not placed |
 | `CoachCard` | A new kind of post, before it starts: "YENİ POST · 2/4", its gem, a hand acting the move out (swipe, double-tap, hold into the green zone, keep still — twice, then still), its name and line, the gold "Anladım" that starts the post |
+| `ConsentCard` | The one question about usage analytics: "SENİN SEÇİMİN", "Oyunu birlikte geliştirelim mi?", what is counted and what never is, and **İzin verme** / **İzin ver** — two slabs of one size, violet and magenta, never gold. On the welcome before the ways in; once in the lobby of a phone that never saw it |
 | `Stamp`, `CountUp`, `Confetti`, `useShake` | Juice: slam a value in; count a number up (the final value is its accessibility label); a burst of confetti on a key; a small shake |
 
 Overlays are `ui/sheet.tsx`: `Sheet` (a dark tile rising from the bottom, a

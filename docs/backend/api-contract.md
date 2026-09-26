@@ -20,6 +20,14 @@ A contract change is one commit: `packages/types` → Laravel request/resource �
   from the server's clock, never the phone's.
 - Auth is a Sanctum personal access token: `Authorization: Bearer <token>`.
 - The app sends `X-App-Version: 1.0.0` on every call; the API stores it on runs.
+- The app also names the phone on every call, once it knows its install id:
+  `X-Device: install=…; platform=ios; os=18.2; model=iPhone%2015; build=42`
+  (every value URI-encoded — `deviceHeader` in `@quezby/sdk`). A token's first
+  request of the Istanbul day writes it into the **device registry** — every
+  player's, consent or not: install, system, model, app build, first and last
+  seen; no IP — and, for a player who said yes to usage analytics, marks their
+  day (`docs/product/analytics.md`). Later requests that day write nothing.
+  A header without a sound install id (8–100 of `A-Za-z0-9-`) is ignored.
 - Errors always have one shape, whatever the status:
 
   ```json
@@ -42,7 +50,7 @@ A contract change is one commit: `packages/types` → Laravel request/resource �
 Throttles: guest sign-up 10/h/IP · login 10/min/IP · nonce 20/min/IP · Apple/Google
 10/min/IP · identities 10/min · username check 60/min · username pick 10/min · run start 30/min · run
 checkpoint 12/min · run finish 20/min · device challenge 20/min · device checks
-(Android, iOS attest and assert together) 10/min · search 30/min · follow 60/min ·
+(Android, iOS attest and assert together) 10/min · analytics visits 12/min · search 30/min · follow 60/min ·
 every read (boards, daily, league, stats, players, follow lists) 60/min.
 
 ## Health and app
@@ -111,7 +119,9 @@ Revokes the current token. `204`.
 { "user": Me, "ranks": { "daily": 12, "weekly": 40, "monthly": 88, "all": 311 } }
 ```
 
-`Me` = `{ id, username, email, isGuest, identities: ("apple"|"google")[], settings: { haptics }, best: { score, reels, achievedAt } | null, createdAt }`.
+`Me` = `{ id, username, email, isGuest, identities: ("apple"|"google")[], settings: { haptics, analytics }, best: { score, reels, achievedAt } | null, createdAt }`.
+`settings.analytics` is the player's consent to usage analytics — false until
+they say yes.
 `username` is set from the moment the account exists — the automatic
 `guest48128742` until the player picks one; it is null only on accounts made
 before automatic names.
@@ -137,6 +147,12 @@ are the friends' posts (catalog ids, the app knows them) liked most.
 
 As before: availability with a `UsernameProblem` reason (the player's own name
 is available to them); `{ "haptics": false }` → `{ "settings": … }`.
+
+`PUT /me/settings` also takes `{ "analytics": true | false }` — the player's
+answer to usage analytics, kept as its moment (`users.analytics_at`), never in
+the settings column. A yes starts today's count at once; a no deletes the
+player's visits, days and firsts (only anonymous daily totals stay). Every
+setting is a JSON boolean (`422 validation_failed` otherwise).
 
 `PUT /me/username` `{ "username" }` → `{ "user": Me }` picks a name **once**:
 only while the account's name is the automatic one or there is none
@@ -170,8 +186,9 @@ email and no other identity). Unlinking Apple revokes its grant.
 ### `DELETE /me`
 
 Deletes the account, its runs, board rows, league seats, follows, stats, device
-checks, App Attest keys and challenges, and every token; revokes Apple's grant
-when there is one (never blocks). `204`.
+checks, App Attest keys and challenges, its phones in the device registry, its
+usage analytics (visits, days, firsts) and every token; revokes Apple's grant
+when there is one (never blocks). Anonymous daily totals stay. `204`.
 Required by App Store guideline 5.1.1(v).
 
 ## Device
@@ -443,6 +460,48 @@ then, with the tier they will play); a player who opens it mid-week brings the
 week's earlier daily bests along. Zones: ⌊members × 5 / 30⌋ up and down; none above `diamond`
 or below `bronze`. Last week is settled lazily, the first time any of its
 players needs it — no cron.
+
+## Analytics
+
+Only for a player who said yes (`settings.analytics`); the whole design —
+what is kept, for how long, and why it never bloats — is
+`docs/product/analytics.md`.
+
+### `POST /analytics/visits`
+
+The visits the phone summed up, sent as the app goes to the background (and
+what waited, on the next chance) — one request per visit, never per tap:
+
+```json
+{
+  "sentAt": "2026-09-26T10:00:00.000Z",
+  "platform": "ios",
+  "visits": [{
+    "id": "3f5c…32 lower-case hex",
+    "startedAt": "2026-09-26T09:55:00.000Z",
+    "seconds": 240,
+    "appVersion": "1.0.0",
+    "journey": [["home", 0], ["game", 12], ["share_result", 230]],
+    "counts": { "home": 1, "game": 1, "share_result": 1 }
+  }]
+}
+```
+
+→ `200 { "record": true }`, or `{ "record": false }` when nothing of this
+player is kept — analytics switched off (`QUEZBY_ANALYTICS_ENABLED`), no
+consent, or outside the sample (`QUEZBY_ANALYTICS_SAMPLE`): the app then
+records nothing for a day. Nothing is written in that case.
+
+- Codes are `AnalyticsScreen | AnalyticsEvent` (`@quezby/config`'s closed
+  catalog). One this API does not know is dropped and counted, not refused.
+- `sentAt` is stamped as the request leaves: every `startedAt` moves by the
+  phone's clock skew. A visit older than 7 days or ahead of the API's clock
+  is turned away (counted); `seconds` is held to 4 hours and to the time since
+  the visit began; a player's day takes at most 50 visits.
+- `id` makes it idempotent: a visit sent twice is kept once.
+- Refused as `422 validation_failed`: no visits or more than 10, an `id` that
+  is not 32 hex characters, a journey over 40 steps or a step that is not
+  `[code, seconds]`, a count over 999, an unknown `platform`.
 
 ## Players and follows
 

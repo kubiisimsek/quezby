@@ -1,12 +1,15 @@
 import { ApiError } from '@quezby/sdk';
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 
+import { track } from '@/analytics/track';
 import { api } from '@/api/client';
 import { useSession } from '@/auth/session';
 import { UsernameScreen } from '@/screens/username/UsernameScreen';
 import { useOnboarding } from '@/stores/onboarding';
 import { buildMe } from '@/test/factories';
 import { renderWithProviders } from '@/test/renderWithProviders';
+
+jest.mock('@/analytics/track', () => ({ track: jest.fn() }));
 
 jest.mock('@/api/client', () => ({
   api: { me: { updateUsername: jest.fn() }, usernames: { check: jest.fn() } },
@@ -61,6 +64,7 @@ describe('UsernameScreen', () => {
 
     expect(mocked.me.updateUsername).not.toHaveBeenCalled();
     expect(useOnboarding.getState().step).toBe('protect');
+    expect(track).toHaveBeenCalledWith('nickname_skip');
   });
 
   it('saves a picked name and moves on', async () => {

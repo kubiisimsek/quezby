@@ -11,6 +11,9 @@
  */
 
 import type {
+  AnalyticsCode,
+  AnalyticsEvent,
+  AnalyticsScreen,
   LeaderboardBoard,
   LeagueOutcome,
   LeagueTier,
@@ -134,6 +137,26 @@ export type AdminPlayerDetail = AdminPlayerRow & {
   sessions: number;
   lastSeenAt: string | null;
   identityDetails: AdminIdentity[];
+  /** When the player said yes to usage analytics; null while they have not. */
+  analyticsAt: string | null;
+};
+
+/**
+ * One phone the player used, from the device registry — kept for every
+ * player, consent or not, for support and security (`docs/product/analytics.md`).
+ */
+export type AdminPlayerDevice = {
+  installId: string;
+  platform: Platform | null;
+  osVersion: string | null;
+  model: string | null;
+  appVersion: string | null;
+  appBuild: string | null;
+  firstSeenAt: string;
+  /** The day it was last seen: the registry writes once a day. */
+  lastSeenAt: string;
+  /** Other accounts seen on the same install. */
+  others: AdminPlayerRef[];
 };
 
 export type AdminLeagueSeat = {
@@ -161,6 +184,8 @@ export type AdminPlayerResponse = {
   devices: AdminDeviceCheck[];
   /** Other accounts made on the same install. */
   sameInstall: AdminPlayerRef[];
+  /** The phones the player used, most recently seen first. */
+  installs: AdminPlayerDevice[];
   follows: { following: number; followers: number };
   audit: AdminAuditEntry[];
 };
@@ -528,7 +553,8 @@ export type AdminAuditAction =
   | 'admin.reset_password'
   | 'system.migrate'
   | 'system.optimize'
-  | 'system.expire_runs';
+  | 'system.expire_runs'
+  | 'system.analytics_prune';
 
 export type AdminAuditSubjectType = 'player' | 'run' | 'admin' | 'system';
 
@@ -591,6 +617,167 @@ export type AdminSystem = {
   };
 };
 
-export type AdminSystemAction = 'migrate' | 'optimize' | 'expire-runs';
+export type AdminSystemAction = 'migrate' | 'optimize' | 'expire-runs' | 'analytics-prune';
 
 export type AdminSystemActionResponse = { output: string };
+
+/* ----------------------------------------------------------- analytics -- */
+
+/** How many Istanbul days the analytics page covers. */
+export type AdminAnalyticsWindow = 30 | 90;
+
+export type AdminAnalyticsQuery = { days?: AdminAnalyticsWindow };
+
+/** A new player's first steps, in the order they usually come. */
+export type AdminFunnelStep =
+  | 'joined'
+  | 'tutorial'
+  | 'named'
+  | 'protected'
+  | 'first_run'
+  | 'league'
+  | 'returned';
+
+/** One kept layer of analytics: how many rows, since when, and how long rows stay (null: for good). */
+export type AdminStorageTier = { rows: number; oldest: string | null; keepDays: number | null };
+
+/** Devices of one kind — an app version, a system, a model — and their share of all, per-mille. */
+export type AdminDeviceSlice = {
+  platform: Platform | null;
+  value: string | null;
+  devices: number;
+  share: number;
+};
+
+/**
+ * `GET /admin/analytics` — how the game is used. Everything but `now.online`
+ * and `devices` counts only the players who said yes to usage analytics.
+ */
+export type AdminAnalytics = {
+  serverTime: string;
+  /** The Istanbul day, `Y-m-d`. */
+  today: string;
+  days: AdminAnalyticsWindow;
+  /** Whether the API keeps analytics at all, and for how many of every 1000 consenting players. */
+  collecting: { enabled: boolean; sample: number };
+  /** Who said yes: of every player, and of those who joined in the window — rates per-mille. */
+  consent: {
+    players: number;
+    granted: number;
+    rate: number | null;
+    newPlayers: number;
+    newGranted: number;
+    newRate: number | null;
+  };
+  now: {
+    /** Players whose app talked to the API in the last few minutes — everyone, consent or not. */
+    online: number;
+    /** Players active today, and over the last 7 and 30 days, rolling. */
+    active: number;
+    weekly: number;
+    monthly: number;
+    /** Today's active over the last 30 days', per-mille. */
+    stickiness: number | null;
+  };
+  /** One entry per Istanbul day of the window, oldest first; every list is as long as `days`. */
+  series: {
+    days: string[];
+    active: number[];
+    /** Active on the day they joined. */
+    newcomers: number[];
+    returning: number[];
+    visits: number[];
+    /** Time in the foreground, whole minutes. */
+    minutes: number[];
+    avgVisitSeconds: Array<number | null>;
+  };
+  /**
+   * Weekly cohorts of players active on the day they joined, newest first:
+   * how many of them came back on day N, per-mille — null until day N has
+   * passed for someone in the cohort.
+   */
+  retention: Array<{
+    week: string;
+    players: number;
+    d1: number | null;
+    d3: number | null;
+    d7: number | null;
+    d14: number | null;
+    d30: number | null;
+  }>;
+  /**
+   * Players who joined in the window and were active on their first day:
+   * how many took each step, and the share of those who could have — per-mille.
+   */
+  funnel: Array<{ step: AdminFunnelStep; players: number; rate: number | null }>;
+  /** How often each screen was opened in the window, most first. */
+  screens: Array<{ screen: AnalyticsScreen; views: number }>;
+  /** How often each moment happened in the window, most first. */
+  events: Array<{ event: AnalyticsEvent; count: number }>;
+  /** Every player's phones seen in the last 7 days — the device registry, consent or not. */
+  devices: {
+    total: number;
+    versions: AdminDeviceSlice[];
+    systems: AdminDeviceSlice[];
+    models: AdminDeviceSlice[];
+  };
+  /** What analytics keeps, so its growth shows. */
+  storage: {
+    visits: AdminStorageTier;
+    days: AdminStorageTier;
+    totals: AdminStorageTier;
+    devices: AdminStorageTier;
+    milestones: number;
+    /** Visits and codes turned away in the last 7 days: stale, unknown, over a limit. */
+    dropped: number;
+  };
+};
+
+/**
+ * Why a player's activity shows or not: kept; they have not said yes;
+ * outside the share of players kept; analytics switched off.
+ */
+export type AdminActivityStatus = 'tracked' | 'no_consent' | 'not_sampled' | 'disabled';
+
+/** A first in a player's life, from the app (with consent) or from what the API already knows. */
+export type AdminMilestone =
+  | 'joined'
+  | 'tutorial_done'
+  | 'nickname_skip'
+  | 'protect_skip'
+  | 'protect_reminder'
+  | 'protected'
+  | 'first_run'
+  | 'league';
+
+/** One visit: when, how long, and where the player went, in order. */
+export type AdminVisit = {
+  id: number;
+  startedAt: string;
+  seconds: number;
+  platform: Platform | null;
+  appVersion: string | null;
+  /** Screens and moments, each with the seconds since the visit began. */
+  journey: Array<{ code: AnalyticsCode; at: number }>;
+};
+
+/** `GET /admin/players/{id}/activity`. */
+export type AdminPlayerActivity = {
+  status: AdminActivityStatus;
+  consentAt: string | null;
+  /** The last 30 Istanbul days. */
+  summary: {
+    activeDays: number;
+    visits: number;
+    seconds: number;
+    avgVisitSeconds: number | null;
+    firstDay: string | null;
+    lastDay: string | null;
+  };
+  /** The last 30 Istanbul days, oldest first. */
+  days: Array<{ day: string; visits: number; seconds: number }>;
+  /** The latest visits, newest first — at most 20. */
+  visits: AdminVisit[];
+  /** Oldest first. */
+  milestones: Array<{ milestone: AdminMilestone; at: string }>;
+};

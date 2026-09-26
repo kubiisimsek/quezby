@@ -9,7 +9,7 @@ test('a guest signs up and the token works', function () {
     $response->assertCreated()
         ->assertJsonPath('user.email', null)
         ->assertJsonPath('user.isGuest', true)
-        ->assertJsonPath('user.settings', ['haptics' => true])
+        ->assertJsonPath('user.settings', ['haptics' => true, 'analytics' => false])
         ->assertJsonPath('user.best', null);
     $this->assertMatchesRegularExpression('/^guest\d{8}$/', $response->json('user.username'));
     $this->assertMatchesRegularExpression('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/', $response->json('user.createdAt'));

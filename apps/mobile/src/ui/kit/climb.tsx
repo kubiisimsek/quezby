@@ -305,7 +305,8 @@ export function FloorCard({
   gapToNext?: number | null;
   /** How far your score is towards passing them, per-mille. */
   progress?: number | null;
-  onPlay: () => void;
+  /** `chasing`: the slab said "Geç onu" — there was someone right above to pass. */
+  onPlay: (chasing: boolean) => void;
   style?: StyleProp<ViewStyle>;
 }) {
   const theme = useTheme();
@@ -378,7 +379,7 @@ export function FloorCard({
           icon="play"
           tone="play"
           size="md"
-          onPress={onPlay}
+          onPress={() => onPlay(chasing)}
         />
       </View>
       {permille === null ? null : (

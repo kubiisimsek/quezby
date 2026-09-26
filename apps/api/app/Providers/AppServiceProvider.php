@@ -2,14 +2,17 @@
 
 namespace App\Providers;
 
+use App\Services\Analytics\Presence;
 use App\Support\ModerationToken;
 use App\Support\OpsToken;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Laravel\Sanctum\Events\TokenAuthenticated;
 use RuntimeException;
 
 class AppServiceProvider extends ServiceProvider
@@ -31,6 +34,9 @@ class AppServiceProvider extends ServiceProvider
         Schema::defaultStringLength(191);
 
         $this->configureRateLimiting();
+
+        // Sanctum names the token just before it moves `last_used_at`: the old value says whether today was seen.
+        Event::listen(fn (TokenAuthenticated $event) => Presence::remember($event));
     }
 
     /**
@@ -96,6 +102,10 @@ class AppServiceProvider extends ServiceProvider
             ->by($request->user()?->getAuthIdentifier() ?? $request->ip()));
 
         RateLimiter::for('reads', fn (Request $request) => Limit::perMinute(60)
+            ->by($request->user()?->getAuthIdentifier() ?? $request->ip()));
+
+        // A phone sends its visits as it goes to the background — a few a day; a burst after a long offline stretch fits.
+        RateLimiter::for('analytics', fn (Request $request) => Limit::perMinute(12)
             ->by($request->user()?->getAuthIdentifier() ?? $request->ip()));
 
         RateLimiter::for('moderation', fn (Request $request) => ModerationToken::current() !== ''

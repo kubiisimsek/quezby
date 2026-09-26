@@ -36,6 +36,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 
+import { track } from '@/analytics/track';
 import { APP_PLATFORM } from '@/config/env';
 import { BONUS_ORDER, DEVICE_FAILED, REEL_GUIDE } from '@/game/howTo';
 import type { Outcome } from '@/game/useGame';
@@ -422,7 +423,10 @@ export function ResultView({
           main={main}
           onShare={
             verified
-              ? () => void Share.share({ message: verified.shareText })
+              ? () => {
+                  track(verified.run.mode === 'daily' ? 'share_daily' : 'share_result');
+                  void Share.share({ message: verified.shareText });
+                }
               : undefined
           }
           leave={leave}

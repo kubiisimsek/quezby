@@ -20,6 +20,11 @@
   (the game), `@quezby/config` (usernames) and the API (everything else).
 - The game's outcome is **only** what `Run.apply` returns. The screen's
   timers decide when to ask the engine, never what happened.
+- Usage analytics goes through `track(event)` / `trackScreen(route)`
+  (`src/analytics/track.ts`) and nothing else: they only change the visit on
+  the phone — never a request per event — and do nothing before the player's
+  yes. A new moment is a code added to `@quezby/config`'s closed catalog (and
+  the API's enum), never free text or a property. `docs/product/analytics.md`.
 - Network calls go through `@/api/client` (the `@quezby/sdk` instance), never
   a screen-level `fetch`. Server state is `@tanstack/react-query`; session and
   settings are Zustand stores.

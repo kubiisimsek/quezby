@@ -15,12 +15,14 @@ import {
   withTiming,
 } from 'react-native-reanimated';
 
+import { track } from '@/analytics/track';
 import { api } from '@/api/client';
 import { useSession } from '@/auth/session';
 import { REEL_GUIDE } from '@/game/howTo';
 import { HomeScreen } from '@/screens/home/HomeScreen';
 import { useDeviceVerdict } from '@/stores/deviceVerdict';
 import { useOnboarding } from '@/stores/onboarding';
+import { useSettings } from '@/stores/settings';
 import { buildEntry, buildMe, buildRanks } from '@/test/factories';
 import { renderWithProviders } from '@/test/renderWithProviders';
 
@@ -34,6 +36,8 @@ jest.mock('react-native-reanimated', () => {
     withTiming: jest.fn(reanimated.withTiming),
   };
 });
+
+jest.mock('@/analytics/track', () => ({ track: jest.fn() }));
 
 jest.mock('@/api/client', () => ({
   api: {
@@ -186,6 +190,7 @@ describe('HomeScreen', () => {
     mocked.leagues.current.mockResolvedValue(league());
     mocked.leaderboards.get.mockResolvedValue(weekly());
     useDeviceVerdict.setState({ userId: null, verdict: null, validUntil: null, hydrated: true });
+    useSettings.setState({ hydrated: true, consent: 'synced', analytics: true });
     // Asked already — the reminder has tests of its own below.
     useOnboarding.setState({ userId: null, step: null, remindedFor: 'player-1', hydrated: true });
   });
@@ -252,6 +257,7 @@ describe('HomeScreen', () => {
 
     await fireEvent.press(screen.getByRole('button', { name: 'Paylaş' }));
     expect(share).toHaveBeenCalledWith({ message: shareText });
+    expect(track).toHaveBeenCalledWith('share_daily');
 
     await fireEvent.press(
       screen.getByRole('button', { name: 'Sıralamayı gör' }),
@@ -337,6 +343,34 @@ describe('HomeScreen', () => {
     expect(screen.queryByText('Bu hafta ilk turunu oyna, ligine katıl.')).not.toBeOnTheScreen();
   });
 
+  describe('on a phone that never answered the usage question', () => {
+    beforeEach(() => {
+      useSettings.setState({ hydrated: true, consent: 'unasked', analytics: false });
+    });
+
+    it('asks it once, up top, with no as easy as yes', async () => {
+      await renderLobby();
+
+      expect(screen.getByText('Oyunu birlikte geliştirelim mi?')).toBeOnTheScreen();
+      await fireEvent.press(screen.getByRole('button', { name: 'İzin verme' }));
+
+      expect(useSettings.getState()).toMatchObject({ analytics: false, consent: 'pending' });
+      expect(screen.queryByText('Oyunu birlikte geliştirelim mi?')).not.toBeOnTheScreen();
+    });
+
+    it('keeps the league reminder for after the answer', async () => {
+      useOnboarding.setState({ userId: null, step: null, remindedFor: null, hydrated: true });
+      mocked.leagues.current.mockResolvedValue(joined(7, 'stay'));
+      await renderLobby();
+
+      expect(screen.queryByText(/^Ligdesin!/)).not.toBeOnTheScreen();
+      await fireEvent.press(screen.getByRole('button', { name: 'İzin ver' }));
+
+      expect(useSettings.getState()).toMatchObject({ analytics: true, consent: 'pending' });
+      expect(await screen.findByText(/^Ligdesin! Telefonun değişirse/)).toBeOnTheScreen();
+    });
+  });
+
   describe('once a guest\'s league opens', () => {
     beforeEach(() => {
       useOnboarding.setState({ userId: null, step: null, remindedFor: null, hydrated: true });
@@ -348,6 +382,7 @@ describe('HomeScreen', () => {
 
       expect(await screen.findByText(/^Ligdesin! Telefonun değişirse/)).toBeOnTheScreen();
       expect(useOnboarding.getState().remindedFor).toBe('player-1');
+      expect(track).toHaveBeenCalledWith('protect_reminder');
 
       await first.unmount();
       await renderLobby();
@@ -386,6 +421,7 @@ describe('HomeScreen', () => {
 
     await fireEvent.press(screen.getByRole('button', { name: 'Geç onu' }));
     expect(navigate).toHaveBeenCalledWith('Game', { mode: 'free' });
+    expect(track).toHaveBeenCalledWith('rival');
   });
 
   it('shows no target with nobody right above you', async () => {

@@ -16,6 +16,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
+import { track } from '@/analytics/track';
 import { useSession } from '@/auth/session';
 import { FeedbackLayer } from '@/game/FeedbackLayer';
 import { Hud } from '@/game/Hud';
@@ -71,6 +72,11 @@ export function GameScreen({ navigation, route }: Props) {
   useEffect(() => {
     void start(tutorial ? 'tutorial' : null);
   }, [start, tutorial]);
+
+  // The practice run's end: the first step of every new player's funnel.
+  useEffect(() => {
+    if (game.phase === 'result' && tutorial) track('tutorial_done');
+  }, [game.phase, tutorial]);
 
   useEffect(() => {
     if (game.phase !== 'result' || tutorial) return;

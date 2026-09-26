@@ -19,7 +19,10 @@ for Games_ rehberi ve Unity'nin "önce anonim hesap, sonra bağla" yaklaşımı)
 
 1. **Karşılama:** marka, dört hareketin taşları, tek altın **Oyna** ve
    **Hesabım var, giriş yap**. Oyna misafir hesabı açar; hesap açılırken
-   sunucu ona `guest48128742` gibi bir ad verir.
+   sunucu ona `guest48128742` gibi bir ad verir. Bu iki düğmeden önce bir kez
+   **"Oyunu birlikte geliştirelim mi?"** sorulur (**İzin ver / İzin verme**):
+   cevap gelmeden hiçbir kullanım verisi sayılmaz
+   ([analytics.md](./analytics.md)).
 2. **Deneme turu:** gerçek kurallarla bir tur, ama tamamen telefonda —
    sunucuya hiç gitmez, **hiçbir yere sayılmaz** (tablo, lig, istatistik,
    rekor). Her hareketin ilk postundan önce akış durur ve bir koç kartı onu
@@ -114,6 +117,12 @@ mükemmel, dokunmadan geçilen, yakalanma, türe göre hatalar, tepki süreleri,
 kombolar. Oyuncunun ömür boyu sayıları (`GET /me/stats`) ve akışın her
 gönderisinin kaç kez gösterildiği/beğenildiği (`content_stats`) tutulur.
 Yalnızca sıralı turlar sayılır.
+
+Oyunun nasıl kullanıldığı — ziyaretler, ekranlar, geri dönüş, ilk adımlar —
+yalnızca izin veren oyuncular için ve şişmeyen katmanlarda tutulur; telefonun
+modeli, sistemi ve uygulama sürümü ise herkes için, cihaz kaydında:
+[analytics.md](./analytics.md). Karar **Ayarlar → Kullanım verisi**'nden
+değişir; hayır diyenin kayıtları silinir.
 
 ## İçerik
 

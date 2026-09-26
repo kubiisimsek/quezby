@@ -73,6 +73,8 @@ jest.mock('react-native-device-info', () => {
   mock.getBundleId.mockReturnValue('com.kubisimsek.game.quezby');
   mock.getVersion.mockReturnValue('1.0.0');
   mock.getBuildNumber.mockReturnValue('1');
+  mock.getModel.mockReturnValue('iPhone 15');
+  mock.getSystemVersion.mockReturnValue('18.0');
   return { __esModule: true, default: mock, ...mock };
 });
 

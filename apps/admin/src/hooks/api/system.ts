@@ -16,6 +16,6 @@ export function useSystemAction() {
   return useMutation({
     mutationFn: (action: AdminSystemAction) => api.system.run(action),
     onSettled: () =>
-      Promise.all(['system', 'audit', 'overview', 'runs', 'counts'].map((resource) => queryClient.invalidateQueries({ queryKey: [resource] }))),
+      Promise.all(['system', 'audit', 'overview', 'runs', 'counts', 'analytics', 'players'].map((resource) => queryClient.invalidateQueries({ queryKey: [resource] }))),
   });
 }

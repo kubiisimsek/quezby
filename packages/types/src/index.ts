@@ -16,6 +16,12 @@ export type SocialProvider = 'apple' | 'google';
 
 export type UserSettings = {
   haptics: boolean;
+  /**
+   * Consent to count how the app is used — visits, screens, a few moments
+   * (`docs/product/analytics.md`). Off until the player says yes; saying no
+   * later deletes what was kept about them.
+   */
+  analytics: boolean;
 };
 
 export type BestScore = {
@@ -460,6 +466,72 @@ export type AppConfigResponse = {
   minVersion: string;
   storeUrl: string | null;
 };
+
+/* ----------------------------------------------------------- analytics -- */
+
+/** A screen a visit's journey names — the app's routes, lower-case (`@quezby/config` › ANALYTICS_SCREENS). */
+export type AnalyticsScreen =
+  | 'welcome'
+  | 'login'
+  | 'tutorial'
+  | 'username'
+  | 'protect'
+  | 'home'
+  | 'leaderboard'
+  | 'league'
+  | 'search'
+  | 'profile'
+  | 'game'
+  | 'help'
+  | 'daily';
+
+/** A moment worth counting that the API cannot see by itself (`@quezby/config` › ANALYTICS_EVENTS). */
+export type AnalyticsEvent =
+  | 'share_result'
+  | 'share_daily'
+  | 'rival'
+  | 'player_card'
+  | 'offline_run'
+  | 'outdated_run'
+  | 'unsent_run'
+  | 'offline_gate'
+  | 'update_gate'
+  | 'tutorial_done'
+  | 'nickname_skip'
+  | 'protect_skip'
+  | 'protect_reminder';
+
+export type AnalyticsCode = AnalyticsScreen | AnalyticsEvent;
+
+/**
+ * One stretch of the app in the foreground, summed up on the phone and sent
+ * once it ends — only with the player's consent (`UserSettings.analytics`).
+ */
+export type AnalyticsVisit = {
+  /** 32 lower-case hex characters, minted on the phone: a visit sent twice counts once. */
+  id: string;
+  startedAt: string;
+  /** Seconds in the foreground. */
+  seconds: number;
+  appVersion: string;
+  /** Screens and moments in order, each with the seconds since the start — at most 40. */
+  journey: Array<[AnalyticsCode, number]>;
+  /** How often each screen was opened and each moment happened over the whole visit. */
+  counts: Partial<Record<AnalyticsCode, number>>;
+};
+
+export type AnalyticsVisitsRequest = {
+  /** The phone's clock as it sends: the API moves every `startedAt` by its difference to its own. */
+  sentAt: string;
+  platform: Platform;
+  visits: AnalyticsVisit[];
+};
+
+/**
+ * `record: false` — keep nothing for a day: analytics is switched off, the
+ * player has not said yes, or they are outside the share of players kept.
+ */
+export type AnalyticsVisitsResponse = { record: boolean };
 
 /* ---------------------------------------------------- device integrity -- */
 

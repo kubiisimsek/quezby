@@ -23,6 +23,7 @@ monthly and all-time boards, a daily challenge everyone plays on one seed
 | Game rules, scoring, difficulty | `docs/product/scoring.md` |
 | Anti-cheat, device integrity, checkpoints | `docs/product/scoring.md` → "Hile koruması" |
 | Usernames | `docs/product/usernames.md` |
+| Analytics, consent, the device registry | `docs/product/analytics.md` |
 | API work | `docs/backend/api-contract.md` · admin routes: `docs/backend/admin-api.md` |
 | Mobile | `docs/rules/react-native-rules.md` |
 | Local / staging / production | `docs/development/environments.md` |

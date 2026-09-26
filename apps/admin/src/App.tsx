@@ -11,6 +11,7 @@ import { LoginPage } from '@/pages/LoginPage';
  */
 const AccountPage = lazy(() => import('@/pages/AccountPage').then((module) => ({ default: module.AccountPage })));
 const AdminsPage = lazy(() => import('@/pages/AdminsPage').then((module) => ({ default: module.AdminsPage })));
+const AnalyticsPage = lazy(() => import('@/pages/AnalyticsPage').then((module) => ({ default: module.AnalyticsPage })));
 const AuditPage = lazy(() => import('@/pages/AuditPage').then((module) => ({ default: module.AuditPage })));
 const BoardsPage = lazy(() => import('@/pages/BoardsPage').then((module) => ({ default: module.BoardsPage })));
 const ContentPage = lazy(() => import('@/pages/ContentPage').then((module) => ({ default: module.ContentPage })));
@@ -39,6 +40,7 @@ export const appRoutes: RouteObject[] = [
         element: <Shell />,
         children: [
           { index: true, element: <OverviewPage /> },
+          { path: '/analytics', element: <AnalyticsPage /> },
           { path: '/players', element: <PlayersPage /> },
           { path: '/players/:playerId', element: <PlayerPage /> },
           { path: '/suspects', element: <SuspectsPage /> },

@@ -33,6 +33,13 @@ export const APP_ENV: AppEnvironment = environmentFrom(QUEZBY_ENV);
 
 export const APP_VERSION: string = DeviceInfo.getVersion();
 
+/** The build number, the system's version and the phone's model — the API's device registry, with every call. */
+export const APP_BUILD: string = DeviceInfo.getBuildNumber();
+
+export const OS_VERSION: string = DeviceInfo.getSystemVersion();
+
+export const DEVICE_MODEL: string = DeviceInfo.getModel();
+
 const PLATFORM: 'ios' | 'android' = Platform.OS === 'android' ? 'android' : 'ios';
 
 function metroHost(): string | null {

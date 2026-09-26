@@ -3,7 +3,9 @@
 use App\Game\Gesture;
 use App\Game\ReelKind;
 use App\Game\Run as Engine;
+use App\Support\Timestamp;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\Assert;
 use Tests\TestCase;
 
@@ -122,3 +124,61 @@ function drawn(int ...$values): Closure
 */
 
 require_once __DIR__.'/Support/FakeIdentityProvider.php';
+
+/*
+|--------------------------------------------------------------------------
+| Analytics
+|--------------------------------------------------------------------------
+*/
+
+/**
+ * One visit as the app sends it (`AnalyticsVisit` in `packages/types`), with
+ * `$overrides` over a five-minute visit that ended a moment ago.
+ *
+ * @param  array<string, mixed>  $overrides
+ * @return array<string, mixed>
+ */
+function analyticsVisit(array $overrides = []): array
+{
+    return [
+        'id' => bin2hex(random_bytes(16)),
+        'startedAt' => Timestamp::iso(now()->subMinutes(5)),
+        'seconds' => 240,
+        'appVersion' => '1.0.0',
+        'journey' => [['home', 0], ['game', 12], ['share_result', 230]],
+        'counts' => ['home' => 1, 'game' => 1, 'share_result' => 1],
+        ...$overrides,
+    ];
+}
+
+/**
+ * `POST /analytics/visits`'s body: the visits, sent now from an iPhone.
+ *
+ * @param  array<string, mixed>  ...$visits
+ * @return array<string, mixed>
+ */
+function analyticsBatch(array ...$visits): array
+{
+    return ['sentAt' => Timestamp::iso(now()), 'platform' => 'ios', 'visits' => array_values($visits)];
+}
+
+/**
+ * The anonymous totals of one Istanbul day, bucket => total.
+ *
+ * @return array<string, int>
+ */
+function analyticsTotals(string $day): array
+{
+    return DB::table('analytics_totals')
+        ->where('day', $day)
+        ->orderBy('bucket')
+        ->pluck('total', 'bucket')
+        ->map(fn ($total) => (int) $total)
+        ->all();
+}
+
+/** The `X-Device` header of a phone, as `@quezby/sdk` writes it. */
+function deviceHeaderOf(string $install = 'c0ffee00c0ffee00', string $platform = 'ios', string $os = '18.2', string $model = 'iPhone 15 Pro', string $build = '42'): string
+{
+    return "install={$install}; platform={$platform}; os=".rawurlencode($os).'; model='.rawurlencode($model).'; build='.rawurlencode($build);
+}

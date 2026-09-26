@@ -10,12 +10,13 @@ use App\Http\Requests\Admin\PlayersRequest;
 use App\Models\Admin;
 use App\Models\User;
 use App\Services\Admin\AdminPlayers;
+use App\Services\Admin\PlayerActivity;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\JsonResponse;
 
 /**
- * `GET /admin/players` and `/admin/players/{player}` — every account, banned
- * players and guests included.
+ * `GET /admin/players`, `/admin/players/{player}` and its `activity` — every
+ * account, banned players and guests included.
  */
 class PlayerController extends Controller
 {
@@ -37,5 +38,12 @@ class PlayerController extends Controller
         $found = User::query()->find(strtolower($player)) ?? throw ApiException::of(ErrorCode::NotFound);
 
         return response()->json($this->players->detail($found, $admin->hasRole(AdminRole::Owner)));
+    }
+
+    public function activity(string $player, PlayerActivity $activity): JsonResponse
+    {
+        $found = User::query()->find(strtolower($player)) ?? throw ApiException::of(ErrorCode::NotFound);
+
+        return response()->json($activity->of($found));
     }
 }

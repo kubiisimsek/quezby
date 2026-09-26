@@ -71,4 +71,19 @@ describe('SystemPage', () => {
 
     expect(await screen.findByText('optimize başarısız (çıkış kodu 1): disk dolu', { selector: 'pre' })).toBeInTheDocument();
   });
+
+  it('prunes old analytics after asking', async () => {
+    const api = fakeApi();
+    api.system.get.mockResolvedValue(system());
+    api.system.run.mockResolvedValue({ output: 'Pruned 12 visits, 3 player days and 1 phones' });
+    const { user } = renderApp({ path: '/system', api });
+
+    await user.click(await screen.findByRole('button', { name: 'Analitiği temizle' }));
+    expect(await screen.findByRole('dialog', { name: 'Eski analitik temizlensin mi?' })).toBeInTheDocument();
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Analitiği temizle' }));
+
+    await waitFor(() => expect(api.system.run).toHaveBeenCalledWith('analytics-prune'));
+    expect(await screen.findByText('Pruned 12 visits, 3 player days and 1 phones')).toBeInTheDocument();
+  });
 });
+

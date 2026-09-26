@@ -20,7 +20,7 @@ use RuntimeException;
 /**
  * `/admin/system` — what the API runs with, for owners, and the chores a
  * host without SSH needs: run the new migrations, rebuild the caches, close
- * runs left open. Each one is on record with what it printed.
+ * runs left open, prune old analytics. Each one is on record with what it printed.
  */
 class SystemController extends Controller
 {
@@ -35,6 +35,7 @@ class SystemController extends Controller
             'migrate' => [fn () => $chores->migrate(), AuditAction::SystemMigrate],
             'optimize' => [fn () => $chores->optimize(), AuditAction::SystemOptimize],
             'expire-runs' => [fn () => $chores->expireRuns(), AuditAction::SystemExpireRuns],
+            'analytics-prune' => [fn () => $chores->pruneAnalytics(), AuditAction::SystemAnalyticsPrune],
             default => throw ApiException::of(ErrorCode::NotFound),
         };
         $actor = Actor::panel($owner, $request);

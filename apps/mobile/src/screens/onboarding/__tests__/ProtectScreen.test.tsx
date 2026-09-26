@@ -2,12 +2,15 @@ import { appleAuth } from '@invertase/react-native-apple-authentication';
 import { ApiError } from '@quezby/sdk';
 import { fireEvent, screen } from '@testing-library/react-native';
 
+import { track } from '@/analytics/track';
 import { api } from '@/api/client';
 import { useSession } from '@/auth/session';
 import { ProtectScreen } from '@/screens/onboarding/ProtectScreen';
 import { useOnboarding } from '@/stores/onboarding';
 import { buildMe } from '@/test/factories';
 import { renderWithProviders } from '@/test/renderWithProviders';
+
+jest.mock('@/analytics/track', () => ({ track: jest.fn() }));
 
 jest.mock('@/config/env', () => ({
   ...jest.requireActual('@/config/env'),
@@ -50,6 +53,7 @@ describe('ProtectScreen', () => {
     await fireEvent.press(screen.getByText('Şimdi değil'));
 
     expect(useOnboarding.getState().step).toBeNull();
+    expect(track).toHaveBeenCalledWith('protect_skip');
   });
 
   it('keeps the account with Apple, says so, and only then moves on', async () => {

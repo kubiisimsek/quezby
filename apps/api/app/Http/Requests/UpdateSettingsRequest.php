@@ -15,6 +15,8 @@ class UpdateSettingsRequest extends FormRequest
     {
         return [
             'haptics' => ['sometimes', 'boolean:strict'],
+            // The player's yes or no to usage analytics (`docs/product/analytics.md`).
+            'analytics' => ['sometimes', 'boolean:strict'],
         ];
     }
 }

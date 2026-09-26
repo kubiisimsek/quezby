@@ -122,6 +122,23 @@ describe('SettingsSheet', () => {
     expect(screen.getByText('Oyun sessizce oynanır.')).toBeOnTheScreen();
   });
 
+  it('turns Kullanım verisi on and off on the phone, for the account to take it next', async () => {
+    useSettings.setState({ analytics: false, consent: 'synced', hydrated: true });
+    await renderSheet();
+
+    expect(screen.getByText('Yalnızca oyunun çalışması için gereken cihaz bilgisi gider.')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('switch', { name: 'Kullanım verisi' }));
+
+    expect(useSettings.getState()).toMatchObject({ analytics: true, consent: 'pending' });
+    expect(screen.getByRole('switch', { name: 'Kullanım verisi' })).toBeChecked();
+    expect(screen.getByText('Hangi ekranlara girdiğini ve ne kadar oynadığını sayarız.')).toBeOnTheScreen();
+    // `useConsentSync` takes it to the account, not the sheet.
+    expect(mocked.me.updateSettings).not.toHaveBeenCalled();
+
+    await fireEvent.press(screen.getByRole('switch', { name: 'Kullanım verisi' }));
+    expect(useSettings.getState()).toMatchObject({ analytics: false, consent: 'pending' });
+  });
+
   it('keeps the phone’s choice when the API cannot be reached', async () => {
     mocked.me.updateSettings.mockRejectedValue(new Error('offline'));
     await renderSheet();

@@ -1,6 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react-native';
 import { useReducedMotion, type SharedValue } from 'react-native-reanimated';
 
+import { track } from '@/analytics/track';
 import { useSession } from '@/auth/session';
 import { useGame, type GameController } from '@/game/useGame';
 import { GameScreen } from '@/screens/game/GameScreen';
@@ -9,6 +10,7 @@ import { buildMe } from '@/test/factories';
 import { renderWithProviders } from '@/test/renderWithProviders';
 
 jest.mock('@/game/useGame', () => ({ useGame: jest.fn() }));
+jest.mock('@/analytics/track', () => ({ track: jest.fn() }));
 
 type Props = Parameters<typeof GameScreen>[0];
 
@@ -253,6 +255,7 @@ describe('GameScreen', () => {
         outcome: { mode: 'practice', summary: PRACTICE_SUMMARY, reason: 'tutorial', unseen: [] },
       });
       await setupTutorial(game).render();
+      expect(track).toHaveBeenCalledWith('tutorial_done');
 
       await fireEvent.press(screen.getByText('Devam et'));
       expect(useOnboarding.getState().step).toBe('nickname');

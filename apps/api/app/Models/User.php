@@ -24,6 +24,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property array<string, mixed> $settings
  * @property Carbon|null $banned_at
  * @property string|null $ban_reason
+ * @property Carbon|null $analytics_at When the player said yes to usage analytics.
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
@@ -52,6 +53,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'settings' => 'array',
             'banned_at' => 'datetime',
+            'analytics_at' => 'datetime',
         ];
     }
 
@@ -85,6 +87,12 @@ class User extends Authenticatable
         return $this->hasMany(AppAttestKey::class);
     }
 
+    /** @return HasMany<PlayerDevice, $this> The phones this player used — the device registry. */
+    public function devices(): HasMany
+    {
+        return $this->hasMany(PlayerDevice::class);
+    }
+
     /** @return HasOne<PlayerStat, $this> */
     public function stats(): HasOne
     {
@@ -115,11 +123,19 @@ class User extends Authenticatable
         return $this->banned_at !== null;
     }
 
-    /** @return array{haptics: bool} */
+    /**
+     * The settings as the app reads them. `analytics` is the consent, kept as
+     * its moment (`analytics_at`), never in the settings column.
+     *
+     * @return array{haptics: bool, analytics: bool}
+     */
     public function resolvedSettings(): array
     {
         $settings = array_merge(self::DEFAULT_SETTINGS, $this->settings ?? []);
 
-        return ['haptics' => (bool) $settings['haptics']];
+        return [
+            'haptics' => (bool) $settings['haptics'],
+            'analytics' => $this->analytics_at !== null,
+        ];
     }
 }
