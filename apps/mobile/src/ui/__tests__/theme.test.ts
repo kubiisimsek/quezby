@@ -53,3 +53,26 @@ describe('the arena', () => {
     expect(TYPE.heading.fontFamily).toMatch(/^Nunito-/);
   });
 });
+
+describe('type for the language on screen', () => {
+  it('sets Latin languages in Rubik and Nunito, spaced and at their own line heights', () => {
+    const theme = jest.requireActual('@/ui/theme') as typeof import('@/ui/theme');
+    expect(theme.FONT).toEqual(theme.LATIN_FONT);
+    expect(theme.TYPE.label).toMatchObject({ fontFamily: 'Rubik-ExtraBold', letterSpacing: 1.1, lineHeight: 16 });
+    expect(theme.lh(20)).toBe(20);
+    expect(theme.tracking(1.1)).toBe(1.1);
+  });
+
+  it('sets Arabic in Cairo, weight for weight, never spaced, with room for its letters', () => {
+    jest.isolateModules(() => {
+      jest.doMock('@/i18n/native', () => ({ ...jest.requireActual('@/i18n/native'), IS_RTL: true }));
+      const theme = require('@/ui/theme') as typeof import('@/ui/theme');
+
+      expect(theme.FONT).toEqual(theme.ARABIC_FONT);
+      expect(theme.FONT.display).toBe('Cairo-Black');
+      expect(theme.TYPE.label.letterSpacing).toBe(0);
+      expect(theme.TYPE.body.lineHeight).toBe(26);
+      expect(theme.tracking(1.1)).toBe(0);
+    });
+  });
+});

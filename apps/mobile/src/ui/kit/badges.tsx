@@ -2,6 +2,7 @@ import type { LeagueTier } from '@quezby/types';
 import { StyleSheet, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
+import { useT } from '@/i18n';
 import { Icon } from '@/ui/icons';
 import { FONT, RADIUS, SPACE, embossed, useTheme, withAlpha, type Theme } from '@/ui/theme';
 
@@ -55,6 +56,7 @@ export function MedalBadge({
   size?: 'sm' | 'md' | 'lg';
 }) {
   const theme = useTheme();
+  const t = useT();
   const colors = medalColors(theme, rank);
   const { box, glyph } = MEDAL_SIZE[size];
 
@@ -62,7 +64,7 @@ export function MedalBadge({
     <View
       accessible
       accessibilityRole="image"
-      accessibilityLabel={`${rank}. sıra`}
+      accessibilityLabel={t.board.place(rank)}
       style={[
         styles.medal,
         {
@@ -95,13 +97,6 @@ export function MedalBadge({
   );
 }
 
-export const TIER_LABELS: Record<LeagueTier, string> = {
-  bronze: 'Bronz',
-  silver: 'Gümüş',
-  gold: 'Altın',
-  platinum: 'Platin',
-  diamond: 'Elmas',
-};
 
 function tierColors(
   theme: Theme,
@@ -192,15 +187,16 @@ export function TierBadge({
   showLabel?: boolean;
 }) {
   const theme = useTheme();
+  const t = useT();
   const colors = tierColors(theme, tier);
   const box = TIER_SIZE[size];
-  const label = TIER_LABELS[tier];
+  const label = t.tiers.names[tier];
 
   return (
     <View
       accessible
       accessibilityRole="image"
-      accessibilityLabel={`${label} lig`}
+      accessibilityLabel={t.tiers.league(tier)}
       style={styles.tier}
     >
       <Svg width={box} height={box} viewBox="0 0 24 24">

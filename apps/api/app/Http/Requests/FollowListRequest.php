@@ -17,7 +17,7 @@ class FollowListRequest extends FormRequest
         return [
             'cursor' => ['bail', 'nullable', 'string', 'max:200', function (string $attribute, string $value, Closure $fail) {
                 if (FollowService::parseCursor($value) === null) {
-                    $fail('Listenin devamı yüklenemedi, listeyi baştan yükle.');
+                    $fail(__('messages.cursor'));
                 }
             }],
         ];

@@ -30,6 +30,26 @@ describe('PlayersPage', () => {
     expect(api.players.list).toHaveBeenCalledWith({ search: undefined, status: undefined, platform: undefined, sort: 'newest', page: 1 });
   });
 
+  it('says which language each player plays in', async () => {
+    const api = fakeApi();
+    api.players.list.mockResolvedValue(
+      playersPage([
+        playerRow(),
+        playerRow({ id: '01jplayer00000000000000000b', username: 'layla', locale: 'ar' }),
+        playerRow({ id: '01jplayer00000000000000000c', username: 'lucia', locale: 'es' }),
+      ]),
+    );
+    renderApp({ path: '/players', api });
+
+    await screen.findByText('@layla');
+    const table = screen.getByRole('table');
+    expect(within(table).getByRole('columnheader', { name: 'Dil' })).toBeInTheDocument();
+    const cells = (username: string) => within(screen.getByRole('link', { name: `${username} sayfasını aç` }).closest('tr') ?? table);
+    expect(cells('kerem.35').getByText('Türkçe')).toBeInTheDocument();
+    expect(cells('layla').getByText('Arapça')).toBeInTheDocument();
+    expect(cells('lucia').getByText('İspanyolca')).toBeInTheDocument();
+  });
+
   it('asks the API again as a search is typed, and keeps the search in the address', async () => {
     const api = fakeApi();
     api.players.list.mockResolvedValue(playersPage([playerRow()]));

@@ -1,18 +1,11 @@
 import type { BestScore } from '@quezby/types';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { formatScore, initialsOf } from '@/lib/format';
+import { useT } from '@/i18n';
+import { initialsOf } from '@/lib/format';
 import { Icon } from '@/ui/icons';
 import { Stamp, Txt, gemColors } from '@/ui/kit';
-import {
-  DEPTH,
-  FONT,
-  RADIUS,
-  SPACE,
-  embossed,
-  useTheme,
-  withAlpha,
-} from '@/ui/theme';
+import { DEPTH, FONT, RADIUS, SPACE, embossed, lh, useTheme, withAlpha } from '@/ui/theme';
 
 /**
  * The pieces a player card is built from — the profile's own card and the
@@ -92,12 +85,13 @@ export function SeasonBest({
   delay?: number;
 }) {
   const theme = useTheme();
-  const value = best ? formatScore(best.score) : '—';
+  const t = useT();
+  const value = best ? t.fmt.score(best.score) : '—';
 
   return (
     <View
       accessible
-      accessibilityLabel={`Sezon rekoru: ${value}`}
+      accessibilityLabel={t.friends.best.said(value)}
       style={[
         styles.best,
         { backgroundColor: theme.well, borderColor: theme.wellLine },
@@ -106,7 +100,7 @@ export function SeasonBest({
       <View style={styles.bestHead}>
         <Icon name="trophy" size={14} color={theme.gold} strokeWidth={2.6} />
         <Txt variant="micro" tone="muted">
-          Sezon rekoru
+          {t.friends.best.title}
         </Txt>
       </View>
       <Stamp delay={delay} from={1.6}>
@@ -120,7 +114,7 @@ export function SeasonBest({
       </Stamp>
       {best ? (
         <Txt variant="micro" tone="faint">
-          {`${formatScore(best.reels)} post`}
+          {t.board.posts(best.reels)}
         </Txt>
       ) : null}
     </View>
@@ -159,8 +153,8 @@ const styles = StyleSheet.create({
   cardLg: { borderRadius: PORTRAIT.lg.radius - PORTRAIT.lg.frame - 1 },
   shine: { height: '45%', left: 0, position: 'absolute', right: 0, top: 0 },
   initials: { fontFamily: FONT.display, includeFontPadding: false },
-  initialsMd: { fontSize: 26, lineHeight: 31 },
-  initialsLg: { fontSize: 34, lineHeight: 40 },
+  initialsMd: { fontSize: 26, lineHeight: lh(31) },
+  initialsLg: { fontSize: 34, lineHeight: lh(40) },
   best: {
     alignItems: 'center',
     alignSelf: 'stretch',

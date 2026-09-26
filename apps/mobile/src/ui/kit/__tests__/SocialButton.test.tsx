@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
+import { useLanguage } from '@/i18n/language';
 import { SocialButton } from '@/ui/kit';
 import { arena } from '@/ui/tokens';
 
@@ -67,5 +68,14 @@ describe('SocialButton', () => {
     expect(button).toBeDisabled();
     await fireEvent.press(button);
     expect(onPress).not.toHaveBeenCalled();
+  });
+
+  it('uses each company’s own words in the player’s language', async () => {
+    useLanguage.setState({ locale: 'de' });
+    await render(<SocialButton provider="apple" onPress={jest.fn()} />);
+    expect(screen.getByRole('button', { name: 'Mit Apple fortfahren' })).toBeOnTheScreen();
+
+    await screen.rerender(<SocialButton provider="google" onPress={jest.fn()} />);
+    expect(screen.getByRole('button', { name: 'Weiter mit Google' })).toBeOnTheScreen();
   });
 });

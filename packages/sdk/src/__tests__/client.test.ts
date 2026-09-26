@@ -57,6 +57,26 @@ describe('createApiClient', () => {
     });
   });
 
+  it('asks for the language the app speaks in Accept-Language, as it is at each call', async () => {
+    const fetchMock = respond(200, { user: { id: '1' }, ranks: {} });
+    vi.stubGlobal('fetch', fetchMock);
+    let locale: 'de' | 'ar' | null = null;
+    const api = createApiClient({ baseUrl: 'http://x', getToken: () => 'tok', locale: () => locale });
+
+    await api.me.get();
+    locale = 'de';
+    await api.me.get();
+    locale = 'ar';
+    await api.auth.guest({ platform: 'ios', installId: 'abc' });
+
+    const headers = fetchMock.mock.calls.map(
+      (call) => (call as unknown as [string, RequestInit])[1].headers,
+    );
+    expect(headers[0]).not.toHaveProperty('Accept-Language');
+    expect(headers[1]).toMatchObject({ 'Accept-Language': 'de' });
+    expect(headers[2]).toMatchObject({ 'Accept-Language': 'ar' });
+  });
+
   it('encodes every device value, so nothing can break the header apart', () => {
     expect(
       deviceHeader({ installId: 'a;b', platform: 'android', os: '14', model: 'Pixel=8\nPro', build: '7' }),

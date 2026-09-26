@@ -91,15 +91,36 @@ read from colour and badge before any text. The HUD's dopamine meter runs
 | `heading` · `body` · `meta` · `micro` | Nunito ExtraBold / Bold | Everything else. |
 | Button labels | Rubik Black | Sized with the button. |
 
-Both faces carry every Turkish letter; most faces games use do not (Lilita
-One, Fredoka, Titan One, Chango and Bowlby One lack ğ, ş or İ, and caps-only
-faces such as Luckiest Guy draw a lower-case i without its dot). The app
+Both faces carry every letter the four Latin languages write — Turkish,
+German, French and Spanish (ğ ş ı İ ä ö ü ß é è ê à â ç œ ñ á í ó ú ¿ ¡ « »);
+most faces games use do not (Lilita One, Fredoka, Titan One, Chango and
+Bowlby One lack ğ, ş or İ, and caps-only faces such as Luckiest Guy draw a
+lower-case i without its dot). Neither has a capital ẞ or the narrow no-break
+space (U+202F): German capitals write SS, French spacing uses U+00A0. The app
 ships static Latin subsets: Rubik Black and ExtraBold, Nunito SemiBold, Bold,
 ExtraBold and Black (`assets/fonts`, OFL).
 
+**Arabic** is set in **Cairo** (OFL), weight for weight — Black where Rubik
+Black stands, ExtraBold, Bold, SemiBold for the rest (`ARABIC_FONT` in
+`ui/theme.ts`). Arabic reads right to left and the app reloads to turn
+around, so `FONT` and `TYPE` are chosen once, when the app starts, by the
+direction it reads: in Arabic every role is Cairo, `label` loses its
+letter-spacing (spacing tears joined letters apart — `tracking()`), and
+every line is a third taller (`lh()`: Cairo's letters climb and hang
+further). The language picker writes each language's name in its own face,
+whatever the game speaks.
+
 **Capitals** are allowed for ribbons and tile names only, **typed in capitals
-in the source** with the Turkish İ. Never `textTransform: 'uppercase'`: it
-knows no Turkish and turns "i" into "I". Everything else is sentence case.
+in each language's line** — the Turkish İ, the German SS; Arabic has none.
+Never `textTransform: 'uppercase'`: it knows no Turkish and turns "i" into
+"I". Everything else is sentence case.
+
+**Right to left.** In Arabic the whole layout mirrors itself: rows, margins,
+`left`/`right`, the dock's order, the podium, a meter's fill. What a layout
+does not turn by itself is turned by hand — the glyphs that point along the
+line (`chevron`, `back`, `logout`, `trendUp`/`trendDown`, …; `MIRRORED` in
+`ui/icons.tsx`) and transforms (the `Toggle` knob). The game's own gestures
+are vertical and read the same both ways.
 
 ## Shape and depth
 

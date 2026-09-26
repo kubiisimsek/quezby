@@ -26,8 +26,8 @@ import { BoardStage, useArrival } from '@/components/BoardStage';
 import { FloorDock } from '@/components/FloorDock';
 import { PlayerSheet } from '@/components/PlayerSheet';
 import { useLeague } from '@/hooks/useBoards';
+import { useT } from '@/i18n';
 import { messageFor } from '@/lib/errors';
-import { dativeOf, formatRank } from '@/lib/format';
 import type { RootStackParamList, TabParamList } from '@/navigation/types';
 import { Icon } from '@/ui/icons';
 import {
@@ -45,7 +45,6 @@ import {
   SkeletonList,
   Spotlight,
   Stamp,
-  TIER_LABELS,
   TierBadge,
   Txt,
 } from '@/ui/kit';
@@ -82,6 +81,7 @@ const TIERS: LeagueTier[] = ['bronze', 'silver', 'gold', 'platinum', 'diamond'];
 export function LeagueScreen({ navigation }: Props) {
   const league = useLeague();
   const theme = useTheme();
+  const t = useT();
   const { refetch } = league;
   const data = league.data;
   const [selected, setSelected] = useState<string | null>(null);
@@ -122,11 +122,11 @@ export function LeagueScreen({ navigation }: Props) {
   if (!data) {
     body = league.isError ? (
       <View style={styles.stack}>
-        <Callout tone="bad" title="Lig yüklenemedi">
-          {messageFor(league.error)}
+        <Callout tone="bad" title={t.league.failed}>
+          {messageFor(league.error, t)}
         </Callout>
         <Button
-          label="Tekrar dene"
+          label={t.league.retry}
           tone="neutral"
           icon="refresh"
           onPress={() => void refetch()}
@@ -149,20 +149,25 @@ export function LeagueScreen({ navigation }: Props) {
         ) : data.unlock ? (
           <EmptyState
             icon="lock"
-            title={`Lige ${data.unlock.remaining} oyun kaldı`}
-            hint={`Lig, ilk ${data.unlock.required} oyunundan sonra açılır; deneme turu sayılmaz. Sonra her haftanın ilk turu seni bir gruba yerleştirir.`}
+            title={t.league.locked.title(data.unlock.remaining)}
+            hint={t.league.locked.hint(data.unlock.required)}
             action={
-              <Button label="Oyna" icon="play" tone="play" onPress={play} />
+              <Button
+                label={t.league.play}
+                icon="play"
+                tone="play"
+                onPress={play}
+              />
             }
           />
         ) : (
           <EmptyState
             icon="shield"
-            title="Bu hafta henüz oynamadın"
-            hint="Haftanın ilk turu seni bir gruba yerleştirir; her günün en iyi skoru puanına eklenir."
+            title={t.league.join.title}
+            hint={t.league.join.hint}
             action={
               <Button
-                label="Oyna, ligine katıl"
+                label={t.league.join.action}
                 icon="play"
                 tone="play"
                 onPress={play}
@@ -295,6 +300,7 @@ function LeagueStage({
   onElapsed: () => void;
 }) {
   const theme = useTheme();
+  const t = useT();
   const insets = useSafeAreaInsets();
 
   let hero: ReactNode;
@@ -320,7 +326,7 @@ function LeagueStage({
 
   return (
     <BoardStage style={[styles.stage, { paddingTop: insets.top + SPACE.md }]}>
-      <Ribbon label="HAFTALIK LİG" />
+      <Ribbon label={t.league.ribbon} />
       {hero}
     </BoardStage>
   );
@@ -334,19 +340,20 @@ function TierHero({
   onElapsed: () => void;
 }) {
   const theme = useTheme();
+  const t = useT();
   const intro = useArrival(0, 12);
 
   return (
     <Animated.View style={[styles.hero, intro]}>
       <TierLadder tier={league.tier} />
       <Txt variant="hero" align="center">
-        {`${TIER_LABELS[league.tier]} lig`}
+        {t.tiers.league(league.tier)}
       </Txt>
       <View style={styles.centred}>
         <CountdownChip
           endsAt={league.endsAt}
           serverTime={league.serverTime}
-          prefix="Bitmesine"
+          prefix={t.home.countdown.endsIn}
           tone="onBrand"
           onElapsed={onElapsed}
         />
@@ -359,7 +366,7 @@ function TierHero({
           strokeWidth={2.4}
         />
         <Txt variant="meta" tone="onSolid">
-          Puanın: her günün en iyi skorunun toplamı
+          {t.league.rule}
         </Txt>
       </View>
     </Animated.View>
@@ -438,16 +445,16 @@ function LastWeekCard({
   onDismiss: () => void;
 }) {
   const theme = useTheme();
+  const t = useT();
+  const words = t.league.lastWeek;
   const intro = useArrival(1);
-  const from = TIER_LABELS[lastWeek.tier];
-  const to = TIER_LABELS[lastWeek.newTier];
   const up = lastWeek.outcome === 'promoted';
   const down = lastWeek.outcome === 'demoted';
   const headline = up
-    ? `${dativeOf(to)} yükseldin!`
+    ? words.promoted(lastWeek.newTier)
     : down
-      ? `${dativeOf(to)} düştün.`
-      : `${to} ligde kaldın.`;
+      ? words.demoted(lastWeek.newTier)
+      : words.stayed(lastWeek.newTier);
   const ring = up
     ? withAlpha(theme.gold, 0.8)
     : down
@@ -487,10 +494,10 @@ function LastWeekCard({
             {headline}
           </Txt>
           <Txt variant="meta" tone="muted">
-            {`Geçen hafta ${from} ligde ${formatRank(lastWeek.rank)} oldun.`}
+            {words.finished(lastWeek.tier, lastWeek.rank)}
           </Txt>
         </View>
-        <IconButton icon="close" label="Kapat" onPress={onDismiss} />
+        <IconButton icon="close" label={words.close} onPress={onDismiss} />
       </Panel>
     </Animated.View>
   );
@@ -518,6 +525,7 @@ function Group({
   members: LeagueMember[];
   onPress: (member: LeagueMember) => void;
 }) {
+  const t = useT();
   return (
     <View style={styles.group}>
       {runsOf(members).map((run) => {
@@ -527,7 +535,7 @@ function Group({
             rank={member.rank}
             username={member.username}
             score={member.points}
-            detail={`${member.daysPlayed} gün`}
+            detail={t.league.days(member.daysPlayed)}
             gap={member.gap}
             isMe={member.isMe}
             index={members.indexOf(member)}
@@ -565,6 +573,8 @@ function ZoneBand({
   children: ReactNode;
 }) {
   const theme = useTheme();
+  const t = useT();
+  const words = t.league.zones[zone];
   const up = zone === 'promote';
   const look = up
     ? {
@@ -593,7 +603,7 @@ function ZoneBand({
         <View
           accessible
           accessibilityRole="header"
-          accessibilityLabel={up ? 'Terfi bölgesi' : 'Düşme bölgesi'}
+          accessibilityLabel={words.name}
           style={[
             styles.banner,
             {
@@ -608,9 +618,7 @@ function ZoneBand({
             style={[styles.bannerHi, { backgroundColor: look.hi }]}
           />
           {arrow}
-          <Text style={[TYPE.label, { color: look.ink }]}>
-            {up ? 'TERFİ BÖLGESİ' : 'DÜŞME BÖLGESİ'}
-          </Text>
+          <Text style={[TYPE.label, { color: look.ink }]}>{words.ribbon}</Text>
           {arrow}
         </View>
       </View>

@@ -15,7 +15,11 @@ anlamlı kılmak için var.
 ## İlk açılış
 
 İlk kez giren oyuncuyu önce oyun karşılar, form değil (Apple'ın _Onboarding
-for Games_ rehberi ve Unity'nin "önce anonim hesap, sonra bağla" yaklaşımı):
+for Games_ rehberi ve Unity'nin "önce anonim hesap, sonra bağla" yaklaşımı).
+Oyun **telefonun dilinde** açılır — Türkçe, İngilizce, Almanca, Arapça,
+Fransızca ya da İspanyolca; telefonun dili bunlardan biri değilse İngilizce.
+Karşılamadaki küçük dil düğmesi daha oynamadan başka dil seçtirir
+([localization.md](./localization.md)).
 
 1. **Karşılama:** marka, dört hareketin taşları, tek altın **Oyna** ve
    **Hesabım var, giriş yap**. Oyna misafir hesabı açar; hesap açılırken
@@ -107,8 +111,10 @@ Ayrıntılar: [scoring.md](./scoring.md).
   yolunun kaldırılmasına izin vermez.
 - **Hesabı sil:** uygulama içinden, kalıcı (App Store 5.1.1(v)); Apple ile
   bağlıysa Apple'daki izin de geri alınır.
-- Ayarlar: titreşim (telefonda saklanır, hesaba da yazılır). Yardım: lobideki
-  `?` ve Profil'den.
+- Ayarlar: **dil** ve titreşim (ikisi de telefonda saklanır, hesaba da
+  yazılır). Dil, hesabın kaydıdır: başka bir telefonda o hesaba giren oyunu
+  hesabın dilinde bulur ([localization.md](./localization.md)). Yardım:
+  lobideki `?` ve Profil'den.
 
 ## İstatistik
 

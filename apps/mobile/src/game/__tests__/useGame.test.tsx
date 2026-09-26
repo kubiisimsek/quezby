@@ -8,6 +8,7 @@ import { AppState, type AppStateStatus, type NativeEventSubscription } from 'rea
 import { track } from '@/analytics/track';
 import { api } from '@/api/client';
 import { useGame } from '@/game/useGame';
+import { useLanguage } from '@/i18n/language';
 import { usePendingRun } from '@/stores/pendingRun';
 
 jest.mock('@/analytics/track', () => ({ track: jest.fn() }));
@@ -89,6 +90,28 @@ describe('useGame', () => {
     expect(hook.result.current.startError?.code).toBe('daily_already_played');
   });
 
+  it('words why a run could not start in the language on screen, even one picked after', async () => {
+    runs.start.mockRejectedValue(new ApiError(0, 'network', 'offline'));
+
+    const hook = await renderHook(() => useGame('daily'));
+    await act(async () => {
+      await hook.result.current.start();
+    });
+
+    expect(hook.result.current.startError).toEqual({
+      code: 'network',
+      message: 'Sunucuya ulaşılamadı. İnternet bağlantını kontrol et.',
+    });
+
+    await act(async () => {
+      useLanguage.setState({ locale: 'en' });
+    });
+    expect(hook.result.current.startError).toEqual({
+      code: 'network',
+      message: "Couldn't reach the server. Check your internet connection.",
+    });
+  });
+
   it('shows only what the API answered at the end', async () => {
     runs.start.mockResolvedValue(started);
     const answer = { run: { score: 1 }, best: null, ranks: {}, isNewBest: false };
@@ -142,6 +165,30 @@ describe('useGame', () => {
 
     expect(hook.result.current.outcome).toMatchObject({ mode: 'unsent', canRetry: false });
     expect(usePendingRun.getState().run).toBeNull();
+  });
+
+  it('words an unsent finish in the language on screen', async () => {
+    runs.start.mockResolvedValue(started);
+    runs.finish.mockRejectedValueOnce(new ApiError(410, 'run_expired', 'x'));
+    const hook = await playing();
+
+    await act(async () => {
+      hook.result.current.quit();
+    });
+    expect(hook.result.current.outcome).toEqual({
+      mode: 'unsent',
+      message: 'Tur çok uzun sürdüğü için süresi doldu.',
+      canRetry: false,
+    });
+
+    await act(async () => {
+      useLanguage.setState({ locale: 'ar' });
+    });
+    expect(hook.result.current.outcome).toEqual({
+      mode: 'unsent',
+      message: 'استغرقت الجولة وقتًا طويلًا فانتهت صلاحيتها.',
+      canRetry: false,
+    });
   });
 });
 

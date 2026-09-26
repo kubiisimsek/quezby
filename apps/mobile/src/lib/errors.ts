@@ -1,55 +1,38 @@
-import { USERNAME_MESSAGES, type UsernameProblem } from '@quezby/config';
+import type { UsernameProblem } from '@quezby/config';
 import { ApiError } from '@quezby/sdk';
 
-/** Turkish copy for what went wrong — what happened, then what to do. */
-export function messageFor(error: unknown): string {
-  if (!(error instanceof ApiError)) {
-    return 'Bir şeyler ters gitti. Tekrar dene.';
-  }
+import { getT, type Messages } from '@/i18n';
+
+/**
+ * What went wrong — what happened, then what to do — in the player's
+ * language. Every API code has its own line; only `validation_failed` shows
+ * the API's message, which comes back in the language the request asked for.
+ */
+export function messageFor(error: unknown, t: Messages = getT()): string {
+  if (!(error instanceof ApiError)) return t.errors.unknown;
   switch (error.code) {
     case 'network':
-      return 'Sunucuya ulaşılamadı. İnternet bağlantını kontrol et.';
+      return t.errors.network;
     case 'timeout':
-      return 'Sunucu geç yanıt verdi. Birazdan tekrar dene.';
-    case 'invalid_credentials':
-      return 'E-posta ya da şifre hatalı.';
-    case 'email_taken':
-      return 'Bu e-posta başka bir hesaba bağlı.';
-    case 'already_linked':
-      return 'Bu hesaba zaten bağlı.';
-    case 'identity_invalid':
-      return 'Giriş doğrulanamadı. Tekrar dene.';
-    case 'identity_taken':
-      return 'Bu hesap başka bir Quezby oyuncusuna bağlı.';
-    case 'last_sign_in_method':
-      return 'Bu, hesabına girmenin tek yolu. Önce başka bir yol bağla.';
-    case 'daily_already_played':
-      return 'Günün akışını bugün oynadın. Yarın yeni akış seni bekliyor.';
-    case 'cannot_follow_self':
-      return 'Kendini takip edemezsin.';
-    case 'follow_limit':
-      return 'En fazla 500 oyuncu takip edebilirsin.';
+      return t.errors.timeout;
     case 'username_taken':
-      return USERNAME_MESSAGES.taken;
-    case 'username_locked':
-      return 'Kullanıcı adını zaten seçtin; seçilen ad değişmez.';
+      return t.usernameRules.taken;
     case 'username_invalid': {
       const problem = error.fields.username?.[0] as UsernameProblem | undefined;
-      return problem && problem in USERNAME_MESSAGES
-        ? USERNAME_MESSAGES[problem]
-        : 'Bu kullanıcı adı kullanılamaz.';
+      return (problem && t.usernameRules.problems[problem]) || t.errors.codes.username_invalid;
     }
-    case 'too_many_requests':
-      return 'Çok hızlı denedin. Bir dakika bekle.';
-    case 'engine_outdated':
-      return 'Oyunun yeni sürümü var. Güncellemeden skorun sıralamaya giremez.';
-    case 'run_rejected':
-      return 'Bu tur doğrulanamadı, skoru sıralamaya girmedi.';
-    case 'run_expired':
-      return 'Tur çok uzun sürdüğü için süresi doldu.';
     case 'validation_failed':
-      return error.message || 'Girdiğin bilgileri kontrol et.';
+      return error.message || t.errors.codes.validation_failed;
     default:
-      return error.message || 'Bir şeyler ters gitti. Tekrar dene.';
+      return t.errors.codes[error.code] ?? t.errors.unknown;
   }
+}
+
+/** Why a name is refused, in the player's language — a code the rules or the API gave. */
+export function usernameMessage(problem: string | null | undefined, t: Messages = getT()): string {
+  if (problem === 'taken') return t.usernameRules.taken;
+  return (
+    (problem && t.usernameRules.problems[problem as UsernameProblem]) ||
+    t.errors.codes.username_invalid
+  );
 }

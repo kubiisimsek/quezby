@@ -9,6 +9,8 @@ import { fireEvent, screen } from '@testing-library/react-native';
 import type { ComponentProps } from 'react';
 
 import { api } from '@/api/client';
+import { iso } from '@/i18n';
+import { useLanguage } from '@/i18n/language';
 import { LeagueScreen } from '@/screens/league/LeagueScreen';
 import { renderWithProviders } from '@/test/renderWithProviders';
 
@@ -325,6 +327,98 @@ describe('LeagueScreen — Lig', () => {
 
     expect(
       await screen.findByRole('header', { name: 'Terfi bölgesi' }),
+    ).toBeOnTheScreen();
+  });
+});
+
+describe('LeagueScreen — in other languages', () => {
+  beforeEach(async () => {
+    jest.clearAllMocks();
+    await AsyncStorage.clear();
+  });
+
+  it('speaks English: the stage, last week, the zones and your floor', async () => {
+    useLanguage.setState({ locale: 'en' });
+    mocked.leagues.current.mockResolvedValue(
+      league({ lastWeek: lastWeek('promoted', 'silver', 'gold') }),
+    );
+
+    await renderLeague();
+
+    expect(
+      await screen.findByText('You moved up to Gold league!'),
+    ).toBeOnTheScreen();
+    expect(
+      screen.getByText('Last week you finished #3 in Silver league.'),
+    ).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Close' })).toBeOnTheScreen();
+    expect(screen.getByText('WEEKLY LEAGUE')).toBeOnTheScreen();
+    expect(screen.getByText('Gold league')).toBeOnTheScreen();
+    expect(
+      screen.getByText("Your points: the sum of each day's best score"),
+    ).toBeOnTheScreen();
+    expect(
+      screen.getByRole('header', { name: 'Promotion zone' }),
+    ).toBeOnTheScreen();
+    expect(screen.getByText('PROMOTION ZONE')).toBeOnTheScreen();
+    expect(screen.getByText('RELEGATION ZONE')).toBeOnTheScreen();
+    expect(
+      screen.getByRole('button', {
+        name: '3rd place, @kubi, you, 30,500 points, 3 days, 7,501 points to pass',
+      }),
+    ).toBeOnTheScreen();
+    expect(screen.getAllByText('1 day')).toHaveLength(2);
+    expect(screen.getByText('7,501 pts to @mert')).toBeOnTheScreen();
+  });
+
+  it('tells a new player in English how many games stand before the league', async () => {
+    useLanguage.setState({ locale: 'en' });
+    mocked.leagues.current.mockResolvedValue(
+      league({
+        joined: false,
+        members: [],
+        me: null,
+        unlock: { required: 3, remaining: 1 },
+      }),
+    );
+
+    await renderLeague();
+
+    expect(await screen.findByText('1 game to the league')).toBeOnTheScreen();
+    expect(
+      screen.getByText(
+        "The league opens after your first 3 games; the practice run doesn't count. Then your first run of each week puts you in a group.",
+      ),
+    ).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Play' })).toBeOnTheScreen();
+  });
+
+  it('speaks Arabic: the tier, the zones and how last week ended', async () => {
+    useLanguage.setState({ locale: 'ar' });
+    mocked.leagues.current.mockResolvedValue(
+      league({ lastWeek: lastWeek('demoted', 'platinum', 'gold') }),
+    );
+
+    await renderLeague();
+
+    expect(await screen.findByText('هبطت إلى دوري الذهب.')).toBeOnTheScreen();
+    expect(
+      screen.getByText(
+        `في الأسبوع الماضي حللت في المركز ${iso('#3')} في دوري البلاتين.`,
+      ),
+    ).toBeOnTheScreen();
+    expect(screen.getByText('الدوري الأسبوعي')).toBeOnTheScreen();
+    expect(screen.getByText('دوري الذهب')).toBeOnTheScreen();
+    expect(
+      screen.getByRole('header', { name: 'منطقة الصعود' }),
+    ).toBeOnTheScreen();
+    expect(
+      screen.getByRole('header', { name: 'منطقة الهبوط' }),
+    ).toBeOnTheScreen();
+    expect(
+      screen.getByRole('button', {
+        name: `المركز 1، ${iso('@ekin')}، 41,200 نقطة، 5 أيام`,
+      }),
     ).toBeOnTheScreen();
   });
 });

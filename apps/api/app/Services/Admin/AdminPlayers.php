@@ -165,6 +165,7 @@ final class AdminPlayers
             'email' => $player->email,
             'platform' => $player->platform,
             'identities' => $identities,
+            'locale' => $player->locale->value,
             'best' => $best,
             'createdAt' => Timestamp::iso($player->created_at),
             'lastPlayedAt' => is_string($lastPlayed) ? Timestamp::iso(Carbon::parse($lastPlayed, 'UTC')) : null,

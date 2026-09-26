@@ -33,6 +33,7 @@ class MeResource extends JsonResource
             'isGuest' => $this->email === null && $identities === [],
             'identities' => $identities,
             'settings' => $this->resolvedSettings(),
+            'locale' => $this->locale->value,
             'best' => self::best($this->resource),
             'createdAt' => Timestamp::iso($this->created_at),
         ];

@@ -16,6 +16,27 @@
 - `StyleSheet.create` for layout. A theme colour may be passed inline in a
   style array; a static size or spacing may not.
 - Never `textTransform: 'uppercase'`.
+- **Every word a player sees comes from the catalogs** (`src/i18n/messages/`,
+  the six languages side by side; `docs/design/ui-writing.md`): `const t =
+  useT()` in the component, `t.<area>.<line>`. No text literal in a screen,
+  kit piece or hook — ESLint refuses JSX text, copy props (`label`, `title`,
+  `subtitle`, `body`, `hint`, `placeholder`, `message`, `accessibilityLabel`)
+  and Turkish letters outside `src/i18n`. Numbers, times and lists through
+  `t.fmt`, a player's name through `handle(name)` (never `` `@${name}` ``).
+  Keep codes in state and words out of it, so a language picked mid-screen
+  shows at once.
+- **The language** is `useLanguage` (`src/i18n/language.ts`): the phone's own
+  language on a first launch (English when it is none of the six), then the
+  one picked in Ayarlar or taken from the account at sign-in;
+  `useLanguageSync` writes it to the account (`PUT /me/locale`) and every
+  request asks the API for it (`Accept-Language`). Arabic reads right to left
+  (`I18nManager`): choosing it, or leaving it, reloads the app
+  (`react-native-restart`), guarded against reloading twice.
+- **Right to left is automatic, except where it is not.** React Native mirrors
+  rows, margins, paddings and `left`/`right` in Arabic by itself — use them
+  freely. A transform, an SVG path or a glyph that points somewhere does not
+  turn: flip it with `IS_RTL` (`src/i18n/native.ts`) or add the glyph to
+  `MIRRORED` in `src/ui/icons.tsx`. No line of copy names a side.
 - UI components are presentation-only. Rules live in `@quezby/engine`
   (the game), `@quezby/config` (usernames) and the API (everything else).
 - The game's outcome is **only** what `Run.apply` returns. The screen's
@@ -63,13 +84,18 @@ The owner judges every screen as a game. These are the rules that keep it one
   that starts a game. Magenta and violet do everything else; red takes
   something away.
 - **Type.** Titles, numbers and button labels are Rubik through `Txt`
-  (`hero`, `display`, `title`, `score`) or `embossed()`; body text is Nunito.
+  (`hero`, `display`, `title`, `score`) or `embossed()`; body text is Nunito
+  (Cairo in Arabic, chosen by `FONT` — never name a face in a screen).
   Capitals only for ribbons and tile names (`TYPE.label`), typed in capitals
-  in the source with the Turkish **İ** — never `textTransform`.
-- **Fonts carry Turkish.** A face is allowed only if it has ğ Ğ ş Ş ı İ ç Ç ö Ö
-  ü Ü and draws a lower-case i with its dot (Lilita One, Fredoka, Titan One,
-  Luckiest Guy and other caps-only faces fail). A new weight goes into
-  `assets/fonts`, `Info.plist` `UIAppFonts`, the Xcode project's resources and
+  in each language's line (the Turkish **İ**, German **SS**) — never
+  `textTransform`. A letter-spacing or a line height outside `TYPE` goes
+  through `tracking()` / `lh()`, so Arabic stays joined and uncut.
+- **Fonts carry the six languages.** A Latin face is allowed only if it has
+  every letter of Turkish, German, French and Spanish (ğ Ğ ş Ş ı İ ç Ç ö Ö ü
+  Ü ä ß é è ê à â œ ñ á í ó ú ¿ ¡ « ») and draws a lower-case i with its dot
+  (Lilita One, Fredoka, Titan One, Luckiest Guy and other caps-only faces
+  fail); Arabic is Cairo. A new weight goes into `assets/fonts`,
+  `Info.plist` `UIAppFonts`, the Xcode project's resources and
   `android/app/src/main/assets/fonts`, then a native rebuild.
 - **Colour is a job.** Gold: play, records, your rank numbers. Magenta: brand,
   you, likes. Violet: quiet. Cyan (`accent`): time only. Green / red: good /

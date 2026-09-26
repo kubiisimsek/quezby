@@ -1,5 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react-native';
 
+import { iso } from '@/i18n';
+import { useLanguage } from '@/i18n/language';
 import { renderWithProviders } from '@/test/renderWithProviders';
 import { FloorCard } from '@/ui/kit';
 import { arena as light } from '@/ui/tokens';
@@ -108,5 +110,63 @@ describe('FloorCard', () => {
     expect(screen.getByRole('progressbar')).toHaveAccessibilityValue({
       now: 100,
     });
+  });
+});
+
+describe('FloorCard — in other languages', () => {
+  it('names the player to pass in English, without bending the name', async () => {
+    useLanguage.setState({ locale: 'en' });
+    await renderWithProviders(
+      <FloorCard
+        rank={44}
+        score={9_870}
+        targetUsername="ekin"
+        gapToNext={1_240}
+        progress={620}
+        onPlay={jest.fn()}
+      />,
+    );
+
+    expect(screen.getByText('YOUR FLOOR')).toHaveProp(
+      'accessibilityLabel',
+      'Your floor',
+    );
+    expect(screen.getByText('You · 9,870')).toBeOnTheScreen();
+    expect(screen.getByText('1,240 pts to @ekin')).toBeOnTheScreen();
+    expect(
+      screen.getByRole('progressbar', { name: 'Progress to the next rank' }),
+    ).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Pass them' })).toBeOnTheScreen();
+
+    await screen.rerender(
+      <FloorCard rank={7} score={500} gapToNext={1} onPlay={jest.fn()} />,
+    );
+    expect(screen.getByText('1 pt to the next rank')).toBeOnTheScreen();
+
+    await screen.rerender(
+      <FloorCard rank={1} score={24_000} gapToNext={null} onPlay={jest.fn()} />,
+    );
+    expect(
+      screen.getByText("You're on the summit! Hold your spot."),
+    ).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Play' })).toBeOnTheScreen();
+  });
+
+  it('keeps the name whole in the Arabic line', async () => {
+    useLanguage.setState({ locale: 'ar' });
+    await renderWithProviders(
+      <FloorCard
+        rank={44}
+        score={9_870}
+        targetUsername="ekin"
+        gapToNext={2}
+        onPlay={jest.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByText(`تفصلك نقطتان عن ${iso('@ekin')}`),
+    ).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'تجاوزه' })).toBeOnTheScreen();
   });
 });

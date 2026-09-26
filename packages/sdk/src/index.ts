@@ -24,6 +24,7 @@ import type {
   LeaderboardScope,
   LeagueResponse,
   LinkCredentialsRequest,
+  Locale,
   LoginRequest,
   Me,
   MeResponse,
@@ -35,6 +36,7 @@ import type {
   StartRunRequest,
   StartRunResponse,
   StatsResponse,
+  UpdateLocaleRequest,
   UpdateSettingsRequest,
   UsernameAvailability,
   UserSearchResponse,
@@ -87,6 +89,12 @@ export type ApiClientOptions = {
   appVersion?: string;
   /** The phone, sent as `X-Device` with every call once it is known. */
   device?: () => ClientDevice | null;
+  /**
+   * The language the app speaks, sent as `Accept-Language` with every call:
+   * the API's messages and share texts come back in it, and an account made
+   * by the call is born with it.
+   */
+  locale?: () => Locale | null;
 };
 
 /**
@@ -152,6 +160,12 @@ export function createApiClient({ device, ...options }: ApiClientOptions) {
         request<{ settings: UserSettings }>('/me/settings', {
           method: 'PUT',
           body: input,
+        }),
+      /** The language the phone plays in, written to the account. */
+      updateLocale: (locale: Locale) =>
+        request<{ user: Me }>('/me/locale', {
+          method: 'PUT',
+          body: { locale } satisfies UpdateLocaleRequest,
         }),
       linkCredentials: (input: LinkCredentialsRequest) =>
         request<{ user: Me }>('/me/credentials', {

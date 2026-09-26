@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import {
-  USERNAME_MESSAGES,
+  USERNAME_PROBLEMS,
   canPickUsername,
   isAutoUsername,
   normalizeUsername,
@@ -41,9 +41,9 @@ describe('validateUsername', () => {
     }
   });
 
-  it('has a message for every problem', () => {
+  it('names every problem the fixtures refuse a name for', () => {
     for (const { problem } of fixtures.invalid) {
-      expect(USERNAME_MESSAGES[problem as keyof typeof USERNAME_MESSAGES]).toBeTruthy();
+      expect(USERNAME_PROBLEMS).toContain(problem);
     }
   });
 
@@ -97,9 +97,16 @@ describe('usernameChecklist', () => {
 
   it('shows which rule a name breaks', () => {
     const unmet = usernameChecklist('ku..').filter((item) => !item.met).map((item) => item.rule);
-    expect(unmet).toEqual([
-      'Harf ya da rakamla başlar ve biter',
-      'Nokta ve yıldız art arda gelmez',
+    expect(unmet).toEqual(['edges', 'symbols']);
+  });
+
+  it('lists the rules in the order the field shows them', () => {
+    expect(usernameChecklist('').map((item) => item.rule)).toEqual([
+      'length',
+      'charset',
+      'edges',
+      'symbols',
+      'letter',
     ]);
   });
 });

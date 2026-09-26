@@ -69,5 +69,38 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    // Every word a player sees comes from the catalogs, in six languages
+    // (apps/mobile/src/i18n/messages, docs/rules/react-native-rules.md): no
+    // text in a screen, a kit piece or a hook. The brand is the one word left.
+    files: ['apps/mobile/src/**/*.{ts,tsx}'],
+    ignores: ['apps/mobile/src/i18n/**', 'apps/mobile/src/**/__tests__/**', 'apps/mobile/src/test/**'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'JSXText[value=/\\p{L}/u]:not([value=/^\\s*Quezby\\s*$/])',
+          message: 'Words come from the catalogs: `const t = useT()`, then `t.<area>.<line>`.',
+        },
+        {
+          selector:
+            'JSXAttribute[name.name=/^(label|title|subtitle|body|hint|placeholder|message|description|eyebrow|prefix|accessibilityLabel|accessibilityHint)$/] > Literal[value=/\\p{L}/u]',
+          message: 'Words come from the catalogs: `const t = useT()`, then `t.<area>.<line>`.',
+        },
+        {
+          selector: 'Literal[value=/[çğıöşüÇĞİÖŞÜ]/]',
+          message: 'Turkish belongs in the catalogs (src/i18n/messages), with the other five languages.',
+        },
+        {
+          selector: 'TemplateElement[value.raw=/[çğıöşüÇĞİÖŞÜ]/]',
+          message: 'Turkish belongs in the catalogs (src/i18n/messages), with the other five languages.',
+        },
+        {
+          selector: 'TemplateLiteral[quasis.0.value.raw="@"]',
+          message: "A player's name is written with `handle(name)` — it stays whole in Arabic.",
+        },
+      ],
+    },
+  },
   eslintConfigPrettier,
 );

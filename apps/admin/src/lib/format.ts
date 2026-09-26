@@ -16,6 +16,7 @@ import type {
   LeagueOutcome,
   LeagueTier,
   LeagueZone,
+  Locale,
   Platform,
   RunFlagCode,
   RunFlagSeverity,
@@ -317,6 +318,16 @@ export const BOARD: Record<LeaderboardBoard, string> = {
 export const PLATFORM: Record<Platform, string> = { ios: 'iOS', android: 'Android' };
 
 export const PROVIDER: Record<SocialProvider, string> = { apple: 'Apple', google: 'Google' };
+
+/** The language a player plays in, named the panel's way — in Turkish, whatever the game speaks. */
+export const LOCALE_LABEL: Record<Locale, string> = {
+  tr: 'Türkçe',
+  en: 'İngilizce',
+  de: 'Almanca',
+  ar: 'Arapça',
+  fr: 'Fransızca',
+  es: 'İspanyolca',
+};
 
 export const DEVICE_VERDICT: Record<AdminDeviceVerdict, Label> = {
   pass: { tone: 'ok', label: 'Doğrulandı' },

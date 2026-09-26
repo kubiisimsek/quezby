@@ -26,6 +26,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useT } from '@/i18n';
 import { Icon, type IconName } from '@/ui/icons';
 import {
   Button,
@@ -83,6 +84,7 @@ export function Sheet({
   children?: ReactNode;
 }) {
   const theme = useTheme();
+  const t = useT();
   const insets = useSafeAreaInsets();
 
   /** The modal outlives `open` by one animation, so the exit can be seen. */
@@ -184,7 +186,7 @@ export function Sheet({
         >
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Kapat"
+            accessibilityLabel={t.kit.sheet.close}
             style={styles.fill}
             onPress={close}
           />
@@ -232,7 +234,7 @@ export function Sheet({
                     lip={DEPTH.lipSm}
                     onPress={close}
                     hitSlop={12}
-                    accessibilityLabel="Kapat"
+                    accessibilityLabel={t.kit.sheet.close}
                     faceStyle={styles.closeButton}
                   >
                     <Icon name="close" size={18} color={theme.onBrand} strokeWidth={3.2} />
@@ -272,7 +274,7 @@ export function FormSheet({
   title,
   description,
   onSubmit,
-  submitLabel = 'Kaydet',
+  submitLabel,
   submitIcon,
   submitTone = 'primary',
   pending = false,
@@ -287,6 +289,7 @@ export function FormSheet({
   title: string;
   description?: string;
   onSubmit: () => void;
+  /** "Kaydet", in the player's language, unless given. */
   submitLabel?: string;
   submitIcon?: Parameters<typeof Icon>[0]['name'];
   submitTone?: Extract<ButtonTone, 'primary' | 'danger'>;
@@ -295,6 +298,7 @@ export function FormSheet({
   error?: string | null;
   children: ReactNode;
 }) {
+  const t = useT();
   return (
     <Sheet
       open={open}
@@ -304,7 +308,7 @@ export function FormSheet({
       description={description}
       footer={
         <Button
-          label={submitLabel}
+          label={submitLabel ?? t.kit.sheet.save}
           icon={submitIcon}
           tone={submitTone}
           onPress={onSubmit}

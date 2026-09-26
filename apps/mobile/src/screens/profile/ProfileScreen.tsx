@@ -12,19 +12,16 @@ import { api } from '@/api/client';
 import { useSession } from '@/auth/session';
 import { Portrait, SeasonBest } from '@/components/PlayerCard';
 import { CredentialsSheet } from '@/components/CredentialsSheet';
+import { LanguageSheet } from '@/components/LanguageSheet';
 import { SignInWaysSheet, signInWays } from '@/components/SignInWaysSheet';
 import { UsernameField } from '@/components/UsernameField';
 import { BONUS_ORDER } from '@/game/howTo';
 import { useLeague, useStats } from '@/hooks/useBoards';
 import { rememberMe } from '@/hooks/useMe';
 import { useUsernameCheck } from '@/hooks/useUsernameCheck';
+import { handle, useLocale, useT } from '@/i18n';
+import { SHRINK_TO_FIT } from '@/i18n/native';
 import { messageFor } from '@/lib/errors';
-import {
-  formatCombo,
-  formatList,
-  formatPlayTime,
-  formatScore,
-} from '@/lib/format';
 import type { RootStackParamList, TabParamList } from '@/navigation/types';
 import {
   SettingsSheet,
@@ -71,7 +68,7 @@ type Props = CompositeScreenProps<
 >;
 
 type SheetName =
-  'settings' | 'username' | 'ways' | 'credentials' | 'delete' | null;
+  'settings' | 'language' | 'username' | 'ways' | 'credentials' | 'delete' | null;
 
 /** What waits for the open sheet to leave the screen: another sheet, or a door out. */
 type Next = Exclude<SheetName, 'settings' | null> | SettingsDoor;
@@ -83,7 +80,7 @@ const PORTRAIT_RISE = 46;
  * The player's card, the way a game shows one: who you are, your league,
  * your season best and places — then every count the API keeps, the named
  * combos you have pulled off and the friends' posts you liked most. What is
- * opened now and then — Titreşim, Yardım, the account's doors — waits in
+ * opened now and then — the language, Titreşim, Yardım, the account's doors — waits in
  * Ayarlar behind the gear; a guest's nudge to keep the account stays out
  * front.
  */
@@ -144,6 +141,7 @@ export function ProfileScreen({ navigation }: Props) {
         onClosed={settle}
         onPick={leaveFor}
       />
+      <LanguageSheet open={sheet === 'language'} onClose={() => setSheet(null)} />
       <UsernameSheet
         open={sheet === 'username'}
         current={user.username}
@@ -187,15 +185,18 @@ function PlayerHero({
   onSettings: () => void;
 }) {
   const theme = useTheme();
-  const ways = signInWays(user);
+  const t = useT();
+  const words = t.profile.hero;
+  const periods = t.board.summit.periods;
+  const ways = signInWays(user, t);
 
   return (
     <Panel tone="primary" style={styles.hero}>
       <BrandBand style={[styles.banner, { borderBottomColor: theme.outline }]}>
-        <Ribbon label="PROFİL" />
+        <Ribbon label={words.ribbon} />
         <IconButton
           icon="sliders"
-          label="Ayarlar"
+          label={t.profile.settings.title}
           tone="onBrand"
           onPress={onSettings}
         />
@@ -207,19 +208,19 @@ function PlayerHero({
         </Stamp>
         <Text
           numberOfLines={1}
-          adjustsFontSizeToFit
+          adjustsFontSizeToFit={SHRINK_TO_FIT}
           minimumFontScale={0.6}
           style={[TYPE.display, styles.name, { color: theme.ink }, embossed(2)]}
         >
-          @{user.username}
+          {handle(user.username ?? '')}
         </Text>
         <View style={styles.badges}>
           {tier ? <TierBadge tier={tier} size="md" showLabel /> : null}
           {user.isGuest ? (
-            <Tag label="Misafir hesap" tone="warn" icon="alert" />
+            <Tag label={words.guest} tone="warn" icon="alert" />
           ) : (
             <Tag
-              label={user.email ?? `${formatList(ways, 've')} ile bağlı`}
+              label={user.email ?? words.linked(t.fmt.list(ways, 'and'))}
               tone="ok"
               icon="shield"
             />
@@ -229,10 +230,10 @@ function PlayerHero({
         <View style={styles.stretch}>
           <RankChips
             items={[
-              { label: 'Bugün', rank: ranks?.daily },
-              { label: 'Hafta', rank: ranks?.weekly },
-              { label: 'Ay', rank: ranks?.monthly },
-              { label: 'Tüm zamanlar', rank: ranks?.all },
+              { label: periods.daily, rank: ranks?.daily },
+              { label: periods.weekly, rank: ranks?.weekly },
+              { label: periods.monthly, rank: ranks?.monthly },
+              { label: periods.all, rank: ranks?.all },
             ]}
           />
         </View>
@@ -247,6 +248,7 @@ function PlayerHero({
  */
 function KeepNudge({ onPress }: { onPress: () => void }) {
   const theme = useTheme();
+  const t = useT();
   return (
     <Pressable
       accessibilityRole="button"
@@ -263,9 +265,9 @@ function KeepNudge({ onPress }: { onPress: () => void }) {
       />
       <IconChip icon="shield" tone="warn" size="md" />
       <View style={styles.flex}>
-        <Txt variant="heading">Hesabını koru</Txt>
+        <Txt variant="heading">{t.auth.keepAccount}</Txt>
         <Txt variant="meta" tone="warn">
-          {keepHint()}
+          {keepHint(t)}
         </Txt>
       </View>
       <ArrowNub />
@@ -279,13 +281,18 @@ function KeepNudge({ onPress }: { onPress: () => void }) {
  * they liked most — known on the phone by id, drawn from the content catalog.
  */
 function Statistics() {
+  const t = useT();
+  const words = t.profile.stats;
+  /** The counts a player card shows too, in the card's words. */
+  const counted = t.friends.sheet.stats;
   const stats = useStats();
   const posts = useMemo(() => postsOf(), []);
+  const locale = useLocale();
 
   if (stats.isLoading) {
     return (
       <>
-        <Eyebrow icon="grid">İstatistikler</Eyebrow>
+        <Eyebrow icon="grid">{words.title}</Eyebrow>
         <SkeletonList rows={2} />
       </>
     );
@@ -294,12 +301,12 @@ function Statistics() {
   if (!stats.data) {
     return (
       <>
-        <Eyebrow icon="grid">İstatistikler</Eyebrow>
-        <Callout tone="bad" title="İstatistikler yüklenemedi">
-          {messageFor(stats.error)}
+        <Eyebrow icon="grid">{words.title}</Eyebrow>
+        <Callout tone="bad" title={words.failed}>
+          {messageFor(stats.error, t)}
         </Callout>
         <Button
-          label="Tekrar dene"
+          label={words.retry}
           tone="neutral"
           icon="refresh"
           onPress={() => void stats.refetch()}
@@ -317,52 +324,52 @@ function Statistics() {
 
   return (
     <>
-      <Eyebrow icon="grid">İstatistikler</Eyebrow>
+      <Eyebrow icon="grid">{words.title}</Eyebrow>
       <StatGrid
         items={[
-          { label: 'Tur', value: formatScore(counts.runs), icon: 'play' },
-          { label: 'Post', value: formatScore(counts.reels), icon: 'grid' },
+          { label: counted.runs, value: t.fmt.score(counts.runs), icon: 'play' },
+          { label: counted.posts, value: t.fmt.score(counts.reels), icon: 'grid' },
           {
-            label: 'Kaydırma',
-            value: formatScore(counts.swipes),
+            label: words.swipes,
+            value: t.fmt.score(counts.swipes),
             icon: 'arrowUp',
           },
           {
-            label: 'Beğeni',
-            value: formatScore(counts.likes),
+            label: counted.likes,
+            value: t.fmt.score(counts.likes),
             icon: 'heart',
             tone: 'primary',
           },
           {
-            label: 'Mükemmel',
-            value: formatScore(counts.perfects),
+            label: counted.perfects,
+            value: t.fmt.score(counts.perfects),
             icon: 'star',
             tone: 'warn',
           },
           {
-            label: 'En iyi tepki',
+            label: words.bestReaction,
             value:
               counts.bestReactionMs === null
                 ? '—'
-                : `${formatScore(counts.bestReactionMs)} ms`,
+                : words.milliseconds(t.fmt.score(counts.bestReactionMs)),
             icon: 'bolt',
             tone: 'warn',
           },
           {
-            label: 'Oyun süresi',
-            value: formatPlayTime(counts.activeMs),
+            label: words.playTime,
+            value: t.fmt.playTime(counts.activeMs),
             icon: 'clock',
           },
           {
-            label: 'En yüksek kombo',
-            value: counts.maxCombo > 0 ? formatCombo(counts.maxCombo) : '—',
+            label: t.result.stats.maxCombo,
+            value: counts.maxCombo > 0 ? t.fmt.combo(counts.maxCombo) : '—',
             icon: 'flame',
             tone: 'primary',
           },
         ]}
       />
 
-      <Eyebrow icon="sparkle">İsimli kombolar</Eyebrow>
+      <Eyebrow icon="sparkle">{t.profile.combos.title}</Eyebrow>
       <Panel style={styles.section}>
         {combos.length > 0 ? (
           <View style={styles.chips}>
@@ -372,12 +379,12 @@ function Statistics() {
           </View>
         ) : (
           <Txt variant="meta" tone="muted">
-            Henüz isimli kombo yapmadın. Nasıl yapıldıkları Yardım’da.
+            {t.profile.combos.empty}
           </Txt>
         )}
       </Panel>
 
-      <Eyebrow icon="heart">En çok beğendiğin</Eyebrow>
+      <Eyebrow icon="heart">{t.profile.liked.title}</Eyebrow>
       <Panel style={styles.section}>
         {liked.length > 0 ? (
           liked.map((item, index) => (
@@ -385,15 +392,15 @@ function Statistics() {
               {index > 0 ? <Divider /> : null}
               <LikedPost
                 emoji={item.post.emoji}
-                user={item.post.user}
-                caption={item.post.caption}
+                user={item.post.user[locale]}
+                caption={item.post.caption[locale]}
                 likes={item.likes}
               />
             </View>
           ))
         ) : (
           <Txt variant="meta" tone="muted">
-            Arkadaşlarının postlarını beğendikçe en sevdiklerin burada görünür.
+            {t.profile.liked.empty}
           </Txt>
         )}
       </Panel>
@@ -418,6 +425,7 @@ function LikedPost({
   likes: number;
 }) {
   const theme = useTheme();
+  const t = useT();
   return (
     <View style={styles.post}>
       <View
@@ -443,7 +451,7 @@ function LikedPost({
           {caption}
         </Txt>
       </View>
-      <Tag label={`${formatScore(likes)} kez`} tone="primary" icon="heart" />
+      <Tag label={t.profile.liked.times(likes)} tone="primary" icon="heart" />
     </View>
   );
 }
@@ -462,9 +470,12 @@ function UsernameSheet({
   current: string | null;
   onClose: () => void;
 }) {
+  const t = useT();
+  const words = t.profile.pickName;
   const [value, setValue] = useState('');
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  /** What went wrong, kept as it came — its words are read in the language of the moment. */
+  const [failure, setFailure] = useState<{ error: unknown } | null>(null);
   const check = useUsernameCheck(value, current);
   const queryClient = useQueryClient();
 
@@ -473,14 +484,14 @@ function UsernameSheet({
   const save = async () => {
     if (check.state !== 'available' && check.state !== 'unknown') return;
     setPending(true);
-    setError(null);
+    setFailure(null);
     try {
       const { user } = await api.me.updateUsername(check.normalized);
       rememberMe(user);
       void queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
       onClose();
     } catch (caught) {
-      setError(messageFor(caught));
+      setFailure({ error: caught });
     } finally {
       setPending(false);
     }
@@ -490,17 +501,14 @@ function UsernameSheet({
     <FormSheet
       open={open}
       onClose={onClose}
-      title="Adını seç"
+      title={words.title}
       description={
-        current
-          ? `Şimdilik @${current} olarak görünüyorsun. Seçtiğin ad bütün skorlarında görünür ve bir daha değişmez.`
-          : 'Seçtiğin ad bütün skorlarında görünür ve bir daha değişmez.'
+        current ? words.description(handle(current)) : words.descriptionNoName
       }
-      submitLabel="Kaydet"
       onSubmit={() => void save()}
       pending={pending}
       disabled={!ready}
-      error={error}
+      error={failure ? messageFor(failure.error, t) : null}
     >
       <UsernameField value={value} onChange={setValue} check={check} />
     </FormSheet>
@@ -516,35 +524,45 @@ function DeleteSheet({
   username: string;
   onClose: () => void;
 }) {
+  const t = useT();
+  const words = t.profile.deleteAccount;
   const [typed, setTyped] = useState('');
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const confirmed = typed.trim().toLowerCase() === username;
+  /**
+   * What went wrong, kept as it came — the name typed wrong, or the API's
+   * answer — and put in words in the language of the moment.
+   */
+  const [failure, setFailure] = useState<'mismatch' | { error: unknown } | null>(null);
+  // The label shows the name as `@ekin`: typed with or without its `@`, it confirms.
+  const confirmed = typed.trim().toLowerCase().replace(/^@/, '') === username;
 
   const remove = async () => {
     if (!confirmed) {
-      setError('Onaylamak için kullanıcı adını aynen yaz.');
+      setFailure('mismatch');
       return;
     }
     setPending(true);
-    setError(null);
+    setFailure(null);
     try {
       await api.me.delete();
       onClose();
       await useSession.getState().signOut();
     } catch (caught) {
-      setError(messageFor(caught));
+      setFailure({ error: caught });
       setPending(false);
     }
   };
+
+  const error =
+    failure === 'mismatch' ? words.mismatch : failure ? messageFor(failure.error, t) : null;
 
   return (
     <FormSheet
       open={open}
       onClose={onClose}
-      title="Hesabı sil"
-      description="Bu geri alınamaz: adın, skorların ve sıralamadaki yerin silinir."
-      submitLabel="Hesabı kalıcı olarak sil"
+      title={words.title}
+      description={words.description}
+      submitLabel={words.submit}
       submitIcon="trash"
       submitTone="danger"
       onSubmit={() => void remove()}
@@ -553,7 +571,7 @@ function DeleteSheet({
       error={error}
     >
       <Field
-        label={`Onay için @${username} yaz`}
+        label={words.confirm(handle(username))}
         value={typed}
         onChangeText={setTyped}
         autoCapitalize="none"

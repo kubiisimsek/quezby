@@ -1,8 +1,4 @@
-import {
-  USERNAME_MAX_LENGTH,
-  USERNAME_MESSAGES,
-  validateUsername,
-} from '@quezby/config';
+import { USERNAME_MAX_LENGTH, validateUsername } from '@quezby/config';
 import type { FollowListResponse, PlayerSummary } from '@quezby/types';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { useQueries, type UseQueryResult } from '@tanstack/react-query';
@@ -18,7 +14,8 @@ import {
   useFollowing,
   useUserSearch,
 } from '@/hooks/useBoards';
-import { messageFor } from '@/lib/errors';
+import { useT, type Messages } from '@/i18n';
+import { messageFor, usernameMessage } from '@/lib/errors';
 import type { TabParamList } from '@/navigation/types';
 import {
   Button,
@@ -49,6 +46,7 @@ const SEARCH_MIN_LENGTH = 2;
  * friends boards race you against.
  */
 export function SearchScreen(_props: Props) {
+  const t = useT();
   const [query, setQuery] = useState('');
   const [tab, setTab] = useState<FollowKind>('following');
   const [opened, setOpened] = useState<string | null>(null);
@@ -56,7 +54,7 @@ export function SearchScreen(_props: Props) {
   const search = useUserSearch(query);
 
   const term = query.trim();
-  const problem = nameProblem(term);
+  const problem = nameProblem(term, t);
   const open = (username: string) => {
     Keyboard.dismiss();
     setOpened(username);
@@ -78,14 +76,17 @@ export function SearchScreen(_props: Props) {
 
   return (
     <Screen>
-      <TopBar title="Arkadaşlar" subtitle="Oyuncu ara, takip et, yarış" />
+      <TopBar
+        title={t.friends.search.title}
+        subtitle={t.friends.search.tagline}
+      />
       <View style={styles.head}>
         <Field
-          label="Kullanıcı adı"
+          label={t.friends.search.field}
           icon="search"
           value={query}
           onChangeText={(text) => setQuery(text.toLowerCase())}
-          placeholder="ör. ekin"
+          placeholder={t.friends.search.placeholder}
           autoCapitalize="none"
           autoCorrect={false}
           autoComplete="off"
@@ -95,12 +96,12 @@ export function SearchScreen(_props: Props) {
           error={problem ?? undefined}
           hint={
             term !== '' && term.length < SEARCH_MIN_LENGTH
-              ? `Aramak için en az ${SEARCH_MIN_LENGTH} karakter yaz.`
+              ? t.friends.search.tooShort(SEARCH_MIN_LENGTH)
               : undefined
           }
         />
         {follow.isError ? (
-          <Callout tone="bad">{messageFor(follow.error)}</Callout>
+          <Callout tone="bad">{messageFor(follow.error, t)}</Callout>
         ) : null}
         {term === '' ? (
           <Segmented
@@ -109,10 +110,14 @@ export function SearchScreen(_props: Props) {
             options={[
               {
                 value: 'following',
-                label: 'Takip ettiklerin',
+                label: t.friends.search.tabs.following,
                 icon: 'userCheck',
               },
-              { value: 'followers', label: 'Takipçilerin', icon: 'users' },
+              {
+                value: 'followers',
+                label: t.friends.search.tabs.followers,
+                icon: 'users',
+              },
             ]}
           />
         ) : null}
@@ -127,16 +132,16 @@ export function SearchScreen(_props: Props) {
 
 /**
  * Why what was typed cannot be the start of a name, in the rules' own words
- * (`USERNAME_MESSAGES`) — or null. Length is not a problem here: a search
+ * (`usernameMessage`) — or null. Length is not a problem here: a search
  * is a prefix.
  */
-function nameProblem(term: string): string | null {
+function nameProblem(term: string, t: Messages): string | null {
   if (term === '') return null;
   const checked = validateUsername(term);
   if (checked.ok) return null;
   return checked.problem === 'turkish_char' ||
     checked.problem === 'invalid_char'
-    ? USERNAME_MESSAGES[checked.problem]
+    ? usernameMessage(checked.problem, t)
     : null;
 }
 
@@ -156,6 +161,7 @@ function Results({
   follow: Follow;
   onOpen: (username: string) => void;
 }) {
+  const t = useT();
   const data = search.data;
   const players = (data?.users ?? []).filter((player) =>
     player.username.startsWith(term),
@@ -169,11 +175,11 @@ function Results({
   if (search.isError && players.length === 0) {
     return (
       <View style={styles.pad}>
-        <Callout tone="bad" title="Arama yapılamadı">
-          {messageFor(search.error)}
+        <Callout tone="bad" title={t.friends.search.failed}>
+          {messageFor(search.error, t)}
         </Callout>
         <Button
-          label="Tekrar dene"
+          label={t.friends.search.retry}
           tone="neutral"
           icon="refresh"
           onPress={() => void search.refetch()}
@@ -186,8 +192,8 @@ function Results({
     return nobody ? (
       <EmptyState
         icon="search"
-        title="Kimse bulunamadı"
-        hint={`Adı “${term}” ile başlayan bir oyuncu yok. Yazdığını kontrol et.`}
+        title={t.friends.search.nobody}
+        hint={t.friends.search.nobodyHint(term)}
       />
     ) : (
       <View style={styles.pad}>
@@ -209,6 +215,7 @@ function Results({
 type ListProps = { follow: Follow; onOpen: (username: string) => void };
 
 function FollowingList(props: ListProps) {
+  const t = useT();
   const first = useFollowing();
   return (
     <FollowPages
@@ -217,8 +224,8 @@ function FollowingList(props: ListProps) {
       empty={
         <EmptyState
           icon="userPlus"
-          title="Henüz kimseyi takip etmiyorsun"
-          hint="Yukarıdan bir oyuncu ara ve takip et; arkadaş sıralamalarında onu da görürsün."
+          title={t.friends.notFollowing}
+          hint={t.friends.search.followingHint}
         />
       }
       {...props}
@@ -227,6 +234,7 @@ function FollowingList(props: ListProps) {
 }
 
 function FollowersList(props: ListProps) {
+  const t = useT();
   const first = useFollowers();
   const username = useSession((state) => state.user?.username);
   return (
@@ -236,8 +244,8 @@ function FollowersList(props: ListProps) {
       empty={
         <EmptyState
           icon="users"
-          title="Henüz takipçin yok"
-          hint={`Seni takip edenler burada görünür. Adını arkadaşlarına söyle: @${username ?? ''}`}
+          title={t.friends.search.noFollowers}
+          hint={t.friends.search.noFollowersHint(username ?? '')}
         />
       }
       {...props}
@@ -262,6 +270,7 @@ function FollowPages({
   first: UseQueryResult<FollowListResponse>;
   empty: ReactElement;
 }) {
+  const t = useT();
   const [cursors, setCursors] = useState<string[]>([]);
   const more = useQueries({
     queries: cursors.map((cursor) => ({
@@ -284,11 +293,11 @@ function FollowPages({
   if (!first.data) {
     return (
       <View style={styles.pad}>
-        <Callout tone="bad" title="Liste yüklenemedi">
-          {messageFor(first.error)}
+        <Callout tone="bad" title={t.friends.search.listFailed}>
+          {messageFor(first.error, t)}
         </Callout>
         <Button
-          label="Tekrar dene"
+          label={t.friends.search.retry}
           tone="neutral"
           icon="refresh"
           onPress={() => void first.refetch()}
@@ -323,7 +332,7 @@ function FollowPages({
       footer={
         next || failed || last.isLoading ? (
           <Button
-            label={failed ? 'Tekrar dene' : 'Daha fazla'}
+            label={failed ? t.friends.search.retry : t.friends.search.more}
             icon={failed ? 'refresh' : undefined}
             tone="neutral"
             size="md"
@@ -413,6 +422,7 @@ function FollowButton({
   updatedAt: number;
   follow: Follow;
 }) {
+  const t = useT();
   const asked =
     follow.variables?.username === player.username ? follow.variables : null;
   const pending = asked !== null && follow.isPending;
@@ -423,7 +433,7 @@ function FollowButton({
 
   return (
     <Button
-      label={following ? 'Takibi bırak' : 'Takip et'}
+      label={following ? t.friends.unfollow : t.friends.follow}
       icon={following ? 'userCheck' : 'userPlus'}
       tone={following ? 'neutral' : 'primary'}
       size="sm"

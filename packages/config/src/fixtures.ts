@@ -1,11 +1,22 @@
+import type { Locale } from '@quezby/types';
+
 import { ANALYTICS, ANALYTICS_EVENTS, ANALYTICS_MILESTONES, ANALYTICS_SCREENS } from './analytics';
 import { CHECKPOINTS, prefixHash, sha256Hex } from './checkpoints';
 import { CATALOGS, SALT, mix, postFor, type ContentKind } from './content';
+import {
+  LOCALES,
+  bestLocale,
+  groupDigits,
+  isRtl,
+  pluralCategory,
+  type PluralCategory,
+} from './locales';
 import { PACE } from './pace';
 
 /**
  * Fixtures the API's PHP twins are tested against (`tests/Unit/ContentParityTest.php`,
- * `PaceParityTest.php`, `CheckpointParityTest.php`, `AnalyticsParityTest.php`), built deterministically
+ * `PaceParityTest.php`, `CheckpointParityTest.php`, `AnalyticsParityTest.php`,
+ * `LocaleParityTest.php`), built deterministically
  * so a test can rebuild them and fail when the committed files have gone stale.
  */
 const KINDS: ContentKind[] = ['skip', 'like', 'hold', 'freeze'];
@@ -84,3 +95,49 @@ export function buildCheckpoints() {
   };
 }
 
+
+/**
+ * The forms Laravel's `trans_choice` picks between, per language, in its order:
+ * Turkish has one, Arabic six. A category the list lacks (`many` in French or
+ * Spanish) is the last form.
+ */
+const LARAVEL_FORMS: Record<Locale, readonly PluralCategory[]> = {
+  tr: ['other'],
+  en: ['one', 'other'],
+  de: ['one', 'other'],
+  ar: ['zero', 'one', 'two', 'few', 'many', 'other'],
+  fr: ['one', 'other'],
+  es: ['one', 'other'],
+};
+
+/** The languages, how each groups digits and counts, and how a phone's tags resolve — for `LocaleParityTest.php`. */
+export function buildLocales() {
+  const values = [0, 7, 999, 1000, 1234, 9999, 12345, 123456, 1234567, -1234, -12345];
+  const counts = [0, 1, 2, 3, 10, 11, 99, 100, 101, 102, 103, 111, 1000000];
+  const tags = [
+    ['tr-TR'],
+    ['de-AT', 'en-US'],
+    ['ar_SA'],
+    ['zh-Hant-TW', 'fr-CA'],
+    ['ja-JP'],
+    ['EN'],
+    ['pt-BR', 'es-419'],
+    [],
+  ];
+  return {
+    locales: LOCALES,
+    rtl: LOCALES.filter(isRtl),
+    groups: LOCALES.flatMap((locale) =>
+      values.map((value) => ({ locale, value, text: groupDigits(value, locale) })),
+    ),
+    plurals: LOCALES.flatMap((locale) =>
+      counts.map((count) => {
+        const category = pluralCategory(locale, count);
+        const forms = LARAVEL_FORMS[locale];
+        const at = forms.indexOf(category);
+        return { locale, count, category, index: at >= 0 ? at : forms.length - 1 };
+      }),
+    ),
+    tags: tags.map((list) => ({ tags: list, locale: bestLocale(list) })),
+  };
+}

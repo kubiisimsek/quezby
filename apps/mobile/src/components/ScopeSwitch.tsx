@@ -14,26 +14,16 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 
+import { useT } from '@/i18n';
 import { Icon, type IconName } from '@/ui/icons';
 import { AnimatedPressable } from '@/ui/kit/shared';
 import { SPRING, usePressScale } from '@/ui/motion';
-import {
-  DEPTH,
-  FONT,
-  RADIUS,
-  SPACE,
-  embossed,
-  useTheme,
-  withAlpha,
-} from '@/ui/theme';
+import { DEPTH, FONT, RADIUS, SPACE, embossed, lh, useTheme, withAlpha } from '@/ui/theme';
 
-const OPTIONS: Array<{
-  value: LeaderboardScope;
-  label: string;
-  icon: IconName;
-}> = [
-  { value: 'everyone', label: 'Herkes', icon: 'users' },
-  { value: 'friends', label: 'Arkadaşlar', icon: 'userCheck' },
+/** The two sides, in order; their words are `t.board.scopes`. */
+const OPTIONS: Array<{ value: LeaderboardScope; icon: IconName }> = [
+  { value: 'everyone', icon: 'users' },
+  { value: 'friends', icon: 'userCheck' },
 ];
 
 /**
@@ -53,6 +43,7 @@ export function ScopeSwitch({
   style?: StyleProp<ViewStyle>;
 }) {
   const theme = useTheme();
+  const t = useT();
   const reduced = useReducedMotion();
   const index = Math.max(
     0,
@@ -104,7 +95,7 @@ export function ScopeSwitch({
       {OPTIONS.map((option) => (
         <Option
           key={option.value}
-          label={option.label}
+          label={t.board.scopes[option.value]}
           icon={option.icon}
           on={option.value === value}
           onPress={() => {
@@ -199,5 +190,5 @@ const styles = StyleSheet.create({
     paddingBottom: SLAB_LIP,
     paddingHorizontal: SPACE.md,
   },
-  label: { fontFamily: FONT.display, fontSize: 15, lineHeight: 19 },
+  label: { fontFamily: FONT.display, fontSize: 15, lineHeight: lh(19) },
 });

@@ -16,10 +16,11 @@ it('signs up a new Apple player', function () {
         ->assertJsonPath('created', true)
         ->assertJsonPath('user.email', null)
         ->assertJsonPath('user.isGuest', false)
-        ->assertJsonPath('user.identities', ['apple']);
+        ->assertJsonPath('user.identities', ['apple'])
+        ->assertJsonPath('user.locale', 'tr');
     $this->assertMatchesRegularExpression('/^guest\d{8}$/', $response->json('user.username'));
     $userId = $response->json('user.id');
-    $this->assertDatabaseHas('users', ['id' => $userId, 'platform' => 'ios', 'install_id' => 'install-1', 'email' => null]);
+    $this->assertDatabaseHas('users', ['id' => $userId, 'platform' => 'ios', 'install_id' => 'install-1', 'email' => null, 'locale' => 'tr']);
     $this->assertDatabaseHas('social_identities', [
         'user_id' => $userId,
         'provider' => 'apple',
@@ -39,12 +40,14 @@ it('signs the same Apple player back in', function () {
     $first = $this->postJson('/api/v1/auth/apple', $this->idp->appleSignIn())->assertCreated();
     $this->travel(1)->hours();
 
-    $again = $this->postJson('/api/v1/auth/apple', $this->idp->appleSignIn(body: ['installId' => 'new-phone']));
+    // A phone that speaks another language finds the player in their own.
+    $again = $this->withHeader('Accept-Language', 'fr')->postJson('/api/v1/auth/apple', $this->idp->appleSignIn(body: ['installId' => 'new-phone']));
 
     $again->assertOk()
         ->assertJsonPath('created', false)
         ->assertJsonPath('user.id', $first->json('user.id'))
-        ->assertJsonPath('user.username', $first->json('user.username'));
+        ->assertJsonPath('user.username', $first->json('user.username'))
+        ->assertJsonPath('user.locale', 'tr');
     $this->assertNotSame($first->json('token'), $again->json('token'));
     $this->assertSame(1, User::query()->count());
     $this->assertTrue(SocialIdentity::query()->sole()->last_used_at->equalTo(now()->startOfSecond()));

@@ -72,6 +72,18 @@ test('a name the rules refuse is username_invalid, with the problem', function (
         ->assertJsonPath('error.fields.username', ['required']);
 });
 
+test('the problem is said in the request\'s language, its code the same in all', function (string $acceptLanguage, string $message) {
+    $this->signIn();
+
+    $this->assertApiError($this->withHeader('Accept-Language', $acceptLanguage)->putJson('/api/v1/me/username', ['username' => 'şule']), 422, 'username_invalid')
+        ->assertJsonPath('error.fields', ['username' => ['turkish_char']])
+        ->assertJsonPath('error.message', $message);
+})->with([
+    'Turkish' => ['tr', 'Türkçe karakter kullanılamaz — ş yerine s, ı yerine i gibi.'],
+    'English' => ['en', "Letters like ş, ı, ü or ç aren't allowed — write s, i, u, c."],
+    'Arabic' => ['ar', 'لا يُسمح بأحرف مثل ş وı وü وç — اكتب s وi وu وc.'],
+]);
+
 test('a player on an automatic name picks a name of their own', function () {
     $user = $this->signIn(User::factory()->withUsername('guest00000007')->create());
 

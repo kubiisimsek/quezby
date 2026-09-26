@@ -1,6 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 
 import { useFollowing } from '@/hooks/useBoards';
+import { useT } from '@/i18n';
 import { Icon } from '@/ui/icons';
 import { Button, IconChip, Panel, SkeletonList, Txt } from '@/ui/kit';
 import { RADIUS, SPACE, useTheme, withAlpha } from '@/ui/theme';
@@ -19,6 +20,8 @@ export function FriendsEmpty({
   /** Left out where playing now is not an option — today's one attempt is used. */
   onPlay?: () => void;
 }) {
+  const t = useT();
+  const words = t.friends.empty;
   const following = useFollowing();
 
   if (following.isLoading) {
@@ -46,14 +49,14 @@ export function FriendsEmpty({
         {followsSomeone ? (
           <>
             <Txt variant="title" align="center">
-              Takip ettiklerin henüz oynamadı
+              {words.waiting}
             </Txt>
             <Txt variant="meta" tone="muted" align="center">
-              Onlar oynadıkça burada seninle yarışacaklar.
+              {words.waitingHint}
             </Txt>
             {onPlay ? (
               <Button
-                label="Oyna"
+                label={words.play}
                 icon="play"
                 tone="play"
                 onPress={onPlay}
@@ -64,13 +67,13 @@ export function FriendsEmpty({
         ) : (
           <>
             <Txt variant="title" align="center">
-              Henüz kimseyi takip etmiyorsun
+              {t.friends.notFollowing}
             </Txt>
             <Txt variant="meta" tone="muted" align="center">
-              Takip ettiğin oyuncular burada seninle yarışır.
+              {words.noneHint}
             </Txt>
             <Button
-              label="Oyuncu ara"
+              label={t.friends.find}
               icon="search"
               onPress={onSearch}
               style={styles.action}

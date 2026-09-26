@@ -6,11 +6,12 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
+import { SHRINK_TO_FIT } from '@/i18n/native';
 import { IconChip } from '@/ui/kit/identity';
 import { common } from '@/ui/kit/shared';
 import { tagPalette, toneColor, type TagTone, type Tone } from '@/ui/kit/tones';
 import { Icon, type IconName } from '@/ui/icons';
-import { DEPTH, FONT, RADIUS, SPACE, TYPE, embossed, useTheme } from '@/ui/theme';
+import { DEPTH, FONT, RADIUS, SPACE, TYPE, embossed, lh, useTheme } from '@/ui/theme';
 
 /**
  * A status on a pill: a glyph (or a dot) and a few words, in the tone's colour
@@ -152,7 +153,7 @@ export function Stat({
       {icon ? <IconChip icon={icon} tone={STAT_GEM[tone]} size="sm" /> : null}
       <Animated.Text
         numberOfLines={1}
-        adjustsFontSizeToFit
+        adjustsFontSizeToFit={SHRINK_TO_FIT}
         style={[styles.statValue, { color: toneColor(theme, tone) }, embossed(2), style]}
       >
         {value}
@@ -160,7 +161,7 @@ export function Stat({
       <Text
         style={[TYPE.micro, styles.statLabel, { color: theme.inkMuted }]}
         numberOfLines={1}
-        adjustsFontSizeToFit
+        adjustsFontSizeToFit={SHRINK_TO_FIT}
         minimumFontScale={0.7}
       >
         {label}
@@ -245,7 +246,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   tagDot: { borderRadius: RADIUS.pill, height: 6, width: 6 },
-  tagText: { fontFamily: FONT.bold, fontSize: 12, lineHeight: 15 },
+  tagText: { fontFamily: FONT.bold, fontSize: 12, lineHeight: lh(15) },
   callout: {
     alignItems: 'flex-start',
     borderRadius: RADIUS.control,
@@ -268,7 +269,7 @@ const styles = StyleSheet.create({
   },
   statEdge: { height: 3, left: 0, position: 'absolute', right: 0, top: 0 },
   statLabel: { alignSelf: 'stretch', textAlign: 'center' },
-  statValue: { fontFamily: FONT.display, fontSize: 21, lineHeight: 26 },
+  statValue: { fontFamily: FONT.display, fontSize: 21, lineHeight: lh(26) },
   statRow: { flexDirection: 'row', gap: SPACE.ms },
   statGrid: { gap: SPACE.ms },
 });

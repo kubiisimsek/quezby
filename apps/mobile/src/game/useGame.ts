@@ -15,7 +15,7 @@ import {
 } from '@quezby/engine';
 import { ApiError } from '@quezby/sdk';
 import type { FinishRunRequest, FinishRunResponse, RunMode } from '@quezby/types';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState, useWindowDimensions } from 'react-native';
 import {
   Easing,
@@ -29,6 +29,7 @@ import { track } from '@/analytics/track';
 import { api } from '@/api/client';
 import { useSession } from '@/auth/session';
 import { rememberMe } from '@/hooks/useMe';
+import { useT } from '@/i18n';
 import {
   IDLE,
   touchDown,
@@ -76,6 +77,17 @@ export type Outcome =
       unseen?: readonly ReelKind[];
     }
   | { mode: 'unsent'; message: string; canRetry: boolean };
+
+/**
+ * An outcome as the hook keeps it. An unsent finish holds the error itself,
+ * never its words: they are written at render, in the language on screen.
+ */
+type Ending =
+  | Exclude<Outcome, { mode: 'unsent' }>
+  | { mode: 'unsent'; error: unknown; canRetry: boolean };
+
+/** Why a run could not start, as the screen is told it. */
+export type StartError = { message: string; code: string | null };
 
 /** A finish worth sending again: the API never got it, or could not take it right then. */
 function retryable(error: unknown): boolean {
@@ -130,6 +142,7 @@ function exitDelay(verdict: Verdict, kind: ReelKind): number {
  * timers here only decide *when* to ask it.
  */
 export function useGame(mode: RunMode = 'free') {
+  const t = useT();
   const { height } = useWindowDimensions();
 
   const [phase, setPhase] = useState<Phase>('starting');
@@ -139,8 +152,9 @@ export function useGame(mode: RunMode = 'free') {
   const [score, setScore] = useState(0);
   const [combo, setCombo] = useState(1000);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
-  const [outcome, setOutcome] = useState<Outcome | null>(null);
-  const [startError, setStartError] = useState<{ message: string; code: string | null } | null>(null);
+  const [ending, setEnding] = useState<Ending | null>(null);
+  /** The error a run could not start with — kept whole, worded at render. */
+  const [startFailure, setStartFailure] = useState<{ error: unknown } | null>(null);
   const [practice, setPractice] = useState<PracticeReason | null>(null);
   /** The kind whose coach card is up, in a practice run. */
   const [coach, setCoach] = useState<ReelKind | null>(null);
@@ -220,7 +234,7 @@ export function useGame(mode: RunMode = 'free') {
       const user = useSession.getState().user;
       if (user) rememberMe({ ...user, best: response.best }, response.ranks);
       if (response.isNewBest) feel('record');
-      setOutcome({ mode: 'verified', response });
+      setEnding({ mode: 'verified', response });
     } catch (error) {
       const canRetry = retryable(error);
       if (canRetry) {
@@ -229,7 +243,7 @@ export function useGame(mode: RunMode = 'free') {
         usePendingRun.getState().clear();
       }
       track('unsent_run');
-      setOutcome({ mode: 'unsent', message: messageFor(error), canRetry });
+      setEnding({ mode: 'unsent', error, canRetry });
     }
     setPhase('result');
   }, []);
@@ -328,7 +342,7 @@ export function useGame(mode: RunMode = 'free') {
       return;
     }
     const reason = practiceRef.current ?? 'offline';
-    setOutcome(
+    setEnding(
       reason === 'tutorial'
         ? {
             mode: 'practice',
@@ -648,7 +662,7 @@ export function useGame(mode: RunMode = 'free') {
       setScore(0);
       setCombo(1000);
       setFeedback(null);
-      setOutcome(null);
+      setEnding(null);
       setReel(runRef.current.current);
       meter.value = 1000;
       timer.value = 1;
@@ -681,7 +695,7 @@ export function useGame(mode: RunMode = 'free') {
       clearTimers();
       modeRef.current = 'idle';
       practiceRef.current = practiceReason;
-      setStartError(null);
+      setStartFailure(null);
       setPhase('starting');
       setPractice(practiceReason);
       if (practiceReason) {
@@ -706,10 +720,7 @@ export function useGame(mode: RunMode = 'free') {
           begin(localSeed(), null);
           return;
         }
-        setStartError({
-          message: messageFor(error),
-          code: error instanceof ApiError ? error.code : null,
-        });
+        setStartFailure({ error });
         setPhase('error');
       }
     },
@@ -733,10 +744,10 @@ export function useGame(mode: RunMode = 'free') {
 
   const retrySubmit = useCallback(() => {
     const pending = usePendingRun.getState().run;
-    if (outcome?.mode !== 'unsent' || !pending) return;
+    if (ending?.mode !== 'unsent' || !pending) return;
     const { runId, savedAt: _savedAt, ...request } = pending;
     void send(runId, request);
-  }, [outcome, send]);
+  }, [ending, send]);
 
   useEffect(() => {
     const subscription = AppState.addEventListener('change', (state) => {
@@ -757,6 +768,23 @@ export function useGame(mode: RunMode = 'free') {
       clearTimers();
     };
   }, [clearTimers]);
+
+  // The words are written at render, in the language on screen — never kept in state.
+  const outcome = useMemo<Outcome | null>(
+    () =>
+      ending?.mode === 'unsent'
+        ? { mode: 'unsent', message: messageFor(ending.error, t), canRetry: ending.canRetry }
+        : ending,
+    [ending, t],
+  );
+  const startError = useMemo<StartError | null>(
+    () =>
+      startFailure && {
+        message: messageFor(startFailure.error, t),
+        code: startFailure.error instanceof ApiError ? startFailure.error.code : null,
+      },
+    [startFailure, t],
+  );
 
   return {
     phase,

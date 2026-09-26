@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\ErrorCode;
+use App\Enums\Locale;
 use App\Exceptions\ApiException;
 use App\Models\User;
 use Illuminate\Container\Attributes\Config;
@@ -35,14 +36,14 @@ final class FollowService
         // Whoever follows shows up in a followers list, which has no room for a nameless row.
         if ($follower->username === null) {
             throw ValidationException::withMessages([
-                'username' => ['Birini takip etmek için önce bir kullanıcı adı seç.'],
+                'username' => [__('messages.username_to_follow')],
             ]);
         }
         if ($this->follows($follower, $followee)) {
             return;
         }
         if ($this->visible('follower_id', 'followee_id', $follower)->count() >= $this->limit) {
-            throw new ApiException(ErrorCode::FollowLimit, "En fazla {$this->limit} oyuncu takip edebilirsin.");
+            throw new ApiException(ErrorCode::FollowLimit, ErrorCode::FollowLimit->message(['limit' => Locale::current()->group($this->limit)]));
         }
 
         DB::table('follows')->insertOrIgnore([

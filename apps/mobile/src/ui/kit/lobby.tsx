@@ -19,7 +19,8 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { formatRank } from '@/lib/format';
+import { useT } from '@/i18n';
+import { IS_RTL, SHRINK_TO_FIT } from '@/i18n/native';
 import { Icon, type IconName } from '@/ui/icons';
 import { buttonColors } from '@/ui/kit/buttons';
 import { IconChip } from '@/ui/kit/identity';
@@ -33,6 +34,7 @@ import {
   RADIUS,
   SPACE,
   TYPE,
+  lh,
   useTheme,
   withAlpha,
 } from '@/ui/theme';
@@ -126,6 +128,11 @@ const BREATH = { scale: 1.04, ms: 1600 } as const;
 const BREATH_CURVE = { duration: BREATH.ms, easing: Easing.inOut(Easing.sin) };
 /** A glint crossing the face, and the rest before the next one. */
 const GLINT = { ms: 900, rest: 2600 } as const;
+/**
+ * The way the glint crosses: along the line, so from the right when the game
+ * reads right to left — a transform the layout does not turn by itself.
+ */
+const ALONG = IS_RTL ? -1 : 1;
 
 /**
  * The lobby's play button — today's game. A big gold slab that breathes,
@@ -201,8 +208,8 @@ export function PlayButton({
   const glintStyle = useAnimatedStyle(() => ({
     opacity: glint.value <= -1 ? 0 : 1,
     transform: [
-      { translateX: ((glint.value + 1) / 2) * (width + 120) - 90 },
-      { rotate: '18deg' },
+      { translateX: ALONG * (((glint.value + 1) / 2) * (width + 120) - 90) },
+      { rotate: `${ALONG * 18}deg` },
     ],
   }));
 
@@ -235,7 +242,12 @@ export function PlayButton({
         {loading ? null : (
           <Icon name={icon} size={30} color={colors.ink} strokeWidth={2.6} fill={colors.ink} />
         )}
-        <Text style={[styles.playLabel, { color: loading ? withAlpha(colors.ink, 0.5) : colors.ink }]}>
+        <Text
+          numberOfLines={1}
+          adjustsFontSizeToFit={SHRINK_TO_FIT}
+          minimumFontScale={0.72}
+          style={[styles.playLabel, { color: loading ? withAlpha(colors.ink, 0.5) : colors.ink }]}
+        >
           {label}
         </Text>
       </Slab>
@@ -254,15 +266,18 @@ export function RankChips({
   items: Array<{ label: string; rank: number | null | undefined }>;
 }) {
   const theme = useTheme();
+  const t = useT();
   return (
     <View style={styles.ranks}>
       {items.map((item) => (
         <View
           key={item.label}
           accessible
-          accessibilityLabel={`${item.label}: ${
-            item.rank ? formatRank(item.rank) : 'sıralamada değilsin'
-          }`}
+          accessibilityLabel={
+            item.rank
+              ? t.home.rankChips.ranked(item.label, t.fmt.rank(item.rank))
+              : t.home.rankChips.unranked(item.label)
+          }
           style={[
             styles.rank,
             { backgroundColor: theme.well, borderColor: theme.wellLine },
@@ -270,18 +285,18 @@ export function RankChips({
         >
           <Text
             numberOfLines={1}
-            adjustsFontSizeToFit
+            adjustsFontSizeToFit={SHRINK_TO_FIT}
             style={[
               styles.rankValue,
               { color: item.rank ? theme.gold : theme.inkFaint },
             ]}
           >
-            {formatRank(item.rank)}
+            {t.fmt.rank(item.rank)}
           </Text>
           <Text
             style={[TYPE.micro, { color: theme.inkFaint }]}
             numberOfLines={1}
-            adjustsFontSizeToFit
+            adjustsFontSizeToFit={SHRINK_TO_FIT}
             minimumFontScale={0.7}
           >
             {item.label}
@@ -312,7 +327,7 @@ const styles = StyleSheet.create({
     minHeight: 76,
     paddingHorizontal: SPACE.xl,
   },
-  playLabel: { fontFamily: FONT.display, fontSize: 30, lineHeight: 36 },
+  playLabel: { flexShrink: 1, fontFamily: FONT.display, fontSize: 30, lineHeight: lh(36) },
   glint: {
     height: '220%',
     left: 0,
@@ -330,5 +345,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACE.xs,
     paddingVertical: SPACE.ms,
   },
-  rankValue: { fontFamily: FONT.display, fontSize: 19, lineHeight: 23 },
+  rankValue: { fontFamily: FONT.display, fontSize: 19, lineHeight: lh(23) },
 });

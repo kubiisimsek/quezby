@@ -26,17 +26,6 @@ class FinishRunRequest extends FormRequest
     }
 
     /**
-     * @return array<string, string>
-     */
-    public function attributes(): array
-    {
-        return [
-            'checkpoints' => 'kontrol noktaları',
-            'checkpoints.*' => 'kontrol noktası makbuzu',
-        ];
-    }
-
-    /**
      * @return array<mixed>
      */
     public function actions(): array

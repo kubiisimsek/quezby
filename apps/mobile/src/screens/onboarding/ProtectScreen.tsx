@@ -8,6 +8,7 @@ import { useSession } from '@/auth/session';
 import { CredentialsSheet } from '@/components/CredentialsSheet';
 import { PROVIDER_NAMES } from '@/components/SignInWaysSheet';
 import { useSocialAuth } from '@/hooks/useSocialAuth';
+import { useT } from '@/i18n';
 import { useOnboarding } from '@/stores/onboarding';
 import { Button, Callout, IconChip, Screen, SocialButton, Stamp, Txt } from '@/ui/kit';
 import { SPACE } from '@/ui/theme';
@@ -21,6 +22,7 @@ import { SPACE } from '@/ui/theme';
  * behind has nothing yet, as its practice run was never counted.
  */
 export function ProtectScreen() {
+  const t = useT();
   const insets = useSafeAreaInsets();
   const user = useSession((state) => state.user);
   const social = useSocialAuth();
@@ -42,11 +44,12 @@ export function ProtectScreen() {
     if (useSession.getState().user?.id !== user.id) finish();
   };
 
-  const keptWith = tried && user.identities.includes(tried)
-    ? PROVIDER_NAMES[tried]
+  const words = t.auth.protect;
+  const kept = tried && user.identities.includes(tried)
+    ? t.auth.linked(PROVIDER_NAMES[tried])
     : user.email
-      ? 'E-posta'
-      : null;
+      ? words.emailLinked
+      : words.wayLinked;
 
   return (
     <Screen>
@@ -63,33 +66,30 @@ export function ProtectScreen() {
             <IconChip icon="shield" tone={user.isGuest ? 'secondary' : 'ok'} size="lg" />
           </Stamp>
           <Txt variant="display" align="center">
-            Hesabını koru
+            {t.auth.keepAccount}
           </Txt>
           <Txt variant="body" tone="muted" align="center">
-            Bu hesap şu an yalnızca bu telefonda. Bir giriş yolu bağla; telefonun değişse de adın,
-            skorların ve ligin seninle gelsin.
+            {words.body}
           </Txt>
         </View>
 
         {!user.isGuest ? (
           <View style={styles.actions}>
-            <Callout title={`${keptWith ?? 'Giriş yolu'} bağlandı`}>
-              Hesabın artık korunuyor. Başka bir telefondan da girebilirsin.
-            </Callout>
-            <Button label="Devam et" icon="check" tone="primary" onPress={finish} />
+            <Callout title={kept}>{words.keptBody}</Callout>
+            <Button label={words.continue} icon="check" tone="primary" onPress={finish} />
           </View>
         ) : (
           <View style={styles.actions}>
             {social.error ? (
               <Callout tone="bad">
                 {social.errorCode === 'identity_taken'
-                  ? `${social.error} O hesapla oynamak istersen ona geçebilirsin; bu yeni hesap burada kalır.`
+                  ? words.identityTaken(social.error)
                   : social.error}
               </Callout>
             ) : null}
             {social.errorCode === 'identity_taken' && tried ? (
               <Button
-                label={`${PROVIDER_NAMES[tried]} hesabıma geç`}
+                label={words.switchTo(PROVIDER_NAMES[tried])}
                 tone="neutral"
                 loading={social.busy === tried}
                 disabled={busy}
@@ -113,14 +113,14 @@ export function ProtectScreen() {
               />
             ) : null}
             <Button
-              label="E-postayla koru"
+              label={t.auth.keepWithEmail}
               icon="mail"
               tone="neutral"
               disabled={busy}
               onPress={() => setEmailOpen(true)}
             />
             <Button
-              label="Şimdi değil"
+              label={words.notNow}
               tone="ghost"
               disabled={busy}
               onPress={() => {

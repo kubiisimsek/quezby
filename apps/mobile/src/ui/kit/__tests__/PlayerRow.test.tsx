@@ -1,5 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
+import { iso } from '@/i18n';
+import { useLanguage } from '@/i18n/language';
 import { Button, PlayerRow } from '@/ui/kit';
 
 describe('PlayerRow', () => {
@@ -46,5 +48,26 @@ describe('PlayerRow', () => {
     await render(<PlayerRow username="ekin" tier={null} best={10} isMe />);
 
     expect(screen.getByText('@ekin · sen')).toBeOnTheScreen();
+  });
+
+  it('reads out in English, numbers grouped the English way', async () => {
+    useLanguage.setState({ locale: 'en' });
+    await render(<PlayerRow username="ekin" tier="gold" best={41_200} isMe />);
+
+    expect(screen.getByText('@ekin · you')).toBeOnTheScreen();
+    expect(screen.getByText('Season record 41,200')).toBeOnTheScreen();
+    expect(
+      screen.getByLabelText('@ekin, you, Gold league, Season record 41,200'),
+    ).toBeOnTheScreen();
+  });
+
+  it('reads out in Arabic, the name kept whole and the pieces joined the Arabic way', async () => {
+    useLanguage.setState({ locale: 'ar' });
+    await render(<PlayerRow username="oya" tier="silver" best={null} />);
+
+    expect(screen.getByText('لا رقم قياسي بعد')).toBeOnTheScreen();
+    expect(
+      screen.getByLabelText(`${iso('@oya')}، دوري الفضة، لا رقم قياسي بعد`),
+    ).toBeOnTheScreen();
   });
 });

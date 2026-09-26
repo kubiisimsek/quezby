@@ -35,3 +35,12 @@ it('forbids an admin a role may not use with its own code', function () {
     expect(ErrorCode::Forbidden->status())->toBe(403)
         ->and(ErrorCode::Forbidden->message())->toBe('Bu işlem için yetkin yok.');
 });
+
+it('names the follow cap, the configured one unless told', function () {
+    expect(ErrorCode::FollowLimit->message())->toBe('En fazla 500 oyuncu takip edebilirsin.')
+        ->and(ErrorCode::FollowLimit->message(['limit' => '2']))->toBe('En fazla 2 oyuncu takip edebilirsin.');
+
+    config(['quezby.follows.limit' => 1500]);
+    app()->setLocale('fr');
+    expect(ErrorCode::FollowLimit->message())->toBe("Tu peux suivre 1\u{00A0}500 joueurs au maximum.");
+});

@@ -2,7 +2,8 @@ import { ApiError } from '@quezby/sdk';
 import { act, renderHook } from '@testing-library/react-native';
 
 import { api } from '@/api/client';
-import { useUsernameCheck } from '@/hooks/useUsernameCheck';
+import { checkMessage, useUsernameCheck } from '@/hooks/useUsernameCheck';
+import { messagesOf } from '@/i18n';
 
 jest.mock('@/api/client', () => ({
   api: { usernames: { check: jest.fn() } },
@@ -34,11 +35,8 @@ describe('useUsernameCheck', () => {
   });
 
   it('refuses on the phone what the rules refuse, without asking the API', async () => {
-    expect(await typed('ab')).toEqual({ state: 'invalid', message: 'En az 3 karakter olmalı.' });
-    expect(await typed('guest12345678')).toEqual({
-      state: 'invalid',
-      message: 'Bu kullanıcı adı ayrılmış, başka bir tane dene.',
-    });
+    expect(await typed('ab')).toEqual({ state: 'invalid', problem: 'too_short' });
+    expect(await typed('guest12345678')).toEqual({ state: 'invalid', problem: 'reserved' });
     expect(check).not.toHaveBeenCalled();
   });
 
@@ -57,12 +55,22 @@ describe('useUsernameCheck', () => {
     expect(check).toHaveBeenCalledWith('ekin.su');
 
     check.mockResolvedValueOnce({ username: 'ekin', available: false, reason: 'taken' });
-    expect(await typed('ekin')).toEqual({ state: 'taken', normalized: 'ekin', message: 'Bu kullanıcı adı alınmış.' });
+    expect(await typed('ekin')).toEqual({ state: 'taken', normalized: 'ekin' });
   });
 
   it('lets the player go on when the API cannot be asked', async () => {
     check.mockRejectedValueOnce(new ApiError(0, 'network', 'offline'));
 
     expect(await typed('ekin.su')).toEqual({ state: 'unknown', normalized: 'ekin.su' });
+  });
+
+  it('says a refusal in the language on screen, from its code', () => {
+    const tr = messagesOf('tr');
+    const en = messagesOf('en');
+    expect(checkMessage({ state: 'invalid', problem: 'too_short' }, tr)).toBe('En az 3 karakter olmalı.');
+    expect(checkMessage({ state: 'invalid', problem: 'too_short' }, en)).toBe('At least 3 characters.');
+    expect(checkMessage({ state: 'taken', normalized: 'ekin' }, en)).toBe('This username is taken.');
+    expect(checkMessage({ state: 'invalid', problem: null }, en)).toBe("This username can't be used.");
+    expect(checkMessage({ state: 'available', normalized: 'ekin' }, en)).toBeUndefined();
   });
 });

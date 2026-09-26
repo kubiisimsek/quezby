@@ -27,6 +27,14 @@ describe('PlayerPage', () => {
     expect(screen.getByRole('link', { name: 'Tüm turları' })).toHaveAttribute('href', `/runs?player=${ID}`);
   });
 
+  it('says the language the player plays in, in Turkish', async () => {
+    renderApp({ path: `/players/${ID}`, api: withPlayer(playerResponse({}, { locale: 'de' })) });
+
+    const fact = (await screen.findByText('Dil')).closest('div');
+    expect(fact).not.toBeNull();
+    expect(within(fact as HTMLElement).getByText('Almanca')).toBeInTheDocument();
+  });
+
   it('bans with a reason, and says so', async () => {
     const api = withPlayer();
     api.players.ban.mockResolvedValue({ changed: true });

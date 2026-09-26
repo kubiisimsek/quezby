@@ -10,6 +10,7 @@ test('a guest signs up and the token works', function () {
         ->assertJsonPath('user.email', null)
         ->assertJsonPath('user.isGuest', true)
         ->assertJsonPath('user.settings', ['haptics' => true, 'analytics' => false])
+        ->assertJsonPath('user.locale', 'tr')
         ->assertJsonPath('user.best', null);
     $this->assertMatchesRegularExpression('/^guest\d{8}$/', $response->json('user.username'));
     $this->assertMatchesRegularExpression('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/', $response->json('user.createdAt'));
@@ -18,6 +19,7 @@ test('a guest signs up and the token works', function () {
         'platform' => 'ios',
         'install_id' => 'install-123',
         'username' => $response->json('user.username'),
+        'locale' => 'tr',
         'password' => null,
     ]);
 

@@ -3,6 +3,7 @@
 namespace App\Services\Identity;
 
 use App\Enums\ErrorCode;
+use App\Enums\Locale;
 use App\Enums\Platform;
 use App\Enums\SocialProvider;
 use App\Exceptions\ApiException;
@@ -111,13 +112,19 @@ final class SocialAccountService
         return ['user' => $existing->user, 'created' => false];
     }
 
-    /** @return array{user: User, created: bool} */
+    /**
+     * A new player speaks the request's language; one coming back keeps
+     * their own, whatever this phone speaks.
+     *
+     * @return array{user: User, created: bool}
+     */
     private function signUp(VerifiedIdentity $identity, Platform $platform, string $installId, ?string $refreshToken): array
     {
         $user = User::create([
             'username' => $this->names->mint(),
             'platform' => $platform->value,
             'install_id' => $installId,
+            'locale' => Locale::current(),
         ]);
         $this->attach($user, $identity, $refreshToken);
 

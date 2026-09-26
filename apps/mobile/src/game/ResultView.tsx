@@ -38,15 +38,10 @@ import Svg, { Path } from 'react-native-svg';
 
 import { track } from '@/analytics/track';
 import { APP_PLATFORM } from '@/config/env';
-import { BONUS_ORDER, DEVICE_FAILED, REEL_GUIDE } from '@/game/howTo';
+import { BONUS_ORDER, deviceFailed, reelGuide } from '@/game/howTo';
 import type { Outcome } from '@/game/useGame';
-import {
-  formatCombo,
-  formatPerMille,
-  formatRank,
-  formatRankChange,
-  formatScore,
-} from '@/lib/format';
+import { handle, ltr, useT, type Messages } from '@/i18n';
+import { IS_RTL, SHRINK_TO_FIT } from '@/i18n/native';
 import { Icon, type IconName } from '@/ui/icons';
 import {
   Avatar,
@@ -65,7 +60,6 @@ import {
   ShareGrid,
   Stamp,
   StatGrid,
-  TIER_LABELS,
   Tag,
   TierBadge,
   Txt,
@@ -82,30 +76,22 @@ import {
   SPACE,
   TYPE,
   embossed,
+  lh,
+  tracking,
   useTheme,
   withAlpha,
 } from '@/ui/theme';
 
-const ENDING: Record<RunSummary['endedBy'], string> = {
-  drained: 'Dopamin bitti. Sıkıldın, uygulamayı kapattın.',
-  penalty: 'Çok hata yaptın, akış seni bıraktı.',
-  quit: 'Oyundan çıktın.',
-};
+const PERIODS: readonly LeaderboardPeriod[] = ['daily', 'weekly', 'monthly', 'all'];
 
-const PERIODS: Array<{ period: LeaderboardPeriod; label: string }> = [
-  { period: 'daily', label: 'Bugün' },
-  { period: 'weekly', label: 'Hafta' },
-  { period: 'monthly', label: 'Ay' },
-  { period: 'all', label: 'Tümü' },
-];
-
+/** How a league zone looks, and which of the lobby's lines names it (`t.home.league`). */
 const ZONE: Record<
   LeagueZone,
-  { line: string; tone: TagTone; icon: IconName }
+  { tone: TagTone; icon: IconName; line: 'promote' | 'safe' | 'demote' }
 > = {
-  promote: { line: 'Terfi bölgesindesin', tone: 'ok', icon: 'trendUp' },
-  stay: { line: 'Güvendesin', tone: 'secondary', icon: 'shield' },
-  demote: { line: 'Düşme bölgesindesin', tone: 'bad', icon: 'trendDown' },
+  promote: { tone: 'ok', icon: 'trendUp', line: 'promote' },
+  stay: { tone: 'secondary', icon: 'shield', line: 'safe' },
+  demote: { tone: 'bad', icon: 'trendDown', line: 'demote' },
 };
 
 /**
@@ -195,53 +181,34 @@ function choreograph(
 type Note = { tone: 'info' | 'warn' | 'bad'; title: string; body: string };
 
 /** What a result that is not a plain ranked run has to say about itself. */
-function noteFor(outcome: Outcome): Note | null {
+function noteFor(outcome: Outcome, t: Messages): Note | null {
+  const notes = t.result.notes;
   if (outcome.mode === 'unsent') {
     return {
       tone: 'bad',
-      title: 'Skorun doğrulanamadı',
-      body: outcome.canRetry
-        ? `${outcome.message} Hamlelerin telefonda saklı; bağlantı gelince tekrar gönderebilirsin.`
-        : outcome.message,
+      title: notes.unsent.title,
+      body: outcome.canRetry ? notes.unsent.retry(outcome.message) : outcome.message,
     };
   }
   if (outcome.mode === 'practice') {
     if (outcome.reason === 'tutorial') {
-      return {
-        tone: 'info',
-        title: 'Deneme turu',
-        body: 'Bu tur hiçbir yere sayılmadı. Hareketleri gördün; sıra gerçek oyunda.',
-      };
+      return { tone: 'info', title: notes.tutorial.title, body: notes.tutorial.body };
     }
     return {
       tone: 'info',
-      title: 'Antrenman turu',
-      body:
-        outcome.reason === 'outdated'
-          ? 'Uygulamanın yeni sürümü var; güncelleyene kadar skorların sıralamaya girmez.'
-          : 'Çevrimdışı oynadın; bu skor sıralamaya gönderilmedi.',
+      title: notes.practice.title,
+      body: outcome.reason === 'outdated' ? notes.practice.outdated : notes.practice.offline,
     };
   }
   if (outcome.response.run.flagReason === 'device') {
-    return {
-      tone: 'warn',
-      title: DEVICE_FAILED.title,
-      body: `${DEVICE_FAILED.why[APP_PLATFORM]} Oynamaya devam edebilirsin.`,
-    };
+    const failed = deviceFailed(t);
+    return { tone: 'warn', title: failed.title, body: notes.device(failed.why[APP_PLATFORM]) };
   }
   switch (outcome.response.run.status) {
     case 'review':
-      return {
-        tone: 'info',
-        title: 'Skorun inceleniyor',
-        body: 'Zirveye yakın skorlara bir göz atıyoruz. Onaylanınca sıralamada yerini alır.',
-      };
+      return { tone: 'info', title: t.daily.attempt.review.title, body: notes.review };
     case 'flagged':
-      return {
-        tone: 'warn',
-        title: 'Sıralamaya girmedi',
-        body: 'Bu tur doğrulanamadı. Skorun kaydedildi ama sıralamada görünmeyecek.',
-      };
+      return { tone: 'warn', title: notes.flagged.title, body: notes.flagged.body };
     default:
       return null;
   }
@@ -280,6 +247,7 @@ export function ResultView({
   /** After a new player's practice run: on to their name. */
   onContinue?: () => void;
 }) {
+  const t = useT();
   const insets = useSafeAreaInsets();
   const reduced = useReducedMotion();
   const verified = outcome.mode === 'verified' ? outcome.response : null;
@@ -291,7 +259,7 @@ export function ResultView({
   const endedBy = run?.endedBy ?? practice?.endedBy ?? null;
   const ranked = run?.status === 'ranked';
   const record = Boolean(verified?.isNewBest) && ranked;
-  const note = noteFor(outcome);
+  const note = noteFor(outcome, t);
 
   const shown: Section[] = [];
   if (note) shown.push('status');
@@ -328,18 +296,19 @@ export function ResultView({
       }
     : undefined;
 
+  const dock = t.result.dock;
   const main: DockAction & { icon: IconName } =
     tutorial && onContinue
-      ? { label: 'Devam et', icon: 'check', tone: 'primary', onPress: onContinue }
+      ? { label: dock.continue, icon: 'check', tone: 'primary', onPress: onContinue }
       : outcome.mode === 'unsent' && outcome.canRetry
-        ? { label: 'Tekrar gönder', icon: 'refresh', tone: 'play', onPress: onRetrySubmit }
+        ? { label: dock.resend, icon: 'refresh', tone: 'play', onPress: onRetrySubmit }
         : mode === 'daily'
-          ? { label: 'Serbest oyna', icon: 'play', tone: 'play', onPress: onPlayFree }
-          : { label: 'Tekrar oyna', icon: 'play', tone: 'play', onPress: onReplay };
+          ? { label: t.home.today.free, icon: 'play', tone: 'play', onPress: onPlayFree }
+          : { label: dock.replay, icon: 'play', tone: 'play', onPress: onReplay };
   const leave: DockAction =
     tutorial && onContinue
-      ? { label: 'Bir daha dene', tone: 'secondary', onPress: onReplay }
-      : { label: 'Ana sayfaya dön', tone: 'ghost', onPress: onClose };
+      ? { label: dock.practiceAgain, tone: 'secondary', onPress: onReplay }
+      : { label: dock.home, tone: 'ghost', onPress: onClose };
 
   return (
     <Screen>
@@ -388,18 +357,18 @@ export function ResultView({
                   columns={3}
                   items={[
                     {
-                      label: 'Post',
-                      value: formatScore(practice.reels),
+                      label: t.result.stats.posts,
+                      value: t.fmt.score(practice.reels),
                       icon: 'arrowUp',
                     },
                     {
-                      label: 'İsabet',
-                      value: formatPerMille(practice.accuracy),
+                      label: t.result.stats.accuracy,
+                      value: t.fmt.perMille(practice.accuracy),
                       icon: 'check',
                     },
                     {
-                      label: 'En yüksek kombo',
-                      value: formatCombo(practice.maxCombo),
+                      label: t.result.stats.maxCombo,
+                      value: t.fmt.combo(practice.maxCombo),
                       icon: 'flame',
                       tone: 'warn',
                     },
@@ -536,6 +505,7 @@ function Stage({
   skipped: boolean;
 }) {
   const theme = useTheme();
+  const t = useT();
   const punch = useSharedValue(1);
   const punchStyle = useAnimatedStyle(() => ({
     transform: [{ scale: punch.value }],
@@ -546,7 +516,7 @@ function Stage({
       withSpring(1, SPRING_POP),
     );
   };
-  const long = score !== null && formatScore(score).length > 7;
+  const long = score !== null && t.fmt.score(score).length > 7;
 
   return (
     <BrandBand
@@ -557,14 +527,17 @@ function Stage({
     >
       {practice ? (
         <Rise at={0} skipped={skipped}>
-          <Ribbon label={practice === 'tutorial' ? 'DENEME TURU' : 'ANTRENMAN'} tone="ink" />
+          <Ribbon
+            label={practice === 'tutorial' ? t.result.stage.tutorial : t.result.stage.practice}
+            tone="ink"
+          />
         </Rise>
       ) : null}
 
       {endedBy ? (
         <Rise at={0} skipped={skipped}>
           <Txt variant="heading" tone="onSolid" align="center">
-            {ENDING[endedBy]}
+            {t.result.ending[endedBy]}
           </Txt>
         </Rise>
       ) : null}
@@ -578,7 +551,7 @@ function Stage({
         >
           <IconChip icon="alert" tone="bad" size="lg" />
           <Txt variant="display" tone="onSolid" align="center">
-            Skor gönderilemedi
+            {t.result.stage.unsent}
           </Txt>
         </Slam>
       ) : (
@@ -587,7 +560,7 @@ function Stage({
             <Animated.View style={punchStyle}>
               <CountUp
                 value={score}
-                format={formatScore}
+                format={t.fmt.score}
                 delay={BEAT.score}
                 duration={skipped ? 0 : BEAT.count}
                 onDone={skipped ? undefined : land}
@@ -602,7 +575,7 @@ function Stage({
           </Slam>
           <Rise at={BEAT.score + 160} skipped={skipped}>
             <Text style={[styles.unit, { color: theme.onBrand }, embossed(2)]}>
-              {practice === 'tutorial' ? 'deneme puanı' : practice ? 'antrenman puanı' : 'puan'}
+              {t.result.stage.unit[practice ?? 'ranked'](score)}
             </Text>
           </Rise>
         </View>
@@ -624,11 +597,15 @@ function Stage({
 const TAIL_LEFT = 'M30 2H2l10 16L2 34h28z';
 const TAIL_RIGHT = 'M2 2h28L20 18l10 16H2z';
 
-/** "YENİ REKOR!" on a gold banner with folded tails. */
+/**
+ * "YENİ REKOR!" on a gold banner with folded tails. A tail's fold points
+ * outwards, so in Arabic, where the tails swap sides, each draws the other's.
+ */
 function RecordBanner() {
   const theme = useTheme();
+  const t = useT();
   return (
-    <View accessible accessibilityLabel="Yeni rekor" style={styles.banner}>
+    <View accessible accessibilityLabel={t.result.stage.recordLabel} style={styles.banner}>
       <Svg
         width={32}
         height={36}
@@ -636,7 +613,7 @@ function RecordBanner() {
         style={[styles.tail, styles.tailLeft]}
       >
         <Path
-          d={TAIL_LEFT}
+          d={IS_RTL ? TAIL_RIGHT : TAIL_LEFT}
           fill={theme.goldLip}
           stroke={theme.outline}
           strokeWidth={DEPTH.outline}
@@ -650,7 +627,7 @@ function RecordBanner() {
         style={[styles.tail, styles.tailRight]}
       >
         <Path
-          d={TAIL_RIGHT}
+          d={IS_RTL ? TAIL_LEFT : TAIL_RIGHT}
           fill={theme.goldLip}
           stroke={theme.outline}
           strokeWidth={DEPTH.outline}
@@ -669,7 +646,7 @@ function RecordBanner() {
         />
         <Icon name="crown" size={22} color={theme.goldInk} strokeWidth={2.8} />
         <Text style={[styles.bannerText, { color: theme.goldInk }]}>
-          YENİ REKOR!
+          {t.result.stage.record}
         </Text>
       </View>
     </View>
@@ -678,6 +655,7 @@ function RecordBanner() {
 
 function BestLine({ score }: { score: number }) {
   const theme = useTheme();
+  const t = useT();
   return (
     <View
       style={[
@@ -690,7 +668,7 @@ function BestLine({ score }: { score: number }) {
     >
       <Icon name="crown" size={15} color={theme.gold} strokeWidth={2.6} />
       <Txt variant="meta" tone="onSolid">
-        Sezon rekorun: {formatScore(score)}
+        {t.result.stage.seasonBest(t.fmt.score(score))}
       </Txt>
     </View>
   );
@@ -707,6 +685,7 @@ function Verified({
   skipped: boolean;
   onOpenDaily: () => void;
 }) {
+  const t = useT();
   const { run } = response;
 
   return (
@@ -722,15 +701,15 @@ function Verified({
       </Rise>
 
       <Rise at={plan.at.stats} skipped={skipped}>
-        <StatGrid columns={3} items={runStats(run)} />
+        <StatGrid columns={3} items={runStats(run, t)} />
       </Rise>
 
       {run.status === 'ranked' ? (
         <View style={styles.ranks}>
-          {PERIODS.map(({ period, label }, index) => (
+          {PERIODS.map((period, index) => (
             <RankTile
               key={period}
-              label={label}
+              period={period}
               rank={response.ranks[period]}
               change={response.rankChanges[period]}
               at={plan.at.ranks + index * BEAT.inner}
@@ -765,15 +744,16 @@ function Verified({
 
 /** The league before it opens: how many counted runs it still waits for. */
 function LeagueUnlockTile({ unlock }: { unlock: LeagueUnlock }) {
+  const t = useT();
   const played = unlock.required - unlock.remaining;
   return (
     <Panel style={styles.unlock}>
       <View style={styles.league}>
         <IconChip icon="lock" tone="secondary" size="lg" />
         <View style={styles.leagueText}>
-          <Txt variant="title">{`Lige ${unlock.remaining} oyun kaldı`}</Txt>
+          <Txt variant="title">{t.league.locked.title(unlock.remaining)}</Txt>
           <Txt variant="meta" tone="muted">
-            {`Lig, ilk ${unlock.required} oyunundan sonra açılır.`}
+            {t.result.unlockBody(unlock.required)}
           </Txt>
         </View>
       </View>
@@ -784,11 +764,13 @@ function LeagueUnlockTile({ unlock }: { unlock: LeagueUnlock }) {
 
 /** A practice run that ended before some kinds came up: their rules, so nothing is left unknown. */
 function Unseen({ kinds }: { kinds: readonly ReelKind[] }) {
+  const t = useT();
+  const guides = reelGuide(t);
   return (
     <Panel style={styles.unseen}>
-      <Eyebrow icon="info">Henüz görmediklerin</Eyebrow>
+      <Eyebrow icon="info">{t.result.unseen}</Eyebrow>
       {kinds.map((kind) => {
-        const guide = REEL_GUIDE[kind];
+        const guide = guides[kind];
         return (
           <View key={kind} style={styles.unseenRow}>
             <IconChip icon={guide.icon} tone={guide.tone === 'neutral' ? 'secondary' : guide.tone} />
@@ -814,9 +796,10 @@ function DailyTile({
   onOpenDaily: () => void;
 }) {
   const theme = useTheme();
+  const t = useT();
   return (
     <Panel style={styles.tile}>
-      <Eyebrow icon="calendar">{`Günün akışı #${daily.number}`}</Eyebrow>
+      <Eyebrow icon="calendar">{t.daily.numbered(t.fmt.score(daily.number))}</Eyebrow>
       <View
         style={[
           styles.well,
@@ -827,16 +810,16 @@ function DailyTile({
       </View>
       {daily.rank === null ? (
         <Txt variant="heading" tone="muted" align="center">
-          Bugünün tablosuna girmedi
+          {t.result.daily.unplaced}
         </Txt>
       ) : (
         <Txt variant="title" align="center">
-          <Text style={{ color: theme.gold }}>{formatRank(daily.rank)}</Text>
-          {` / ${formatScore(daily.players)} oyuncu`}
+          <Text style={{ color: theme.gold }}>{t.fmt.rank(daily.rank)}</Text>
+          {t.result.daily.ofPlayers(daily.players)}
         </Txt>
       )}
       <Button
-        label="Günün tablosu"
+        label={t.game.actions.dailyBoard}
         icon="podium"
         tone="secondary"
         size="md"
@@ -856,21 +839,22 @@ function Breakdown({
   at: number;
   skipped: boolean;
 }) {
+  const t = useT();
   const bonuses = BONUS_ORDER.filter(
     (kind) => run.breakdown.bonuses[kind].count > 0,
   );
 
   return (
     <Panel style={styles.tile}>
-      <Eyebrow icon="sparkle">Puanın nereden geldi</Eyebrow>
+      <Eyebrow icon="sparkle">{t.result.breakdown.title}</Eyebrow>
       <View style={styles.sources}>
         <Source
-          label="Postlardan"
-          value={formatScore(run.breakdown.reelPoints)}
+          label={t.result.breakdown.posts}
+          value={t.fmt.score(run.breakdown.reelPoints)}
         />
         <Source
-          label="Kombolardan"
-          value={`+${formatScore(run.breakdown.bonusPoints)}`}
+          label={t.result.breakdown.combos}
+          value={ltr(`+${t.fmt.score(run.breakdown.bonusPoints)}`)}
           bright
         />
       </View>
@@ -916,7 +900,7 @@ function Source({
       <Text style={[TYPE.micro, { color: theme.inkMuted }]}>{label}</Text>
       <Text
         numberOfLines={1}
-        adjustsFontSizeToFit
+        adjustsFontSizeToFit={SHRINK_TO_FIT}
         style={[
           styles.sourceValue,
           { color: bright ? theme.primaryText : theme.ink },
@@ -929,44 +913,58 @@ function Source({
   );
 }
 
-function runStats(run: RunResult): StatItem[] {
+function runStats(run: RunResult, t: Messages): StatItem[] {
+  const stats = t.result.stats;
   return [
-    { label: 'Post', value: formatScore(run.reels), icon: 'arrowUp' },
-    { label: 'İsabet', value: formatPerMille(run.accuracy), icon: 'check' },
+    { label: stats.posts, value: t.fmt.score(run.reels), icon: 'arrowUp' },
+    { label: stats.accuracy, value: t.fmt.perMille(run.accuracy), icon: 'check' },
     {
-      label: 'En yüksek kombo',
-      value: formatCombo(run.maxCombo),
+      label: stats.maxCombo,
+      value: t.fmt.combo(run.maxCombo),
       icon: 'flame',
       tone: 'warn',
     },
     {
-      label: 'Beğeni',
-      value: formatScore(run.stats.likes),
+      label: stats.likes,
+      value: t.fmt.score(run.stats.likes),
       icon: 'heart',
       tone: 'primary',
     },
     {
-      label: 'Mükemmel',
-      value: formatScore(run.stats.perfects),
+      label: stats.perfects,
+      value: t.fmt.score(run.stats.perfects),
       icon: 'star',
       tone: 'ok',
     },
     {
-      label: 'Tepki',
+      label: stats.reaction,
       value: run.stats.avgReactionMs ? `${run.stats.avgReactionMs} ms` : '—',
       icon: 'clock',
     },
   ];
 }
 
+/** Which way a board's place moved; a new place or one that held moved neither way. */
+function directionOf({ before, after }: RankChange): 'up' | 'down' | null {
+  if (before === null || after === null || after === before) return null;
+  return after < before ? 'up' : 'down';
+}
+
 /** How a board's place moved, as it is read aloud. */
-function spokenMove(change: RankChange): string | null {
+function spokenMove(change: RankChange, t: Messages): string | null {
   const { before, after } = change;
+  const moved = t.result.ranks.moved;
   if (after === null) return null;
-  if (before === null) return 'yeni';
-  if (after < before) return `${formatScore(before - after)} sıra yukarı`;
-  if (after > before) return `${formatScore(after - before)} sıra aşağı`;
-  return null;
+  if (before === null) return moved.new;
+  const places = Math.abs(after - before);
+  switch (directionOf(change)) {
+    case 'up':
+      return moved.up(places, t.fmt.score(places));
+    case 'down':
+      return moved.down(places, t.fmt.score(places));
+    default:
+      return null;
+  }
 }
 
 /**
@@ -974,21 +972,25 @@ function spokenMove(change: RankChange): string | null {
  * run moved it, on a green or red pill. A place that climbed hops once.
  */
 function RankTile({
-  label,
+  period,
   rank,
   change,
   at,
   skipped,
 }: {
-  label: string;
+  period: LeaderboardPeriod;
   rank: number | null;
   change: RankChange;
   at: number;
   skipped: boolean;
 }) {
   const theme = useTheme();
-  const moved = formatRankChange(change.before, change.after);
-  const climbed = moved.startsWith('▲');
+  const t = useT();
+  const label = t.result.ranks.periods[period];
+  const moved = t.fmt.rankChange(change.before, change.after);
+  // From the numbers, not the arrow: in Arabic the arrow comes wrapped in an isolate.
+  const direction = directionOf(change);
+  const climbed = direction === 'up';
   const land = useBeat(at, skipped);
   const hop = useSharedValue(0);
 
@@ -1012,15 +1014,13 @@ function RankTile({
     transform: [{ translateY: (1 - land.value) * 18 + hop.value }],
   }));
 
-  const spoken = spokenMove(change);
-  const place = rank ? formatRank(rank) : 'sıralamada değilsin';
+  const spoken = spokenMove(change, t);
+  const place = rank ? t.result.ranks.place(rank) : t.result.ranks.unranked;
 
   return (
     <Animated.View
       accessible
-      accessibilityLabel={
-        spoken ? `${label}: ${place}, ${spoken}` : `${label}: ${place}`
-      }
+      accessibilityLabel={t.result.ranks.label(label, place, spoken)}
       style={[
         styles.rankTile,
         { backgroundColor: theme.tile, borderColor: theme.outline },
@@ -1031,28 +1031,37 @@ function RankTile({
         pointerEvents="none"
         style={[styles.edge, { backgroundColor: theme.tileHi }]}
       />
-      <Text numberOfLines={1} style={[TYPE.micro, { color: theme.inkMuted }]}>
+      <Text
+        numberOfLines={1}
+        adjustsFontSizeToFit={SHRINK_TO_FIT}
+        minimumFontScale={0.7}
+        style={[TYPE.micro, { color: theme.inkMuted }]}
+      >
         {label}
       </Text>
       <Text
         numberOfLines={1}
-        adjustsFontSizeToFit
+        adjustsFontSizeToFit={SHRINK_TO_FIT}
         style={[
           styles.rankValue,
           { color: rank ? theme.gold : theme.inkFaint },
           embossed(2),
         ]}
       >
-        {formatRank(rank)}
+        {t.fmt.rank(rank)}
       </Text>
-      {moved ? <MovePill moved={moved} /> : <View style={styles.moveSpace} />}
+      {moved ? (
+        <MovePill moved={moved} down={direction === 'down'} />
+      ) : (
+        <View style={styles.moveSpace} />
+      )}
     </Animated.View>
   );
 }
 
-function MovePill({ moved }: { moved: string }) {
+function MovePill({ moved, down }: { moved: string; down: boolean }) {
   const theme = useTheme();
-  const gem = gemColors(theme, moved.startsWith('▼') ? 'bad' : 'ok');
+  const gem = gemColors(theme, down ? 'bad' : 'ok');
   return (
     <View
       style={[
@@ -1075,9 +1084,10 @@ function Passed({
   at: number;
   skipped: boolean;
 }) {
+  const t = useT();
   return (
     <Panel style={styles.tile}>
-      <Eyebrow icon="trendUp">Bugün geçtiklerin</Eyebrow>
+      <Eyebrow icon="trendUp">{t.result.passed.title}</Eyebrow>
       {players.map((player, index) => (
         <PassedRow
           key={player.username}
@@ -1100,6 +1110,8 @@ function PassedRow({
   skipped: boolean;
 }) {
   const theme = useTheme();
+  const t = useT();
+  const name = handle(player.username);
   const climb = useBeat(at, skipped, CLIMB);
   const motion = useAnimatedStyle(() => ({
     opacity: Math.min(1, climb.value),
@@ -1109,7 +1121,12 @@ function PassedRow({
   return (
     <Animated.View
       accessible
-      accessibilityLabel={`@${player.username}${player.isFollowing ? ', arkadaşın' : ''}, ${formatScore(player.score)} puan, geçtin`}
+      accessibilityLabel={t.result.passed.label(
+        name,
+        player.isFollowing,
+        player.score,
+        t.fmt.score(player.score),
+      )}
       style={[
         styles.passed,
         { backgroundColor: theme.well, borderColor: theme.wellLine },
@@ -1118,11 +1135,10 @@ function PassedRow({
     >
       <Avatar name={player.username} size="sm" />
       <Txt variant="heading" numberOfLines={1} style={styles.shrink}>
-        @{player.username}
-        {player.isFollowing ? ' · arkadaşın' : ''}
+        {t.result.passed.name(name, player.isFollowing)}
       </Txt>
       <Text style={[styles.passedScore, { color: theme.inkMuted }]}>
-        {formatScore(player.score)}
+        {t.fmt.score(player.score)}
       </Text>
       <View
         style={[
@@ -1142,17 +1158,22 @@ function PassedRow({
 }
 
 function LeagueTile({ league }: { league: LeagueStanding }) {
+  const t = useT();
   const zone = ZONE[league.zone];
   return (
     <Panel style={styles.league}>
       <TierBadge tier={league.tier} size="lg" />
       <View style={styles.leagueText}>
         <Txt variant="title" numberOfLines={1}>
-          {`${TIER_LABELS[league.tier]} lig · ${formatRank(league.rank)}/${league.members}`}
+          {t.result.league.title(
+            t.tiers.league(league.tier),
+            t.fmt.rank(league.rank),
+            league.members,
+          )}
         </Txt>
-        <Tag label={zone.line} tone={zone.tone} icon={zone.icon} />
+        <Tag label={t.home.league[zone.line]} tone={zone.tone} icon={zone.icon} />
         <Txt variant="meta" tone="muted">
-          {`Haftalık ${formatScore(league.points)} puan`}
+          {t.result.league.weekly(league.points, t.fmt.score(league.points))}
         </Txt>
       </View>
     </Panel>
@@ -1185,6 +1206,7 @@ function Dock({
   onHeight: (height: number) => void;
 }) {
   const theme = useTheme();
+  const t = useT();
   const slide = useBeat(at, skipped, SLIDE);
   const motion = useAnimatedStyle(() => ({
     transform: [{ translateY: (1 - slide.value) * 320 }],
@@ -1216,7 +1238,7 @@ function Dock({
       <View style={styles.dockRow}>
         {onShare ? (
           <Button
-            label="Paylaş"
+            label={t.result.dock.share}
             icon="share"
             tone="primary"
             size="md"
@@ -1251,15 +1273,15 @@ const styles = StyleSheet.create({
   score: {
     fontFamily: FONT.display,
     fontSize: 68,
-    lineHeight: 80,
+    lineHeight: lh(80),
     textAlign: 'center',
   },
-  scoreLong: { fontSize: 54, lineHeight: 64 },
+  scoreLong: { fontSize: 54, lineHeight: lh(64) },
   unit: {
     fontFamily: FONT.displayBold,
     fontSize: 18,
-    letterSpacing: 0.5,
-    lineHeight: 22,
+    letterSpacing: tracking(0.5),
+    lineHeight: lh(22),
   },
   unsent: { alignItems: 'center', gap: SPACE.sm, marginTop: SPACE.sm },
   crown: { marginTop: SPACE.sm },
@@ -1287,8 +1309,8 @@ const styles = StyleSheet.create({
   bannerText: {
     fontFamily: FONT.display,
     fontSize: 23,
-    letterSpacing: 1,
-    lineHeight: 28,
+    letterSpacing: tracking(1),
+    lineHeight: lh(28),
   },
   best: {
     alignItems: 'center',
@@ -1317,7 +1339,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACE.md,
     paddingVertical: SPACE.ms,
   },
-  sourceValue: { fontFamily: FONT.display, fontSize: 22, lineHeight: 27 },
+  sourceValue: { fontFamily: FONT.display, fontSize: 22, lineHeight: lh(27) },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACE.sm },
   ranks: { flexDirection: 'row', gap: SPACE.sm },
   rankTile: {
@@ -1332,7 +1354,7 @@ const styles = StyleSheet.create({
     paddingVertical: SPACE.ms,
   },
   edge: { height: 3, left: 0, position: 'absolute', right: 0, top: 0 },
-  rankValue: { fontFamily: FONT.display, fontSize: 22, lineHeight: 27 },
+  rankValue: { fontFamily: FONT.display, fontSize: 22, lineHeight: lh(27) },
   move: {
     alignItems: 'center',
     borderBottomWidth: 3.5,
@@ -1342,8 +1364,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACE.sm,
     paddingVertical: 1,
   },
-  moveText: { fontFamily: FONT.display, fontSize: 12.5, lineHeight: 16 },
-  moveSpace: { height: 21.5 },
+  moveText: { fontFamily: FONT.display, fontSize: 12.5, lineHeight: lh(16) },
+  /** A tile with no move keeps the pill's room, so the four tiles stay level. */
+  moveSpace: { height: lh(16) + 5.5 },
   passed: {
     alignItems: 'center',
     borderRadius: RADIUS.control,
@@ -1354,7 +1377,7 @@ const styles = StyleSheet.create({
     paddingVertical: SPACE.sm,
   },
   shrink: { flex: 1 },
-  passedScore: { fontFamily: FONT.displayBold, fontSize: 15, lineHeight: 19 },
+  passedScore: { fontFamily: FONT.displayBold, fontSize: 15, lineHeight: lh(19) },
   passedMark: {
     alignItems: 'center',
     borderRadius: RADIUS.pill,

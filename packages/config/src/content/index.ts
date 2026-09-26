@@ -1,7 +1,14 @@
 import { CATALOGS, CONTENT_VERSION, type ContentKind, type Post } from './catalog';
 import { SALT, mix } from './mix';
 
-export { CATALOGS, CONTENT_VERSION, type Catalog, type ContentKind, type Post } from './catalog';
+export {
+  CATALOGS,
+  CONTENT_VERSION,
+  type Catalog,
+  type ContentKind,
+  type Localized,
+  type Post,
+} from './catalog';
 export { SALT, mix } from './mix';
 
 /** Every post in a catalog version, by id. */

@@ -52,7 +52,7 @@ final class RunService
     {
         if ($user->username === null) {
             throw ValidationException::withMessages([
-                'username' => ['Sıralı bir oyun için önce bir kullanıcı adı seç.'],
+                'username' => [__('messages.username_to_play')],
             ]);
         }
         if ($engineVersion !== (int) config('quezby.engine_version') || ! Catalog::has($contentVersion)) {

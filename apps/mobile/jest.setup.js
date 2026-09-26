@@ -78,6 +78,27 @@ jest.mock('react-native-device-info', () => {
   return { __esModule: true, default: mock, ...mock };
 });
 
+/**
+ * The phone's languages: a Turkish phone, so every screen speaks the words
+ * its tests were written in. A test that wants another phone sets
+ * `getLocales` or picks a language in the store.
+ */
+jest.mock('react-native-localize', () => ({
+  getLocales: jest.fn(() => [
+    { languageCode: 'tr', countryCode: 'TR', languageTag: 'tr-TR', isRTL: false },
+  ]),
+  findBestLanguageTag: jest.fn(() => ({ languageTag: 'tr', isRTL: false })),
+  getNumberFormatSettings: jest.fn(() => ({ decimalSeparator: ',', groupingSeparator: '.' })),
+  usesMetricSystem: jest.fn(() => true),
+  openAppLanguageSettings: jest.fn(async () => undefined),
+}));
+
+/** A reload is the phone's business; a test only checks it was asked for. */
+jest.mock('react-native-restart', () => ({
+  __esModule: true,
+  default: { restart: jest.fn(), Restart: jest.fn(), getReason: jest.fn(async () => null) },
+}));
+
 jest.mock('react-native-haptic-feedback', () => {
   const haptics = {
     trigger: jest.fn(),

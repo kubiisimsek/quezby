@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react';
 import Svg, { Circle, G, Path, Rect, type NumberProp } from 'react-native-svg';
 
+import { IS_RTL } from '@/i18n/native';
+
 /**
  * The app's icon set, drawn here rather than pulled from a font — an icon font
  * is a native asset to link on two platforms for shapes this simple. Every
@@ -30,6 +32,7 @@ export type IconName =
   | 'help'
   | 'search'
   | 'grid'
+  | 'globe'
   // people
   | 'users'
   | 'userPlus'
@@ -161,6 +164,16 @@ const GLYPHS: Record<IconName, (s: Stroke, color: string) => ReactNode> = {
     <>
       <Circle cx={10.8} cy={10.8} r={6.4} {...s} />
       <Path d="m15.6 15.6 4.6 4.6" {...s} />
+    </>
+  ),
+  // The language picker's door: a globe with its equator and one meridian.
+  globe: (s) => (
+    <>
+      <Circle cx={12} cy={12} r={8.6} {...s} />
+      <Path
+        d="M3.4 12h17.2M12 3.4c2.3 2.4 3.5 5.3 3.5 8.6s-1.2 6.2-3.5 8.6c-2.3-2.4-3.5-5.3-3.5-8.6S9.7 5.8 12 3.4z"
+        {...s}
+      />
     </>
   ),
   grid: (s) => (
@@ -376,6 +389,24 @@ const GLYPHS: Record<IconName, (s: Stroke, color: string) => ReactNode> = {
   ),
 };
 
+/**
+ * The glyphs that point somewhere along the line — forward, back, out, up the
+ * chart — and so point the other way when the game reads right to left. The
+ * layout turns itself around; a drawing does not.
+ */
+const MIRRORED: ReadonlySet<IconName> = new Set<IconName>([
+  'chevron',
+  'back',
+  'logout',
+  'trendUp',
+  'trendDown',
+  'history',
+  'userPlus',
+  'userCheck',
+]);
+
+const MIRROR = { transform: [{ scaleX: -1 }] };
+
 export function Icon({
   name,
   size = 24,
@@ -399,7 +430,12 @@ export function Icon({
   };
 
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      style={IS_RTL && MIRRORED.has(name) ? MIRROR : undefined}
+    >
       {GLYPHS[name](stroke, color)}
     </Svg>
   );

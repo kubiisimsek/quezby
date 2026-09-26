@@ -17,16 +17,6 @@ class GoogleLinkRequest extends FormRequest
         ];
     }
 
-    /**
-     * @return array<string, string>
-     */
-    public function attributes(): array
-    {
-        return [
-            'idToken' => 'kimlik jetonu',
-        ];
-    }
-
     public function idToken(): string
     {
         return (string) $this->validated('idToken');

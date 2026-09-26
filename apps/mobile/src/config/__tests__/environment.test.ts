@@ -4,7 +4,8 @@ import {
   hostOfScriptUrl,
   localApiUrl,
 } from '@/config/environment';
-import { formatDuration, formatPerMille, formatRank, formatScore } from '@/lib/format';
+import { formatsFor } from '@/i18n/format';
+import { formatDuration } from '@/lib/format';
 
 describe('environment', () => {
   it('reads the environment QUEZBY_ENV names', () => {
@@ -53,15 +54,17 @@ describe('environment', () => {
 });
 
 describe('format', () => {
+  const tr = formatsFor('tr');
+
   it('groups digits the Turkish way', () => {
-    expect(formatScore(0)).toBe('0');
-    expect(formatScore(1234567)).toBe('1.234.567');
+    expect(tr.score(0)).toBe('0');
+    expect(tr.score(1234567)).toBe('1.234.567');
   });
 
   it('writes durations, shares and ranks', () => {
     expect(formatDuration(154_000)).toBe('2:34');
-    expect(formatPerMille(942)).toBe('%94,2');
-    expect(formatRank(null)).toBe('—');
-    expect(formatRank(1204)).toBe('#1.204');
+    expect(tr.perMille(942)).toBe('%94,2');
+    expect(tr.rank(null)).toBe('—');
+    expect(tr.rank(1204)).toBe('#1.204');
   });
 });

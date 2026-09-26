@@ -7,6 +7,8 @@ import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import type { ComponentProps } from 'react';
 
 import { api } from '@/api/client';
+import { iso } from '@/i18n';
+import { useLanguage } from '@/i18n/language';
 import { LeaderboardScreen } from '@/screens/leaderboard/LeaderboardScreen';
 import { buildEntries, buildEntry } from '@/test/factories';
 import { renderWithProviders } from '@/test/renderWithProviders';
@@ -349,5 +351,97 @@ describe('LeaderboardScreen — Zirve', () => {
 
     expect(await boardArrived()).toBeOnTheScreen();
     expect(screen.queryByText('Sıralama yüklenemedi')).not.toBeOnTheScreen();
+  });
+});
+
+describe('LeaderboardScreen — in other languages', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  /** You below the list, with the player right above you to pass. */
+  function chasing() {
+    const me = buildEntry({
+      rank: 311,
+      username: 'kubi',
+      score: 9_120,
+      isMe: true,
+      gap: 121,
+    });
+    const rival = buildEntry({ rank: 310, username: 'oya', score: 9_240 });
+    mocked.leaderboards.get.mockResolvedValue(
+      board({
+        me,
+        rival: { entry: rival, gap: 121 },
+        nextRankProgress: 986,
+        players: 5_120,
+      }),
+    );
+  }
+
+  it('speaks English: the summit, its switches, the climb and your floor', async () => {
+    useLanguage.setState({ locale: 'en' });
+    chasing();
+
+    await renderZirve();
+
+    expect(
+      await screen.findByRole('button', {
+        name: '1st place, @ekin, 24,000 points',
+      }),
+    ).toBeOnTheScreen();
+    expect(screen.getByText('Summit')).toBeOnTheScreen();
+    expect(screen.getByText('5,120 players')).toBeOnTheScreen();
+    expect(screen.getByRole('tab', { name: 'Today' })).toBeSelected();
+    expect(screen.getByRole('tab', { name: 'Everyone' })).toBeSelected();
+    ['Week', 'Month', 'All time', 'Friends'].forEach((name) =>
+      expect(screen.getByRole('tab', { name })).toBeOnTheScreen(),
+    );
+    expect(
+      screen.getByRole('button', {
+        name: '4th place, @deniz, 20,280 points, 1,241 points to pass',
+      }),
+    ).toBeOnTheScreen();
+    expect(screen.getByLabelText('More players in between')).toBeOnTheScreen();
+    expect(screen.getByText('YOUR FLOOR')).toBeOnTheScreen();
+    expect(screen.getByText('You · 9,120')).toBeOnTheScreen();
+    expect(screen.getByText('121 pts to @oya')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Pass them' })).toBeOnTheScreen();
+    expect(
+      screen.getByRole('button', { name: 'Find players' }),
+    ).toBeOnTheScreen();
+  });
+
+  it('says in English when the summit is empty', async () => {
+    useLanguage.setState({ locale: 'en' });
+    mocked.leaderboards.get.mockResolvedValue(
+      board({ entries: [], players: 0 }),
+    );
+
+    await renderZirve();
+
+    expect(await screen.findByText('The summit is empty')).toBeOnTheScreen();
+    expect(screen.getByLabelText('1st place, empty')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Play' })).toBeOnTheScreen();
+  });
+
+  it('speaks Arabic, keeping names whole in its lines', async () => {
+    useLanguage.setState({ locale: 'ar' });
+    chasing();
+
+    await renderZirve();
+
+    expect(
+      await screen.findByRole('button', {
+        name: `المركز 1، ${iso('@ekin')}، 24,000 نقطة`,
+      }),
+    ).toBeOnTheScreen();
+    expect(screen.getByText('القمة')).toBeOnTheScreen();
+    expect(screen.getByText('5,120 لاعبًا')).toBeOnTheScreen();
+    expect(screen.getByRole('tab', { name: 'اليوم' })).toBeSelected();
+    expect(screen.getByRole('tab', { name: 'الأصدقاء' })).toBeOnTheScreen();
+    expect(screen.getByText('طابقك')).toBeOnTheScreen();
+    expect(
+      screen.getByText(`تفصلك 121 نقطة عن ${iso('@oya')}`),
+    ).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'تجاوزه' })).toBeOnTheScreen();
   });
 });

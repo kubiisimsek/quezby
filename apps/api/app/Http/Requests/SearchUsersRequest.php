@@ -8,8 +8,6 @@ use Illuminate\Foundation\Http\FormRequest;
 /** `GET /users?search=…` — the start of a username, 2 to 20 of its characters. */
 class SearchUsersRequest extends FormRequest
 {
-    private const MESSAGE = 'Aramak için 2 ile 20 arası harf, rakam, nokta ya da yıldız yaz.';
-
     protected function prepareForValidation(): void
     {
         $search = $this->query('search');
@@ -29,14 +27,18 @@ class SearchUsersRequest extends FormRequest
     }
 
     /**
+     * One line for whatever is wrong with it: what a search takes.
+     *
      * @return array<string, string>
      */
     public function messages(): array
     {
+        $message = __('messages.search');
+
         return [
-            'search.required' => self::MESSAGE,
-            'search.string' => self::MESSAGE,
-            'search.regex' => self::MESSAGE,
+            'search.required' => $message,
+            'search.string' => $message,
+            'search.regex' => $message,
         ];
     }
 

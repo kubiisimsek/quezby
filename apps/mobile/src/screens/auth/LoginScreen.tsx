@@ -3,8 +3,9 @@ import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 
 import { api } from '@/api/client';
-import { useSession } from '@/auth/session';
+import { signInToAccount } from '@/hooks/accountLanguage';
 import { useSocialAuth } from '@/hooks/useSocialAuth';
+import { useT } from '@/i18n';
 import { messageFor } from '@/lib/errors';
 import {
   Button,
@@ -24,10 +25,12 @@ import { SPACE } from '@/ui/theme';
  * was kept with. A guest account has nothing to type — its phone holds it.
  */
 export function LoginScreen() {
+  const t = useT();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // What failed, not its words: the line is read in the language of the moment.
+  const [failure, setFailure] = useState<'missing' | { error: unknown } | null>(null);
   const social = useSocialAuth();
   const navigation = useNavigation();
   const offersSocial = social.available.apple || social.available.google;
@@ -36,24 +39,28 @@ export function LoginScreen() {
 
   const submit = async () => {
     if (!valid) {
-      setError('E-postanı ve şifreni yaz.');
+      setFailure('missing');
       return;
     }
     setPending(true);
-    setError(null);
+    setFailure(null);
     try {
       const auth = await api.auth.login({ email: email.trim(), password });
-      await useSession.getState().signIn(auth.token, auth.user);
+      // An account that already exists brings its language with it.
+      await signInToAccount(auth.token, auth.user);
     } catch (caught) {
-      setError(messageFor(caught));
+      setFailure({ error: caught });
       setPending(false);
     }
   };
 
+  const error =
+    failure === 'missing' ? t.auth.login.missing : failure ? messageFor(failure.error, t) : null;
+
   return (
     <Screen>
       <TopBar
-        title="Tekrar hoş geldin"
+        title={t.auth.login.title}
         onBack={navigation.canGoBack() ? () => navigation.goBack() : undefined}
       />
       <KeyboardAvoidingView
@@ -62,8 +69,7 @@ export function LoginScreen() {
       >
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
           <Txt variant="meta" tone="muted">
-            Hesabını Apple, Google ya da e-postayla koruduysan buradan dönebilirsin. Skorların ve
-            kullanıcı adın seninle gelir.
+            {t.auth.login.intro}
           </Txt>
           {social.available.apple ? (
             <SocialButton
@@ -86,13 +92,13 @@ export function LoginScreen() {
             <View style={styles.or}>
               <Divider style={styles.line} />
               <Txt variant="meta" tone="faint">
-                ya da e-postayla
+                {t.auth.login.orEmail}
               </Txt>
               <Divider style={styles.line} />
             </View>
           ) : null}
           <Field
-            label="E-posta"
+            label={t.auth.email}
             icon="mail"
             value={email}
             onChangeText={setEmail}
@@ -102,9 +108,9 @@ export function LoginScreen() {
             textContentType="emailAddress"
             autoComplete="email"
           />
-          <PasswordField label="Şifre" value={password} onChangeText={setPassword} />
+          <PasswordField label={t.auth.password} value={password} onChangeText={setPassword} />
           {error ? <Callout tone="bad">{error}</Callout> : null}
-          <Button label="Giriş yap" tone="play" onPress={() => void submit()} loading={pending} />
+          <Button label={t.auth.login.submit} tone="play" onPress={() => void submit()} loading={pending} />
         </ScrollView>
       </KeyboardAvoidingView>
     </Screen>

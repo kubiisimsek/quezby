@@ -8,6 +8,8 @@ import {
   type ViewStyle,
 } from 'react-native';
 
+import { useT } from '@/i18n';
+import { SHRINK_TO_FIT } from '@/i18n/native';
 import { GoogleMark } from '@/ui/brand-mark';
 import { AnimatedPressable } from '@/ui/kit/shared';
 import { Slab, type SlabColors } from '@/ui/kit/slab';
@@ -21,6 +23,7 @@ import {
   SPACE,
   TYPE,
   embossed,
+  lh,
   useTheme,
   type Theme,
 } from '@/ui/theme';
@@ -97,10 +100,10 @@ export function buttonColors(
 }
 
 const LABEL: Record<Size, { fontSize: number; lineHeight: number }> = {
-  sm: { fontSize: 14, lineHeight: 18 },
-  md: { fontSize: 17, lineHeight: 21 },
-  lg: { fontSize: 20, lineHeight: 24 },
-  xl: { fontSize: 28, lineHeight: 33 },
+  sm: { fontSize: 14, lineHeight: lh(18) },
+  md: { fontSize: 17, lineHeight: lh(21) },
+  lg: { fontSize: 20, lineHeight: lh(24) },
+  xl: { fontSize: 28, lineHeight: lh(33) },
 };
 
 const GLYPH: Record<Size, number> = { sm: 15, md: 18, lg: 21, xl: 28 };
@@ -207,7 +210,7 @@ export function Button({
           ) : null}
           <Text
             numberOfLines={1}
-            adjustsFontSizeToFit
+            adjustsFontSizeToFit={SHRINK_TO_FIT}
             minimumFontScale={0.72}
             style={[
               styles.label,
@@ -246,6 +249,7 @@ export function IconButton({
   style?: StyleProp<ViewStyle>;
 }) {
   const theme = useTheme();
+  const t = useT();
   const colors = buttonColors(theme, tone === 'onBrand' ? 'secondary' : 'neutral');
 
   return (
@@ -256,7 +260,7 @@ export function IconButton({
         lip={DEPTH.lipSm}
         onPress={onPress}
         hitSlop={8}
-        accessibilityLabel={badge > 0 ? `${label}, ${badge} yeni` : label}
+        accessibilityLabel={badge > 0 ? t.kit.iconButton.badge(label, badge) : label}
         faceStyle={styles.square}
       >
         <Icon name={icon} size={21} color={theme.ink} strokeWidth={2.6} />
@@ -297,17 +301,18 @@ export function SocialButton({
   onPress: () => void;
   loading?: boolean;
   disabled?: boolean;
-  /** "Apple ile devam et" / "Google ile devam et" unless given. */
+  /** "Apple ile devam et" / "Google ile devam et", in the player's language, unless given. */
   label?: string;
   style?: StyleProp<ViewStyle>;
 }) {
   const theme = useTheme();
+  const t = useT();
   const press = usePressScale(0.96);
   const apple = provider === 'apple';
   const colors = apple
     ? { bg: theme.appleBg, fg: theme.appleInk, border: theme.appleBg }
     : { bg: theme.googleBg, fg: theme.googleInk, border: theme.googleLine };
-  const text = label ?? (apple ? 'Apple ile devam et' : 'Google ile devam et');
+  const text = label ?? t.kit.socialButton[provider];
   const inactive = Boolean(disabled || loading);
 
   return (
@@ -379,5 +384,5 @@ const styles = StyleSheet.create({
     right: -6,
     top: -6,
   },
-  badgeText: { fontFamily: FONT.display, fontSize: 10.5, lineHeight: 13 },
+  badgeText: { fontFamily: FONT.display, fontSize: 10.5, lineHeight: lh(13) },
 });

@@ -19,18 +19,6 @@ class AppleLinkRequest extends FormRequest
         ];
     }
 
-    /**
-     * @return array<string, string>
-     */
-    public function attributes(): array
-    {
-        return [
-            'identityToken' => 'kimlik jetonu',
-            'nonce' => 'tek kullanımlık kod',
-            'authorizationCode' => 'yetki kodu',
-        ];
-    }
-
     public function identityToken(): string
     {
         return (string) $this->validated('identityToken');

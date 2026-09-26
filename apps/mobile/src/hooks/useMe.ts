@@ -5,6 +5,8 @@ import { useEffect } from 'react';
 import { api } from '@/api/client';
 import { queryClient } from '@/api/queryClient';
 import { useSession } from '@/auth/session';
+import { adoptAccountLanguage } from '@/hooks/accountLanguage';
+import { useLanguage } from '@/i18n/language';
 import { useSettings } from '@/stores/settings';
 
 const meKey = (token: string | null) => ['me', token] as const;
@@ -31,8 +33,12 @@ export function useMe() {
   useEffect(() => {
     if (!query.data || query.dataUpdatedAt <= appliedAt) return;
     appliedAt = query.dataUpdatedAt;
-    useSession.getState().setMe(query.data.user, query.data.ranks);
-    useSettings.getState().fromAccount(query.data.user.settings);
+    const { user } = query.data;
+    // An account this phone has not seen — a reinstall the keychain kept, an
+    // account from before languages — brings its language before it draws.
+    if (useLanguage.getState().account !== user.id) void adoptAccountLanguage(user);
+    useSession.getState().setMe(user, query.data.ranks);
+    useSettings.getState().fromAccount(user.settings);
   }, [query.data, query.dataUpdatedAt]);
 
   return query;

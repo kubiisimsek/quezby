@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-/** Every `ApiErrorCode` of `packages/types`, with its status and Turkish message. */
+/** Every `ApiErrorCode` of `packages/types`, with its status and its message in each language. */
 enum ErrorCode: string
 {
     case ValidationFailed = 'validation_failed';
@@ -48,34 +48,18 @@ enum ErrorCode: string
         };
     }
 
-    public function message(): string
+    /**
+     * What the player reads, in the request's language (`lang/{locale}/errors.php`).
+     * `follow_limit` names the cap: `$replace['limit']`, else the configured one.
+     *
+     * @param  array<string, int|string>  $replace
+     */
+    public function message(array $replace = []): string
     {
-        return match ($this) {
-            self::ValidationFailed => 'Gönderilen bilgilerde bir sorun var.',
-            self::Unauthenticated => 'Oturumun geçersiz, lütfen yeniden giriş yap.',
-            self::NotFound => 'Aradığın şey bulunamadı.',
-            self::UsernameInvalid => 'Bu kullanıcı adı geçersiz.',
-            self::UsernameTaken => 'Bu kullanıcı adı alınmış.',
-            self::UsernameLocked => 'Kullanıcı adını zaten seçtin; seçilen ad değişmez.',
-            self::InvalidCredentials => 'E-posta ya da şifre hatalı.',
-            self::EmailTaken => 'Bu e-posta başka bir hesaba bağlı.',
-            self::AlreadyLinked => 'Bu hesaba zaten bağlı.',
-            self::IdentityInvalid => 'Giriş doğrulanamadı, lütfen tekrar dene.',
-            self::IdentityTaken => 'Bu hesap başka bir Quezby oyuncusuna bağlı.',
-            self::LastSignInMethod => 'Bu, hesabına girmenin tek yolu. Önce başka bir yol bağla.',
-            self::RunAlreadyFinished => 'Bu oyun zaten bitirilmiş.',
-            self::RunExpired => 'Bu oyunun süresi doldu.',
-            self::RunRejected => 'Bu oyun doğrulanamadı, sıralamaya giremez.',
-            self::EngineOutdated => 'Oyun sürümün güncel değil, sıralamaya girmek için uygulamayı güncelle.',
-            self::DailyAlreadyPlayed => 'Günün akışını bugün oynadın. Yarın yeni akış seni bekliyor.',
-            self::CannotFollowSelf => 'Kendini takip edemezsin.',
-            self::FollowLimit => 'En fazla 500 oyuncu takip edebilirsin.',
-            self::ChallengeInvalid => 'Cihaz doğrulama isteği geçersiz ya da süresi dolmuş, tekrar dene.',
-            self::IntegrityInvalid => 'Cihaz doğrulaması okunamadı, tekrar dene.',
-            self::AttestKeyUnknown => 'Bu cihazın anahtarı tanınmıyor, cihazı yeniden doğrula.',
-            self::TooManyRequests => 'Çok fazla istek gönderdin, biraz bekleyip tekrar dene.',
-            self::Forbidden => 'Bu işlem için yetkin yok.',
-            self::ServerError => 'Bir şeyler ters gitti, birazdan tekrar dene.',
-        };
+        if ($this === self::FollowLimit) {
+            $replace += ['limit' => Locale::current()->group((int) config('quezby.follows.limit'))];
+        }
+
+        return __('errors.'.$this->value, $replace);
     }
 }

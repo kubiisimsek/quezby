@@ -15,11 +15,11 @@ import {
   withTiming,
 } from 'react-native-reanimated';
 
-import { formatScore } from '@/lib/format';
+import { useT } from '@/i18n';
 import { Icon } from '@/ui/icons';
 import { BrandBand } from '@/ui/kit';
 import { stagger } from '@/ui/motion';
-import { DEPTH, FONT, RADIUS, SPACE, useTheme, withAlpha } from '@/ui/theme';
+import { DEPTH, FONT, RADIUS, SPACE, lh, useTheme, withAlpha } from '@/ui/theme';
 
 /**
  * The stage a board stands on: the brand's magenta running into violet,
@@ -69,6 +69,7 @@ export function BoardStage({
 /** "5.120 oyuncu" — how many are on a board, on a dark pill for a stage. */
 export function PlayersPill({ count }: { count: number }) {
   const theme = useTheme();
+  const t = useT();
   return (
     <View
       style={[
@@ -81,7 +82,7 @@ export function PlayersPill({ count }: { count: number }) {
     >
       <Icon name="users" size={14} color={theme.onBrand} strokeWidth={2.6} />
       <Text style={[styles.pillText, { color: theme.onBrand }]}>
-        {`${formatScore(count)} oyuncu`}
+        {t.board.players(count)}
       </Text>
     </View>
   );
@@ -140,6 +141,6 @@ const styles = StyleSheet.create({
     fontFamily: FONT.displayBold,
     fontSize: 13.5,
     fontVariant: ['tabular-nums'],
-    lineHeight: 17,
+    lineHeight: lh(17),
   },
 });

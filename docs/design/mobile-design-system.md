@@ -28,7 +28,8 @@ navigation/
 screens/
   welcome/           the arena, the mark stamped in, "Quezby" in Rubik, the four moves as gems,
                      one gold "Oyna" (a guest account, then the practice run) and "Hesabım var,
-                     giriş yap"
+                     giriş yap"; a small neutral slab at the top end names the language on
+                     screen and opens LanguageSheet
   auth/              Login (TopBar "Tekrar hoş geldin") — Apple / Google, then "ya da e-postayla"
   username/          after the practice run "Sana ne diyelim?" — the field in a tile, magenta
                      "Kaydet", ghost "Şimdilik geç" (the account keeps `guest48128742`); for an
@@ -58,7 +59,8 @@ screens/
   profile/           a player card (framed portrait, tier, season best in gold, place on each
                      board), a "Hesabını koru" tile for guests, İstatistikler (stat tiles, named
                      combos, most-liked posts as little reels); the gear opens Ayarlar
-                     (SettingsSheet): Titreşim, Yardım and the account doors — "Adını seç"
+                     (SettingsSheet): Dil (LanguageSheet), Titreşim, Yardım and the account
+                     doors — "Adını seç"
                      while the name is automatic (a picked one sits there locked, no arrow:
                      "Kullanıcı adın · @ekin · kalıcı"), "Hesabını koru" / "Giriş yolları"
                      (SignInWaysSheet), e-posta, çıkış, silme.
@@ -201,6 +203,7 @@ which takes a tint.
 
 | Component | Role |
 | --- | --- |
+| `LanguageSheet` | The six languages, each in its own words and its own script (Cairo for Arabic, whatever the game speaks), its name in the language on screen under it; a language read the other way (to or from Arabic) asks first — the game reloads to turn around |
 | `UsernameField` | The username input everywhere: lower case as typed, the rules ticking off under it, availability in the trailing slot |
 | `PlayerSheet` | A player's card from any row: portrait, tier, season best in gold, weekly and all-time place, a few lifetime counts, followers, "Takip et" / "Takibi bırak" |
 | `PlayerCard` | `Portrait` (the 72/92pt framed portrait of a profile) and `SeasonBest` (the gold record well) |

@@ -2,6 +2,8 @@ import { fireEvent, screen } from '@testing-library/react-native';
 
 import { api } from '@/api/client';
 import { useSession } from '@/auth/session';
+import { iso } from '@/i18n';
+import { useLanguage } from '@/i18n/language';
 import { SettingsSheet, keepHint } from '@/screens/profile/SettingsSheet';
 import { useSettings } from '@/stores/settings';
 import { buildMe } from '@/test/factories';
@@ -50,6 +52,21 @@ describe('SettingsSheet', () => {
       expect(onPick).toHaveBeenLastCalledWith(door);
     }
     expect(onPick).toHaveBeenCalledTimes(3);
+  });
+
+  it('opens with the language, named in its own words, as the first setting of the game', async () => {
+    const onPick = await renderSheet();
+
+    await fireEvent.press(screen.getByRole('button', { name: /^Dil.*Türkçe/ }));
+    expect(onPick).toHaveBeenLastCalledWith('language');
+  });
+
+  it('names the language in its own words whatever the game speaks', async () => {
+    useLanguage.setState({ locale: 'de', account: buildMe().id });
+    await renderSheet();
+
+    expect(screen.getByText('Sprache')).toBeOnTheScreen();
+    expect(screen.getByText('Deutsch')).toBeOnTheScreen();
   });
 
   it('shows a picked name locked, with no door to change it', async () => {
@@ -147,5 +164,70 @@ describe('SettingsSheet', () => {
 
     expect(useSettings.getState().haptics).toBe(false);
     expect(screen.getByText('Oyun sessizce oynanır.')).toBeOnTheScreen();
+  });
+
+  describe('in other languages', () => {
+    /** Plays in `locale` on an account this phone has seen, so the account's own language does not take over. */
+    const speak = (locale: 'en' | 'ar') => {
+      useLanguage.setState({ locale, account: buildMe().id });
+    };
+
+    it('speaks English, and still never offers to change a picked name', async () => {
+      speak('en');
+      const onPick = await renderSheet();
+
+      expect(screen.getByText('Settings')).toBeOnTheScreen();
+      expect(screen.getByText('Game')).toBeOnTheScreen();
+      expect(screen.getByRole('switch', { name: 'Vibration' })).toBeChecked();
+      expect(screen.getByText('Vibrates on every swipe and every mistake.')).toBeOnTheScreen();
+      expect(screen.getByRole('switch', { name: 'Usage data' })).not.toBeChecked();
+      expect(
+        screen.getByText('Only the device info the game needs to run is sent.'),
+      ).toBeOnTheScreen();
+      expect(screen.getByText('Your username')).toBeOnTheScreen();
+      expect(screen.getByText('@ekin · permanent')).toBeOnTheScreen();
+      expect(screen.queryByText(/change/i)).not.toBeOnTheScreen();
+      expect(
+        screen.getByText('Link Apple or email and your scores stay with you, even on a new phone.'),
+      ).toBeOnTheScreen();
+      expect(screen.getByText(keepHint())).toBeOnTheScreen();
+      expect(screen.getByText(/^Quezby .+ · Local$/)).toBeOnTheScreen();
+
+      await fireEvent.press(screen.getByRole('button', { name: /^Help/ }));
+      expect(onPick).toHaveBeenLastCalledWith('help');
+      await fireEvent.press(screen.getByRole('button', { name: /^Delete account/ }));
+      expect(onPick).toHaveBeenLastCalledWith('delete');
+    });
+
+    it('names a kept account’s ways in and the way out in English', async () => {
+      speak('en');
+      useSession.setState({
+        user: buildMe({ isGuest: false, identities: ['google'] }),
+      });
+      await renderSheet();
+
+      expect(screen.getByText('Google linked')).toBeOnTheScreen();
+      expect(screen.getByText('You can sign back in with Google.')).toBeOnTheScreen();
+      expect(screen.getByRole('button', { name: /^Sign-in methods/ })).toBeOnTheScreen();
+      expect(screen.getByRole('button', { name: /^Sign out/ })).toBeOnTheScreen();
+      expect(screen.queryByText('Protect your account')).not.toBeOnTheScreen();
+    });
+
+    it('speaks Arabic, a name kept whole inside its line', async () => {
+      speak('ar');
+      useSession.setState({ user: buildMe({ username: 'guest48128742' }) });
+      const onPick = await renderSheet();
+
+      expect(screen.getByText('الإعدادات')).toBeOnTheScreen();
+      expect(screen.getByRole('switch', { name: 'الاهتزاز' })).toBeChecked();
+      expect(screen.getByRole('switch', { name: 'بيانات الاستخدام' })).toBeOnTheScreen();
+      expect(
+        screen.getByText(`حاليًا ${iso('@guest48128742')} · تختار مرة واحدة فقط`),
+      ).toBeOnTheScreen();
+      expect(screen.getByText('اربط Apple أو البريد الإلكتروني، فلا تضيع نتائجك حتى لو تغيّر هاتفك.')).toBeOnTheScreen();
+
+      await fireEvent.press(screen.getByRole('button', { name: /^اختر اسمك/ }));
+      expect(onPick).toHaveBeenCalledWith('username');
+    });
   });
 });

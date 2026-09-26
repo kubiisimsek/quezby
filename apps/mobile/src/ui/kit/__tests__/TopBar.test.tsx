@@ -1,6 +1,7 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { useLanguage } from '@/i18n/language';
 import { Button, TopBar } from '@/ui/kit';
 
 function Wrapped(props: Parameters<typeof TopBar>[0]) {
@@ -31,5 +32,17 @@ describe('TopBar', () => {
     expect(back).toHaveBeenCalledTimes(1);
     await fireEvent.press(screen.getByRole('button', { name: 'Tamam' }));
     expect(act).toHaveBeenCalledTimes(1);
+  });
+
+  it('says the way back in the player’s language, and again when it changes', async () => {
+    useLanguage.setState({ locale: 'en' });
+    await render(<Wrapped title="Help" onBack={jest.fn()} />);
+    expect(screen.getByRole('button', { name: 'Back' })).toBeOnTheScreen();
+
+    await act(async () => {
+      useLanguage.setState({ locale: 'ar' });
+    });
+    expect(screen.getByRole('button', { name: 'رجوع' })).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Back' })).not.toBeOnTheScreen();
   });
 });

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\LeaderboardPeriod;
+use App\Enums\Locale;
 use App\Enums\RunMode;
 use App\Enums\RunStatus;
 use App\Game\Rules;
@@ -69,15 +70,24 @@ final class DailyService
         return implode('', $squares);
     }
 
+    /**
+     * What "Paylaş" sends after the day's run, in the request's language
+     * (`lang/{locale}/share.php`): the day, its grid and the score — and the
+     * rank among the day's players once it ranked. Built on every request,
+     * never stored, so each player reads it in their own language.
+     */
     public function shareText(int $number, string $grid, int $score, ?int $rank, int $players): string
     {
-        $lines = [
-            "Quezby · Günün akışı #{$number}",
-            $grid,
-            self::thousands($score).' puan'.($rank === null ? '' : ' · #'.$rank.'/'.self::thousands($players)),
+        $locale = Locale::current();
+        $replace = [
+            'number' => $locale->group($number),
+            'grid' => $grid,
+            'points' => trans_choice('share.points', $score, ['count' => $locale->group($score)]),
         ];
 
-        return implode("\n", $lines);
+        return $rank === null
+            ? __('share.daily', $replace)
+            : __('share.daily_ranked', $replace + ['rank' => $locale->group($rank), 'players' => $locale->group($players)]);
     }
 
     /**
@@ -153,10 +163,5 @@ final class DailyService
             'grid' => $result['grid'],
             'shareText' => $result['shareText'],
         ];
-    }
-
-    private static function thousands(int $value): string
-    {
-        return number_format($value, 0, ',', '.');
     }
 }

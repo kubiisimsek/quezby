@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { formatCountdown } from '@/lib/format';
+import { useT } from '@/i18n';
 import { Icon } from '@/ui/icons';
-import { FONT, RADIUS, SPACE, useTheme, withAlpha } from '@/ui/theme';
+import { FONT, RADIUS, SPACE, lh, useTheme, withAlpha } from '@/ui/theme';
 
 const HOUR = 3_600_000;
 
 /**
- * Milliseconds until the text next changes. `formatCountdown` rounds seconds
+ * Milliseconds until the text next changes. `t.fmt.countdown` rounds seconds
  * up, so `5 sa 12 dk` turns into `5 sa 11 dk` at 5:11:59, not at 5:12:00.
  */
 function nextTick(remaining: number): number {
@@ -36,13 +36,17 @@ export function CountdownChip({
   endsAt: string;
   /** ISO time the server stamped on the response that carried `endsAt`. */
   serverTime: string;
-  /** "Bitmesine" — left out once the time is up. */
+  /**
+   * The caller's words before the time, in the player's language —
+   * `t.home.countdown.endsIn` ("Bitmesine"). Left out once the time is up.
+   */
   prefix?: string;
   tone?: 'onBrand' | 'neutral';
   /** Once, when the time runs out — refetch the board here. */
   onElapsed?: () => void;
 }) {
   const theme = useTheme();
+  const t = useT();
   const offset = useMemo(() => {
     const server = Date.parse(serverTime);
     return Number.isNaN(server) ? 0 : server - Date.now();
@@ -72,7 +76,7 @@ export function CountdownChip({
   }, [endsAt, remaining]);
 
   const over = remaining <= 0;
-  const time = over ? 'Sona erdi' : formatCountdown(remaining);
+  const time = over ? t.home.countdown.over : t.fmt.countdown(remaining);
   const text = prefix && !over ? `${prefix} ${time}` : time;
   const onBrand = tone === 'onBrand';
   const color = over ? theme.inkMuted : theme.accent;
@@ -111,6 +115,6 @@ const styles = StyleSheet.create({
     fontFamily: FONT.displayBold,
     fontSize: 13.5,
     fontVariant: ['tabular-nums'],
-    lineHeight: 17,
+    lineHeight: lh(17),
   },
 });

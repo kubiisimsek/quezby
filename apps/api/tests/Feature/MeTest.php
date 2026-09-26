@@ -20,6 +20,7 @@ test('me shows the player and their ranks', function () {
         ->assertOk()
         ->assertJsonPath('user.username', 'kubi')
         ->assertJsonPath('user.identities', [])
+        ->assertJsonPath('user.locale', 'tr')
         ->assertJsonPath('user.best', ['score' => 5000, 'reels' => 80, 'achievedAt' => '2026-09-23T09:00:00.000Z'])
         ->assertJsonPath('ranks', ['daily' => 2, 'weekly' => 2, 'monthly' => 2, 'all' => 2]);
 

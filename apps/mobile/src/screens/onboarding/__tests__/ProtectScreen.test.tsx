@@ -5,6 +5,8 @@ import { fireEvent, screen } from '@testing-library/react-native';
 import { track } from '@/analytics/track';
 import { api } from '@/api/client';
 import { useSession } from '@/auth/session';
+import { iso } from '@/i18n';
+import { useLanguage } from '@/i18n/language';
 import { ProtectScreen } from '@/screens/onboarding/ProtectScreen';
 import { useOnboarding } from '@/stores/onboarding';
 import { buildMe } from '@/test/factories';
@@ -94,5 +96,41 @@ describe('ProtectScreen', () => {
 
     expect(useSession.getState()).toMatchObject({ token: 'their-token', user: { id: 'u0' } });
     expect(useOnboarding.getState().step).toBeNull();
+  });
+
+  it('keeps the account with Apple in English, says so, and moves on', async () => {
+    useLanguage.setState({ locale: 'en' });
+    mocked.me.linkApple.mockResolvedValue({ user: buildMe({ id: 'u1', isGuest: false, identities: ['apple'] }) });
+    await renderWithProviders(<ProtectScreen />);
+
+    expect(screen.getByText('Protect your account')).toBeTruthy();
+    expect(screen.getByText(/so your name, scores and league come with you, even to a new phone\./)).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Protect with email' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Not now' })).toBeTruthy();
+
+    await fireEvent.press(screen.getByRole('button', { name: /Apple/ }));
+
+    expect(screen.getByText('Apple linked')).toBeTruthy();
+    expect(screen.getByText('Your account is protected now. You can sign in from another phone too.')).toBeTruthy();
+    await fireEvent.press(screen.getByRole('button', { name: 'Continue' }));
+    expect(useOnboarding.getState().step).toBeNull();
+  });
+
+  it('offers, in Arabic, to switch to the player an Apple account already belongs to', async () => {
+    useLanguage.setState({ locale: 'ar' });
+    mocked.me.linkApple.mockRejectedValue(new ApiError(409, 'identity_taken', 'x'));
+    await renderWithProviders(<ProtectScreen />);
+
+    expect(screen.getByText('احمِ حسابك')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'ليس الآن' })).toBeTruthy();
+
+    await fireEvent.press(screen.getByRole('button', { name: /Apple/ }));
+
+    expect(
+      screen.getByText(
+        'هذا الحساب مرتبط بلاعب آخر في Quezby. إن أردت اللعب بذلك الحساب فيمكنك الانتقال إليه، ويبقى هذا الحساب الجديد هنا.',
+      ),
+    ).toBeTruthy();
+    expect(screen.getByRole('button', { name: `الانتقال إلى حسابي على ${iso('Apple')}` })).toBeTruthy();
   });
 });

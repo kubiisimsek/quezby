@@ -16,21 +16,13 @@ import Svg, {
   Stop,
 } from 'react-native-svg';
 
-import { formatScore } from '@/lib/format';
+import { handle, useT } from '@/i18n';
 import { Icon } from '@/ui/icons';
 import { MedalBadge, medalColors, type MedalRank } from '@/ui/kit/badges';
 import { Avatar } from '@/ui/kit/identity';
 import { AnimatedPressable } from '@/ui/kit/shared';
 import { SPRING, SPRING_POP, usePressScale } from '@/ui/motion';
-import {
-  DEPTH,
-  FONT,
-  RADIUS,
-  SPACE,
-  embossed,
-  useTheme,
-  withAlpha,
-} from '@/ui/theme';
+import { DEPTH, FONT, RADIUS, SPACE, embossed, lh, useTheme, withAlpha } from '@/ui/theme';
 
 export type PodiumEntry = {
   rank: number;
@@ -150,6 +142,7 @@ function Place<T extends PodiumEntry>({
   onPress?: (entry: T) => void;
 }) {
   const theme = useTheme();
+  const t = useT();
   const reduced = useReducedMotion();
   const metal = medalColors(theme, place);
   const press = usePressScale(0.96);
@@ -189,8 +182,13 @@ function Place<T extends PodiumEntry>({
   }));
 
   const label = entry
-    ? `${place}. sıra, @${entry.username}${entry.isMe ? ', sen' : ''}, ${formatScore(entry.score)} puan`
-    : `${place}. sıra boş`;
+    ? t.board.row({
+        rank: place,
+        name: entry.username,
+        isMe: entry.isMe,
+        score: entry.score,
+      })
+    : t.board.vacant(place);
 
   const column = (
     <>
@@ -271,13 +269,13 @@ function Place<T extends PodiumEntry>({
             embossed(1.5),
           ]}
         >
-          {entry ? `@${entry.username}` : '—'}
+          {entry ? handle(entry.username) : '—'}
         </Text>
         {entry?.isMe ? (
           <Text
             style={[styles.nameText, { color: theme.onBrand }, embossed(1.5)]}
           >
-            {' · sen'}
+            {` · ${t.board.you}`}
           </Text>
         ) : null}
       </View>
@@ -296,7 +294,7 @@ function Place<T extends PodiumEntry>({
               embossed(1.5),
             ]}
           >
-            {formatScore(entry.score)}
+            {t.fmt.score(entry.score)}
           </Text>
         ) : null}
       </View>
@@ -483,7 +481,7 @@ const styles = StyleSheet.create({
     maxWidth: '100%',
     paddingHorizontal: SPACE.xs,
   },
-  nameText: { fontFamily: FONT.displayBold, fontSize: 14, lineHeight: 18 },
+  nameText: { fontFamily: FONT.displayBold, fontSize: 14, lineHeight: lh(18) },
   shrink: { flexShrink: 1 },
   score: {
     borderRadius: RADIUS.pill,
@@ -495,7 +493,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT.display,
     fontSize: 15,
     fontVariant: ['tabular-nums'],
-    lineHeight: 19,
+    lineHeight: lh(19),
   },
   stage: { alignSelf: 'stretch', marginTop: SPACE.xs, overflow: 'hidden' },
   pedestal: {
@@ -522,7 +520,7 @@ const styles = StyleSheet.create({
 });
 
 const DIGIT = StyleSheet.create({
-  1: { fontSize: 44, lineHeight: 50 },
-  2: { fontSize: 34, lineHeight: 40 },
-  3: { fontSize: 28, lineHeight: 32 },
+  1: { fontSize: 44, lineHeight: lh(50) },
+  2: { fontSize: 34, lineHeight: lh(40) },
+  3: { fontSize: 28, lineHeight: lh(32) },
 });

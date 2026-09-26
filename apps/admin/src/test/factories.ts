@@ -57,6 +57,7 @@ export function playerRow(overrides: Partial<AdminPlayerRow> = {}): AdminPlayerR
     email: 'kerem@quezby.com',
     platform: 'ios',
     identities: ['apple'],
+    locale: 'tr',
     best: 250311,
     createdAt: '2026-09-01T09:00:00.000Z',
     lastPlayedAt: '2026-09-25T08:00:00.000Z',

@@ -81,6 +81,44 @@ test('a finished run is replayed, ranked and recorded on every board', function 
         ->toEqualCanonicalizing(['daily', 'weekly', 'monthly', 'all']);
 });
 
+test('the share text speaks the request\'s language', function (string $acceptLanguage, string $shareText) {
+    $this->signIn();
+    $fixture = replayFixture('pro-7919');
+    $runId = $this->startRunFor($fixture);
+
+    $this->withHeader('Accept-Language', $acceptLanguage)
+        ->finishRunFor($runId, $fixture)
+        ->assertOk()
+        ->assertJsonPath('run.score', 557623)
+        ->assertJsonPath('run.reels', 685)
+        ->assertJsonPath('shareText', $shareText);
+})->with([
+    'Turkish' => ['tr', "Quezby'de 557.623 puan yaptım! 685 post · bugün #1. Sen kaç yaparsın?"],
+    'English' => ['en', 'I scored 557,623 points on Quezby! 685 posts · today #1. How many can you score?'],
+    'German' => ['de', 'Ich habe in Quezby 557.623 Punkte geholt! 685 Posts · heute #1. Wie viele schaffst du?'],
+    'Arabic' => ['ar', "\u{200F}نتيجتي في Quezby: 557,623 نقطة! 685 منشورًا · اليوم #1. وأنت، كم ستحقق؟"],
+    'French' => ['fr', "J'ai fait 557\u{00A0}623 points sur Quezby\u{00A0}! 685 posts · aujourd'hui #1. Et toi, tu en fais combien\u{00A0}?"],
+    'Spanish' => ['es', '¡Hice 557.623 puntos en Quezby! 685 posts · hoy #1. ¿Cuántos puedes hacer tú?'],
+]);
+
+test('a run with no rank today shares its score alone, counted the language\'s way', function (string $acceptLanguage, string $shareText) {
+    $this->signIn();
+    $runId = $this->startRun()->json('runId');
+    $this->travel(2)->seconds();
+
+    $this->withHeader('Accept-Language', $acceptLanguage)
+        ->finishRun($runId, [], 0, 0)
+        ->assertOk()
+        ->assertJsonPath('ranks.daily', null)
+        ->assertJsonPath('shareText', $shareText);
+})->with([
+    'Turkish' => ['tr', "Quezby'de 0 puan yaptım! 0 post. Sen kaç yaparsın?"],
+    'English' => ['en', 'I scored 0 points on Quezby! 0 posts. How many can you score?'],
+    // French counts nothing the way it counts one.
+    'French' => ['fr', "J'ai fait 0 point sur Quezby\u{00A0}! 0 post. Et toi, tu en fais combien\u{00A0}?"],
+    'Arabic' => ['ar', "\u{200F}نتيجتي في Quezby: 0 نقطة! 0 منشور. وأنت، كم ستحقق؟"],
+]);
+
 test('a run finishes once', function () {
     $this->signIn();
     $fixture = replayFixture('casual-42');

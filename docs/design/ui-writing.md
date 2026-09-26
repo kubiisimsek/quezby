@@ -1,7 +1,16 @@
 # Quezby — UI writing
 
-The app speaks Turkish, informally (*sen*), in sentence case — with capitals
-kept for the game's ribbons (see Rules).
+The game speaks six languages — Türkçe, English, Deutsch, العربية, Français,
+Español — informally, in sentence case, with capitals kept for the game's
+ribbons (see Rules). **Turkish is the source:** every line is written in
+Turkish first and in the other five in the same change, with the words below.
+The five translations have not been read by native speakers yet
+(`docs/product/localization.md` tracks it).
+
+Every line lives in `apps/mobile/src/i18n/messages/<area>.ts`, one file per
+area of the game with the six languages side by side. A line with a number, a
+name or grammar in it is a function in every language — never two lines glued
+into a sentence.
 
 ## Two registers
 
@@ -11,7 +20,19 @@ kept for the game's ribbons (see Rules).
 | Around the game | Plain, warm, exact | "Bu kullanıcı adı alınmış.", "Sunucuya ulaşılamadı. İnternet bağlantını kontrol et." |
 
 Game words are welcome here (seviye, kombo, seri, rekor) — Quezby is a game.
-Captions on reels are jokes and may be silly; nothing else may be.
+Captions on reels are jokes and may be silly; nothing else may be. A caption is
+not translated word for word: each language gets a joke that lands in it.
+
+## Each language's voice
+
+| Language | Speaks to the player as | Notes |
+| --- | --- | --- |
+| Türkçe | *sen* | Ribbons typed in capitals with **İ** (and **I** for ı) |
+| English | *you*, with contractions ("You're", "Don't") | American spelling |
+| Deutsch | *du* | Nouns capitalised as German wants; in ribbons ß is written **SS** (the fonts have no ẞ) |
+| Français | *tu* | A no-break space (U+00A0) before `! ? : ; %` and inside « » |
+| Español | *tú* | Neutral Spanish: no *vosotros*, no *vos*, no regional words; ¡ and ¿ open |
+| العربية | Modern Standard Arabic, the singular masculine as everyone's *you* | No capitals, no letter-spacing, Latin digits; see "Arabic" below |
 
 ## The game's own words
 
@@ -27,7 +48,7 @@ Captions on reels are jokes and may be silly; nothing else may be.
 | **Bronz, Gümüş, Altın, Platin, Elmas** | League tiers, capitalised as names: "Altın lig" |
 | **Terfi bölgesi / Düşme bölgesi** | League zones; "Terfiye 1.240 puan" |
 | **Kusursuz seviye!, Şimşek!, Soğukkanlı!, Geri dönüş!** | Named combos, as in-run toasts (with "!") and as plain names on the result |
-| **Kombo x1,25** | Always two decimals, comma |
+| **Kombo x1,25** | Always two decimals, the language's decimal mark |
 | **Doğrulanıyor…** | While the API replays a run — no number before it answers |
 | **Skorun inceleniyor** | A held top score; never "şüpheli" or "hile" to the player |
 | **Oyna / Hesabım var, giriş yap** | The ways in, on the welcome: a new player plays first (a guest account and the practice run); **Apple ile devam et / Google ile devam et** and "ya da e-postayla" are on the login |
@@ -40,23 +61,107 @@ Captions on reels are jokes and may be silly; nothing else may be.
 | **Hesabını koru** | Attach Apple, Google or an email to a guest account — a step after the name ("Şimdi değil" skips it), and once, when a guest's league opens ("Ligdesin!…") |
 | **Oyunu birlikte geliştirelim mi?** · **İzin ver / İzin verme** | The one question about usage analytics (ribbon "SENİN SEÇİMİN"), on the welcome before anything else — and once in the lobby of a phone that predates it. Two slabs of one size, neither gold. It says what is counted ("hangi ekranlara girdiğini ve ne kadar oynadığını sayarız") and what never leaves the phone ("Adın, e-postan ya da konumun gönderilmez") |
 | **Kullanım verisi** | The switch in Ayarlar for that answer: on — "Hangi ekranlara girdiğini ve ne kadar oynadığını sayarız."; off — "Yalnızca oyunun çalışması için gereken cihaz bilgisi gider." Never "izleme", "takip" or "tracking" to the player |
+| **Dil** | The language row in Ayarlar and the small button on the welcome: the six languages, each in its own words ("Türkçe", "English", "Deutsch", "العربية", "Français", "Español") |
 | **Apple hesabıma geç** | An Apple or Google account already belongs to another player: switch to it, leaving the fresh guest behind |
 | **Giriş yolları** | The same place once the account is kept: what is attached ("Apple ve e-posta bağlı"), **Bağı kaldır** to take Apple or Google off |
+
+## The same words in six languages
+
+Use these and nothing else for them. A ribbon's capitals are in brackets.
+
+| Türkçe | English | Deutsch | Français | Español | العربية |
+| --- | --- | --- | --- | --- | --- |
+| post | post | Post | post | post | منشور |
+| Sıradan post | Plain post | Normaler Post | Post banal | Post normal | منشور عادي |
+| Arkadaşın (the pink post's badge) | Your friend | Dein Freund | Ton ami | Tu amigo | صديقك |
+| Altın post | Gold post | Gold-Post | Post doré | Post dorado | منشور ذهبي |
+| Kırmızı post · Dokunma! | Red post · Don't touch! | Roter Post · Nicht berühren! | Post rouge · Touche pas ! | Post rojo · ¡No toques! | منشور أحمر · لا تلمس! |
+| Günün akışı (GÜNÜN AKIŞI) | Daily Feed (DAILY FEED) | Tages-Feed (TAGES-FEED) | Fil du jour (FIL DU JOUR) | Feed del día (FEED DEL DÍA) | خلاصة اليوم |
+| Serbest oyun | Free play | Freies Spiel | Partie libre | Juego libre | لعب حر |
+| Oyna · Zirve · Lig · Arkadaşlar · Profil | Play · Summit · League · Friends · Profile | Spielen · Gipfel · Liga · Freunde · Profil | Jouer · Sommet · Ligue · Amis · Profil | Jugar · Cumbre · Liga · Amigos · Perfil | العب · القمة · الدوري · الأصدقاء · الملف |
+| Senin katın (SENİN KATIN) | Your floor (YOUR FLOOR) | Deine Etage (DEINE ETAGE) | Ton étage (TON ÉTAGE) | Tu piso (TU PISO) | طابقك |
+| Geç onu | Pass them | Überholen | Dépasser | Superar | تجاوزه |
+| Bronz · Gümüş · Altın · Platin · Elmas | Bronze · Silver · Gold · Platinum · Diamond | Bronze · Silber · Gold · Platin · Diamant | Bronze · Argent · Or · Platine · Diamant | Bronce · Plata · Oro · Platino · Diamante | البرونز · الفضة · الذهب · البلاتين · الماس |
+| Altın lig | Gold league | Gold-Liga | Ligue Or | Liga Oro | دوري الذهب |
+| Terfi bölgesi · Düşme bölgesi | Promotion zone · Relegation zone | Aufstiegszone · Abstiegszone | Zone de promotion · Zone de relégation | Zona de ascenso · Zona de descenso | منطقة الصعود · منطقة الهبوط |
+| Kusursuz seviye! · Şimşek! · Soğukkanlı! · Geri dönüş! | Flawless level! · Lightning! · Cool head! · Comeback! | Makelloses Level! · Blitz! · Eiskalt! · Comeback! | Niveau parfait ! · Éclair ! · Sang-froid ! · Remontada ! | ¡Nivel perfecto! · ¡Relámpago! · ¡Sangre fría! · ¡Remontada! | مستوى مثالي! · برق! · أعصاب باردة! · عودة قوية! |
+| İsimli kombolar | Named combos | Spezialkombos | Combos spéciaux | Combos especiales | الكومبو الخاصة |
+| Sezon rekoru · Mükemmel · Tur (stats) | Season record · Perfect · Runs | Saisonrekord · Perfekt · Runden | Record de la saison · Parfait · Parties | Récord de la temporada · Perfecto · Partidas | الرقم القياسي للموسم · مثالي · الجولات |
+| kombo · seviye · rekor | combo · level · record | Kombo · Level · Rekord | combo · niveau · record | combo · nivel · récord | كومبو · مستوى · رقم قياسي |
+| YENİ REKOR! | NEW RECORD! | NEUER REKORD! | NOUVEAU RECORD ! | ¡NUEVO RÉCORD! | رقم قياسي جديد! |
+| Dopamin · Dopamin bitti | Dopamine · Out of dopamine | Dopamin · Dopamin leer | Dopamine · Plus de dopamine | Dopamina · Sin dopamina | الدوبامين · نفد الدوبامين |
+| puan | points (pts where tight) | Punkte | points (pts) | puntos | نقطة · نقاط |
+| oyun (one round played) | game | Spiel | partie | partida | مباراة |
+| Doğrulanıyor… | Verifying… | Wird geprüft… | Vérification… | Verificando… | جارٍ التحقق… |
+| Skorun inceleniyor | Your score is being reviewed | Dein Score wird geprüft | Ton score est en cours de vérification | Tu puntuación está en revisión | نتيجتك قيد المراجعة |
+| Deneme turu (DENEME TURU) | Practice run (PRACTICE RUN) | Proberunde (PROBERUNDE) | Partie d'essai (PARTIE D'ESSAI) | Ronda de práctica (RONDA DE PRÁCTICA) | جولة تجريبية |
+| YENİ POST · Anladım | NEW POST · Got it | NEUER POST · Verstanden | NOUVEAU POST · Compris | POST NUEVO · Entendido | منشور جديد · فهمت |
+| E-posta · Şifre · Giriş yap | Email · Password · Sign in | E-Mail · Passwort · Anmelden | E-mail · Mot de passe · Se connecter | Correo · Contraseña · Iniciar sesión | البريد الإلكتروني · كلمة المرور · تسجيل الدخول |
+| Hesabım var, giriş yap | I have an account, sign in | Ich habe ein Konto – anmelden | J'ai un compte, me connecter | Ya tengo cuenta, iniciar sesión | لديّ حساب، سجّل الدخول |
+| Apple ile devam et · Google ile devam et | Continue with Apple · Continue with Google | Mit Apple fortfahren · Weiter mit Google | Continuer avec Apple · Continuer avec Google | Continuar con Apple · Continuar con Google | المتابعة باستخدام Apple · المتابعة باستخدام Google |
+| Sana ne diyelim? · Şimdilik geç | What should we call you? · Skip for now | Wie sollen wir dich nennen? · Erst mal überspringen | On t'appelle comment ? · Passer pour l'instant | ¿Cómo te llamamos? · Saltar por ahora | بماذا نناديك؟ · تخطَّ الآن |
+| Adını seç | Pick your name | Wähle deinen Namen | Choisis ton nom | Elige tu nombre | اختر اسمك |
+| Seçtiğin ad bir daha değişmez | The name you pick never changes | Dein gewählter Name bleibt für immer | Le nom choisi ne change plus jamais | El nombre que elijas no cambia nunca | الاسم الذي تختاره لن يتغيّر أبدًا |
+| Lige 2 oyun kaldı · KİLİTLİ | 2 games to the league · LOCKED | Noch 2 Spiele bis zur Liga · GESPERRT | Encore 2 parties avant la ligue · VERROUILLÉ | Faltan 2 partidas para la liga · BLOQUEADA | مباراتان للوصول إلى الدوري · مقفل |
+| Hesabını koru · Şimdi değil · Ligdesin! | Protect your account · Not now · You're in the league! | Konto sichern · Nicht jetzt · Du bist in der Liga! | Protège ton compte · Pas maintenant · Tu es dans la ligue ! | Protege tu cuenta · Ahora no · ¡Estás en la liga! | احمِ حسابك · ليس الآن · أنت في الدوري! |
+| Apple hesabıma geç | Switch to my Apple account | Zu meinem Apple-Konto wechseln | Passer à mon compte Apple | Cambiar a mi cuenta de Apple | الانتقال إلى حسابي على Apple |
+| Giriş yolları · Bağı kaldır | Sign-in methods · Unlink | Anmeldewege · Verknüpfung lösen | Moyens de connexion · Dissocier | Métodos de acceso · Desvincular | طرق تسجيل الدخول · إلغاء الربط |
+| Oyunu birlikte geliştirelim mi? · İzin ver · İzin verme | Shall we improve the game together? · Allow · Don't allow | Wollen wir das Spiel gemeinsam verbessern? · Erlauben · Nicht erlauben | On améliore le jeu ensemble ? · Autoriser · Refuser | ¿Mejoramos el juego juntos? · Permitir · No permitir | هل نطوّر اللعبة معًا؟ · السماح · عدم السماح |
+| Kullanım verisi | Usage data | Nutzungsdaten | Données d'utilisation | Datos de uso | بيانات الاستخدام |
+| Bugün · Bu hafta · Bu ay · Tüm zamanlar | Today · This week · This month · All time | Heute · Diese Woche · Dieser Monat · Allzeit | Aujourd'hui · Cette semaine · Ce mois-ci · Depuis toujours | Hoy · Esta semana · Este mes · Histórico | اليوم · هذا الأسبوع · هذا الشهر · كل الأوقات |
+| Herkes · Arkadaşlar | Everyone · Friends | Alle · Freunde | Tous · Amis | Todos · Amigos | الجميع · الأصدقاء |
+| Takip et · Takibi bırak | Follow · Unfollow | Folgen · Entfolgen | Suivre · Ne plus suivre | Seguir · Dejar de seguir | تابِع · إلغاء المتابعة |
+| Ayarlar · Titreşim · Dil · Yardım | Settings · Vibration · Language · Help | Einstellungen · Vibration · Sprache · Hilfe | Réglages · Vibrations · Langue · Aide | Ajustes · Vibración · Idioma · Ayuda | الإعدادات · الاهتزاز · اللغة · المساعدة |
 
 ## Rules
 
 - **Sentence case** everywhere, except **ribbons and tile names**, which a game
   sets in capitals: "GÜNÜN AKIŞI", "BU HAFTA", "TERFİ BÖLGESİ", "YENİ REKOR!".
-  Type those capitals in the source, with the Turkish **İ** (and **I** for ı).
-  Never `textTransform: 'uppercase'` — it turns "Lig" into "LIG" and
-  "bölgesi" into "BÖLGESI".
+  Type those capitals in each language's line yourself: the Turkish **İ** (and
+  **I** for ı), German **SS** for ß, French and Spanish keep their accents
+  (É, À, Á, Í); Arabic has no capitals. Never `textTransform: 'uppercase'` — it
+  turns "Lig" into "LIG" and "bölgesi" into "BÖLGESI".
 - **Errors:** what happened, then what to do, in one or two sentences. Never
-  blame, never a raw exception. `src/lib/errors.ts` maps every API code to its
-  line; `USERNAME_MESSAGES` in `@quezby/config` is the one source for name rules.
+  blame, never a raw exception. `messageFor(error, t)` in `src/lib/errors.ts`
+  gives every API code its line in the player's language; the server's own
+  `message` (already in the request's language) is shown only for
+  `validation_failed`. The name rules are in `@quezby/config`; their words are
+  `username.*` in the app's catalogs and `lang/{locale}/username.php` on the API.
 - **Buttons:** a verb — "Oyna", "Tekrar oyna", "Kaydet", "Hesabı koru".
-  Destructive buttons name what goes: "Hesabı kalıcı olarak sil".
+  Destructive buttons name what goes: "Hesabı kalıcı olarak sil". Apple's and
+  Google's buttons use the companies' own words in each language ("Continue with
+  Apple", "Mit Apple fortfahren", …).
 - **Empty states:** what is missing and the action that fixes it — "Zirve boş…
   İlk sen ol" with **Oyna**.
-- **Numbers:** Turkish grouping (`12.345`), `%94,2`, rank as `#12`, unknown
-  rank as `—`.
-- **Brand:** always **Quezby** — never QUEZBY, never Quezbi.
+- **Numbers:** each language groups and marks decimals its own way, through
+  `t.fmt` — never by hand:
+
+  | | Score | Per cent | Combo |
+  | --- | --- | --- | --- |
+  | tr | `12.345` | `%94,2` | `x1,25` |
+  | en | `12,345` | `94.2%` | `x1.25` |
+  | de | `12.345` | `94,2 %` | `x1,25` |
+  | fr | `12 345` | `94,2 %` | `x1,25` |
+  | es | `1234`, `12.345` | `94,2 %` | `x1,25` |
+  | ar | `12,345` | `94.2%` | `x1.25` |
+
+  Rank as `#12`, an unknown rank as `—`. The API groups the share text's
+  numbers the same way (`Locale::group`).
+- **Directions:** no line says "top right" or "on the left" — Arabic mirrors the
+  screen. Name the thing instead ("the settings button on your profile").
+- **Names:** a player's name is always written with `handle(name)` — `@ekin` —
+  never `` `@${name}` `` (in Arabic it keeps its `@` in front).
+- **Brand:** always **Quezby** — never QUEZBY, never Quezbi, never translated.
+
+### Arabic
+
+- Right to left: the layout mirrors itself; words never say a side.
+- No capitals and **no letter-spacing** — spacing tears Arabic's joined letters
+  apart (`tracking()` returns 0 in Arabic).
+- **Latin digits** (0–9), grouped with a comma: `12,345`.
+- A Latin piece inside an Arabic sentence — a name, `#12`, `x1.25`, `▲8` — is
+  wrapped in left-to-right marks (U+200E, `iso()` / `ltr()`) so it keeps its
+  own order. Not the Unicode isolates (U+2066 … U+2069): iOS ignores them and
+  `@ekin` comes out `ekin@`.
+- Counts take six forms: 0, 1, 2, 3–10, 11–99 and the rest
+  (`pluralCategory('ar', n)`).

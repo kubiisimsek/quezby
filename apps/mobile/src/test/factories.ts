@@ -9,6 +9,7 @@ export function buildMe(overrides: Partial<Me> = {}): Me {
     isGuest: true,
     identities: [],
     settings: { haptics: true, analytics: false },
+    locale: 'tr',
     best: { score: 12_345, reels: 87, achievedAt: '2026-09-24T09:30:00.000Z' },
     createdAt: '2026-09-01T12:00:00.000Z',
     ...overrides,

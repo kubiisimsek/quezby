@@ -18,6 +18,7 @@ import type {
   LeagueOutcome,
   LeagueTier,
   LeagueZone,
+  Locale,
   Platform,
   PlayerStats,
   Ranks,
@@ -102,6 +103,8 @@ export type AdminPlayerRow = AdminPlayerRef & {
   email: string | null;
   platform: Platform | null;
   identities: SocialProvider[];
+  /** The language the player plays in (`Me.locale`). */
+  locale: Locale;
   /** This season's best score. */
   best: number | null;
   createdAt: string;

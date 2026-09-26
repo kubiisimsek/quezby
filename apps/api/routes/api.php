@@ -12,6 +12,7 @@ use App\Http\Controllers\HealthController;
 use App\Http\Controllers\IdentityController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\LeagueController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MeController;
 use App\Http\Controllers\ModerationController;
 use App\Http\Controllers\OpsController;
@@ -30,51 +31,60 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('v1')->group(function () {
-    Route::get('health', HealthController::class);
-    Route::get('app/config', AppConfigController::class);
+    /*
+    | The player's routes answer in the request's language (`locale`,
+    | `ResolveLocale`): `Accept-Language`, else the player's own, else
+    | Turkish — a 401 or a 429 too. The ops routes and the admin panel below
+    | stay Turkish.
+    */
+    Route::middleware('locale')->group(function () {
+        Route::get('health', HealthController::class);
+        Route::get('app/config', AppConfigController::class);
 
-    Route::post('auth/guest', [AuthController::class, 'guest'])->middleware('throttle:guest-signup');
-    Route::post('auth/login', [AuthController::class, 'login'])->middleware('throttle:login');
-    Route::post('auth/nonce', [SocialAuthController::class, 'nonce'])->middleware('throttle:auth-nonce');
-    Route::post('auth/apple', [SocialAuthController::class, 'apple'])->middleware('throttle:social-auth');
-    Route::post('auth/google', [SocialAuthController::class, 'google'])->middleware('throttle:social-auth');
+        Route::post('auth/guest', [AuthController::class, 'guest'])->middleware('throttle:guest-signup');
+        Route::post('auth/login', [AuthController::class, 'login'])->middleware('throttle:login');
+        Route::post('auth/nonce', [SocialAuthController::class, 'nonce'])->middleware('throttle:auth-nonce');
+        Route::post('auth/apple', [SocialAuthController::class, 'apple'])->middleware('throttle:social-auth');
+        Route::post('auth/google', [SocialAuthController::class, 'google'])->middleware('throttle:social-auth');
 
-    // `presence`: a token's first request of the day records the phone and, with consent, the player's day.
-    Route::middleware(['auth:sanctum', 'presence'])->group(function () {
-        Route::post('auth/logout', [AuthController::class, 'logout']);
+        // `presence`: a token's first request of the day records the phone and, with consent, the player's day.
+        Route::middleware(['auth:sanctum', 'presence'])->group(function () {
+            Route::post('auth/logout', [AuthController::class, 'logout']);
 
-        Route::get('me', [MeController::class, 'show']);
-        Route::delete('me', [MeController::class, 'destroy']);
-        Route::put('me/username', [UsernameController::class, 'update'])->middleware('throttle:username-update');
-        Route::put('me/settings', SettingsController::class);
-        Route::post('me/credentials', CredentialsController::class);
-        Route::post('me/identities/{provider}', [IdentityController::class, 'store'])->middleware('throttle:identities');
-        Route::delete('me/identities/{provider}', [IdentityController::class, 'destroy'])->middleware('throttle:identities');
-        Route::get('me/stats', StatsController::class)->middleware('throttle:reads');
-        Route::get('me/following', [FollowController::class, 'following'])->middleware('throttle:reads');
-        Route::get('me/followers', [FollowController::class, 'followers'])->middleware('throttle:reads');
+            Route::get('me', [MeController::class, 'show']);
+            Route::delete('me', [MeController::class, 'destroy']);
+            Route::put('me/username', [UsernameController::class, 'update'])->middleware('throttle:username-update');
+            Route::put('me/settings', SettingsController::class);
+            Route::put('me/locale', LocaleController::class);
+            Route::post('me/credentials', CredentialsController::class);
+            Route::post('me/identities/{provider}', [IdentityController::class, 'store'])->middleware('throttle:identities');
+            Route::delete('me/identities/{provider}', [IdentityController::class, 'destroy'])->middleware('throttle:identities');
+            Route::get('me/stats', StatsController::class)->middleware('throttle:reads');
+            Route::get('me/following', [FollowController::class, 'following'])->middleware('throttle:reads');
+            Route::get('me/followers', [FollowController::class, 'followers'])->middleware('throttle:reads');
 
-        Route::get('usernames/check', [UsernameController::class, 'check'])->middleware('throttle:username-check');
+            Route::get('usernames/check', [UsernameController::class, 'check'])->middleware('throttle:username-check');
 
-        Route::post('device/challenge', [DeviceController::class, 'challenge'])->middleware('throttle:device-challenge');
-        Route::post('device/android', [DeviceController::class, 'android'])->middleware('throttle:device-check');
-        Route::post('device/ios/attest', [DeviceController::class, 'iosAttest'])->middleware('throttle:device-check');
-        Route::post('device/ios/assert', [DeviceController::class, 'iosAssert'])->middleware('throttle:device-check');
+            Route::post('device/challenge', [DeviceController::class, 'challenge'])->middleware('throttle:device-challenge');
+            Route::post('device/android', [DeviceController::class, 'android'])->middleware('throttle:device-check');
+            Route::post('device/ios/attest', [DeviceController::class, 'iosAttest'])->middleware('throttle:device-check');
+            Route::post('device/ios/assert', [DeviceController::class, 'iosAssert'])->middleware('throttle:device-check');
 
-        Route::post('runs', [RunController::class, 'store'])->middleware('throttle:run-start');
-        Route::post('runs/{runId}/checkpoint', [RunController::class, 'checkpoint'])->middleware('throttle:run-checkpoint');
-        Route::post('runs/{runId}/finish', [RunController::class, 'finish'])->middleware('throttle:run-finish');
+            Route::post('runs', [RunController::class, 'store'])->middleware('throttle:run-start');
+            Route::post('runs/{runId}/checkpoint', [RunController::class, 'checkpoint'])->middleware('throttle:run-checkpoint');
+            Route::post('runs/{runId}/finish', [RunController::class, 'finish'])->middleware('throttle:run-finish');
 
-        Route::get('leaderboards/{board}', LeaderboardController::class)->middleware('throttle:reads');
-        Route::get('daily', DailyController::class)->middleware('throttle:reads');
-        Route::get('leagues/current', LeagueController::class)->middleware('throttle:reads');
+            Route::get('leaderboards/{board}', LeaderboardController::class)->middleware('throttle:reads');
+            Route::get('daily', DailyController::class)->middleware('throttle:reads');
+            Route::get('leagues/current', LeagueController::class)->middleware('throttle:reads');
 
-        Route::post('analytics/visits', AnalyticsController::class)->middleware('throttle:analytics');
+            Route::post('analytics/visits', AnalyticsController::class)->middleware('throttle:analytics');
 
-        Route::get('users', [UserController::class, 'search'])->middleware('throttle:search');
-        Route::get('users/{username}', [UserController::class, 'show'])->middleware('throttle:reads');
-        Route::put('users/{username}/follow', [FollowController::class, 'store'])->middleware('throttle:follow');
-        Route::delete('users/{username}/follow', [FollowController::class, 'destroy'])->middleware('throttle:follow');
+            Route::get('users', [UserController::class, 'search'])->middleware('throttle:search');
+            Route::get('users/{username}', [UserController::class, 'show'])->middleware('throttle:reads');
+            Route::put('users/{username}/follow', [FollowController::class, 'store'])->middleware('throttle:follow');
+            Route::delete('users/{username}/follow', [FollowController::class, 'destroy'])->middleware('throttle:follow');
+        });
     });
 
     Route::prefix('ops')->middleware(['throttle:ops', VerifyOpsToken::class])->group(function () {

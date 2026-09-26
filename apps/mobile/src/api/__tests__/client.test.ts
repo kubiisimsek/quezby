@@ -1,5 +1,6 @@
 import { api } from '@/api/client';
 import { installId, useSession } from '@/auth/session';
+import { useLanguage } from '@/i18n/language';
 
 describe('api', () => {
   const fetchMock = jest.fn(async () => new Response(JSON.stringify({ user: {}, ranks: {} }), { status: 200 }));
@@ -20,5 +21,15 @@ describe('api', () => {
       'X-App-Version': '1.0.0',
       'X-Device': `install=${install}; platform=ios; os=18.0; model=iPhone%2015; build=1`,
     });
+  });
+
+  it('asks the API to answer in the language the game speaks, as it is at each call', async () => {
+    await api.me.get();
+    useLanguage.setState({ locale: 'ar' });
+    await api.me.get();
+
+    const headers = fetchMock.mock.calls.map((call) => (call as unknown as [string, RequestInit])[1].headers);
+    expect(headers[0]).toMatchObject({ 'Accept-Language': 'tr' });
+    expect(headers[1]).toMatchObject({ 'Accept-Language': 'ar' });
   });
 });

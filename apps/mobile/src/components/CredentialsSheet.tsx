@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { api } from '@/api/client';
 import { rememberMe } from '@/hooks/useMe';
+import { useT } from '@/i18n';
 import { messageFor } from '@/lib/errors';
 import { Field, PasswordField } from '@/ui/kit';
 import { FormSheet } from '@/ui/sheet';
@@ -22,21 +23,23 @@ export function CredentialsSheet({
   onClose: () => void;
   onClosed?: () => void;
 }) {
+  const t = useT();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // What failed, not its words: the line is read in the language of the moment.
+  const [failure, setFailure] = useState<'invalid' | { error: unknown } | null>(null);
 
   const emailOk = /\S+@\S+\.\S+/.test(email.trim());
   const passwordOk = password.length >= 8;
 
   const save = async () => {
     if (!emailOk || !passwordOk) {
-      setError('Geçerli bir e-posta ve en az 8 karakterlik bir şifre yaz.');
+      setFailure('invalid');
       return;
     }
     setPending(true);
-    setError(null);
+    setFailure(null);
     try {
       const { user } = await api.me.linkCredentials({
         email: email.trim(),
@@ -45,31 +48,31 @@ export function CredentialsSheet({
       rememberMe(user);
       onClose();
     } catch (caught) {
-      setError(messageFor(caught));
+      setFailure({ error: caught });
     } finally {
       setPending(false);
     }
   };
+
+  const words = t.auth.credentials;
+  const error =
+    failure === 'invalid' ? words.invalid : failure ? messageFor(failure.error, t) : null;
 
   return (
     <FormSheet
       open={open}
       onClose={onClose}
       onClosed={onClosed}
-      title={guest ? 'Hesabını koru' : 'E-posta bağla'}
-      description={
-        guest
-          ? 'Bu hesap şu an yalnızca bu telefonda. E-posta bağlarsan başka cihazdan da girersin.'
-          : 'Bu e-posta ve şifreyle de girersin.'
-      }
-      submitLabel={guest ? 'Hesabı koru' : 'E-postayı bağla'}
+      title={guest ? t.auth.keepAccount : words.title}
+      description={guest ? words.guestBody : words.body}
+      submitLabel={guest ? words.guestSubmit : words.submit}
       submitIcon="shield"
       onSubmit={() => void save()}
       pending={pending}
       error={error}
     >
       <Field
-        label="E-posta"
+        label={t.auth.email}
         icon="mail"
         value={email}
         onChangeText={setEmail}
@@ -80,11 +83,11 @@ export function CredentialsSheet({
         autoComplete="email"
       />
       <PasswordField
-        label="Şifre"
+        label={t.auth.password}
         isNew
         value={password}
         onChangeText={setPassword}
-        hint="En az 8 karakter."
+        hint={words.passwordHint}
       />
     </FormSheet>
   );

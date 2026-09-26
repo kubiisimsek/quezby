@@ -16,6 +16,7 @@ import {
   SPACE,
   TYPE,
   embossed,
+  lh,
   useTheme,
   withAlpha,
   type TypeRole,
@@ -126,7 +127,7 @@ const styles = StyleSheet.create({
     gap: SPACE.sm,
     marginTop: SPACE.xs,
   },
-  eyebrowText: { fontSize: 17, lineHeight: 22 },
+  eyebrowText: { fontSize: 17, lineHeight: lh(22) },
   groove: { borderRadius: RADIUS.pill, flex: 1, height: 2 },
   ribbon: {
     alignSelf: 'center',

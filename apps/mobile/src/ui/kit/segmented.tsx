@@ -1,7 +1,8 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { SHRINK_TO_FIT } from '@/i18n/native';
 import { Icon, type IconName } from '@/ui/icons';
-import { DEPTH, FONT, RADIUS, SPACE, embossed, useTheme } from '@/ui/theme';
+import { DEPTH, FONT, RADIUS, SPACE, embossed, lh, useTheme } from '@/ui/theme';
 
 /**
  * One surface, two to four views of it — the boards' periods — as a game's
@@ -59,7 +60,7 @@ export function Segmented<T extends string>({
             ) : null}
             <Text
               numberOfLines={1}
-              adjustsFontSizeToFit
+              adjustsFontSizeToFit={SHRINK_TO_FIT}
               style={[segmented.label, { color: ink }, on ? embossed(1.5) : null]}
             >
               {option.label}
@@ -105,12 +106,12 @@ const segmented = StyleSheet.create({
     paddingHorizontal: SPACE.xs,
   },
   hi: { height: '48%', left: 0, position: 'absolute', right: 0, top: 0 },
-  label: { fontFamily: FONT.display, fontSize: 14, lineHeight: 18 },
+  label: { fontFamily: FONT.display, fontSize: 14, lineHeight: lh(18) },
   count: {
     borderRadius: RADIUS.pill,
     minWidth: 20,
     paddingHorizontal: 6,
     paddingVertical: 1,
   },
-  countText: { fontFamily: FONT.display, fontSize: 11, lineHeight: 14, textAlign: 'center' },
+  countText: { fontFamily: FONT.display, fontSize: 11, lineHeight: lh(14), textAlign: 'center' },
 });

@@ -5,6 +5,7 @@ import type {
   LeagueMember,
   LeagueResponse,
   LeagueZone,
+  Locale,
 } from '@quezby/types';
 import type { QueryClient } from '@tanstack/react-query';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
@@ -18,7 +19,9 @@ import {
 import { track } from '@/analytics/track';
 import { api } from '@/api/client';
 import { useSession } from '@/auth/session';
-import { REEL_GUIDE } from '@/game/howTo';
+import { reelGuide } from '@/game/howTo';
+import { getT, iso } from '@/i18n';
+import { useLanguage } from '@/i18n/language';
 import { HomeScreen } from '@/screens/home/HomeScreen';
 import { useDeviceVerdict } from '@/stores/deviceVerdict';
 import { useOnboarding } from '@/stores/onboarding';
@@ -175,6 +178,14 @@ async function renderLobby() {
   return result;
 }
 
+/**
+ * The game speaks `locale` on a phone that already knows this account — an
+ * account seen for the first time would bring its own language (`useMe`).
+ */
+function speak(locale: Locale) {
+  useLanguage.setState({ locale, account: buildMe().id });
+}
+
 describe('HomeScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -199,7 +210,7 @@ describe('HomeScreen', () => {
     await renderLobby();
 
     expect(screen.queryByText('Nasıl oynanır')).not.toBeOnTheScreen();
-    for (const guide of Object.values(REEL_GUIDE)) {
+    for (const guide of Object.values(reelGuide(getT()))) {
       expect(screen.queryByText(guide.title)).not.toBeOnTheScreen();
     }
   });
@@ -538,5 +549,160 @@ describe('HomeScreen', () => {
       resolve(daily());
     });
     await settle(queryClient);
+  });
+
+  describe('in the player\'s language', () => {
+    it('speaks English: today\'s feed, the league, the rival and the records', async () => {
+      speak('en');
+      mocked.leagues.current.mockResolvedValue(joined(7, 'stay'));
+      mocked.leaderboards.get.mockResolvedValue(
+        weekly({
+          entry: buildEntry({ username: 'deniz', rank: 11 }),
+          gap: 1_001,
+        }),
+      );
+      await renderLobby();
+
+      expect(screen.getByText('DAILY FEED')).toBeOnTheScreen();
+      expect(screen.getByText('Daily Feed #17')).toBeOnTheScreen();
+      expect(
+        screen.getByText('Everyone plays the same feed · one shot'),
+      ).toBeOnTheScreen();
+      expect(screen.getByText('Ends in 11h 0m')).toBeOnTheScreen();
+      expect(
+        screen.getByRole('button', { name: 'Play the Daily Feed' }),
+      ).toBeOnTheScreen();
+      expect(screen.getByRole('button', { name: 'Free play' })).toBeOnTheScreen();
+
+      expect(await screen.findByText('#7/30 · 17,000 points')).toBeOnTheScreen();
+      expect(screen.getByText('Gold league')).toBeOnTheScreen();
+      expect(screen.getByText('1,001 points to promotion')).toBeOnTheScreen();
+      expect(screen.getByText('Ends in 3d 11h')).toBeOnTheScreen();
+      expect(screen.getAllByText('THIS WEEK')).toHaveLength(2);
+
+      expect(screen.getByText('Your target')).toBeOnTheScreen();
+      expect(screen.getByText('1,001 points to pass @deniz')).toBeOnTheScreen();
+      expect(
+        screen.getByText('@deniz is right ahead of you in the weekly ranking.'),
+      ).toBeOnTheScreen();
+      expect(screen.getByRole('button', { name: 'Pass them' })).toBeOnTheScreen();
+
+      expect(screen.getByText('Season record')).toBeOnTheScreen();
+      expect(screen.getByText('12,345')).toBeOnTheScreen();
+      for (const label of ['Today', 'Week', 'Month', 'All time']) {
+        expect(screen.getByText(label)).toBeOnTheScreen();
+      }
+      expect(screen.getByLabelText('All time: #1,204')).toBeOnTheScreen();
+      expect(screen.getByRole('button', { name: 'Help' })).toBeOnTheScreen();
+    });
+
+    it('counts one game to the league in English, and a played day', async () => {
+      speak('en');
+      mocked.daily.get.mockResolvedValue(
+        daily({
+          status: 'review',
+          score: 250_000,
+          rank: null,
+          grid: null,
+          shareText: null,
+        }),
+      );
+      mocked.leagues.current.mockResolvedValue(
+        league({ unlock: { required: 3, remaining: 1 } }),
+      );
+      await renderLobby();
+
+      expect(await screen.findByText('1 game to the league')).toBeOnTheScreen();
+      expect(screen.getByText('LOCKED')).toBeOnTheScreen();
+      expect(
+        screen.getByText(
+          "The league opens after your first 3 games. The practice run doesn't count.",
+        ),
+      ).toBeOnTheScreen();
+
+      expect(screen.getByText('Your score today')).toBeOnTheScreen();
+      expect(screen.getByText('250,000')).toBeOnTheScreen();
+      expect(screen.getByText('Your score is being reviewed')).toBeOnTheScreen();
+      expect(screen.getByText('Next feed in 11h 0m')).toBeOnTheScreen();
+      expect(screen.getByRole('button', { name: 'See ranking' })).toBeOnTheScreen();
+      expect(screen.getByRole('button', { name: 'Play' })).toBeOnTheScreen();
+    });
+
+    it('warns in English when this phone failed the integrity check', async () => {
+      speak('en');
+      useDeviceVerdict.setState({
+        userId: buildMe().id,
+        verdict: 'fail',
+        validUntil: '2999-01-01T00:00:00.000Z',
+        enforced: true,
+      });
+      await renderLobby();
+
+      expect(screen.getByText('RANKING')).toBeOnTheScreen();
+      expect(screen.getByText('Off on this device')).toBeOnTheScreen();
+      expect(
+        screen.getByText(/security check didn't approve this device: .* You can still play, but your scores won't rank\.$/),
+      ).toBeOnTheScreen();
+    });
+
+    it('speaks Arabic, with names and ranks kept whole inside the line', async () => {
+      speak('ar');
+      mocked.daily.get.mockResolvedValue(
+        daily({
+          status: 'ranked',
+          score: 18_420,
+          rank: 12,
+          grid: '🟩🟩🟨⬛',
+          shareText: 'Quezby',
+        }),
+      );
+      mocked.leagues.current.mockResolvedValue(
+        league({ unlock: { required: 3, remaining: 2 } }),
+      );
+      mocked.leaderboards.get.mockResolvedValue(
+        weekly({
+          entry: buildEntry({ username: 'deniz', rank: 11 }),
+          gap: 1_001,
+        }),
+      );
+      await renderLobby();
+
+      expect(screen.getByText('خلاصة اليوم')).toBeOnTheScreen();
+      expect(screen.getByText(`خلاصة اليوم ${iso('#17')}`)).toBeOnTheScreen();
+      expect(screen.getByText('18,420')).toBeOnTheScreen();
+      // 1.204 players: the tail 4 takes the plural of three to ten.
+      expect(screen.getByText(`${iso('#12')} / 1,204 لاعبين`)).toBeOnTheScreen();
+      expect(screen.getByText('الخلاصة التالية بعد 11 س 0 د')).toBeOnTheScreen();
+      expect(screen.getByRole('button', { name: 'شارِك' })).toBeOnTheScreen();
+
+      expect(await screen.findByText('مباراتان للوصول إلى الدوري')).toBeOnTheScreen();
+      expect(screen.getByText('مقفل')).toBeOnTheScreen();
+
+      expect(screen.getByText('ضد')).toBeOnTheScreen();
+      expect(
+        screen.getByText(`1,001 نقطة لتجاوز ${iso('@deniz')}`),
+      ).toBeOnTheScreen();
+      expect(
+        screen.getByText(`يسبقك ${iso('@deniz')} مباشرةً في ترتيب الأسبوع.`),
+      ).toBeOnTheScreen();
+      expect(screen.getByRole('button', { name: 'تجاوزه' })).toBeOnTheScreen();
+      expect(screen.getByLabelText(`اليوم: ${iso('#44')}`)).toBeOnTheScreen();
+    });
+
+    it('turns to a language picked while the lobby is up', async () => {
+      speak('tr');
+      await renderLobby();
+      expect(screen.getByText('Günün akışı #17')).toBeOnTheScreen();
+
+      await act(async () => {
+        speak('es');
+      });
+
+      expect(screen.getByText('Feed del día #17')).toBeOnTheScreen();
+      expect(screen.getByText('Termina en 11 h 0 min')).toBeOnTheScreen();
+      expect(
+        screen.getByRole('button', { name: 'Jugar el Feed del día' }),
+      ).toBeOnTheScreen();
+    });
   });
 });

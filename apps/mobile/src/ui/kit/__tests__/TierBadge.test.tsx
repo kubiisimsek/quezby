@@ -1,7 +1,9 @@
 import type { LeagueTier } from '@quezby/types';
 import { render, screen } from '@testing-library/react-native';
 
-import { TIER_LABELS, TierBadge } from '@/ui/kit';
+import { getT } from '@/i18n';
+import { useLanguage } from '@/i18n/language';
+import { TierBadge } from '@/ui/kit';
 import { arena } from '@/ui/tokens';
 
 const TIERS: Array<[LeagueTier, string, string]> = [
@@ -19,7 +21,7 @@ describe('TierBadge', () => {
     expect(
       screen.getByRole('image', { name: `${label} lig` }),
     ).toBeOnTheScreen();
-    expect(TIER_LABELS[tier]).toBe(label);
+    expect(getT().tiers.names[tier]).toBe(label);
   });
 
   it('shows no label unless asked', async () => {
@@ -36,4 +38,17 @@ describe('TierBadge', () => {
       expect(screen.getByText(label)).toHaveStyle({ color: colour });
     },
   );
+});
+
+describe('TierBadge — in English', () => {
+  it("names the tier and its league in the player's language", async () => {
+    useLanguage.setState({ locale: 'en' });
+    await render(<TierBadge tier="gold" showLabel />);
+
+    expect(
+      screen.getByRole('image', { name: 'Gold league' }),
+    ).toBeOnTheScreen();
+    expect(screen.getByText('Gold')).toBeOnTheScreen();
+    expect(getT().tiers.names.diamond).toBe('Diamond');
+  });
 });

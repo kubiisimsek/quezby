@@ -19,7 +19,7 @@ monthly and all-time boards, a daily challenge everyone plays on one seed
 | --- | --- |
 | Anything with a UI in the game | `docs/design/design-language.md`, then `docs/design/mobile-design-system.md` |
 | The admin panel (`apps/admin`) | `docs/design/admin-design-system.md`, then `docs/rules/admin-rules.md` |
-| Anything user-visible | `docs/design/ui-writing.md` |
+| Anything user-visible | `docs/design/ui-writing.md` (six languages — every word lives in `apps/mobile/src/i18n/messages`), then `docs/product/localization.md` |
 | Game rules, scoring, difficulty | `docs/product/scoring.md` |
 | Anti-cheat, device integrity, checkpoints | `docs/product/scoring.md` → "Hile koruması" |
 | Usernames | `docs/product/usernames.md` |

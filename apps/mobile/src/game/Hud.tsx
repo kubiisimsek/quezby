@@ -13,10 +13,10 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { formatCombo, formatScore } from '@/lib/format';
+import { useT } from '@/i18n';
 import { Icon } from '@/ui/icons';
 import { SPRING_POP, SPRING_PRESS } from '@/ui/motion';
-import { DEPTH, FONT, RADIUS, SPACE, embossed, withAlpha } from '@/ui/theme';
+import { DEPTH, FONT, RADIUS, SPACE, embossed, lh, withAlpha } from '@/ui/theme';
 import { reel as REEL } from '@/ui/tokens';
 
 /** How far the close slab sinks into its lip. */
@@ -43,6 +43,7 @@ export function Hud({
   reelIndex: number;
   onClose: () => void;
 }) {
+  const t = useT();
   const insets = useSafeAreaInsets();
   const reduced = useReducedMotion();
   const pop = useSharedValue(1);
@@ -100,7 +101,7 @@ export function Hud({
               fill={REEL.ink}
               strokeWidth={2}
             />
-            <Text style={styles.meterLabel}>Dopamin</Text>
+            <Text style={styles.meterLabel}>{t.game.hud.meter}</Text>
           </View>
           <View style={styles.meterTrack}>
             <Animated.View style={[styles.meterFill, fillStyle]}>
@@ -114,7 +115,7 @@ export function Hud({
 
         <View style={styles.scoreBox}>
           <Animated.Text style={[styles.score, scoreStyle]}>
-            {formatScore(score)}
+            {t.fmt.score(score)}
           </Animated.Text>
         </View>
       </View>
@@ -122,7 +123,7 @@ export function Hud({
       {/* A row of its own, so the combo coming and going never resizes the meter. */}
       <View style={styles.tags}>
         <View style={styles.level}>
-          <Text style={styles.levelText}>Seviye {levelFor(reelIndex)}</Text>
+          <Text style={styles.levelText}>{t.game.hud.level(levelFor(reelIndex))}</Text>
         </View>
         {combo > RULES.comboStart ? (
           <Animated.View style={[styles.combo, comboStyle]}>
@@ -132,7 +133,7 @@ export function Hud({
               color={REEL.goldInk}
               strokeWidth={2.8}
             />
-            <Text style={styles.comboText}>{formatCombo(combo)}</Text>
+            <Text style={styles.comboText}>{t.fmt.combo(combo)}</Text>
           </Animated.View>
         ) : null}
       </View>
@@ -142,6 +143,7 @@ export function Hud({
 
 /** The way out: a small dark slab that sinks into its lip under the thumb. */
 function CloseSlab({ onPress }: { onPress: () => void }) {
+  const t = useT();
   const down = useSharedValue(0);
   const faceStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: down.value * LIP }],
@@ -150,7 +152,7 @@ function CloseSlab({ onPress }: { onPress: () => void }) {
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel="Oyundan çık"
+      accessibilityLabel={t.game.hud.close}
       hitSlop={12}
       onPress={onPress}
       onPressIn={() => {
@@ -215,7 +217,7 @@ const styles = StyleSheet.create({
     color: REEL.ink,
     fontFamily: FONT.displayBold,
     fontSize: 13,
-    lineHeight: 16,
+    lineHeight: lh(16),
     ...embossed(1.5),
   },
   meterTrack: {
@@ -252,7 +254,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT.display,
     fontSize: 30,
     fontVariant: ['tabular-nums'],
-    lineHeight: 35,
+    lineHeight: lh(35),
     ...embossed(3),
   },
   tags: {
@@ -274,7 +276,7 @@ const styles = StyleSheet.create({
     color: REEL.ink,
     fontFamily: FONT.displayBold,
     fontSize: 12,
-    lineHeight: 16,
+    lineHeight: lh(16),
   },
   combo: {
     alignItems: 'center',
@@ -292,6 +294,6 @@ const styles = StyleSheet.create({
     color: REEL.goldInk,
     fontFamily: FONT.display,
     fontSize: 13,
-    lineHeight: 16,
+    lineHeight: lh(16),
   },
 });

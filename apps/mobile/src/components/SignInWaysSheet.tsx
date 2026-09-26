@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { useSession } from '@/auth/session';
 import { useSocialAuth } from '@/hooks/useSocialAuth';
+import { getT, useT, type Messages } from '@/i18n';
 import { GoogleMark } from '@/ui/brand-mark';
 import { Icon } from '@/ui/icons';
 import {
@@ -20,18 +21,25 @@ import { DEPTH, RADIUS, SPACE, useTheme } from '@/ui/theme';
 
 const PROVIDERS: SocialProvider[] = ['apple', 'google'];
 
+/** The companies' own names — the same in every language. */
 export const PROVIDER_NAMES: Record<SocialProvider, string> = {
   apple: 'Apple',
   google: 'Google',
 };
 
-/** Every way this player can sign in, in a fixed order: `['Apple', 'e-posta']`. */
-export function signInWays(user: Pick<Me, 'identities' | 'email'>): string[] {
+/**
+ * Every way this player can sign in, in a fixed order and in `t`'s language:
+ * `['Apple', 'e-posta']`, `['Apple', 'email']`.
+ */
+export function signInWays(
+  user: Pick<Me, 'identities' | 'email'>,
+  t: Messages = getT(),
+): string[] {
   return [
     ...PROVIDERS.filter((provider) => user.identities.includes(provider)).map(
       (provider) => PROVIDER_NAMES[provider],
     ),
-    ...(user.email ? ['e-posta'] : []),
+    ...(user.email ? [t.auth.ways.email] : []),
   ];
 }
 
@@ -57,6 +65,7 @@ export function SignInWaysSheet({
   /** Why now, when the sheet comes up on its own — the lobby's "Ligdesin!". */
   description?: string;
 }) {
+  const t = useT();
   const user = useSession((state) => state.user);
   const social = useSocialAuth();
   const [added, setAdded] = useState<SocialProvider | null>(null);
@@ -76,6 +85,7 @@ export function SignInWaysSheet({
   );
   const busy = social.busy !== null;
   const hasWays = linked.length > 0 || Boolean(user.email);
+  const words = t.auth.ways;
 
   const link = async (provider: SocialProvider) => {
     setAdded(null);
@@ -90,33 +100,29 @@ export function SignInWaysSheet({
       open={open}
       onClose={onClose}
       onClosed={onClosed}
-      title={user.isGuest ? 'Hesabını koru' : 'Giriş yolları'}
-      description={
-        description ?? (user.isGuest
-          ? 'Bu hesap şu an yalnızca bu telefonda. Bir giriş yolu bağla; telefon değişse de skorların, ligin ve takiplerin seninle gelir.'
-          : 'Hesabına bu yollarla girersin. Birini kaldırmak için başka bir yol bağlı kalmalı.')
-      }
+      title={user.isGuest ? t.auth.keepAccount : words.title}
+      description={description ?? (user.isGuest ? words.guestBody : words.body)}
     >
       <View style={styles.body}>
         {added ? (
-          <Callout title={`${PROVIDER_NAMES[added]} bağlandı`}>
-            {`Artık bu hesaba ${PROVIDER_NAMES[added]} ile de girersin.`}
+          <Callout title={t.auth.linked(PROVIDER_NAMES[added])}>
+            {words.linkedBody(PROVIDER_NAMES[added])}
           </Callout>
         ) : null}
         {social.error ? <Callout tone="bad">{social.error}</Callout> : null}
 
         {hasWays ? (
           <>
-            <Eyebrow icon="shield">Bağlı yollar</Eyebrow>
+            <Eyebrow icon="shield">{words.attached}</Eyebrow>
             {linked.map((provider) => (
               <WayTile
                 key={provider}
                 gem={<ProviderGem provider={provider} />}
                 title={PROVIDER_NAMES[provider]}
-                detail={<Tag label="Bağlı" tone="ok" icon="check" />}
+                detail={<Tag label={words.attachedTag} tone="ok" icon="check" />}
                 action={
                   <Button
-                    label="Bağı kaldır"
+                    label={words.unlink}
                     tone="neutral"
                     size="sm"
                     loading={social.busy === provider}
@@ -129,7 +135,7 @@ export function SignInWaysSheet({
             {user.email ? (
               <WayTile
                 gem={<IconChip icon="mail" tone="ok" size="md" />}
-                title="E-posta"
+                title={t.auth.email}
                 detail={
                   <Txt variant="meta" tone="muted" numberOfLines={1}>
                     {user.email}
@@ -143,7 +149,7 @@ export function SignInWaysSheet({
         {addable.length > 0 || !user.email ? (
           <>
             {hasWays ? (
-              <Eyebrow icon="plus">Başka bir yol bağla</Eyebrow>
+              <Eyebrow icon="plus">{words.addAnother}</Eyebrow>
             ) : null}
             {addable.map((provider) => (
               <SocialButton
@@ -156,9 +162,7 @@ export function SignInWaysSheet({
             ))}
             {!user.email ? (
               <Button
-                label={
-                  user.isGuest ? 'E-postayla koru' : 'E-posta ve şifre bağla'
-                }
+                label={user.isGuest ? t.auth.keepWithEmail : words.addEmail}
                 icon="mail"
                 tone="neutral"
                 disabled={busy}

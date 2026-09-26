@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
+import { useLanguage } from '@/i18n/language';
 import { buildEntry } from '@/test/factories';
 import { ClimbRow } from '@/ui/kit';
 import { arena as light } from '@/ui/tokens';
@@ -140,5 +141,24 @@ describe('ClimbRow', () => {
 
     await screen.rerender(<ClimbRow {...buildEntry()} />);
     expect(screen.queryByRole('button')).not.toBeOnTheScreen();
+  });
+});
+
+describe('ClimbRow — in English', () => {
+  it('reads a row out and counts its posts the English way', async () => {
+    useLanguage.setState({ locale: 'en' });
+    await render(
+      <ClimbRow {...buildEntry({ isMe: true, reels: 1 })} detail="3 days" />,
+    );
+
+    expect(
+      screen.getByLabelText(
+        '4th place, @deniz, you, 9,870 points, 3 days, 1,240 points to pass',
+      ),
+    ).toBeOnTheScreen();
+    expect(screen.getByText('1 post · 3 days')).toBeOnTheScreen();
+    expect(screen.getByText('· you')).toBeOnTheScreen();
+    expect(screen.getByText('9,870')).toBeOnTheScreen();
+    expect(screen.getByText('▲ 1,240')).toBeOnTheScreen();
   });
 });

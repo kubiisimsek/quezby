@@ -42,7 +42,12 @@ src/
   the dock at the bottom. No white canvases, no iOS chevron rows.
 - Fonts are native assets: a new weight goes in `assets/fonts`, `Info.plist`
   `UIAppFonts`, the Xcode project's resources and `android/app/src/main/assets/fonts`,
-  then a native rebuild. Only faces with every Turkish letter (ğ ş ı İ).
+  then a native rebuild. Latin faces must carry every Turkish, German, French
+  and Spanish letter (ğ ş ı İ ä ß é ç ñ …); Arabic is set in Cairo (`ARABIC_FONT`).
+- Every word a player sees is in `src/i18n/messages/<area>.ts`, in all six
+  languages (`docs/design/ui-writing.md`); screens read it with `useT()`. Arabic
+  reads right to left and reloads the app when chosen — see
+  `docs/product/localization.md`.
 
 ## Adding a native dependency
 

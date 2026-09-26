@@ -20,10 +20,11 @@ import { track } from '@/analytics/track';
 import { useSession } from '@/auth/session';
 import { FeedbackLayer } from '@/game/FeedbackLayer';
 import { Hud } from '@/game/Hud';
-import { REEL_GUIDE, REEL_ORDER } from '@/game/howTo';
+import { REEL_ORDER, reelGuide } from '@/game/howTo';
 import { ReelCard } from '@/game/ReelCard';
 import { ResultView } from '@/game/ResultView';
 import { useGame } from '@/game/useGame';
+import { useT } from '@/i18n';
 import type { RootStackParamList } from '@/navigation/types';
 import { useOnboarding } from '@/stores/onboarding';
 import type { IconName } from '@/ui/icons';
@@ -44,6 +45,7 @@ import {
   RADIUS,
   SPACE,
   embossed,
+  lh,
   useTheme,
   withAlpha,
 } from '@/ui/theme';
@@ -63,6 +65,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Game' | 'Tutorial'>;
  * result leads on to the player's name.
  */
 export function GameScreen({ navigation, route }: Props) {
+  const t = useT();
   const tutorial = route.name === 'Tutorial';
   const mode = route.params?.mode ?? 'free';
   const game = useGame(mode);
@@ -116,7 +119,7 @@ export function GameScreen({ navigation, route }: Props) {
     );
   }
 
-  const coach = game.coach ? REEL_GUIDE[game.coach] : null;
+  const coach = game.coach ? reelGuide(t)[game.coach] : null;
 
   return (
     <View style={styles.root}>
@@ -183,8 +186,8 @@ export function GameScreen({ navigation, route }: Props) {
         <Waiting
           label={
             game.phase === 'starting'
-              ? 'Akış hazırlanıyor…'
-              : 'Skorun doğrulanıyor…'
+              ? t.game.screen.preparing
+              : t.game.screen.verifying
           }
         />
       ) : null}
@@ -196,24 +199,24 @@ export function GameScreen({ navigation, route }: Props) {
             <Trouble
               icon="calendar"
               tone="warn"
-              title="Bugünün akışını oynadın"
+              title={t.game.screen.dailyPlayed}
               body={game.startError.message}
             >
               <Button
-                label="Serbest oyna"
+                label={t.home.today.free}
                 icon="play"
                 tone="play"
                 onPress={() => navigation.replace('Game', { mode: 'free' })}
               />
               <Button
-                label="Günün tablosu"
+                label={t.game.actions.dailyBoard}
                 icon="podium"
                 tone="secondary"
                 size="md"
                 onPress={() => navigation.replace('Daily')}
               />
               <Button
-                label="Vazgeç"
+                label={t.game.screen.cancel}
                 tone="ghost"
                 size="md"
                 onPress={() => navigation.goBack()}
@@ -223,25 +226,25 @@ export function GameScreen({ navigation, route }: Props) {
             <Trouble
               icon="alert"
               tone="bad"
-              title="Tur başlatılamadı"
-              body={game.startError?.message ?? 'Sunucuya ulaşılamadı.'}
+              title={t.game.screen.cannotStart}
+              body={game.startError?.message ?? t.game.screen.unreachable}
             >
               <Button
-                label="Tekrar dene"
+                label={t.game.screen.retry}
                 icon="refresh"
                 tone="play"
                 onPress={() => void game.start()}
               />
               {mode === 'free' ? (
                 <Button
-                  label="Çevrimdışı antrenman"
+                  label={t.game.screen.offline}
                   tone="secondary"
                   size="md"
                   onPress={() => void game.start('offline')}
                 />
               ) : null}
               <Button
-                label="Vazgeç"
+                label={t.game.screen.cancel}
                 tone="ghost"
                 size="md"
                 onPress={() => navigation.goBack()}
@@ -256,6 +259,7 @@ export function GameScreen({ navigation, route }: Props) {
 
 /** 3, 2, 1 — each number slammed down in gold over the first reel. */
 function Countdown({ value }: { value: number }) {
+  const t = useT();
   const reduced = useReducedMotion();
   const pop = useSharedValue(reduced ? 1 : 0);
 
@@ -279,7 +283,7 @@ function Countdown({ value }: { value: number }) {
     <View pointerEvents="none" style={styles.countdown}>
       <Animated.Text style={[styles.count, style]}>{value}</Animated.Text>
       <View style={styles.ready}>
-        <Text style={styles.readyText}>Başparmağını hazırla</Text>
+        <Text style={styles.readyText}>{t.game.screen.getReady}</Text>
       </View>
     </View>
   );
@@ -433,7 +437,7 @@ const styles = StyleSheet.create({
     color: REEL.gold,
     fontFamily: FONT.display,
     fontSize: 150,
-    lineHeight: 172,
+    lineHeight: lh(172),
     ...embossed(8),
   },
   ready: {
@@ -448,7 +452,7 @@ const styles = StyleSheet.create({
     color: REEL.ink,
     fontFamily: FONT.displayBold,
     fontSize: 17,
-    lineHeight: 21,
+    lineHeight: lh(21),
   },
   roll: {
     borderRadius: RADIUS.pill,

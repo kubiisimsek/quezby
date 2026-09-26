@@ -1,5 +1,6 @@
-import { render, screen } from '@testing-library/react-native';
+import { act, render, screen } from '@testing-library/react-native';
 
+import { useLanguage } from '@/i18n/language';
 import { ShareGrid } from '@/ui/kit';
 
 describe('ShareGrid', () => {
@@ -34,5 +35,17 @@ describe('ShareGrid', () => {
 
     expect(screen.queryByRole('image')).not.toBeOnTheScreen();
     expect(screen.toJSON()).toBeNull();
+  });
+
+  it('reads the grid aloud in the player’s language, and follows a change at once', async () => {
+    useLanguage.setState({ locale: 'en' });
+    await render(<ShareGrid grid="🟩🟨" />);
+
+    expect(screen.getByRole('image', { name: 'Result grid: 🟩🟨' })).toBeOnTheScreen();
+
+    await act(async () => {
+      useLanguage.setState({ locale: 'ar' });
+    });
+    expect(screen.getByRole('image', { name: 'جدول النتيجة: 🟩🟨' })).toBeOnTheScreen();
   });
 });

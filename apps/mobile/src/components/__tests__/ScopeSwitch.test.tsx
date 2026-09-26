@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
 import { ScopeSwitch } from '@/components/ScopeSwitch';
+import { useLanguage } from '@/i18n/language';
 
 describe('ScopeSwitch', () => {
   it('offers everyone and friends, with the chosen side selected', async () => {
@@ -35,5 +36,15 @@ describe('ScopeSwitch', () => {
 
     expect(screen.getByRole('tab', { name: 'Arkadaşlar' })).toBeSelected();
     expect(screen.getByRole('tab', { name: 'Herkes' })).not.toBeSelected();
+  });
+});
+
+describe('ScopeSwitch — in English', () => {
+  it('offers everyone and friends in English', async () => {
+    useLanguage.setState({ locale: 'en' });
+    await render(<ScopeSwitch value="friends" onChange={jest.fn()} />);
+
+    expect(screen.getByRole('tab', { name: 'Friends' })).toBeSelected();
+    expect(screen.getByRole('tab', { name: 'Everyone' })).not.toBeSelected();
   });
 });

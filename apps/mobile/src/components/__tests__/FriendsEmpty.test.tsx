@@ -2,6 +2,7 @@ import { fireEvent, screen } from '@testing-library/react-native';
 
 import { api } from '@/api/client';
 import { FriendsEmpty } from '@/components/FriendsEmpty';
+import { useLanguage } from '@/i18n/language';
 import { renderWithProviders } from '@/test/renderWithProviders';
 
 jest.mock('@/api/client', () => ({
@@ -70,5 +71,43 @@ describe('FriendsEmpty', () => {
     expect(
       await screen.findByRole('button', { name: 'Oyuncu ara' }),
     ).toBeOnTheScreen();
+  });
+});
+
+describe('FriendsEmpty — in English', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it('sends a player who follows nobody to find players, in English', async () => {
+    useLanguage.setState({ locale: 'en' });
+    mocked.me.following.mockResolvedValue({ users: [], nextCursor: null });
+    await renderWithProviders(<FriendsEmpty onSearch={jest.fn()} />);
+
+    expect(
+      await screen.findByText("You're not following anyone yet"),
+    ).toBeOnTheScreen();
+    expect(
+      screen.getByText('Players you follow race you here.'),
+    ).toBeOnTheScreen();
+    expect(
+      screen.getByRole('button', { name: 'Find players' }),
+    ).toBeOnTheScreen();
+  });
+
+  it('asks the player to set the bar, in English', async () => {
+    useLanguage.setState({ locale: 'en' });
+    mocked.me.following.mockResolvedValue({
+      users: [
+        { username: 'oya', best: 9_000, league: null, isFollowing: true },
+      ],
+      nextCursor: null,
+    });
+    await renderWithProviders(
+      <FriendsEmpty onSearch={jest.fn()} onPlay={jest.fn()} />,
+    );
+
+    expect(
+      await screen.findByText("The players you follow haven't played yet"),
+    ).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Play' })).toBeOnTheScreen();
   });
 });

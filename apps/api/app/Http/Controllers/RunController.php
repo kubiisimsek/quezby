@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Locale;
 use App\Http\Requests\CheckpointRequest;
 use App\Http\Requests\FinishRunRequest;
 use App\Http\Requests\StartRunRequest;
@@ -81,11 +82,21 @@ class RunController extends Controller
         ]);
     }
 
-    /** What "Paylaş" sends after a free run, from the server's own numbers. */
+    /**
+     * What "Paylaş" sends after a free run, from the server's own numbers, in
+     * the request's language (`lang/{locale}/share.php`) — with today's rank
+     * once the run has one.
+     */
     private function shareText(int $score, int $reels, ?int $dailyRank): string
     {
-        $rank = $dailyRank === null ? '' : ' · bugün #'.number_format($dailyRank, 0, ',', '.');
+        $locale = Locale::current();
+        $replace = [
+            'points' => trans_choice('share.points', $score, ['count' => $locale->group($score)]),
+            'posts' => trans_choice('share.posts', $reels, ['count' => $locale->group($reels)]),
+        ];
 
-        return "Quezby'de ".number_format($score, 0, ',', '.')." puan yaptım! {$reels} post{$rank}. Sen kaç yaparsın?";
+        return $dailyRank === null
+            ? __('share.free', $replace)
+            : __('share.free_ranked', $replace + ['rank' => $locale->group($dailyRank)]);
     }
 }

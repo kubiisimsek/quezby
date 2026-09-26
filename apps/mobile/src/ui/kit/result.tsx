@@ -1,19 +1,13 @@
 import type { BonusKind } from '@quezby/types';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { formatScore } from '@/lib/format';
+import { ltr, useT } from '@/i18n';
 import { type IconName } from '@/ui/icons';
 import { IconChip, gemColors } from '@/ui/kit/identity';
 import { Txt } from '@/ui/kit/text';
 import { type TagTone } from '@/ui/kit/tones';
-import { DEPTH, FONT, RADIUS, SPACE, embossed, useTheme, withAlpha } from '@/ui/theme';
+import { DEPTH, FONT, RADIUS, SPACE, embossed, lh, useTheme, withAlpha } from '@/ui/theme';
 
-export const BONUS_LABELS: Record<BonusKind, string> = {
-  flawless: 'Kusursuz seviye',
-  lightning: 'Şimşek',
-  coolHead: 'Soğukkanlı',
-  comeback: 'Geri dönüş',
-};
 
 const BONUS_LOOK: Record<BonusKind, { icon: IconName; tone: TagTone }> = {
   flawless: { icon: 'star', tone: 'primary' },
@@ -37,16 +31,15 @@ export function BonusChip({
   points?: number;
 }) {
   const theme = useTheme();
+  const t = useT();
   const look = BONUS_LOOK[kind];
   const gem = gemColors(theme, look.tone);
-  const name = BONUS_LABELS[kind];
-  const label = [
+  const name = t.bonus[kind].name;
+  const label = t.result.bonusChip({
     name,
-    count === undefined ? null : `${count} kez`,
-    points === undefined ? null : `${formatScore(points)} puan`,
-  ]
-    .filter(Boolean)
-    .join(', ');
+    count,
+    points: points === undefined ? undefined : { value: points, shown: t.fmt.score(points) },
+  });
 
   return (
     <View
@@ -63,11 +56,11 @@ export function BonusChip({
       <IconChip icon={look.icon} tone={look.tone} size="sm" />
       <Text style={[styles.name, { color: theme.ink }]}>{name}</Text>
       {count !== undefined && count > 1 ? (
-        <Text style={[styles.count, { color: gem.solid }]}>{`×${count}`}</Text>
+        <Text style={[styles.count, { color: gem.solid }]}>{ltr(`×${count}`)}</Text>
       ) : null}
       {points === undefined ? null : (
         <Text style={[styles.points, { color: gem.solid }, embossed(1.5)]}>
-          {`+${formatScore(points)}`}
+          {ltr(`+${t.fmt.score(points)}`)}
         </Text>
       )}
     </View>
@@ -100,6 +93,7 @@ function symbols(line: string): string[] {
  * set large, one square to a cell so every row lines up.
  */
 export function ShareGrid({ grid }: { grid: string }) {
+  const t = useT();
   const lines = grid
     .split('\n')
     .map(symbols)
@@ -111,7 +105,7 @@ export function ShareGrid({ grid }: { grid: string }) {
     <View
       accessible
       accessibilityRole="image"
-      accessibilityLabel={`Sonuç tablosu: ${grid}`}
+      accessibilityLabel={t.result.shareGrid(grid)}
       style={styles.grid}
     >
       {lines.map((cells, row) => (
@@ -140,9 +134,9 @@ const styles = StyleSheet.create({
     paddingRight: SPACE.md,
     paddingVertical: 4,
   },
-  name: { fontFamily: FONT.semibold, fontSize: 15, lineHeight: 19 },
-  count: { fontFamily: FONT.display, fontSize: 13, lineHeight: 17 },
-  points: { fontFamily: FONT.display, fontSize: 16, lineHeight: 20, marginLeft: SPACE.xxs },
+  name: { fontFamily: FONT.semibold, fontSize: 15, lineHeight: lh(19) },
+  count: { fontFamily: FONT.display, fontSize: 13, lineHeight: lh(17) },
+  points: { fontFamily: FONT.display, fontSize: 16, lineHeight: lh(20), marginLeft: SPACE.xxs },
   grid: { alignItems: 'center', gap: SPACE.xs },
   line: {
     flexDirection: 'row',

@@ -2,6 +2,7 @@ import { createApiClient } from '@quezby/sdk';
 
 import { currentInstallId, useSession } from '@/auth/session';
 import { API_URL, APP_BUILD, APP_PLATFORM, APP_VERSION, DEVICE_MODEL, OS_VERSION } from '@/config/env';
+import { currentLocale } from '@/i18n/language';
 
 /** Every network call in the app goes through this one client. */
 export const api = createApiClient({
@@ -11,6 +12,8 @@ export const api = createApiClient({
   onUnauthorized: () => {
     void useSession.getState().signOut();
   },
+  // The language the game speaks: the API answers in it, and an account made now is born with it.
+  locale: () => currentLocale(),
   // The phone, for the API's device registry — kept for every player, consent or not; no names, no IP.
   device: () => {
     const installId = currentInstallId();

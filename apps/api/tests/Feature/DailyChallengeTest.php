@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Locale;
 use App\Enums\RunStatus;
 use App\Models\LeaderboardEntry;
 use App\Models\Run;
@@ -95,6 +96,56 @@ test('a finished attempt shows its rank, grid and share text; others see the top
         ->assertJsonPath('me.username', $second->username);
     expect($state->json('attempt.shareText'))->toContain('#2/2');
 });
+
+test('the share text speaks each request\'s language, the finish\'s and today\'s alike', function () {
+    $this->signIn();
+    $finish = $this->withHeader('Accept-Language', 'en')->playFeed('daily')->assertOk();
+    $score = $finish->json('run.score');
+    $grid = $finish->json('daily.grid');
+
+    expect($finish->json('daily.shareText'))->toBe("Quezby · Daily Feed #3\n{$grid}\n".Locale::En->group($score).' points · #1/1')
+        ->and($finish->json('shareText'))->toBe($finish->json('daily.shareText'));
+
+    // Never stored: the same attempt, read again in another language, is written in it.
+    expect($this->withHeader('Accept-Language', 'ar')->getJson('/api/v1/daily')->json('attempt.shareText'))
+        ->toStartWith("\u{200F}Quezby · خلاصة اليوم #3\n\u{200F}{$grid}\n\u{200F}".Locale::Ar->group($score).' ')
+        ->toEndWith(' · #1/1');
+    expect($this->withHeader('Accept-Language', 'tr')->getJson('/api/v1/daily')->json('attempt.shareText'))
+        ->toBe("Quezby · Günün akışı #3\n{$grid}\n".Locale::Tr->group($score).' puan · #1/1');
+});
+
+test('the day\'s share text is written in each language', function (string $locale, string $ranked, string $unranked) {
+    app()->setLocale($locale);
+    $daily = app(DailyService::class);
+
+    expect($daily->shareText(3, '🟩🟨⬛', 52340, 37, 1204))->toBe($ranked)
+        ->and($daily->shareText(17, '⬛', 1, null, 5))->toBe($unranked);
+})->with([
+    'Turkish' => ['tr', "Quezby · Günün akışı #3\n🟩🟨⬛\n52.340 puan · #37/1.204", "Quezby · Günün akışı #17\n⬛\n1 puan"],
+    'English' => ['en', "Quezby · Daily Feed #3\n🟩🟨⬛\n52,340 points · #37/1,204", "Quezby · Daily Feed #17\n⬛\n1 point"],
+    'German' => ['de', "Quezby · Tages-Feed #3\n🟩🟨⬛\n52.340 Punkte · #37/1.204", "Quezby · Tages-Feed #17\n⬛\n1 Punkt"],
+    'Arabic' => [
+        'ar',
+        "\u{200F}Quezby · خلاصة اليوم #3\n\u{200F}🟩🟨⬛\n\u{200F}52,340 نقطة · #37/1,204",
+        "\u{200F}Quezby · خلاصة اليوم #17\n\u{200F}⬛\n\u{200F}نقطة واحدة",
+    ],
+    'French' => ['fr', "Quezby · Fil du jour #3\n🟩🟨⬛\n52\u{00A0}340 points · #37/1\u{00A0}204", "Quezby · Fil du jour #17\n⬛\n1 point"],
+    'Spanish' => ['es', "Quezby · Feed del día #3\n🟩🟨⬛\n52.340 puntos · #37/1204", "Quezby · Feed del día #17\n⬛\n1 punto"],
+]);
+
+test('Arabic counts a score in six forms', function (int $score, string $points) {
+    app()->setLocale('ar');
+
+    expect(app(DailyService::class)->shareText(3, '⬛', $score, null, 1))->toEndWith("\n\u{200F}{$points}");
+})->with([
+    [0, '0 نقطة'],
+    [1, 'نقطة واحدة'],
+    [2, 'نقطتان'],
+    [7, '7 نقاط'],
+    [15, '15 نقطة'],
+    [100, '100 نقطة'],
+    [1203, '1,203 نقاط'],
+]);
 
 test('the grid reads each level of the run, the last one black', function () {
     $daily = app(DailyService::class);

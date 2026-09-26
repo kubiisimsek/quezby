@@ -1,8 +1,9 @@
 import type { LeaderboardEntry, LeaderboardResponse } from '@quezby/types';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
+import { useT } from '@/i18n';
 import { ClimbRow, Podium, Txt } from '@/ui/kit';
-import { RADIUS, SPACE, useTheme, withAlpha } from '@/ui/theme';
+import { RADIUS, SPACE, lh, useTheme, withAlpha } from '@/ui/theme';
 
 /** One line under the podium: a player, or the quiet break before your own rows. */
 export type ClimbItem =
@@ -146,13 +147,10 @@ export function ClimbItemView({
  */
 function ClimbBreak() {
   const theme = useTheme();
+  const t = useT();
   const groove = { backgroundColor: withAlpha(theme.onBrand, 0.12) };
   return (
-    <View
-      accessible
-      accessibilityLabel="Arada başka oyuncular var"
-      style={styles.gap}
-    >
+    <View accessible accessibilityLabel={t.board.between} style={styles.gap}>
       <View style={[styles.groove, groove]} />
       <View
         style={[
@@ -189,5 +187,5 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     paddingHorizontal: SPACE.md,
   },
-  ellipsis: { lineHeight: 22 },
+  ellipsis: { lineHeight: lh(22) },
 });

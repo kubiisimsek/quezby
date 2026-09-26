@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\Locale;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -37,6 +38,12 @@ class UserFactory extends Factory
         return $this->state(fn () => [
             'username' => $username ?? 'player'.fake()->unique()->numberBetween(100, 999999),
         ]);
+    }
+
+    /** Plays in `$locale` rather than Turkish, the language of an account nobody set one for. */
+    public function locale(Locale|string $locale): static
+    {
+        return $this->state(fn () => ['locale' => $locale instanceof Locale ? $locale : Locale::from($locale)]);
     }
 
     /** Said yes to usage analytics — at `$at`, or now. */

@@ -14,7 +14,7 @@ import { usePlayers } from '@/hooks/api/players';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useListParams } from '@/hooks/useListParams';
 import { PlayerCell, When } from '@/lib/columns';
-import { formatNumber, PLATFORM, PROVIDER } from '@/lib/format';
+import { formatNumber, LOCALE_LABEL, PLATFORM, PROVIDER } from '@/lib/format';
 
 type StatusChip = 'all' | AdminPlayerStatus;
 type PlatformChoice = 'all' | Platform;
@@ -56,6 +56,7 @@ const COLUMNS: Column<AdminPlayerRow>[] = [
     hideBelow: 'md',
   },
   { key: 'platform', header: 'Platform', cell: (player) => (player.platform ? PLATFORM[player.platform] : '—'), tone: 'muted', hideBelow: 'lg' },
+  { key: 'locale', header: 'Dil', cell: (player) => LOCALE_LABEL[player.locale], tone: 'muted', hideBelow: 'lg' },
   { key: 'best', header: 'Sezon rekoru', cell: (player) => formatNumber(player.best), align: 'end', tone: 'strong' },
   { key: 'last', header: 'Son oyun', cell: (player) => <When at={player.lastPlayedAt} />, tone: 'muted', hideBelow: 'md' },
   { key: 'joined', header: 'Katıldı', cell: (player) => <When at={player.createdAt} as="date" />, tone: 'muted', hideBelow: 'xl' },

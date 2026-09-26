@@ -1,6 +1,7 @@
 import { act, render, screen } from '@testing-library/react-native';
 
-import * as format from '@/lib/format';
+import { getT, messagesOf } from '@/i18n';
+import { useLanguage } from '@/i18n/language';
 import { CountdownChip } from '@/ui/kit';
 
 const NOW = '2026-09-24T10:00:00.000Z';
@@ -78,7 +79,7 @@ describe('CountdownChip', () => {
   });
 
   it('ticks by the minute above an hour', async () => {
-    const formatted = jest.spyOn(format, 'formatCountdown');
+    const formatted = jest.spyOn(getT().fmt, 'countdown');
     await render(
       <CountdownChip
         endsAt={after(5 * HOUR + 12 * MINUTE + 30 * SECOND)}
@@ -161,5 +162,48 @@ describe('CountdownChip', () => {
     );
     expect(screen.getByText('1 g 1 sa')).toBeOnTheScreen();
     expect(onElapsed).toHaveBeenCalledTimes(1);
+  });
+
+  describe("in the player's language", () => {
+    it('reads the time in English, after the words the caller gave', async () => {
+      useLanguage.setState({ locale: 'en' });
+      await render(
+        <CountdownChip
+          endsAt={after(6 * DAY + 14 * HOUR + 20 * MINUTE)}
+          serverTime={NOW}
+          prefix={messagesOf('en').home.countdown.endsIn}
+        />,
+      );
+
+      expect(
+        screen.getByRole('timer', { name: 'Ends in 6d 14h' }),
+      ).toBeOnTheScreen();
+    });
+
+    it('says the time is up in Arabic', async () => {
+      useLanguage.setState({ locale: 'ar' });
+      await render(
+        <CountdownChip
+          endsAt={after(3 * SECOND)}
+          serverTime={NOW}
+          prefix={messagesOf('ar').home.countdown.endsIn}
+        />,
+      );
+      expect(screen.getByText('ينتهي بعد 3 ث')).toBeOnTheScreen();
+
+      await advance(3 * SECOND);
+      expect(screen.getByText('انتهى')).toBeOnTheScreen();
+    });
+
+    it('turns to a language picked while it is up', async () => {
+      await render(<CountdownChip endsAt={after(-SECOND)} serverTime={NOW} />);
+      expect(screen.getByText('Sona erdi')).toBeOnTheScreen();
+
+      await act(() => {
+        useLanguage.setState({ locale: 'de' });
+      });
+
+      expect(screen.getByText('Beendet')).toBeOnTheScreen();
+    });
   });
 });

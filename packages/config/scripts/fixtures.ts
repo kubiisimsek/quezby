@@ -5,14 +5,21 @@
  *   fixtures/pace.json     the app's pace between reels, for the wall-clock check
  *   fixtures/checkpoints.json  checkpoint marks, SHA-256 vectors and prefix hashes
  *   fixtures/analytics.json    the analytics catalog (screens, events, milestones) and its limits
+ *   fixtures/locales.json      the six languages, digit grouping, plural forms and tag matching
  *
  * `fixtures/usernames.json` is written by hand. Run `pnpm --filter @quezby/config fixtures`
- * after touching `src/content`, `src/pace.ts`, `src/checkpoints.ts` or `src/analytics.ts`.
+ * after touching `src/content`, `src/pace.ts`, `src/checkpoints.ts`, `src/analytics.ts` or `src/locales.ts`.
  */
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { buildAnalytics, buildCheckpoints, buildContent, buildPace } from '../src/fixtures';
+import {
+  buildAnalytics,
+  buildCheckpoints,
+  buildContent,
+  buildLocales,
+  buildPace,
+} from '../src/fixtures';
 
 const dir = join(__dirname, '..', 'fixtures');
 const write = (name: string, data: unknown) => {
@@ -24,3 +31,4 @@ write('content.json', buildContent());
 write('pace.json', buildPace());
 write('checkpoints.json', buildCheckpoints());
 write('analytics.json', buildAnalytics());
+write('locales.json', buildLocales());

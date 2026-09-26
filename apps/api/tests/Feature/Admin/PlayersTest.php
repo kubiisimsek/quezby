@@ -104,7 +104,7 @@ test('sorts by the last run played', function () {
 });
 
 test('each row says what the player is', function () {
-    $player = adminPlayersMade('guest48128742', 1, ['platform' => 'android']);
+    $player = adminPlayersMade('guest48128742', 1, ['platform' => 'android', 'locale' => 'de']);
     $player->identities()->create(['provider' => 'google', 'subject' => 'g-1', 'email' => 'x@gmail.com', 'email_verified' => true]);
 
     adminPlayersList()
@@ -117,6 +117,7 @@ test('each row says what the player is', function () {
             'email' => null,
             'platform' => 'android',
             'identities' => ['google'],
+            'locale' => 'de',
             'best' => null,
             'createdAt' => '2026-09-24T09:00:00.000Z',
             'lastPlayedAt' => null,

@@ -1,5 +1,69 @@
 # Changelog
 
+## 2026-09-26 — Six languages: Türkçe, English, Deutsch, العربية, Français, Español
+
+- **The game speaks six languages** (`docs/product/localization.md`,
+  `docs/design/ui-writing.md` — each language's voice and a six-language
+  glossary). Every word a player sees now lives in
+  `apps/mobile/src/i18n/messages/<area>.ts`, the six side by side; Turkish is
+  the source and fixes each line's shape, so a line missing in any language
+  does not compile. Screens read them with `useT()`; numbers, times and lists
+  go through `t.fmt` — Turkish exactly as before (`12.345`, `%94,2`, `x1,25`,
+  "6 g 14 sa"), `12,345` / `94.2%` / `x1.25` in English, a no-break space in
+  French, `1234` but `12.345` in Spanish, Latin digits in Arabic — and counts
+  take each language's plural forms (Arabic's six). Turkish grammar that
+  follows a name ("@ekin'e") stays in the Turkish lines (`i18n/grammar/tr.ts`).
+  The 39 fake posts' jokes and handles are rewritten for each language
+  (`packages/config` content catalog; ids, order and the API's fixtures
+  unchanged). **The five translations still wait for a native speaker's read.**
+- **Which language:** a first launch opens in the phone's language — the first
+  of its preferred languages among the six, English for any other
+  (`react-native-localize`). The welcome has a small language slab; Ayarlar's
+  first row is **Dil** (`LanguageSheet`: each language in its own words and
+  script). The choice is kept on the phone; a later change of the phone's own
+  language (system, or the per-app setting iOS and Android 13+ now offer —
+  `CFBundleLocalizations`, `localeConfig`) wins at the next launch.
+- **The account keeps it:** `users.locale` (accounts from before are `tr`),
+  `Me.locale`, `PUT /me/locale` → `{ user }`. An account is born with the
+  request's language. A phone that sees an account for the first time — a
+  sign-in with email, Apple or Google, a reinstall the keychain kept — takes
+  the account's language before its screens draw; after that the phone's
+  choice is written to the account (`useLanguageSync`, tried again on return
+  when the network was missing). The admin panel shows it ("Dil").
+- **Arabic reads right to left.** Choosing it, or leaving it, reloads the app
+  (`I18nManager` + `react-native-restart`), asked first in the picker; an
+  automatic turn is tried once per build and direction, so a phone that
+  ignores the flags never loops. The layout mirrors itself; glyphs that point
+  along the line (`MIRRORED` in `ui/icons.tsx`) and the Toggle's knob are
+  turned by hand; names and `#ranks` inside Arabic lines keep their order
+  between left-to-right marks (`handle()`, `iso()` — iOS ignores Unicode's
+  isolates). Arabic is set in **Cairo** (OFL; SemiBold to Black,
+  bundled on both platforms) with no letter-spacing (`tracking()`) and taller
+  lines (`lh()`); iOS paints the arena behind a reload, never white.
+- **The API answers in the request's language** (`Accept-Language`,
+  `ResolveLocale` on every player route, ahead of auth and the throttles;
+  the admin panel and ops stay Turkish): error and validation messages,
+  username refusals and both share texts come from
+  `lang/{tr,en,de,ar,fr,es}/`, numbers grouped the language's way
+  (`Locale::group`, held to `packages/config/fixtures/locales.json`), Arabic
+  share lines opening with an RLM. `ErrorCode` messages, `Username::MESSAGES`
+  and the FormRequests' `attributes()` moved into the lang files. API tests
+  pin `Accept-Language: tr` (Symfony sends `en-us` by default).
+- **Contract:** `Locale`, `Me.locale`, `UpdateLocaleRequest`, admin
+  `AdminPlayerRow.locale`; SDK `locale` (sent as `Accept-Language`) and
+  `me.updateLocale`; `@quezby/config` `LOCALES`, `LOCALE_NAMES`, `bestLocale`,
+  `groupDigits`, `decimalMark`, `pluralCategory`, `USERNAME_PROBLEMS`;
+  `usernameChecklist` returns rule ids and `USERNAME_MESSAGES` is gone (the
+  words are the catalogs').
+- **Held in place:** ESLint refuses JSX text, copy props, Turkish letters and
+  `` `@${name}` `` in `apps/mobile/src` outside `src/i18n`; catalog tests (no
+  line left empty that Turkish fills, no Turkish left in another language,
+  dock words that fit); `LocaleParityTest` and `LangParityTest` on the API.
+- Smaller: Yardım's "sağ üstteki ayarlar" names no side any more; the delete
+  confirmation accepts the name typed with its `@`, as its label shows it; a
+  refused name is kept as its code and said in the language on screen; share
+  texts group every number (`1.234 post`).
+
 ## 2026-09-26 — Usage analytics with consent, and the device registry
 
 - **Analytics, self-hosted, without the bloat** (`docs/product/analytics.md`).

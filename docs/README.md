@@ -6,6 +6,7 @@
 | [product/scoring.md](product/scoring.md) | Rules, curves, points, balance tables, anti-cheat |
 | [product/usernames.md](product/usernames.md) | Username rules |
 | [product/analytics.md](product/analytics.md) | Usage analytics with consent, the device registry, and how neither bloats (Turkish) |
+| [product/localization.md](product/localization.md) | The six languages: how the game picks one, Arabic right to left, the account's language, adding a line or a language (Turkish) |
 | [backend/api-contract.md](backend/api-contract.md) | Every endpoint and error |
 | [backend/admin-api.md](backend/admin-api.md) | The admin panel's API: roles, moderation, suspects, audit log |
 | [design/design-language.md](design/design-language.md) | "Arena" — the game look: palette, type, depth, motion |

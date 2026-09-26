@@ -23,7 +23,7 @@ function adminPlayerDetail(User $player): TestResponse
 
 test('shows everything about a player on one page', function () {
     $this->signInAdmin(AdminRole::Viewer);
-    $player = User::factory()->withUsername('kerem.35')->linked('kerem@quezby.com')->create(['platform' => 'ios', 'install_id' => 'install-1']);
+    $player = User::factory()->withUsername('kerem.35')->linked('kerem@quezby.com')->locale('ar')->create(['platform' => 'ios', 'install_id' => 'install-1']);
     $player->identities()->create(['provider' => 'apple', 'subject' => 'a-1', 'email' => 'k@privaterelay.appleid.com', 'email_verified' => true, 'apple_refresh_token' => 'secret-refresh']);
     $twin = User::factory()->withUsername('kerem.yedek')->create(['install_id' => 'install-1']);
     $best = $this->recordRanked($player, 9000);
@@ -42,6 +42,7 @@ test('shows everything about a player on one page', function () {
         ->assertJsonPath('player.username', 'kerem.35')
         ->assertJsonPath('player.email', 'kerem@quezby.com')
         ->assertJsonPath('player.identities', ['apple'])
+        ->assertJsonPath('player.locale', 'ar')
         ->assertJsonPath('player.identityDetails.0.provider', 'apple')
         ->assertJsonPath('player.identityDetails.0.emailVerified', true)
         ->assertJsonPath('player.installId', 'install-1')

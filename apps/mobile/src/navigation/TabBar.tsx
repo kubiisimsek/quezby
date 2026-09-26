@@ -9,11 +9,12 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { SHRINK_TO_FIT } from '@/i18n/native';
 import { Icon } from '@/ui/icons';
 import { buttonColors } from '@/ui/kit/buttons';
 import { Slab } from '@/ui/kit/slab';
 import { SPRING, SPRING_POP } from '@/ui/motion';
-import { DEPTH, FONT, RADIUS, SPACE, embossed, useTheme, withAlpha } from '@/ui/theme';
+import { DEPTH, FONT, RADIUS, SPACE, embossed, lh, useTheme, withAlpha } from '@/ui/theme';
 
 /** The lobby: the dock's middle slot, drawn as the game's play slab. */
 const CENTRE = 'Home';
@@ -115,6 +116,8 @@ function Centre({
       </Animated.View>
       <Text
         numberOfLines={1}
+        adjustsFontSizeToFit={SHRINK_TO_FIT}
+        minimumFontScale={0.8}
         style={[styles.label, { color: focused ? theme.gold : theme.inkFaint }, embossed(1.5)]}
       >
         {label}
@@ -180,6 +183,8 @@ function Slot({
       </Animated.View>
       <Text
         numberOfLines={1}
+        adjustsFontSizeToFit={SHRINK_TO_FIT}
+        minimumFontScale={0.8}
         style={[styles.label, { color: focused ? theme.ink : theme.inkFaint }, focused ? embossed(1.5) : null]}
       >
         {label}
@@ -229,5 +234,6 @@ const styles = StyleSheet.create({
   tileHi: { height: '50%', left: 0, position: 'absolute', right: 0, top: 0 },
   orb: { marginTop: -34 },
   orbFace: { height: 58, width: 64 },
-  label: { fontFamily: FONT.displayBold, fontSize: 11.5, lineHeight: 14 },
+  // A slot's word shrinks a little rather than cut off where a language runs long.
+  label: { fontFamily: FONT.displayBold, fontSize: 11.5, lineHeight: lh(14) },
 });

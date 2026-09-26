@@ -6,6 +6,8 @@ import { fireEvent, screen } from '@testing-library/react-native';
 import { api } from '@/api/client';
 import { useSession } from '@/auth/session';
 import { SignInWaysSheet, signInWays } from '@/components/SignInWaysSheet';
+import { iso, messagesOf } from '@/i18n';
+import { useLanguage } from '@/i18n/language';
 import { buildMe } from '@/test/factories';
 import { renderWithProviders } from '@/test/renderWithProviders';
 
@@ -44,6 +46,15 @@ describe('signInWays', () => {
       'e-posta',
     ]);
     expect(signInWays({ identities: [], email: null })).toEqual([]);
+  });
+
+  it('names the email in the language asked for, or the one the game speaks', () => {
+    const user = { identities: ['apple' as const], email: 'ekin@example.com' };
+
+    expect(signInWays(user, messagesOf('en'))).toEqual(['Apple', 'email']);
+    expect(signInWays(user, messagesOf('de'))).toEqual(['Apple', 'E-Mail']);
+    useLanguage.setState({ locale: 'ar' });
+    expect(signInWays(user)).toEqual(['Apple', 'البريد الإلكتروني']);
   });
 });
 
@@ -178,5 +189,51 @@ describe('SignInWaysSheet', () => {
     await fireEvent.press(screen.getByRole('button', { name: 'E-posta ve şifre bağla' }));
 
     expect(onEmail).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps a guest’s account with Apple in English, and says so', async () => {
+    useLanguage.setState({ locale: 'en' });
+    apple.mockResolvedValue({ identityToken: 'apple.jwt', authorizationCode: 'code-1', nonce: 'raw-nonce' });
+    mocked.me.linkApple.mockResolvedValue({ user: buildMe({ identities: ['apple'], isGuest: false }) });
+    await renderSheet();
+
+    expect(screen.getByText('Protect your account')).toBeOnTheScreen();
+    expect(screen.getByText(/^This account only lives on this phone for now\./)).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Protect with email' })).toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole('button', { name: /Apple/ }));
+
+    expect(await screen.findByText('Apple linked')).toBeOnTheScreen();
+    expect(screen.getByText('You can now sign in to this account with Apple too.')).toBeOnTheScreen();
+    expect(screen.getByText('Sign-in methods')).toBeOnTheScreen();
+    expect(screen.getByText('Linked methods')).toBeOnTheScreen();
+    expect(screen.getByText('Linked')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Unlink' })).toBeOnTheScreen();
+    expect(screen.getByText('Link another method')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Link email and password' })).toBeOnTheScreen();
+  });
+
+  it('lists a kept account’s ways in Arabic, the company’s name kept whole', async () => {
+    useLanguage.setState({ locale: 'ar' });
+    useSession.setState({
+      user: buildMe({ isGuest: false, identities: ['apple'], email: 'ekin@example.com' }),
+    });
+    google.mockResolvedValue({ type: 'success', data: { idToken: 'google.jwt' } });
+    mocked.me.linkGoogle.mockResolvedValue({
+      user: buildMe({ isGuest: false, identities: ['apple', 'google'], email: 'ekin@example.com' }),
+    });
+    await renderSheet();
+
+    expect(screen.getByText('طرق تسجيل الدخول')).toBeOnTheScreen();
+    expect(screen.getByText('تدخل إلى حسابك بهذه الطرق. لإزالة إحداها يجب أن تبقى طريقة أخرى مربوطة.')).toBeOnTheScreen();
+    expect(screen.getByText('الطرق المربوطة')).toBeOnTheScreen();
+    expect(screen.getByText('البريد الإلكتروني')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'إلغاء الربط' })).toBeOnTheScreen();
+    expect(screen.getByText('اربط طريقة أخرى')).toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole('button', { name: /Google/ }));
+
+    expect(await screen.findByText(`تم ربط ${iso('Google')}`)).toBeOnTheScreen();
+    expect(screen.getAllByText('مربوط')).toHaveLength(2);
   });
 });

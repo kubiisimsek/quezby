@@ -13,6 +13,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
+import { useT } from '@/i18n';
 import { Txt } from '@/ui/kit/text';
 import { Icon, type IconName } from '@/ui/icons';
 import { CONTROL, DEPTH, RADIUS, SPACE, TYPE, useTheme } from '@/ui/theme';
@@ -107,6 +108,7 @@ export function PasswordField({
   isNew?: boolean;
 }) {
   const theme = useTheme();
+  const t = useT();
   const [visible, setVisible] = useState(false);
   return (
     <Field
@@ -120,7 +122,7 @@ export function PasswordField({
       trailing={
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={visible ? 'Şifreyi gizle' : 'Şifreyi göster'}
+          accessibilityLabel={visible ? t.kit.passwordField.hide : t.kit.passwordField.show}
           hitSlop={10}
           onPress={() => setVisible((value) => !value)}
         >

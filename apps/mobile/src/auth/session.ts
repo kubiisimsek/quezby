@@ -27,6 +27,21 @@ type SessionState = {
   signOut: () => Promise<void>;
 };
 
+/** The last token being written to the keychain. */
+let saving: Promise<unknown> = Promise.resolve();
+
+/**
+ * Settles once the token of the last sign-in is in the keychain — before
+ * anything reloads the app (a language that reads the other way): Android
+ * starts the process over, and a token still on its way would be lost.
+ */
+export function sessionSaved(): Promise<void> {
+  return saving.then(
+    () => undefined,
+    () => undefined,
+  );
+}
+
 export const useSession = create<SessionState>((set, get) => ({
   token: null,
   user: null,
@@ -45,10 +60,11 @@ export const useSession = create<SessionState>((set, get) => ({
 
   signIn: async (token, user) => {
     set({ token, user, ranks: null });
-    await Keychain.setGenericPassword('player', token, {
+    saving = Keychain.setGenericPassword('player', token, {
       service: TOKEN_SERVICE,
       accessible: Keychain.ACCESSIBLE.AFTER_FIRST_UNLOCK,
     });
+    await saving;
   },
 
   setMe: (user, ranks) =>

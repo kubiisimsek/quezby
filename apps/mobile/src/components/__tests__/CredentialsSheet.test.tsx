@@ -4,6 +4,7 @@ import { fireEvent, screen } from '@testing-library/react-native';
 import { api } from '@/api/client';
 import { useSession } from '@/auth/session';
 import { CredentialsSheet } from '@/components/CredentialsSheet';
+import { useLanguage } from '@/i18n/language';
 import { buildMe } from '@/test/factories';
 import { renderWithProviders } from '@/test/renderWithProviders';
 
@@ -63,5 +64,38 @@ describe('CredentialsSheet', () => {
     await fireEvent.press(screen.getByText('Hesabı koru'));
 
     expect(await screen.findByText('Bu e-posta başka bir hesaba bağlı.')).toBeTruthy();
+  });
+
+  it('offers a guest to keep the account in English, and asks for what is missing', async () => {
+    useLanguage.setState({ locale: 'en' });
+    await renderWithProviders(<CredentialsSheet open guest onClose={jest.fn()} />);
+
+    expect(screen.getByText('Protect your account')).toBeTruthy();
+    expect(screen.getByText(/^This account only lives on this phone for now\./)).toBeTruthy();
+    expect(screen.getByText('At least 8 characters.')).toBeTruthy();
+
+    await fireEvent.changeText(screen.getByLabelText('Email'), 'ekin');
+    await fireEvent.changeText(screen.getByLabelText('Password'), 'kisa');
+    await fireEvent.press(screen.getByText('Protect account'));
+
+    expect(
+      screen.getByText('Enter a valid email and a password of at least 8 characters.'),
+    ).toBeTruthy();
+    expect(link).not.toHaveBeenCalled();
+  });
+
+  it('links one more way in to a kept account, in Arabic', async () => {
+    useLanguage.setState({ locale: 'ar' });
+    link.mockRejectedValue(new ApiError(409, 'email_taken', 'x'));
+    await renderWithProviders(<CredentialsSheet open guest={false} onClose={jest.fn()} />);
+
+    expect(screen.getByText('ربط بريد إلكتروني')).toBeTruthy();
+    expect(screen.getByText('ستتمكن من الدخول بهذا البريد الإلكتروني وكلمة المرور أيضًا.')).toBeTruthy();
+
+    await fireEvent.changeText(screen.getByLabelText('البريد الإلكتروني'), 'ekin@example.com');
+    await fireEvent.changeText(screen.getByLabelText('كلمة المرور'), 'uzun-bir-sifre');
+    await fireEvent.press(screen.getByText('ربط البريد الإلكتروني'));
+
+    expect(await screen.findByText('هذا البريد الإلكتروني مرتبط بحساب آخر.')).toBeTruthy();
   });
 });

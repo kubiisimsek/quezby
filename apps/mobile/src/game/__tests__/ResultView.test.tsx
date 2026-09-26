@@ -6,6 +6,7 @@ import { useReducedMotion } from 'react-native-reanimated';
 import { track } from '@/analytics/track';
 import { ResultView } from '@/game/ResultView';
 import type { Outcome } from '@/game/useGame';
+import { useLanguage } from '@/i18n/language';
 import { renderWithProviders } from '@/test/renderWithProviders';
 
 jest.mock('@/analytics/track', () => ({ track: jest.fn() }));
@@ -374,6 +375,162 @@ describe('ResultView', () => {
     expect(
       screen.getByTestId('result').props.onStartShouldSetResponderCapture,
     ).toBeUndefined();
+  });
+
+  describe('in the player’s language', () => {
+    it('speaks English: the words, the numbers, and each board read aloud', async () => {
+      useLanguage.setState({ locale: 'en' });
+      await view({ mode: 'verified', response: response() }).render();
+
+      expect(screen.getByText('104,560')).toBeTruthy();
+      expect(screen.getByText('points')).toBeTruthy();
+      expect(screen.getByText('NEW RECORD!')).toBeTruthy();
+      expect(screen.getByLabelText('New record')).toBeTruthy();
+      expect(
+        screen.getByText('Out of dopamine. You got bored and closed the app.'),
+      ).toBeTruthy();
+      expect(screen.getByText('Where your points came from')).toBeTruthy();
+      expect(screen.getByText('+12,560')).toBeTruthy();
+      expect(screen.getByText('Flawless level')).toBeTruthy();
+      expect(screen.getByLabelText('Lightning, 4 times, 5,080 points')).toBeTruthy();
+      expect(screen.getByLabelText('Comeback, once, 4,000 points')).toBeTruthy();
+      expect(screen.getByText('Best combo')).toBeTruthy();
+      expect(screen.getByText('x1.50')).toBeTruthy();
+      expect(screen.getByText('93.8%')).toBeTruthy();
+      expect(screen.getByLabelText('Today: 12th place, up 8 places')).toBeTruthy();
+      expect(screen.getByLabelText('Week: 44th place, new')).toBeTruthy();
+      expect(screen.getByLabelText('Month: 80th place')).toBeTruthy();
+      expect(screen.getByLabelText('Overall: 311th place, down 11 places')).toBeTruthy();
+      expect(screen.getByText('Passed today')).toBeTruthy();
+      expect(screen.getByText('@ayse · your friend')).toBeTruthy();
+      expect(
+        screen.getByLabelText('@ayse, your friend, 101,000 points, you passed them'),
+      ).toBeTruthy();
+      expect(screen.getByText('Gold league · #4/30')).toBeTruthy();
+      expect(screen.getByText('In the promotion zone')).toBeTruthy();
+      expect(screen.getByText('250,000 points this week')).toBeTruthy();
+      expect(screen.getByText('Play again')).toBeTruthy();
+      expect(screen.getByText('Share')).toBeTruthy();
+      expect(screen.getByText('Back to home')).toBeTruthy();
+    });
+
+    it('speaks Arabic, keeping names and ranks whole inside its lines', async () => {
+      useLanguage.setState({ locale: 'ar' });
+      await view({ mode: 'verified', response: response() }).render();
+
+      expect(screen.getByText('104,560')).toBeTruthy();
+      expect(screen.getByText('نقطة')).toBeTruthy();
+      expect(screen.getByText('رقم قياسي جديد!')).toBeTruthy();
+      expect(screen.getByText('نفد الدوبامين. شعرت بالملل فأغلقت التطبيق.')).toBeTruthy();
+      expect(screen.getByText('من أين جاءت نقاطك')).toBeTruthy();
+      expect(screen.getByLabelText('برق، 4 مرات، 5,080 نقطة')).toBeTruthy();
+      expect(screen.getByLabelText('اليوم: المركز 12، تقدّم 8 مراكز')).toBeTruthy();
+      expect(screen.getByLabelText('الأسبوع: المركز 44، جديد')).toBeTruthy();
+      expect(screen.getByLabelText('الشهر: المركز 80')).toBeTruthy();
+      expect(screen.getByLabelText('الكل: المركز 311، تراجع 11 مركزًا')).toBeTruthy();
+      expect(screen.getByText('\u200E@ayse\u200E · صديقك')).toBeTruthy();
+      expect(screen.getByText('دوري الذهب · \u200E#4/30\u200E')).toBeTruthy();
+      expect(screen.getByText('في منطقة الصعود')).toBeTruthy();
+      expect(screen.getByText('250,000 نقطة هذا الأسبوع')).toBeTruthy();
+      expect(screen.getByText('العب مجددًا')).toBeTruthy();
+      expect(screen.getByText('العودة إلى الرئيسية')).toBeTruthy();
+    });
+
+    it('explains a new player’s practice run in English, and what it never showed', async () => {
+      useLanguage.setState({ locale: 'en' });
+      await renderWithProviders(
+        <ResultView
+          outcome={{ mode: 'practice', summary: SUMMARY, reason: 'tutorial', unseen: ['hold'] }}
+          mode="free"
+          onReplay={jest.fn()}
+          onPlayFree={jest.fn()}
+          onClose={jest.fn()}
+          onRetrySubmit={jest.fn()}
+          onOpenDaily={jest.fn()}
+          onContinue={jest.fn()}
+        />,
+      );
+
+      expect(screen.getByText('PRACTICE RUN')).toBeTruthy();
+      expect(screen.getByText('practice points')).toBeTruthy();
+      expect(screen.getByText('You left the game.')).toBeTruthy();
+      expect(
+        screen.getByText(
+          "This run didn't count anywhere. You've seen the moves; now for the real game.",
+        ),
+      ).toBeTruthy();
+      expect(screen.getByText("You haven't seen these yet")).toBeTruthy();
+      expect(screen.getByText('Gold post')).toBeTruthy();
+      expect(screen.getByText('Continue')).toBeTruthy();
+      expect(screen.getByText('Try again')).toBeTruthy();
+    });
+
+    it('holds a daily result in English: its card, its board and free play', async () => {
+      useLanguage.setState({ locale: 'en' });
+      const daily = response({
+        daily: {
+          dayKey: '2026-09-26',
+          number: 3,
+          rank: 37,
+          players: 1_204,
+          grid: '🟩🟨🟥⬛',
+          shareText: 'x',
+        },
+      });
+      await view({ mode: 'verified', response: daily }, 'daily').render();
+
+      expect(screen.getByText('Daily Feed #3')).toBeTruthy();
+      expect(screen.getByText('#37 / 1,204 players')).toBeTruthy();
+      expect(screen.getByText("Today's board")).toBeTruthy();
+      expect(screen.getByText('Free play')).toBeTruthy();
+      expect(screen.getByRole('image', { name: 'Result grid: 🟩🟨🟥⬛' })).toBeTruthy();
+    });
+
+    it('tells a phone that failed the integrity check why, in English', async () => {
+      useLanguage.setState({ locale: 'en' });
+      const onDevice = response({
+        run: { ...response().run, status: 'flagged', flagReason: 'device' },
+      });
+      await view({ mode: 'verified', response: onDevice }).render();
+
+      expect(screen.getByText("Scores on this device don't rank")).toBeTruthy();
+      expect(screen.getByText(/security check didn't approve this device: .*You can keep playing\.$/)).toBeTruthy();
+    });
+
+    it('counts the games left before the league in Arabic', async () => {
+      useLanguage.setState({ locale: 'ar' });
+      await view({
+        mode: 'verified',
+        response: response({ league: null, leagueUnlock: { required: 3, remaining: 2 } }),
+      }).render();
+
+      expect(screen.getByText('مباراتان للوصول إلى الدوري')).toBeTruthy();
+      expect(screen.getByText('يُفتح الدوري بعد أول 3 مباريات لك.')).toBeTruthy();
+    });
+
+    it('marks an offline run as training in Arabic, with the unit its score takes', async () => {
+      useLanguage.setState({ locale: 'ar' });
+      await view({ mode: 'practice', summary: SUMMARY, reason: 'offline' }).render();
+
+      expect(screen.getByText('تدريب')).toBeTruthy();
+      expect(screen.getByText('جولة تدريبية')).toBeTruthy();
+      expect(screen.getByText('نقطة تدريب')).toBeTruthy();
+      expect(screen.getByText('لعبت دون اتصال؛ لم تُرسل هذه النتيجة إلى الترتيب.')).toBeTruthy();
+    });
+
+    it('changes language on the spot, with nothing kept in the old one', async () => {
+      await view({ mode: 'verified', response: response() }).render();
+      expect(screen.getByText('Tekrar oyna')).toBeTruthy();
+
+      await act(async () => {
+        useLanguage.setState({ locale: 'en' });
+      });
+
+      expect(screen.getByText('Play again')).toBeTruthy();
+      expect(screen.getByText('104,560')).toBeTruthy();
+      expect(screen.getByLabelText('Today: 12th place, up 8 places')).toBeTruthy();
+      expect(screen.queryByText('Tekrar oyna')).toBeNull();
+    });
   });
 
   describe('with motion', () => {

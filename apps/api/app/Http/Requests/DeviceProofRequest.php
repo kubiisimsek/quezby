@@ -21,20 +21,6 @@ abstract class DeviceProofRequest extends FormRequest
         ];
     }
 
-    /**
-     * @return array<string, string>
-     */
-    public function attributes(): array
-    {
-        return [
-            'challenge' => 'doğrulama kodu',
-            'token' => 'bütünlük jetonu',
-            'keyId' => 'anahtar kimliği',
-            'attestation' => 'cihaz onayı',
-            'assertion' => 'cihaz imzası',
-        ];
-    }
-
     public function challenge(): string
     {
         return (string) $this->validated('challenge');

@@ -18,6 +18,11 @@ import { formatNumber, formatPerMille, POST_KIND } from '@/lib/format';
 
 type KindChip = 'all' | AdminPostKind;
 
+/** What a post says, in Turkish: the panel's language and the catalog's source — players read their own. */
+function wordsOf(post: Post | undefined): string | undefined {
+  return post?.headline?.tr ?? post?.caption.tr;
+}
+
 /** A post as the feed shows it: its emoji, who posted it and what it says. */
 function PostCell({ post, id }: { post: Post | undefined; id: string }) {
   return (
@@ -26,9 +31,9 @@ function PostCell({ post, id }: { post: Post | undefined; id: string }) {
         {post?.emoji ?? '·'}
       </span>
       <span className="min-w-0">
-        <span className="block truncate font-semibold text-ink">{post?.headline ?? post?.caption ?? id}</span>
+        <span className="block truncate font-semibold text-ink">{wordsOf(post) ?? id}</span>
         <span className="block truncate text-micro font-medium text-ink-faint">
-          {post ? `${post.user} · ` : ''}
+          {post ? `${post.user.tr} · ` : ''}
           <span className="font-mono">{id}</span>
         </span>
       </span>
@@ -73,7 +78,7 @@ export function ContentPage() {
 
   const label = (row: AdminContentRow) => {
     const post = posts.get(row.contentId);
-    return `${post?.emoji ?? ''} ${post?.headline ?? post?.caption ?? row.contentId}`.trim();
+    return `${post?.emoji ?? ''} ${wordsOf(post) ?? row.contentId}`.trim();
   };
   // The five highest rates the API sent, among posts it happened to at all.
   const topBy = (rate: 'likeRate' | 'missRate', count: 'likes' | 'misses') =>

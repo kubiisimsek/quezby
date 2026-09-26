@@ -13,6 +13,8 @@ describe('ContentPage', () => {
 
     expect(await screen.findByText('Kimse sormadı ama kahvem soğudu')).toBeInTheDocument();
     expect(screen.getByText('kedim yine beni yargılıyor')).toBeInTheDocument();
+    // The catalog speaks six languages; the panel reads its Turkish source.
+    expect(screen.getByText('@zeynep.k ·')).toBeInTheDocument();
     expect(screen.getAllByText('%75').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Gösterilmedi')).toHaveLength(2);
     expect(screen.getByRole('list', { name: 'En çok kaçırılan postlar' })).toBeInTheDocument();

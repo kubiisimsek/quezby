@@ -8,6 +8,7 @@ import {
   layoutBoard,
   type ClimbItem,
 } from '@/components/SummitBoard';
+import { useLanguage } from '@/i18n/language';
 import { buildEntries, buildEntry } from '@/test/factories';
 import { BrandBand } from '@/ui/kit';
 
@@ -190,5 +191,14 @@ describe('SummitPodium', () => {
     );
 
     expect(onPressEntry).toHaveBeenCalledWith(entries[0]);
+  });
+});
+
+describe('ClimbItemView — in English', () => {
+  it('reads the break out in English', async () => {
+    useLanguage.setState({ locale: 'en' });
+    await render(<ClimbItemView item={{ kind: 'gap' }} index={3} />);
+
+    expect(screen.getByLabelText('More players in between')).toBeOnTheScreen();
   });
 });

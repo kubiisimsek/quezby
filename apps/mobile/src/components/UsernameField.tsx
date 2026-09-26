@@ -1,7 +1,13 @@
-import { usernameChecklist, USERNAME_MAX_LENGTH } from '@quezby/config';
+import {
+  USERNAME_MAX_LENGTH,
+  USERNAME_MIN_LENGTH,
+  usernameChecklist,
+  type UsernameRule,
+} from '@quezby/config';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
-import type { UsernameCheck } from '@/hooks/useUsernameCheck';
+import { checkMessage, type UsernameCheck } from '@/hooks/useUsernameCheck';
+import { useT, type Messages } from '@/i18n';
 import { Icon } from '@/ui/icons';
 import { Field, Txt } from '@/ui/kit';
 import { SPACE, useTheme } from '@/ui/theme';
@@ -24,6 +30,7 @@ export function UsernameField({
   autoFocus?: boolean;
 }) {
   const theme = useTheme();
+  const t = useT();
   const checklist = usernameChecklist(value);
 
   const trailing =
@@ -35,21 +42,22 @@ export function UsernameField({
       <Icon name="alert" size={18} color={theme.bad} />
     ) : null;
 
+  const words = t.username.field;
   const error =
-    check.state === 'invalid' || check.state === 'taken' ? check.message : undefined;
+    checkMessage(check, t);
   const hint =
     check.state === 'available'
-      ? `@${check.normalized} senin olabilir.`
+      ? words.available(check.normalized)
       : check.state === 'current'
-        ? 'Şu anki adın.'
+        ? words.current
         : check.state === 'unknown'
-        ? 'Uygunluk şu an kontrol edilemedi; kaydederken yeniden denenecek.'
-        : 'Sıralamada herkes seni bu adla görecek.';
+        ? words.unknown
+        : words.idle;
 
   return (
     <View style={styles.block}>
       <Field
-        label="Kullanıcı adı"
+        label={words.label}
         icon="account"
         defaultValue={value}
         onChangeText={onChange}
@@ -59,7 +67,7 @@ export function UsernameField({
         textContentType="username"
         maxLength={USERNAME_MAX_LENGTH + 5}
         autoFocus={autoFocus}
-        placeholder="ornek.kullanici"
+        placeholder={words.placeholder}
         trailing={trailing}
         error={error}
         hint={hint}
@@ -74,7 +82,7 @@ export function UsernameField({
               strokeWidth={2.4}
             />
             <Txt variant="meta" tone={item.met ? 'ok' : 'faint'}>
-              {item.rule}
+              {ruleText(t, item.rule)}
             </Txt>
           </View>
         ))}
@@ -88,3 +96,9 @@ const styles = StyleSheet.create({
   rules: { gap: SPACE.xs, paddingHorizontal: SPACE.xs },
   rule: { alignItems: 'center', flexDirection: 'row', gap: SPACE.sm },
 });
+
+/** A rule of the checklist in the player's words. */
+function ruleText(t: Messages, rule: UsernameRule): string {
+  const rules = t.usernameRules.rules;
+  return rule === 'length' ? rules.length(USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH) : rules[rule];
+}

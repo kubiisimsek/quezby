@@ -1,8 +1,12 @@
 <?php
 
 /*
-| Messages for the rules the API uses. They reach the player through
-| `error.fields`, so they are Turkish like every other message.
+| Messages for the rules the API uses — in Turkish, the source of the six
+| languages (`lang/{tr,en,de,ar,fr,es}`, one set of keys: `LangParityTest`).
+| They reach the player through `error.fields` in the request's language
+| (`ResolveLocale`); the admin panel always reads the Turkish. A field's name
+| lives here under `attributes`, never in a FormRequest, so every language
+| has it.
 */
 
 return [
@@ -41,18 +45,46 @@ return [
     'attributes' => [
         'actions' => 'hamle kaydı',
         'analytics' => 'kullanım verisi izni',
+        'assertion' => 'cihaz imzası',
+        'attestation' => 'cihaz onayı',
+        'authorizationCode' => 'yetki kodu',
+        'challenge' => 'doğrulama kodu',
+        'checkpoints' => 'kontrol noktaları',
+        'checkpoints.*' => 'kontrol noktası makbuzu',
         'clientReels' => 'reel sayısı',
         'clientScore' => 'skor',
+        'contentVersion' => 'katalog sürümü',
+        'cursor' => 'sayfa imleci',
         'email' => 'e-posta',
+        'engineVersion' => 'oyun motoru sürümü',
         'haptics' => 'titreşim ayarı',
+        'identityToken' => 'kimlik jetonu',
+        'idToken' => 'kimlik jetonu',
         'installId' => 'kurulum kimliği',
+        'keyId' => 'anahtar kimliği',
         'limit' => 'limit',
+        'locale' => 'dil',
+        'nonce' => 'tek kullanımlık kod',
         'password' => 'şifre',
         'platform' => 'platform',
+        'prefixHash' => 'hamle özeti',
+        'reel' => 'post sayısı',
+        'scope' => 'kapsam',
         'sentAt' => 'gönderim anı',
+        'token' => 'bütünlük jetonu',
         'username' => 'kullanıcı adı',
         'version' => 'sürüm',
         'visits' => 'ziyaretler',
+        'visits.*.id' => 'ziyaret kimliği',
+        'visits.*.startedAt' => 'ziyaret başlangıcı',
+        'visits.*.seconds' => 'ziyaret süresi',
+        'visits.*.appVersion' => 'uygulama sürümü',
+        'visits.*.journey' => 'yolculuk',
+        'visits.*.journey.*' => 'yolculuk adımı',
+        'visits.*.journey.*.0' => 'adım kodu',
+        'visits.*.journey.*.1' => 'adım zamanı',
+        'visits.*.counts' => 'sayılar',
+        'visits.*.counts.*' => 'sayı',
 
         // The admin panel.
         'action' => 'eylem',

@@ -15,7 +15,8 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { dativeOf, formatGap, formatRank, formatScore } from '@/lib/format';
+import { handle, ltr, useT } from '@/i18n';
+import { SHRINK_TO_FIT } from '@/i18n/native';
 import { medalColors } from '@/ui/kit/badges';
 import { Button } from '@/ui/kit/buttons';
 import { Avatar } from '@/ui/kit/identity';
@@ -30,6 +31,7 @@ import {
   SPACE,
   TYPE,
   embossed,
+  lh,
   shadow,
   useTheme,
   withAlpha,
@@ -71,6 +73,7 @@ export function ClimbRow({
   index?: number;
 }) {
   const theme = useTheme();
+  const t = useT();
   const reduced = useReducedMotion();
   const enter = useSharedValue(reduced ? 1 : 0);
   const down = useSharedValue(0);
@@ -91,18 +94,10 @@ export function ClimbRow({
     transform: [{ translateY: (1 - enter.value) * 12 + down.value * 3 }],
   }));
 
-  const label = [
-    `${rank}. sıra`,
-    `@${username}${isMe ? ', sen' : ''}`,
-    `${formatScore(score)} puan`,
-    detail || null,
-    gap === null ? null : `geçmek için ${formatGap(gap)} puan`,
-  ]
-    .filter(Boolean)
-    .join(', ');
+  const label = t.board.row({ rank, name: username, isMe, score, detail, gap });
 
   const facts = [
-    reels === undefined ? null : `${formatScore(reels)} post`,
+    reels === undefined ? null : t.board.posts(reels),
     detail || null,
   ]
     .filter(Boolean)
@@ -131,11 +126,11 @@ export function ClimbRow({
       <View style={styles.who}>
         <View style={styles.nameLine}>
           <Txt variant="heading" numberOfLines={1} style={styles.shrink}>
-            @{username}
+            {handle(username)}
           </Txt>
           {isMe ? (
             <Txt variant="heading" tone="primary">
-              {' · sen'}
+              {` · ${t.board.you}`}
             </Txt>
           ) : null}
         </View>
@@ -147,7 +142,7 @@ export function ClimbRow({
       </View>
       <View style={styles.numbers}>
         <Txt variant="title" numberOfLines={1}>
-          {formatScore(score)}
+          {t.fmt.score(score)}
         </Txt>
         {gap === null ? null : <GapPill gap={gap} mine={isMe} />}
       </View>
@@ -222,6 +217,7 @@ function coinLook(
 
 function RankCoin({ rank, isMe }: { rank: number; isMe: boolean }) {
   const theme = useTheme();
+  const t = useT();
   const look = coinLook(theme, rank, isMe);
 
   return (
@@ -252,7 +248,7 @@ function RankCoin({ rank, isMe }: { rank: number; isMe: boolean }) {
           look.lit ? null : embossed(1.5),
         ]}
       >
-        {formatScore(rank)}
+        {t.fmt.score(rank)}
       </Text>
     </View>
   );
@@ -261,6 +257,7 @@ function RankCoin({ rank, isMe }: { rank: number; isMe: boolean }) {
 /** "▲ 1.240" — what it takes to pass the row above, in the colour of going up. */
 function GapPill({ gap, mine }: { gap: number; mine: boolean }) {
   const theme = useTheme();
+  const t = useT();
   return (
     <View
       style={[
@@ -276,7 +273,7 @@ function GapPill({ gap, mine }: { gap: number; mine: boolean }) {
           { color: mine ? theme.outline : theme.okText },
         ]}
       >
-        {`▲ ${formatGap(gap)}`}
+        {ltr(`▲ ${t.fmt.gap(gap)}`)}
       </Text>
     </View>
   );
@@ -310,16 +307,18 @@ export function FloorCard({
   style?: StyleProp<ViewStyle>;
 }) {
   const theme = useTheme();
+  const t = useT();
+  const words = t.board.floor;
   const top = rank === 1;
   const chasing = rank !== null && !top && gapToNext != null;
 
   let line: string | null = null;
-  if (rank === null) line = 'Bu dönemde henüz sıran yok.';
-  else if (top) line = 'Zirvedesin! Yerini koru.';
+  if (rank === null) line = words.unranked;
+  else if (top) line = words.top;
   else if (gapToNext != null) {
     line = targetUsername
-      ? `@${dativeOf(targetUsername)} ${formatGap(gapToNext)} puan`
-      : `Bir üst sıraya ${formatGap(gapToNext)} puan`;
+      ? words.toPass(targetUsername, gapToNext)
+      : words.toNext(gapToNext);
   }
 
   const permille =
@@ -345,28 +344,28 @@ export function FloorCard({
         ]}
       >
         <Text
-          accessibilityLabel="Senin katın"
+          accessibilityLabel={words.name}
           numberOfLines={1}
           style={[TYPE.label, { color: theme.gold }]}
         >
-          SENİN KATIN
+          {words.ribbon}
         </Text>
       </View>
       <View style={styles.floorRow}>
         <Text
           numberOfLines={1}
-          adjustsFontSizeToFit
+          adjustsFontSizeToFit={SHRINK_TO_FIT}
           style={[
             styles.floorRank,
             { color: rank === null ? theme.inkFaint : theme.gold },
             embossed(3),
           ]}
         >
-          {formatRank(rank)}
+          {t.fmt.rank(rank)}
         </Text>
         <View style={styles.floorText}>
           <Txt variant="heading" numberOfLines={1}>
-            {score === null ? 'Sen' : `Sen · ${formatScore(score)}`}
+            {score === null ? words.you : words.youScored(score)}
           </Txt>
           {line ? (
             <Txt variant="meta" tone="muted" numberOfLines={2}>
@@ -375,7 +374,7 @@ export function FloorCard({
           ) : null}
         </View>
         <Button
-          label={chasing ? 'Geç onu' : 'Oyna'}
+          label={chasing ? words.pass : words.play}
           icon="play"
           tone="play"
           size="md"
@@ -386,7 +385,7 @@ export function FloorCard({
         <View
           accessible
           accessibilityRole="progressbar"
-          accessibilityLabel="Bir üst sıraya ilerleme"
+          accessibilityLabel={words.progress}
           accessibilityValue={{
             min: 0,
             max: 100,
@@ -454,7 +453,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT.display,
     fontSize: 14,
     fontVariant: ['tabular-nums'],
-    lineHeight: 18,
+    lineHeight: lh(18),
   },
   who: { flex: 1, gap: 1 },
   nameLine: { flexDirection: 'row' },
@@ -470,7 +469,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT.displayBold,
     fontSize: 12,
     fontVariant: ['tabular-nums'],
-    lineHeight: 15,
+    lineHeight: lh(15),
   },
   floor: {
     borderBottomWidth: DEPTH.outline + DEPTH.lip,
@@ -505,7 +504,7 @@ const styles = StyleSheet.create({
   floorRank: {
     fontFamily: FONT.display,
     fontSize: 30,
-    lineHeight: 36,
+    lineHeight: lh(36),
     maxWidth: 110,
   },
   floorText: { flex: 1, gap: 1 },

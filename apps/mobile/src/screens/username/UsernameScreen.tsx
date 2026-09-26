@@ -8,7 +8,8 @@ import { api } from '@/api/client';
 import { useSession } from '@/auth/session';
 import { UsernameField } from '@/components/UsernameField';
 import { rememberMe } from '@/hooks/useMe';
-import { useUsernameCheck } from '@/hooks/useUsernameCheck';
+import { checkMessage, useUsernameCheck, type UsernameCheck } from '@/hooks/useUsernameCheck';
+import { useT } from '@/i18n';
 import { messageFor } from '@/lib/errors';
 import { stepFor, useOnboarding } from '@/stores/onboarding';
 import { BrandMark } from '@/ui/brand-mark';
@@ -27,38 +28,47 @@ import { SPACE } from '@/ui/theme';
  * none, so for it this is the one question before the game.
  */
 export function UsernameScreen() {
+  const t = useT();
   const insets = useSafeAreaInsets();
   const user = useSession((state) => state.user);
   const onboarding = useOnboarding((state) => stepFor(state, user?.id) === 'nickname');
   const current = user?.username ?? null;
   const [value, setValue] = useState('');
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // What failed, not its words: the line is read in the language of the moment.
+  const [failure, setFailure] = useState<{ check: UsernameCheck } | { error: unknown } | null>(
+    null,
+  );
   const check = useUsernameCheck(value, current);
 
   const ready = check.state === 'available' || check.state === 'unknown';
   const canSkip = onboarding && current !== null;
+  const autoName = canSkip && isAutoUsername(current) ? current : null;
 
   const next = () => useOnboarding.getState().advance(useSession.getState().user?.isGuest ?? true);
 
   const save = async () => {
     if (!ready) {
-      setError(check.state === 'invalid' || check.state === 'taken'
-        ? check.message
-        : 'Önce bir kullanıcı adı seç.');
+      setFailure({ check });
       return;
     }
     setPending(true);
-    setError(null);
+    setFailure(null);
     try {
       const { user: named } = await api.me.updateUsername(check.normalized);
       rememberMe(named);
       if (onboarding) next();
     } catch (caught) {
-      setError(messageFor(caught));
+      setFailure({ error: caught });
       setPending(false);
     }
   };
+
+  const error = !failure
+    ? null
+    : 'error' in failure
+      ? messageFor(failure.error, t)
+      : (checkMessage(failure.check, t) ?? t.username.pickFirst);
 
   return (
     <Screen>
@@ -68,12 +78,10 @@ export function UsernameScreen() {
           <BrandMark size={64} />
         </Stamp>
         <Txt variant="display" align="center">
-          {onboarding ? 'Sana ne diyelim?' : 'Sıralamada adın ne olsun?'}
+          {onboarding ? t.username.onboardingTitle : t.username.title}
         </Txt>
         <Txt variant="meta" tone="muted" align="center">
-          {canSkip && isAutoUsername(current)
-            ? `Zirvede ve ligde bu adla görünürsün; seçtiğin ad bir daha değişmez. Şimdilik adın @${current}, istersen sonra Profil’den seçersin.`
-            : 'Benzersiz olmalı ve bir daha değişmez. Harf, rakam, nokta ve yıldız kullanabilirsin.'}
+          {autoName ? t.username.autoName(autoName) : t.username.rules}
         </Txt>
       </View>
       <KeyboardAvoidingView
@@ -91,7 +99,7 @@ export function UsernameScreen() {
           {onboarding ? (
             <>
               <Button
-                label="Kaydet"
+                label={t.username.save}
                 tone="primary"
                 icon="check"
                 onPress={() => void save()}
@@ -100,7 +108,7 @@ export function UsernameScreen() {
               />
               {canSkip ? (
                 <Button
-                  label="Şimdilik geç"
+                  label={t.username.skip}
                   tone="ghost"
                   onPress={() => {
                     track('nickname_skip');
@@ -112,7 +120,7 @@ export function UsernameScreen() {
             </>
           ) : (
             <Button
-              label="Devam"
+              label={t.username.continue}
               tone="play"
               icon="play"
               onPress={() => void save()}

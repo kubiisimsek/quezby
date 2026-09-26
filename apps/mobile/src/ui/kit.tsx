@@ -38,16 +38,11 @@ export { Field, PasswordField } from '@/ui/kit/fields';
 export { EmptyState, Loading, Skeleton, SkeletonList } from '@/ui/kit/loading';
 export { Segmented } from '@/ui/kit/segmented';
 export { Meter } from '@/ui/kit/meter';
-export {
-  MedalBadge,
-  TIER_LABELS,
-  TierBadge,
-  type MedalRank,
-} from '@/ui/kit/badges';
+export { MedalBadge, TierBadge, type MedalRank } from '@/ui/kit/badges';
 export { CountdownChip } from '@/ui/kit/countdown';
 export { Podium, Spotlight, type PodiumEntry } from '@/ui/kit/podium';
 export { ClimbRow, FloorCard } from '@/ui/kit/climb';
-export { BONUS_LABELS, BonusChip, ShareGrid } from '@/ui/kit/result';
+export { BonusChip, ShareGrid } from '@/ui/kit/result';
 export { LobbyCard, PlayButton, RankChips } from '@/ui/kit/lobby';
 export { CoachCard, type CoachGesture } from '@/ui/kit/coach';
 export { ConsentCard } from '@/ui/kit/consent';

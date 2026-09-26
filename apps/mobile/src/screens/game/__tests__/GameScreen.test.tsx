@@ -4,6 +4,7 @@ import { useReducedMotion, type SharedValue } from 'react-native-reanimated';
 import { track } from '@/analytics/track';
 import { useSession } from '@/auth/session';
 import { useGame, type GameController } from '@/game/useGame';
+import { useLanguage } from '@/i18n/language';
 import { GameScreen } from '@/screens/game/GameScreen';
 import { useOnboarding } from '@/stores/onboarding';
 import { buildMe } from '@/test/factories';
@@ -262,6 +263,65 @@ describe('GameScreen', () => {
 
       await fireEvent.press(screen.getByText('Bir daha dene'));
       expect(game.start).toHaveBeenLastCalledWith('tutorial');
+    });
+  });
+
+  describe('in the player\'s language', () => {
+    it('counts down in English, with the way out named for a screen reader', async () => {
+      useLanguage.setState({ locale: 'en' });
+      await setup(controller({ phase: 'countdown', countdown: 3 })).render();
+
+      expect(screen.getByText('Get your thumb ready')).toBeTruthy();
+      expect(screen.getByText('Dopamine')).toBeTruthy();
+      expect(screen.getByRole('button', { name: 'Leave the game' })).toBeTruthy();
+    });
+
+    it('says in English why a free run could not start, and the ways on', async () => {
+      useLanguage.setState({ locale: 'en' });
+      await setup(controller({ phase: 'error' })).render();
+
+      expect(screen.getByText("Couldn't start the run")).toBeTruthy();
+      expect(screen.getByText("Couldn't reach the server.")).toBeTruthy();
+      expect(screen.getByText('Try again')).toBeTruthy();
+      expect(screen.getByText('Offline training')).toBeTruthy();
+      expect(screen.getByText('Cancel')).toBeTruthy();
+    });
+
+    it('offers free play in English when today’s run is already played', async () => {
+      useLanguage.setState({ locale: 'en' });
+      const game = controller({
+        phase: 'error',
+        startError: {
+          code: 'daily_already_played',
+          message: "You've played today's Daily Feed. A new one is waiting tomorrow.",
+        },
+      });
+      const { navigation, render } = setup(game, 'daily');
+      await render();
+
+      expect(screen.getByText("You've played today's Daily Feed")).toBeTruthy();
+      await fireEvent.press(screen.getByText('Free play'));
+      expect(navigation.replace).toHaveBeenCalledWith('Game', { mode: 'free' });
+      await fireEvent.press(screen.getByText("Today's board"));
+      expect(navigation.replace).toHaveBeenCalledWith('Daily');
+    });
+
+    it('waits for the verdict in Arabic', async () => {
+      useLanguage.setState({ locale: 'ar' });
+      await setup(controller({ phase: 'finishing' })).render();
+
+      expect(screen.getByText('جارٍ التحقق من نتيجتك…')).toBeTruthy();
+    });
+
+    it('explains a new kind of post in Arabic', async () => {
+      useLanguage.setState({ locale: 'ar' });
+      const game = controller({ phase: 'coach', coach: 'like' });
+      await setupTutorial(game).render();
+
+      expect(screen.getByText('منشور جديد · \u200E2/4\u200E')).toBeTruthy();
+      expect(screen.getByText('صديقك')).toBeTruthy();
+      await fireEvent.press(screen.getByText('فهمت'));
+      expect(game.dismissCoach).toHaveBeenCalledTimes(1);
     });
   });
 });

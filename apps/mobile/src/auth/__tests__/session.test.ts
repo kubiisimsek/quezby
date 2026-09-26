@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Keychain from 'react-native-keychain';
 
-import { currentInstallId, installId, useSession } from '@/auth/session';
+import { currentInstallId, installId, sessionSaved, useSession } from '@/auth/session';
 import { useSettings } from '@/stores/settings';
 import { buildMe } from '@/test/factories';
 
@@ -38,5 +38,22 @@ describe('session', () => {
 
     expect(useSession.getState().token).toBeNull();
     expect(useSettings.getState()).toMatchObject({ analytics: false, consent: 'unasked' });
+  });
+
+  it('says when the token of a sign-in is in the keychain — nothing may reload before', async () => {
+    let stored = false;
+    jest.mocked(Keychain.setGenericPassword).mockImplementationOnce(async () => {
+      await Promise.resolve();
+      stored = true;
+      return { service: 'quezby.auth', storage: 'keychain' } as unknown as Awaited<
+        ReturnType<typeof Keychain.setGenericPassword>
+      >;
+    });
+
+    const signIn = useSession.getState().signIn('token-9', buildMe());
+    await sessionSaved();
+
+    expect(stored).toBe(true);
+    await signIn;
   });
 });

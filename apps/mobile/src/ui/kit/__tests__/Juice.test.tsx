@@ -2,7 +2,9 @@ import { act, render, renderHook, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
 import { useReducedMotion, withSequence } from 'react-native-reanimated';
 
-import { formatScore } from '@/lib/format';
+import { formatsFor } from '@/i18n/format';
+
+const formatScore = formatsFor('tr').score;
 import { Confetti, CountUp, Stamp, useShake } from '@/ui/kit';
 
 jest.mock('react-native-reanimated', () => {

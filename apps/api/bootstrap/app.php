@@ -5,6 +5,8 @@ use App\Exceptions\ErrorResponse;
 use App\Http\Middleware\EnsureAdminRole;
 use App\Http\Middleware\RecordPresence;
 use App\Http\Middleware\RequireAppKey;
+use App\Http\Middleware\ResolveLocale;
+use Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -23,11 +25,18 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // `admin.role:moderator`: the admin panel's roles, lowest first. `presence`: the
         // device registry and, with consent, the player's day — once a day per token.
-        // One call: `alias()` replaces the list it was given before.
+        // `locale`: the language a player route answers in. One call: `alias()`
+        // replaces the list it was given before.
         $middleware->alias([
             'admin.role' => EnsureAdminRole::class,
+            'locale' => ResolveLocale::class,
             'presence' => RecordPresence::class,
         ]);
+
+        // The language is settled before anything may refuse the request, so a 401 or
+        // a 429 is in it too — otherwise Laravel's priority list would run the auth
+        // and throttle middleware first, whatever the route says.
+        $middleware->prependToPriorityList(before: AuthenticatesRequests::class, prepend: ResolveLocale::class);
 
         // No player request without APP_KEY; the panel and the ops routes stay open to put it right.
         $middleware->api(prepend: [RequireAppKey::class]);

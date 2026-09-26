@@ -6,6 +6,8 @@ import { act, renderHook } from '@testing-library/react-native';
 import { api } from '@/api/client';
 import { useSession } from '@/auth/session';
 import { useSocialAuth } from '@/hooks/useSocialAuth';
+import { iso } from '@/i18n';
+import { useLanguage } from '@/i18n/language';
 import { useOnboarding } from '@/stores/onboarding';
 import { buildMe } from '@/test/factories';
 
@@ -137,5 +139,60 @@ describe('useSocialAuth', () => {
     });
     expect(mocked.me.unlink).toHaveBeenCalledWith('apple');
     expect(useSession.getState().user?.identities).toEqual([]);
+  });
+
+  it('says what went wrong in the language the game speaks now', async () => {
+    useLanguage.setState({ locale: 'en' });
+    google.mockResolvedValue({ type: 'success', data: { idToken: 'google.jwt' } });
+    mocked.me.linkGoogle.mockRejectedValue(new ApiError(409, 'identity_taken', 'x'));
+    apple.mockRejectedValue(Object.assign(new Error('boom'), { code: '1004' }));
+    const { result } = await hook();
+
+    await act(async () => {
+      await result.current.link('google');
+    });
+    expect(result.current.error).toBe('This account belongs to another Quezby player.');
+    expect(result.current.errorCode).toBe('identity_taken');
+
+    await act(async () => {
+      await result.current.link('apple');
+    });
+    expect(result.current.error).toBe("Couldn't sign in with Apple right now. Try again in a bit.");
+
+    await act(async () => {
+      useLanguage.setState({ locale: 'ar' });
+    });
+    expect(result.current.error).toBe(
+      `تعذّر تسجيل الدخول باستخدام ${iso('Apple')} الآن. حاول مرة أخرى بعد قليل.`,
+    );
+    expect(result.current.errorCode).toBeNull();
+  });
+
+  it('brings a returning Apple player’s language to this phone, and leaves a new one in the phone’s', async () => {
+    useLanguage.setState({ phase: 'ready', locale: 'tr', account: null });
+    apple.mockResolvedValue({ identityToken: 'apple.jwt', authorizationCode: 'code-1', nonce: 'raw-nonce' });
+    mocked.auth.apple.mockResolvedValue({
+      token: 'tok-2',
+      user: buildMe({ id: 'back-1', locale: 'fr', identities: ['apple'], isGuest: false }),
+      created: false,
+    });
+    const { result } = await hook();
+
+    await act(async () => {
+      await result.current.signIn('apple');
+    });
+
+    expect(useLanguage.getState()).toMatchObject({ locale: 'fr', account: 'back-1' });
+    expect(useSession.getState().token).toBe('tok-2');
+
+    mocked.auth.apple.mockResolvedValue({
+      token: 'tok-3',
+      user: buildMe({ id: 'new-2', locale: 'fr', identities: ['apple'], isGuest: false }),
+      created: true,
+    });
+    await act(async () => {
+      await result.current.signIn('apple');
+    });
+    expect(useLanguage.getState()).toMatchObject({ locale: 'fr', account: 'new-2' });
   });
 });

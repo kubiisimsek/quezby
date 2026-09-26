@@ -11,6 +11,8 @@ import { Share } from 'react-native';
 
 import { track } from '@/analytics/track';
 import { api } from '@/api/client';
+import { iso } from '@/i18n';
+import { useLanguage } from '@/i18n/language';
 import { DailyScreen } from '@/screens/daily/DailyScreen';
 import { buildEntries } from '@/test/factories';
 import { renderWithProviders } from '@/test/renderWithProviders';
@@ -278,5 +280,136 @@ describe('DailyScreen — Günün akışı', () => {
     await fireEvent.press(screen.getByRole('button', { name: 'Tekrar dene' }));
 
     expect(await screen.findByText('#17')).toBeOnTheScreen();
+  });
+
+  describe("in the player's language", () => {
+    it('speaks English, from the stage to the summit', async () => {
+      useLanguage.setState({ locale: 'en' });
+      mocked.daily.get.mockResolvedValue(today());
+      const navigation = await renderDaily();
+
+      expect(await screen.findByText('#17')).toBeOnTheScreen();
+      expect(screen.getByText('Daily Feed')).toBeOnTheScreen();
+      expect(screen.getByText('FEED')).toBeOnTheScreen();
+      expect(screen.getByText('Next feed in 11h 0m')).toBeOnTheScreen();
+      expect(
+        screen.getByText("Today's feed is waiting for you"),
+      ).toBeOnTheScreen();
+      expect(
+        screen.getByText('Everyone plays the same feed · one shot'),
+      ).toBeOnTheScreen();
+      expect(screen.getByText("TODAY'S SUMMIT")).toBeOnTheScreen();
+
+      await fireEvent.press(screen.getByRole('button', { name: 'Play' }));
+      expect(navigation.navigate).toHaveBeenCalledWith('Game', {
+        mode: 'daily',
+      });
+    });
+
+    it('shows a ranked attempt in English', async () => {
+      mocked.daily.get.mockResolvedValue(today({ attempt: attempt() }));
+      useLanguage.setState({ locale: 'en' });
+
+      await renderDaily();
+
+      expect(await screen.findByText('12,345')).toBeOnTheScreen();
+      expect(screen.getByLabelText('Your score')).toHaveTextContent('YOUR SCORE');
+      expect(screen.getByLabelText('Your rank')).toHaveTextContent('YOUR RANK');
+      expect(screen.getByText('#12 / 5,120')).toBeOnTheScreen();
+      expect(screen.getByRole('button', { name: 'Share' })).toBeOnTheScreen();
+    });
+
+    it.each([
+      ['unfinished', 'Your run was cut short'],
+      ['review', 'Your score is being reviewed'],
+      ['flagged', "Your score didn't rank"],
+      ['void', "The run didn't count"],
+    ] as const)('explains the %s attempt in English', async (status, title) => {
+      useLanguage.setState({ locale: 'en' });
+      mocked.daily.get.mockResolvedValue(
+        today({
+          attempt: attempt({ status, rank: null, grid: null, shareText: null }),
+        }),
+      );
+
+      await renderDaily();
+
+      expect(await screen.findByText(title)).toBeOnTheScreen();
+    });
+
+    it('explains a failed load in English', async () => {
+      useLanguage.setState({ locale: 'en' });
+      mocked.daily.get.mockRejectedValue(new Error('offline'));
+      mocked.leaderboards.get.mockRejectedValue(new Error('offline'));
+
+      await renderDaily();
+
+      expect(
+        await screen.findByText("Couldn't load the Daily Feed"),
+      ).toBeOnTheScreen();
+      expect(
+        await screen.findByText("Couldn't load the ranking"),
+      ).toBeOnTheScreen();
+      expect(
+        screen.getAllByText('Something went wrong. Try again.'),
+      ).toHaveLength(2);
+      expect(screen.getAllByRole('button', { name: 'Try again' })).toHaveLength(2);
+    });
+
+    it('speaks Arabic, the day number kept whole', async () => {
+      useLanguage.setState({ locale: 'ar' });
+      mocked.daily.get.mockResolvedValue(
+        today({
+          attempt: attempt({ status: 'flagged', rank: null, shareText: null }),
+        }),
+      );
+
+      await renderDaily();
+
+      expect(await screen.findByText(iso('#17'))).toBeOnTheScreen();
+      expect(screen.getByText('خلاصة اليوم')).toBeOnTheScreen();
+      expect(screen.getByText('الخلاصة')).toBeOnTheScreen();
+      expect(screen.getByText('الخلاصة التالية بعد 11 س 0 د')).toBeOnTheScreen();
+      expect(screen.getByText('لم تدخل نتيجتك الترتيب')).toBeOnTheScreen();
+      expect(
+        screen.getByText(
+          'تعذّر التحقق من الجولة، لذلك لم تُسجَّل في ترتيب اليوم. خلاصة جديدة بانتظارك غدًا.',
+        ),
+      ).toBeOnTheScreen();
+      expect(screen.getByText('قمة اليوم')).toBeOnTheScreen();
+    });
+
+    it('shows an empty summit in Arabic', async () => {
+      useLanguage.setState({ locale: 'ar' });
+      mocked.daily.get.mockResolvedValue(today());
+      mocked.leaderboards.get.mockImplementation(
+        async (
+          board: LeaderboardBoard,
+          { scope }: { scope: LeaderboardScope },
+        ): Promise<LeaderboardResponse> => ({
+          board,
+          periodKey: '2026-09-24',
+          season: 1,
+          scope,
+          startsAt: '2026-09-23T21:00:00.000Z',
+          endsAt: '2026-09-24T21:00:00.000Z',
+          serverTime: NOW,
+          entries: [],
+          me: null,
+          neighbors: [],
+          rival: null,
+          nextRankProgress: null,
+          players: 0,
+        }),
+      );
+
+      await renderDaily();
+
+      expect(await screen.findByText('قمة اليوم فارغة')).toBeOnTheScreen();
+      expect(
+        screen.getByText('ستتشكّل القمة هنا مع وصول النتائج الأولى.'),
+      ).toBeOnTheScreen();
+      expect(screen.getByRole('button', { name: 'العب' })).toBeOnTheScreen();
+    });
   });
 });

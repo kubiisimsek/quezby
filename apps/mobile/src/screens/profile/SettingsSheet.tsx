@@ -1,4 +1,4 @@
-import { canPickUsername } from '@quezby/config';
+import { LOCALE_NAMES, canPickUsername } from '@quezby/config';
 import type { Me } from '@quezby/types';
 import { StyleSheet, View } from 'react-native';
 
@@ -8,7 +8,7 @@ import { socialAvailability } from '@/auth/social';
 import { PROVIDER_NAMES, signInWays } from '@/components/SignInWaysSheet';
 import { APP_ENV, APP_VERSION } from '@/config/env';
 import { rememberMe } from '@/hooks/useMe';
-import { formatList } from '@/lib/format';
+import { getT, handle, useLocale, useT, type Messages } from '@/i18n';
 import { useSettings } from '@/stores/settings';
 import {
   Divider,
@@ -22,8 +22,8 @@ import {
 import { Sheet } from '@/ui/sheet';
 import { SPACE } from '@/ui/theme';
 
-/** What Ayarlar opens: Yardım, or one of the account's doors. */
-export type SettingsDoor = 'help' | 'username' | 'ways' | 'signOut' | 'delete';
+/** What Ayarlar opens: the language, Yardım, or one of the account's doors. */
+export type SettingsDoor = 'language' | 'help' | 'username' | 'ways' | 'signOut' | 'delete';
 
 const ENV_LABEL = {
   local: 'Local',
@@ -32,18 +32,18 @@ const ENV_LABEL = {
 } as const;
 
 /**
- * What a guest is offered to keep the account with, in this build's words:
- * "Apple ya da e-posta bağla; …".
+ * What a guest is offered to keep the account with, in this build's words
+ * and the player's language: "Apple ya da e-posta bağla; …".
  */
-export function keepHint(): string {
+export function keepHint(t: Messages = getT()): string {
   const available = socialAvailability();
   const offered = [
     ...(['apple', 'google'] as const)
       .filter((provider) => available[provider])
       .map((provider) => PROVIDER_NAMES[provider]),
-    'e-posta',
+    t.auth.ways.email,
   ];
-  return `${formatList(offered, 'ya da')} bağla; telefon değişse de skorların kaybolmaz.`;
+  return t.profile.keepHint(t.fmt.list(offered, 'or'));
 }
 
 /**
@@ -68,12 +68,14 @@ function setHaptics(user: Me, value: boolean) {
  * itself, locked — a picked name never changes.
  */
 function NameRow({ username, onPick }: { username: string | null; onPick: () => void }) {
+  const t = useT();
+  const words = t.profile.settings;
   if (canPickUsername(username)) {
     return (
       <Row
         leading={<IconChip icon="edit" tone="primary" size="sm" />}
-        title="Adını seç"
-        subtitle={username ? `Şimdilik @${username} · bir kez seçersin` : 'Henüz bir adın yok'}
+        title={t.profile.pickName.title}
+        subtitle={username ? words.pickNameHint(handle(username)) : words.noName}
         onPress={onPick}
       />
     );
@@ -81,8 +83,8 @@ function NameRow({ username, onPick }: { username: string | null; onPick: () => 
   return (
     <Row
       leading={<IconChip icon="lock" tone="neutral" size="sm" />}
-      title="Kullanıcı adın"
-      subtitle={`@${username} · kalıcı`}
+      title={words.name}
+      subtitle={words.nameLocked(handle(username ?? ''))}
     />
   );
 }
@@ -104,75 +106,77 @@ export function SettingsSheet({
   onClosed?: () => void;
   onPick: (door: SettingsDoor) => void;
 }) {
+  const t = useT();
+  const locale = useLocale();
   const user = useSession((state) => state.user);
   const haptics = useSettings((state) => state.haptics);
   const analytics = useSettings((state) => state.analytics);
 
   if (!user) return null;
 
-  const ways = signInWays(user);
+  const words = t.profile.settings;
+  const ways = signInWays(user, t);
 
   return (
-    <Sheet open={open} onClose={onClose} onClosed={onClosed} title="Ayarlar">
+    <Sheet open={open} onClose={onClose} onClosed={onClosed} title={words.title}>
       <View style={styles.body}>
-        <Eyebrow icon="play">Oyun</Eyebrow>
+        <Eyebrow icon="play">{words.game}</Eyebrow>
         <Panel tone="sunken" elevation="flat" style={styles.group}>
+          <Row
+            leading={<IconChip icon="globe" tone="primary" size="sm" />}
+            title={t.language.title}
+            subtitle={LOCALE_NAMES[locale]}
+            onPress={() => onPick('language')}
+          />
+          <Divider />
           <SwitchRow
             leading={<IconChip icon="vibrate" tone="secondary" size="sm" />}
-            title="Titreşim"
-            subtitle={
-              haptics
-                ? 'Her kaydırmada ve hatada titrer.'
-                : 'Oyun sessizce oynanır.'
-            }
+            title={words.haptics}
+            subtitle={haptics ? words.hapticsOn : words.hapticsOff}
             value={haptics}
             onChange={(value) => setHaptics(user, value)}
           />
           <Divider />
           <SwitchRow
             leading={<IconChip icon="trendUp" tone="secondary" size="sm" />}
-            title="Kullanım verisi"
-            subtitle={
-              analytics
-                ? 'Hangi ekranlara girdiğini ve ne kadar oynadığını sayarız.'
-                : 'Yalnızca oyunun çalışması için gereken cihaz bilgisi gider.'
-            }
+            title={words.analytics}
+            subtitle={analytics ? words.analyticsOn : words.analyticsOff}
             value={analytics}
             onChange={setAnalytics}
           />
           <Divider />
           <Row
             leading={<IconChip icon="help" tone="neutral" size="sm" />}
-            title="Yardım"
-            subtitle="Postlar, puanlar, ligler ve hesabın."
+            title={t.help.title}
+            subtitle={words.helpHint}
             onPress={() => onPick('help')}
           />
         </Panel>
 
-        <Eyebrow icon="account">Hesap</Eyebrow>
+        <Eyebrow icon="account">{words.account}</Eyebrow>
         <Panel tone="sunken" elevation="flat" style={styles.group}>
           <NameRow username={user.username} onPick={() => onPick('username')} />
           <Divider />
           {user.isGuest ? (
             <Row
               leading={<IconChip icon="shield" tone="warn" size="sm" />}
-              title="Hesabını koru"
-              subtitle={keepHint()}
+              title={t.auth.keepAccount}
+              subtitle={keepHint(t)}
               onPress={() => onPick('ways')}
             />
           ) : (
             <>
               <Row
                 leading={<IconChip icon="shield" tone="ok" size="sm" />}
-                title="Giriş yolları"
-                subtitle={`${formatList(ways, 've')} bağlı`}
+                title={t.auth.ways.title}
+                subtitle={words.waysLinked(t.fmt.list(ways, 'and'))}
                 onPress={() => onPick('ways')}
               />
               <Divider />
               <Row
                 leading={<IconChip icon="logout" tone="neutral" size="sm" />}
-                title="Çıkış yap"
-                subtitle={`Tekrar ${formatList(ways, 'ya da')} ile girebilirsin.`}
+                title={words.signOut}
+                subtitle={words.signOutHint(t.fmt.list(ways, 'or'))}
                 onPress={() => onPick('signOut')}
               />
             </>
@@ -180,8 +184,8 @@ export function SettingsSheet({
           <Divider />
           <Row
             leading={<IconChip icon="trash" tone="bad" size="sm" />}
-            title="Hesabı sil"
-            subtitle="Skorların ve adın kalıcı olarak silinir."
+            title={t.profile.deleteAccount.title}
+            subtitle={words.deleteHint}
             onPress={() => onPick('delete')}
           />
         </Panel>

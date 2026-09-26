@@ -45,15 +45,21 @@ ya da **Şimdilik geç** der ve bu adla oynar. Adlar küçük harfle saklandığ
 - Büyük/küçük harf fark etmez: `Kubi.01` → `kubi.01` olarak saklanır ve gösterilir.
 - Benzersizlik veritabanında **unique index** ile garanti edilir; aynı ada aynı
   anda başvuran iki oyuncudan biri `409 username_taken` alır.
-- Uygulama kuralları yazarken canlı gösterir (`usernameChecklist`), iyi biçimli
-  bir adı 350 ms bekleyip `GET /usernames/check` ile sorar.
+- Uygulama kuralları yazarken canlı gösterir (`usernameChecklist` kural
+  kimliklerini verir; kelimeler oyuncunun dilinde `username.rules` /
+  `usernameRules` kataloğundan gelir), iyi biçimli bir adı 350 ms bekleyip
+  `GET /usernames/check` ile sorar. Sunucunun mesajları isteğin dilindedir
+  (`lang/{dil}/username.php`).
 
 ## Neden Türkçe karakter yok?
 
 `İ` / `ı` harfleri dile göre farklı küçülür (`I` → `ı` mı `i` mi?) ve `şule` ile
 `sule` iki ayrı kişi olursa sıralamada kimse kimseyi bulamaz. Instagram ve
 TikTok da aynı sebeple yalnızca ASCII harf kabul eder. Oyuncuya "ş yerine s"
-diyen ayrı bir mesaj gösterilir.
+diyen ayrı bir mesaj gösterilir — her dilde: Almanca, Fransızca ya da
+İspanyolca yazan da `ü`, `ç` gibi harflerde aynı yardımı alır ("ü yerine u").
+Arapça harfler de kabul edilmez; Arapça oynayan oyuncunun adı da Latin
+harflerle yazılır ve kural bunu "yalnızca Latin harfler" diye söyler.
 
 ## Kalıcı ad
 

@@ -16,10 +16,11 @@ it('signs up a new Google player', function () {
         ->assertJsonPath('created', true)
         ->assertJsonPath('user.email', null)
         ->assertJsonPath('user.isGuest', false)
-        ->assertJsonPath('user.identities', ['google']);
+        ->assertJsonPath('user.identities', ['google'])
+        ->assertJsonPath('user.locale', 'tr');
     $this->assertMatchesRegularExpression('/^guest\d{8}$/', $response->json('user.username'));
     $userId = $response->json('user.id');
-    $this->assertDatabaseHas('users', ['id' => $userId, 'platform' => 'android', 'install_id' => 'install-1']);
+    $this->assertDatabaseHas('users', ['id' => $userId, 'platform' => 'android', 'install_id' => 'install-1', 'locale' => 'tr']);
     $this->assertDatabaseHas('social_identities', [
         'user_id' => $userId,
         'provider' => 'google',
@@ -37,11 +38,12 @@ it('signs the same Google player back in', function () {
     $first = $this->postJson('/api/v1/auth/google', $this->idp->googleSignIn())->assertCreated();
     User::query()->whereKey($first->json('user.id'))->update(['username' => 'ekin.su']);
 
-    $this->postJson('/api/v1/auth/google', $this->idp->googleSignIn(body: ['platform' => 'ios']))
+    $this->withHeader('Accept-Language', 'de')->postJson('/api/v1/auth/google', $this->idp->googleSignIn(body: ['platform' => 'ios']))
         ->assertOk()
         ->assertJsonPath('created', false)
         ->assertJsonPath('user.id', $first->json('user.id'))
-        ->assertJsonPath('user.username', 'ekin.su');
+        ->assertJsonPath('user.username', 'ekin.su')
+        ->assertJsonPath('user.locale', 'tr');
     $this->assertSame(1, User::query()->count());
     Http::assertSentCount(1);
 });

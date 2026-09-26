@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useT } from '@/i18n';
 import { IconButton } from '@/ui/kit/buttons';
 import { Txt } from '@/ui/kit/text';
 import { SPACE } from '@/ui/theme';
@@ -25,9 +26,10 @@ export function TopBar({
   right?: ReactNode;
 }) {
   const insets = useSafeAreaInsets();
+  const t = useT();
   return (
     <View style={[styles.bar, { paddingTop: insets.top + SPACE.sm }]}>
-      {onBack ? <IconButton icon="back" label="Geri" onPress={onBack} /> : null}
+      {onBack ? <IconButton icon="back" label={t.kit.topBar.back} onPress={onBack} /> : null}
       <View style={styles.titles}>
         <Txt variant="display" numberOfLines={1}>
           {title}

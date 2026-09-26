@@ -1,7 +1,13 @@
 import { RULES } from '@quezby/engine';
 import { fireEvent, screen } from '@testing-library/react-native';
 
-import { BONUS_GUIDE, BONUS_ORDER, REEL_GUIDE, REEL_ORDER } from '@/game/howTo';
+import { BONUS_ORDER, REEL_ORDER, bonusGuide, reelGuide } from '@/game/howTo';
+import { messagesOf } from '@/i18n';
+
+const REEL_GUIDE = reelGuide(messagesOf('tr'));
+const BONUS_GUIDE = bonusGuide(messagesOf('tr'));
+import { getT, iso } from '@/i18n';
+import { useLanguage } from '@/i18n/language';
 import { HelpScreen } from '@/screens/help/HelpScreen';
 import { renderWithProviders } from '@/test/renderWithProviders';
 
@@ -55,7 +61,9 @@ describe('HelpScreen', () => {
     await fireEvent.press(
       screen.getByRole('button', { name: 'Titreşimi nasıl kapatırım?' }),
     );
-    expect(screen.getByText(/sağ üstteki ayarlar düğmesine/)).toBeOnTheScreen();
+    // No line names a side: an Arabic screen mirrors it.
+    expect(screen.getByText(/^Profil’deki ayarlar düğmesine dokun/)).toBeOnTheScreen();
+    expect(screen.queryByText(/sağ üst|sol üst|sağda|solda/)).not.toBeOnTheScreen();
   });
 
   it('never calls a held score suspicious, not even in an answer', async () => {
@@ -188,5 +196,98 @@ describe('HelpScreen', () => {
       screen.getByRole('button', { name: 'Kullanıcı adımı değiştirebilir miyim?' }),
     );
     expect(screen.getByText(/^Hayır\. Adını bir kez seçersin ve bir daha değişmez/)).toBeOnTheScreen();
+  });
+});
+
+describe('HelpScreen in other languages', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it('speaks English: its name, the way back, every section and the engine’s numbers', async () => {
+    useLanguage.setState({ locale: 'en' });
+    await renderWithProviders(<HelpScreen {...props} />);
+
+    expect(screen.getByText('Help')).toBeOnTheScreen();
+    expect(screen.getByText('Rules, points and common questions')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Back' }));
+    expect(goBack).toHaveBeenCalledTimes(1);
+
+    for (const title of [
+      'The four posts',
+      'Dopamine bar',
+      'Points and combos',
+      'Daily Feed',
+      'Leagues',
+      'Rankings',
+      'Fair play',
+      'Account',
+      'Common questions',
+    ]) {
+      expect(screen.getByText(title)).toBeOnTheScreen();
+    }
+    const reels = reelGuide(getT());
+    for (const kind of REEL_ORDER) {
+      expect(screen.getByText(reels[kind].title)).toBeOnTheScreen();
+      expect(screen.getByText(reels[kind].body)).toBeOnTheScreen();
+    }
+    const bonuses = bonusGuide(getT());
+    for (const kind of BONUS_ORDER) {
+      expect(screen.getByText(bonuses[kind].body)).toBeOnTheScreen();
+    }
+    expect(
+      screen.getByText(
+        `You level up every ${RULES.levelEvery} posts. Each level makes your point multiplier bigger.`,
+      ),
+    ).toBeOnTheScreen();
+    expect(
+      screen.getByText(
+        'Starts at x1.00; every right move adds +0.05, up to x1.50. Make a mistake and the part of your combo above x1.00 is cut in half.',
+      ),
+    ).toBeOnTheScreen();
+    expect(screen.getByText(/every midnight, Istanbul time\.$/)).toBeOnTheScreen();
+    expect(screen.getByText(/one like guest48128742\./)).toBeOnTheScreen();
+  });
+
+  it('answers in English without naming a side, a reel or a cheat', async () => {
+    useLanguage.setState({ locale: 'en' });
+    await renderWithProviders(<HelpScreen {...props} />);
+
+    const questions = screen.getAllByRole('button', { name: /\?$/ });
+    expect(questions).toHaveLength(8);
+    for (const question of questions) {
+      await fireEvent.press(question);
+    }
+
+    expect(
+      screen.getByText(/^Tap the settings button on your profile and turn it off there\./),
+    ).toBeOnTheScreen();
+    expect(screen.getByText(/meanwhile it says “Verifying…”/)).toBeOnTheScreen();
+    expect(
+      screen.queryByText(/(top|bottom|upper|lower)[ -](left|right)|(on|to) the (left|right)/i),
+    ).not.toBeOnTheScreen();
+    expect(screen.queryByText(/\breel/i)).not.toBeOnTheScreen();
+    expect(screen.queryByText(/suspicious|cheat/i)).not.toBeOnTheScreen();
+  });
+
+  it('speaks Arabic: questions asked the Arabic way, Latin numbers kept whole', async () => {
+    useLanguage.setState({ locale: 'ar' });
+    await renderWithProviders(<HelpScreen {...props} />);
+
+    expect(screen.getByText('المساعدة')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'رجوع' })).toBeOnTheScreen();
+    expect(screen.getByText('خلاصة اليوم')).toBeOnTheScreen();
+    expect(
+      screen.getByText(
+        `تنتقل إلى المستوى التالي كل ${RULES.levelEvery} منشورًا. ومع كل مستوى يكبر مضاعِف نقاطك.`,
+      ),
+    ).toBeOnTheScreen();
+    expect(
+      screen.getByText(
+        `يبدأ الكومبو من ${iso('x1.00')}، وكل حركة صحيحة تضيف ${iso('+0.05')}، حتى ${iso('x1.50')} كحد أقصى. وإن أخطأت انخفض ما يزيد به الكومبو على ${iso('x1.00')} إلى النصف.`,
+      ),
+    ).toBeOnTheScreen();
+
+    expect(screen.getAllByRole('button', { name: /؟$/ })).toHaveLength(8);
+    await fireEvent.press(screen.getByRole('button', { name: 'كيف أوقف الاهتزاز؟' }));
+    expect(screen.getByText(/^اضغط زر الإعدادات في ملفك/)).toBeOnTheScreen();
   });
 });

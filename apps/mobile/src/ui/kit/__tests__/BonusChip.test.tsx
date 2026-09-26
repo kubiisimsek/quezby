@@ -1,7 +1,13 @@
 import type { BonusKind } from '@quezby/types';
 import { render, screen } from '@testing-library/react-native';
 
-import { BONUS_LABELS, BonusChip } from '@/ui/kit';
+import { useLanguage } from '@/i18n/language';
+import { messagesOf } from '@/i18n';
+import { BonusChip } from '@/ui/kit';
+
+const BONUS_LABELS = Object.fromEntries(
+  Object.entries(messagesOf('tr').bonus).map(([kind, words]) => [kind, words.name]),
+);
 
 describe('BonusChip', () => {
   it.each<[BonusKind, string]>([
@@ -46,5 +52,28 @@ describe('BonusChip', () => {
 
     expect(screen.getByLabelText('Soğukkanlı')).toBeOnTheScreen();
     expect(screen.queryByText(/×|\+/)).not.toBeOnTheScreen();
+  });
+
+  it('speaks English: once, or how many times', async () => {
+    useLanguage.setState({ locale: 'en' });
+    await render(<BonusChip kind="lightning" count={3} points={4_500} />);
+
+    expect(screen.getByText('Lightning')).toBeOnTheScreen();
+    expect(screen.getByText('+4,500')).toBeOnTheScreen();
+    expect(screen.getByLabelText('Lightning, 3 times, 4,500 points')).toBeOnTheScreen();
+
+    await screen.rerender(<BonusChip kind="comeback" count={1} points={1} />);
+    expect(screen.getByLabelText('Comeback, once, 1 point')).toBeOnTheScreen();
+  });
+
+  it('speaks Arabic, each count in its own form', async () => {
+    useLanguage.setState({ locale: 'ar' });
+    await render(<BonusChip kind="lightning" count={3} points={4_500} />);
+
+    expect(screen.getByText('برق')).toBeOnTheScreen();
+    expect(screen.getByLabelText('برق، 3 مرات، 4,500 نقطة')).toBeOnTheScreen();
+
+    await screen.rerender(<BonusChip kind="coolHead" count={2} />);
+    expect(screen.getByLabelText('أعصاب باردة، مرتان')).toBeOnTheScreen();
   });
 });

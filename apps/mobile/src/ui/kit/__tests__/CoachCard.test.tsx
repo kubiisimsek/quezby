@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { useReducedMotion, withRepeat } from 'react-native-reanimated';
 
+import { useLanguage } from '@/i18n/language';
 import { CoachCard, type CoachGesture } from '@/ui/kit';
 
 jest.mock('react-native-reanimated', () => {
@@ -69,5 +70,21 @@ describe('CoachCard', () => {
 
     expect(withRepeat).not.toHaveBeenCalled();
     expect(screen.getByText('Altın post')).toBeOnTheScreen();
+  });
+
+  it('speaks English', async () => {
+    useLanguage.setState({ locale: 'en' });
+    await render(card());
+
+    expect(screen.getByText('NEW POST · 3/4')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Got it' })).toBeOnTheScreen();
+  });
+
+  it('speaks Arabic, keeping the count whole', async () => {
+    useLanguage.setState({ locale: 'ar' });
+    await render(card());
+
+    expect(screen.getByText('منشور جديد · \u200E3/4\u200E')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'فهمت' })).toBeOnTheScreen();
   });
 });

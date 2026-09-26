@@ -14,6 +14,10 @@
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		90F895FD825D65128B3291D3 /* Rubik-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = EEBB71C9E248F117AAFDC07F /* Rubik-Black.ttf */; };
+		0CC2164C2DD529D406381931 /* Cairo-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 75B29BB38A6008294B27057C /* Cairo-SemiBold.ttf */; };
+		BCA771E7CB029749C97B257C /* Cairo-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A197133355D8D2DB0A521EA5 /* Cairo-Bold.ttf */; };
+		7DC8696D15D664D00B820A34 /* Cairo-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 032B8E3C8CD49DBD292206CB /* Cairo-ExtraBold.ttf */; };
+		62C76BA68E185CA1C91B8648 /* Cairo-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 84530F2E6F210FEC23C8EBDF /* Cairo-Black.ttf */; };
 		994ABBCA01C71933B2CC91DD /* Nunito-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8A6D9971EA3C4268DE1FBD2A /* Nunito-Bold.ttf */; };
 		A9603E37E51DE20B3985631A /* Nunito-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0527CF8F59F65E99F9961F32 /* Nunito-ExtraBold.ttf */; };
 		A96A6B82A150A86319EF7397 /* Rubik-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0DCCF862C55D8A7316D89355 /* Rubik-ExtraBold.ttf */; };
@@ -39,6 +43,10 @@
 		A4040B0656FCD6335C62D399 /* Nunito-Black.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "Nunito-Black.ttf"; path = "../assets/fonts/Nunito-Black.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		EEBB71C9E248F117AAFDC07F /* Rubik-Black.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "Rubik-Black.ttf"; path = "../assets/fonts/Rubik-Black.ttf"; sourceTree = "<group>"; };
+		75B29BB38A6008294B27057C /* Cairo-SemiBold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "Cairo-SemiBold.ttf"; path = "../assets/fonts/Cairo-SemiBold.ttf"; sourceTree = "<group>"; };
+		A197133355D8D2DB0A521EA5 /* Cairo-Bold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "Cairo-Bold.ttf"; path = "../assets/fonts/Cairo-Bold.ttf"; sourceTree = "<group>"; };
+		032B8E3C8CD49DBD292206CB /* Cairo-ExtraBold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "Cairo-ExtraBold.ttf"; path = "../assets/fonts/Cairo-ExtraBold.ttf"; sourceTree = "<group>"; };
+		84530F2E6F210FEC23C8EBDF /* Cairo-Black.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "Cairo-Black.ttf"; path = "../assets/fonts/Cairo-Black.ttf"; sourceTree = "<group>"; };
 		EF313606C6A0AC4C1799DD96 /* QuezbyIntegrity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = QuezbyIntegrity.m; path = Quezby/QuezbyIntegrity.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -116,6 +124,10 @@
 				8A6D9971EA3C4268DE1FBD2A /* Nunito-Bold.ttf */,
 				0527CF8F59F65E99F9961F32 /* Nunito-ExtraBold.ttf */,
 				A4040B0656FCD6335C62D399 /* Nunito-Black.ttf */,
+				75B29BB38A6008294B27057C /* Cairo-SemiBold.ttf */,
+				A197133355D8D2DB0A521EA5 /* Cairo-Bold.ttf */,
+				032B8E3C8CD49DBD292206CB /* Cairo-ExtraBold.ttf */,
+				84530F2E6F210FEC23C8EBDF /* Cairo-Black.ttf */,
 			);
 			name = Fonts;
 			sourceTree = "<group>";
@@ -182,6 +194,11 @@
 			knownRegions = (
 				en,
 				Base,
+				tr,
+				de,
+				ar,
+				fr,
+				es,
 			);
 			mainGroup = 83CBB9F61A601CBA00E9B192;
 			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
@@ -206,6 +223,10 @@
 				994ABBCA01C71933B2CC91DD /* Nunito-Bold.ttf in Resources */,
 				A9603E37E51DE20B3985631A /* Nunito-ExtraBold.ttf in Resources */,
 				25046AE84FBB971E974878EE /* Nunito-Black.ttf in Resources */,
+				0CC2164C2DD529D406381931 /* Cairo-SemiBold.ttf in Resources */,
+				BCA771E7CB029749C97B257C /* Cairo-Bold.ttf in Resources */,
+				7DC8696D15D664D00B820A34 /* Cairo-ExtraBold.ttf in Resources */,
+				62C76BA68E185CA1C91B8648 /* Cairo-Black.ttf in Resources */,
 				D406DD5B56461C91FECC77A1 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -25,6 +25,18 @@ use Laravel\Sanctum\Sanctum;
 abstract class TestCase extends BaseTestCase
 {
     /**
+     * Every request speaks Turkish unless a test says otherwise: Symfony's
+     * `Request::create()` sends `Accept-Language: en-us,en;q=0.5` by
+     * itself, which would answer every player route in English.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->withHeader('Accept-Language', 'tr');
+    }
+
+    /**
      * A player with a username, signed in by token.
      */
     protected function signIn(?User $user = null): User

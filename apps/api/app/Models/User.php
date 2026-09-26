@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Locale;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -21,6 +22,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property string|null $password
  * @property string|null $install_id
  * @property string|null $platform
+ * @property Locale $locale The language the player plays in: the request's at sign-up, then the phone's (`PUT /me/locale`).
  * @property array<string, mixed> $settings
  * @property Carbon|null $banned_at
  * @property string|null $ban_reason
@@ -28,7 +30,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
-#[Fillable(['username', 'email', 'password', 'install_id', 'platform', 'settings'])]
+#[Fillable(['username', 'email', 'password', 'install_id', 'platform', 'locale', 'settings'])]
 #[Hidden(['password'])]
 class User extends Authenticatable
 {
@@ -37,8 +39,14 @@ class User extends Authenticatable
 
     public const DEFAULT_SETTINGS = ['haptics' => true];
 
-    /** @var array<string, mixed> */
+    /**
+     * Eloquent does not read the columns' defaults back after an insert, so a
+     * new account must carry its own — or `Me` would say `locale: null`.
+     *
+     * @var array<string, mixed>
+     */
     protected $attributes = [
+        'locale' => 'tr',
         'settings' => '{"haptics":true}',
     ];
 
@@ -51,6 +59,7 @@ class User extends Authenticatable
     {
         return [
             'password' => 'hashed',
+            'locale' => Locale::class,
             'settings' => 'array',
             'banned_at' => 'datetime',
             'analytics_at' => 'datetime',

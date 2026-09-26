@@ -31,8 +31,8 @@ import {
   layoutBoard,
 } from '@/components/SummitBoard';
 import { useDaily, useLeaderboard } from '@/hooks/useBoards';
+import { useT } from '@/i18n';
 import { messageFor } from '@/lib/errors';
-import { formatRank, formatScore } from '@/lib/format';
 import type { RootStackParamList } from '@/navigation/types';
 import {
   Button,
@@ -53,6 +53,7 @@ import {
   SPACE,
   TYPE,
   embossed,
+  lh,
   useTheme,
   withAlpha,
 } from '@/ui/theme';
@@ -74,6 +75,7 @@ type Body = 'loading' | 'error' | 'alone' | 'empty' | 'board';
  */
 export function DailyScreen({ navigation }: Props) {
   const theme = useTheme();
+  const t = useT();
   const insets = useSafeAreaInsets();
   const [scope, setScope] = useState<LeaderboardScope>('everyone');
   const [selected, setSelected] = useState<string | null>(null);
@@ -135,11 +137,11 @@ export function DailyScreen({ navigation }: Props) {
   } else if (daily.isError) {
     top = (
       <View style={styles.stageBlock}>
-        <Callout tone="bad" title="Günün akışı yüklenemedi">
-          {messageFor(daily.error)}
+        <Callout tone="bad" title={t.daily.loadFailed}>
+          {messageFor(daily.error, t)}
         </Callout>
         <Button
-          label="Tekrar dene"
+          label={t.nav.retry}
           tone="onBrandSoft"
           icon="refresh"
           onPress={() => void refetchDaily()}
@@ -161,7 +163,7 @@ export function DailyScreen({ navigation }: Props) {
   const header = (
     <View>
       <BoardStage>
-        <TopBar title="Günün akışı" onBack={back} />
+        <TopBar title={t.daily.name} onBack={back} />
         {top}
       </BoardStage>
       <View style={styles.section}>
@@ -172,7 +174,7 @@ export function DailyScreen({ navigation }: Props) {
         >
           <View style={styles.summit}>
             <View style={styles.summitHead}>
-              <Ribbon label="GÜNÜN ZİRVESİ" />
+              <Ribbon label={t.daily.summit.ribbon} />
               {data ? <PlayersPill count={data.players} /> : null}
             </View>
             <ScopeSwitch value={scope} onChange={setScope} />
@@ -203,11 +205,11 @@ export function DailyScreen({ navigation }: Props) {
     case 'error':
       empty = (
         <View style={styles.pad}>
-          <Callout tone="bad" title="Sıralama yüklenemedi">
-            {messageFor(board.error)}
+          <Callout tone="bad" title={t.daily.summit.loadFailed}>
+            {messageFor(board.error, t)}
           </Callout>
           <Button
-            label="Tekrar dene"
+            label={t.nav.retry}
             tone="neutral"
             icon="refresh"
             onPress={() => void refetchBoard()}
@@ -227,8 +229,8 @@ export function DailyScreen({ navigation }: Props) {
       empty = (
         <EmptyState
           icon="mountain"
-          title="Günün zirvesi boş"
-          hint="İlk skorlar geldikçe zirve burada şekillenir."
+          title={t.daily.summit.emptyTitle}
+          hint={t.daily.summit.emptyHint}
         />
       );
       break;
@@ -283,20 +285,23 @@ function DayStage({
   onElapsed: () => void;
 }) {
   const theme = useTheme();
+  const t = useT();
   const intro = useArrival(0, 12);
 
   return (
     <Animated.View style={[styles.stageBlock, intro]}>
       <View style={styles.dayHead}>
         <View>
-          <Text style={[TYPE.label, { color: withAlpha(theme.onBrand, 0.8) }]}>AKIŞ</Text>
-          <Txt variant="display">{`#${formatScore(today.number)}`}</Txt>
+          <Text style={[TYPE.label, { color: withAlpha(theme.onBrand, 0.8) }]}>
+            {t.daily.stage.label}
+          </Text>
+          <Txt variant="display">{t.daily.stage.day(t.fmt.score(today.number))}</Txt>
         </View>
         <View>
           <CountdownChip
             endsAt={today.endsAt}
             serverTime={today.serverTime}
-            prefix="Yeni akışa"
+            prefix={t.daily.nextIn}
             tone="onBrand"
             onElapsed={onElapsed}
           />
@@ -323,15 +328,16 @@ function Attempt({
   onPlay: () => void;
   onShare: (message: string) => void;
 }) {
+  const t = useT();
   if (!attempt) {
     return (
       <View style={styles.attempt}>
-        <Txt variant="title">Bugünün akışı seni bekliyor</Txt>
+        <Txt variant="title">{t.daily.stage.waiting}</Txt>
         <Txt variant="body" tone="onSolid">
-          Herkes aynı akışı oynar · tek hak
+          {t.daily.rule}
         </Txt>
         <Button
-          label="Oyna"
+          label={t.nav.tabs.play}
           icon="play"
           tone="onBrand"
           size="xl"
@@ -357,32 +363,28 @@ function Attempt({
     case 'unfinished':
       return (
         <View style={styles.attempt}>
-          <Txt variant="title">Turun yarıda kaldı</Txt>
+          <Txt variant="title">{t.daily.attempt.unfinished.title}</Txt>
           <Txt variant="body" tone="onSolid">
-            Bugünkü hakkını başlattın ama tur bitmedi. Sonuç sunucuya ulaşırsa
-            burada görünür.
+            {t.daily.attempt.unfinished.body}
           </Txt>
         </View>
       );
     case 'review':
       return (
-        <Callout tone="info" title="Skorun inceleniyor">
-          Bu skor sıralamaya girmeden önce bir göz atıyoruz. Onaylanınca burada
-          görünür.
+        <Callout tone="info" title={t.daily.attempt.review.title}>
+          {t.daily.attempt.review.body}
         </Callout>
       );
     case 'flagged':
       return (
-        <Callout tone="warn" title="Skorun sıralamaya girmedi">
-          Tur doğrulanamadı, bu yüzden bugünün sıralamasına yazılmadı. Yarın
-          yeni akış seni bekliyor.
+        <Callout tone="warn" title={t.daily.attempt.flagged.title}>
+          {t.daily.attempt.flagged.body}
         </Callout>
       );
     default:
       return (
-        <Callout tone="warn" title="Tur sayılmadı">
-          Tur yarıda kaldı ya da süresi doldu, bu yüzden sıralamaya girmedi.
-          Yarın yeni akış seni bekliyor.
+        <Callout tone="warn" title={t.daily.attempt.void.title}>
+          {t.daily.attempt.void.body}
         </Callout>
       );
   }
@@ -408,6 +410,7 @@ function Ranked({
   onShare: (message: string) => void;
 }) {
   const theme = useTheme();
+  const t = useT();
 
   return (
     <View style={styles.attempt}>
@@ -423,28 +426,28 @@ function Ranked({
         <View style={styles.resultRow}>
           <View style={styles.resultScore}>
             <Text
-              accessibilityLabel="Skorun"
+              accessibilityLabel={t.daily.ranked.scoreA11y}
               style={[TYPE.label, { color: theme.inkMuted }]}
             >
-              SKORUN
+              {t.daily.ranked.score}
             </Text>
             <Stamp from={1.7} delay={180} style={styles.stamp}>
               <Txt variant="score">
-                {score === null ? '—' : formatScore(score)}
+                {score === null ? '—' : t.fmt.score(score)}
               </Txt>
             </Stamp>
           </View>
           <View style={styles.resultRank}>
             <Text
-              accessibilityLabel="Sıran"
+              accessibilityLabel={t.daily.ranked.rankA11y}
               style={[TYPE.label, { color: theme.inkMuted }]}
             >
-              SIRAN
+              {t.daily.ranked.rank}
             </Text>
             <Text style={[styles.rank, { color: theme.gold }, embossed(2)]}>
-              {formatRank(rank)}
+              {t.fmt.rank(rank)}
               <Text style={{ color: theme.inkMuted }}>
-                {` / ${formatScore(players)}`}
+                {` / ${t.fmt.score(players)}`}
               </Text>
             </Text>
           </View>
@@ -462,7 +465,7 @@ function Ranked({
       </View>
       {shareText ? (
         <Button
-          label="Paylaş"
+          label={t.daily.share}
           icon="share"
           tone="onBrandSoft"
           size="lg"
@@ -510,7 +513,7 @@ const styles = StyleSheet.create({
   resultScore: { gap: SPACE.xxs },
   stamp: { alignSelf: 'flex-start' },
   resultRank: { alignItems: 'flex-end', gap: SPACE.xxs },
-  rank: { fontFamily: FONT.display, fontSize: 22, lineHeight: 28 },
+  rank: { fontFamily: FONT.display, fontSize: 22, lineHeight: lh(28) },
   grid: {
     alignItems: 'center',
     borderTopWidth: 2,

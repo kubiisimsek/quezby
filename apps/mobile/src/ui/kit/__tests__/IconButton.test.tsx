@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, within } from '@testing-library/react-native';
 
+import { useLanguage } from '@/i18n/language';
 import { IconButton } from '@/ui/kit';
 import { arena } from '@/ui/tokens';
 
@@ -80,5 +81,26 @@ describe('IconButton', () => {
     expect(within(onArena).getByTestId('slab-face')).toHaveStyle({
       backgroundColor: arena.tile,
     });
+  });
+
+  it('says its count the way the language counts', async () => {
+    useLanguage.setState({ locale: 'fr' });
+    await render(
+      <IconButton icon="users" label="Amis" badge={1} onPress={jest.fn()} />,
+    );
+    expect(screen.getByRole('button', { name: 'Amis, 1 nouveau' })).toBeOnTheScreen();
+
+    await screen.rerender(
+      <IconButton icon="users" label="Amis" badge={3} onPress={jest.fn()} />,
+    );
+    expect(screen.getByRole('button', { name: 'Amis, 3 nouveaux' })).toBeOnTheScreen();
+  });
+
+  it('says its count in Arabic without bending a word around the number', async () => {
+    useLanguage.setState({ locale: 'ar' });
+    await render(
+      <IconButton icon="users" label="الأصدقاء" badge={3} onPress={jest.fn()} />,
+    );
+    expect(screen.getByRole('button', { name: 'الأصدقاء، الجديد: 3' })).toBeOnTheScreen();
   });
 });

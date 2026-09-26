@@ -14,9 +14,10 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { lookOf } from '@/game/content';
-import { REEL_GUIDE } from '@/game/howTo';
+import { reelGuide } from '@/game/howTo';
+import { useT } from '@/i18n';
 import { Icon, type IconName } from '@/ui/icons';
-import { FONT, RADIUS, SPACE, TYPE } from '@/ui/theme';
+import { FONT, RADIUS, SPACE, TYPE, lh } from '@/ui/theme';
 import { reel as REEL } from '@/ui/tokens';
 
 export type ReelValues = {
@@ -53,9 +54,10 @@ export function ReelCard({
   /** Waiting under a coach card: not live yet, so it holds still. */
   paused?: boolean;
 }) {
+  const t = useT();
   const insets = useSafeAreaInsets();
-  const look = useMemo(() => lookOf(seed, reel), [seed, reel]);
-  const copy = REEL_GUIDE[reel.kind];
+  const look = useMemo(() => lookOf(seed, reel, t.locale), [seed, reel, t.locale]);
+  const copy = reelGuide(t)[reel.kind];
   const pulse = useSharedValue(0);
 
   // The reel is "playing": the one loop that means live.
@@ -144,7 +146,7 @@ export function ReelCard({
       <View style={[styles.side, { bottom: insets.bottom + 110 }]}>
         <SideAction icon="heart" label={look.likes} />
         <SideAction icon="edit" label={look.comments} />
-        <SideAction icon="share" label="Paylaş" />
+        <SideAction icon="share" label={t.game.post.share} />
       </View>
 
       {reel.kind !== 'freeze' ? (
@@ -180,6 +182,7 @@ function SideAction({ icon, label }: { icon: IconName; label: string }) {
 
 /** The gold reel's bar: it fills while pressed; let go inside the green. */
 function HoldMeter({ reel, values }: { reel: Reel; values: ReelValues }) {
+  const t = useT();
   const zoneLeft = (reel.zoneCenter - reel.zoneHalf) / 10;
   const zoneWidth = (reel.zoneHalf * 2) / 10;
 
@@ -196,7 +199,7 @@ function HoldMeter({ reel, values }: { reel: Reel; values: ReelValues }) {
         <View style={[styles.holdZone, { left: `${zoneLeft}%`, width: `${zoneWidth}%` }]} />
         <Animated.View style={[styles.holdFill, fillStyle]} />
       </Animated.View>
-      <Text style={styles.holdLabel}>Basılı tut · yeşilde bırak</Text>
+      <Text style={styles.holdLabel}>{t.game.post.holdMeter}</Text>
     </View>
   );
 }
@@ -251,7 +254,7 @@ const styles = StyleSheet.create({
   discFreeze: { backgroundColor: REEL.shade, borderColor: REEL.freezeAlarm, borderWidth: 4 },
   emoji: { fontSize: 104, lineHeight: 124 },
   headlineBlock: { alignItems: 'center', gap: SPACE.xs },
-  headline: { ...TYPE.display, color: REEL.ink, fontSize: 30, lineHeight: 36, textAlign: 'center' },
+  headline: { ...TYPE.display, color: REEL.ink, fontSize: 30, lineHeight: lh(36), textAlign: 'center' },
   subline: { ...TYPE.heading, color: REEL.inkSoft },
   hint: {
     backgroundColor: REEL.shade,

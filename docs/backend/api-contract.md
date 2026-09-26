@@ -19,6 +19,17 @@ A contract change is one commit: `packages/types` → Laravel request/resource �
   milliseconds. Boards that count down also send `serverTime`: the app counts
   from the server's clock, never the phone's.
 - Auth is a Sanctum personal access token: `Authorization: Bearer <token>`.
+- **Language.** The API speaks the game's six languages — `tr`, `en`, `de`,
+  `ar`, `fr`, `es` (`Locale` in `packages/types`) — and the app names the one
+  it speaks in `Accept-Language` on every call. A player route answers in the
+  first of the six the header names, by the primary subtag in the header's
+  order of preference (`de-AT` → `de`, `ja, fr;q=0.8` → `fr`); when it names
+  none of them (or is empty), in the signed-in player's own language
+  (`Me.locale`); else in Turkish. Every error `message` (401s and 429s
+  included), every validation line in `fields`, and the share texts follow it.
+  The admin panel (`/admin/*`) and the ops routes always answer in Turkish,
+  whatever the browser sends — and so does whatever is answered before a route
+  is found (an unknown path, a wrong method, maintenance).
 - The app sends `X-App-Version: 1.0.0` on every call; the API stores it on runs.
 - The app also names the phone on every call, once it knows its install id:
   `X-Device: install=…; platform=ios; os=18.2; model=iPhone%2015; build=42`
@@ -34,8 +45,10 @@ A contract change is one commit: `packages/types` → Laravel request/resource �
   { "error": { "code": "username_taken", "message": "…", "fields": { "username": ["…"] } } }
   ```
 
-  `code` is one of `ApiErrorCode` in `packages/types`. `message` is Turkish and
-  safe to show; the app prefers its own copy per `code` where it has one.
+  `code` is one of `ApiErrorCode` in `packages/types`. `message` is in the
+  request's language (see *Language*) and safe to show; the app prefers its own
+  line per `code` and shows the server's only for `validation_failed`. A
+  username problem keeps its code in `fields` in every language.
 
 | Status | When |
 | ------ | ---- |
@@ -76,7 +89,8 @@ does not parse is `ok` — the network must never lock a player out.
 `{ "platform": "ios", "installId": "…" }` → `201 { "token", "user": Me }`. A
 new account with no email, password or identity, named `guest` + 8 digits
 (`guest48128742`) until its player picks a name — once: a picked name never
-changes (`PUT /me/username`) — so it can start a run at once. The digits are drawn at random; a taken name is drawn again, and a race
+changes (`PUT /me/username`) — so it can start a run at once. The account plays
+in the request's language (`Me.locale`). The digits are drawn at random; a taken name is drawn again, and a race
 on the unique index draws once more. Names like it are reserved: no player can
 pick one (`PUT /me/username` → `422 username_invalid`, `reserved`).
 
@@ -93,8 +107,9 @@ with Apple hashes it into the identity token; the API consumes it once.
 
 `{ "identityToken", "nonce", "authorizationCode"?, "platform", "installId" }` →
 `201 { "token", "user", "created": true }` for a new player — named
-`guest48128742` like a guest, and the app starts its first steps — `200 …
-"created": false` for a returning one. The token must be signed by Apple (JWKS, cached), issued
+`guest48128742` like a guest, playing in the request's language, and the app
+starts its first steps — `200 … "created": false` for a returning one, who
+keeps their own language whatever the phone speaks (so does an email login). The token must be signed by Apple (JWKS, cached), issued
 by `https://appleid.apple.com`, for one of `APPLE_BUNDLE_IDS`, unexpired, and
 carry the SHA-256 of a nonce the API issued and has not seen used. Anything
 else → `422 identity_invalid`. With `APPLE_TEAM_ID`/`APPLE_KEY_ID`/
@@ -119,9 +134,12 @@ Revokes the current token. `204`.
 { "user": Me, "ranks": { "daily": 12, "weekly": 40, "monthly": 88, "all": 311 } }
 ```
 
-`Me` = `{ id, username, email, isGuest, identities: ("apple"|"google")[], settings: { haptics, analytics }, best: { score, reels, achievedAt } | null, createdAt }`.
+`Me` = `{ id, username, email, isGuest, identities: ("apple"|"google")[], settings: { haptics, analytics }, locale, best: { score, reels, achievedAt } | null, createdAt }`.
 `settings.analytics` is the player's consent to usage analytics — false until
 they say yes.
+`locale` is the language the player plays in: the request's when the account
+was made, then whatever the phone last set (`PUT /me/locale`); accounts from
+before languages are `tr`. A phone signing in to the account takes it.
 `username` is set from the moment the account exists — the automatic
 `guest48128742` until the player picks one; it is null only on accounts made
 before automatic names.
@@ -164,6 +182,13 @@ the one the request saw (compare-and-set), so of two quick picks one lands and
 the other gets `username_locked`; the unique index decides a race between two
 players (`username_taken`). A moderator's reset (`POST /admin/players/{id}/rename`)
 gives back an automatic name and with it one more pick.
+
+### `PUT /me/locale`
+
+`{ "locale": "de" }` → `{ "user": Me }` — the same shape as `PUT /me/username`.
+One of the six (`UpdateLocaleRequest`), else `422 validation_failed` on
+`locale`. The app sends it when the player picks a language (**Dil**). The API
+answers in it whenever a request names none of the six.
 
 ### `POST /me/credentials`
 
@@ -392,6 +417,15 @@ hits, misses, perfects, maxStreak, level, accuracy, avgReactionMs, activeMs,
 endedBy, maxCombo, breakdown: { reelPoints, bonusPoints, bonuses: { flawless|lightning|coolHead|comeback: { count, points } } },
 stats: { swipes, likes, holds, perfects, freezes, misses: { timeout, wrong, holdEarly, holdLate, caught }, avgReactionMs, bestReactionMs, levelMisses[] },
 flagReason: "device" | null }`.
+`shareText` is what "Paylaş" sends, built from the server's own numbers in the
+request's language (`lang/{locale}/share.php`): `Quezby'de 240.310 puan
+yaptım! 405 post · bugün #12. Sen kaç yaparsın?`, `I scored 240,310 points on
+Quezby! 405 posts · today #12. How many can you score?` — without "today #…"
+when the run has no rank today. For a daily run it is `daily.shareText`. Every
+number is grouped the language's way (`Locale::group`, the app's
+`groupDigits`); counts take the language's forms (six in Arabic). Every line of
+an Arabic share text starts with U+200F (RIGHT-TO-LEFT MARK), so a messaging
+app lays it out right to left.
 `flagReason` is `device` when a `flagged` run carries `device_integrity` — the
 phone failed its integrity check, so its runs never rank, and the app says so
 ("Bu cihazda skorlar sıralamaya girmiyor"). It is null for every other flag:
@@ -439,6 +473,10 @@ rival's, per-mille. `friends` = the players you follow, and you. `limit` 1–100
 
 `attempt` is null before today's run starts; `unfinished` while it is open;
 `void` when it was abandoned, expired or rejected; otherwise the run's status.
+`shareText` is built for every request, never stored, so it is in the
+request's language: `Quezby · Günün akışı #3`, the grid and `52.340 puan ·
+#37/1.204` on three lines (`Daily Feed`, `Tages-Feed`, `خلاصة اليوم`, `Fil du
+jour`, `Feed del día` in the other five; each Arabic line opens with U+200F).
 
 ### `GET /leagues/current`
 

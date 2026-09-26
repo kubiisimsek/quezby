@@ -23,6 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     reactNativeFactory = factory
 
     window = UIWindow(frame: UIScreen.main.bounds)
+    window?.backgroundColor = ReactNativeDelegate.arena
 
     factory.startReactNative(
       withModuleName: "Quezby",
@@ -47,6 +48,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 
 class ReactNativeDelegate: RCTDefaultReactNativeFactoryDelegate {
+  /// The arena's canvas (`canvas` in design/palette.mjs, as LaunchScreen.storyboard paints it):
+  /// behind the first frame and behind a reload — choosing Arabic, or leaving it, flips the
+  /// reading direction and reloads the app, which must not flash white.
+  static let arena = UIColor(red: 0.1411764706, green: 0.0196078431, blue: 0.3294117647, alpha: 1)
+
+  override func customize(_ rootView: RCTRootView) {
+    super.customize(rootView)
+    rootView.backgroundColor = ReactNativeDelegate.arena
+  }
+
   override func sourceURL(for bridge: RCTBridge) -> URL? {
     self.bundleURL()
   }

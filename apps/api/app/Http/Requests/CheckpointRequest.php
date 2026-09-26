@@ -18,17 +18,6 @@ class CheckpointRequest extends FormRequest
         ];
     }
 
-    /**
-     * @return array<string, string>
-     */
-    public function attributes(): array
-    {
-        return [
-            'reel' => 'post sayısı',
-            'prefixHash' => 'hamle özeti',
-        ];
-    }
-
     /** Reels played so far: the length of the log the hash covers. */
     public function reel(): int
     {

@@ -12,7 +12,9 @@ use Throwable;
 
 /**
  * Renders every error as `{ "error": { code, message, fields? } }`, whatever
- * threw it — see `docs/backend/api-contract.md`.
+ * threw it — see `docs/backend/api-contract.md`. The message is in the
+ * request's language (`ResolveLocale`), Turkish where no player route was
+ * reached.
  */
 final class ErrorResponse
 {
@@ -71,7 +73,8 @@ final class ErrorResponse
             $status >= 500 => ErrorCode::ServerError,
             default => ErrorCode::ValidationFailed,
         };
-        $message = $status === 503 ? 'Bakım çalışması var, birazdan tekrar dene.' : null;
+        // `php artisan down` answers before any route, so in the default language.
+        $message = $status === 503 ? __('errors.maintenance') : null;
 
         return self::make($code, $message, status: $status, headers: $e->getHeaders());
     }

@@ -3,6 +3,7 @@ import { Text } from 'react-native';
 import Animated, { useReducedMotion } from 'react-native-reanimated';
 
 import { BoardStage, PlayersPill, useArrival } from '@/components/BoardStage';
+import { useLanguage } from '@/i18n/language';
 
 function Arriving() {
   const style = useArrival(2);
@@ -47,5 +48,19 @@ describe('BoardStage', () => {
     await render(<Arriving />);
 
     expect(screen.getByTestId('arriving')).toHaveStyle({ opacity: 1 });
+  });
+});
+
+describe('PlayersPill — in other languages', () => {
+  it.each([
+    ['en', 5_120, '5,120 players'],
+    ['en', 1, '1 player'],
+    ['ar', 5_120, '5,120 لاعبًا'],
+    ['ar', 2, 'لاعبان'],
+  ] as const)('counts the players in %s: %i', async (locale, count, text) => {
+    useLanguage.setState({ locale });
+    await render(<PlayersPill count={count} />);
+
+    expect(screen.getByText(text)).toBeOnTheScreen();
   });
 });

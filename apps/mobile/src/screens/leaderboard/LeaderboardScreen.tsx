@@ -29,8 +29,8 @@ import {
   layoutBoard,
 } from '@/components/SummitBoard';
 import { useLeaderboard } from '@/hooks/useBoards';
+import { useT } from '@/i18n';
 import { messageFor } from '@/lib/errors';
-import { formatScore } from '@/lib/format';
 import type { RootStackParamList, TabParamList } from '@/navigation/types';
 import {
   Button,
@@ -51,12 +51,8 @@ type Props = CompositeScreenProps<
   NativeStackScreenProps<RootStackParamList>
 >;
 
-const PERIODS: Array<{ value: LeaderboardPeriod; label: string }> = [
-  { value: 'daily', label: 'Bugün' },
-  { value: 'weekly', label: 'Hafta' },
-  { value: 'monthly', label: 'Ay' },
-  { value: 'all', label: 'Tüm zamanlar' },
-];
+/** The periods, in the switch's order; their words are `t.board.summit.periods`. */
+const PERIODS: LeaderboardPeriod[] = ['daily', 'weekly', 'monthly', 'all'];
 
 /** What sits under the period switch. */
 type Body = 'loading' | 'error' | 'alone' | 'empty' | 'board';
@@ -75,6 +71,7 @@ type Body = 'loading' | 'error' | 'alone' | 'empty' | 'board';
  */
 export function LeaderboardScreen({ navigation }: Props) {
   const theme = useTheme();
+  const t = useT();
   const [period, setPeriod] = useState<LeaderboardPeriod>('daily');
   const [scope, setScope] = useState<LeaderboardScope>('everyone');
   const [selected, setSelected] = useState<string | null>(null);
@@ -128,22 +125,22 @@ export function LeaderboardScreen({ navigation }: Props) {
         style={podiumShown ? null : styles.stageClosed}
       >
         <TopBar
-          title="Zirve"
-          subtitle={data ? `${formatScore(data.players)} oyuncu` : undefined}
+          title={t.board.summit.title}
+          subtitle={data ? t.board.players(data.players) : undefined}
           right={
             <View style={styles.headRight}>
               {data?.endsAt ? (
                 <CountdownChip
                   endsAt={data.endsAt}
                   serverTime={data.serverTime}
-                  prefix="Bitmesine"
+                  prefix={t.home.countdown.endsIn}
                   tone="onBrand"
                   onElapsed={() => void refetch()}
                 />
               ) : null}
               <IconButton
                 icon="search"
-                label="Oyuncu ara"
+                label={t.friends.find}
                 tone="onBrand"
                 onPress={search}
               />
@@ -166,7 +163,14 @@ export function LeaderboardScreen({ navigation }: Props) {
       </BoardStage>
 
       <View style={styles.periods}>
-        <Segmented value={period} onChange={setPeriod} options={PERIODS} />
+        <Segmented
+          value={period}
+          onChange={setPeriod}
+          options={PERIODS.map((value) => ({
+            value,
+            label: t.board.summit.periods[value],
+          }))}
+        />
       </View>
     </View>
   );
@@ -183,11 +187,11 @@ export function LeaderboardScreen({ navigation }: Props) {
     case 'error':
       empty = (
         <View style={styles.pad}>
-          <Callout tone="bad" title="Sıralama yüklenemedi">
-            {messageFor(board.error)}
+          <Callout tone="bad" title={t.board.summit.failed}>
+            {messageFor(board.error, t)}
           </Callout>
           <Button
-            label="Tekrar dene"
+            label={t.board.summit.retry}
             tone="neutral"
             icon="refresh"
             onPress={() => void refetch()}
@@ -202,10 +206,15 @@ export function LeaderboardScreen({ navigation }: Props) {
       empty = (
         <EmptyState
           icon="mountain"
-          title="Zirve boş"
-          hint="Bu dönemde henüz kimse oynamadı. İlk sen ol, adın en üstte dursun."
+          title={t.board.summit.emptyTitle}
+          hint={t.board.summit.emptyHint}
           action={
-            <Button label="Oyna" icon="play" tone="play" onPress={play} />
+            <Button
+              label={t.board.summit.play}
+              icon="play"
+              tone="play"
+              onPress={play}
+            />
           }
         />
       );

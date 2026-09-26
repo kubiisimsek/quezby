@@ -12,6 +12,7 @@ import Animated, {
   type SharedValue,
 } from 'react-native-reanimated';
 
+import { useT } from '@/i18n';
 import { Icon, type IconName } from '@/ui/icons';
 import { Button } from '@/ui/kit/buttons';
 import { IconChip } from '@/ui/kit/identity';
@@ -54,10 +55,11 @@ export function CoachCard({
   of: number;
   onDismiss: () => void;
 }) {
+  const t = useT();
   return (
     <Stamp from={1.12}>
       <Panel style={styles.card}>
-        <Ribbon label={`YENİ POST · ${step}/${of}`} />
+        <Ribbon label={t.game.coach.ribbon(step, of)} />
         <View style={styles.stage}>
           <IconChip icon={icon} tone={tone} size="lg" />
           <Demo gesture={gesture} />
@@ -70,7 +72,7 @@ export function CoachCard({
             {line}
           </Txt>
         </View>
-        <Button label="Anladım" icon="play" tone="play" onPress={onDismiss} />
+        <Button label={t.game.coach.start} icon="play" tone="play" onPress={onDismiss} />
       </Panel>
     </Stamp>
   );

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ErrorCode;
+use App\Enums\Locale;
 use App\Exceptions\ApiException;
 use App\Http\Requests\GuestSignUpRequest;
 use App\Http\Requests\LoginRequest;
@@ -20,8 +21,9 @@ class AuthController extends Controller
 {
     /**
      * A new account with no email or password — the token is its only key —
-     * playing as `guest48128742` until its player picks a name. Two sign-ups
-     * that drew the same name at once: the loser draws again.
+     * playing as `guest48128742` until its player picks a name, in the
+     * request's language. Two sign-ups that drew the same name at once: the
+     * loser draws again.
      */
     public function guest(GuestSignUpRequest $request, GuestNames $names): JsonResponse
     {
@@ -29,6 +31,7 @@ class AuthController extends Controller
             'username' => $names->mint(),
             'platform' => $request->validated('platform'),
             'install_id' => $request->validated('installId'),
+            'locale' => Locale::current(),
         ]);
 
         try {

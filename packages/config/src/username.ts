@@ -153,43 +153,48 @@ export function validateUsername(input: string): UsernameValidation {
   return { ok: true, normalized: value };
 }
 
+/** The rules a name is checked against while the player types, in the order the field lists them. */
+export type UsernameRule = 'length' | 'charset' | 'edges' | 'symbols' | 'letter';
+
 /**
  * The rules as a checklist the player can watch fill in while typing. It
- * guides; `validateUsername` decides.
+ * guides; `validateUsername` decides. The words are the app's
+ * (`username.rules` in its catalogs), in the player's language.
  */
-export function usernameChecklist(input: string): Array<{ rule: string; met: boolean }> {
+export function usernameChecklist(input: string): Array<{ rule: UsernameRule; met: boolean }> {
   const value = input.trim().toLowerCase();
   const filled = value.length > 0;
   return [
     {
-      rule: `${USERNAME_MIN_LENGTH}–${USERNAME_MAX_LENGTH} karakter`,
+      rule: 'length',
       met: value.length >= USERNAME_MIN_LENGTH && value.length <= USERNAME_MAX_LENGTH,
     },
+    { rule: 'charset', met: filled && !TURKISH.test(input) && ALLOWED.test(value) },
     {
-      rule: 'Sadece harf, rakam, nokta (.) ve yıldız (*)',
-      met: filled && !TURKISH.test(input) && ALLOWED.test(value),
-    },
-    {
-      rule: 'Harf ya da rakamla başlar ve biter',
+      rule: 'edges',
       met: filled && !SYMBOL.test(value[0] ?? '') && !SYMBOL.test(value[value.length - 1] ?? ''),
     },
-    { rule: 'Nokta ve yıldız art arda gelmez', met: filled && !TOUCHING_SYMBOLS.test(value) },
-    { rule: 'En az bir harf', met: LETTER.test(value) },
+    { rule: 'symbols', met: filled && !TOUCHING_SYMBOLS.test(value) },
+    { rule: 'letter', met: LETTER.test(value) },
   ];
 }
 
-/** What the player reads under the field. One sentence, no blame. */
-export const USERNAME_MESSAGES: Record<UsernameProblem | 'taken', string> = {
-  required: 'Bir kullanıcı adı yaz.',
-  too_short: 'En az 3 karakter olmalı.',
-  too_long: 'En fazla 20 karakter olabilir.',
-  turkish_char: 'Türkçe karakter kullanılamaz — ş yerine s, ı yerine i gibi.',
-  invalid_char: 'Sadece harf, rakam, nokta (.) ve yıldız (*) kullanılabilir.',
-  bad_start: 'Harf ya da rakamla başlamalı.',
-  bad_end: 'Harf ya da rakamla bitmeli.',
-  consecutive_symbols: 'Nokta ve yıldız art arda gelemez.',
-  no_letter: 'En az bir harf içermeli.',
-  reserved: 'Bu kullanıcı adı ayrılmış, başka bir tane dene.',
-  blocked: 'Bu kullanıcı adı kullanılamaz.',
-  taken: 'Bu kullanıcı adı alınmış.',
-};
+/**
+ * Every reason a name can be refused, as the API also names it
+ * (`fields.username`, `/usernames/check`'s `reason`). What the player reads
+ * for each is in the app's catalogs (`username.problems`) and the API's
+ * `lang/{locale}/username.php`.
+ */
+export const USERNAME_PROBLEMS: readonly UsernameProblem[] = [
+  'required',
+  'too_short',
+  'too_long',
+  'turkish_char',
+  'invalid_char',
+  'bad_start',
+  'bad_end',
+  'consecutive_symbols',
+  'no_letter',
+  'reserved',
+  'blocked',
+];

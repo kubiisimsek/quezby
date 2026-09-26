@@ -1,5 +1,6 @@
 import type { TextStyle, ViewStyle } from 'react-native';
 
+import { IS_RTL } from '@/i18n/native';
 import { arena, type Palette } from '@/ui/tokens';
 
 /**
@@ -36,11 +37,12 @@ export function withAlpha(color: string, opacity: number): string {
 
 /**
  * Rubik Black for what a player reads at a glance — titles, numbers, buttons
- * — and Nunito for everything they read. Both carry every Turkish letter
- * (ğ ş ı İ ç ö ü); most display faces games use (Lilita One, Fredoka,
- * Luckiest Guy) do not, or draw a lower-case i without its dot.
+ * — and Nunito for everything they read. Both carry every letter Turkish,
+ * German, French and Spanish write (ğ ş ı İ ç ö ü ä ß é è ê à ñ á í ó ú œ);
+ * most display faces games use (Lilita One, Fredoka, Luckiest Guy) do not,
+ * or draw a lower-case i without its dot.
  */
-export const FONT = {
+export const LATIN_FONT = {
   /** Rubik Black: titles, scores, button labels. */
   display: 'Rubik-Black',
   /** Rubik ExtraBold: a smaller display line, a tab label. */
@@ -50,6 +52,43 @@ export const FONT = {
   semibold: 'Nunito-ExtraBold',
   bold: 'Nunito-Black',
 } as const;
+
+/**
+ * Neither face has a single Arabic letter: Arabic is set in Cairo, weight
+ * for weight — Black where Rubik Black stands, down to SemiBold for body text.
+ */
+export const ARABIC_FONT: Record<keyof typeof LATIN_FONT, string> = {
+  display: 'Cairo-Black',
+  displayBold: 'Cairo-ExtraBold',
+  regular: 'Cairo-SemiBold',
+  medium: 'Cairo-Bold',
+  semibold: 'Cairo-ExtraBold',
+  bold: 'Cairo-Black',
+};
+
+/**
+ * The faces the game speaks in. Arabic is the one language read right to
+ * left, and turning around reloads the app, so the direction the app started
+ * in tells which faces every style sheet is built with.
+ */
+export const FONT: Record<keyof typeof LATIN_FONT, string> = IS_RTL ? ARABIC_FONT : LATIN_FONT;
+
+/**
+ * A line height for the language on screen. Arabic's letters climb and hang
+ * further than Latin ones (Cairo's ascender and descender are half again
+ * Rubik's), so its lines get more room or the tops and tails are cut off.
+ */
+export function lh(height: number): number {
+  return IS_RTL ? Math.round(height * 1.3) : height;
+}
+
+/**
+ * Letter-spacing for the language on screen: none in Arabic, whose letters
+ * join one another — any spacing tears the words apart.
+ */
+export function tracking(spacing: number): number {
+  return IS_RTL ? 0 : spacing;
+}
 
 /** 4pt grid, with the half steps a dense layout needs. */
 export const SPACE = {
@@ -96,24 +135,25 @@ export type TypeRole =
 
 export const TYPE: Record<TypeRole, TextStyle> = {
   /** A first page's one big line. */
-  hero: { fontFamily: FONT.display, fontSize: 42, lineHeight: 48 },
-  display: { fontFamily: FONT.display, fontSize: 28, lineHeight: 33 },
-  title: { fontFamily: FONT.display, fontSize: 20, lineHeight: 25 },
-  heading: { fontFamily: FONT.semibold, fontSize: 16, lineHeight: 21 },
-  body: { fontFamily: FONT.medium, fontSize: 15, lineHeight: 20 },
-  meta: { fontFamily: FONT.medium, fontSize: 13, lineHeight: 17 },
-  micro: { fontFamily: FONT.semibold, fontSize: 11.5, lineHeight: 14 },
+  hero: { fontFamily: FONT.display, fontSize: 42, lineHeight: lh(48) },
+  display: { fontFamily: FONT.display, fontSize: 28, lineHeight: lh(33) },
+  title: { fontFamily: FONT.display, fontSize: 20, lineHeight: lh(25) },
+  heading: { fontFamily: FONT.semibold, fontSize: 16, lineHeight: lh(21) },
+  body: { fontFamily: FONT.medium, fontSize: 15, lineHeight: lh(20) },
+  meta: { fontFamily: FONT.medium, fontSize: 13, lineHeight: lh(17) },
+  micro: { fontFamily: FONT.semibold, fontSize: 11.5, lineHeight: lh(14) },
   /** A score is the one number a player opens the app to read. */
-  score: { fontFamily: FONT.display, fontSize: 40, lineHeight: 46 },
+  score: { fontFamily: FONT.display, fontSize: 40, lineHeight: lh(46) },
   /**
-   * A ribbon or a tile's name — "GÜNÜN AKIŞI", "LİG". Typed in capitals with
-   * the Turkish İ, never through `textTransform`, which knows no Turkish.
+   * A ribbon or a tile's name — "GÜNÜN AKIŞI", "LİG". Typed in capitals in
+   * each language's own line (the Turkish İ, German SS), never through
+   * `textTransform`, which knows no Turkish.
    */
   label: {
     fontFamily: FONT.displayBold,
     fontSize: 12.5,
-    letterSpacing: 1.1,
-    lineHeight: 16,
+    letterSpacing: tracking(1.1),
+    lineHeight: lh(16),
   },
 };
 

@@ -3,6 +3,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import { track } from '@/analytics/track';
 import { api } from '@/api/client';
 import { PlayerSheet } from '@/components/PlayerSheet';
+import { useLanguage } from '@/i18n/language';
 import { renderWithProviders } from '@/test/renderWithProviders';
 
 jest.mock('@/analytics/track', () => ({ track: jest.fn() }));
@@ -141,5 +142,28 @@ describe('PlayerSheet', () => {
 
     expect(mocked.users.get).not.toHaveBeenCalled();
     expect(track).not.toHaveBeenCalled();
+  });
+});
+
+describe('PlayerSheet — in English', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it('shows the card in English', async () => {
+    useLanguage.setState({ locale: 'en' });
+    mocked.users.get.mockResolvedValue(player({ followers: 1 }));
+
+    await renderWithProviders(
+      <PlayerSheet username="ekin" onClose={jest.fn()} />,
+    );
+
+    expect(await screen.findByText('41,200')).toBeTruthy();
+    expect(screen.getByText('Follows you')).toBeTruthy();
+    expect(screen.getByText('1 follower · 3 following')).toBeTruthy();
+    expect(screen.getByLabelText('Gold league')).toBeTruthy();
+    ['This week', 'All time', 'Runs', 'Posts', 'Likes', 'Perfect'].forEach(
+      (label) => expect(screen.getByText(label)).toBeTruthy(),
+    );
+    expect(screen.getByText('5,200')).toBeTruthy();
+    expect(screen.getByText('Follow')).toBeTruthy();
   });
 });

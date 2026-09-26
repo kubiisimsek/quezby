@@ -1,4 +1,4 @@
-import { RULES, type BonusHit, type Verdict } from '@quezby/engine';
+import { RULES, type BonusHit } from '@quezby/engine';
 import { useEffect, useRef } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated, {
@@ -13,26 +13,14 @@ import Animated, {
   type SharedValue,
 } from 'react-native-reanimated';
 
-import { BONUS_GUIDE } from '@/game/howTo';
+import { bonusGuide } from '@/game/howTo';
 import type { Feedback } from '@/game/useGame';
-import { formatCombo, formatScore } from '@/lib/format';
+import { ltr, useT } from '@/i18n';
 import { Icon } from '@/ui/icons';
 import { useShake } from '@/ui/kit';
 import { SPRING_POP } from '@/ui/motion';
-import { DEPTH, FONT, SPACE, embossed, withAlpha } from '@/ui/theme';
+import { DEPTH, FONT, SPACE, embossed, lh, withAlpha } from '@/ui/theme';
 import { reel as REEL } from '@/ui/tokens';
-
-/** Every miss says what happened, in the game's voice. */
-export const VERDICT_COPY: Record<Verdict, string> = {
-  hit: '',
-  perfect: 'Mükemmel!',
-  timeout: 'Takıldın!',
-  wrong: 'Yanlış hareket',
-  holdEarly: 'Erken bıraktın',
-  holdLate: 'Geç kaldın',
-  caught: 'Yakalandın!',
-  drained: 'Dopamin bitti',
-};
 
 /** A burst's whole life — in, held, gone — short enough to never cover the next reel. */
 const LIFE_MS = 680;
@@ -46,7 +34,8 @@ function fadeAfter(t: number, from: number): number {
 /**
  * What the thumb just did, told once over the reel: points rising in Rubik
  * on a hard shadow, a heart on a like, named combos stamped on gold ribbons,
- * and on a miss a red flash and a word slammed onto a red slab. Keyed by the
+ * and on a miss a red flash and a word slammed onto a red slab — every miss
+ * says what happened, in the game's voice (`t.game.verdicts`). Keyed by the
  * feedback id, so each one plays in full even when two arrive close together.
  * With reduced motion nothing flies, grows or shakes; it only comes and goes.
  */
@@ -56,6 +45,7 @@ export function FeedbackLayer({ feedback }: { feedback: Feedback | null }) {
 }
 
 function Burst({ feedback }: { feedback: Feedback }) {
+  const t = useT();
   const reduced = useReducedMotion();
   const hit = feedback.verdict === 'hit' || feedback.verdict === 'perfect';
   const life = useSharedValue(0);
@@ -104,7 +94,7 @@ function Burst({ feedback }: { feedback: Feedback }) {
     transform: [{ scale: 1.7 - 0.7 * pop.value }],
   }));
 
-  const label = VERDICT_COPY[feedback.verdict];
+  const label = t.game.verdicts[feedback.verdict];
 
   return (
     <View pointerEvents="none" style={StyleSheet.absoluteFill}>
@@ -127,10 +117,10 @@ function Burst({ feedback }: { feedback: Feedback }) {
           <>
             <Animated.View style={[styles.pointsBlock, pointsStyle]}>
               {label ? <Text style={styles.perfect}>{label}</Text> : null}
-              <Text style={styles.points}>+{formatScore(feedback.points)}</Text>
+              <Text style={styles.points}>{ltr(`+${t.fmt.score(feedback.points)}`)}</Text>
               {feedback.combo > RULES.comboStart ? (
                 <Text style={styles.combo}>
-                  {formatCombo(feedback.combo)} kombo
+                  {t.game.feedback.combo(t.fmt.combo(feedback.combo))}
                 </Text>
               ) : null}
             </Animated.View>
@@ -173,6 +163,7 @@ function ComboRibbon({
   life: SharedValue<number>;
   reduced: boolean;
 }) {
+  const t = useT();
   const land = useSharedValue(reduced ? 1 : 0);
 
   useEffect(() => {
@@ -192,7 +183,7 @@ function ComboRibbon({
     <Animated.View style={[styles.ribbon, style]}>
       <View style={styles.ribbonHi} />
       <Text style={styles.ribbonText}>
-        {`${BONUS_GUIDE[bonus.kind].toast} +${formatScore(bonus.points)}`}
+        {t.game.feedback.bonus(bonusGuide(t)[bonus.kind].toast, t.fmt.score(bonus.points))}
       </Text>
     </Animated.View>
   );
@@ -214,7 +205,7 @@ const styles = StyleSheet.create({
     color: REEL.hit,
     fontFamily: FONT.display,
     fontSize: 28,
-    lineHeight: 34,
+    lineHeight: lh(34),
     transform: [{ rotate: '-4deg' }],
     ...embossed(3),
   },
@@ -222,14 +213,14 @@ const styles = StyleSheet.create({
     color: REEL.ink,
     fontFamily: FONT.display,
     fontSize: 48,
-    lineHeight: 56,
+    lineHeight: lh(56),
     ...embossed(4),
   },
   combo: {
     color: REEL.gold,
     fontFamily: FONT.displayBold,
     fontSize: 18,
-    lineHeight: 22,
+    lineHeight: lh(22),
     ...embossed(2),
   },
   ribbons: { alignItems: 'center', gap: SPACE.sm },
@@ -255,7 +246,7 @@ const styles = StyleSheet.create({
     color: REEL.goldInk,
     fontFamily: FONT.display,
     fontSize: 20,
-    lineHeight: 25,
+    lineHeight: lh(25),
   },
   miss: {
     backgroundColor: REEL.miss,
@@ -279,7 +270,7 @@ const styles = StyleSheet.create({
     color: REEL.ink,
     fontFamily: FONT.display,
     fontSize: 34,
-    lineHeight: 41,
+    lineHeight: lh(41),
     ...embossed(3),
   },
 });

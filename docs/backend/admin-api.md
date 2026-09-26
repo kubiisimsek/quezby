@@ -85,7 +85,10 @@ exact player id or install id; `%` and `_` mean themselves), `status`
 (`active | banned | guest`), `platform` (`ios | android`), `sort`
 (`newest | oldest | best | lastPlayed`; players with no best or no run last).
 Rows are `AdminPlayerRow`; `counts` says how many each status chip holds under
-the search and platform: `{ all, active, banned, guest }`.
+the search and platform: `{ all, active, banned, guest }`. A row's `locale` is
+the language the player plays in (`tr | en | de | ar | fr | es`, `Me.locale`);
+the panel names it in Turkish ("Almanca"). The panel itself is answered in
+Turkish whatever the browser's `Accept-Language` says.
 
 ### `GET /players/{id}` — viewer
 

@@ -5,6 +5,8 @@ import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 
 import { api } from '@/api/client';
 import { useSession } from '@/auth/session';
+import { iso } from '@/i18n';
+import { useLanguage } from '@/i18n/language';
 import { ProfileScreen } from '@/screens/profile/ProfileScreen';
 import { buildMe, buildRanks } from '@/test/factories';
 import { renderWithProviders } from '@/test/renderWithProviders';
@@ -16,7 +18,7 @@ jest.mock('@/config/env', () => ({
 
 jest.mock('@/api/client', () => ({
   api: {
-    me: { stats: jest.fn(), updateSettings: jest.fn(), updateUsername: jest.fn() },
+    me: { stats: jest.fn(), updateSettings: jest.fn(), updateUsername: jest.fn(), delete: jest.fn() },
     auth: { logout: jest.fn() },
     leagues: { current: jest.fn() },
     usernames: { check: jest.fn() },
@@ -24,7 +26,7 @@ jest.mock('@/api/client', () => ({
 }));
 
 const mocked = api as unknown as {
-  me: { stats: jest.Mock; updateSettings: jest.Mock; updateUsername: jest.Mock };
+  me: { stats: jest.Mock; updateSettings: jest.Mock; updateUsername: jest.Mock; delete: jest.Mock };
   auth: { logout: jest.Mock };
   leagues: { current: jest.Mock };
   usernames: { check: jest.Mock };
@@ -263,12 +265,12 @@ describe('ProfileScreen', () => {
       const first = posts.get('like-001');
       expect(first).toBeDefined();
       expect(await screen.findByText(first?.emoji ?? '')).toBeOnTheScreen();
-      expect(screen.getByText(first?.user ?? '')).toBeOnTheScreen();
+      expect(screen.getByText(first?.user.tr ?? '')).toBeOnTheScreen();
       expect(screen.getByText('12 kez')).toBeOnTheScreen();
       expect(screen.getByText('8 kez')).toBeOnTheScreen();
       expect(screen.queryByText('7 kez')).not.toBeOnTheScreen();
       expect(
-        screen.queryByText(posts.get('like-006')?.caption ?? ''),
+        screen.queryByText(posts.get('like-006')?.caption.tr ?? ''),
       ).not.toBeOnTheScreen();
     });
 
@@ -458,6 +460,19 @@ describe('ProfileScreen', () => {
       ).toBeOnTheScreen();
     });
 
+    it('deletes the account when the name is typed as the label shows it, with its @', async () => {
+      mocked.me.delete.mockResolvedValue(undefined);
+      await renderProfile();
+      await openSettings();
+      await fireEvent.press(screen.getByRole('button', { name: /^Hesabı sil/ }));
+      await leave();
+
+      await fireEvent.changeText(screen.getByLabelText('Onay için @ekin yaz'), '@Ekin ');
+      await fireEvent.press(screen.getByRole('button', { name: 'Hesabı kalıcı olarak sil' }));
+
+      await waitFor(() => expect(mocked.me.delete).toHaveBeenCalledTimes(1));
+    });
+
     it('opens nothing when it is closed without a choice', async () => {
       useSession.setState({ user: buildMe({ username: 'guest48128742' }) });
       await renderProfile();
@@ -539,6 +554,105 @@ describe('ProfileScreen', () => {
       await leave();
       expect(mocked.auth.logout).toHaveBeenCalledTimes(1);
       expect(useSession.getState().token).toBeNull();
+    });
+  });
+
+  describe('in other languages', () => {
+    /** Plays in `locale` on an account this phone has seen, so the account's own language does not take over. */
+    const speak = (locale: 'en' | 'ar') => {
+      useLanguage.setState({ locale, account: buildMe().id });
+    };
+
+    it('shows the card and the numbers in English, the English way', async () => {
+      speak('en');
+      await renderWithProviders(<ProfileScreen {...props} />);
+      expect(await screen.findByText('5,210')).toBeOnTheScreen();
+
+      expect(screen.getByText('PROFILE')).toBeOnTheScreen();
+      expect(screen.getByRole('button', { name: 'Settings' })).toBeOnTheScreen();
+      expect(screen.getByText('@ekin')).toBeOnTheScreen();
+      expect(screen.getByText('Guest account')).toBeOnTheScreen();
+      expect(screen.getByText('Stats')).toBeOnTheScreen();
+      const shown: Array<[string, string]> = [
+        ['Runs', '42'],
+        ['Posts', '5,210'],
+        ['Swipes', '3,904'],
+        ['Likes', '610'],
+        ['Perfect', '95'],
+        ['Best reaction', '312 ms'],
+        ['Play time', '2h 14m'],
+        ['Best combo', 'x1.45'],
+      ];
+      for (const [label, value] of shown) {
+        expect(screen.getByText(label)).toBeOnTheScreen();
+        expect(screen.getByText(value)).toBeOnTheScreen();
+      }
+      expect(screen.getByText('Protect your account')).toBeOnTheScreen();
+      expect(
+        screen.getByText('Link Apple or email and your scores stay with you, even on a new phone.'),
+      ).toBeOnTheScreen();
+    });
+
+    it('counts likes in English and names what the delete door takes', async () => {
+      speak('en');
+      mocked.me.stats.mockResolvedValue(
+        stats({}, [
+          { contentId: 'like-001', likes: 12 },
+          { contentId: 'like-002', likes: 1 },
+        ]),
+      );
+      await renderWithProviders(<ProfileScreen {...props} />);
+
+      expect(await screen.findByText('12 times')).toBeOnTheScreen();
+      expect(screen.getByText('1 time')).toBeOnTheScreen();
+
+      await fireEvent.press(screen.getByRole('button', { name: 'Settings' }));
+      await fireEvent.press(screen.getByRole('button', { name: /^Delete account/ }));
+      await leave();
+
+      expect(
+        screen.getByText(
+          "This can't be undone: your name, your scores and your place in the rankings are deleted.",
+        ),
+      ).toBeOnTheScreen();
+      expect(
+        screen.getByRole('button', { name: 'Delete account permanently' }),
+      ).toBeOnTheScreen();
+      expect(screen.getByLabelText('Type @ekin to confirm')).toBeOnTheScreen();
+    });
+
+    it('speaks Arabic: its numbers, its counts and a name kept whole', async () => {
+      speak('ar');
+      useSession.setState({ user: buildMe({ username: 'guest48128742' }) });
+      mocked.me.stats.mockResolvedValue(
+        stats({}, [
+          { contentId: 'like-001', likes: 12 },
+          { contentId: 'like-002', likes: 8 },
+          { contentId: 'like-003', likes: 2 },
+        ]),
+      );
+      await renderWithProviders(<ProfileScreen {...props} />);
+
+      expect(await screen.findByText('5,210')).toBeOnTheScreen();
+      expect(screen.getByText('الملف')).toBeOnTheScreen();
+      expect(screen.getByText('حساب ضيف')).toBeOnTheScreen();
+      expect(screen.getByText('الإحصاءات')).toBeOnTheScreen();
+      expect(screen.getByText('312 مللي ثانية')).toBeOnTheScreen();
+      expect(screen.getByText('2 س 14 د')).toBeOnTheScreen();
+      expect(screen.getByText('12 مرة')).toBeOnTheScreen();
+      expect(screen.getByText('8 مرات')).toBeOnTheScreen();
+      expect(screen.getByText('مرتان')).toBeOnTheScreen();
+
+      await fireEvent.press(screen.getByRole('button', { name: 'الإعدادات' }));
+      await fireEvent.press(screen.getByRole('button', { name: /^اختر اسمك/ }));
+      await leave();
+
+      expect(
+        screen.getByText(
+          `تظهر حاليًا باسم ${iso('@guest48128742')}. الاسم الذي تختاره يظهر مع كل نتائجك ولن يتغيّر أبدًا.`,
+        ),
+      ).toBeOnTheScreen();
+      expect(screen.getByRole('button', { name: 'حفظ' })).toBeOnTheScreen();
     });
   });
 });

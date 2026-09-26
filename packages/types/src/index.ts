@@ -14,6 +14,13 @@ export type Platform = 'ios' | 'android';
 
 export type SocialProvider = 'apple' | 'google';
 
+/**
+ * The six languages the game speaks (`LOCALES` in `@quezby/config`, in this
+ * order). A request says which one it wants in `Accept-Language`; the API
+ * answers its messages and share texts in it.
+ */
+export type Locale = 'tr' | 'en' | 'de' | 'ar' | 'fr' | 'es';
+
 export type UserSettings = {
   haptics: boolean;
   /**
@@ -47,6 +54,13 @@ export type Me = {
   /** Apple and Google accounts that can sign in to this player. */
   identities: SocialProvider[];
   settings: UserSettings;
+  /**
+   * The language the player plays in: the request's when the account was
+   * made, then whatever the phone last wrote (`PUT /me/locale`). A phone
+   * signing in to this account takes it; accounts from before languages
+   * are `tr`.
+   */
+  locale: Locale;
   /** This season's best — see `LeaderboardResponse.season`. */
   best: BestScore | null;
   createdAt: string;
@@ -109,6 +123,9 @@ export type UsernameAvailability = {
 };
 
 export type UpdateSettingsRequest = Partial<UserSettings>;
+
+/** `PUT /me/locale` → `{ user: Me }`. */
+export type UpdateLocaleRequest = { locale: Locale };
 
 /* ---------------------------------------------------------------- runs -- */
 

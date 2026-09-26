@@ -17,9 +17,12 @@ enum UsernameProblem: string
     case Reserved = 'reserved';
     case Blocked = 'blocked';
 
-    /** What the player reads under the field. */
+    /**
+     * What the player reads under the field, in the request's language:
+     * `lang/{locale}/username.php`, the same words as the app's catalogs.
+     */
     public function message(): string
     {
-        return Username::MESSAGES[$this->value];
+        return __('username.'.$this->value);
     }
 }

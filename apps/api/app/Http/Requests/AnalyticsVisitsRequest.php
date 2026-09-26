@@ -40,25 +40,6 @@ class AnalyticsVisitsRequest extends FormRequest
     }
 
     /**
-     * @return array<string, string>
-     */
-    public function attributes(): array
-    {
-        return [
-            'visits.*.id' => 'ziyaret kimliği',
-            'visits.*.startedAt' => 'ziyaret başlangıcı',
-            'visits.*.seconds' => 'ziyaret süresi',
-            'visits.*.appVersion' => 'uygulama sürümü',
-            'visits.*.journey' => 'yolculuk',
-            'visits.*.journey.*' => 'yolculuk adımı',
-            'visits.*.journey.*.0' => 'adım kodu',
-            'visits.*.journey.*.1' => 'adım zamanı',
-            'visits.*.counts' => 'sayılar',
-            'visits.*.counts.*' => 'sayı',
-        ];
-    }
-
-    /**
      * @return array{sentAt: string, platform: string, visits: list<array{id: string, startedAt: string, seconds: int, appVersion?: string|null, journey: list<array{0: string, 1: int}>, counts: array<string, int>}>}
      */
     public function batch(): array

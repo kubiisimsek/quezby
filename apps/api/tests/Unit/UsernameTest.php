@@ -32,9 +32,18 @@ it('never lets two symbols touch, in any order', function () {
 
 it('has a Turkish message for every problem and for taken', function () {
     foreach (UsernameProblem::cases() as $problem) {
+        $this->assertNotSame('username.'.$problem->value, $problem->message());
         $this->assertNotSame('', $problem->message());
     }
-    $this->assertSame('Bu kullanıcı adı alınmış.', Username::MESSAGES['taken']);
+    $this->assertSame('En az 3 karakter olmalı.', UsernameProblem::TooShort->message());
+    $this->assertSame('Bu kullanıcı adı alınmış.', __('username.taken'));
+});
+
+it('says a problem in the language asked for', function () {
+    app()->setLocale('en');
+
+    $this->assertSame('At least 3 characters.', UsernameProblem::TooShort->message());
+    $this->assertSame("Letters like ş, ı, ü or ç aren't allowed — write s, i, u, c.", UsernameProblem::TurkishChar->message());
 });
 
 it('normalizes to lower case, so uniqueness ignores case', function () {

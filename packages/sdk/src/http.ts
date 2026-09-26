@@ -18,6 +18,11 @@ export type HttpOptions = {
   appVersion?: string;
   /** Sent as `X-Device` when it answers — the phone the app runs on, for the API's device registry. */
   device?: () => string | null;
+  /**
+   * Sent as `Accept-Language` when it answers — the language the app speaks
+   * right now, which the API answers its messages and share texts in.
+   */
+  locale?: () => string | null;
 };
 
 export class ApiError extends Error {
@@ -75,6 +80,8 @@ export function createRequest(options: HttpOptions) {
     if (options.appVersion) headers['X-App-Version'] = options.appVersion;
     const device = options.device?.();
     if (device) headers['X-Device'] = device;
+    const locale = options.locale?.();
+    if (locale) headers['Accept-Language'] = locale;
     const token = auth ? options.getToken?.() : null;
     if (token) headers.Authorization = `Bearer ${token}`;
 

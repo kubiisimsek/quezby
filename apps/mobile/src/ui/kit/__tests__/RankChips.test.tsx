@@ -1,5 +1,7 @@
 import { render, screen } from '@testing-library/react-native';
 
+import { iso } from '@/i18n';
+import { useLanguage } from '@/i18n/language';
 import { RankChips } from '@/ui/kit';
 import { arena } from '@/ui/tokens';
 
@@ -40,5 +42,41 @@ describe('RankChips', () => {
     expect(
       screen.getByLabelText('Bugün: sıralamada değilsin'),
     ).toBeOnTheScreen();
+  });
+
+  it("groups the rank and says it the player's way, in French", async () => {
+    useLanguage.setState({ locale: 'fr' });
+    await render(
+      <RankChips
+        items={[
+          { label: "Aujourd'hui", rank: 1_204 },
+          { label: 'Semaine', rank: null },
+        ]}
+      />,
+    );
+
+    // Exact props: a query would read a no-break space as any space.
+    expect(screen.getByText(/^#1/).props.children).toBe('#1\u00a0204');
+    expect(screen.getByLabelText(/^Aujourd'hui/).props.accessibilityLabel).toBe(
+      "Aujourd'hui\u00a0: #1\u00a0204",
+    );
+    expect(screen.getByLabelText(/^Semaine/).props.accessibilityLabel).toBe(
+      'Semaine\u00a0: hors classement',
+    );
+  });
+
+  it('keeps the rank whole inside an Arabic label', async () => {
+    useLanguage.setState({ locale: 'ar' });
+    await render(
+      <RankChips
+        items={[
+          { label: 'اليوم', rank: 44 },
+          { label: 'الأسبوع', rank: null },
+        ]}
+      />,
+    );
+
+    expect(screen.getByLabelText(`اليوم: ${iso('#44')}`)).toBeOnTheScreen();
+    expect(screen.getByLabelText('الأسبوع: لست في الترتيب')).toBeOnTheScreen();
   });
 });

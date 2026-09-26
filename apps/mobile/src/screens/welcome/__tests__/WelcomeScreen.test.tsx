@@ -1,8 +1,9 @@
 import { ApiError } from '@quezby/sdk';
-import { fireEvent, screen } from '@testing-library/react-native';
+import { act, fireEvent, screen } from '@testing-library/react-native';
 
 import { api } from '@/api/client';
 import { useSession } from '@/auth/session';
+import { useLanguage } from '@/i18n/language';
 import { WelcomeScreen } from '@/screens/welcome/WelcomeScreen';
 import { useOnboarding } from '@/stores/onboarding';
 import { useSettings } from '@/stores/settings';
@@ -95,5 +96,65 @@ describe('WelcomeScreen', () => {
     await fireEvent.press(screen.getByText('Hesabım var, giriş yap'));
 
     expect(props.navigation.navigate).toHaveBeenCalledWith('Login');
+  });
+
+  it('asks and lets the player in, in English', async () => {
+    useLanguage.setState({ locale: 'en' });
+    useSettings.setState({ consent: 'unasked' });
+    await renderWithProviders(<WelcomeScreen {...props} />);
+
+    expect(screen.getByText('Your scrolling habit, now a competition.')).toBeTruthy();
+    expect(screen.getByText(/Learn them in a practice run first — it doesn't count\./)).toBeTruthy();
+    expect(screen.getByText('Shall we improve the game together?')).toBeTruthy();
+
+    await fireEvent.press(screen.getByRole('button', { name: "Don't allow" }));
+
+    expect(useSettings.getState().analytics).toBe(false);
+    expect(screen.getByText('Quezby')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Play' })).toBeTruthy();
+    await fireEvent.press(screen.getByRole('button', { name: 'I have an account, sign in' }));
+    expect(props.navigation.navigate).toHaveBeenCalledWith('Login');
+  });
+
+  it('speaks Arabic, down to why an account could not be opened', async () => {
+    useLanguage.setState({ locale: 'ar' });
+    jest.mocked(api.auth.guest).mockRejectedValue(new ApiError(0, 'network', 'offline'));
+    await renderWithProviders(<WelcomeScreen {...props} />);
+
+    expect(screen.getByText('عادتك في التمرير أصبحت منافسة.')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'لديّ حساب، سجّل الدخول' })).toBeTruthy();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'العب' }));
+
+    expect(
+      await screen.findByText('تعذّر الوصول إلى الخادم. تحقّق من اتصالك بالإنترنت.'),
+    ).toBeTruthy();
+  });
+
+  it('says what went wrong in the language of the moment, not the one it failed in', async () => {
+    jest.mocked(api.auth.guest).mockRejectedValue(new ApiError(0, 'network', 'offline'));
+    await renderWithProviders(<WelcomeScreen {...props} />);
+    await fireEvent.press(screen.getByText('Oyna'));
+    expect(await screen.findByText(/İnternet bağlantını kontrol et/)).toBeTruthy();
+
+    await act(async () => {
+      useLanguage.setState({ locale: 'en' });
+    });
+
+    expect(
+      screen.getByText("Couldn't reach the server. Check your internet connection."),
+    ).toBeTruthy();
+    expect(screen.queryByText(/İnternet bağlantını kontrol et/)).toBeNull();
+  });
+
+  it('names the language it speaks at the top, and opens the picker from there', async () => {
+    await renderWithProviders(<WelcomeScreen {...props} />);
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Türkçe' }));
+
+    expect(await screen.findByText('Oyun seçtiğin dilde konuşur.')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('radio', { name: 'English, İngilizce' }));
+    expect(await screen.findByRole('button', { name: 'English' })).toBeOnTheScreen();
+    expect(screen.getByText('Play')).toBeOnTheScreen();
   });
 });

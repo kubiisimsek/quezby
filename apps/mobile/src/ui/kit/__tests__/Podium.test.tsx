@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
+import { useLanguage } from '@/i18n/language';
 import { buildEntries } from '@/test/factories';
 import { BrandBand, Podium } from '@/ui/kit';
 
@@ -79,5 +80,20 @@ describe('Podium', () => {
 
     await screen.rerender(<Podium entries={buildEntries(3)} />);
     expect(screen.queryAllByRole('button')).toHaveLength(0);
+  });
+});
+
+describe('Podium — in English', () => {
+  it('reads its places out, the empty ones too', async () => {
+    useLanguage.setState({ locale: 'en' });
+    await render(<Podium entries={buildEntries(1, { me: 1 })} />);
+
+    expect(
+      screen.getByLabelText('1st place, @ekin, you, 24,000 points'),
+    ).toBeOnTheScreen();
+    expect(screen.getByLabelText('2nd place, empty')).toBeOnTheScreen();
+    expect(screen.getByLabelText('3rd place, empty')).toBeOnTheScreen();
+    expect(screen.getByRole('image', { name: '1st place' })).toBeOnTheScreen();
+    expect(screen.getByText('· you')).toBeOnTheScreen();
   });
 });

@@ -1,9 +1,10 @@
-import { USERNAME_MESSAGES } from '@quezby/config';
 import type { PlayerSummary } from '@quezby/types';
 import { act, fireEvent, screen } from '@testing-library/react-native';
 
 import { api } from '@/api/client';
 import { useSession } from '@/auth/session';
+import { iso } from '@/i18n';
+import { useLanguage } from '@/i18n/language';
 import { SearchScreen } from '@/screens/search/SearchScreen';
 import { buildMe } from '@/test/factories';
 import { renderWithProviders } from '@/test/renderWithProviders';
@@ -132,7 +133,9 @@ describe('SearchScreen', () => {
       await search('şu');
 
       expect(
-        screen.getByText(USERNAME_MESSAGES.turkish_char),
+        screen.getByText(
+          'Türkçe karakter kullanılamaz — ş yerine s, ı yerine i gibi.',
+        ),
       ).toBeOnTheScreen();
       expect(mocked.users.search).not.toHaveBeenCalled();
     });
@@ -294,5 +297,70 @@ describe('SearchScreen', () => {
 
       expect(await screen.findByText('@mert')).toBeOnTheScreen();
     });
+  });
+});
+
+/** On real timers: the search's pause passes by itself. */
+describe('SearchScreen — in other languages', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    useSession.setState({ token: 'token', user: buildMe(), hydrated: true });
+    mocked.me.following.mockResolvedValue({ users: [], nextCursor: null });
+    mocked.me.followers.mockResolvedValue({ users: [], nextCursor: null });
+    mocked.users.search.mockResolvedValue({ users: [] });
+  });
+
+  it('speaks English: the tab, its lists, and a search that finds nobody', async () => {
+    useLanguage.setState({ locale: 'en' });
+    await renderWithProviders(<SearchScreen {...props} />);
+
+    expect(screen.getByText('Friends')).toBeOnTheScreen();
+    expect(screen.getByText('Find players, follow, race')).toBeOnTheScreen();
+    expect(
+      await screen.findByText("You're not following anyone yet"),
+    ).toBeOnTheScreen();
+    expect(screen.getByRole('tab', { name: 'Following' })).toBeSelected();
+
+    await fireEvent.press(screen.getByRole('tab', { name: 'Followers' }));
+
+    expect(await screen.findByText('No followers yet')).toBeOnTheScreen();
+    expect(
+      screen.getByText(
+        'Players who follow you show up here. Tell your friends your name: @ekin',
+      ),
+    ).toBeOnTheScreen();
+
+    await fireEvent.changeText(screen.getByPlaceholderText('e.g. ekin'), 'e');
+    expect(
+      screen.getByText('Type at least 2 characters to search.'),
+    ).toBeOnTheScreen();
+
+    await fireEvent.changeText(screen.getByPlaceholderText('e.g. ekin'), 'zz');
+    expect(await screen.findByText('No one found')).toBeOnTheScreen();
+    expect(
+      screen.getByText(
+        "No player's name starts with “zz”. Check what you typed.",
+      ),
+    ).toBeOnTheScreen();
+  });
+
+  it('speaks Arabic, keeping your name whole in its line', async () => {
+    useLanguage.setState({ locale: 'ar' });
+    await renderWithProviders(<SearchScreen {...props} />);
+
+    expect(screen.getByText('الأصدقاء')).toBeOnTheScreen();
+    expect(
+      screen.getByPlaceholderText(`مثال: ${iso('ekin')}`),
+    ).toBeOnTheScreen();
+    expect(await screen.findByText('لا تتابع أحدًا بعد')).toBeOnTheScreen();
+    expect(screen.getByRole('tab', { name: 'من تتابعهم' })).toBeSelected();
+
+    await fireEvent.press(screen.getByRole('tab', { name: 'متابعوك' }));
+
+    expect(
+      await screen.findByText(
+        `يظهر هنا من يتابعونك. أخبر أصدقاءك باسمك: ${iso('@ekin')}`,
+      ),
+    ).toBeOnTheScreen();
   });
 });

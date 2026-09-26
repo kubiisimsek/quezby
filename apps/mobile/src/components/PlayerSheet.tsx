@@ -4,8 +4,8 @@ import { StyleSheet, View } from 'react-native';
 import { track } from '@/analytics/track';
 import { Portrait, SeasonBest } from '@/components/PlayerCard';
 import { useFollow, usePlayer } from '@/hooks/useBoards';
+import { handle, useT } from '@/i18n';
 import { messageFor } from '@/lib/errors';
-import { formatRank, formatScore } from '@/lib/format';
 import {
   Button,
   Callout,
@@ -33,6 +33,8 @@ export function PlayerSheet({
   username: string | null;
   onClose: () => void;
 }) {
+  const t = useT();
+  const words = t.friends.sheet;
   const player = usePlayer(username);
   const follow = useFollow();
   const card = player.data?.player;
@@ -45,13 +47,13 @@ export function PlayerSheet({
     <Sheet
       open={username !== null}
       onClose={onClose}
-      title={username ? `@${username}` : ''}
+      title={username ? handle(username) : ''}
     >
       {player.isLoading ? (
         <SkeletonList rows={3} />
       ) : player.isError ? (
-        <Callout tone="bad" title="Oyuncu yüklenemedi">
-          {messageFor(player.error)}
+        <Callout tone="bad" title={words.failed}>
+          {messageFor(player.error, t)}
         </Callout>
       ) : card ? (
         <View style={styles.body}>
@@ -66,11 +68,11 @@ export function PlayerSheet({
               {card.isMe || card.followsMe ? (
                 <View style={styles.tags}>
                   {card.isMe ? (
-                    <Tag label="Sen" tone="primary" icon="account" />
+                    <Tag label={words.you} tone="primary" icon="account" />
                   ) : null}
                   {card.followsMe ? (
                     <Tag
-                      label="Seni takip ediyor"
+                      label={words.followsYou}
                       tone="secondary"
                       icon="userCheck"
                     />
@@ -78,7 +80,7 @@ export function PlayerSheet({
                 </View>
               ) : null}
               <Txt variant="meta" tone="muted">
-                {`${formatScore(card.followers)} takipçi · ${formatScore(card.following)} takip`}
+                {words.counts(card.followers, card.following)}
               </Txt>
             </View>
           </View>
@@ -89,36 +91,36 @@ export function PlayerSheet({
             columns={3}
             items={[
               {
-                label: 'Bu hafta',
-                value: formatRank(card.ranks.weekly),
+                label: words.stats.weekly,
+                value: t.fmt.rank(card.ranks.weekly),
                 icon: 'podium',
                 tone: 'warn',
               },
               {
-                label: 'Tüm zamanlar',
-                value: formatRank(card.ranks.all),
+                label: words.stats.all,
+                value: t.fmt.rank(card.ranks.all),
                 icon: 'crown',
                 tone: 'warn',
               },
               {
-                label: 'Tur',
-                value: formatScore(card.stats.runs),
+                label: words.stats.runs,
+                value: t.fmt.score(card.stats.runs),
                 icon: 'play',
               },
               {
-                label: 'Post',
-                value: formatScore(card.stats.reels),
+                label: words.stats.posts,
+                value: t.fmt.score(card.stats.reels),
                 icon: 'arrowUp',
               },
               {
-                label: 'Beğeni',
-                value: formatScore(card.stats.likes),
+                label: words.stats.likes,
+                value: t.fmt.score(card.stats.likes),
                 icon: 'heart',
                 tone: 'primary',
               },
               {
-                label: 'Mükemmel',
-                value: formatScore(card.stats.perfects),
+                label: words.stats.perfects,
+                value: t.fmt.score(card.stats.perfects),
                 icon: 'star',
               },
             ]}
@@ -126,7 +128,7 @@ export function PlayerSheet({
 
           {card.isMe ? null : (
             <Button
-              label={card.isFollowing ? 'Takibi bırak' : 'Takip et'}
+              label={card.isFollowing ? t.friends.unfollow : t.friends.follow}
               icon={card.isFollowing ? 'userCheck' : 'userPlus'}
               tone={card.isFollowing ? 'neutral' : 'primary'}
               loading={follow.isPending}
@@ -139,7 +141,7 @@ export function PlayerSheet({
             />
           )}
           {follow.isError ? (
-            <Callout tone="bad">{messageFor(follow.error)}</Callout>
+            <Callout tone="bad">{messageFor(follow.error, t)}</Callout>
           ) : null}
         </View>
       ) : null}

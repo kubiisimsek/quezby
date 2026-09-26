@@ -14,6 +14,8 @@ namespace App\Support;
  *   - case-insensitive: stored and shown in lower case
  *   - `guest48128742`-like names are the API's: every new account gets one
  *     until its player picks a name (`GuestNames`)
+ *
+ * What each problem says, in six languages, is `lang/{locale}/username.php`.
  */
 final class Username
 {
@@ -71,21 +73,6 @@ final class Username
         'fuck',
         'bitch',
         'cunt',
-    ];
-
-    public const MESSAGES = [
-        'required' => 'Bir kullanıcı adı yaz.',
-        'too_short' => 'En az 3 karakter olmalı.',
-        'too_long' => 'En fazla 20 karakter olabilir.',
-        'turkish_char' => 'Türkçe karakter kullanılamaz — ş yerine s, ı yerine i gibi.',
-        'invalid_char' => 'Sadece harf, rakam, nokta (.) ve yıldız (*) kullanılabilir.',
-        'bad_start' => 'Harf ya da rakamla başlamalı.',
-        'bad_end' => 'Harf ya da rakamla bitmeli.',
-        'consecutive_symbols' => 'Nokta ve yıldız art arda gelemez.',
-        'no_letter' => 'En az bir harf içermeli.',
-        'reserved' => 'Bu kullanıcı adı ayrılmış, başka bir tane dene.',
-        'blocked' => 'Bu kullanıcı adı kullanılamaz.',
-        'taken' => 'Bu kullanıcı adı alınmış.',
     ];
 
     /** Every code point JavaScript's `String.prototype.trim()` removes. */

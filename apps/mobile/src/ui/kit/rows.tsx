@@ -8,8 +8,9 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 
-import { formatScore } from '@/lib/format';
-import { TIER_LABELS, TierBadge } from '@/ui/kit/badges';
+import { handle, useT } from '@/i18n';
+import { IS_RTL } from '@/i18n/native';
+import { TierBadge } from '@/ui/kit/badges';
 import { Avatar } from '@/ui/kit/identity';
 import { AnimatedPressable, common } from '@/ui/kit/shared';
 import { Txt } from '@/ui/kit/text';
@@ -120,6 +121,13 @@ export function SwitchRow({
 
 const TRACK = { width: 56, height: 32, knob: 24 } as const;
 
+/**
+ * How far the knob slides to "on": toward the end of the line, which is the
+ * left when the game reads right to left — a transform is the one thing the
+ * layout does not turn around by itself.
+ */
+const KNOB_TRAVEL = (IS_RTL ? -1 : 1) * (TRACK.width - TRACK.knob - 8 - DEPTH.outline * 2);
+
 /** On or off, the game's way: a green groove with the knob to the right. */
 export function Toggle({
   label,
@@ -143,7 +151,7 @@ export function Toggle({
     backgroundColor: interpolateColor(on.value, [0, 1], [theme.well, theme.ok]),
   }));
   const knobStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: on.value * (TRACK.width - TRACK.knob - 8 - DEPTH.outline * 2) }],
+    transform: [{ translateX: on.value * KNOB_TRAVEL }],
   }));
 
   return (
@@ -198,22 +206,23 @@ export function PlayerRow({
   onPress?: () => void;
 }) {
   const press = usePressScale(0.985);
-  const record =
-    best === null ? 'Henüz rekor yok' : `Sezon rekoru ${formatScore(best)}`;
-  const label = [
-    `@${username}${isMe ? ', sen' : ''}`,
-    tier ? `${TIER_LABELS[tier]} lig` : null,
+  const t = useT();
+  const words = t.kit.playerRow;
+  const name = handle(username);
+  const record = best === null ? words.noRecord : words.record(t.fmt.score(best));
+  const label = words.label({
+    name,
+    me: isMe,
+    league: tier ? t.tiers.league(tier) : null,
     record,
-  ]
-    .filter(Boolean)
-    .join(', ');
+  });
 
   const who = (
     <>
       <Avatar name={username} tone={isMe ? 'primary' : 'neutral'} size="sm" />
       <View style={styles.playerText}>
         <Txt variant="heading" numberOfLines={1}>
-          {`@${username}${isMe ? ' · sen' : ''}`}
+          {isMe ? words.me(name) : name}
         </Txt>
         <View style={styles.playerMeta}>
           {tier ? <TierBadge tier={tier} size="sm" showLabel /> : null}

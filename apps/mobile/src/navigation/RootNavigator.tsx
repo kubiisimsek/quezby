@@ -10,8 +10,10 @@ import { useAnalytics } from '@/hooks/useAnalytics';
 import { useAppStatus } from '@/hooks/useAppStatus';
 import { useConsentSync } from '@/hooks/useConsentSync';
 import { useDeviceCheck } from '@/hooks/useDeviceCheck';
+import { useLanguageSync } from '@/hooks/useLanguageSync';
 import { useMe } from '@/hooks/useMe';
 import { usePendingRunSender } from '@/hooks/usePendingRunSender';
+import { useLanguage, useT } from '@/i18n';
 import { messageFor } from '@/lib/errors';
 import { gateFor } from '@/navigation/gate';
 import { tab, useNavTheme, useStackOptions } from '@/navigation/options';
@@ -44,24 +46,26 @@ const navigationRef = createNavigationContainerRef<RootStackParamList>();
 const onScreen = () => trackScreen(navigationRef.getCurrentRoute()?.name);
 
 function TabsShell() {
+  const { tabs } = useT().nav;
   return (
     <Tabs.Navigator
       initialRouteName="Home"
       tabBar={(props) => <TabBar {...props} />}
       screenOptions={{ headerShown: false }}
     >
-      <Tabs.Screen name="Leaderboard" component={LeaderboardScreen} options={tab('Zirve', 'mountain')} />
-      <Tabs.Screen name="League" component={LeagueScreen} options={tab('Lig', 'shield')} />
-      <Tabs.Screen name="Home" component={HomeScreen} options={tab('Oyna', 'play')} />
-      <Tabs.Screen name="Search" component={SearchScreen} options={tab('Arkadaşlar', 'users')} />
-      <Tabs.Screen name="Profile" component={ProfileScreen} options={tab('Profil', 'account')} />
+      <Tabs.Screen name="Leaderboard" component={LeaderboardScreen} options={tab(tabs.leaderboard, 'mountain')} />
+      <Tabs.Screen name="League" component={LeagueScreen} options={tab(tabs.league, 'shield')} />
+      <Tabs.Screen name="Home" component={HomeScreen} options={tab(tabs.play, 'play')} />
+      <Tabs.Screen name="Search" component={SearchScreen} options={tab(tabs.friends, 'users')} />
+      <Tabs.Screen name="Profile" component={ProfileScreen} options={tab(tabs.profile, 'account')} />
     </Tabs.Navigator>
   );
 }
 
 /**
  * What mounts is `gateFor`'s answer: a build the API no longer accepts → the
- * update screen; storage not read yet → the splash; no account → the
+ * update screen; storage not read yet — or the app still turning to read its
+ * language the right way — → the splash; no account → the
  * welcome; a new account's first steps — the practice run, the name, keeping
  * the account — one screen at a time; an account from before automatic names
  * → the name question; otherwise the game.
@@ -75,14 +79,18 @@ export function RootNavigator() {
   const onboardingHydrated = useOnboarding((state) => state.hydrated);
   const onboardingUser = useOnboarding((state) => state.userId);
   const onboardingStep = useOnboarding((state) => state.step);
+  const languageReady = useLanguage((state) => state.phase === 'ready');
+  const t = useT();
   const status = useAppStatus();
   const me = useMe();
   usePendingRunSender();
   useDeviceCheck();
   useConsentSync();
+  useLanguageSync();
   useAnalytics();
 
   useEffect(() => {
+    void useLanguage.getState().hydrate();
     void useSession.getState().hydrate();
     void useOnboarding.getState().hydrate();
     void useSettings.getState().hydrate();
@@ -90,7 +98,7 @@ export function RootNavigator() {
 
   const gate = gateFor({
     updateRequired: status?.status === 'update_required',
-    hydrated: hydrated && onboardingHydrated,
+    hydrated: hydrated && onboardingHydrated && languageReady,
     token,
     user,
     meFailed: me.isError,
@@ -106,12 +114,12 @@ export function RootNavigator() {
   if (status?.status === 'update_required') {
     return (
       <Splash
-        title="Güncelleme gerekli"
-        body={`Bu sürüm (${status.minVersion} altı) artık desteklenmiyor. Oynamaya devam etmek için güncelle.`}
+        title={t.nav.updateTitle}
+        body={t.nav.updateBody(status.minVersion)}
         action={
           status.storeUrl ? (
             <Button
-              label="Mağazada aç"
+              label={t.nav.openStore}
               tone="play"
               onPress={() => void Linking.openURL(status.storeUrl ?? '')}
             />
@@ -126,9 +134,9 @@ export function RootNavigator() {
   if (gate === 'offline') {
     return (
       <Splash
-        title="Bağlanamadık"
-        body={messageFor(me.error)}
-        action={<Button label="Tekrar dene" tone="play" icon="refresh" onPress={() => void me.refetch()} />}
+        title={t.nav.offlineTitle}
+        body={messageFor(me.error, t)}
+        action={<Button label={t.nav.retry} tone="play" icon="refresh" onPress={() => void me.refetch()} />}
       />
     );
   }
