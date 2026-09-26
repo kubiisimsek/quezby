@@ -26,7 +26,8 @@ for Games_ rehberi ve Unity'nin "önce anonim hesap, sonra bağla" yaklaşımı)
    anlatır; postun süresi "Anladım"dan sonra başlar. Sonuç "DENEME TURU"
    etiketlidir; turun bitmeden göremediği hareketler orada anlatılır.
 3. **Takma ad:** "Sana ne diyelim?" — seçilebilir ya da **Şimdilik geç**
-   denir; geçen oyuncu otomatik adla oynar, Profil'den istediği zaman ad seçer.
+   denir; geçen oyuncu otomatik adla oynar, adını sonra Profil'den seçer.
+   Seçilen ad kalıcıdır, bir daha değişmez.
 4. **Hesabını koru:** Apple, Google ya da e-posta — ya da **Şimdi değil**.
    Apple/Google ile yeni açılan hesap bu adımı görmez.
 
@@ -92,7 +93,8 @@ Ayrıntılar: [scoring.md](./scoring.md).
 - Yeni oyuncu **Oyna** ile misafir başlar; var olan hesaba **Hesabım var, giriş
   yap** (Apple, Google ya da e-posta) ile girilir. Misafir token'ı keychain'de
   tutulur (iOS'ta uygulama silinse bile kalır). Her hesap açıldığı anda bir ad
-  alır — oyuncu seçene kadar `guest48128742` ([usernames.md](./usernames.md)).
+  alır — oyuncu seçene kadar `guest48128742`; seçtiği ad bir daha değişmez
+  ([usernames.md](./usernames.md)).
 - Misafir kalan oyuncuya, ligi açıldığı ilk an lobide **bir kez** "Hesabını
   koru" sorulur: kaybedecek bir şeyi olduğu an. Sonrası yalnızca Profil'dedir.
 - **Hesabını koru:** misafir hesaba Apple, Google ya da e-posta + şifre

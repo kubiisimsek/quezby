@@ -32,7 +32,8 @@ screens/
   auth/              Login (TopBar "Tekrar hoş geldin") — Apple / Google, then "ya da e-postayla"
   username/          after the practice run "Sana ne diyelim?" — the field in a tile, magenta
                      "Kaydet", ghost "Şimdilik geç" (the account keeps `guest48128742`); for an
-                     old account with no name, the one question before the game, gold "Devam"
+                     old account with no name, the one question before the game, gold "Devam".
+                     The line under the title says the picked name never changes
   onboarding/        Protect — "Hesabını koru" after the name: Apple / Google, "E-postayla
                      koru", ghost "Şimdi değil"; a kept account says so before "Devam et", and
                      an Apple / Google account that is another player's can be switched to
@@ -57,8 +58,10 @@ screens/
   profile/           a player card (framed portrait, tier, season best in gold, place on each
                      board), a "Hesabını koru" tile for guests, İstatistikler (stat tiles, named
                      combos, most-liked posts as little reels); the gear opens Ayarlar
-                     (SettingsSheet): Titreşim, Yardım and the account doors — username,
-                     "Hesabını koru" / "Giriş yolları" (SignInWaysSheet), e-posta, çıkış, silme.
+                     (SettingsSheet): Titreşim, Yardım and the account doors — "Adını seç"
+                     while the name is automatic (a picked one sits there locked, no arrow:
+                     "Kullanıcı adın · @ekin · kalıcı"), "Hesabını koru" / "Giriş yolları"
+                     (SignInWaysSheet), e-posta, çıkış, silme.
                      Each door opens only after Ayarlar has left the screen (`onClosed`)
   help/              Yardım (TopBar with a back slab) — the rules, from `game/howTo` and the
                      engine's `RULES`: reels in their feed colours, the dopamine bar, points and
@@ -152,7 +155,7 @@ A new shape goes into the family it belongs to and into that list.
 | `IconButton` | A square glyph slab: `neutral` on the arena, `onBrand` on a stage; `label` is read aloud; `badge` counts what is new |
 | `SocialButton` | "Apple ile devam et" / "Google ile devam et", flat as each company asks, a large `Button`'s height and corners |
 | `Divider`, `Avatar`, `IconChip` | A groove; a player's framed portrait (initials in Rubik, `primary` = you); a gem — a glyph on a bright outlined tile |
-| `Row`, `ArrowNub`, `SwitchRow`, `Toggle` | A line that opens something (ends in a small arrow slab) / that arrow / a setting with the game's toggle (green groove, springing knob, role `switch`) |
+| `Row`, `ArrowNub`, `SwitchRow`, `Toggle` | A line that opens something (ends in a small arrow slab) — or, without `onPress`, a line that only says something, with no arrow and no press (a picked username, locked) / that arrow / a setting with the game's toggle (green groove, springing knob, role `switch`) |
 | `PlayerRow` | A player in a list: portrait, @name, league, season best — and one action (follow) beside it, a separate target from the row that opens their card |
 | `Tag`, `Callout`, `Stat`, `StatRow`, `Meter` | A status pill; a message with a gem (copy built from pieces is set in its text); a stat tile (gem, label, Rubik number); a chunky bar with a shine |
 | `StatGrid` | Stat tiles in 2 or 3 even columns |
@@ -175,8 +178,8 @@ A new shape goes into the family it belongs to and into that list.
 | `Stamp`, `CountUp`, `Confetti`, `useShake` | Juice: slam a value in; count a number up (the final value is its accessibility label); a burst of confetti on a key; a small shake |
 
 Overlays are `ui/sheet.tsx`: `Sheet` (a dark tile rising from the bottom, a
-Rubik title, a red close slab), `FormSheet` (the profile's username, email and
-delete flows), `ActionSheet` (tile rows with arrow slabs). Never a `Modal` with
+Rubik title, a red close slab), `FormSheet` (the profile's one username pick,
+email and delete flows), `ActionSheet` (tile rows with arrow slabs). Never a `Modal` with
 `animationType="slide"`. One sheet never opens over another that is still
 leaving: the next one waits for `onClosed` (the profile's "E-postayla koru"
 does exactly this). Apple's and Google's own sign-in sheets may open over a

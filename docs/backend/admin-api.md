@@ -108,8 +108,11 @@ Lifts the ban; this season's ranked runs go back on the boards.
 ### `POST /players/{id}/rename` — moderator
 
 `{ "reason" }` → `{ "changed": true, "username": "guest00000007" }`. A fresh
-automatic name (`GuestNames`) in place of one that should not be seen; the
-player may pick another. The old name is in the audit entry's details.
+automatic name (`GuestNames`) in place of one that should not be seen. A
+picked name never changes otherwise, so this is the only way out of one: it
+opens exactly one more pick for the player, and that name is permanent again
+(`docs/product/usernames.md` → "Kalıcı ad"). The old name is in the audit
+entry's details.
 
 ### `POST /players/{id}/sign-out` — moderator
 
@@ -286,9 +289,13 @@ subject { type, id, label }, reason, details, ip` — `ip` only for an owner.
 - `GET /system` → `AdminSystem`: environment, PHP, Laravel, database,
   timezone, season and engine, content version, integrity mode, the daily
   epoch, the apps' minimum and latest versions, whether `OPS_TOKEN` and
-  `MODERATION_TOKEN` are set (**never their values**), whether config and
+  `MODERATION_TOKEN` are set (**never their values**), `appKey` — whether
+  `APP_KEY` is set and well-formed (never the key) — whether config and
   routes are cached, the migrations uploaded but not run, open and stale runs,
-  and the limits the game runs with.
+  and the limits the game runs with. The panel says in red when `appKey` is
+  false: without the key the API answers every player 500 (`RequireAppKey`),
+  while `/admin/*` and `/ops/*` stay open so the key can be put right and the
+  cache rebuilt.
 - `POST /system/migrate | optimize | expire-runs` → `{ "output" }`: the same
   chores as `/ops/migrate`, `/ops/optimize` and `quezby:runs:expire`
   (`OpsChores`). A failure is `500 server_error` with what failed; both are

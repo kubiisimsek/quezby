@@ -98,6 +98,20 @@ test('resetting a name gives an automatic one and keeps the old one on record', 
         ->details->toBe(['from' => 'kufurlu.ad', 'to' => 'guest00000007']);
 });
 
+test('after a reset the player picks one more name, and it is theirs for good', function () {
+    $this->signInAdmin(AdminRole::Moderator);
+    $this->app->instance(GuestNames::class, new GuestNames(drawn(7)));
+    $player = User::factory()->withUsername('kufurlu.ad')->create();
+    adminPlayerAction($player, 'rename', ['reason' => 'Küfürlü ad'])->assertOk();
+
+    $this->signIn($player->fresh());
+
+    $this->putJson('/api/v1/me/username', ['username' => 'temiz.ad'])
+        ->assertOk()
+        ->assertJsonPath('user.username', 'temiz.ad');
+    $this->assertApiError($this->putJson('/api/v1/me/username', ['username' => 'baska.ad']), 409, 'username_locked');
+});
+
 test('signing a player out ends every session they have', function () {
     $this->signInAdmin(AdminRole::Moderator);
     $player = User::factory()->withUsername('kerem.35')->linked('kerem@quezby.com')->create();

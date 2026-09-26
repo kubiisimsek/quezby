@@ -1,5 +1,5 @@
 import { ApiError } from '@quezby/sdk/admin';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { system } from '@/test/factories';
@@ -16,6 +16,25 @@ describe('SystemPage', () => {
     expect(screen.getAllByText('Uygulanıyor').length).toBeGreaterThan(0);
     expect(screen.getAllByText('1.0.0 · 1.1.0')).toHaveLength(2);
     expect(screen.queryByText('Paylaşılan bir anahtar açık')).not.toBeInTheDocument();
+    expect(screen.queryByText('APP_KEY eksik')).not.toBeInTheDocument();
+    expect(screen.getByText('Tanımlı')).toBeInTheDocument();
+  });
+
+  it('says APP_KEY is missing and rebuilds the cache once .env has it', async () => {
+    const api = fakeApi();
+    api.system.get.mockResolvedValue(system({ appKey: false }));
+    api.system.run.mockResolvedValue({ output: 'cached' });
+    const { user } = renderApp({ path: '/system', api });
+
+    const alert = await screen.findByRole('alert');
+    expect(within(alert).getByText('APP_KEY eksik')).toBeInTheDocument();
+    expect(within(alert).getByText(/Oyuncu istekleri 500 dönüyor/)).toBeInTheDocument();
+    expect(screen.getByText('Eksik')).toBeInTheDocument();
+
+    await user.click(within(alert).getByRole('button', { name: 'Önbelleği yenile' }));
+    await user.click(await screen.findByRole('button', { name: 'Önbelleği yenile' }));
+
+    await waitFor(() => expect(api.system.run).toHaveBeenCalledWith('optimize'));
   });
 
   it('warns about waiting migrations and runs them after asking', async () => {

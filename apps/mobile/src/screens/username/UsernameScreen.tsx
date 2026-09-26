@@ -21,8 +21,9 @@ import { SPACE } from '@/ui/theme';
  *
  * Right after a new player's practice run it is a step they may skip: the
  * account already plays as `guest48128742`, and keeps that name until they
- * pick one — here or later on the profile. An account from before automatic
- * names has none, so for it this is the one question before the game.
+ * pick one — here or later on the profile. The name they pick is theirs for
+ * good, and the screen says so. An account from before automatic names has
+ * none, so for it this is the one question before the game.
  */
 export function UsernameScreen() {
   const insets = useSafeAreaInsets();
@@ -70,8 +71,8 @@ export function UsernameScreen() {
         </Txt>
         <Txt variant="meta" tone="muted" align="center">
           {canSkip && isAutoUsername(current)
-            ? `Zirvede ve ligde bu adla görünürsün. Şimdilik adın @${current}; Profil’den istediğin zaman değiştirirsin.`
-            : 'Benzersiz olmalı. Harf, rakam, nokta ve yıldız kullanabilirsin.'}
+            ? `Zirvede ve ligde bu adla görünürsün; seçtiğin ad bir daha değişmez. Şimdilik adın @${current}, istersen sonra Profil’den seçersin.`
+            : 'Benzersiz olmalı ve bir daha değişmez. Harf, rakam, nokta ve yıldız kullanabilirsin.'}
         </Txt>
       </View>
       <KeyboardAvoidingView

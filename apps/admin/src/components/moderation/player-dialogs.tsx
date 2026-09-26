@@ -104,7 +104,7 @@ export function RenamePlayerDialog({ player, open, onOpenChange, onDone }: Dialo
         onOpenChange(next);
       }}
       title={`${playerName(player.username)} adı sıfırlansın mı?`}
-      description="Oyuncuya “guest” ve sekiz rakamdan oluşan otomatik bir ad verilir. Kendine yeni bir ad seçebilir; eski ad denetim kaydında kalır."
+      description="Oyuncuya “guest” ve sekiz rakamdan oluşan otomatik bir ad verilir. Kendine bir kez daha ad seçebilir; o ad da kalıcıdır. Eski ad denetim kaydında kalır."
       icon={<RotateCcw />}
       tone="warn"
       submitLabel="Adı sıfırla"

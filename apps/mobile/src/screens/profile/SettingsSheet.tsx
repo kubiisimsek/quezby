@@ -1,4 +1,4 @@
-import { isAutoUsername } from '@quezby/config';
+import { canPickUsername } from '@quezby/config';
 import type { Me } from '@quezby/types';
 import { StyleSheet, View } from 'react-native';
 
@@ -54,6 +54,31 @@ function setHaptics(user: Me, value: boolean) {
 }
 
 /**
+ * The name, as Ayarlar shows it: a door to pick one while the account still
+ * plays under the automatic name (or none), and after that only the name
+ * itself, locked — a picked name never changes.
+ */
+function NameRow({ username, onPick }: { username: string | null; onPick: () => void }) {
+  if (canPickUsername(username)) {
+    return (
+      <Row
+        leading={<IconChip icon="edit" tone="primary" size="sm" />}
+        title="Adını seç"
+        subtitle={username ? `Şimdilik @${username} · bir kez seçersin` : 'Henüz bir adın yok'}
+        onPress={onPick}
+      />
+    );
+  }
+  return (
+    <Row
+      leading={<IconChip icon="lock" tone="neutral" size="sm" />}
+      title="Kullanıcı adın"
+      subtitle={`@${username} · kalıcı`}
+    />
+  );
+}
+
+/**
  * Ayarlar — what a player opens now and then, kept off the profile's face:
  * the one setting the game has, Yardım, and the account's doors. A door
  * never opens over this sheet: `onPick` names it, and the profile opens it
@@ -104,12 +129,7 @@ export function SettingsSheet({
 
         <Eyebrow icon="account">Hesap</Eyebrow>
         <Panel tone="sunken" elevation="flat" style={styles.group}>
-          <Row
-            leading={<IconChip icon="edit" tone="primary" size="sm" />}
-            title={isAutoUsername(user.username) ? 'Adını seç' : 'Kullanıcı adını değiştir'}
-            subtitle={`Şu an @${user.username}`}
-            onPress={() => onPick('username')}
-          />
+          <NameRow username={user.username} onPick={() => onPick('username')} />
           <Divider />
           {user.isGuest ? (
             <Row

@@ -40,20 +40,36 @@ class UsernameController extends Controller
         ]);
     }
 
-    /** The unique index decides a race: one player gets the name, the other a 409. */
+    /**
+     * A name is picked once — only over the one the API gave, or none — and
+     * then it never changes; the same name again is a harmless no-op. The
+     * write holds only while the name is still the one the player had, so two
+     * quick picks cannot both land, and the unique index decides a race
+     * between two players: one gets the name, the other a 409.
+     */
     public function update(UpdateUsernameRequest $request, #[CurrentUser] User $user): JsonResponse
     {
         $username = $request->normalizedUsername();
 
         if ($user->username !== $username) {
-            if (User::query()->where('username', $username)->exists()) {
+            if (! Username::isPickable($user->username)) {
+                throw ApiException::of(ErrorCode::UsernameLocked);
+            }
+            if (User::query()->where('username', $username)->whereKeyNot($user->getKey())->exists()) {
                 throw ApiException::of(ErrorCode::UsernameTaken);
             }
 
+            $pick = User::query()->whereKey($user->getKey());
+            $user->username === null ? $pick->whereNull('username') : $pick->where('username', $user->username);
             try {
-                $user->forceFill(['username' => $username])->save();
+                $landed = $pick->update(['username' => $username]);
             } catch (UniqueConstraintViolationException) {
                 throw ApiException::of(ErrorCode::UsernameTaken);
+            }
+
+            $user->refresh();
+            if ($landed === 0 && $user->username !== $username) {
+                throw ApiException::of(ErrorCode::UsernameLocked);
             }
         }
 

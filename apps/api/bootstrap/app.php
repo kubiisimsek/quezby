@@ -3,6 +3,7 @@
 use App\Exceptions\ApiException;
 use App\Exceptions\ErrorResponse;
 use App\Http\Middleware\EnsureAdminRole;
+use App\Http\Middleware\RequireAppKey;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -21,6 +22,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // `admin.role:moderator`: the admin panel's roles, lowest first.
         $middleware->alias(['admin.role' => EnsureAdminRole::class]);
+
+        // No player request without APP_KEY; the panel and the ops routes stay open to put it right.
+        $middleware->api(prepend: [RequireAppKey::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->dontReport(ApiException::class);

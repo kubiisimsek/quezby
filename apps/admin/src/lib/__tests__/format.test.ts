@@ -19,6 +19,7 @@ import {
   playerName,
   RUN_FLAG,
   shortId,
+  VERDICT,
 } from '@/lib/format';
 
 describe('numbers', () => {
@@ -97,5 +98,20 @@ describe('names', () => {
       expect(flag.label).not.toBe('');
       expect(flag.hint).not.toBe('');
     }
+  });
+});
+
+describe('verdicts', () => {
+  it('colours a hit and a perfect green, a miss red, and none of them in the action magenta', () => {
+    expect(VERDICT.hit.tone).toBe('ok');
+    expect(VERDICT.perfect.tone).toBe('ok');
+    expect([VERDICT.timeout.tone, VERDICT.wrong.tone, VERDICT.caught.tone]).toEqual(['bad', 'bad', 'bad']);
+    for (const { tone } of Object.values(VERDICT)) expect(tone).not.toBe('primary');
+  });
+
+  it('never gives a perfect the tone of a failure', () => {
+    const failures = Object.entries(VERDICT).filter(([verdict]) => verdict !== 'hit' && verdict !== 'perfect');
+    expect(failures).toHaveLength(6);
+    for (const [, { tone }] of failures) expect(tone).not.toBe(VERDICT.perfect.tone);
   });
 });

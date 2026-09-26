@@ -43,7 +43,7 @@ Route::prefix('v1')->group(function () {
 
         Route::get('me', [MeController::class, 'show']);
         Route::delete('me', [MeController::class, 'destroy']);
-        Route::put('me/username', [UsernameController::class, 'update']);
+        Route::put('me/username', [UsernameController::class, 'update'])->middleware('throttle:username-update');
         Route::put('me/settings', SettingsController::class);
         Route::post('me/credentials', CredentialsController::class);
         Route::post('me/identities/{provider}', [IdentityController::class, 'store'])->middleware('throttle:identities');

@@ -179,4 +179,14 @@ describe('HelpScreen', () => {
     expect(screen.getByText(/deneme turuyla başlarsın; o tur hiçbir yere\s+sayılmaz/)).toBeOnTheScreen();
     expect(screen.getByText(/guest48128742 gibi bir adla oynarsın/)).toBeOnTheScreen();
   });
+
+  it('says a picked name is for good', async () => {
+    await renderWithProviders(<HelpScreen {...props} />);
+
+    expect(screen.getByText(/Seçtiğin ad\s+kalıcıdır; bir daha değişmez\./)).toBeOnTheScreen();
+    await fireEvent.press(
+      screen.getByRole('button', { name: 'Kullanıcı adımı değiştirebilir miyim?' }),
+    );
+    expect(screen.getByText(/^Hayır\. Adını bir kez seçersin ve bir daha değişmez/)).toBeOnTheScreen();
+  });
 });

@@ -1,4 +1,4 @@
-import { isAutoUsername, postsOf } from '@quezby/config';
+import { postsOf } from '@quezby/config';
 import type { LeagueTier, Me, Ranks } from '@quezby/types';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { CompositeScreenProps } from '@react-navigation/native';
@@ -449,8 +449,9 @@ function LikedPost({
 }
 
 /**
- * The player's name. An automatic one (`guest48128742`) was never picked, so
- * the sheet asks for a first name, empty, instead of offering to change it.
+ * The player's one pick of a name, over the automatic one (`guest48128742`)
+ * — Ayarlar only opens it while the name can still be picked. What is saved
+ * here never changes, and the sheet says so before it is saved.
  */
 function UsernameSheet({
   open,
@@ -461,8 +462,7 @@ function UsernameSheet({
   current: string | null;
   onClose: () => void;
 }) {
-  const automatic = isAutoUsername(current);
-  const [value, setValue] = useState(automatic ? '' : (current ?? ''));
+  const [value, setValue] = useState('');
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const check = useUsernameCheck(value, current);
@@ -490,11 +490,11 @@ function UsernameSheet({
     <FormSheet
       open={open}
       onClose={onClose}
-      title={automatic ? 'Adını seç' : 'Kullanıcı adını değiştir'}
+      title="Adını seç"
       description={
-        automatic
-          ? `Şimdilik @${current ?? ''} olarak görünüyorsun. Seçtiğin ad bütün skorlarında görünür.`
-          : 'Sıralamadaki tüm skorların yeni adla görünür.'
+        current
+          ? `Şimdilik @${current} olarak görünüyorsun. Seçtiğin ad bütün skorlarında görünür ve bir daha değişmez.`
+          : 'Seçtiğin ad bütün skorlarında görünür ve bir daha değişmez.'
       }
       submitLabel="Kaydet"
       onSubmit={() => void save()}

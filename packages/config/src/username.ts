@@ -80,6 +80,15 @@ export function isAutoUsername(name: string | null | undefined): boolean {
 }
 
 /**
+ * Whether the player may still pick a name: only while it is the one the API
+ * gave (or an account from before automatic names has none). A picked name is
+ * theirs for good — the API answers any other with `username_locked`.
+ */
+export function canPickUsername(name: string | null | undefined): boolean {
+  return name === null || name === undefined || isAutoUsername(name);
+}
+
+/**
  * A short list of words a public leaderboard will not show. Matched with the
  * symbols taken out, so `o.r.o.s.p.u` is caught too. Kept to words that do
  * not hide inside ordinary names — extend it in both languages at once.

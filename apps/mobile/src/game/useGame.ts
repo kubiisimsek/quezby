@@ -84,6 +84,15 @@ function retryable(error: unknown): boolean {
   );
 }
 
+/**
+ * A check-in lost on the way — no answer (network or timeout: status 0) or
+ * the API failing (5xx) — not one it refused. The status tells, not the code:
+ * a 4xx that is not JSON, like a firewall's HTML 403, also comes as `server_error`.
+ */
+function lostOnTheWay(error: unknown): boolean {
+  return error instanceof ApiError && (error.status === 0 || error.status >= 500);
+}
+
 type Mode = 'idle' | 'coach' | 'live' | 'transition' | 'over';
 
 /** How long a drag that began in time may keep the reel after its window. */
@@ -97,6 +106,12 @@ const now = () => {
 
 /** How long a finish waits for a checkpoint still on its way, so its receipt can ride along. */
 const CHECKPOINT_WAIT_MS = 2000;
+
+/** How soon after a check-in was lost it may go again. */
+const CHECK_IN_RETRY_AFTER_MS = 5_000;
+
+/** How many lost check-ins a run sends again: the receipts a finish can carry beyond one per mark. */
+const CHECK_IN_RETRIES = CHECKPOINTS.maxReceipts - CHECKPOINTS.marksMs.length;
 
 type Receipt = { reel: number; receipt: string };
 
@@ -149,6 +164,10 @@ export function useGame(mode: RunMode = 'free') {
   const markRef = useRef(0);
   const receiptsRef = useRef<Receipt[]>([]);
   const checkingInRef = useRef<Set<Promise<void>>>(new Set());
+  /** When each check-in lost on the way may go again, the earliest first. */
+  const owedRef = useRef<number[]>([]);
+  /** How many lost check-ins this run has sent again, out of `CHECK_IN_RETRIES`. */
+  const retriesRef = useRef(0);
   const modeRef = useRef<Mode>('idle');
   const touchRef = useRef<TouchState>(IDLE);
   const reelStartRef = useRef(0);
@@ -250,18 +269,30 @@ export function useGame(mode: RunMode = 'free') {
    * clock passes each `CHECKPOINTS.marksMs` mark: how many reels so far, and
    * the hash of exactly those moves. The API stamps when it saw them — that
    * is what shows a slowed-down game — and its receipt rides with the
-   * finish. Fire-and-forget: a checkpoint that fails is simply missing.
+   * finish. The game never waits on one. A check-in lost on the way — no
+   * answer, or a 5xx — is owed: a later verdict, `CHECK_IN_RETRY_AFTER_MS`
+   * after the failure at the soonest, checks in again with the reels and
+   * moves so far, just as a mark's would. One the API refused (a 4xx) is
+   * not. A verdict sends one check-in at most, a new mark's before an owed
+   * one, and a run sends `CHECK_IN_RETRIES` again at most — never more than
+   * a finish can carry.
    */
   const checkIn = useCallback(() => {
     const runId = runIdRef.current;
     const goAt = goAtRef.current;
     if (!runId || goAt === null) return;
-    const elapsed = now() - goAt;
+    const at = now();
     const marks = CHECKPOINTS.marksMs;
     let passed = markRef.current;
-    while (passed < marks.length && elapsed >= (marks[passed] ?? Infinity)) passed += 1;
-    if (passed === markRef.current) return;
-    markRef.current = passed;
+    while (passed < marks.length && at - goAt >= (marks[passed] ?? Infinity)) passed += 1;
+    if (passed > markRef.current) {
+      markRef.current = passed;
+    } else {
+      const due = owedRef.current[0];
+      if (due === undefined || at < due || retriesRef.current >= CHECK_IN_RETRIES) return;
+      owedRef.current.shift();
+      retriesRef.current += 1;
+    }
 
     const reel = actionsRef.current.length;
     const request: Promise<void> = api.runs
@@ -269,7 +300,11 @@ export function useGame(mode: RunMode = 'free') {
       .then(({ receipt }) => {
         if (runIdRef.current === runId) receiptsRef.current.push({ reel, receipt });
       })
-      .catch(() => undefined)
+      .catch((error: unknown) => {
+        if (runIdRef.current === runId && lostOnTheWay(error)) {
+          owedRef.current.push(now() + CHECK_IN_RETRY_AFTER_MS);
+        }
+      })
       .finally(() => {
         checkingInRef.current.delete(request);
       });
@@ -603,6 +638,8 @@ export function useGame(mode: RunMode = 'free') {
       markRef.current = 0;
       receiptsRef.current = [];
       checkingInRef.current = new Set();
+      owedRef.current = [];
+      retriesRef.current = 0;
       coachedRef.current = new Set();
       setCoach(null);
       setSeed(runSeed);

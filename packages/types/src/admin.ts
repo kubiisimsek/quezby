@@ -572,6 +572,12 @@ export type AdminSystem = {
   apps: Record<Platform, { min: string; latest: string }>;
   /** Whether each shared secret is set — never the secret itself. */
   tokens: { ops: boolean; moderation: boolean };
+  /**
+   * Whether APP_KEY is set and well-formed — never the key. Checkpoint
+   * receipts are signed and Apple's refresh tokens encrypted with it: without
+   * it every player request answers 500, while the panel stays open.
+   */
+  appKey: boolean;
   cached: { config: boolean; routes: boolean };
   pendingMigrations: string[];
   runs: { open: number; stale: number };

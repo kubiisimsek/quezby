@@ -102,6 +102,16 @@ final class Username
         return $name !== null && preg_match(self::AUTOMATIC, $name) === 1;
     }
 
+    /**
+     * Whether the player may still pick a name: only while it is the one the
+     * API gave (or an account from before automatic names has none). A picked
+     * name is theirs for good — `canPickUsername` in `@quezby/config`.
+     */
+    public static function isPickable(?string $name): bool
+    {
+        return $name === null || self::isAutomatic($name);
+    }
+
     public static function validate(string $input): UsernameValidation
     {
         if (! mb_check_encoding($input, 'UTF-8')) {

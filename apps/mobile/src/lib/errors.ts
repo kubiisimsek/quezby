@@ -31,6 +31,8 @@ export function messageFor(error: unknown): string {
       return 'En fazla 500 oyuncu takip edebilirsin.';
     case 'username_taken':
       return USERNAME_MESSAGES.taken;
+    case 'username_locked':
+      return 'Kullanıcı adını zaten seçtin; seçilen ad değişmez.';
     case 'username_invalid': {
       const problem = error.fields.username?.[0] as UsernameProblem | undefined;
       return problem && problem in USERNAME_MESSAGES

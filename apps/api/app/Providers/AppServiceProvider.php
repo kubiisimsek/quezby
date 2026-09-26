@@ -61,13 +61,17 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('username-check', fn (Request $request) => Limit::perMinute(60)
             ->by($request->user()?->getAuthIdentifier() ?? $request->ip()));
 
+        // A name is picked once; a few more tries for the ones already taken.
+        RateLimiter::for('username-update', fn (Request $request) => Limit::perMinute(10)
+            ->by($request->user()?->getAuthIdentifier() ?? $request->ip()));
+
         RateLimiter::for('run-start', fn (Request $request) => Limit::perMinute(30)
             ->by($request->user()?->getAuthIdentifier() ?? $request->ip()));
 
         RateLimiter::for('run-finish', fn (Request $request) => Limit::perMinute(20)
             ->by($request->user()?->getAuthIdentifier() ?? $request->ip()));
 
-        // A run checks in two or three times; a few more for a retry or a second run in the minute.
+        // A run checks in at most five times (three marks, two retries of a lost one); a few more for a second run in the minute.
         RateLimiter::for('run-checkpoint', fn (Request $request) => Limit::perMinute(12)
             ->by($request->user()?->getAuthIdentifier() ?? $request->ip()));
 

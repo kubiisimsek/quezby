@@ -34,7 +34,8 @@ Captions on reels are jokes and may be silly; nothing else may be.
 | **Deneme turu** (DENEME TURU) | A new player's first run: coached, played on the phone, counted nowhere — "Bu tur hiçbir yere sayılmadı." Its score is the "deneme puanı". Never "tutorial" to the player |
 | **YENİ POST · 2/4** · **Anladım** | A coach card's ribbon, and the gold slab that starts the post it explained |
 | **Sana ne diyelim?** · **Şimdilik geç** | The name, right after the practice run, and the way past it; until then the account is `@guest48128742` ("Şimdilik adın @guest48128742") |
-| **Adını seç** | The profile's name door while the name is still the automatic one; "Kullanıcı adını değiştir" after |
+| **Adını seç** | The profile's name door while the name is still the automatic one ("Şimdilik @guest48128742 · bir kez seçersin"). A picked name never changes, so after the pick Ayarlar only shows it, locked: "Kullanıcı adın · @ekin · kalıcı" — never "değiştir" |
+| **Seçtiğin ad bir daha değişmez** | Said wherever a name is picked, before it is saved — there is no confirm step |
 | **Lige 2 oyun kaldı** · **KİLİTLİ** | The league before a new player's first 3 counted runs: "Lig, ilk 3 oyunundan sonra açılır. Deneme turu sayılmaz." |
 | **Hesabını koru** | Attach Apple, Google or an email to a guest account — a step after the name ("Şimdi değil" skips it), and once, when a guest's league opens ("Ligdesin!…") |
 | **Apple hesabıma geç** | An Apple or Google account already belongs to another player: switch to it, leaving the fresh guest behind |

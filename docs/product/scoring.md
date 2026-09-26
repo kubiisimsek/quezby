@@ -207,16 +207,23 @@ görünen her sayı sunucudan gelir.
    saniyelerinde (`CHECKPOINTS.marksMs`) sunucuya kaç reel oynadığını ve tam o
    hareketlerin SHA-256 özetini (`prefixHash`) bildirir. Sunucu gördüğü anı
    imzalayıp **veritabanına yazmadan** bir makbuz döner; bitiş bu makbuzları
-   taşır. Bitişte sunucu her makbuz için kaydın o kısmını yeniden özetler ve o
-   hareketlerin uygulamanın temposuyla gerektirdiği süreyi, gerçekte geçen süreyle
-   karşılaştırır:
+   taşır. Yolda kaybolan bir bildirim (yanıt yok, zaman aşımı ya da 5xx) borç
+   kalır: sonraki bir kararda, hatadan en az 5 sn sonra, o ana kadarki reel
+   sayısı ve özetiyle — tıpkı bir işaretinki gibi — yeniden gönderilir; bir turda
+   en fazla iki kez. Sunucunun reddettiği (4xx) yeniden denenmez. Bir karar en
+   fazla bir bildirim gönderir, önce yeni işaretinki. Böylece bir tur en fazla
+   beş bildirim gönderir: bitişin taşıyabildiği makbuz sayısı
+   (`CHECKPOINTS.maxReceipts`). Bitişte sunucu her makbuz için kaydın o kısmını
+   yeniden özetler ve o hareketlerin uygulamanın temposuyla gerektirdiği süreyi,
+   gerçekte geçen süreyle karşılaştırır:
    - sahte ya da başka turun makbuzu → sert `checkpoint_forged`; özet tutmuyor
      (geçmiş sonradan değiştirilmiş) → sert `checkpoint_mismatch`;
    - gerçek süre, gereken sürenin 1,35 katı + 10 sn'den uzun → sert `slow_motion`;
      1,2 katı + 6 sn'den uzun → yumuşak `slow_timing`;
-   - beklenen makbuz eksik (bağlantı yok) → yumuşak `checkpoint_missing`.
-   Maliyet: bir turda en fazla üç küçük istek; bir tur bitişinin tamamı
-   (tekrar oynatma dahil) yerelde ~7 ms, en uzun turun tekrarı ~2,5 ms.
+   - beklenen makbuz eksik (bağlantı yeniden denemelerde de yok) → yumuşak
+     `checkpoint_missing`.
+   Maliyet: bir turda en fazla beş küçük istek (çoğunlukla üç); bir tur bitişinin
+   tamamı (tekrar oynatma dahil) yerelde ~7 ms, en uzun turun tekrarı ~2,5 ms.
 9. **Cihaz bütünlüğü — rootlu cihaz, emülatör, değiştirilmiş uygulama.**
    Uygulama, tek kullanımlık bir sunucu challenge'ına karşı Android'de **Google
    Play Integrity** (standard request, `requestHash = sha256Hex(challenge)`), iOS'ta

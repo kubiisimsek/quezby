@@ -32,6 +32,16 @@ cp apps/api/.env.staging.example apps/api/.env.staging
 openssl rand -hex 32                                # çıktıyı OPS_TOKEN= satırına yapıştır (SSH yoksa)
 ```
 
+- `APP_KEY`: `key:generate --show` çıktısı, **bir kez**. Kontrol noktası
+  makbuzları bununla imzalanır, Apple'ın refresh token'ları bununla şifrelenir.
+  Anahtarsız API her oyuncu isteğine `500` döner (panel açık kalır, **Sistem**
+  sayfası kırmızıyla söyler). Yerel `.env.staging` ile sunucudaki `.env` hep
+  **aynı** anahtarı taşır — her güncelleme zip'i sunucudaki `.env`'in üzerine
+  yazar — ve anahtar bir daha **değişmez**: değişirse o an oynanan turların
+  makbuzları "Sahte makbuz" olur, kayıtlı Apple token'ları okunamaz.
+  (`APP_PREVIOUS_KEYS` makbuzları kurtarmaz.)
+- `APP_ENV` dosyanın ortamıdır: `staging` ya da `production`. `local` yazmak o
+  ortamın korumalarını (ör. `APP_DEBUG` reddi) atlatır.
 - `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`: 1. adımdaki bilgiler.
   `DB_HOST` çoğu hostta `localhost`'tur.
 - `APP_DEBUG=false` kalmalı. Staging ve production'da `true` ile API hiç
@@ -72,7 +82,13 @@ Depo kökünde:
 Çıktı: `dist-deploy/quezby-api-staging-<tarih>.zip`. İçinde production
 bağımlılıkları kurulu `vendor/` ve `.env` olarak `apps/api/.env.staging` var;
 testler, loglar, sqlite dosyaları ve diğer `.env*` dosyaları yok.
-`.env.staging` bulunamazsa script uyarır ve zip'i `.env` olmadan üretir.
+
+Script işe `.env.staging`'i denetleyerek başlar (`scripts/check-api-env.mjs`,
+elle de çalışır: `node scripts/check-api-env.mjs staging`): `APP_KEY` boş ya da
+bozuksa, `APP_ENV` `staging` değilse ya da `APP_DEBUG` açıksa hiçbir şey
+üretmeden durur ve neyin eksik olduğunu söyler (değerleri asla yazmaz).
+`.env.staging` bulunamazsa script uyarır ve zip'i `.env` olmadan üretir; o
+zaman sunucudaki `.env`'de `APP_KEY`, `APP_ENV` ve `APP_DEBUG=false` olmalı.
 
 ## 4. Yükle ve aç
 
@@ -94,7 +110,7 @@ cPanel → **Domains** → `staging-api.quezby.com`:
 - SSL için cPanel → **SSL/TLS Status** → AutoSSL.
 
 Kontrol: `curl https://staging-api.quezby.com/api/v1/health` →
-`{"status":"ok",…}`
+`{"status":"ok",…}`. `500` dönüyorsa önce `APP_KEY`'e bak (Sorun giderme).
 
 ## 6. Migration ve önbellek
 
@@ -149,7 +165,9 @@ migration gerektiren bir sonraki sürümde yeniden doldurursun.
 ## Güncelleme
 
 3 → 4 → 6 → 7. Yeni sürüm açıldıktan sonra `optimize`'ı mutlaka yeniden
-çağır: eski önbellek yeni kodla çalışmaya devam eder.
+çağır: eski önbellek yeni kodla çalışmaya devam eder. Zip `.env`'i de getirir:
+sunucuda elle değiştirdiğin bir değeri önce yerel `.env.staging`'e yaz,
+yoksa güncelleme onu geri alır.
 
 ## Yönetim paneli (admin.quezby.com)
 
@@ -212,7 +230,14 @@ uçlarından yapılanlar da.
 
 ## Sorun giderme
 
-- **500 / `server_error`**: `storage/logs/laravel-<tarih>.log`.
+- **500 / `server_error`**: `storage/logs/laravel-<tarih>.log`
+  (`LOG_STACK=single` ise `laravel.log`).
+- **Oyuncu istekleri 500, panel açık** (Sistem'de "APP_KEY eksik"; log'da
+  `APP_KEY is missing`): sunucudaki `.env`'de `APP_KEY` boş ya da önbellekte
+  eskisi var. Yerel `.env.staging`'deki satırı aynen yaz, panelde **Sistem →
+  Önbelleği yenile**. Bu hâldeyken biten sıralı turlar "Makbuz eksik"le
+  incelemeye düşer ve Apple ile giriş olmaz; düzeltmeden sonra kuyruktakileri
+  onayla.
 - **`.env` değişikliği etkisiz**: config önbellekte. `optimize`'ı yeniden
   çağır ya da `bootstrap/cache/config.php` dosyasını sil. (`OPS_TOKEN` bundan
   muaf, her istekte `.env`'den okunur.)

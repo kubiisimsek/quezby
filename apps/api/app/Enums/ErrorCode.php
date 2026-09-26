@@ -10,6 +10,7 @@ enum ErrorCode: string
     case NotFound = 'not_found';
     case UsernameInvalid = 'username_invalid';
     case UsernameTaken = 'username_taken';
+    case UsernameLocked = 'username_locked';
     case InvalidCredentials = 'invalid_credentials';
     case EmailTaken = 'email_taken';
     case AlreadyLinked = 'already_linked';
@@ -36,7 +37,7 @@ enum ErrorCode: string
             self::Unauthenticated => 401,
             self::Forbidden => 403,
             self::NotFound => 404,
-            self::UsernameTaken, self::EmailTaken, self::AlreadyLinked, self::IdentityTaken, self::LastSignInMethod,
+            self::UsernameTaken, self::UsernameLocked, self::EmailTaken, self::AlreadyLinked, self::IdentityTaken, self::LastSignInMethod,
             self::RunAlreadyFinished, self::DailyAlreadyPlayed, self::AttestKeyUnknown => 409,
             self::RunExpired => 410,
             self::ValidationFailed, self::UsernameInvalid, self::InvalidCredentials, self::IdentityInvalid,
@@ -55,6 +56,7 @@ enum ErrorCode: string
             self::NotFound => 'Aradığın şey bulunamadı.',
             self::UsernameInvalid => 'Bu kullanıcı adı geçersiz.',
             self::UsernameTaken => 'Bu kullanıcı adı alınmış.',
+            self::UsernameLocked => 'Kullanıcı adını zaten seçtin; seçilen ad değişmez.',
             self::InvalidCredentials => 'E-posta ya da şifre hatalı.',
             self::EmailTaken => 'Bu e-posta başka bir hesaba bağlı.',
             self::AlreadyLinked => 'Bu hesaba zaten bağlı.',

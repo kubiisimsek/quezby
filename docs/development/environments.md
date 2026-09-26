@@ -103,9 +103,20 @@ installs on a phone, Google Play refuses it. Making the key:
 `apps/api/.env.example` is local development (SQLite, debug on).
 `.env.staging.example` and `.env.production.example` are the hosting
 templates (MySQL, debug off); the API refuses to boot with `APP_DEBUG=true`
-outside local. Copy one to `apps/api/.env.staging` / `.env.production`
-(git-ignored), fill it in, and `pnpm api:package:staging` builds a zip ready
-to upload — see `docs/deployment/shared-hosting.md`.
+when `APP_ENV` is `staging` or `production` — so a hosting `.env` that says
+`APP_ENV=local` skips that guard. Copy one to `apps/api/.env.staging` /
+`.env.production` (git-ignored), fill it in, and `pnpm api:package:staging`
+builds a zip ready to upload — see `docs/deployment/shared-hosting.md`. The
+build refuses a file without a well-formed `APP_KEY`, with another `APP_ENV`
+or with debug on (`scripts/check-api-env.mjs`).
+
+`APP_KEY` is not optional anywhere: checkpoint receipts are signed with a key
+derived from it and Apple's refresh tokens are encrypted with it. Without it
+the API answers every player request `500` (`RequireAppKey`; the admin panel
+and the ops routes stay open, and the panel's Sistem page says so in red).
+Generate it once per environment and never change it — a new key turns the
+receipts of runs in play into forgeries and leaves the stored Apple tokens
+unreadable. The Pest suite carries its own key in `phpunit.xml`.
 
 The API accepts `com.kubisimsek.game.quezby` wherever it checks which app it is
 talking to (`APPLE_BUNDLE_IDS`, `PLAY_INTEGRITY_PACKAGES`); both stay empty
@@ -121,7 +132,9 @@ The app ships the code for both; the consoles are set up once, for the one app.
   create one Sign in with Apple key (`.p8`). Only for revoking Apple's grant
   when an account is deleted, the API needs `APPLE_TEAM_ID`, `APPLE_KEY_ID`
   and `APPLE_PRIVATE_KEY_PATH` (the `.p8` under `storage/app/private`, never in
-  git). Apple sign-in is iOS only.
+  git). With the key in place, every Apple sign-in trades Apple's one-time code
+  for a refresh token and stores it encrypted — so it needs `APP_KEY`. Apple
+  sign-in is iOS only.
 - **Google** — in Google Cloud: the OAuth consent screen, one **Web** client
   (the token audience the API checks), one **iOS** client for
   `com.kubisimsek.game.quezby`, and one **Android** client per signing key, each

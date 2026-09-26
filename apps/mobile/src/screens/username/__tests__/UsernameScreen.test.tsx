@@ -1,3 +1,4 @@
+import { ApiError } from '@quezby/sdk';
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 
 import { api } from '@/api/client';
@@ -43,6 +44,15 @@ describe('UsernameScreen', () => {
     expect(screen.getByText('Kaydet')).toBeTruthy();
   });
 
+  it('says the name it picks is for good, and never promises a change later', async () => {
+    signedIn();
+    await renderWithProviders(<UsernameScreen />);
+
+    expect(screen.getByText(/seçtiğin ad bir daha değişmez/)).toBeTruthy();
+    expect(screen.getByText(/istersen sonra Profil’den seçersin/)).toBeTruthy();
+    expect(screen.queryByText(/değiştir/)).toBeNull();
+  });
+
   it('lets a new player skip it, keeping the automatic name, and moves on to keeping the account', async () => {
     signedIn();
     await renderWithProviders(<UsernameScreen />);
@@ -81,7 +91,25 @@ describe('UsernameScreen', () => {
     await renderWithProviders(<UsernameScreen />);
 
     expect(screen.getByText('Sana ne diyelim?')).toBeTruthy();
+    expect(screen.getByText(/^Benzersiz olmalı ve bir daha değişmez/)).toBeTruthy();
     expect(screen.queryByText('Şimdilik geç')).toBeNull();
+  });
+
+  it('says why a second name is refused, and still lets the step be skipped', async () => {
+    signedIn({ username: 'ekin' });
+    mocked.usernames.check.mockResolvedValue({ username: 'baska', available: true, reason: null });
+    mocked.me.updateUsername.mockRejectedValue(
+      new ApiError(409, 'username_locked', 'Kullanıcı adını zaten seçtin; seçilen ad değişmez.'),
+    );
+    await renderWithProviders(<UsernameScreen />);
+
+    await type('baska', 'Kaydet');
+    await fireEvent.press(screen.getByText('Kaydet'));
+
+    expect(await screen.findByText('Kullanıcı adını zaten seçtin; seçilen ad değişmez.')).toBeTruthy();
+    expect(useSession.getState().user?.username).toBe('ekin');
+    await fireEvent.press(screen.getByText('Şimdilik geç'));
+    expect(useOnboarding.getState().step).toBe('protect');
   });
 
   it('is the one question before the game for an account from before automatic names', async () => {

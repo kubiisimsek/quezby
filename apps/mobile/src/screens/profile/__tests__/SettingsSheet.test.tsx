@@ -38,20 +38,48 @@ describe('SettingsSheet', () => {
     const onPick = await renderSheet();
 
     expect(screen.getByText('Ayarlar')).toBeOnTheScreen();
-    expect(screen.getByText('Şu an @ekin')).toBeOnTheScreen();
     expect(screen.getByText(keepHint())).toBeOnTheScreen();
     expect(screen.queryByText('Çıkış yap')).not.toBeOnTheScreen();
 
     for (const [name, door] of [
       [/^Yardım/, 'help'],
-      [/^Kullanıcı adını değiştir/, 'username'],
       [/^Hesabını koru/, 'ways'],
       [/^Hesabı sil/, 'delete'],
     ] as const) {
       await fireEvent.press(screen.getByRole('button', { name }));
       expect(onPick).toHaveBeenLastCalledWith(door);
     }
-    expect(onPick).toHaveBeenCalledTimes(4);
+    expect(onPick).toHaveBeenCalledTimes(3);
+  });
+
+  it('shows a picked name locked, with no door to change it', async () => {
+    const onPick = await renderSheet();
+
+    expect(screen.getByText('Kullanıcı adın')).toBeOnTheScreen();
+    expect(screen.getByText('@ekin · kalıcı')).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: /Kullanıcı adın/ })).not.toBeOnTheScreen();
+    expect(screen.queryByText(/değiştir/)).not.toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByText('Kullanıcı adın'));
+    expect(onPick).not.toHaveBeenCalled();
+  });
+
+  it('opens the one pick while the name is still the automatic one', async () => {
+    useSession.setState({ user: buildMe({ username: 'guest48128742' }) });
+    const onPick = await renderSheet();
+
+    expect(screen.getByText('Şimdilik @guest48128742 · bir kez seçersin')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: /^Adını seç/ }));
+    expect(onPick).toHaveBeenCalledWith('username');
+  });
+
+  it('asks an account with no name for one, without an empty @', async () => {
+    useSession.setState({ user: buildMe({ username: null }) });
+    await renderSheet();
+
+    expect(screen.getByRole('button', { name: /^Adını seç/ })).toBeOnTheScreen();
+    expect(screen.getByText('Henüz bir adın yok')).toBeOnTheScreen();
+    expect(screen.queryByText(/@null/)).not.toBeOnTheScreen();
   });
 
   it('offers a kept account its ways in and the way out', async () => {

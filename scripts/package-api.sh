@@ -7,7 +7,9 @@
 #   ./scripts/package-api.sh production
 #
 # → dist-deploy/quezby-api-<env>-<timestamp>.zip with production dependencies
-# installed and apps/api/.env.<env> (git-ignored) inside as .env.
+# installed and apps/api/.env.<env> (git-ignored) inside as .env. That file is
+# checked first (scripts/check-api-env.mjs): without APP_KEY, or with another
+# APP_ENV or debug on, nothing is built.
 
 set -euo pipefail
 
@@ -26,12 +28,24 @@ OUT="$ROOT/dist-deploy"
 NAME="quezby-api-$ENVIRONMENT-$(date +%Y%m%d-%H%M%S)"
 COMPOSER="${COMPOSER_BIN:-composer}"
 
-for tool in rsync zip php "$COMPOSER"; do
+for tool in node rsync zip php "$COMPOSER"; do
   if ! command -v "$tool" >/dev/null 2>&1; then
     echo "error: '$tool' is not installed." >&2
     exit 69
   fi
 done
+
+# The .env goes first: a zip that would answer every player 500 is not worth building.
+ENV_FILE="$API/.env.$ENVIRONMENT"
+if [[ -f "$ENV_FILE" ]]; then
+  echo "→ Checking apps/api/.env.$ENVIRONMENT"
+  node "$ROOT/scripts/check-api-env.mjs" "$ENVIRONMENT" "$ENV_FILE"
+else
+  echo "warning: apps/api/.env.$ENVIRONMENT not found, so the zip has no .env." >&2
+  echo "         Copy apps/api/.env.$ENVIRONMENT.example to apps/api/.env.$ENVIRONMENT, fill it in" >&2
+  echo "         and package again — or keep the server's own .env, which needs APP_KEY," >&2
+  echo "         APP_ENV=$ENVIRONMENT and APP_DEBUG=false: without APP_KEY every player request answers 500." >&2
+fi
 
 WORK="$(mktemp -d "${TMPDIR:-/tmp}/quezby-api.XXXXXX")"
 trap 'rm -rf "$WORK"' EXIT
@@ -75,21 +89,9 @@ mkdir -p \
 echo "→ Installing production dependencies"
 (cd "$BUILD" && "$COMPOSER" install --no-dev --optimize-autoloader --no-interaction --no-progress)
 
-ENV_FILE="$API/.env.$ENVIRONMENT"
 if [[ -f "$ENV_FILE" ]]; then
   cp "$ENV_FILE" "$BUILD/.env"
   echo "→ Using apps/api/.env.$ENVIRONMENT as .env"
-  grep -Eq "^APP_ENV=\"?${ENVIRONMENT}\"?[[:space:]]*$" "$ENV_FILE" ||
-    echo "warning: APP_ENV in .env.$ENVIRONMENT is not '$ENVIRONMENT'." >&2
-  grep -Eq '^APP_KEY="?base64:' "$ENV_FILE" ||
-    echo "warning: APP_KEY is empty — fill it with: (cd apps/api && php artisan key:generate --show)" >&2
-  if grep -Eiq '^APP_DEBUG="?\(?(true|1)' "$ENV_FILE"; then
-    echo "warning: APP_DEBUG=true — the API refuses to start in $ENVIRONMENT until it is false." >&2
-  fi
-else
-  echo "warning: apps/api/.env.$ENVIRONMENT not found, so the zip has no .env." >&2
-  echo "         Copy apps/api/.env.$ENVIRONMENT.example to apps/api/.env.$ENVIRONMENT, fill it in" >&2
-  echo "         and package again — or create .env on the server by hand." >&2
 fi
 
 mkdir -p "$OUT"

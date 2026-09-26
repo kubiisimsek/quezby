@@ -81,6 +81,65 @@ test('a player on an automatic name picks a name of their own', function () {
     $this->assertSame('ekin.su', $user->fresh()->username);
 });
 
+test('a picked name is the player\'s for good', function () {
+    $user = $this->signIn(User::factory()->withUsername('kubi')->create());
+
+    $this->assertApiError($this->putJson('/api/v1/me/username', ['username' => 'ekin']), 409, 'username_locked')
+        ->assertJsonPath('error.message', 'Kullanıcı adını zaten seçtin; seçilen ad değişmez.');
+    $this->assertSame('kubi', $user->fresh()->username);
+
+    // Sending the name it already has is still fine.
+    $this->putJson('/api/v1/me/username', ['username' => 'KUBI'])
+        ->assertOk()
+        ->assertJsonPath('user.username', 'kubi');
+});
+
+test('an automatic name is picked over once, and never again', function () {
+    $user = $this->signIn(User::factory()->withUsername('guest00000007')->create());
+
+    $this->putJson('/api/v1/me/username', ['username' => 'ekin.su'])->assertOk();
+    $this->assertApiError($this->putJson('/api/v1/me/username', ['username' => 'ekin.su2']), 409, 'username_locked');
+
+    $this->assertSame('ekin.su', $user->fresh()->username);
+});
+
+test('an account with no name picks one, and keeps it', function () {
+    $user = $this->signIn(User::factory()->create());
+
+    $this->putJson('/api/v1/me/username', ['username' => 'kubi'])->assertOk();
+    $this->assertApiError($this->putJson('/api/v1/me/username', ['username' => 'kubi2']), 409, 'username_locked');
+
+    $this->assertSame('kubi', $user->fresh()->username);
+});
+
+test('two quick picks cannot both land', function () {
+    // The second request still sees the automatic name; the first pick has landed meanwhile.
+    $user = $this->signIn(User::factory()->withUsername('guest00000007')->create());
+    User::query()->whereKey($user->getKey())->update(['username' => 'first.pick']);
+
+    $this->assertApiError($this->putJson('/api/v1/me/username', ['username' => 'second.pick']), 409, 'username_locked');
+
+    $this->assertSame('first.pick', $user->fresh()->username);
+});
+
+test('the same pick landing twice is fine', function () {
+    $user = $this->signIn(User::factory()->withUsername('guest00000007')->create());
+    User::query()->whereKey($user->getKey())->update(['username' => 'ekin.su']);
+
+    $this->putJson('/api/v1/me/username', ['username' => 'ekin.su'])
+        ->assertOk()
+        ->assertJsonPath('user.username', 'ekin.su');
+});
+
+test('picking a name is throttled', function () {
+    $this->signIn(User::factory()->withUsername('kubi')->create());
+    for ($i = 0; $i < 10; $i++) {
+        $this->putJson('/api/v1/me/username', ['username' => 'kubi'])->assertOk();
+    }
+
+    $this->assertApiError($this->putJson('/api/v1/me/username', ['username' => 'kubi']), 429, 'too_many_requests');
+});
+
 test('a player cannot pick a name that looks automatic', function () {
     $this->signIn();
 

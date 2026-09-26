@@ -42,6 +42,23 @@ describe('PlayerPage', () => {
     expect(await screen.findByText('Oyuncu yasaklandı')).toBeInTheDocument();
   });
 
+  it('resets a name with a reason, saying the player gets one more pick, and shows the new name', async () => {
+    const api = withPlayer();
+    api.players.rename.mockResolvedValue({ changed: true, username: 'guest00000007' });
+    const { user } = renderApp({ path: `/players/${ID}`, api });
+
+    await user.click(await screen.findByRole('button', { name: 'İşlemler' }));
+    await user.click(await screen.findByRole('menuitem', { name: /Adı sıfırla/ }));
+    const dialog = await screen.findByRole('dialog', { name: '@kerem.35 adı sıfırlansın mı?' });
+    expect(within(dialog).getByText(/Kendine bir kez daha ad seçebilir; o ad da kalıcıdır\./)).toBeInTheDocument();
+    await user.type(within(dialog).getByLabelText('Sebep'), 'Küfürlü ad');
+    await user.click(within(dialog).getByRole('button', { name: 'Adı sıfırla' }));
+
+    await waitFor(() => expect(api.players.rename).toHaveBeenCalledWith(ID, { reason: 'Küfürlü ad' }));
+    expect(await screen.findByText('Ad sıfırlandı')).toBeInTheDocument();
+    expect(await screen.findByText('Yeni adı: @guest00000007')).toBeInTheDocument();
+  });
+
   it('shows the API\'s problem with a reason under the reason', async () => {
     const api = withPlayer();
     api.players.ban.mockRejectedValue(new ApiError(422, 'validation_failed', 'x', { reason: ['Sebep en az 3 karakter olmalı.'] }));

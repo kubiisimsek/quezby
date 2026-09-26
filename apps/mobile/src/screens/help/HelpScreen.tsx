@@ -78,6 +78,11 @@ const FAQ: ReadonlyArray<{ question: string; answer: string }> = [
       'Arkadaşlar’dan onları bul ve takip et. Zirve’de Arkadaşlar’a geçince yalnızca takip ettiklerinle yarışırsın.',
   },
   {
+    question: 'Kullanıcı adımı değiştirebilir miyim?',
+    answer:
+      'Hayır. Adını bir kez seçersin ve bir daha değişmez; Zirve’de ve ligde herkes seni o adla tanır. Acelen yoksa önce guest adıyla oyna, adını sonra Profil’deki Ayarlar’dan seç.',
+  },
+  {
     question: 'Telefonumu değiştirirsem ne olur?',
     answer:
       'Hesabını koruduysan yeni telefonda bağladığın yolla girersin; adın ve skorların seninle gelir. Misafir hesap yalnızca bu telefonda durur.',
@@ -282,7 +287,8 @@ export function HelpScreen({ navigation }: Props) {
           <Txt>
             İlk açılışta bir deneme turuyla başlarsın; o tur hiçbir yere
             sayılmaz. Hesabın misafir olarak bu telefonda durur ve bir ad
-            seçene kadar guest48128742 gibi bir adla oynarsın.
+            seçene kadar guest48128742 gibi bir adla oynarsın. Seçtiğin ad
+            kalıcıdır; bir daha değişmez.
           </Txt>
           <Txt tone="muted">
             Profil’de “Hesabını koru” ile Apple, Google ya da e-posta bağla;

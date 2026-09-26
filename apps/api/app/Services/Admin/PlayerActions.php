@@ -27,8 +27,8 @@ final class PlayerActions
 
     /**
      * Gives the player a fresh automatic name — `guest` and eight digits — in
-     * place of one that should not be seen. They may pick another; the old
-     * one is in the audit log.
+     * place of one that should not be seen. That opens one more pick, and the
+     * name they pick is theirs for good again; the old one is in the audit log.
      */
     public function rename(User $player, string $reason, Actor $actor): string
     {

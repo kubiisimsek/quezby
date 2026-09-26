@@ -63,8 +63,13 @@ phone that failed its device check and the moderation on the audit log.
 
 Never "try" a migration with `php artisan migrate:fresh` or `db:wipe`: there
 is no `.env.testing`, so it wipes `database/database.sqlite`. The Pest suite
-migrates its own in-memory database; `php artisan migrate --pretend` shows
-what a migration would do.
+migrates its own in-memory database and carries its own `APP_KEY`
+(`phpunit.xml`), so it never leans on your `.env`; `php artisan migrate
+--pretend` shows what a migration would do.
+
+`php artisan key:generate` above is not a formality: without `APP_KEY` the API
+answers every player request `500` — checkpoint receipts are signed with it and
+Apple's refresh tokens encrypted with it (`docs/development/environments.md`).
 
 ## Checks
 

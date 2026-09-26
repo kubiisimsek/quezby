@@ -3,6 +3,7 @@ export {
   USERNAME_MAX_LENGTH,
   USERNAME_MESSAGES,
   USERNAME_MIN_LENGTH,
+  canPickUsername,
   isAutoUsername,
   normalizeUsername,
   usernameChecklist,

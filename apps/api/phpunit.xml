@@ -19,6 +19,8 @@
     </source>
     <php>
         <env name="APP_ENV" value="testing"/>
+        <!-- The suite's own key, so it never leans on a local .env: checkpoint receipts are signed with it. -->
+        <env name="APP_KEY" value="base64:A+uQkyeqz/Tyh1xPRh3/CrVKpD0NegxFlrnPqyDDUHk="/>
         <env name="APP_DEBUG" value="false"/>
         <env name="APP_LOCALE" value="tr"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>

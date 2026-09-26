@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   USERNAME_MESSAGES,
+  canPickUsername,
   isAutoUsername,
   normalizeUsername,
   usernameChecklist,
@@ -71,6 +72,21 @@ describe('isAutoUsername', () => {
     for (const { name, automatic } of fixtures.automatic) {
       if (automatic) expect(validateUsername(name)).toEqual({ ok: false, problem: 'reserved' });
     }
+  });
+});
+
+describe('canPickUsername', () => {
+  it.each(fixtures.automatic)('lets a player pick over "$name": $automatic', ({ name, automatic }) => {
+    expect(canPickUsername(name)).toBe(automatic);
+  });
+
+  it('lets an account with no name pick one', () => {
+    expect(canPickUsername(null)).toBe(true);
+    expect(canPickUsername(undefined)).toBe(true);
+  });
+
+  it('keeps every name a player could have picked', () => {
+    for (const { normalized } of fixtures.valid) expect(canPickUsername(normalized)).toBe(false);
   });
 });
 

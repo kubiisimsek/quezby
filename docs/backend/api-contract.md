@@ -34,13 +34,13 @@ A contract change is one commit: `packages/types` → Laravel request/resource �
 | 401 | `unauthenticated` — missing or revoked token |
 | 403 | `forbidden` — the admin panel only: the admin's role may not do this (`docs/backend/admin-api.md`) |
 | 404 | `not_found` — also another player's run, an unknown board, a banned player |
-| 409 | `username_taken`, `email_taken`, `already_linked`, `identity_taken`, `last_sign_in_method`, `run_already_finished`, `daily_already_played`, `attest_key_unknown` |
+| 409 | `username_taken`, `username_locked`, `email_taken`, `already_linked`, `identity_taken`, `last_sign_in_method`, `run_already_finished`, `daily_already_played`, `attest_key_unknown` |
 | 410 | `run_expired` |
 | 422 | `validation_failed`, `username_invalid`, `invalid_credentials`, `identity_invalid`, `run_rejected`, `engine_outdated`, `cannot_follow_self`, `follow_limit`, `challenge_invalid`, `integrity_invalid` |
 | 429 | `too_many_requests` |
 
 Throttles: guest sign-up 10/h/IP · login 10/min/IP · nonce 20/min/IP · Apple/Google
-10/min/IP · identities 10/min · username check 60/min · run start 30/min · run
+10/min/IP · identities 10/min · username check 60/min · username pick 10/min · run start 30/min · run
 checkpoint 12/min · run finish 20/min · device challenge 20/min · device checks
 (Android, iOS attest and assert together) 10/min · search 30/min · follow 60/min ·
 every read (boards, daily, league, stats, players, follow lists) 60/min.
@@ -67,8 +67,8 @@ does not parse is `ok` — the network must never lock a player out.
 
 `{ "platform": "ios", "installId": "…" }` → `201 { "token", "user": Me }`. A
 new account with no email, password or identity, named `guest` + 8 digits
-(`guest48128742`) until its player picks a name — so it can start a run at
-once. The digits are drawn at random; a taken name is drawn again, and a race
+(`guest48128742`) until its player picks a name — once: a picked name never
+changes (`PUT /me/username`) — so it can start a run at once. The digits are drawn at random; a taken name is drawn again, and a race
 on the unique index draws once more. Names like it are reserved: no player can
 pick one (`PUT /me/username` → `422 username_invalid`, `reserved`).
 
@@ -135,9 +135,19 @@ are the friends' posts (catalog ids, the app knows them) liked most.
 
 ### `GET /usernames/check?username=…` · `PUT /me/username` · `PUT /me/settings`
 
-As before: availability with a `UsernameProblem` reason; `{ "username" }` →
-`{ "user": Me }` (`422 username_invalid`, `409 username_taken`); `{ "haptics": false }`
-→ `{ "settings": … }`.
+As before: availability with a `UsernameProblem` reason (the player's own name
+is available to them); `{ "haptics": false }` → `{ "settings": … }`.
+
+`PUT /me/username` `{ "username" }` → `{ "user": Me }` picks a name **once**:
+only while the account's name is the automatic one or there is none
+(`canPickUsername` / `Username::isPickable`). In order: the rules
+(`422 username_invalid`, with the problem); the name it already has → `200`,
+nothing changes; a name already picked → `409 username_locked`; a name another
+player has → `409 username_taken`. The write holds only while the name is still
+the one the request saw (compare-and-set), so of two quick picks one lands and
+the other gets `username_locked`; the unique index decides a race between two
+players (`username_taken`). A moderator's reset (`POST /admin/players/{id}/rename`)
+gives back an automatic name and with it one more pick.
 
 ### `POST /me/credentials`
 
@@ -286,8 +296,15 @@ moves written `g,t,d;g,t,d;…` (`App\Game\Checkpoint::prefixHash`, checked
 against `packages/config/fixtures/checkpoints.json`). The API signs them with
 the time it saw them: `base64url(json {r: runId, n, h, t: ms}) . base64url(HMAC-SHA256)`,
 keyed from `APP_KEY`. **Nothing is written** — the receipt is the record; the
-app keeps it and sends it back with the finish. Fire-and-forget: the run
-never waits on it. Another player's or an unknown run → 404; a run no longer
+app keeps it and sends it back with the finish. The run never waits on it. A
+check-in lost on the way — no answer (network, timeout) or a 5xx — is sent
+again at a later verdict, no sooner than 5 s after it failed, with that
+verdict's `reel` and `prefixHash`, just like a mark's: at most twice a run, and
+never two in one verdict (a new mark's goes first). No 4xx is retried — the app
+goes by the status, so a hosting firewall's HTML 403, which the SDK codes
+`server_error`, is not either. So a run sends at most five check-ins, the
+receipts a finish carries (`CHECKPOINTS.maxReceipts`), well under the 12/min
+throttle. Another player's or an unknown run → 404; a run no longer
 `started` → `409 run_already_finished`; one past its time → `410 run_expired`
 (left for the finish to close).
 

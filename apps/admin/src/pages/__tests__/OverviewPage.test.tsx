@@ -23,6 +23,21 @@ describe('OverviewPage', () => {
     expect(screen.getByRole('link', { name: 'Tümü' })).toHaveAttribute('href', '/suspects');
   });
 
+  it('draws the clean runs green and the flagged ones red, never in the action magenta', async () => {
+    const api = fakeApi();
+    api.overview.get.mockResolvedValue(overview());
+    renderApp({ path: '/', api });
+
+    const chart = (await screen.findByRole('table', { name: 'Son 30 günün turları' })).closest('figure');
+    // Every day has clean runs; two days in three have flagged ones.
+    expect(chart?.querySelectorAll('rect.fill-ok')).toHaveLength(30);
+    expect(chart?.querySelectorAll('rect.fill-bad')).toHaveLength(20);
+    expect(chart?.querySelector('.fill-primary, .bg-primary')).toBeNull();
+    const key = (series: string) => (chart ? within(chart).getByText(series, { selector: 'figcaption span' }).querySelector('span') : null);
+    expect(key('Temiz')).toHaveClass('bg-ok');
+    expect(key('Bayraklı')).toHaveClass('bg-bad');
+  });
+
   it('says so when the week was clean and nothing waits', async () => {
     const api = fakeApi();
     api.overview.get.mockResolvedValue(overview({ topFlags: [], queue: [] }));

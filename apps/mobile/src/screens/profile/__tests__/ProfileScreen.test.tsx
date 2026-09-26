@@ -1,5 +1,6 @@
 import { postsOf } from '@quezby/config';
 import type { LeagueResponse, PlayerStats, StatsResponse } from '@quezby/types';
+import { ApiError } from '@quezby/sdk';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 
 import { api } from '@/api/client';
@@ -15,7 +16,7 @@ jest.mock('@/config/env', () => ({
 
 jest.mock('@/api/client', () => ({
   api: {
-    me: { stats: jest.fn(), updateSettings: jest.fn() },
+    me: { stats: jest.fn(), updateSettings: jest.fn(), updateUsername: jest.fn() },
     auth: { logout: jest.fn() },
     leagues: { current: jest.fn() },
     usernames: { check: jest.fn() },
@@ -23,10 +24,14 @@ jest.mock('@/api/client', () => ({
 }));
 
 const mocked = api as unknown as {
-  me: { stats: jest.Mock; updateSettings: jest.Mock };
+  me: { stats: jest.Mock; updateSettings: jest.Mock; updateUsername: jest.Mock };
   auth: { logout: jest.Mock };
   leagues: { current: jest.Mock };
+  usernames: { check: jest.Mock };
 };
+
+const PICK_DESCRIPTION =
+  'Şimdilik @guest48128742 olarak görünüyorsun. Seçtiğin ad bütün skorlarında görünür ve bir daha değişmez.';
 
 type Props = Parameters<typeof ProfileScreen>[0];
 
@@ -338,7 +343,8 @@ describe('ProfileScreen', () => {
 
       expect(screen.getByText('Titreşim')).toBeOnTheScreen();
       expect(screen.getByRole('button', { name: /^Yardım/ })).toBeOnTheScreen();
-      expect(screen.getByText('Kullanıcı adını değiştir')).toBeOnTheScreen();
+      expect(screen.getByText('Kullanıcı adın')).toBeOnTheScreen();
+      expect(screen.getByText('@ekin · kalıcı')).toBeOnTheScreen();
       expect(
         screen.getAllByRole('button', { name: /^Hesabını koru/ }),
       ).toHaveLength(2);
@@ -358,35 +364,65 @@ describe('ProfileScreen', () => {
       expect(navigate).toHaveBeenCalledWith('Help');
     });
 
-    it('opens the username form once the sheet has left the screen', async () => {
+    it('never offers to change a name the player picked', async () => {
       await renderProfile();
       await openSettings();
 
-      await fireEvent.press(
-        screen.getByRole('button', { name: /^Kullanıcı adını değiştir/ }),
-      );
-      expect(
-        screen.queryByText('Sıralamadaki tüm skorların yeni adla görünür.'),
-      ).not.toBeOnTheScreen();
-
-      await leave();
-      expect(
-        screen.getByText('Sıralamadaki tüm skorların yeni adla görünür.'),
-      ).toBeOnTheScreen();
+      expect(screen.queryByRole('button', { name: /Kullanıcı adın/ })).not.toBeOnTheScreen();
+      expect(screen.queryByRole('button', { name: /^Adını seç/ })).not.toBeOnTheScreen();
+      expect(screen.queryByText(/değiştir/)).not.toBeOnTheScreen();
     });
 
-    it('asks a player still on the automatic name to pick one, from an empty field', async () => {
+    it('asks a player still on the automatic name to pick one, once the sheet has left the screen', async () => {
       useSession.setState({ user: buildMe({ username: 'guest48128742' }) });
       await renderProfile();
       await openSettings();
 
       await fireEvent.press(screen.getByRole('button', { name: /^Adını seç/ }));
+      expect(screen.queryByText(PICK_DESCRIPTION)).not.toBeOnTheScreen();
+
+      await leave();
+      expect(screen.getByText(PICK_DESCRIPTION)).toBeOnTheScreen();
+      expect(screen.getByPlaceholderText('ornek.kullanici').props.value ?? '').toBe('');
+    });
+
+    it('saves the one pick, and from then on shows the name locked', async () => {
+      useSession.setState({ user: buildMe({ username: 'guest48128742' }) });
+      mocked.usernames.check.mockResolvedValue({ username: 'ekin.su', available: true, reason: null });
+      mocked.me.updateUsername.mockResolvedValue({ user: buildMe({ username: 'ekin.su' }) });
+      await renderProfile();
+      await openSettings();
+      await fireEvent.press(screen.getByRole('button', { name: /^Adını seç/ }));
       await leave();
 
-      expect(
-        screen.getByText('Şimdilik @guest48128742 olarak görünüyorsun. Seçtiğin ad bütün skorlarında görünür.'),
-      ).toBeOnTheScreen();
-      expect(screen.getByPlaceholderText('ornek.kullanici').props.value ?? '').toBe('');
+      await fireEvent.changeText(screen.getByPlaceholderText('ornek.kullanici'), 'Ekin.Su');
+      await waitFor(() => expect(screen.getByRole('button', { name: 'Kaydet' })).toBeEnabled());
+      await fireEvent.press(screen.getByRole('button', { name: 'Kaydet' }));
+
+      await waitFor(() => expect(mocked.me.updateUsername).toHaveBeenCalledWith('ekin.su'));
+      await waitFor(() => expect(useSession.getState().user?.username).toBe('ekin.su'));
+      await leave();
+      await openSettings();
+      expect(screen.getByText('@ekin.su · kalıcı')).toBeOnTheScreen();
+      expect(screen.queryByRole('button', { name: /^Adını seç/ })).not.toBeOnTheScreen();
+    });
+
+    it('says why a second pick is refused', async () => {
+      useSession.setState({ user: buildMe({ username: 'guest48128742' }) });
+      mocked.usernames.check.mockResolvedValue({ username: 'ekin.su', available: true, reason: null });
+      mocked.me.updateUsername.mockRejectedValue(
+        new ApiError(409, 'username_locked', 'Kullanıcı adını zaten seçtin; seçilen ad değişmez.'),
+      );
+      await renderProfile();
+      await openSettings();
+      await fireEvent.press(screen.getByRole('button', { name: /^Adını seç/ }));
+      await leave();
+
+      await fireEvent.changeText(screen.getByPlaceholderText('ornek.kullanici'), 'ekin.su');
+      await waitFor(() => expect(screen.getByRole('button', { name: 'Kaydet' })).toBeEnabled());
+      await fireEvent.press(screen.getByRole('button', { name: 'Kaydet' }));
+
+      expect(await screen.findByText('Kullanıcı adını zaten seçtin; seçilen ad değişmez.')).toBeOnTheScreen();
     });
 
     it('keeps a guest account from here too', async () => {
@@ -423,6 +459,7 @@ describe('ProfileScreen', () => {
     });
 
     it('opens nothing when it is closed without a choice', async () => {
+      useSession.setState({ user: buildMe({ username: 'guest48128742' }) });
       await renderProfile();
       await openSettings();
 
@@ -432,9 +469,7 @@ describe('ProfileScreen', () => {
       await leave();
 
       expect(navigate).not.toHaveBeenCalled();
-      expect(
-        screen.queryByText('Sıralamadaki tüm skorların yeni adla görünür.'),
-      ).not.toBeOnTheScreen();
+      expect(screen.queryByText(PICK_DESCRIPTION)).not.toBeOnTheScreen();
       expect(
         screen.queryByRole('button', { name: 'Apple ile devam et' }),
       ).not.toBeOnTheScreen();

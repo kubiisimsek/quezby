@@ -6,9 +6,15 @@ import { Facts } from '@/components/patterns/facts';
 import { formatCombo, formatMs, formatNumber, GESTURE, POST_KIND, VERDICT } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
+/**
+ * A verdict's cell, and its swatch in the tally — the strip's legend. Good is
+ * green, as in the game: a hit a soft cell with a green edge (a pale fill
+ * alone reads as the grey of `drained`), a perfect one solid. Never `primary`:
+ * its magenta reads as the failures' red.
+ */
 const CELL: Record<AdminVerdict, string> = {
-  hit: 'bg-ok',
-  perfect: 'bg-primary',
+  hit: 'border border-ok bg-ok-soft',
+  perfect: 'bg-ok',
   timeout: 'bg-bad',
   wrong: 'bg-bad',
   caught: 'bg-bad',
@@ -23,7 +29,10 @@ const FAST_MS = 250;
 /**
  * A run post by post, as the API's replay judged it: a strip of the decision
  * times of the swipes and likes — a human's wander, a bot's flat line — and
- * a cell per post in the colour of its verdict. A cell opens its post.
+ * a cell per post in the colour of its verdict: green for a hit (soft, edged)
+ * and a perfect (solid), amber for a hold let go early or late, red for a
+ * miss, grey once the dopamine ran out. The tally above carries each cell's
+ * swatch, so it reads as the legend. A cell opens its post.
  */
 export function RunTimeline({ steps }: { steps: AdminRunStep[] }) {
   const [chosen, setChosen] = useState<number | null>(null);
@@ -42,7 +51,12 @@ export function RunTimeline({ steps }: { steps: AdminRunStep[] }) {
     <div className="space-y-5">
       <div className="flex flex-wrap gap-1.5">
         {tally.map(([verdict, count]) => (
-          <Tag key={verdict} tone={VERDICT[verdict].tone} label={`${VERDICT[verdict].label} ${formatNumber(count)}`} />
+          <Tag
+            key={verdict}
+            tone={VERDICT[verdict].tone}
+            icon={<span aria-hidden className={cn('size-2.5 shrink-0 rounded-[3px]', CELL[verdict])} />}
+            label={`${VERDICT[verdict].label} ${formatNumber(count)}`}
+          />
         ))}
       </div>
 

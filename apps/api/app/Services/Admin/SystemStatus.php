@@ -6,6 +6,7 @@ use App\Content\Catalog;
 use App\Enums\RunStatus;
 use App\Game\Rules;
 use App\Models\Run;
+use App\Support\AppKey;
 use App\Support\ModerationToken;
 use App\Support\OpsToken;
 use App\Support\Timestamp;
@@ -46,6 +47,7 @@ final class SystemStatus
                 'android' => ['min' => (string) config('quezby.apps.android.min_version'), 'latest' => (string) config('quezby.apps.android.latest_version')],
             ],
             'tokens' => ['ops' => OpsToken::current() !== '', 'moderation' => ModerationToken::current() !== ''],
+            'appKey' => AppKey::problem() === null,
             'cached' => ['config' => app()->configurationIsCached(), 'routes' => app()->routesAreCached()],
             'pendingMigrations' => $this->pendingMigrations(),
             'runs' => [

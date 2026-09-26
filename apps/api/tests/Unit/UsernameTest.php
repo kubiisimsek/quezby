@@ -55,6 +55,14 @@ it('never calls a missing name automatic', function () {
     $this->assertFalse(Username::isAutomatic(null));
 });
 
+it('lets a player pick only over the name the API gave', function (string $name, bool $automatic) {
+    $this->assertSame($automatic, Username::isPickable($name));
+})->with('automatic usernames');
+
+it('lets an account with no name pick one', function () {
+    $this->assertTrue(Username::isPickable(null));
+});
+
 it('trims exactly what JavaScript trims', function () {
     // No-break and ideographic spaces are whitespace to JavaScript's trim()…
     $this->assertSame('kubi', Username::validate("\u{00A0}kubi\u{3000}")->normalized);

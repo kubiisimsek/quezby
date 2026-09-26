@@ -3,8 +3,9 @@
 **Kod:** `packages/config/src/username.ts` (uygulama) · `apps/api/app/Support/Username.php` (API)
 **Ortak testler:** `packages/config/fixtures/usernames.json` — iki taraf da aynı dosyaya karşı test edilir.
 
-Sıralamada herkes birbirini kullanıcı adıyla görür; ad **benzersizdir** ve her
-hesabın ilk andan bir adı vardır.
+Sıralamada herkes birbirini kullanıcı adıyla görür; ad **benzersizdir**, her
+hesabın ilk andan bir adı vardır ve oyuncunun seçtiği ad **kalıcıdır** — bir
+kez seçilir, bir daha değişmez.
 
 ## Otomatik ad
 
@@ -16,7 +17,10 @@ ya da **Şimdilik geç** der ve bu adla oynar. Adlar küçük harfle saklandığ
 `Guest48128742` değil `guest48128742` görünür.
 
 - `isAutoUsername` (TS) / `Username::isAutomatic` (PHP): ad hâlâ otomatik mi.
-  Profil'de satır "Adını seç" der ve form boş açılır.
+- `canPickUsername` (TS) / `Username::isPickable` (PHP): oyuncu hâlâ ad seçebilir
+  mi — yalnızca ad otomatikken ya da hiç yokken. Profil → Ayarlar'da satır
+  "Adını seç" der ve form boş açılır; seçildikten sonra aynı yerde kilitli,
+  basılmayan bir satır durur: "Kullanıcı adın · @ekin · kalıcı".
 - **Otomatik görünen adlar ayrılmıştır:** sembolleri atılınca `guest` ya da
   `misafir` + yalnızca rakam kalan her ad (`guest12345678`, `Guest.4812`,
   `misafir*7`) `reserved` döner — seçilmiş bir ad verilmiş gibi görünmesin.
@@ -51,12 +55,25 @@ ya da **Şimdilik geç** der ve bu adla oynar. Adlar küçük harfle saklandığ
 TikTok da aynı sebeple yalnızca ASCII harf kabul eder. Oyuncuya "ş yerine s"
 diyen ayrı bir mesaj gösterilir.
 
-## Değiştirmek
+## Kalıcı ad
 
-Profil → Ayarlar → *Kullanıcı adını değiştir* (ad hâlâ otomatikse *Adını seç*).
-Aynı kurallar ve aynı kontrol; eski skorlar yeni adla görünür (skorlar
-kullanıcıya bağlıdır, ada değil). Oyuncunun kendi adı — otomatik olan da —
-"ayrılmış" sayılmaz, "şu anki adın" olarak gösterilir.
+Ad **bir kez** seçilir: ilk açılıştaki "Sana ne diyelim?" adımında ya da sonra
+Profil → Ayarlar → *Adını seç*'te. Seçilen ad bir daha değişmez; ekranlar bunu
+kaydetmeden önce söyler ("seçtiğin ad bir daha değişmez"), onay adımı yoktur.
+
+- `PUT /me/username` yalnızca ad otomatikken ya da yokken yeni bir ad yazar;
+  seçilmiş bir adın üstüne gelen her ad `409 username_locked` döner ("Kullanıcı
+  adını zaten seçtin; seçilen ad değişmez."). Aynı adı yeniden göndermek
+  zararsızdır (200, hiçbir şey değişmez).
+- Yazma, oyuncunun o anki adına **koşulludur** (compare-and-set): art arda iki
+  hızlı istek ikisi birden yazılamaz; geç kalan `username_locked` alır. İki
+  oyuncunun aynı ada yarışını unique index çözer (`username_taken`).
+- Uygun olup olmadığına bakarken oyuncunun kendi adı "ayrılmış" sayılmaz,
+  "şu anki adın" olarak gösterilir.
+- Tek kaçış yolu moderasyon: panelde **Adı sıfırla** oyuncuya yeni bir otomatik
+  ad verir (eski ad denetim kaydında kalır) ve bu, oyuncuya **bir** seçim daha
+  açar; o ad da kalıcıdır.
+- Kural devreye girdiği anda bugüne kadar seçilmiş bütün adlar kalıcı oldu.
 
 Listeyi genişletirken (`RESERVED_USERNAMES`, `BLOCKED_FRAGMENTS`, otomatik ad
 kalıbı) PHP tarafını ve fixture dosyasını (`valid`, `invalid`, `automatic`) aynı

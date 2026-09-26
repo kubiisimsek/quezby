@@ -95,6 +95,23 @@ export function SystemPage() {
         />
       }
     >
+      {!data.appKey ? (
+        <Callout
+          tone="bad"
+          title="APP_KEY eksik"
+          action={
+            <Button size="sm" tone="primary" onClick={() => setAsking('optimize')}>
+              Önbelleği yenile
+            </Button>
+          }
+        >
+          <p>
+            Oyuncu istekleri 500 dönüyor: kontrol noktası makbuzları imzalanamıyor, Apple ile giriş yapılamıyor. Yerelde{' '}
+            <code className="font-mono">php artisan key:generate --show</code> çıktısını sunucudaki .env dosyasına APP_KEY olarak yaz, sonra önbelleği
+            yenile. Anahtar bir kez yazılır, bir daha değişmez.
+          </p>
+        </Callout>
+      ) : null}
       {pending > 0 ? (
         <Callout
           tone="warn"
@@ -127,6 +144,7 @@ export function SystemPage() {
               { label: 'Veritabanı', value: data.database },
               { label: 'Saat dilimi', value: data.timezone },
               { label: 'Sunucu saati', value: formatDateTime(data.serverTime) },
+              { label: 'APP_KEY', value: <Tag tone={data.appKey ? 'ok' : 'bad'} label={data.appKey ? 'Tanımlı' : 'Eksik'} /> },
               { label: 'Yapılandırma önbelleği', value: <Tag tone={data.cached.config ? 'ok' : 'neutral'} label={data.cached.config ? 'Açık' : 'Kapalı'} /> },
               { label: 'Rota önbelleği', value: <Tag tone={data.cached.routes ? 'ok' : 'neutral'} label={data.cached.routes ? 'Açık' : 'Kapalı'} /> },
             ]}

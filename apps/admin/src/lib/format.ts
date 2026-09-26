@@ -275,9 +275,10 @@ export const POST_KIND: Record<AdminPostKind, { label: string; move: string }> =
   freeze: { label: 'Kırmızı', move: 'Dokunma' },
 };
 
+/** How the replay judged a post. A perfect is good news too, so `ok` — never `primary`, whose magenta reads as `bad`. */
 export const VERDICT: Record<AdminVerdict, Label> = {
   hit: { tone: 'ok', label: 'İsabet' },
-  perfect: { tone: 'primary', label: 'Mükemmel' },
+  perfect: { tone: 'ok', label: 'Mükemmel' },
   timeout: { tone: 'bad', label: 'Süre doldu' },
   wrong: { tone: 'bad', label: 'Yanlış hareket' },
   holdEarly: { tone: 'warn', label: 'Erken bıraktı' },

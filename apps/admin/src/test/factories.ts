@@ -361,6 +361,7 @@ export function system(overrides: Partial<AdminSystem> = {}): AdminSystem {
     dailyEpoch: '2026-09-24',
     apps: { ios: { min: '1.0.0', latest: '1.1.0' }, android: { min: '1.0.0', latest: '1.1.0' } },
     tokens: { ops: false, moderation: false },
+    appKey: true,
     cached: { config: true, routes: true },
     pendingMigrations: [],
     runs: { open: 4, stale: 1 },

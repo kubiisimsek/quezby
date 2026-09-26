@@ -128,7 +128,7 @@ export function PlayerPage() {
         banned
           ? { label: 'Yasağı kaldır', hint: 'Turları tablolara döner', icon: <ShieldCheck />, onSelect: () => setDialog('unban') }
           : { label: 'Yasakla', hint: 'Tablolardan sessizce çıkar', icon: <Ban />, onSelect: () => setDialog('ban'), tone: 'danger' },
-        { label: 'Adı sıfırla', hint: 'Otomatik bir ad verir', icon: <RotateCcw />, onSelect: () => setDialog('rename') },
+        { label: 'Adı sıfırla', hint: 'Otomatik ad; oyuncu bir kez yeniden seçer', icon: <RotateCcw />, onSelect: () => setDialog('rename') },
         {
           label: 'Oturumları kapat',
           hint: me.isGuest ? 'Misafirde yapılamaz: hesap kaybolur' : 'Her cihazdan çıkarır',

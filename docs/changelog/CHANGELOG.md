@@ -1,5 +1,49 @@
 # Changelog
 
+## 2026-09-26 — Staging fixes: APP_KEY, permanent names, verdict colours
+
+- **Staging went out without `APP_KEY`** (and with `APP_ENV=local`), which
+  explains two bugs at once: every checkpoint check-in answered `500`, so
+  honest runs were reviewed for "Makbuz eksik" (`checkpoint_missing`, received
+  0); and Apple sign-in failed after Face ID, because storing Apple's refresh
+  token (an `encrypted` column) needs the key — Google stores none, so it
+  worked. The key now cannot go missing quietly:
+  - `scripts/check-api-env.mjs` — `package-api.sh` checks the `.env` first and
+    builds nothing without a well-formed `APP_KEY`, with another `APP_ENV` or
+    with debug on (Laravel's own reading of `APP_DEBUG`); an empty
+    `QUEZBY_DAILY_SECRET` is a warning. It never prints a value.
+  - `RequireAppKey` (API middleware): without the key every player request is
+    a logged `500` before anything runs — Apple's one-time code is no longer
+    spent for nothing. `/admin/*` and `/ops/*` stay open: they need no key and
+    they are how it is put right. `App\Support\AppKey` says what is wrong.
+  - **`AdminSystem.appKey`** (contract): the panel's Sistem page says in red
+    when the key is missing, with **Önbelleği yenile** at hand.
+  - `phpunit.xml` carries the suite's own key instead of leaning on a local
+    `.env`. Docs: why the key must stay the same on the machine and the server,
+    and never change (`APP_PREVIOUS_KEYS` does not cover receipts).
+- **A lost check-in is tried again** (`useGame`): a check-in that fails on the
+  network, a timeout or a `5xx` goes again at a later verdict, at least 5 s
+  later, at most twice a run — three marks and two retries, never more than a
+  finish carries (`CHECKPOINTS.maxReceipts`). A refused one (`4xx`, `429`) is
+  not retried. The API is unchanged: a retry is sent like any check-in.
+- **A username is picked once and never changes.** `PUT /me/username` writes a
+  name only over the automatic one (or none): any other answers the new
+  **`409 username_locked`**, the same name again stays a harmless `200`, and
+  the write holds only while the name is still the one the player had, so two
+  quick picks cannot both land. Picks are throttled (`username-update`, 10 a
+  minute). `canPickUsername` / `Username::isPickable` share the rule. The app
+  says so wherever a name is picked ("seçtiğin ad bir daha değişmez"), Ayarlar
+  shows a picked name locked — "Kullanıcı adın · @ekin · kalıcı", no arrow —
+  instead of "Kullanıcı adını değiştir", and Yardım answers "Kullanıcı adımı
+  değiştirebilir miyim?". The panel's **Adı sıfırla** is the one way out: it
+  opens exactly one more pick. Names picked before this are permanent now.
+- **The panel's verdicts read at a glance**: "Mükemmel" was the brand magenta,
+  a hair from the failure red. A run's strip now draws İsabet light green (a
+  soft fill with a green edge), Mükemmel solid green, Erken/Geç bıraktı amber,
+  failures red and Dopamin bitti grey, and its tally pills carry each cell's
+  swatch as the legend. The overview's clean runs are green too.
+  `docs/design/admin-design-system.md`: the action colour is never a status.
+
 ## 2026-09-25 — The admin panel
 
 - **`apps/admin`: the game's admin panel** — a static single-page app (Vite +

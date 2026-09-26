@@ -15,8 +15,9 @@ Enforceable rules: `docs/rules/admin-rules.md`. The API behind it:
   tables with rich cells, never bare text grids.
 - **One solid action per view.** On the band it is the white `onBrand`
   button; inside a card the magenta `primary`.
-- **Say the thing.** Status is a tag with a word, never colour alone. Empty
-  states say what is missing and what to do. A destructive act names itself.
+- **Say the thing.** Status is a tag with a word, never colour alone, and
+  never in the action's magenta. Empty states say what is missing and what to
+  do. A destructive act names itself.
 - **The API decides.** The panel shows numbers, ranks, risks and rates as the
   API sends them, and hides what a role cannot use.
 
@@ -39,10 +40,15 @@ Two layers, and components only touch the second.
    | `fill`, `fill-hover`, `fill-active` | input wells, neutral buttons, chips at rest |
    | `line`, `line-soft`, `line-strong` | edges, table rules, checkbox borders |
    | `ink`, `ink-muted`, `ink-faint`, `ink-on-solid` | text, strongest to weakest; `ink-faint` for labels and placeholders only |
-   | `primary-*` | the action colour, focus ring, the chosen nav item |
+   | `primary-*` | the action colour, focus ring, the chosen nav item — never a status |
    | `secondary-*` | accent only — never a solid call to action |
    | `ok-*`, `warn-*`, `bad-*` | status |
    | `brand-from`, `brand-to`, `on-brand`, `scrim` | the band's gradient — the game's `brandFrom → brandTo` — and the white it carries |
+
+`primary` is never a status colour: its magenta (hue 352) beside `bad`
+(hue 25) reads as the same red. A verdict, a state or a chart series that
+means good or bad takes `ok`, `warn` or `bad` — the neutral grey when it is
+neither — and good news is green, as in the game: a clean run, a perfect post.
 
 Light and dark point the roles at different rungs of the same ramps, so no
 component carries a `dark:` class. The theme is light, dark or the system's,
@@ -114,13 +120,20 @@ exceptions). Numbers are tabular in tables and tiles.
 | `patterns/data-table`, `pager`, `filter-chips` | every list: loading, failure and empty are its states; the API pages it |
 | `patterns/confirm-modal`, `form-modal` | every destructive act asks first, focus on "Vazgeç"; small forms read with `FormData` |
 | `patterns/callout`, `empty-state`, `facts`, `share-list`, `bar-chart` | messages, missing things, records, shares, 30-day charts (SVG, a table for screen readers) |
-| `patterns/run-timeline` | a run post by post: decision times and a cell per verdict |
+| `patterns/run-timeline` | a run post by post: decision times and a cell per verdict (its colours below) |
 | `patterns/secret-reveal` | a temporary password, shown once |
 | `layout/shell`, `sidebar`, `login-layout`, `gate` | the frame and the doors |
 | `moderation/*`, `boards/board-table` | the moderation dialogs and the board table every page shares |
 | `lib/columns` | the cells many tables draw: `PlayerCell`, `When` (a moment on one line, the exact time on hover), `RunStatusTag`, `FlagTags`, the audit columns |
 
 A third copy of the same markup is a missing component.
+
+The run timeline's cells follow the game: **İsabet** light green (a soft fill
+with a green edge — a pale fill alone reads as the grey of a drained post),
+**Mükemmel** solid green, **Erken bıraktı** and **Geç bıraktı** amber,
+**Süre doldu**, **Yanlış hareket** and **Dokundu** red, **Dopamin bitti**
+grey. The tally pills above the strip carry each cell's swatch, so they read
+as its legend; every cell also says its post and verdict in words.
 
 ## Words
 

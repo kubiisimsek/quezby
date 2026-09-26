@@ -102,7 +102,7 @@ export function OverviewPage() {
               labels={series.days}
               formatLabel={formatDayKey}
               series={[
-                { label: 'Temiz', tone: 'primary', values: series.runs.map((runs, index) => Math.max(0, runs - (series.flagged[index] ?? 0))) },
+                { label: 'Temiz', tone: 'ok', values: series.runs.map((runs, index) => Math.max(0, runs - (series.flagged[index] ?? 0))) },
                 { label: 'Bayraklı', tone: 'bad', values: series.flagged },
               ]}
             />

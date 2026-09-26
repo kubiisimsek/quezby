@@ -26,12 +26,21 @@ test('says what the API runs with, and only whether each secret is set', functio
         ->assertJsonPath('engineVersion', 2)
         ->assertJsonPath('timezone', 'Europe/Istanbul')
         ->assertJsonPath('tokens', ['ops' => true, 'moderation' => false])
+        ->assertJsonPath('appKey', true)
         ->assertJsonPath('pendingMigrations', [])
         ->assertJsonPath('runs', ['open' => 2, 'stale' => 1])
         ->assertJsonPath('limits.adminTokenHours', 12);
 
     expect($response->getContent())->not->toContain('a-very-secret-ops-token')
         ->and($response->json('apps.ios'))->toHaveKeys(['min', 'latest']);
+});
+
+test('says when APP_KEY is missing — the panel stays open to put it right', function () {
+    config(['app.key' => '']);
+
+    $response = $this->getJson('/api/v1/admin/system')->assertOk()->assertJsonPath('appKey', false);
+
+    expect($response->json())->not->toHaveKey('key');
 });
 
 test('closes the runs left open past their time, and it is on record', function () {

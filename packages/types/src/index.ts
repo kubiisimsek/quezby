@@ -28,8 +28,10 @@ export type Me = {
   id: string;
   /**
    * Given when the account is made — `guest48128742` until the player picks
-   * one (`isAutoUsername` in `@quezby/config`). Null only on accounts from
-   * before automatic names; nothing ranked is shown without it.
+   * one (`isAutoUsername` in `@quezby/config`). Picked once, it never changes
+   * (`canPickUsername`); only a moderator's reset gives back an automatic name
+   * and one more pick. Null only on accounts from before automatic names;
+   * nothing ranked is shown without it.
    */
   username: string | null;
   /** The email a password sign-in uses, when one is linked. */
@@ -510,6 +512,8 @@ export type ApiErrorCode =
   | 'not_found'
   | 'username_invalid'
   | 'username_taken'
+  /** The player picked their name already: a picked name never changes. */
+  | 'username_locked'
   | 'invalid_credentials'
   | 'email_taken'
   | 'already_linked'
