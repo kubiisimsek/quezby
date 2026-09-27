@@ -13,6 +13,7 @@ const VALUES: ReelValues = {
   dragY: shared(0),
   enter: shared(1),
   timer: shared(1),
+  timerShown: shared(1),
   holdFill: shared(0),
   holding: shared(0),
 };
@@ -43,6 +44,20 @@ describe('ReelCard', () => {
     await render(<ReelCard reel={reel('hold')} seed={42} values={VALUES} hint={false} />);
 
     expect(screen.getByText('Altın post')).toBeOnTheScreen();
+    expect(screen.getByText('Basılı tut · yeşilde bırak')).toBeOnTheScreen();
+  });
+
+  it('draws the time bar while a post is live', async () => {
+    await render(<ReelCard reel={reel('skip')} seed={42} values={VALUES} hint={false} />);
+
+    expect(screen.getByTestId('post-timer')).toHaveStyle({ opacity: 1 });
+  });
+
+  it('hides the time bar while a gold post is held — its gold bar is the clock', async () => {
+    const held = { ...VALUES, timerShown: shared(0), holding: shared(1) };
+    await render(<ReelCard reel={reel('hold')} seed={42} values={held} hint={false} />);
+
+    expect(screen.getByTestId('post-timer')).toHaveStyle({ opacity: 0 });
     expect(screen.getByText('Basılı tut · yeşilde bırak')).toBeOnTheScreen();
   });
 

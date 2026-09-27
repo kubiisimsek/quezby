@@ -7,11 +7,16 @@
  * wait for it. Instead each touch is read once, here, from its distance,
  * speed and duration. A single tap on its own does nothing — the only
  * gestures that count are the ones a reels app already taught the thumb.
+ *
+ * A gesture counts the moment it is recognised, and that is its time: a
+ * swipe while the finger is still moving, as soon as it has gone far or fast
+ * enough — or at the lift, if only the lift makes it one. The post leaves
+ * then, so the time it was on screen is exactly the time the engine counts.
  */
 export const GESTURE_CONFIG = {
   /** Travel before a press becomes a drag. */
   slop: 12,
-  /** Upward travel that commits a swipe on release. */
+  /** Upward travel that makes a drag a swipe, the moment it is reached. */
   swipeDistance: 60,
   /** …or a shorter flick at this speed, px/ms. */
   swipeVelocity: 0.35,
@@ -51,6 +56,14 @@ export type Detected =
 
 export const IDLE: TouchState = { down: null, consumed: false, lastTapUpAt: null };
 
+/** A finger that has gone this far up, or this fast and far enough, has swiped. */
+function swiped(dy: number, velocity: number): boolean {
+  return (
+    dy <= -GESTURE_CONFIG.swipeDistance ||
+    (velocity <= -GESTURE_CONFIG.swipeVelocity && dy <= -GESTURE_CONFIG.flickDistance)
+  );
+}
+
 export function touchDown(
   state: TouchState,
   point: Point,
@@ -87,15 +100,23 @@ export function touchDown(
   };
 }
 
+/** A swipe is recognised here, mid-drag; after it the finger is heard no more. */
 export function touchMove(
   state: TouchState,
   point: Point,
-): { state: TouchState; dragY: number } {
+): { state: TouchState; dragY: number; detected?: Detected } {
   const down = state.down;
   if (!down || state.consumed) return { state, dragY: 0 };
   const dy = point.y - down.y;
   const elapsed = point.at - down.lastAt;
   const velocity = elapsed > 0 ? (point.y - down.lastY) / elapsed : down.velocity;
+  if (swiped(dy, velocity)) {
+    return {
+      state: { down: null, consumed: true, lastTapUpAt: null },
+      dragY: dy,
+      detected: { kind: 'up', at: point.at },
+    };
+  }
   const moved = down.moved || Math.abs(dy) > GESTURE_CONFIG.slop;
   return {
     state: {
@@ -115,13 +136,10 @@ export function touchUp(
 
   const dy = point.y - down.y;
   if (down.moved || Math.abs(dy) > GESTURE_CONFIG.slop) {
-    const flick =
-      down.velocity <= -GESTURE_CONFIG.swipeVelocity &&
-      dy <= -GESTURE_CONFIG.flickDistance;
-    const swiped = dy <= -GESTURE_CONFIG.swipeDistance || flick;
+    // A flick the last move fell just short of: the lift makes it a swipe.
     return {
       state: IDLE,
-      detected: swiped ? { kind: 'up', at: down.at } : { kind: 'cancel' },
+      detected: swiped(dy, down.velocity) ? { kind: 'up', at: point.at } : { kind: 'cancel' },
     };
   }
 

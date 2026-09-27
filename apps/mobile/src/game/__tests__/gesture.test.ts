@@ -13,25 +13,64 @@ function press(at: number, y = 400, state: TouchState = IDLE, freeze = false) {
 }
 
 describe('gesture', () => {
-  it('reads a quick upward drag as a swipe that started at touch-down', () => {
-    let { state } = press(100);
-    state = touchMove(state, { at: 140, y: 350 }).state;
-    state = touchMove(state, { at: 180, y: 320 }).state;
-    const result = touchUp(state, { at: 190, y: 320 });
-    expect(result.detected).toEqual({ kind: 'up', at: 100 });
+  it('recognises a quick upward drag while it moves, at that move', () => {
+    const { state } = press(100);
+    const move = touchMove(state, { at: 140, y: 350 });
+    expect(move.detected).toEqual({ kind: 'up', at: 140 });
+    expect(move.dragY).toBe(-50);
   });
 
-  it('reads a short fast flick as a swipe too', () => {
+  it('recognises a short fast flick at the move that makes it one', () => {
     let { state } = press(0);
-    state = touchMove(state, { at: 30, y: 385 }).state;
-    state = touchMove(state, { at: 50, y: 375 }).state;
-    expect(touchUp(state, { at: 55, y: 375 }).detected).toEqual({ kind: 'up', at: 0 });
+    const first = touchMove(state, { at: 30, y: 385 });
+    expect(first.detected).toBeUndefined();
+    state = first.state;
+    expect(touchMove(state, { at: 50, y: 375 }).detected).toEqual({ kind: 'up', at: 50 });
+  });
+
+  it('recognises a slow drag once it has travelled the swipe distance', () => {
+    let { state } = press(0);
+    for (const point of [
+      { at: 200, y: 380 },
+      { at: 400, y: 345 },
+    ]) {
+      const move = touchMove(state, point);
+      expect(move.detected).toBeUndefined();
+      state = move.state;
+    }
+    expect(touchMove(state, { at: 500, y: 400 - GESTURE_CONFIG.swipeDistance }).detected).toEqual({
+      kind: 'up',
+      at: 500,
+    });
+  });
+
+  it('recognises a flick that only qualifies at the lift, at the lift', () => {
+    let { state } = press(300);
+    const move = touchMove(state, { at: 320, y: 390 });
+    expect(move.detected).toBeUndefined();
+    state = move.state;
+    expect(touchUp(state, { at: 330, y: 378 }).detected).toEqual({ kind: 'up', at: 330 });
+  });
+
+  it('hears nothing more from a finger that has already swiped', () => {
+    const swipe = touchMove(press(0).state, { at: 40, y: 320 });
+    expect(swipe.detected).toEqual({ kind: 'up', at: 40 });
+    const after = touchMove(swipe.state, { at: 60, y: 250 });
+    expect(after.detected).toBeUndefined();
+    expect(after.dragY).toBe(0);
+    expect(touchUp(after.state, { at: 80, y: 240 }).detected).toBeUndefined();
   });
 
   it('lets a slow short drag spring back without a gesture', () => {
     let { state } = press(0);
-    state = touchMove(state, { at: 200, y: 380 }).state;
-    state = touchMove(state, { at: 400, y: 370 }).state;
+    for (const point of [
+      { at: 200, y: 380 },
+      { at: 400, y: 370 },
+    ]) {
+      const move = touchMove(state, point);
+      expect(move.detected).toBeUndefined();
+      state = move.state;
+    }
     expect(touchUp(state, { at: 420, y: 370 }).detected).toEqual({ kind: 'cancel' });
   });
 
@@ -51,6 +90,14 @@ describe('gesture', () => {
       at: 90 + GESTURE_CONFIG.doubleTapGap,
     });
     expect(touchUp(second.state, { at: 500, y: 400 }).detected).toBeUndefined();
+  });
+
+  it('never reads a tap’s wobble as a swipe — two such taps are still a like', () => {
+    const wobble = touchMove(press(0).state, { at: 15, y: 390 });
+    expect(wobble.detected).toBeUndefined();
+    const first = touchUp(wobble.state, { at: 60, y: 390 });
+    expect(first.detected).toEqual({ kind: 'tap' });
+    expect(press(200, 400, first.state).detected).toEqual({ kind: 'like', at: 200 });
   });
 
   it('does not pair taps that are too far apart', () => {

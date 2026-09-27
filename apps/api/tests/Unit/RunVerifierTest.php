@@ -92,13 +92,15 @@ it('matches the score and reel count the app showed', function () {
 /**
  * A phone playing `$replay` at `$speed` of real time, its timers each
  * `$latenessMs` late, `$startMs` between the API starting the run and the
- * countdown, `$networkMs` for each request to reach the API: the receipts
- * it collects at the checkpoint marks, and when its finish arrives — ms
- * after the start.
+ * countdown, `$networkMs` for each request to reach the API, `$drawMs` to
+ * draw each post before it goes live (the app starts a post's clock on its
+ * first drawn frame, which the pace does not count): the receipts it
+ * collects at the checkpoint marks, and when its finish arrives — ms after
+ * the start.
  *
  * @return array{receipts: list<string>, finishMs: int}
  */
-function phonePlaying(Run $run, array $actions, Replay $replay, float $speed = 1.0, int $latenessMs = 0, int $startMs = 250, int $networkMs = 120): array
+function phonePlaying(Run $run, array $actions, Replay $replay, float $speed = 1.0, int $latenessMs = 0, int $startMs = 250, int $networkMs = 120, int $drawMs = 0): array
 {
     $clock = app(RunClock::class);
     $needed = $clock->needed($replay);
@@ -111,8 +113,8 @@ function phonePlaying(Run $run, array $actions, Replay $replay, float $speed = 1
     foreach ($replay->steps as $i => $step) {
         $after = $clock->afterMs($step);
         $onScreen = $needed[$i + 1] - $needed[$i] - $after;
-        $at += $real($onScreen) + $latenessMs;
-        $game += $onScreen + $latenessMs;
+        $at += $real($drawMs + $onScreen) + $latenessMs;
+        $game += $drawMs + $onScreen + $latenessMs;
         // The app goes by its own game clock, which a speed hack slows down with everything else.
         if ($marks !== [] && $game >= $marks[0]) {
             $marks = array_values(array_filter($marks, fn (int $mark) => $mark > $game));
@@ -141,6 +143,7 @@ it('never catches a simulated player at its checkpoints, on any honest phone', f
     'a quick phone' => [['latenessMs' => 0, 'startMs' => 150, 'networkMs' => 60]],
     'a slow phone' => [['latenessMs' => 25, 'startMs' => 1500, 'networkMs' => 1500]],
     'a poor connection' => [['latenessMs' => 8, 'startMs' => 4000, 'networkMs' => 5000]],
+    'a phone slow to draw each post' => [['latenessMs' => 8, 'startMs' => 250, 'networkMs' => 120, 'drawMs' => 45]],
 ]);
 
 it('catches a slowed-down game at its checkpoints', function (float $speed, array $flags) {

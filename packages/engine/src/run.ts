@@ -23,9 +23,11 @@ export const GESTURE = { none: 0, up: 1, like: 2, hold: 3, touch: 4 } as const;
 export type Gesture = (typeof GESTURE)[keyof typeof GESTURE];
 
 /**
- * `[gesture, t, d]`: `t` is when the deciding finger went down, in ms since
- * the reel became active; `d` is how long a hold lasted. Both are 0 for
- * `none`, and `d` is 0 for everything but `hold`.
+ * `[gesture, t, d]`: `t` is when the gesture was recognised, in ms since the
+ * reel went live on its first drawn frame — a swipe as it passes its
+ * threshold, a like's second tap, a hold's press, a freeze reel's first
+ * touch; `d` is how long a hold lasted. Both are 0 for `none`, and `d` is 0
+ * for everything but `hold`.
  */
 export type Action = readonly [gesture: Gesture, t: number, d: number];
 

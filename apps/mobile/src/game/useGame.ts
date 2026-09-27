@@ -106,10 +106,11 @@ function lostOnTheWay(error: unknown): boolean {
   return error instanceof ApiError && (error.status === 0 || error.status >= 500);
 }
 
-type Mode = 'idle' | 'coach' | 'live' | 'transition' | 'over';
-
-/** How long a drag that began in time may keep the reel after its window. */
-const DRAG_GRACE_MS = 1200;
+/**
+ * `arming`: the next post is set but not drawn yet. Nothing is live, so no
+ * clock runs and a touch is not the post's — like one during the slide.
+ */
+type Mode = 'idle' | 'coach' | 'arming' | 'live' | 'transition' | 'over';
 
 /** A monotonic clock where the runtime has one. */
 const now = () => {
@@ -158,10 +159,14 @@ export function useGame(mode: RunMode = 'free') {
   const [practice, setPractice] = useState<PracticeReason | null>(null);
   /** The kind whose coach card is up, in a practice run. */
   const [coach, setCoach] = useState<ReelKind | null>(null);
+  /** Bumped for every post that waits for its first drawn frame to go live. */
+  const [armed, setArmed] = useState(0);
 
   const dragY = useSharedValue(0);
   const enter = useSharedValue(1);
   const timer = useSharedValue(1);
+  /** The time bar is out of sight while a gold post is held: its fill bar is the clock then. */
+  const timerShown = useSharedValue(1);
   const holdFill = useSharedValue(0);
   const holding = useSharedValue(0);
   const meter = useSharedValue(1000);
@@ -186,8 +191,9 @@ export function useGame(mode: RunMode = 'free') {
   const modeRef = useRef<Mode>('idle');
   const touchRef = useRef<TouchState>(IDLE);
   const reelStartRef = useRef(0);
+  /** The post being armed: its token, and whether it is on screen already. */
+  const armedRef = useRef({ token: 0, shown: false });
   const holdRef = useRef<{ downAt: number; t: number } | null>(null);
-  const lateRef = useRef(false);
   const timersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const feedbackId = useRef(0);
   const aliveRef = useRef(true);
@@ -209,7 +215,7 @@ export function useGame(mode: RunMode = 'free') {
     timersRef.current = {};
   }, []);
 
-  /** Milliseconds since the reel came up, as the engine counts them. */
+  /** Milliseconds since the post went live — its first drawn frame — as the engine counts them. */
   const sinceReel = (at: number) =>
     Math.max(0, Math.round(at - reelStartRef.current));
 
@@ -358,62 +364,79 @@ export function useGame(mode: RunMode = 'free') {
   /* ------------------------------------------------------------- reels -- */
 
   const commitRef = useRef<(action: Action) => void>(() => undefined);
+  const liveRef = useRef<(token: number) => void>(() => undefined);
 
   /**
-   * The current reel goes live: its clock starts now. `shown` when it is
-   * already on screen — it slid in under a coach card — so it does not slide
-   * in again.
+   * The current reel is set up, but not live: it waits, hidden, for React to
+   * draw it, and `goLive` starts its clock on that first frame — the phone's
+   * drawing is never the player's time. `shown` when it is already on screen —
+   * it slid in under a coach card — so it stays and does not slide in again.
    */
   const beginReel = useCallback((shown = false) => {
     const run = runRef.current;
     if (!run || run.over) return;
-    const current = run.current;
     touchRef.current = IDLE;
     holdRef.current = null;
-    lateRef.current = false;
-    modeRef.current = 'live';
-    setReel(current);
-    reelStartRef.current = now();
-
+    modeRef.current = 'arming';
+    setReel(run.current);
     dragY.value = 0;
-    if (!shown) {
-      enter.value = 0;
-      enter.value = withTiming(1, { duration: 160, easing: Easing.out(Easing.cubic) });
-    }
+    if (!shown) enter.value = 0;
     holding.value = 0;
     holdFill.value = 0;
     timer.value = 1;
+    timerShown.value = 1;
+    meter.value = run.meter;
+    const token = armedRef.current.token + 1;
+    armedRef.current = { token, shown };
+    setArmed(token);
+  }, [dragY, enter, holdFill, holding, meter, timer, timerShown]);
+
+  /**
+   * The armed reel's first frame is up: it goes live, and its clock starts —
+   * the slide-in, the timer, the meter's drain and the deadline. A frame for a
+   * reel no longer armed (the run ended, or the app was left) does nothing.
+   */
+  const goLive = useCallback((token: number) => {
+    const run = runRef.current;
+    if (!run || run.over || modeRef.current !== 'arming' || armedRef.current.token !== token) return;
+    const current = run.current;
+    modeRef.current = 'live';
+    reelStartRef.current = now();
+
+    if (!armedRef.current.shown) {
+      enter.value = withTiming(1, { duration: 160, easing: Easing.out(Easing.cubic) });
+    }
     timer.value = withTiming(0, { duration: current.window, easing: Easing.linear });
 
     const deadline = Math.min(current.window, run.msUntilEmpty());
-    meter.value = run.meter;
     meter.value = withTiming(
       Math.max(0, run.meter - (current.drain * deadline) / 1000),
       { duration: deadline, easing: Easing.linear },
     );
 
+    // The window's end is final: a finger still on the glass is judged now — a
+    // still press as the hold it is, anything else as too late. Only a gold
+    // hold that began in time runs on, until its own timer.
     schedule('deadline', deadline, () => {
-      if (modeRef.current !== 'live') return;
-      if (holdRef.current) return;
-      const down = touchRef.current.down;
-      if (down && !touchRef.current.consumed) {
-        if (!down.moved) {
-          commitRef.current([
-            GESTURE.hold,
-            sinceReel(down.at),
-            Math.round(now() - down.at),
-          ]);
-          return;
-        }
-        lateRef.current = true;
-        schedule('grace', DRAG_GRACE_MS, () =>
-          commitRef.current([GESTURE.none, 0, 0]),
-        );
-        return;
-      }
-      commitRef.current([GESTURE.none, 0, 0]);
+      if (modeRef.current !== 'live' || holdRef.current) return;
+      const { down, consumed } = touchRef.current;
+      commitRef.current(
+        down && !consumed && !down.moved
+          ? [GESTURE.hold, sinceReel(down.at), Math.round(now() - down.at)]
+          : [GESTURE.none, 0, 0],
+      );
     });
-  }, [dragY, enter, holdFill, holding, meter, schedule, timer]);
+  }, [enter, meter, schedule, timer]);
+  liveRef.current = goLive;
+
+  // Arming a reel is a render; the frame after it has drawn the reel, and
+  // that is when it goes live. Keyed on the token alone, so a render that
+  // changes nothing else never asks for the frame again.
+  useEffect(() => {
+    if (armed === 0) return undefined;
+    const frame = requestAnimationFrame(() => liveRef.current(armed));
+    return () => cancelAnimationFrame(frame);
+  }, [armed]);
 
   /**
    * A coach card over the current reel: the reel slides in and waits, its
@@ -434,10 +457,11 @@ export function useGame(mode: RunMode = 'free') {
     holding.value = 0;
     holdFill.value = 0;
     timer.value = 1;
+    timerShown.value = 1;
     meter.value = run.meter;
     setCoach(current.kind);
     setPhase('coach');
-  }, [clearTimers, dragY, enter, holdFill, holding, meter, timer]);
+  }, [clearTimers, dragY, enter, holdFill, holding, meter, timer, timerShown]);
 
   /** The next reel — after its card, the first time a practice run meets its kind. */
   const advanceReel = useCallback(() => {
@@ -515,7 +539,9 @@ export function useGame(mode: RunMode = 'free') {
       const current = run.current;
       const t = sinceReel(downAt);
       holdRef.current = { downAt, t };
-      cancelAnimation(timer);
+      // The gold bar is the clock now. The timer runs on out of sight, so a
+      // hold broken in time brings it back showing the time truly left.
+      timerShown.value = withTiming(0, { duration: 120 });
       holding.value = withTiming(1, { duration: 120 });
       holdFill.value = 0;
       holdFill.value = withTiming(1, {
@@ -532,9 +558,14 @@ export function useGame(mode: RunMode = 'free') {
         commitRef.current([GESTURE.hold, t, Math.max(0, Math.round(limit))]),
       );
     },
-    [holdFill, holding, meter, schedule, timer],
+    [holdFill, holding, meter, schedule, timerShown],
   );
 
+  /**
+   * A gold hold broken by a finger that moved. Past the reel's last moment —
+   * its window, or the meter running dry — it is judged at once; before it,
+   * the timer shows again and the meter drains on towards the deadline.
+   */
   const dropHold = useCallback(() => {
     if (!holdRef.current) return;
     holdRef.current = null;
@@ -544,17 +575,20 @@ export function useGame(mode: RunMode = 'free') {
     cancelAnimation(holdFill);
     holdFill.value = withTiming(0, { duration: 120 });
     if (!run) return;
-    const elapsed = now() - reelStartRef.current;
-    const left = run.current.window - elapsed;
+    const current = run.current;
+    const deadline = Math.min(current.window, run.msUntilEmpty());
+    const left = deadline - (now() - reelStartRef.current);
     if (left <= 0) {
-      lateRef.current = true;
-      schedule('grace', DRAG_GRACE_MS, () =>
-        commitRef.current([GESTURE.none, 0, 0]),
-      );
+      commitRef.current([GESTURE.none, 0, 0]);
       return;
     }
-    timer.value = withTiming(0, { duration: left, easing: Easing.linear });
-  }, [holdFill, holding, schedule, timer, unschedule]);
+    timerShown.value = withTiming(1, { duration: 120 });
+    cancelAnimation(meter);
+    meter.value = withTiming(
+      Math.max(0, run.meter - (current.drain * deadline) / 1000),
+      { duration: left, easing: Easing.linear },
+    );
+  }, [holdFill, holding, meter, timerShown, unschedule]);
 
   const onDetected = useCallback(
     (detected: Detected | undefined) => {
@@ -579,7 +613,6 @@ export function useGame(mode: RunMode = 'free') {
         case 'tap':
         case 'cancel':
           dragY.value = withSpring(0, SPRING);
-          if (lateRef.current) commit([GESTURE.none, 0, 0]);
       }
     },
     [commit, dragY],
@@ -610,12 +643,14 @@ export function useGame(mode: RunMode = 'free') {
       if (modeRef.current !== 'live') return;
       const result = touchMove(touchRef.current, { at: now(), y });
       touchRef.current = result.state;
-      if (result.state.down?.moved && holdRef.current) dropHold();
       if (result.dragY !== 0) {
         dragY.value = result.dragY < 0 ? result.dragY : result.dragY * 0.25;
       }
+      // A finger that travels — or has already swiped — has let go of a gold hold.
+      if (holdRef.current && (result.detected || result.state.down?.moved)) dropHold();
+      onDetected(result.detected);
     },
-    [dragY, dropHold],
+    [dragY, dropHold, onDetected],
   );
 
   const onTouchEnd = useCallback(
@@ -666,6 +701,7 @@ export function useGame(mode: RunMode = 'free') {
       setReel(runRef.current.current);
       meter.value = 1000;
       timer.value = 1;
+      timerShown.value = 1;
       dragY.value = 0;
       enter.value = 1;
       // A coached run explains its first reel before the countdown, so the 3-2-1 is for playing.
@@ -675,10 +711,10 @@ export function useGame(mode: RunMode = 'free') {
       }
       countDown();
     },
-    [countDown, dragY, enter, enterCoach, meter, timer],
+    [countDown, dragY, enter, enterCoach, meter, timer, timerShown],
   );
 
-  /** The card is put away: the countdown, if the run has not started yet, or else the reel goes live. */
+  /** The card is put away: the countdown, if the run has not started yet, or else the reel goes live on its next frame. */
   const dismissCoach = useCallback(() => {
     if (modeRef.current !== 'coach') return;
     setCoach(null);
@@ -751,9 +787,13 @@ export function useGame(mode: RunMode = 'free') {
 
   useEffect(() => {
     const subscription = AppState.addEventListener('change', (state) => {
-      // Leaving the app ends the run: a paused reel could be studied at leisure.
-      // Nothing is live under a coach card, so there is nothing to study.
-      const live = modeRef.current === 'live' || modeRef.current === 'transition';
+      // Leaving the app ends the run: a paused reel could be studied at leisure —
+      // one still being drawn too. Nothing is live under a coach card, so there
+      // is nothing to study.
+      const live =
+        modeRef.current === 'arming' ||
+        modeRef.current === 'live' ||
+        modeRef.current === 'transition';
       if (state === 'background' && live) {
         finish();
       }
@@ -798,7 +838,7 @@ export function useGame(mode: RunMode = 'free') {
     startError,
     practice,
     coach,
-    values: { dragY, enter, timer, holdFill, holding, meter },
+    values: { dragY, enter, timer, timerShown, holdFill, holding, meter },
     start,
     quit,
     dismissCoach,

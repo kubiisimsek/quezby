@@ -1,5 +1,52 @@
 # Changelog
 
+## 2026-09-26 — Fair timing: a post starts when it is drawn, a swipe counts when it is recognised
+
+- **A post goes live on its first drawn frame** (`useGame`: `beginReel` arms
+  it, `goLive` starts it). Until React has drawn it, it stays hidden, its
+  clock, timer bar, meter drain and deadline wait, and a touch is not its own
+  (as during the slide). The phone's drawing time is no longer charged to the
+  player's reaction — a slow phone was paying for it on every post.
+- **A swipe counts the moment it is recognised** (`gesture.ts`): mid-drag,
+  once the finger has gone 60 px up (or 20 px at ≥ 0,35 px/ms), or at the lift
+  if only the lift makes it one — and the post leaves right then. `t` is that
+  moment; it used to be the finger-down, while the post stayed until the lift.
+  - The API's pace (`RunClock`) counted a swipe post as on screen for `t`
+    only, so every drag was time it never saw. Honest, relaxed play drifted
+    20–30 % behind the model and got **"Biraz yavaş" (`slow_timing`) reviews**
+    at the 120 s and 240 s marks. Now the app and the model agree; only late
+    timers and a frame per post are left. An honest phone that draws each post
+    in 45 ms joins `RunVerifierTest`'s honest phones, and 80 % / 70 % speed
+    games are still caught.
+  - "Press first, decide while holding" no longer buys a swipe a faster `t`.
+  - Engine, rules, lock, fixtures and `ENGINE_VERSION` 2 are untouched (only
+    the `Action` comment in `run.ts`). The same thumb now scores about 10–19 %
+    less, and its runs are 2–3 % shorter; Şimşek's 550 ms swipe limit is a
+    little harder.
+- **The window's end is final.** The 1.2 s drag grace is gone. When the timer
+  bar runs out, a finger still on the glass is judged at once: a still press
+  as a hold (wrong), anything else as a timeout. Only a gold hold that began in
+  time runs on, until it is let go or can only be late.
+- **A gold post's time bar hides while it is held** (`values.timerShown` →
+  `ReelCard`), since its fill bar is the clock then. A hold broken in time
+  brings the bar back with the time really left: it now runs on out of sight
+  instead of freezing. A hold broken after the window, or after the meter ran
+  dry, is judged at once.
+- Docs: `docs/product/scoring.md` (new "Süre" section, `t`, checkpoints),
+  `docs/design/mobile-design-system.md`.
+- Tests:
+  - `gesture.test.ts`: mid-drag, flick at the lift, nothing after a swipe, a
+    wobbly tap.
+  - `useGame.test.tsx`: new "useGame timing" block — live on its frame,
+    fingers from before the frame, coach card, leaving or closing while
+    drawn, still and moving fingers at the window's end, the gold hold's bar,
+    past-window holds.
+  - `ReelCard.test.tsx`: the time bar shown and hidden.
+  - `RunVerifierTest`: the slow-drawing phone.
+- **When this ships**, raise `QUEZBY_IOS_MIN_VERSION` /
+  `QUEZBY_ANDROID_MIN_VERSION` to it, so no build with the old timing plays
+  ranked alongside it.
+
 ## 2026-09-26 — Six languages: Türkçe, English, Deutsch, العربية, Français, Español
 
 - **The game speaks six languages** (`docs/product/localization.md`,

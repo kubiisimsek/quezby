@@ -1,4 +1,4 @@
-import { ENGINE_VERSION } from '@quezby/engine';
+import { ENGINE_VERSION, GESTURE } from '@quezby/engine';
 import { CHECKPOINTS, CONTENT_VERSION, PACE, exitDelayMs, prefixHash } from '@quezby/config';
 import { ApiError } from '@quezby/sdk';
 import type { CheckpointRequest, FinishRunRequest } from '@quezby/types';
@@ -790,5 +790,285 @@ describe('useGame practice run', () => {
     await leave();
     expect(game.result.current.phase).toBe('result');
     expect(game.result.current.outcome).toMatchObject({ mode: 'practice', reason: 'tutorial' });
+  });
+});
+
+/**
+ * The frames a post waits for, held back — the phone still drawing — until
+ * `draw()` lets them through.
+ */
+function holdFrames(): { draw: () => Promise<void> } {
+  const frames = new Map<number, (time: number) => void>();
+  let last = 0;
+  jest.spyOn(globalThis, 'requestAnimationFrame').mockImplementation((callback) => {
+    last += 1;
+    frames.set(last, callback);
+    return last;
+  });
+  jest.spyOn(globalThis, 'cancelAnimationFrame').mockImplementation((id) => {
+    if (id != null) frames.delete(id);
+  });
+  return {
+    draw: async () => {
+      await act(async () => {
+        const due = [...frames.values()];
+        frames.clear();
+        for (const callback of due) callback(clockNow());
+      });
+    },
+  };
+}
+
+/** Sending the app to the background, through the listener the hook subscribed. */
+function leavingTheApp(): () => Promise<void> {
+  const listeners: Array<(state: AppStateStatus) => void> = [];
+  jest.spyOn(AppState, 'addEventListener').mockImplementation((_type, listener) => {
+    listeners.push(listener);
+    return { remove: jest.fn() } as unknown as NativeEventSubscription;
+  });
+  return async () => {
+    await act(async () => {
+      for (const listener of listeners) listener('background');
+    });
+  };
+}
+
+/** A swipe as the screen sends it: down, and up past the swipe distance at once. */
+async function swipe(game: Game) {
+  await act(async () => {
+    game.result.current.touches.onTouchStart(600);
+    game.result.current.touches.onTouchMove(520);
+    game.result.current.touches.onTouchEnd(480);
+  });
+}
+
+async function touch(game: Game, kind: 'start' | 'move' | 'end', y: number) {
+  await act(async () => {
+    const { touches } = game.result.current;
+    if (kind === 'start') touches.onTouchStart(y);
+    else if (kind === 'move') touches.onTouchMove(y);
+    else touches.onTouchEnd(y);
+  });
+}
+
+/** Closes the run and returns the log it sent the API. */
+async function logOf(game: Game): Promise<FinishRunRequest['actions']> {
+  await act(async () => {
+    game.result.current.quit();
+  });
+  const call = runs.finish.mock.calls.at(-1) as [string, FinishRunRequest] | undefined;
+  if (!call) throw new Error('The run was never sent.');
+  return call[1].actions;
+}
+
+/** Plays the intro's first four posts right: the gold one (index 4) is up, live. */
+async function atTheGoldPost(): Promise<Game> {
+  const { game } = await afterCountdown();
+  for (let i = 0; i < 4; i += 1) await answerRight(game);
+  const reel = game.result.current.reel;
+  if (reel?.kind !== 'hold') throw new Error('The intro’s fifth post is gold.');
+  return game;
+}
+
+describe('useGame timing', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.clearAllMocks();
+    usePendingRun.setState({ run: null, hydrated: true });
+    runs.start.mockResolvedValue(started);
+    runs.finish.mockResolvedValue({ run: { score: 0 }, best: null, ranks: {}, isNewBest: false });
+    runs.checkpoint.mockResolvedValue({ receipt: 'receipt' });
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+    jest.restoreAllMocks();
+  });
+
+  it('a post goes live on its first drawn frame — the phone’s drawing is not the player’s time', async () => {
+    const frames = holdFrames();
+    const { game } = await afterCountdown();
+
+    // Still being drawn: a swipe is not the post's, and no window runs out.
+    await swipe(game);
+    await advance(2_700);
+    expect(game.result.current.feedback).toBeNull();
+    expect(game.result.current.reel?.index).toBe(0);
+
+    await frames.draw();
+    await advance(REACTION_MS);
+    await swipe(game);
+
+    expect(game.result.current.feedback?.verdict).toBe('hit');
+    expect(await logOf(game)).toEqual([[GESTURE.up, REACTION_MS, 0]]);
+  });
+
+  it('never gives a post a finger that landed before its frame', async () => {
+    const frames = holdFrames();
+    const { game } = await afterCountdown();
+
+    await touch(game, 'start', 600);
+    await frames.draw();
+    await touch(game, 'move', 520);
+    await touch(game, 'end', 480);
+    expect(game.result.current.feedback).toBeNull();
+
+    await advance(REACTION_MS);
+    await swipe(game);
+    expect(await logOf(game)).toEqual([[GESTURE.up, REACTION_MS, 0]]);
+  });
+
+  it('starts a post that waited under a coach card on its frame, not on “Anladım”', async () => {
+    const game = await practiceRun();
+    await dismiss(game);
+    await advance(COUNTDOWN_MS);
+    await answerRight(game);
+    await answerRight(game);
+    expect(game.result.current.coach).toBe('like');
+    const before = game.result.current.feedback?.id;
+    const frames = holdFrames();
+
+    await dismiss(game);
+    await advance(10_000);
+    expect(game.result.current.feedback?.id).toBe(before);
+    expect(game.result.current.reel?.index).toBe(2);
+
+    await frames.draw();
+    await answerRight(game);
+    expect(game.result.current.feedback).toMatchObject({ kind: 'like', verdict: 'hit' });
+  });
+
+  it('ends the run when the app is left while a post is drawn — the late frame changes nothing', async () => {
+    const leave = leavingTheApp();
+    const frames = holdFrames();
+    const { game } = await afterCountdown();
+
+    await leave();
+    expect(runs.finish).toHaveBeenCalledTimes(1);
+    expect(runs.finish).toHaveBeenLastCalledWith('run-1', { actions: [], clientScore: 0, clientReels: 0 });
+
+    await frames.draw();
+    await advance(5_000);
+    expect(game.result.current.feedback).toBeNull();
+    expect(runs.finish).toHaveBeenCalledTimes(1);
+  });
+
+  it('judges nothing when the run is closed while a post is drawn', async () => {
+    const frames = holdFrames();
+    const { game } = await afterCountdown();
+
+    expect(await logOf(game)).toEqual([]);
+    await frames.draw();
+    await advance(5_000);
+    expect(game.result.current.feedback).toBeNull();
+  });
+
+  it('counts a swipe when it is recognised mid-drag, not when the finger went down', async () => {
+    const { game } = await afterCountdown();
+    await advance(300);
+    await touch(game, 'start', 600);
+    await advance(200);
+    await touch(game, 'move', 570);
+    expect(game.result.current.feedback).toBeNull();
+
+    await advance(200);
+    await touch(game, 'move', 535);
+
+    // Before the finger has lifted.
+    expect(game.result.current.feedback?.verdict).toBe('hit');
+    expect(await logOf(game)).toEqual([[GESTURE.up, 700, 0]]);
+  });
+
+  it('counts a flick that only qualifies at the lift, at the lift', async () => {
+    const { game } = await afterCountdown();
+    await advance(300);
+    await touch(game, 'start', 600);
+    await advance(20);
+    await touch(game, 'move', 590);
+    expect(game.result.current.feedback).toBeNull();
+
+    await advance(10);
+    await touch(game, 'end', 578);
+
+    expect(game.result.current.feedback?.verdict).toBe('hit');
+    expect(await logOf(game)).toEqual([[GESTURE.up, 330, 0]]);
+  });
+
+  it('judges a still finger on a post that is not gold as a hold, when the window ends', async () => {
+    const { game } = await afterCountdown();
+    const window = game.result.current.reel?.window ?? 0;
+    await advance(300);
+    await touch(game, 'start', 600);
+
+    await advance(window - 300 - 1);
+    expect(game.result.current.feedback).toBeNull();
+    await advance(1);
+
+    expect(game.result.current.feedback?.verdict).toBe('wrong');
+    expect(await logOf(game)).toEqual([[GESTURE.hold, 300, window - 300]]);
+  });
+
+  it('ends the window on a finger that moved but never swiped — the post does not wait for it', async () => {
+    const { game } = await afterCountdown();
+    const window = game.result.current.reel?.window ?? 0;
+    await advance(300);
+    await touch(game, 'start', 600);
+    await advance(100);
+    await touch(game, 'move', 630);
+
+    await advance(window - 400);
+    expect(game.result.current.feedback?.verdict).toBe('timeout');
+    await advance(PACE.exitMs.miss + PACE.slideMs);
+    expect(game.result.current.reel?.index).toBe(1);
+    expect(await logOf(game)).toEqual([[GESTURE.none, 0, 0]]);
+  });
+
+  it('hides the time bar while a gold post is held, and a hold broken in time brings it back', async () => {
+    const game = await atTheGoldPost();
+    const window = game.result.current.reel?.window ?? 0;
+    const before = game.result.current.feedback?.id;
+    await advance(300);
+    await touch(game, 'start', 600);
+    expect(game.result.current.values.timerShown.value).toBe(0);
+
+    await advance(200);
+    await touch(game, 'move', 630);
+    expect(game.result.current.values.timerShown.value).toBe(1);
+    expect(game.result.current.feedback?.id).toBe(before);
+
+    await advance(window - 500);
+    expect(game.result.current.feedback).toMatchObject({ kind: 'hold', verdict: 'timeout' });
+  });
+
+  it('lets a gold hold that began in time run past the window, until it is let go', async () => {
+    const game = await atTheGoldPost();
+    const reel = game.result.current.reel;
+    if (!reel) throw new Error('No reel is up.');
+    const release = Math.round((reel.zoneCenter * reel.holdFill) / 1000);
+    const pressAt = reel.window - Math.floor(release / 2);
+    const before = game.result.current.feedback?.id;
+    await advance(pressAt);
+    await touch(game, 'start', 600);
+
+    await advance(reel.window - pressAt);
+    expect(game.result.current.feedback?.id).toBe(before);
+    await advance(release - (reel.window - pressAt));
+    await touch(game, 'end', 600);
+
+    expect(game.result.current.feedback).toMatchObject({ kind: 'hold', verdict: 'perfect' });
+    expect((await logOf(game)).at(-1)).toEqual([GESTURE.hold, pressAt, release]);
+  });
+
+  it('judges a gold hold broken after the window at once', async () => {
+    const game = await atTheGoldPost();
+    const window = game.result.current.reel?.window ?? 0;
+    await advance(window - 200);
+    await touch(game, 'start', 600);
+    await advance(300);
+
+    await touch(game, 'move', 630);
+
+    expect(game.result.current.feedback).toMatchObject({ kind: 'hold', verdict: 'timeout' });
+    expect((await logOf(game)).at(-1)).toEqual([GESTURE.none, 0, 0]);
   });
 });

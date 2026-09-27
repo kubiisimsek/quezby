@@ -78,9 +78,13 @@ game/
                      with the engine and content versions, keeps an unsent finish; a practice
                      run (`offline`, `outdated`, `tutorial`) stays on the phone — the coached
                      one waits under each card (phase `coach`) and starts the post's clock
-                     only when it is put away
-  gesture.ts         raw touches → swipe / like / hold / touch (pure, tested)
-  ReelCard.tsx       one reel, full screen
+                     only when it is put away. Every post is armed first and goes live on
+                     its first drawn frame; the window's end is final (no drag grace) but
+                     for a gold hold begun in time
+  gesture.ts         raw touches → swipe / like / hold / touch (pure, tested); a swipe counts
+                     the moment it is recognised — mid-drag past its threshold, or at the lift
+  ReelCard.tsx       one reel, full screen; a gold post's time bar hides while it is held
+                     (`values.timerShown`) — its fill bar is the clock then
   Hud.tsx            a close slab · the chunky dopamine meter (notched, labelled) · the score in
                      Rubik · level and a gold combo pill (x1,00–x1,50) on their own row
   FeedbackLayer.tsx  points rising in Rubik, heart burst, a miss slammed on a red slab and shaken,

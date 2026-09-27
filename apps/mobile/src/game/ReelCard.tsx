@@ -24,6 +24,8 @@ export type ReelValues = {
   dragY: SharedValue<number>;
   enter: SharedValue<number>;
   timer: SharedValue<number>;
+  /** 0 while a gold post is held: its fill bar is the clock then, not the timer. */
+  timerShown: SharedValue<number>;
   holdFill: SharedValue<number>;
   holding: SharedValue<number>;
 };
@@ -95,6 +97,10 @@ export function ReelCard({
     width: `${Math.max(0, Math.min(1, values.timer.value)) * 100}%`,
   }));
 
+  const timerTrackStyle = useAnimatedStyle(() => ({
+    opacity: values.timerShown.value,
+  }));
+
   return (
     <Animated.View
       pointerEvents="none"
@@ -158,7 +164,10 @@ export function ReelCard({
         </View>
       ) : null}
 
-      <View style={[styles.timerTrack, { bottom: insets.bottom + 10 }]}>
+      <Animated.View
+        testID="post-timer"
+        style={[styles.timerTrack, { bottom: insets.bottom + 10 }, timerTrackStyle]}
+      >
         <Animated.View
           style={[
             styles.timerFill,
@@ -166,7 +175,7 @@ export function ReelCard({
             timerStyle,
           ]}
         />
-      </View>
+      </Animated.View>
     </Animated.View>
   );
 }

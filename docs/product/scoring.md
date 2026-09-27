@@ -34,12 +34,37 @@ edilmez.
 skip, freeze, skip`. Sonrası seed'den gelir. Reel türü dağılımında şans payı
 ölçüldü ve önemsiz çıktı; "torba" karıştırıcısına gerek yok.
 
+### Süre: ne zaman başlar, ne zaman biter
+
+- Bir reelin saati, reel **ekrana ilk çizildiği karede** başlar. O ana kadar
+  reel görünmez ve dokunuşlar ona sayılmaz (kayma sırasındaki gibi): telefonun
+  çizim süresi oyuncunun tepkisine yazılmaz.
+- `t`, hareketin **tanındığı** andır:
+  - kaydırmada, parmak henüz ekrandayken 60 px yukarı (ya da ≥ 0,35 px/ms
+    hızla 20 px) gittiği an; yalnızca bırakış onu kaydırma yapıyorsa bırakış
+    anı;
+  - beğenide ikinci dokunuş;
+  - altında basılış (`d` basılı kalınan süre);
+  - dokunma reelinde ilk temas.
+
+  Reel o anda gider, yani ekranda kaldığı süre motorun saydığı süreyle aynıdır.
+- **Süre çubuğunun bittiği an kesindir.** O anda ekranda duran bir parmak
+  hemen yargılanır: kıpırdamadan basılıysa basılı tutma (yanlış hareket), başka
+  her durumda zaman aşımı. Parmağın kalkması beklenmez.
+- Tek istisna, zamanında başlamış bir **altın tutuş**: bırakılana ya da artık
+  yalnızca geç kalabileceği ana kadar sürer.
+  - Tutuş sürerken süre çubuğu gizlenir; saat artık altın dolum çubuğudur.
+  - Parmak kayıp tutuş süre bitmeden bozulursa çubuk, kalan süreyi göstererek
+    geri gelir.
+  - Tutuş süre bittikten sonra bozulursa reel hemen yargılanır.
+
 ### Deneme turu (ilk açılış)
 
 Yeni oyuncunun ilk turu aynı motorla, aynı kurallarla oynanır ama **yalnızca
 telefonda** kalır: sunucuya gitmez, tabloya, lige, istatistiğe ya da rekora
 yazılmaz — çevrimdışı antrenman gibi. Her türün ilk reelinden (0, 2, 4 ve 6.)
-önce akış bir koç kartıyla durur; reel ancak kart kapanınca aktif olur. Motor
+önce akış bir koç kartıyla durur; reel ancak kart kapandıktan sonraki ilk
+karede aktif olur. Motor
 `t`'yi reelin aktif olduğu andan saydığı ve bar yalnızca aktif sürede eridiği
 için bu duraklama sonucu hiç değiştirmez — kurallar kilitli kalır. Sıralı bir
 turda aynı duraklama checkpoint'lerde `slow_motion` olurdu; bu yüzden koç
@@ -102,8 +127,9 @@ reel puanı = ⌊(taban + bonus) · L · c / 1.000.000⌋
   varmaz. Uzun tur daha değerlidir, ama bir şanslı dakika gerisini ezemez.
 - **Kombo** x1,00 → x1,50: her isabet +0,05 ekler, bir hata yalnızca x1'in
   üstünü yarıya indirir. HUD'da "x1,25" diye görünür.
-- **Hız bonusu:** `taban × (pencere − t) / (pencere − 250)`; `t` parmağın indiği
-  an. 250 ms'den hızlısı ekstra puan getirmez — insanüstü başparmak ödüllendirilmez.
+- **Hız bonusu:** `taban × (pencere − t) / (pencere − 250)`; `t` hareketin
+  tanındığı an (bkz. *Süre*). 250 ms'den hızlısı ekstra puan getirmez —
+  insanüstü başparmak ödüllendirilmez.
 - **Hassasiyet:** yeşil bölgenin merkezine uzaklık, yarı genişliğe oranla;
   merkezin %30 yakınındaki bırakış **"Mükemmel!"** sayılır.
 
@@ -122,6 +148,8 @@ Her biri reelin üstüne `⌊değer · L / 1000⌋` puan ekler (kombo çarpanı 
 
 Dört yetenek profili (tepki süresi, hata oranı, "dokunma" refleksi, altın
 bırakma isabeti) ile ölçüldü. Süre = aktif süre + reel başına 220 ms geçiş.
+Bir profilin tepki süresi, reelin çizildiği kareden hareketin tanındığı ana
+kadar geçen süredir.
 
 | Profil | Reel p50 | Süre p10 / p50 / p90 | Skor p10 / p50 / p90 | Aynı süre (±%10) p10/p50 · p90/p50 | İsimli kombo payı |
 | --- | --: | --- | --- | --- | --: |
@@ -222,6 +250,14 @@ görünen her sayı sunucudan gelir.
      1,2 katı + 6 sn'den uzun → yumuşak `slow_timing`;
    - beklenen makbuz eksik (bağlantı yeniden denemelerde de yok) → yumuşak
      `checkpoint_missing`.
+   Uygulamanın temposu ile modelin temposu birebir örtüşür:
+   - reel ilk çizildiği karede canlanır;
+   - kaydırma, tanındığı an sayılır ve reel o anda gider.
+
+   Modelin görmediği yalnızca geç çalışan zamanlayıcılar ve reel başına bir
+   çizim karesidir. Rahat, sürükleyerek kaydırmak dürüst bir turu yavaş
+   göstermez. `RunVerifierTest`'in "dürüst telefon" örnekleri, reel başına
+   45 ms'de çizen bir telefonu da içerir.
    Maliyet: bir turda en fazla beş küçük istek (çoğunlukla üç); bir tur bitişinin
    tamamı (tekrar oynatma dahil) yerelde ~7 ms, en uzun turun tekrarı ~2,5 ms.
 9. **Cihaz bütünlüğü — rootlu cihaz, emülatör, değiştirilmiş uygulama.**

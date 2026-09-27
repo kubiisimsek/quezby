@@ -37,6 +37,7 @@ function controller(overrides: Partial<GameController> = {}): GameController {
       dragY: shared(0),
       enter: shared(1),
       timer: shared(1),
+      timerShown: shared(1),
       holdFill: shared(0),
       holding: shared(0),
       meter: shared(1000),
