@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  AUDIT_ACTION,
   dayKeyOf,
   formatDate,
   formatDateTime,
@@ -17,7 +18,11 @@ import {
   formatTime,
   formatWeekKey,
   playerName,
+  REPORT_REASON,
+  REPORT_STATUS,
   RUN_FLAG,
+  RUN_MODE,
+  RUN_STATUS,
   shortId,
   VERDICT,
 } from '@/lib/format';
@@ -98,6 +103,35 @@ describe('names', () => {
       expect(flag.label).not.toBe('');
       expect(flag.hint).not.toBe('');
     }
+  });
+});
+
+describe('runs', () => {
+  it('says what every status means for the boards, never in the action magenta', () => {
+    for (const status of Object.values(RUN_STATUS)) {
+      expect(status.label).not.toBe('');
+      expect(status.hint).not.toBe('');
+      expect(status.tone).not.toBe('primary');
+    }
+  });
+
+  it('calls a clean VS run played, in green, and says it counts nowhere', () => {
+    expect(RUN_MODE.vs).toBe('VS');
+    expect(RUN_STATUS.played).toMatchObject({ label: 'Oynandı', tone: 'ok' });
+    expect(RUN_STATUS.played.hint).toMatch(/VS turu.*hiçbir tabloya, lige ya da istatistiğe sayılmaz/);
+  });
+});
+
+describe('reports', () => {
+  it('names what is reported and what became of it', () => {
+    expect(REPORT_REASON).toEqual({ photo: 'Fotoğraf', name: 'Kullanıcı adı' });
+    expect(Object.values(REPORT_STATUS).map((status) => status.label)).toEqual(['Açık', 'Giderildi', 'Kapatıldı']);
+    expect(REPORT_STATUS.open.tone).toBe('warn');
+  });
+
+  it('has words for what a moderator did about a photo and the reports', () => {
+    expect(AUDIT_ACTION['player.avatar_remove']).toEqual({ tone: 'warn', label: 'Fotoğrafı kaldırdı' });
+    expect(AUDIT_ACTION['player.reports_dismiss']).toEqual({ tone: 'neutral', label: 'Bildirimleri kapattı' });
   });
 });
 

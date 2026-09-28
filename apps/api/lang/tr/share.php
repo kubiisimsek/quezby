@@ -11,7 +11,7 @@
 
 return [
     'free' => "Quezby'de :points yaptım! :posts. Sen kaç yaparsın?",
-    'free_ranked' => "Quezby'de :points yaptım! :posts · bugün #:rank. Sen kaç yaparsın?",
+    'free_ranked' => "Quezby'de :points yaptım! :posts · bu hafta #:rank. Sen kaç yaparsın?",
     'daily' => "Quezby · Günün akışı #:number\n:grid\n:points",
     'daily_ranked' => "Quezby · Günün akışı #:number\n:grid\n:points · #:rank/:players",
 

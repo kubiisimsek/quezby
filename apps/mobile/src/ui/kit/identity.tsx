@@ -31,8 +31,8 @@ const AVATAR = { sm: 32, md: 40, lg: 54 } as const;
 /**
  * A player's portrait: their initials in Rubik on a dark card, set in a frame
  * of their tone — magenta for you, violet for everyone else — the way a game
- * shows who is who. A photo, when there is one, covers the initials; an
- * expired one leaves them showing.
+ * shows who is who. A photo, when there is one, covers the initials; one that
+ * cannot load leaves them showing.
  */
 export function Avatar({
   name,
@@ -41,7 +41,10 @@ export function Avatar({
   size = 'md',
 }: {
   name: string;
-  /** The signed, expiring URL the API hands out, already resolved. */
+  /**
+   * The player's photo (`avatarUrl`): an address the API never reuses, so
+   * the phone keeps it cached for good. Null for none.
+   */
   src?: string | null;
   tone?: TagTone;
   size?: 'sm' | 'md' | 'lg';

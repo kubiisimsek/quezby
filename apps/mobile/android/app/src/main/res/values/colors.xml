@@ -2,4 +2,6 @@
     <!-- canvas in apps/mobile/design/palette.mjs: the arena's first frame. Android 12+
          shows the adaptive launcher icon on it while the app starts. -->
     <color name="brand">#240554</color>
+    <!-- primary in apps/mobile/design/palette.mjs: a push's icon and accent. -->
+    <color name="notification">#e31d92</color>
 </resources>

@@ -137,12 +137,16 @@ function exitDelay(verdict: Verdict, kind: ReelKind): number {
   return exitDelayMs(verdict === 'hit' || verdict === 'perfect', kind);
 }
 
+/** A VS run: sent to a friend — or, with `duelId`, the answer to theirs, on its seed. */
+export type VsTarget = { opponent: string; duelId?: string };
+
 /**
  * One run of the game on this screen: the engine, the clock, the touches,
  * and what the screen draws from them. The engine decides every outcome —
- * timers here only decide *when* to ask it.
+ * timers here only decide *when* to ask it. A VS run is played like any
+ * other; it only starts differently, and it never falls back to practice.
  */
-export function useGame(mode: RunMode = 'free') {
+export function useGame(mode: RunMode = 'free', vs: VsTarget | null = null) {
   const t = useT();
   const { height } = useWindowDimensions();
 
@@ -744,12 +748,14 @@ export function useGame(mode: RunMode = 'free') {
           mode,
           engineVersion: ENGINE_VERSION,
           contentVersion: CONTENT_VERSION,
+          ...(mode === 'vs' && vs ? (vs.duelId ? { duel: vs.duelId } : { opponent: vs.opponent }) : {}),
         });
         if (!aliveRef.current) return;
         begin(started.seed, started.runId);
       } catch (error) {
         if (!aliveRef.current) return;
-        if (error instanceof ApiError && error.code === 'engine_outdated') {
+        // A VS is played on its seed and verified, or not at all.
+        if (error instanceof ApiError && error.code === 'engine_outdated' && mode !== 'vs') {
           practiceRef.current = 'outdated';
           setPractice('outdated');
           track('outdated_run');
@@ -760,7 +766,7 @@ export function useGame(mode: RunMode = 'free') {
         setPhase('error');
       }
     },
-    [begin, clearTimers, mode],
+    [begin, clearTimers, mode, vs?.duelId, vs?.opponent],
   );
 
   /**

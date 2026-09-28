@@ -34,7 +34,8 @@ test('shows everything about a player on one page', function () {
     ]);
     $player->deviceChecks()->create(['platform' => 'ios', 'verdict' => 'fail', 'reason' => 'counter', 'details' => ['keyId' => 'k'], 'checked_at' => now(), 'expires_at' => now()->addHours(12)]);
     $player->createToken('ios');
-    DB::table('follows')->insert(['follower_id' => $twin->id, 'followee_id' => $player->id, 'created_at' => now()]);
+    $this->befriend($twin, $player);
+    $this->block(User::factory()->withUsername('rahatsiz')->create(), $player);
 
     $response = adminPlayerDetail($player)->assertOk();
 
@@ -59,7 +60,7 @@ test('shows everything about a player on one page', function () {
         ->assertJsonPath('devices.0.verdict', 'fail')
         ->assertJsonPath('devices.0.reason', 'counter')
         ->assertJsonPath('sameInstall.0.username', 'kerem.yedek')
-        ->assertJsonPath('follows', ['followers' => 1, 'following' => 0]);
+        ->assertJsonPath('social', ['friends' => 1, 'blockedBy' => 1]);
 
     expect($response->getContent())->not->toContain('secret-refresh')
         ->and($response->json('recentRuns.0'))->not->toHaveKey('actions');

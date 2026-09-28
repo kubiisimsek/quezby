@@ -8,7 +8,7 @@ import type {
   StatsResponse,
   UserSearchResponse,
 } from '@quezby/types';
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 
 import { api } from '@/api/client';
@@ -69,29 +69,4 @@ export function useUserSearch(query: string) {
     enabled: valid,
     placeholderData: keepPreviousData,
   });
-}
-
-/** Follow or unfollow a player; every board and list that shows the relation is refreshed. */
-export function useFollow() {
-  const client = useQueryClient();
-  return useMutation({
-    mutationFn: ({ username, follow }: { username: string; follow: boolean }) =>
-      follow ? api.users.follow(username) : api.users.unfollow(username),
-    onSettled: (_data, _error, { username }) => {
-      void client.invalidateQueries({ queryKey: ['player', username] });
-      void client.invalidateQueries({ queryKey: ['leaderboard'] });
-      void client.invalidateQueries({ queryKey: ['league'] });
-      void client.invalidateQueries({ queryKey: ['search'] });
-      void client.invalidateQueries({ queryKey: ['following'] });
-      void client.invalidateQueries({ queryKey: ['followers'] });
-    },
-  });
-}
-
-export function useFollowing() {
-  return useQuery({ queryKey: ['following'], queryFn: () => api.me.following() });
-}
-
-export function useFollowers() {
-  return useQuery({ queryKey: ['followers'], queryFn: () => api.me.followers() });
 }

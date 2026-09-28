@@ -1,8 +1,8 @@
-import { screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { initials } from '@/components/base/avatar';
+import { Avatar, initials } from '@/components/base/avatar';
 import { Segmented } from '@/components/base/segmented';
 import { BarChart } from '@/components/patterns/bar-chart';
 import { ConfirmModal } from '@/components/patterns/confirm-modal';
@@ -15,6 +15,42 @@ describe('initials', () => {
     expect(initials('ilkay irmak')).toBe('İİ');
     expect(initials('guest48128742')).toBe('GU');
     expect(initials(null)).toBe('?');
+  });
+});
+
+describe('Avatar', () => {
+  const photo = 'https://api.quezby.com/api/v1/media/avatars/0123456789abcdef01234567.jpg';
+
+  it('shows the photo when there is one, as decoration beside the name', () => {
+    const { container } = render(<Avatar name="kerem.35" src={photo} />);
+
+    const image = container.querySelector('img');
+    expect(image).toHaveAttribute('src', photo);
+    expect(image).toHaveAttribute('alt', '');
+    expect(image).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.queryByText('KE')).not.toBeInTheDocument();
+  });
+
+  it('names the photo when the photo is what is being looked at', () => {
+    render(<Avatar name="kerem.35" src={photo} alt="@kerem.35 profil fotoğrafı" />);
+
+    expect(screen.getByRole('img', { name: '@kerem.35 profil fotoğrafı' })).toHaveAttribute('src', photo);
+  });
+
+  it('wears the initials without a photo', () => {
+    const { container } = render(<Avatar name="kerem.35" src={null} />);
+
+    expect(screen.getByText('KE')).toBeInTheDocument();
+    expect(container.querySelector('img')).toBeNull();
+  });
+
+  it('falls back to the initials when the photo will not load', () => {
+    const { container } = render(<Avatar name="kerem.35" src={photo} />);
+
+    fireEvent.error(container.querySelector('img') as HTMLImageElement);
+
+    expect(screen.getByText('KE')).toBeInTheDocument();
+    expect(container.querySelector('img')).toBeNull();
   });
 });
 

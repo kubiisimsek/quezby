@@ -54,6 +54,13 @@
   API; Objective-C, App Attest) behind `src/lib/integrity.ts`, which degrades to
   "unavailable" when the module or support is missing. The app only carries the
   proof; the API decides. App Attest does not run in the Simulator.
+- Push is Firebase Cloud Messaging (`@react-native-firebase/messaging`) behind
+  `src/lib/push.ts` — the only thing the app uses Firebase for. A build without
+  Firebase's app files (`GoogleService-Info.plist`, `google-services.json`,
+  git-ignored like `.env`) answers "unavailable" and does nothing. The
+  permission is asked only when the player taps for it — the onboarding step,
+  a `PushNudge`, Ayarlar → Bildirimler — and Firebase makes no token before
+  a yes (`firebase.json`). What a notification says is the API's.
 - Every screen is built from `src/ui/kit.tsx` and `src/ui/sheet.tsx`
   (see `docs/design/mobile-design-system.md`). A missing shape goes into the
   kit, not into a screen.

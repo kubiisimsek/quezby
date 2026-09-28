@@ -27,6 +27,10 @@ describe('renderHtaccess', () => {
   it('lets the panel talk to its own API and nothing else', () => {
     expect(file).toContain("connect-src 'self' https://api.quezby.com;");
   });
+
+  it('shows players\' photos from its own API, and images from nowhere else', () => {
+    expect(file).toContain("img-src 'self' data: https://api.quezby.com;");
+  });
 });
 
 describe('contentSecurityPolicy', () => {
@@ -40,7 +44,14 @@ describe('contentSecurityPolicy', () => {
   });
 
   it('talks to its own origin only when the API sits behind the dev proxy', () => {
-    expect(contentSecurityPolicy({ apiOrigin: '' })).toContain("connect-src 'self';");
+    const policy = contentSecurityPolicy({ apiOrigin: '' });
+
+    expect(policy).toContain("connect-src 'self';");
+    expect(policy).toContain("img-src 'self' data:;");
+  });
+
+  it('takes photos from the API of the environment it was built for', () => {
+    expect(contentSecurityPolicy({ apiOrigin: 'https://staging-api.quezby.com' })).toContain("img-src 'self' data: https://staging-api.quezby.com;");
   });
 });
 

@@ -48,6 +48,7 @@ import {
 export function ClimbRow({
   rank,
   username,
+  avatarUrl,
   score,
   reels,
   detail,
@@ -58,6 +59,8 @@ export function ClimbRow({
 }: {
   rank: number;
   username: string;
+  /** Their photo; null or left out draws their initials. */
+  avatarUrl?: string | null;
   score: number;
   reels?: number;
   /**
@@ -122,7 +125,7 @@ export function ClimbRow({
       <View style={styles.coinSlot}>
         <RankCoin rank={rank} isMe={isMe} />
       </View>
-      <Avatar name={username} tone={isMe ? 'primary' : 'neutral'} size="md" />
+      <Avatar name={username} src={avatarUrl} tone={isMe ? 'primary' : 'neutral'} size="md" />
       <View style={styles.who}>
         <View style={styles.nameLine}>
           <Txt variant="heading" numberOfLines={1} style={styles.shrink}>

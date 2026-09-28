@@ -18,6 +18,7 @@ export function Page({
   title,
   description,
   eyebrow,
+  leading,
   actions,
   back,
   band,
@@ -28,6 +29,8 @@ export function Page({
   description?: ReactNode;
   /** A small pill above the title — a date, a kind of record. */
   eyebrow?: ReactNode;
+  /** A record's picture beside its title — a player's photo. */
+  leading?: ReactNode;
   actions?: ReactNode;
   back?: { to: string; label: string };
   /** What the page says about itself, under the title on the band. */
@@ -69,10 +72,13 @@ export function Page({
           {back ? <BackLink {...back} /> : null}
 
           <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
-            <div className="min-w-0 animate-rise">
-              {eyebrow ? <div className="mb-2.5 flex flex-wrap items-center gap-2">{eyebrow}</div> : null}
-              <h1 className="break-words text-display">{title}</h1>
-              {description ? <p className="mt-1.5 max-w-xl text-meta text-on-brand/90">{description}</p> : null}
+            <div className="flex min-w-0 animate-rise items-center gap-4">
+              {leading ? <div className="shrink-0">{leading}</div> : null}
+              <div className="min-w-0">
+                {eyebrow ? <div className="mb-2.5 flex flex-wrap items-center gap-2">{eyebrow}</div> : null}
+                <h1 className="break-words text-display">{title}</h1>
+                {description ? <p className="mt-1.5 max-w-xl text-meta text-on-brand/90">{description}</p> : null}
+              </div>
             </div>
             {actions ? <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div> : null}
           </div>

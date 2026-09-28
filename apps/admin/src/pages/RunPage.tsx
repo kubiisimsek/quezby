@@ -9,6 +9,7 @@ import {
   ScrollText,
   ShieldAlert,
   ShieldCheck,
+  Swords,
   Timer,
   Trophy,
 } from 'lucide-react';
@@ -32,6 +33,7 @@ import { auditColumns } from '@/lib/columns';
 import { errorMessage, isApiError } from '@/lib/errors';
 import {
   DEVICE_VERDICT,
+  DUEL_STATUS,
   END_REASON,
   formatDateTime,
   formatDayKey,
@@ -46,7 +48,7 @@ import {
   SEVERITY,
   shortId,
 } from '@/lib/format';
-import { can } from '@/lib/permissions';
+import { can, isApprovable, isRejectable } from '@/lib/permissions';
 import { useSession } from '@/stores/session';
 
 const UNAVAILABLE = {
@@ -96,7 +98,8 @@ export function RunPage() {
   const data = run.data;
   const me = data.run;
   const moderator = can(role, 'moderate');
-  const canReject = moderator && ['ranked', 'review', 'flagged'].includes(me.status);
+  const canApprove = moderator && isApprovable(me);
+  const canReject = moderator && isRejectable(me);
 
   return (
     <Page
@@ -105,24 +108,26 @@ export function RunPage() {
       description={`${playerName(me.player.username)} · ${formatDateTime(me.startedAt)}`}
       eyebrow={
         <>
-          <Tag tone="onBrand" label={RUN_STATUS[me.status].label} />
+          <Tag tone="onBrand" label={RUN_STATUS[me.status].label} title={RUN_STATUS[me.status].hint} />
           <Tag tone="onBrand" label={me.mode === 'daily' && me.dailyKey ? `${RUN_MODE.daily} · ${formatDayKey(me.dailyKey)}` : RUN_MODE[me.mode]} />
           <Tag tone="onBrand" icon={<Hash />} label={`Sezon ${me.engineVersion}`} />
         </>
       }
       actions={
-        <>
-          {moderator && me.status === 'review' ? (
-            <Button tone="onBrand" icon={<CircleCheck />} onClick={() => setDialog('approve')}>
-              Onayla
-            </Button>
-          ) : null}
-          {canReject ? (
-            <Button tone="onBrandSoft" icon={<CircleX />} onClick={() => setDialog('reject')}>
-              Reddet
-            </Button>
-          ) : null}
-        </>
+        canApprove || canReject ? (
+          <>
+            {canApprove ? (
+              <Button tone="onBrand" icon={<CircleCheck />} onClick={() => setDialog('approve')}>
+                Onayla
+              </Button>
+            ) : null}
+            {canReject ? (
+              <Button tone="onBrandSoft" icon={<CircleX />} onClick={() => setDialog('reject')}>
+                Reddet
+              </Button>
+            ) : null}
+          </>
+        ) : null
       }
       band={
         <BandStats
@@ -139,6 +144,30 @@ export function RunPage() {
       {me.status === 'review' ? (
         <Callout tone="warn" title="Bu tur incelemede">
           <p>Yumuşak bir sinyali var ve skoru sezonun ya da haftanın zirvesine girecek. Onaylanana kadar hiçbir tabloda görünmez.</p>
+        </Callout>
+      ) : null}
+      {me.mode === 'vs' ? (
+        <Callout tone="info" icon={<Swords />} title="VS turu: hiçbir yere sayılmaz">
+          <p>
+            İki arkadaşın aynı tohumla oynadığı bir VS’in turu. Tabloya, lige ya da istatistiğe girmez; bu yüzden onaylanmaz ve reddedilmez. Temiz
+            değilse VS’ini kaybeder; VS’i başlatanın turuysa VS hiç gönderilmez.
+          </p>
+          {me.duel ? (
+            <p className="mt-2 flex flex-wrap items-center gap-2">
+              <span>VS ·</span>
+              <Link to={`/players/${me.duel.challenger.id}`} className="font-medium hover:text-primary-text hover:underline">
+                {playerName(me.duel.challenger.username)}
+              </Link>
+              <span className="tabular-nums">
+                {me.duel.challengerScore === null ? '—' : formatNumber(me.duel.challengerScore)} –{' '}
+                {me.duel.opponentScore === null ? '—' : formatNumber(me.duel.opponentScore)}
+              </span>
+              <Link to={`/players/${me.duel.opponent.id}`} className="font-medium hover:text-primary-text hover:underline">
+                {playerName(me.duel.opponent.username)}
+              </Link>
+              <Tag tone={DUEL_STATUS[me.duel.status].tone} label={DUEL_STATUS[me.duel.status].label} />
+            </p>
+          ) : null}
         </Callout>
       ) : null}
 

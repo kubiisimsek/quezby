@@ -8,12 +8,15 @@ kullan.
 **Gereksinimler**
 
 - PHP **8.3 veya üstü** (cPanel → MultiPHP Manager). Açık olması gereken
-  eklentiler: `ctype`, `curl`, `dom`, `fileinfo`, `mbstring`, `openssl`,
-  `pdo_mysql`, `tokenizer`, `xml`.
+  eklentiler: `ctype`, `curl`, `dom`, `fileinfo`, `gd`, `mbstring`, `openssl`,
+  `pdo_mysql`, `tokenizer`, `xml`. `gd` profil fotoğrafları içindir: API
+  gelen her fotoğrafı onunla yeniden kaydeder; yoksa fotoğraf yüklemek hata
+  verir ve panelin **Sistem** sayfası "GD eksik" der.
 - MySQL 5.7+ ya da MariaDB 10.3+.
-- **Cron gerekmez**: zamanlanmış görev ve kuyruk yok (ligler ve süresi dolan
-  turlar tembel kapanır); oturum ve önbellek
-  dosyada tutulur.
+- **Cron gerekmez**: zamanlanmış görev ve kuyruk yok (ligler, VS'ler ve
+  süresi dolan turlar tembel kapanır; eski mesajlar ve analitik bir isteğin
+  yanıtından sonra budanır; push bildirimleri de yanıttan sonra gider);
+  oturum ve önbellek dosyada tutulur.
 
 ## 1. Veritabanını oluştur
 
@@ -65,6 +68,27 @@ openssl rand -hex 32                                # çıktıyı OPS_TOKEN= sat
   `docs/development/device-integrity-setup.md`. Hostun
   `playintegrity.googleapis.com` ve `oauth2.googleapis.com`'a HTTPS çıkışı açık
   olmalı: `curl -I https://playintegrity.googleapis.com`.
+- Push bildirimleri (adım adım: `docs/development/push-setup.md`): Firebase
+  servis hesabının JSON anahtarını zip'e koyma; File Manager ile
+  `storage/app/private/`'a yükle (ör. `storage/app/private/firebase-push.json`).
+  Sonra:
+
+  ```dotenv
+  QUEZBY_PUSH_ENABLED=true
+  FIREBASE_PROJECT_ID=quezby-staging
+  FIREBASE_CREDENTIALS=storage/app/private/firebase-push.json
+  ```
+
+  Production da **aynı** projeyi kullanır (`quezby-staging`) ve anahtarı o
+  projeden olur: uygulamada tek bir Firebase dosyası var, telefonların push
+  token'ları o projeye ait. `.env` değişince `optimize`'ı çağır (6. adım).
+  Hostun `fcm.googleapis.com` ve `oauth2.googleapis.com`'a HTTPS çıkışı açık
+  olmalı: `curl -I https://fcm.googleapis.com`. Üçü de dolu ve anahtar
+  okunabiliyorsa panelin **Sistem** sayfası "Push bildirimleri (Firebase)"
+  satırında **Açık** der; değilse hiçbir şey gönderilmez, başka hiçbir şey de
+  bozulmaz.
+- `QUEZBY_LEAGUE_UNLOCK_RUNS=20`: yeni oyuncunun ligi kaç sayılan turdan sonra
+  açılır. Her ortamda aynı kalır.
 - `MODERATION_TOKEN` yalnızca moderasyon yaparken dolu olsun (aşağıda 6b).
 - Analitik (`docs/product/analytics.md`): `QUEZBY_ANALYTICS_ENABLED=true`,
   `QUEZBY_ANALYTICS_SAMPLE=1000`, `QUEZBY_ANALYTICS_VISIT_DAYS=30`,
@@ -181,7 +205,9 @@ migration gerektiren bir sonraki sürümde yeniden doldurursun.
 3 → 4 → 6 → 7. Yeni sürüm açıldıktan sonra `optimize`'ı mutlaka yeniden
 çağır: eski önbellek yeni kodla çalışmaya devam eder. Zip `.env`'i de getirir:
 sunucuda elle değiştirdiğin bir değeri önce yerel `.env.staging`'e yaz,
-yoksa güncelleme onu geri alır.
+yoksa güncelleme onu geri alır. `storage/` ise zip'te boş klasörlerden
+ibarettir: oyuncuların profil fotoğrafları (`storage/app/avatars`) ve
+`storage/app/private/`'a yüklediğin anahtarlar güncellemeden etkilenmez.
 
 ## Yönetim paneli (admin.quezby.com)
 
@@ -238,9 +264,11 @@ ulaşılamadı" diyorsa API'nin adresi yanlış paketlenmiştir ya da API
 kapalıdır: `curl https://api.quezby.com/api/v1/health`.
 
 Panel oturumu 12 saat sürer (`QUEZBY_ADMIN_TOKEN_HOURS`). Yöneticilerin her
-işlemi — yasak, ad sıfırlama, tur onay/ret, hesap silme, migration —
-**Denetim kaydı**nda kimin yaptığıyla durur; komut satırından ve ops
-uçlarından yapılanlar da.
+işlemi — yasak, ad sıfırlama, fotoğraf kaldırma, bildirimleri kapatma, tur
+onay/ret, hesap silme, migration — **Denetim kaydı**nda kimin yaptığıyla
+durur; komut satırından ve ops uçlarından yapılanlar da. Oyuncuların
+birbirinin fotoğrafı ya da adı hakkındaki bildirimleri panelin
+**Bildirimler** sayfasına düşer (`docs/backend/admin-api.md` → *Reports*).
 
 ## Sorun giderme
 
@@ -261,3 +289,12 @@ uçlarından yapılanlar da.
   da hostta `mod_rewrite` kapalı. Zip'i gizli dosyalarla birlikte yeniden aç.
 - **Panel "Bu işlem için yetkin yok" diyor**: rolün yetmiyor; bir Sahip
   **Yöneticiler**'den rolünü değiştirebilir.
+- **Profil fotoğrafı yüklenmiyor** (Sistem'de "GD eksik"): PHP'nin `gd`
+  eklentisi kapalı. cPanel'in PHP eklentileri arasından aç.
+- **Push gelmiyor**: önce Sistem'deki "Push bildirimleri (Firebase)" satırı.
+  **Kapalı** ise üç `.env` değerinden biri eksik ya da JSON anahtarı o yolda
+  yok veya okunamıyor — API o zaman sessizce hiçbir şey göndermez; düzelt,
+  `optimize`. **Açık** ise log'da *Google did not hand out a fcm access
+  token.* (anahtar geçersiz ya da `oauth2.googleapis.com`'a çıkış yok) ya da
+  *Firebase refused a push.* ara. Ayrıntı:
+  `docs/development/push-setup.md` → Sorun giderme.

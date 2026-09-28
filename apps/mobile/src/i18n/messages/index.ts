@@ -12,17 +12,21 @@ import { errors } from './errors';
 import { friends } from './friends';
 import { game } from './game';
 import { help } from './help';
+import { history } from './history';
 import { home } from './home';
+import { inbox } from './inbox';
 import { kit } from './kit';
 import { language } from './language';
 import { league } from './league';
 import { nav } from './nav';
 import { profile } from './profile';
+import { push } from './push';
 import { reels } from './reels';
 import { result } from './result';
 import { tiers } from './tiers';
 import { username } from './username';
 import { usernameRules } from './usernameRules';
+import { vs } from './vs';
 import { welcome } from './welcome';
 
 /**
@@ -42,17 +46,21 @@ const AREAS = {
   friends,
   game,
   help,
+  history,
   home,
+  inbox,
   kit,
   language,
   league,
   nav,
   profile,
+  push,
   reels,
   result,
   tiers,
   username,
   usernameRules,
+  vs,
   welcome,
 };
 

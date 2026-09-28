@@ -3,10 +3,13 @@ import { create } from 'zustand';
 
 const KEY = 'quezby.onboarding.v1';
 
-/** A new player's first steps, in order: the practice run, a name, a way to keep the account. */
-export type OnboardingStep = 'tutorial' | 'nickname' | 'protect';
+/**
+ * A new player's first steps, in order: the practice run, a name, whether
+ * the game may send notifications, a way to keep the account.
+ */
+export type OnboardingStep = 'tutorial' | 'nickname' | 'notifications' | 'protect';
 
-const STEPS: readonly OnboardingStep[] = ['tutorial', 'nickname', 'protect'];
+const STEPS: readonly OnboardingStep[] = ['tutorial', 'nickname', 'notifications', 'protect'];
 
 type Stored = {
   /** The account the steps belong to — signing in to another leaves them behind. */
@@ -61,7 +64,8 @@ export const useOnboarding = create<OnboardingState>((set, get) => {
     advance: (isGuest) => {
       const { step } = get();
       if (step === 'tutorial') save({ step: 'nickname' });
-      else if (step === 'nickname' && isGuest) save({ step: 'protect' });
+      else if (step === 'nickname') save({ step: 'notifications' });
+      else if (step === 'notifications' && isGuest) save({ step: 'protect' });
       else save({ step: null });
     },
 

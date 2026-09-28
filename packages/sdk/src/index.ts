@@ -6,17 +6,21 @@ import type {
   AppleLinkRequest,
   AppleSignInRequest,
   AuthResponse,
+  BlocksResponse,
   CheckpointRequest,
   CheckpointResponse,
   DailyResponse,
   DeviceChallengeResponse,
   DeviceCheckResponse,
+  DuelResponse,
   FinishRunRequest,
   FinishRunResponse,
-  FollowListResponse,
+  FriendRequestsResponse,
+  FriendsResponse,
   GoogleLinkRequest,
   GoogleSignInRequest,
   GuestSignUpRequest,
+  InboxSummary,
   IosAssertionRequest,
   IosAttestationRequest,
   LeaderboardBoard,
@@ -31,11 +35,21 @@ import type {
   NonceResponse,
   Platform,
   PlayerResponse,
+  Phrase,
+  Pulse,
+  PushTokenRequest,
+  RelationResponse,
+  ReportReason,
+  RunDetailResponse,
+  RunHistoryResponse,
+  RunMode,
   SocialAuthResponse,
   SocialProvider,
   StartRunRequest,
   StartRunResponse,
+  SendPhraseResponse,
   StatsResponse,
+  ThreadResponse,
   UpdateLocaleRequest,
   UpdateSettingsRequest,
   UsernameAvailability,
@@ -185,10 +199,40 @@ export function createApiClient({ device, ...options }: ApiClientOptions) {
       unlink: (provider: SocialProvider) =>
         request<{ user: Me }>(`/me/identities/${provider}`, { method: 'DELETE' }),
       stats: () => request<StatsResponse>('/me/stats'),
-      following: (cursor?: string) =>
-        request<FollowListResponse>('/me/following', { query: { cursor } }),
-      followers: (cursor?: string) =>
-        request<FollowListResponse>('/me/followers', { query: { cursor } }),
+      /** The player's past games, the newest first; thirty a page, of one mode or all. */
+      runs: ({ cursor, mode }: { cursor?: string; mode?: RunMode } = {}) =>
+        request<RunHistoryResponse>('/me/runs', { query: { cursor, mode } }),
+      run: (runId: string) => request<RunDetailResponse>(`/me/runs/${encodeURIComponent(runId)}`),
+      /** A square JPEG as base64, at most 100 KB decoded (`AVATAR` in `@quezby/config`). */
+      updateAvatar: (image: string) =>
+        request<{ user: Me }>('/me/avatar', { method: 'PUT', body: { image } }),
+      removeAvatar: () => request<{ user: Me }>('/me/avatar', { method: 'DELETE' }),
+      /** This phone takes the player's pushes — its Firebase Cloud Messaging token. */
+      registerPushToken: (input: PushTokenRequest) =>
+        request<void>('/me/push-token', { method: 'PUT', body: input }),
+      /** This phone takes no more of the player's pushes — before signing out. */
+      unregisterPushToken: (token: string) =>
+        request<void>('/me/push-token', { method: 'DELETE', body: { token } }),
+      /** The player's friends, the one last heard from first; fifty a page. */
+      friends: (cursor?: string) =>
+        request<FriendsResponse>('/me/friends', { query: { cursor } }),
+      /** The requests waiting for the player, and the ones they sent. */
+      friendRequests: () => request<FriendRequestsResponse>('/me/friend-requests'),
+      blocks: () => request<BlocksResponse>('/me/blocks'),
+      /** What the badges count: requests waiting, conversations wanting a look. */
+      inbox: () => request<InboxSummary>('/me/inbox'),
+      /** A number that moves whenever the inbox does: asked every few seconds, it says when to fetch the lists. */
+      pulse: () => request<Pulse>('/me/pulse'),
+      /** The conversation with a friend; `before` a message id fetches older lines. */
+      thread: (username: string, before?: number) =>
+        request<ThreadResponse>(`/me/threads/${encodeURIComponent(username)}`, { query: { before } }),
+      readThread: (username: string) =>
+        request<void>(`/me/threads/${encodeURIComponent(username)}/read`, { method: 'POST' }),
+      sendPhrase: (username: string, phrase: Phrase) =>
+        request<SendPhraseResponse>(`/me/threads/${encodeURIComponent(username)}/messages`, {
+          method: 'POST',
+          body: { phrase },
+        }),
       delete: () => request<void>('/me', { method: 'DELETE' }),
     },
     usernames: {
@@ -227,6 +271,12 @@ export function createApiClient({ device, ...options }: ApiClientOptions) {
           body: input,
         }),
     },
+    /** VS between two friends: started through `runs.start({ mode: 'vs', … })`. */
+    duels: {
+      get: (duelId: string) => request<DuelResponse>(`/duels/${encodeURIComponent(duelId)}`),
+      decline: (duelId: string) =>
+        request<DuelResponse>(`/duels/${encodeURIComponent(duelId)}/decline`, { method: 'POST' }),
+    },
     leaderboards: {
       get: (
         board: LeaderboardBoard,
@@ -255,10 +305,22 @@ export function createApiClient({ device, ...options }: ApiClientOptions) {
       search: (query: string) =>
         request<UserSearchResponse>('/users', { query: { search: query } }),
       get: (username: string) => request<PlayerResponse>(`/users/${encodeURIComponent(username)}`),
-      follow: (username: string) =>
-        request<void>(`/users/${encodeURIComponent(username)}/follow`, { method: 'PUT' }),
-      unfollow: (username: string) =>
-        request<void>(`/users/${encodeURIComponent(username)}/follow`, { method: 'DELETE' }),
+      /** Sends a friend request — or accepts theirs, when it waits. */
+      addFriend: (username: string) =>
+        request<RelationResponse>(`/users/${encodeURIComponent(username)}/friend`, { method: 'PUT' }),
+      /** Takes a request back, turns one down, or ends a friendship. */
+      removeFriend: (username: string) =>
+        request<RelationResponse>(`/users/${encodeURIComponent(username)}/friend`, { method: 'DELETE' }),
+      block: (username: string) =>
+        request<RelationResponse>(`/users/${encodeURIComponent(username)}/block`, { method: 'PUT' }),
+      unblock: (username: string) =>
+        request<RelationResponse>(`/users/${encodeURIComponent(username)}/block`, { method: 'DELETE' }),
+      /** Reports a player's photo or name to the moderators. */
+      report: (username: string, reason: ReportReason) =>
+        request<void>(`/users/${encodeURIComponent(username)}/report`, {
+          method: 'POST',
+          body: { reason },
+        }),
     },
   };
 }

@@ -12,7 +12,7 @@ describe('LoginPage', () => {
     const api = fakeApi();
     api.auth.login.mockResolvedValue(adminSession());
     api.me.get.mockResolvedValue({ admin: adminSession().admin });
-    api.overview.counts.mockResolvedValue({ review: 0 });
+    api.overview.counts.mockResolvedValue({ review: 0, reports: 0 });
     const { user, router } = renderApp({ path: '/login', api, session: null });
 
     await user.type(screen.getByLabelText('E-posta'), ' kubi@quezby.com ');
@@ -29,7 +29,7 @@ describe('LoginPage', () => {
     const api = fakeApi();
     api.auth.login.mockResolvedValue(adminSession());
     api.me.get.mockResolvedValue({ admin: adminSession().admin });
-    api.overview.counts.mockResolvedValue({ review: 0 });
+    api.overview.counts.mockResolvedValue({ review: 0, reports: 0 });
     const { user } = renderApp({ path: '/login', api, session: null });
 
     await user.type(screen.getByLabelText('E-posta'), 'kubi@quezby.com');
@@ -73,7 +73,7 @@ describe('LoginPage', () => {
     const session = adminSession({ mustChangePassword: true });
     api.auth.login.mockResolvedValue(session);
     api.me.get.mockResolvedValue({ admin: session.admin });
-    api.overview.counts.mockResolvedValue({ review: 0 });
+    api.overview.counts.mockResolvedValue({ review: 0, reports: 0 });
     const { user, router } = renderApp({ path: '/login', api, session: null });
 
     await user.type(screen.getByLabelText('E-posta'), 'yeni@quezby.com');

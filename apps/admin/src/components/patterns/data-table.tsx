@@ -87,7 +87,8 @@ export function DataTable<T>({
   toolbar?: ReactNode;
   footer?: ReactNode;
   rowActions?: (row: T) => ReactNode;
-  rowTo?: (row: T) => string;
+  /** Where a row leads; null for a row with nothing to open. */
+  rowTo?: (row: T) => string | null;
   rowLabel?: (row: T) => string;
   /** A row that no longer counts steps back. */
   rowMuted?: (row: T) => boolean;

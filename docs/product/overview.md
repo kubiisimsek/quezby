@@ -35,7 +35,12 @@ Karşılamadaki küçük dil düğmesi daha oynamadan başka dil seçtirir
 3. **Takma ad:** "Sana ne diyelim?" — seçilebilir ya da **Şimdilik geç**
    denir; geçen oyuncu otomatik adla oynar, adını sonra Profil'den seçer.
    Seçilen ad kalıcıdır, bir daha değişmez.
-4. **Hesabını koru:** Apple, Google ya da e-posta — ya da **Şimdi değil**.
+4. **Bildirimler:** "Haberin olsun mu?" — biri seni eklediğinde, bir
+   arkadaşın VS attığında ya da mesaj gönderdiğinde. **Bildirimleri aç**
+   telefonun kendi sorusunu getirir; **Şimdi değil** sonraya bırakır. Adım
+   yalnızca soru hâlâ sorulabiliyorsa görünür: bildirimler zaten açıksa,
+   telefon artık sormuyorsa ya da sürümde push yoksa atlanır.
+5. **Hesabını koru:** Apple, Google ya da e-posta — ya da **Şimdi değil**.
    Apple/Google ile yeni açılan hesap bu adımı görmez.
 
 İlk adımlar hesaba bağlıdır ve telefonda saklanır: uygulamayı kapatan oyuncu
@@ -44,17 +49,22 @@ hesabına giren doğrudan lobiye geçer.
 
 ## Döngü
 
-1. **Lobi** (Oyna sekmesi): bugünün **Günün akışı**, ligdeki yerin, hemen
-   üstündeki rakip ve rekorların. Tek büyük düğme bugünün turunu başlatır.
-2. **Oyna** → sunucudan seed'li bir tur açılır (`POST /runs`, `free` ya da `daily`).
+1. **Lobi** (Oyna sekmesi): bugünün **Günün akışı**, ligdeki yerin, bu hafta
+   hemen üstündeki rakip ve rekorların; üstte arkadaşlarından bekleyenleri
+   sayan mesaj kutusu, sırası sende bir VS varsa onun kapısı. Tek büyük düğme
+   bugünün turunu başlatır.
+2. **Oyna** → sunucudan seed'li bir tur açılır (`POST /runs`, `free`, `daily`
+   ya da bir arkadaşla `vs`).
 3. 3-2-1, sonra reeller: kaydır, çift dokun, basılı tut, dokunma.
 4. Her 20 reelde seviye (puan çarpanı) artar, pencere daralır, bar hızlanır;
    hatasız seriler kombo çarpanını x1,50'ye taşır, isimli kombolar patlar.
 5. Tur bitince hareket kaydı sunucuya gider; sunucu tekrar oynatır, skoru
    doğrular, tablolara, lige ve istatistiklere yazar (`POST /runs/{id}/finish`).
 6. Sonuç ekranı önce "Doğrulanıyor…" der, sonra **yalnızca sunucunun**
-   sayılarını gösterir: skor, puanın nereden geldiği, sıra değişimi, bugün
-   geçtiklerin, lig durumun, günlükse paylaşım kartı.
+   sayılarını gösterir: skor, puanın nereden geldiği, sıra değişimi, bu hafta
+   geçtiklerin, lig durumun, günlükse paylaşım kartı. Bir VS turunda sıra ve
+   paylaşım yoktur; VS'in kendisi vardır: gönderildi, ya da kazandın,
+   kaybettin, berabere.
 
 Tur süresi yeni başlayanda ~2, ortalama oyuncuda ~3,5, iyi oyuncuda 5–6,
 profesyonelde ~7,5 dakikadır. Aynı yetenek aynı sürede ±%20 aynı skoru yapar.
@@ -69,9 +79,10 @@ Ayrıntılar: [scoring.md](./scoring.md).
   başına bir seviye (🟩 hatasız, 🟨 bir-iki hata, 🟥 daha fazla, ⬛ bittiği yer).
   Metni sunucu yazar.
 - **Haftalık ligler:** Bronz · Gümüş · Altın · Platin · Elmas. Lig, oyuncunun
-  **ilk 3 sayılan turundan** (sıralı ve puan almış; deneme turu sayılmaz)
-  sonra açılır — tek tur oynayıp bırakanlar grupları doldurmaz; lobi ve Lig
-  sekmesi "Lige 2 oyun kaldı" der. Bir kez lige girmiş oyuncu için hep açıktır.
+  **ilk 20 sayılan turundan** (sıralı ve puan almış; deneme turu ve VS
+  sayılmaz; `QUEZBY_LEAGUE_UNLOCK_RUNS`) sonra açılır — birkaç tur oynayıp
+  bırakanlar grupları doldurmaz; lobi ve Lig sekmesi "Lige 12 oyun kaldı"
+  der. Bir kez lige girmiş oyuncu için hep açıktır.
   Sonra haftanın ilk sıralı turunda benzer kademedeki en fazla 30 kişilik bir
   gruba oturursun.
   **Lig puanı, haftanın her gününün en iyi skorlarının toplamıdır** — her gün
@@ -81,19 +92,64 @@ Ayrıntılar: [scoring.md](./scoring.md).
 
 ## Rekabet
 
-- Sıralamalar: **Bugün**, **Bu hafta**, **Bu ay**, **Tüm zamanlar**
-  (Europe/Istanbul) ve **Günün akışı**. Her oyuncunun o dönemdeki en iyi turu
-  tek satır; eşitlikte önce yapan önde. Tüm zamanlar sezonun (kural sürümünün)
-  tüm zamanlarıdır.
+- Sıralamalar: **Bu hafta**, **Bu ay**, **Tüm zamanlar** (Europe/Istanbul) ve
+  **Günün akışı**. Günlük tablo yoktur: günün en iyi skoru yalnızca lig puanı
+  için tutulur. Her oyuncunun o dönemdeki en iyi turu tek satır; eşitlikte
+  önce yapan önde. Tüm zamanlar sezonun (kural sürümünün) tüm zamanlarıdır.
 - **Zirve** tasarımı: tepede podyum (taç, madalyalar), altında tırmanış —
   her satır bir üsttekini geçmek için gereken puanı gösterir — ve altta sabit
   **"Senin katın"**: sıran, bir üst sıraya ilerleme çubuğu, "@ekin'e 1.240 puan"
   ve **Geç onu**. Dönemin bitmesine geri sayım sunucu saatine göredir.
-- **Arkadaşlar:** kullanıcı adıyla ara, takip et; her tabloda
-  "Herkes | Arkadaşlar" (takip ettiklerin + sen). Bir satıra dokununca oyuncu
-  kartı açılır. Takip sınırı 500.
+- Her tabloda "Herkes | Arkadaşlar" (arkadaşların + sen). Bir satıra dokununca
+  oyuncu kartı açılır.
 - Skor istemciden asla kabul edilmez; sunucu aynı motoru PHP'de çalıştırır.
   Şüpheli turlar tabloya girmez; zirveye yakın şüpheli skorlar incelemeye düşer.
+
+## Arkadaşlar
+
+Dock'taki **Arkadaşlar** sekmesi oyunun mesaj kutusudur (rozeti bekleyenleri
+sayar): önce cevap bekleyen istekler, sonra arkadaş başına bir sohbet, sesi en
+son gelen üstte. Sözleşme: [api-contract.md](../backend/api-contract.md)
+(*Players and friends*, *Inbox*, *VS*, *Push*).
+
+- **Arkadaşlık iki evetle olur.** **Arkadaş bul** (adın ilk harfleriyle arama)
+  ya da oyuncu kartındaki **Ekle** istek gönderir; öteki **Kabul et** ya da
+  **Reddet** der. İki taraf birbirini eklerse arkadaş olurlar. İstek geri
+  alınır, arkadaşlık bitirilir. En fazla 500 arkadaş ve cevap bekleyen en fazla
+  100 istek. Takip sisteminden gelen karşılıklı takipler arkadaşlığa, tek
+  yönlüler bekleyen isteğe dönüştü.
+- **Sohbet yazıyla değil, hazır mesajlarla olur:** on sabit söz ("İyi oyundu!
+  👏", "Rövanş? 🔥"…); telefon kendi dilinde gösterir. Oyuncudan oyuncuya
+  yazılmış hiçbir söz gitmez; bu yüzden denetlenecek metin de yoktur. Bir
+  arkadaşa günde en fazla 20. Sohbete oyunun kendi satırları da düşer:
+  "artık arkadaşsınız", VS daveti, sonucu, reddi, süresinin dolması. Satırlar
+  90 gün tutulur; arkadaşlık bitince sohbet silinir.
+- **VS:** iki arkadaş, aynı akış, birer hak. Gönderen önce oynar; skoru,
+  arkadaşı oynayana kadar ondan gizlidir. Temiz olmayan tur VS'i hiç
+  göndermez. Arkadaşın 48 saat içinde oynar ya da reddeder; süre dolarsa VS
+  kimseye sayılmaz. Yüksek temiz skor kazanır, eşitlik beraberliktir;
+  arkadaşın turu temiz değilse ya da yarım kalırsa kaybeder. İki arkadaş
+  arasında aynı anda tek açık VS olur. VS hiçbir tabloya, lige, istatistiğe
+  ya da rekora yazılmaz, paylaşım metni yoktur. Cron yok: VS, ikisinden biri
+  baktığında kapanır. Sohbet, iki arkadaşın VS karnesini (galibiyet,
+  mağlubiyet, beraberlik) gösterir.
+- **Engelle:** arkadaşlığı, istekleri, sohbeti ve açık VS'i bitirir.
+  Engellenen oyuncuya söylenmez: engelleyeni bulamaz, ekleyemez, ona yazamaz,
+  VS atamaz. **Ayarlar → Engellenenler**'den kaldırılır.
+- **Bildir:** oyuncu kartından bir oyuncunun fotoğrafı ya da adı moderatöre
+  bildirilir; kimin bildirdiği söylenmez. Moderatör yönetim panelinde
+  fotoğrafı kaldırır, adı sıfırlar ya da bildirimi kapatır
+  ([admin-api.md](../backend/admin-api.md) → *Reports*).
+- **Bildirimler (push):** gelen istek, kabul edilen istek, gelen VS, biten VS
+  ve hazır mesaj telefona alıcının dilinde gelir; aynı arkadaştan hazır mesaj
+  5 dakikada en fazla bir kez. Reddedilen ya da süresi dolan VS yalnızca mesaj
+  kutusuna düşer. Oyun açıkken bildirim üstte kısa bir şerit olur. Dokununca
+  istek Arkadaşlar sekmesini, gerisi o arkadaşın sohbetini açar. Bildirimler
+  kapalıysa Arkadaşlar sekmesi, sohbet ve az önce gönderilen VS bir kartla
+  **Bildirimleri aç** der; telefon artık sormuyorsa düğme **Ayarları aç** olur
+  ve telefonun ayarlarını açar (sekmedeki ve sohbetteki kart bir haftalığına
+  gizlenebilir). Türler **Ayarlar → Bildirimler**'den ayrı ayrı kapatılır.
+  Kurulum: [push-setup.md](../development/push-setup.md).
 
 ## Hesap
 
@@ -110,11 +166,21 @@ Ayrıntılar: [scoring.md](./scoring.md).
   eksik yol eklenir, Apple ya da Google bağı kaldırılabilir — sunucu son giriş
   yolunun kaldırılmasına izin vermez.
 - **Hesabı sil:** uygulama içinden, kalıcı (App Store 5.1.1(v)); Apple ile
-  bağlıysa Apple'daki izin de geri alınır.
+  bağlıysa Apple'daki izin de geri alınır. Arkadaşlıklar, sohbetler, VS'ler ve
+  profil fotoğrafı da hesapla gider.
+- **Profil fotoğrafı:** Profil'deki portrenin kamera düğmesiyle galeriden bir
+  fotoğraf seçilir ve kareye yerleştirilir; telefon 512 px'lik, en çok
+  100 KB'lık bir JPEG gönderir. Sunucu onu yeniden kaydeder: konumu dahil
+  fotoğrafın bütün meta verisi silinir. Fotoğraf kaldırılabilir; her oyuncu
+  satırında, kartta ve podyumda görünür.
+- **Geçmiş oyunlar:** Profil'den, oynanan her tur sunucunun saydığıyla —
+  sıralı, bekleyen, bayraklı ya da VS; yalnızca Günün akışı ya da yalnızca
+  VS'ler süzülebilir.
 - Ayarlar: **dil** ve titreşim (ikisi de telefonda saklanır, hesaba da
   yazılır). Dil, hesabın kaydıdır: başka bir telefonda o hesaba giren oyunu
-  hesabın dilinde bulur ([localization.md](./localization.md)). Yardım:
-  lobideki `?` ve Profil'den.
+  hesabın dilinde bulur ([localization.md](./localization.md)). Ayrıca
+  **Bildirimler** (üç tür: arkadaşlık, VS, hazır mesajlar — hesaba yazılır) ve
+  **Engellenenler**. Yardım: lobideki `?` ve Profil'den.
 
 ## İstatistik
 
@@ -122,7 +188,7 @@ Her şey sunucunun tekrar oynatmasından sayılır: kaydırılan reel, beğeni, 
 mükemmel, dokunmadan geçilen, yakalanma, türe göre hatalar, tepki süreleri,
 kombolar. Oyuncunun ömür boyu sayıları (`GET /me/stats`) ve akışın her
 gönderisinin kaç kez gösterildiği/beğenildiği (`content_stats`) tutulur.
-Yalnızca sıralı turlar sayılır.
+Yalnızca sıralı turlar sayılır; VS turları asla.
 
 Oyunun nasıl kullanıldığı — ziyaretler, ekranlar, geri dönüş, ilk adımlar —
 yalnızca izin veren oyuncular için ve şişmeyen katmanlarda tutulur; telefonun
@@ -167,8 +233,8 @@ karesinde tam çizilmiştir ve internetsiz de aynı görünür.
 ## Sonraki adımlar
 
 - Ses ve müzik (titreşim var).
-- Push bildirimleri ("seni geçtiler", akşam hatırlatması).
+- Oyunun kendi bildirimleri ("seni geçtiler", akşam hatırlatması) — push
+  altyapısı arkadaşlık için kuruldu.
 - Kural değişimleri ("Algoritma güncellendi!"), sahte altın reel, aşağı
   kaydırma ve paylaşma hareketleri — her biri yeni bir sezon.
-- Cihaz doğrulama (App Attest / Play Integrity) ile bot yazmayı daha da zorlaştırmak.
 - Şifre sıfırlama e-postası.

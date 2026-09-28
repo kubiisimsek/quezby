@@ -96,17 +96,18 @@ describe('usernameChecklist', () => {
   });
 
   it('shows which rule a name breaks', () => {
-    const unmet = usernameChecklist('ku..').filter((item) => !item.met).map((item) => item.rule);
-    expect(unmet).toEqual(['edges', 'symbols']);
+    const unmet = usernameChecklist('12').filter((item) => !item.met).map((item) => item.rule);
+    expect(unmet).toEqual(['length', 'letter']);
+  });
+
+  it('leaves symbols at the ends or touching to the refusal, which still comes', () => {
+    for (const name of ['.kubi', 'kubi*', 'ku..bi']) {
+      expect(usernameChecklist(name).every((item) => item.met)).toBe(true);
+      expect(validateUsername(name).ok).toBe(false);
+    }
   });
 
   it('lists the rules in the order the field shows them', () => {
-    expect(usernameChecklist('').map((item) => item.rule)).toEqual([
-      'length',
-      'charset',
-      'edges',
-      'symbols',
-      'letter',
-    ]);
+    expect(usernameChecklist('').map((item) => item.rule)).toEqual(['length', 'charset', 'letter']);
   });
 });

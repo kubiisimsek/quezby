@@ -14,10 +14,15 @@ const SCREENS: Record<Route, AnalyticsScreen> = {
   Game: 'game',
   Help: 'help',
   Daily: 'daily',
+  FindFriends: 'search',
+  Thread: 'thread',
+  History: 'history',
+  AvatarEditor: 'avatar',
+  Notifications: 'notifications',
   Leaderboard: 'leaderboard',
   League: 'league',
   Home: 'home',
-  Search: 'search',
+  Friends: 'friends',
   Profile: 'profile',
 };
 

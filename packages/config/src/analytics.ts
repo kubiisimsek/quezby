@@ -23,6 +23,11 @@ const SCREENS: Record<AnalyticsScreen, true> = {
   game: true,
   help: true,
   daily: true,
+  friends: true,
+  thread: true,
+  history: true,
+  avatar: true,
+  notifications: true,
 };
 
 const EVENTS: Record<AnalyticsEvent, true> = {

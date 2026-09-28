@@ -10,13 +10,15 @@ describe('onboarding', () => {
     reset();
   });
 
-  it('walks a guest through the practice run, the name and keeping the account', () => {
+  it('walks a guest through the practice run, the name, notifications and keeping the account', () => {
     const { begin, advance } = useOnboarding.getState();
 
     begin('u1');
     expect(useOnboarding.getState()).toMatchObject({ userId: 'u1', step: 'tutorial' });
     advance(true);
     expect(useOnboarding.getState().step).toBe('nickname');
+    advance(true);
+    expect(useOnboarding.getState().step).toBe('notifications');
     advance(true);
     expect(useOnboarding.getState().step).toBe('protect');
     advance(true);
@@ -28,6 +30,8 @@ describe('onboarding', () => {
 
     begin('u1');
     advance(false);
+    advance(false);
+    expect(useOnboarding.getState().step).toBe('notifications');
     advance(false);
 
     expect(useOnboarding.getState().step).toBeNull();

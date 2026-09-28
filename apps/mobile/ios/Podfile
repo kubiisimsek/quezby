@@ -14,6 +14,11 @@ project 'Quezby',
   'Debug' => :debug,
   'Release' => :release
 
+# Push notifications (React Native Firebase): Firebase comes as CocoaPods, not
+# Swift packages — the app links its pods as static libraries, which
+# Firebase's Swift packages do not support.
+$RNFirebaseDisableSPM = true
+
 linkage = ENV['USE_FRAMEWORKS']
 if linkage != nil
   Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
@@ -34,6 +39,13 @@ target 'Quezby' do
   # as static libraries. Only these two — not every pod.
   pod 'GoogleUtilities', :modular_headers => true
   pod 'RecaptchaInterop', :modular_headers => true
+  # Firebase (push notifications) the same way: its Swift pods import these,
+  # and AppDelegate.swift imports FirebaseCore.
+  pod 'FirebaseCore', :modular_headers => true
+  pod 'FirebaseCoreExtension', :modular_headers => true
+  pod 'FirebaseInstallations', :modular_headers => true
+  pod 'GoogleDataTransport', :modular_headers => true
+  pod 'nanopb', :modular_headers => true
 
   post_install do |installer|
     react_native_post_install(

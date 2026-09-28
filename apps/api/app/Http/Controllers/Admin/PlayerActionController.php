@@ -11,6 +11,7 @@ use App\Models\Admin;
 use App\Models\User;
 use App\Services\Admin\PlayerActions;
 use App\Services\ModerationService;
+use App\Services\Social\ReportService;
 use App\Support\Actor;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\JsonResponse;
@@ -44,6 +45,18 @@ class PlayerActionController extends Controller
         $name = $this->actions->rename($this->player($player), $request->reason(), Actor::panel($admin, $request));
 
         return response()->json(['changed' => true, 'username' => $name]);
+    }
+
+    /** Takes a player's photo down; their photo reports close. */
+    public function removeAvatar(ReasonRequest $request, string $player, #[CurrentUser('admin')] Admin $admin, ReportService $reports): JsonResponse
+    {
+        return response()->json(['changed' => $reports->removeAvatar($this->player($player), $request->reason(), Actor::panel($admin, $request))]);
+    }
+
+    /** Lets a player's open reports go. */
+    public function dismissReports(ReasonRequest $request, string $player, #[CurrentUser('admin')] Admin $admin, ReportService $reports): JsonResponse
+    {
+        return response()->json(['changed' => $reports->dismiss($this->player($player), $request->reason(), Actor::panel($admin, $request)) > 0]);
     }
 
     public function signOut(Request $request, string $player, #[CurrentUser('admin')] Admin $admin): JsonResponse

@@ -1,4 +1,4 @@
-import type { FinishRunResponse } from '@quezby/types';
+import type { FinishRunResponse, RunMode } from '@quezby/types';
 import { act, fireEvent, screen } from '@testing-library/react-native';
 import { Share } from 'react-native';
 import { useReducedMotion } from 'react-native-reanimated';
@@ -7,6 +7,7 @@ import { track } from '@/analytics/track';
 import { ResultView } from '@/game/ResultView';
 import type { Outcome } from '@/game/useGame';
 import { useLanguage } from '@/i18n/language';
+import { buildDuel } from '@/test/factories';
 import { renderWithProviders } from '@/test/renderWithProviders';
 
 jest.mock('@/analytics/track', () => ({ track: jest.fn() }));
@@ -61,14 +62,13 @@ function response(
       achievedAt: '2026-09-26T10:00:00.000Z',
     },
     isNewBest: true,
-    ranks: { daily: 12, weekly: 44, monthly: 80, all: 311 },
+    ranks: { weekly: 12, monthly: 80, all: 311 },
     rankChanges: {
-      daily: { before: 20, after: 12 },
-      weekly: { before: null, after: 44 },
+      weekly: { before: 20, after: 12 },
       monthly: { before: 80, after: 80 },
       all: { before: 300, after: 311 },
     },
-    passed: [{ username: 'ayse', score: 101_000, isFollowing: true }],
+    passed: [{ username: 'ayse', avatarUrl: null, score: 101_000, isFriend: true }],
     daily: null,
     league: {
       tier: 'gold',
@@ -79,9 +79,23 @@ function response(
     },
     leagueUnlock: null,
     shareText:
-      "Quezby'de 104.560 puan yaptım! 245 post · bugün #12. Sen kaç yaparsın?",
+      "Quezby'de 104.560 puan yaptım! 245 post · bu hafta #12. Sen kaç yaparsın?",
+    duel: null,
     ...overrides,
   };
+}
+
+/** A VS run's answer: counted nowhere, shared with nobody, its VS as it stands. */
+function vsResponse(duel: FinishRunResponse['duel']): FinishRunResponse {
+  const base = response();
+  return response({
+    run: { ...base.run, mode: 'vs', status: 'played' },
+    isNewBest: false,
+    passed: [],
+    league: null,
+    shareText: null,
+    duel,
+  });
 }
 
 /** A practice run's own count — the API never saw it. */
@@ -104,10 +118,12 @@ const SUMMARY = {
   bonuses: { flawless: 0, lightning: 0, coolHead: 0, comeback: 0 },
 };
 
-function view(outcome: Outcome, mode: 'free' | 'daily' = 'free') {
+function view(outcome: Outcome, mode: RunMode = 'free') {
   const handlers = {
     onReplay: jest.fn(),
     onPlayFree: jest.fn(),
+    onRematch: jest.fn(),
+    onThread: jest.fn(),
     onClose: jest.fn(),
     onRetrySubmit: jest.fn(),
     onOpenDaily: jest.fn(),
@@ -143,7 +159,6 @@ describe('ResultView', () => {
     expect(screen.queryByText('Soğukkanlı')).toBeNull();
     expect(screen.getByText('#12')).toBeTruthy();
     expect(screen.getByText('▲8')).toBeTruthy();
-    expect(screen.getByText('yeni')).toBeTruthy();
     expect(screen.getByText('▼11')).toBeTruthy();
     expect(screen.getByText('x1,50')).toBeTruthy();
     expect(screen.getByText('@ayse · arkadaşın')).toBeTruthy();
@@ -154,10 +169,25 @@ describe('ResultView', () => {
   it('reads each board’s place and its move aloud in words', async () => {
     await view({ mode: 'verified', response: response() }).render();
 
-    expect(screen.getByLabelText('Bugün: #12, 8 sıra yukarı')).toBeTruthy();
-    expect(screen.getByLabelText('Hafta: #44, yeni')).toBeTruthy();
+    expect(screen.getByLabelText('Hafta: #12, 8 sıra yukarı')).toBeTruthy();
     expect(screen.getByLabelText('Ay: #80')).toBeTruthy();
     expect(screen.getByLabelText('Tümü: #311, 11 sıra aşağı')).toBeTruthy();
+  });
+
+  it('reads a board the run first placed on as new', async () => {
+    await view({
+      mode: 'verified',
+      response: response({
+        rankChanges: {
+          weekly: { before: null, after: 12 },
+          monthly: { before: 80, after: 80 },
+          all: { before: 300, after: 311 },
+        },
+      }),
+    }).render();
+
+    expect(screen.getByLabelText('Hafta: #12, yeni')).toBeTruthy();
+    expect(screen.getByText('yeni')).toBeTruthy();
   });
 
   it('names the season best instead when the run did not beat it', async () => {
@@ -185,7 +215,7 @@ describe('ResultView', () => {
 
     expect(share).toHaveBeenCalledWith({
       message:
-        "Quezby'de 104.560 puan yaptım! 245 post · bugün #12. Sen kaç yaparsın?",
+        "Quezby'de 104.560 puan yaptım! 245 post · bu hafta #12. Sen kaç yaparsın?",
     });
     expect(track).toHaveBeenCalledWith('share_result');
   });
@@ -364,6 +394,69 @@ describe('ResultView', () => {
     expect(screen.getByText('Lig, ilk 3 oyunundan sonra açılır.')).toBeTruthy();
   });
 
+  it('sends a VS: the friend is told, the score kept from them, and the way back is the conversation', async () => {
+    const { handlers, render } = view(
+      { mode: 'verified', response: vsResponse(buildDuel({ opponent: { ...buildDuel().opponent, username: 'ekin' } })) },
+      'vs',
+    );
+    await render();
+
+    expect(screen.getByText('VS GÖNDERİLDİ')).toBeTruthy();
+    expect(screen.getByText('@ekin oynayınca sonuç mesaj kutuna düşer. Skorun o zamana kadar gizli.')).toBeTruthy();
+    expect(screen.getByRole('timer')).toBeTruthy();
+    expect(screen.queryByText('YENİ REKOR!')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Paylaş' })).toBeNull();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Mesajlara dön' }));
+    expect(handlers.onThread).toHaveBeenCalledTimes(1);
+    expect(handlers.onRematch).not.toHaveBeenCalled();
+  });
+
+  it('shows how a VS went, both scores, and offers the rematch in gold', async () => {
+    const duel = buildDuel({
+      status: 'finished',
+      turn: null,
+      sent: false,
+      you: { score: 104_560, valid: true },
+      them: { score: 98_000, valid: true },
+      outcome: 'won',
+      expiresAt: null,
+      h2h: { wins: 3, losses: 2, draws: 0 },
+      opponent: { ...buildDuel().opponent, username: 'ekin' },
+    });
+    const { handlers, render } = view({ mode: 'verified', response: vsResponse(duel) }, 'vs');
+    await render();
+
+    expect(screen.getByText('KAZANDIN!')).toBeTruthy();
+    expect(screen.getByText('98.000')).toBeTruthy();
+    expect(screen.getByText('Aranızda 3 – 2')).toBeTruthy();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Rövanş' }));
+    expect(handlers.onRematch).toHaveBeenCalledTimes(1);
+    await fireEvent.press(screen.getByRole('button', { name: 'Mesajlara dön' }));
+    expect(handlers.onThread).toHaveBeenCalledTimes(1);
+  });
+
+  it('says a run that was not clean sent no VS', async () => {
+    await view({ mode: 'verified', response: vsResponse(buildDuel({ status: 'void', turn: null, expiresAt: null })) }, 'vs').render();
+    expect(screen.getByText('VS gönderilmedi')).toBeTruthy();
+  });
+
+  it('marks the side of a friend who never finished', async () => {
+    const duel = buildDuel({
+      status: 'finished',
+      turn: null,
+      sent: true,
+      you: { score: 104_560, valid: true },
+      them: { score: null, valid: false },
+      outcome: 'won',
+      expiresAt: null,
+    });
+    await view({ mode: 'verified', response: vsResponse(duel) }, 'vs').render();
+
+    expect(screen.getByText('bitmedi')).toBeTruthy();
+  });
+
   it('gives a player who reduces motion no confetti, and nothing to skip', async () => {
     await view({ mode: 'verified', response: response() }).render();
 
@@ -397,11 +490,10 @@ describe('ResultView', () => {
       expect(screen.getByText('Best combo')).toBeTruthy();
       expect(screen.getByText('x1.50')).toBeTruthy();
       expect(screen.getByText('93.8%')).toBeTruthy();
-      expect(screen.getByLabelText('Today: 12th place, up 8 places')).toBeTruthy();
-      expect(screen.getByLabelText('Week: 44th place, new')).toBeTruthy();
+      expect(screen.getByLabelText('Week: 12th place, up 8 places')).toBeTruthy();
       expect(screen.getByLabelText('Month: 80th place')).toBeTruthy();
       expect(screen.getByLabelText('Overall: 311th place, down 11 places')).toBeTruthy();
-      expect(screen.getByText('Passed today')).toBeTruthy();
+      expect(screen.getByText('Passed this week')).toBeTruthy();
       expect(screen.getByText('@ayse · your friend')).toBeTruthy();
       expect(
         screen.getByLabelText('@ayse, your friend, 101,000 points, you passed them'),
@@ -424,8 +516,7 @@ describe('ResultView', () => {
       expect(screen.getByText('نفد الدوبامين. شعرت بالملل فأغلقت التطبيق.')).toBeTruthy();
       expect(screen.getByText('من أين جاءت نقاطك')).toBeTruthy();
       expect(screen.getByLabelText('برق، 4 مرات، 5,080 نقطة')).toBeTruthy();
-      expect(screen.getByLabelText('اليوم: المركز 12، تقدّم 8 مراكز')).toBeTruthy();
-      expect(screen.getByLabelText('الأسبوع: المركز 44، جديد')).toBeTruthy();
+      expect(screen.getByLabelText('الأسبوع: المركز 12، تقدّم 8 مراكز')).toBeTruthy();
       expect(screen.getByLabelText('الشهر: المركز 80')).toBeTruthy();
       expect(screen.getByLabelText('الكل: المركز 311، تراجع 11 مركزًا')).toBeTruthy();
       expect(screen.getByText('\u200E@ayse\u200E · صديقك')).toBeTruthy();
@@ -528,7 +619,7 @@ describe('ResultView', () => {
 
       expect(screen.getByText('Play again')).toBeTruthy();
       expect(screen.getByText('104,560')).toBeTruthy();
-      expect(screen.getByLabelText('Today: 12th place, up 8 places')).toBeTruthy();
+      expect(screen.getByLabelText('Week: 12th place, up 8 places')).toBeTruthy();
       expect(screen.queryByText('Tekrar oyna')).toBeNull();
     });
   });

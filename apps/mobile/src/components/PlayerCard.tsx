@@ -1,10 +1,10 @@
 import type { BestScore } from '@quezby/types';
-import { StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 
 import { useT } from '@/i18n';
 import { initialsOf } from '@/lib/format';
 import { Icon } from '@/ui/icons';
-import { Stamp, Txt, gemColors } from '@/ui/kit';
+import { IconButton, Stamp, Txt, gemColors } from '@/ui/kit';
 import { DEPTH, FONT, RADIUS, SPACE, embossed, lh, useTheme, withAlpha } from '@/ui/theme';
 
 /**
@@ -15,58 +15,80 @@ import { DEPTH, FONT, RADIUS, SPACE, embossed, lh, useTheme, withAlpha } from '@
 
 /**
  * A player's portrait at card size: the kit's `Avatar` drawn big — their
- * initials in Rubik on a dark card, in a thick frame of their tone (magenta
- * for you, violet for everyone else) that stands on its lip like a tile.
- * The name is always written beside it, so a screen reader skips it.
+ * photo, or their initials in Rubik on a dark card, in a thick frame of their
+ * tone (magenta for you, violet for everyone else) that stands on its lip
+ * like a tile. The name is always written beside it, so a screen reader skips
+ * the picture; `onEdit` pins a small camera slab to its corner.
  */
 export function Portrait({
   name,
+  src,
   isMe = false,
   size = 'lg',
+  onEdit,
+  editLabel,
 }: {
   name: string;
+  /** Their photo (`avatarUrl`); null draws the initials. */
+  src?: string | null;
   isMe?: boolean;
   size?: 'md' | 'lg';
+  onEdit?: () => void;
+  /** What the camera slab does, as a screen reader says it. */
+  editLabel?: string;
 }) {
   const theme = useTheme();
   const colors = gemColors(theme, isMe ? 'primary' : 'secondary');
   const lg = size === 'lg';
 
   return (
-    <View
-      accessibilityElementsHidden
-      importantForAccessibility="no-hide-descendants"
-      style={[
-        styles.frame,
-        lg ? styles.frameLg : styles.frameMd,
-        { backgroundColor: colors.solid, borderColor: theme.outline },
-      ]}
-    >
+    <View>
       <View
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
         style={[
-          styles.card,
-          lg ? styles.cardLg : styles.cardMd,
-          { backgroundColor: colors.deep },
+          styles.frame,
+          lg ? styles.frameLg : styles.frameMd,
+          { backgroundColor: colors.solid, borderColor: theme.outline },
         ]}
       >
         <View
-          pointerEvents="none"
           style={[
-            styles.shine,
-            { backgroundColor: withAlpha(theme.onBrand, 0.12) },
-          ]}
-        />
-        <Text
-          style={[
-            styles.initials,
-            lg ? styles.initialsLg : styles.initialsMd,
-            { color: theme.onBrand },
-            embossed(3),
+            styles.card,
+            lg ? styles.cardLg : styles.cardMd,
+            { backgroundColor: colors.deep },
           ]}
         >
-          {initialsOf(name)}
-        </Text>
+          <View
+            pointerEvents="none"
+            style={[
+              styles.shine,
+              { backgroundColor: withAlpha(theme.onBrand, 0.12) },
+            ]}
+          />
+          <Text
+            style={[
+              styles.initials,
+              lg ? styles.initialsLg : styles.initialsMd,
+              { color: theme.onBrand },
+              embossed(3),
+            ]}
+          >
+            {initialsOf(name)}
+          </Text>
+          {src ? (
+            <Image source={{ uri: src }} style={StyleSheet.absoluteFill} resizeMode="cover" />
+          ) : null}
+        </View>
       </View>
+      {onEdit ? (
+        <IconButton
+          icon="camera"
+          label={editLabel ?? ''}
+          onPress={onEdit}
+          style={styles.edit}
+        />
+      ) : null}
     </View>
   );
 }
@@ -165,4 +187,5 @@ const styles = StyleSheet.create({
     paddingVertical: SPACE.ms,
   },
   bestHead: { alignItems: 'center', flexDirection: 'row', gap: SPACE.xs },
+  edit: { bottom: -SPACE.sm, end: -SPACE.md, position: 'absolute' },
 });

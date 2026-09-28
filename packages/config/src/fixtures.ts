@@ -12,11 +12,12 @@ import {
   type PluralCategory,
 } from './locales';
 import { PACE } from './pace';
+import { AVATAR, PHRASES } from './social';
 
 /**
  * Fixtures the API's PHP twins are tested against (`tests/Unit/ContentParityTest.php`,
  * `PaceParityTest.php`, `CheckpointParityTest.php`, `AnalyticsParityTest.php`,
- * `LocaleParityTest.php`), built deterministically
+ * `LocaleParityTest.php`, `SocialParityTest.php`), built deterministically
  * so a test can rebuild them and fail when the committed files have gone stale.
  */
 const KINDS: ContentKind[] = ['skip', 'like', 'hold', 'freeze'];
@@ -62,6 +63,14 @@ export function buildAnalytics() {
       maxAgeDays: ANALYTICS.maxAgeDays,
       maxVisitSeconds: ANALYTICS.maxVisitSeconds,
     },
+  };
+}
+
+/** The phrases friends send and what a profile photo may be, for `tests/Unit/SocialParityTest.php`. */
+export function buildSocial() {
+  return {
+    phrases: PHRASES,
+    avatar: { size: AVATAR.size, maxBytes: AVATAR.maxBytes, minSide: AVATAR.minSide },
   };
 }
 

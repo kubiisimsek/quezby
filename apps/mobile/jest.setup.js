@@ -1,3 +1,6 @@
+// Dates and times are read on the phone's own clock: the tests' phone is in Istanbul.
+process.env.TZ = 'Europe/Istanbul';
+
 require('react-native-gesture-handler/jestSetup');
 
 jest.mock('react-native-gesture-handler', () => {
@@ -7,6 +10,11 @@ jest.mock('react-native-gesture-handler', () => {
     ...actual,
     GestureDetector: ({ children }) =>
       React.createElement(React.Fragment, null, children),
+    // Gesture Handler 3's hooks lean on Reanimated's event handlers, which its
+    // mock has not: a test reads the config it was given and calls its callbacks.
+    usePanGesture: jest.fn((config) => ({ type: 'pan', config })),
+    usePinchGesture: jest.fn((config) => ({ type: 'pinch', config })),
+    useSimultaneousGestures: jest.fn((...gestures) => ({ type: 'simultaneous', gestures })),
   };
 });
 
@@ -150,3 +158,50 @@ require('react-native/Libraries/BatchedBridge/NativeModules').default.QuezbyInte
   attestKey: jest.fn(async () => 'app-attest-attestation'),
   generateAssertion: jest.fn(async () => 'app-attest-assertion'),
 };
+
+/**
+ * Firebase, as a build without its files: no app, so push is unavailable. A
+ * test that wants push makes `getApps` return one and decides what the
+ * phone answers.
+ */
+jest.mock('@react-native-firebase/app', () => ({
+  getApps: jest.fn(() => []),
+  getApp: jest.fn(() => ({ name: '[DEFAULT]' })),
+}));
+
+jest.mock('@react-native-firebase/messaging', () => ({
+  AuthorizationStatus: { NOT_DETERMINED: -1, DENIED: 0, AUTHORIZED: 1, PROVISIONAL: 2, EPHEMERAL: 3 },
+  getMessaging: jest.fn(() => ({})),
+  getToken: jest.fn(async () => 'fcm-token'),
+  deleteToken: jest.fn(async () => undefined),
+  setAutoInitEnabled: jest.fn(async () => undefined),
+  hasPermission: jest.fn(async () => -1),
+  requestPermission: jest.fn(async () => 1),
+  onMessage: jest.fn(() => jest.fn()),
+  onNotificationOpenedApp: jest.fn(() => jest.fn()),
+  onTokenRefresh: jest.fn(() => jest.fn()),
+  getInitialNotification: jest.fn(async () => null),
+}));
+
+/** The photo library: a test decides what the player picks. */
+jest.mock('react-native-image-picker', () => ({
+  launchImageLibrary: jest.fn(async () => ({ didCancel: true })),
+  launchCamera: jest.fn(async () => ({ didCancel: true })),
+}));
+
+/** Cropping a photo: a test decides how big each quality comes out. */
+jest.mock('@react-native-community/image-editor', () => ({
+  __esModule: true,
+  default: {
+    cropImage: jest.fn(async () => ({
+      uri: 'file:///cropped.jpg',
+      path: '/cropped.jpg',
+      name: 'cropped.jpg',
+      width: 512,
+      height: 512,
+      size: 40_000,
+      type: 'image/jpeg',
+      base64: 'AAAA',
+    })),
+  },
+}));

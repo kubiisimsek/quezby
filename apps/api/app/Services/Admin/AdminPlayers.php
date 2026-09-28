@@ -10,11 +10,13 @@ use App\Models\LeagueMember;
 use App\Models\Run;
 use App\Models\SocialIdentity;
 use App\Models\User;
+use App\Services\Avatars\AvatarService;
 use App\Services\Devices\DeviceRegistry;
-use App\Services\FollowService;
 use App\Services\LeaderboardService;
 use App\Services\LeagueService;
 use App\Services\PlayerStatsService;
+use App\Services\Social\FriendService;
+use App\Services\Social\ReportService;
 use App\Support\Timestamp;
 use App\Support\Username;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -31,7 +33,8 @@ final class AdminPlayers
         private readonly LeaderboardService $leaderboards,
         private readonly LeagueService $leagues,
         private readonly PlayerStatsService $playerStats,
-        private readonly FollowService $follows,
+        private readonly FriendService $friends,
+        private readonly ReportService $reports,
         private readonly AdminRuns $runs,
         private readonly AuditLog $audit,
         private readonly DeviceRegistry $devices,
@@ -142,7 +145,8 @@ final class AdminPlayers
                 ->values()
                 ->all(),
             'installs' => $this->devices->of($player),
-            'follows' => $this->follows->counts($player),
+            'social' => ['friends' => $this->friends->count($player), 'blockedBy' => $this->friends->blockedByCount($player)],
+            'openReports' => $this->reports->openOf($player),
             'audit' => $this->audit->about('player', $player->id)->map(fn ($entry) => $this->audit->present($entry, $withIp))->values()->all(),
         ];
     }
@@ -160,6 +164,7 @@ final class AdminPlayers
 
         return [
             ...AdminRuns::ref($player),
+            'avatarUrl' => AvatarService::url($player->avatar),
             'isAutoUsername' => Username::isAutomatic($player->username),
             'isGuest' => $player->email === null && $identities === [],
             'email' => $player->email,

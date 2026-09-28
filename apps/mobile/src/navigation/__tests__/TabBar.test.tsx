@@ -9,16 +9,19 @@ const ROUTES = [
   { key: 'Leaderboard-1', name: 'Leaderboard', options: tab('Zirve', 'mountain') },
   { key: 'League-1', name: 'League', options: tab('Lig', 'shield') },
   { key: 'Home-1', name: 'Home', options: tab('Oyna', 'play') },
-  { key: 'Search-1', name: 'Search', options: tab('Arkadaşlar', 'users') },
+  { key: 'Friends-1', name: 'Friends', options: tab('Arkadaşlar', 'users') },
   { key: 'Profile-1', name: 'Profile', options: tab('Profil', 'account') },
 ];
 
-function renderDock(index: number) {
+function renderDock(index: number, badge?: number) {
   const navigate = jest.fn();
   const emit = jest.fn(() => ({ defaultPrevented: false }));
+  const routes = ROUTES.map((route) =>
+    route.name === 'Friends' ? { ...route, options: { ...route.options, tabBarBadge: badge } } : route,
+  );
   const props = {
-    state: { index, routes: ROUTES.map(({ key, name }) => ({ key, name })) },
-    descriptors: Object.fromEntries(ROUTES.map((route) => [route.key, { options: route.options }])),
+    state: { index, routes: routes.map(({ key, name }) => ({ key, name })) },
+    descriptors: Object.fromEntries(routes.map((route) => [route.key, { options: route.options }])),
     navigation: { navigate, emit },
   } as unknown as BottomTabBarProps;
   return {
@@ -54,8 +57,8 @@ describe('TabBar — the dock', () => {
     await rendered;
 
     await fireEvent.press(screen.getByRole('tab', { name: 'Arkadaşlar' }));
-    expect(emit).toHaveBeenCalledWith(expect.objectContaining({ type: 'tabPress', target: 'Search-1' }));
-    expect(navigate).toHaveBeenCalledWith('Search');
+    expect(emit).toHaveBeenCalledWith(expect.objectContaining({ type: 'tabPress', target: 'Friends-1' }));
+    expect(navigate).toHaveBeenCalledWith('Friends');
 
     await fireEvent.press(screen.getByRole('tab', { name: 'Oyna' }));
     expect(navigate).toHaveBeenCalledWith('Home');
@@ -63,5 +66,20 @@ describe('TabBar — the dock', () => {
     navigate.mockClear();
     await fireEvent.press(screen.getByRole('tab', { name: 'Zirve' }));
     expect(navigate).not.toHaveBeenCalled();
+  });
+
+  it('counts what waits among friends on their slot, and says so', async () => {
+    const { rendered } = renderDock(2, 3);
+    await rendered;
+
+    expect(screen.getByText('3')).toBeOnTheScreen();
+    expect(screen.getByRole('tab', { name: 'Arkadaşlar, 3 yeni' })).toBeOnTheScreen();
+  });
+
+  it('shows no count when nothing waits', async () => {
+    const { rendered } = renderDock(2);
+    await rendered;
+
+    expect(screen.getByRole('tab', { name: 'Arkadaşlar' })).toBeOnTheScreen();
   });
 });

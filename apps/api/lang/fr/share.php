@@ -7,7 +7,7 @@
 
 return [
     'free' => "J'ai fait :points sur Quezby\u{00A0}! :posts. Et toi, tu en fais combien\u{00A0}?",
-    'free_ranked' => "J'ai fait :points sur Quezby\u{00A0}! :posts · aujourd'hui #:rank. Et toi, tu en fais combien\u{00A0}?",
+    'free_ranked' => "J'ai fait :points sur Quezby\u{00A0}! :posts · cette semaine #:rank. Et toi, tu en fais combien\u{00A0}?",
     'daily' => "Quezby · Fil du jour #:number\n:grid\n:points",
     'daily_ranked' => "Quezby · Fil du jour #:number\n:grid\n:points · #:rank/:players",
 

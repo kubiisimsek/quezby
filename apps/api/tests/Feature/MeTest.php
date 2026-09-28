@@ -22,11 +22,11 @@ test('me shows the player and their ranks', function () {
         ->assertJsonPath('user.identities', [])
         ->assertJsonPath('user.locale', 'tr')
         ->assertJsonPath('user.best', ['score' => 5000, 'reels' => 80, 'achievedAt' => '2026-09-23T09:00:00.000Z'])
-        ->assertJsonPath('ranks', ['daily' => 2, 'weekly' => 2, 'monthly' => 2, 'all' => 2]);
+        ->assertJsonPath('ranks', ['weekly' => 2, 'monthly' => 2, 'all' => 2]);
 
-    // A day later the daily board is empty; the week, the month and the season remain.
-    Carbon::setTestNow(Carbon::parse('2026-09-24 12:00', 'Europe/Istanbul'));
-    $this->getJson('/api/v1/me')->assertJsonPath('ranks', ['daily' => null, 'weekly' => 2, 'monthly' => 2, 'all' => 2]);
+    // The week turns over on Monday; the month and the season remain.
+    Carbon::setTestNow(Carbon::parse('2026-09-28 12:00', 'Europe/Istanbul'));
+    $this->getJson('/api/v1/me')->assertJsonPath('ranks', ['weekly' => null, 'monthly' => 2, 'all' => 2]);
 });
 
 test('settings update known keys and ignore the rest', function () {
@@ -34,13 +34,19 @@ test('settings update known keys and ignore the rest', function () {
 
     $this->putJson('/api/v1/me/settings', ['haptics' => false, 'theme' => 'dark'])
         ->assertOk()
-        ->assertExactJson(['settings' => ['haptics' => false, 'analytics' => false]]);
-    $this->assertSame(['haptics' => false], $user->fresh()->settings);
+        ->assertExactJson(['settings' => ['haptics' => false, 'analytics' => false, 'pushFriends' => true, 'pushVs' => true, 'pushMessages' => true]]);
+    $this->assertSame(['haptics' => false, 'pushFriends' => true, 'pushVs' => true, 'pushMessages' => true], $user->fresh()->settings);
 
     $this->putJson('/api/v1/me/settings', ['theme' => 'light'])
         ->assertOk()
-        ->assertExactJson(['settings' => ['haptics' => false, 'analytics' => false]]);
-    $this->getJson('/api/v1/me')->assertJsonPath('user.settings', ['haptics' => false, 'analytics' => false]);
+        ->assertExactJson(['settings' => ['haptics' => false, 'analytics' => false, 'pushFriends' => true, 'pushVs' => true, 'pushMessages' => true]]);
+    $this->getJson('/api/v1/me')->assertJsonPath('user.settings', ['haptics' => false, 'analytics' => false, 'pushFriends' => true, 'pushVs' => true, 'pushMessages' => true]);
+
+    // Which news pushes tell the phone about.
+    $this->putJson('/api/v1/me/settings', ['pushVs' => false])
+        ->assertOk()
+        ->assertJsonPath('settings.pushVs', false)
+        ->assertJsonPath('settings.pushFriends', true);
 });
 
 test('a setting must be a JSON boolean', function () {

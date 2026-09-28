@@ -28,7 +28,7 @@ test('every period says when it began and when it turns over, in UTC', function 
         ->and($leaderboards->boundsAt(LeaderboardPeriod::All, $at))->toBeNull();
 });
 
-test('runs either side of Istanbul midnight land on different days', function () {
+test('runs either side of Istanbul midnight share the week, and each keeps its day for the league', function () {
     $evening = User::factory()->withUsername('evening')->create();
     $night = User::factory()->withUsername('night')->create();
 
@@ -38,34 +38,41 @@ test('runs either side of Istanbul midnight land on different days', function ()
     $this->recordRanked($night, 2000);
     $this->signIn($night);
 
-    $this->getJson('/api/v1/leaderboards/daily')
+    $evenRow = ['rank' => 1, 'username' => 'evening', 'avatarUrl' => null, 'score' => 3000, 'reels' => 100, 'isMe' => false, 'isFriend' => false, 'gap' => null];
+    $nightRow = ['rank' => 2, 'username' => 'night', 'avatarUrl' => null, 'score' => 2000, 'reels' => 100, 'isMe' => true, 'isFriend' => false, 'gap' => 1001];
+    $this->getJson('/api/v1/leaderboards/weekly')
         ->assertOk()
         ->assertExactJson([
-            'board' => 'daily',
-            'periodKey' => '2026-09-25',
+            'board' => 'weekly',
+            'periodKey' => '2026-W39',
             'season' => 2,
             'scope' => 'everyone',
-            'startsAt' => '2026-09-24T21:00:00.000Z',
-            'endsAt' => '2026-09-25T21:00:00.000Z',
+            'startsAt' => '2026-09-20T21:00:00.000Z',
+            'endsAt' => '2026-09-27T21:00:00.000Z',
             'serverTime' => '2026-09-24T21:30:00.000Z',
-            'entries' => [['rank' => 1, 'username' => 'night', 'score' => 2000, 'reels' => 100, 'isMe' => true, 'isFollowing' => false, 'gap' => null]],
-            'me' => ['rank' => 1, 'username' => 'night', 'score' => 2000, 'reels' => 100, 'isMe' => true, 'isFollowing' => false, 'gap' => null],
-            'neighbors' => [['rank' => 1, 'username' => 'night', 'score' => 2000, 'reels' => 100, 'isMe' => true, 'isFollowing' => false, 'gap' => null]],
-            'rival' => null,
-            'nextRankProgress' => null,
-            'players' => 1,
+            'entries' => [$evenRow, $nightRow],
+            'me' => $nightRow,
+            'neighbors' => [$evenRow, $nightRow],
+            'rival' => ['entry' => $evenRow, 'gap' => 1001],
+            'nextRankProgress' => intdiv(2000 * 1000, 3001),
+            'players' => 2,
         ]);
 
-    $this->getJson('/api/v1/leaderboards/weekly')
-        ->assertJsonPath('periodKey', '2026-W39')
-        ->assertJsonPath('entries.*.username', ['evening', 'night'])
-        ->assertJsonPath('me.rank', 2)
-        ->assertJsonPath('players', 2);
     $this->getJson('/api/v1/leaderboards/monthly')->assertJsonPath('periodKey', '2026-09')->assertJsonPath('players', 2);
     $this->getJson('/api/v1/leaderboards/all')
         ->assertJsonPath('periodKey', 'all')
         ->assertJsonPath('endsAt', null)
         ->assertJsonPath('players', 2);
+
+    // No player sees a day board, but each day's best stays: league points add them up.
+    expect(LeaderboardEntry::query()->where('period', 'daily')->pluck('period_key', 'user_id')->all())
+        ->toBe([$evening->id => '2026-09-24', $night->id => '2026-09-25']);
+});
+
+test('there is no day board', function () {
+    $this->signIn();
+
+    $this->assertApiError($this->getJson('/api/v1/leaderboards/daily'), 404, 'not_found');
 });
 
 test('ties go to whoever got there first, and a gap is what it takes to pass', function () {
@@ -83,18 +90,18 @@ test('ties go to whoever got there first, and a gap is what it takes to pass', f
     $this->recordRanked($top, 7000);
     $this->signIn($second);
 
-    $this->getJson('/api/v1/leaderboards/daily')
+    $this->getJson('/api/v1/leaderboards/weekly')
         ->assertJsonPath('entries.*.username', ['top', 'first', 'twin', 'second'])
         ->assertJsonPath('entries.*.rank', [1, 2, 2, 4])
         ->assertJsonPath('entries.*.gap', [null, 2001, 1, 1])
         ->assertJsonPath('me.rank', 4);
 
-    $this->getJson('/api/v1/leaderboards/daily?limit=2')
+    $this->getJson('/api/v1/leaderboards/weekly?limit=2')
         ->assertJsonPath('entries.*.username', ['top', 'first'])
-        ->assertJsonPath('me', ['rank' => 4, 'username' => 'second', 'score' => 5000, 'reels' => 100, 'isMe' => true, 'isFollowing' => false, 'gap' => 1])
+        ->assertJsonPath('me', ['rank' => 4, 'username' => 'second', 'avatarUrl' => null, 'score' => 5000, 'reels' => 100, 'isMe' => true, 'isFriend' => false, 'gap' => 1])
         ->assertJsonPath('players', 4);
 
-    $this->getJson('/api/v1/me')->assertJsonPath('ranks', ['daily' => 4, 'weekly' => 4, 'monthly' => 4, 'all' => 4]);
+    $this->getJson('/api/v1/me')->assertJsonPath('ranks', ['weekly' => 4, 'monthly' => 4, 'all' => 4]);
 });
 
 test('the rival is the player right above, with the gap and the way there', function () {
@@ -116,29 +123,31 @@ test('the rival is the player right above, with the gap and the way there', func
     expect($players)->toHaveCount(7);
 });
 
-test('the friends board is the players you follow, and you', function () {
+test('the friends board is your friends, and you', function () {
     $me = User::factory()->withUsername('ben')->create();
     $friend = User::factory()->withUsername('kanka')->create();
     $stranger = User::factory()->withUsername('yabanci')->create();
     $this->recordRanked($stranger, 9000);
     $this->recordRanked($friend, 8000);
     $this->recordRanked($me, 7000);
-    $me->following()->attach($friend->id, ['created_at' => now()]);
+    $this->befriend($me, $friend);
+    // A request is not a friendship yet.
+    $this->requestFriend($me, $stranger);
     $this->signIn($me);
 
-    $this->getJson('/api/v1/leaderboards/daily?scope=friends')
+    $this->getJson('/api/v1/leaderboards/weekly?scope=friends')
         ->assertOk()
         ->assertJsonPath('scope', 'friends')
         ->assertJsonPath('entries.*.username', ['kanka', 'ben'])
-        ->assertJsonPath('entries.*.isFollowing', [true, false])
+        ->assertJsonPath('entries.*.isFriend', [true, false])
         ->assertJsonPath('me.rank', 2)
         ->assertJsonPath('rival.entry.username', 'kanka')
         ->assertJsonPath('players', 2);
 
-    $this->getJson('/api/v1/leaderboards/daily')
+    $this->getJson('/api/v1/leaderboards/weekly')
         ->assertJsonPath('entries.*.username', ['yabanci', 'kanka', 'ben'])
         ->assertJsonPath('me.rank', 3);
-    $this->assertApiError($this->getJson('/api/v1/leaderboards/daily?scope=world'), 422, 'validation_failed');
+    $this->assertApiError($this->getJson('/api/v1/leaderboards/weekly?scope=world'), 422, 'validation_failed');
 });
 
 test('a board only ranks this season', function () {
@@ -184,7 +193,7 @@ test('the challenge board holds only daily runs', function () {
     $this->signIn($player);
 
     $this->getJson('/api/v1/leaderboards/challenge')->assertOk()->assertJsonPath('board', 'challenge')->assertJsonPath('players', 0);
-    $this->getJson('/api/v1/leaderboards/daily')->assertJsonPath('players', 1);
+    $this->getJson('/api/v1/leaderboards/weekly')->assertJsonPath('players', 1);
 });
 
 test('an empty board', function () {
@@ -215,14 +224,14 @@ test('an unknown board is not found', function () {
 });
 
 test('leaderboards need a player', function () {
-    $this->assertApiError($this->getJson('/api/v1/leaderboards/daily'), 401, 'unauthenticated');
+    $this->assertApiError($this->getJson('/api/v1/leaderboards/weekly'), 401, 'unauthenticated');
 });
 
 test('leaderboards are throttled', function () {
     $this->signIn();
     for ($i = 0; $i < 60; $i++) {
-        $this->getJson('/api/v1/leaderboards/daily')->assertOk();
+        $this->getJson('/api/v1/leaderboards/weekly')->assertOk();
     }
 
-    $this->assertApiError($this->getJson('/api/v1/leaderboards/daily'), 429, 'too_many_requests');
+    $this->assertApiError($this->getJson('/api/v1/leaderboards/weekly'), 429, 'too_many_requests');
 });

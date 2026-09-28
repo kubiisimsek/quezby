@@ -17,6 +17,10 @@ class UpdateSettingsRequest extends FormRequest
             'haptics' => ['sometimes', 'boolean:strict'],
             // The player's yes or no to usage analytics (`docs/product/analytics.md`).
             'analytics' => ['sometimes', 'boolean:strict'],
+            // Which news a push tells the player's phones about (`PushService`).
+            'pushFriends' => ['sometimes', 'boolean:strict'],
+            'pushVs' => ['sometimes', 'boolean:strict'],
+            'pushMessages' => ['sometimes', 'boolean:strict'],
         ];
     }
 }

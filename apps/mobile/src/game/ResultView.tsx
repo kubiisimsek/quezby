@@ -1,6 +1,8 @@
 import type { ReelKind, RunSummary } from '@quezby/engine';
 import type {
   DailyResult,
+  DuelSide,
+  DuelView,
   FinishRunResponse,
   LeaderboardPeriod,
   LeagueStanding,
@@ -8,6 +10,7 @@ import type {
   LeagueZone,
   PassedPlayer,
   RankChange,
+  RunMode,
   RunResult,
 } from '@quezby/types';
 import { useEffect, useState, type ReactNode } from 'react';
@@ -37,6 +40,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 
 import { track } from '@/analytics/track';
+import { useSession } from '@/auth/session';
+import { PushNudge } from '@/components/PushNudge';
 import { APP_PLATFORM } from '@/config/env';
 import { BONUS_ORDER, deviceFailed, reelGuide } from '@/game/howTo';
 import type { Outcome } from '@/game/useGame';
@@ -50,8 +55,10 @@ import {
   Button,
   Callout,
   Confetti,
+  CountdownChip,
   CountUp,
   Eyebrow,
+  FaceOff,
   IconChip,
   Meter,
   Panel,
@@ -82,7 +89,7 @@ import {
   withAlpha,
 } from '@/ui/theme';
 
-const PERIODS: readonly LeaderboardPeriod[] = ['daily', 'weekly', 'monthly', 'all'];
+const PERIODS: readonly LeaderboardPeriod[] = ['weekly', 'monthly', 'all'];
 
 /** How a league zone looks, and which of the lobby's lines names it (`t.home.league`). */
 const ZONE: Record<
@@ -136,7 +143,7 @@ const SLIDE: WithTimingConfig = {
 };
 
 type Section =
-  'status' | 'daily' | 'breakdown' | 'stats' | 'unseen' | 'ranks' | 'passed' | 'league';
+  'status' | 'vs' | 'daily' | 'breakdown' | 'stats' | 'unseen' | 'ranks' | 'passed' | 'league';
 
 type Plan = {
   crown: number;
@@ -155,6 +162,7 @@ function choreograph(
   const crown = BEAT.score + (counting ? BEAT.count : 0) + BEAT.crown;
   const at: Record<Section, number> = {
     status: 0,
+    vs: 0,
     daily: 0,
     breakdown: 0,
     stats: 0,
@@ -220,7 +228,10 @@ function noteFor(outcome: Outcome, t: Messages): Note | null {
  * own count never reaches this screen. Practice runs, which the API never
  * sees, show the engine's summary under a "practice" label. A new player's
  * practice run ("DENEME TURU") also shows the kinds it ended before, and
- * leads on (`onContinue`) instead of home.
+ * leads on (`onContinue`) instead of home. A VS run leads with its VS — sent
+ * with the score kept from the friend, or won, lost, drawn — and its way on
+ * is the rematch, or back to the conversation; it has no ranks to show and
+ * nothing to share.
  *
  * It arrives as a sequence: the score slams in and counts up, a new record
  * lands in gold with confetti, the tiles follow and the buttons come last. A
@@ -232,15 +243,21 @@ export function ResultView({
   mode,
   onReplay,
   onPlayFree,
+  onRematch,
+  onThread,
   onClose,
   onRetrySubmit,
   onOpenDaily,
   onContinue,
 }: {
   outcome: Outcome;
-  mode: 'free' | 'daily';
+  mode: RunMode;
   onReplay: () => void;
   onPlayFree: () => void;
+  /** After a VS: another one with the same friend. */
+  onRematch?: () => void;
+  /** After a VS: the conversation with the friend. */
+  onThread?: () => void;
   onClose: () => void;
   onRetrySubmit: () => void;
   onOpenDaily: () => void;
@@ -261,8 +278,10 @@ export function ResultView({
   const record = Boolean(verified?.isNewBest) && ranked;
   const note = noteFor(outcome, t);
 
+  const duel = verified?.duel ?? null;
   const shown: Section[] = [];
   if (note) shown.push('status');
+  if (duel) shown.push('vs');
   if (verified?.daily) shown.push('daily');
   if (verified) shown.push('breakdown');
   if (verified || practice) shown.push('stats');
@@ -302,13 +321,20 @@ export function ResultView({
       ? { label: dock.continue, icon: 'check', tone: 'primary', onPress: onContinue }
       : outcome.mode === 'unsent' && outcome.canRetry
         ? { label: dock.resend, icon: 'refresh', tone: 'play', onPress: onRetrySubmit }
-        : mode === 'daily'
-          ? { label: t.home.today.free, icon: 'play', tone: 'play', onPress: onPlayFree }
-          : { label: dock.replay, icon: 'play', tone: 'play', onPress: onReplay };
+        : mode === 'vs' && duel?.status === 'waiting' && onThread
+          ? { label: t.vs.result.toThread, icon: 'message', tone: 'primary', onPress: onThread }
+          : mode === 'vs' && onRematch
+            ? { label: t.vs.result.rematch, icon: 'swords', tone: 'play', onPress: onRematch }
+            : mode === 'daily'
+              ? { label: t.home.today.free, icon: 'play', tone: 'play', onPress: onPlayFree }
+              : { label: dock.replay, icon: 'play', tone: 'play', onPress: onReplay };
   const leave: DockAction =
     tutorial && onContinue
       ? { label: dock.practiceAgain, tone: 'secondary', onPress: onReplay }
-      : { label: dock.home, tone: 'ghost', onPress: onClose };
+      : mode === 'vs' && duel?.status !== 'waiting' && onThread
+        ? { label: t.vs.result.toThread, tone: 'secondary', onPress: onThread }
+        : { label: dock.home, tone: 'ghost', onPress: onClose };
+  const shareText = verified?.shareText ?? null;
 
   return (
     <Screen>
@@ -391,10 +417,10 @@ export function ResultView({
           bottom={insets.bottom}
           main={main}
           onShare={
-            verified
+            verified && shareText
               ? () => {
                   track(verified.run.mode === 'daily' ? 'share_daily' : 'share_result');
-                  void Share.share({ message: verified.shareText });
+                  void Share.share({ message: shareText });
                 }
               : undefined
           }
@@ -690,6 +716,12 @@ function Verified({
 
   return (
     <>
+      {response.duel ? (
+        <Rise at={plan.at.vs} skipped={skipped}>
+          <VsTile duel={response.duel} />
+        </Rise>
+      ) : null}
+
       {response.daily ? (
         <Rise at={plan.at.daily} skipped={skipped}>
           <DailyTile daily={response.daily} onOpenDaily={onOpenDaily} />
@@ -739,6 +771,93 @@ function Verified({
         </Rise>
       ) : null}
     </>
+  );
+}
+
+/**
+ * A VS run's VS: sent — the friend is told, your score is kept from them
+ * until they play, and the time they have runs down; over — the word in
+ * Rubik in the colour of how it went, both scores and how the two of you
+ * stand; never sent — a run that was not clean sends nothing.
+ */
+function VsTile({ duel }: { duel: DuelView }) {
+  const theme = useTheme();
+  const t = useT();
+  const words = t.vs.result;
+  const user = useSession((state) => state.user);
+  const name = handle(duel.opponent.username);
+
+  if (duel.status === 'void') {
+    return (
+      <Callout tone="warn" title={words.voidTitle}>
+        {words.voidBody}
+      </Callout>
+    );
+  }
+
+  if (duel.status === 'waiting' && duel.sent) {
+    return (
+      <Panel tone="primary" style={styles.vs}>
+        <Eyebrow icon="swords">{words.sent}</Eyebrow>
+        <FaceOff
+          left={{ name: user?.username ?? '?', src: user?.avatarUrl, caption: words.you }}
+          right={{ name: duel.opponent.username, src: duel.opponent.avatarUrl, caption: name }}
+        />
+        <Txt variant="meta" align="center">
+          {words.sentBody(name)}
+        </Txt>
+        {duel.expiresAt ? (
+          <View style={styles.vsClock}>
+            <CountdownChip endsAt={duel.expiresAt} serverTime={duel.serverTime} prefix={t.inbox.thread.left} />
+          </View>
+        ) : null}
+        <View style={styles.vsNudge}>
+          <PushNudge line={t.push.nudge.vs(name)} />
+        </View>
+      </Panel>
+    );
+  }
+
+  if (duel.status === 'finished' && duel.outcome) {
+    const color = duel.outcome === 'won' ? theme.ok : duel.outcome === 'lost' ? theme.bad : theme.gold;
+    return (
+      <Panel style={styles.vs}>
+        <Stamp from={1.6}>
+          <Text style={[styles.vsWord, { color }, embossed(3)]}>{words[duel.outcome]}</Text>
+        </Stamp>
+        <View style={styles.vsSides}>
+          <VsSide label={words.you} side={duel.you} />
+          <VsSide label={name} side={duel.them} />
+        </View>
+        <Txt variant="meta" tone="muted" align="center">
+          {words.h2h(duel.h2h.wins, duel.h2h.losses)}
+        </Txt>
+      </Panel>
+    );
+  }
+
+  return <Callout tone="info">{words.closed}</Callout>;
+}
+
+/** One side of a finished VS: whose, the score, and whether it counted. */
+function VsSide({ label, side }: { label: string; side: DuelSide | null }) {
+  const theme = useTheme();
+  const t = useT();
+  const words = t.vs.result;
+  const score = side?.score === null || side?.score === undefined ? '—' : t.fmt.score(side.score);
+  const note = !side || side.score === null ? words.unfinished : side.valid ? null : words.invalid;
+  return (
+    <View style={[styles.vsSide, { backgroundColor: theme.well, borderColor: theme.wellLine }]}>
+      <Txt variant="micro" tone="muted" numberOfLines={1}>
+        {label}
+      </Txt>
+      <Text style={[styles.vsScore, { color: note ? theme.inkFaint : theme.ink }]}>{score}</Text>
+      {note ? (
+        <Txt variant="micro" tone="bad">
+          {note}
+        </Txt>
+      ) : null}
+    </View>
   );
 }
 
@@ -913,7 +1032,8 @@ function Source({
   );
 }
 
-function runStats(run: RunResult, t: Messages): StatItem[] {
+/** A verified run's numbers as stat tiles — here and on a past game's card. */
+export function runStats(run: RunResult, t: Messages): StatItem[] {
   const stats = t.result.stats;
   return [
     { label: stats.posts, value: t.fmt.score(run.reels), icon: 'arrowUp' },
@@ -1074,7 +1194,7 @@ function MovePill({ moved, down }: { moved: string; down: boolean }) {
   );
 }
 
-/** The players this run overtook today, climbing in under you one by one. */
+/** The players this run overtook this week, climbing in under you one by one. */
 function Passed({
   players,
   at,
@@ -1123,7 +1243,7 @@ function PassedRow({
       accessible
       accessibilityLabel={t.result.passed.label(
         name,
-        player.isFollowing,
+        player.isFriend,
         player.score,
         t.fmt.score(player.score),
       )}
@@ -1133,9 +1253,9 @@ function PassedRow({
         motion,
       ]}
     >
-      <Avatar name={player.username} size="sm" />
+      <Avatar name={player.username} src={player.avatarUrl} size="sm" />
       <Txt variant="heading" numberOfLines={1} style={styles.shrink}>
-        {t.result.passed.name(name, player.isFollowing)}
+        {t.result.passed.name(name, player.isFriend)}
       </Txt>
       <Text style={[styles.passedScore, { color: theme.inkMuted }]}>
         {t.fmt.score(player.score)}
@@ -1260,6 +1380,21 @@ function Dock({
 
 const styles = StyleSheet.create({
   fill: { flex: 1 },
+  vs: { alignItems: 'center', gap: SPACE.sm, paddingVertical: SPACE.lg },
+  vsClock: { alignItems: 'center' },
+  vsNudge: { alignSelf: 'stretch' },
+  vsWord: { fontFamily: FONT.display, fontSize: 34, lineHeight: lh(40), textAlign: 'center' },
+  vsSides: { alignSelf: 'stretch', flexDirection: 'row', gap: SPACE.sm },
+  vsSide: {
+    alignItems: 'center',
+    borderRadius: RADIUS.control,
+    borderWidth: 1.5,
+    flex: 1,
+    gap: 2,
+    paddingHorizontal: SPACE.sm,
+    paddingVertical: SPACE.ms,
+  },
+  vsScore: { fontFamily: FONT.display, fontSize: 24, lineHeight: lh(29) },
   stage: {
     alignItems: 'center',
     borderBottomLeftRadius: RADIUS.overlay,

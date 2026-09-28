@@ -3,6 +3,16 @@ apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 
 /**
+ * Push notifications (Firebase Cloud Messaging) need this app's
+ * google-services.json, downloaded from the Firebase console into android/app/
+ * and kept out of git (docs/development/push-setup.md). Without it the app
+ * builds as before and has no push.
+ */
+if (file("google-services.json").exists()) {
+    apply plugin: "com.google.gms.google-services"
+}
+
+/**
  * pnpm keeps `hermes-compiler` inside react-native's own dependencies, where the
  * React Native Gradle plugin's default lookup (node_modules/hermes-compiler next
  * to this app) never finds it — release builds then stop with "Couldn't determine
@@ -121,7 +131,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "0.0.1"
+        versionName "1.0.0"
         resValue "string", "app_name", quezbyDisplayName
         buildConfigField "String", "QUEZBY_ENV", "\"${quezbyEnv}\""
     }

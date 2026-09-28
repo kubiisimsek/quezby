@@ -1,22 +1,31 @@
 <?php
 
+use App\Enums\LeaderboardPeriod;
 use App\Http\Controllers\Admin;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AppConfigController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AvatarController;
+use App\Http\Controllers\BlockController;
 use App\Http\Controllers\CredentialsController;
 use App\Http\Controllers\DailyController;
 use App\Http\Controllers\DeviceController;
-use App\Http\Controllers\FollowController;
+use App\Http\Controllers\DuelController;
+use App\Http\Controllers\FriendController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\IdentityController;
+use App\Http\Controllers\InboxController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\LeagueController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MeController;
+use App\Http\Controllers\MediaController;
 use App\Http\Controllers\ModerationController;
 use App\Http\Controllers\OpsController;
+use App\Http\Controllers\PushTokenController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RunController;
+use App\Http\Controllers\RunHistoryController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SocialAuthController;
 use App\Http\Controllers\StatsController;
@@ -60,8 +69,20 @@ Route::prefix('v1')->group(function () {
             Route::post('me/identities/{provider}', [IdentityController::class, 'store'])->middleware('throttle:identities');
             Route::delete('me/identities/{provider}', [IdentityController::class, 'destroy'])->middleware('throttle:identities');
             Route::get('me/stats', StatsController::class)->middleware('throttle:reads');
-            Route::get('me/following', [FollowController::class, 'following'])->middleware('throttle:reads');
-            Route::get('me/followers', [FollowController::class, 'followers'])->middleware('throttle:reads');
+            Route::put('me/avatar', [AvatarController::class, 'update'])->middleware('throttle:avatar');
+            Route::put('me/push-token', [PushTokenController::class, 'store'])->middleware('throttle:push-token');
+            Route::delete('me/push-token', [PushTokenController::class, 'destroy'])->middleware('throttle:push-token');
+            Route::delete('me/avatar', [AvatarController::class, 'destroy'])->middleware('throttle:avatar');
+            Route::get('me/runs', [RunHistoryController::class, 'index'])->middleware('throttle:reads');
+            Route::get('me/runs/{runId}', [RunHistoryController::class, 'show'])->middleware('throttle:reads');
+            Route::get('me/inbox', [InboxController::class, 'summary'])->middleware('throttle:reads');
+            Route::get('me/pulse', [InboxController::class, 'pulse'])->middleware('throttle:pulse');
+            Route::get('me/friends', [InboxController::class, 'friends'])->middleware('throttle:reads');
+            Route::get('me/threads/{username}', [InboxController::class, 'thread'])->middleware('throttle:reads');
+            Route::post('me/threads/{username}/read', [InboxController::class, 'read'])->middleware('throttle:social');
+            Route::post('me/threads/{username}/messages', [InboxController::class, 'send'])->middleware('throttle:messages');
+            Route::get('me/friend-requests', [FriendController::class, 'requests'])->middleware('throttle:reads');
+            Route::get('me/blocks', [BlockController::class, 'index'])->middleware('throttle:reads');
 
             Route::get('usernames/check', [UsernameController::class, 'check'])->middleware('throttle:username-check');
 
@@ -74,7 +95,7 @@ Route::prefix('v1')->group(function () {
             Route::post('runs/{runId}/checkpoint', [RunController::class, 'checkpoint'])->middleware('throttle:run-checkpoint');
             Route::post('runs/{runId}/finish', [RunController::class, 'finish'])->middleware('throttle:run-finish');
 
-            Route::get('leaderboards/{board}', LeaderboardController::class)->middleware('throttle:reads');
+            Route::get('leaderboards/{board}', LeaderboardController::class)->whereIn('board', LeaderboardPeriod::boardValues())->middleware('throttle:reads');
             Route::get('daily', DailyController::class)->middleware('throttle:reads');
             Route::get('leagues/current', LeagueController::class)->middleware('throttle:reads');
 
@@ -82,10 +103,18 @@ Route::prefix('v1')->group(function () {
 
             Route::get('users', [UserController::class, 'search'])->middleware('throttle:search');
             Route::get('users/{username}', [UserController::class, 'show'])->middleware('throttle:reads');
-            Route::put('users/{username}/follow', [FollowController::class, 'store'])->middleware('throttle:follow');
-            Route::delete('users/{username}/follow', [FollowController::class, 'destroy'])->middleware('throttle:follow');
+            Route::put('users/{username}/friend', [FriendController::class, 'store'])->middleware('throttle:social');
+            Route::delete('users/{username}/friend', [FriendController::class, 'destroy'])->middleware('throttle:social');
+            Route::put('users/{username}/block', [BlockController::class, 'store'])->middleware('throttle:social');
+            Route::post('users/{username}/report', [ReportController::class, 'store'])->middleware('throttle:reports');
+            Route::get('duels/{duel}', [DuelController::class, 'show'])->whereUlid('duel')->middleware('throttle:reads');
+            Route::post('duels/{duel}/decline', [DuelController::class, 'decline'])->whereUlid('duel')->middleware('throttle:social');
+            Route::delete('users/{username}/block', [BlockController::class, 'destroy'])->middleware('throttle:social');
         });
     });
+
+    // Profile photos, for whoever has the address: no token, no language, cached for a year.
+    Route::get('media/avatars/{file}', [MediaController::class, 'avatar'])->middleware('throttle:media');
 
     Route::prefix('ops')->middleware(['throttle:ops', VerifyOpsToken::class])->group(function () {
         Route::post('migrate', [OpsController::class, 'migrate']);
@@ -123,6 +152,7 @@ Route::prefix('v1')->group(function () {
                 Route::get('leagues', [Admin\LeagueController::class, 'index'])->name('leagues.index');
                 Route::get('leagues/groups/{group}', [Admin\LeagueController::class, 'show'])->whereNumber('group')->name('leagues.show');
                 Route::get('content', Admin\ContentController::class)->name('content');
+                Route::get('reports', [Admin\ReportController::class, 'index'])->name('reports.index');
             });
 
             Route::middleware('admin.role:moderator')->group(function () {
@@ -130,6 +160,8 @@ Route::prefix('v1')->group(function () {
                 Route::post('players/{player}/unban', [Admin\PlayerActionController::class, 'unban'])->whereUlid('player')->name('players.unban');
                 Route::post('players/{player}/rename', [Admin\PlayerActionController::class, 'rename'])->whereUlid('player')->name('players.rename');
                 Route::post('players/{player}/sign-out', [Admin\PlayerActionController::class, 'signOut'])->whereUlid('player')->name('players.sign-out');
+                Route::post('players/{player}/avatar/remove', [Admin\PlayerActionController::class, 'removeAvatar'])->whereUlid('player')->name('players.avatar-remove');
+                Route::post('players/{player}/reports/dismiss', [Admin\PlayerActionController::class, 'dismissReports'])->whereUlid('player')->name('players.reports-dismiss');
                 Route::post('runs/{run}/approve', [Admin\RunActionController::class, 'approve'])->whereUlid('run')->name('runs.approve');
                 Route::post('runs/{run}/reject', [Admin\RunActionController::class, 'reject'])->whereUlid('run')->name('runs.reject');
             });

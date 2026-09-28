@@ -27,6 +27,8 @@ import { DEPTH, FONT, RADIUS, SPACE, embossed, lh, useTheme, withAlpha } from '@
 export type PodiumEntry = {
   rank: number;
   username: string;
+  /** Their photo; null or left out draws their initials. */
+  avatarUrl?: string | null;
   score: number;
   isMe: boolean;
 };
@@ -227,6 +229,7 @@ function Place<T extends PodiumEntry>({
             />
             <Avatar
               name={entry.username}
+              src={entry.avatarUrl}
               tone={entry.isMe ? 'primary' : 'neutral'}
               size={winner ? 'lg' : 'md'}
             />

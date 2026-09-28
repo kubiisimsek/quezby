@@ -11,7 +11,7 @@
 
 return [
     'free' => "\u{200F}نتيجتي في Quezby: :points! :posts. وأنت، كم ستحقق؟",
-    'free_ranked' => "\u{200F}نتيجتي في Quezby: :points! :posts · اليوم #:rank. وأنت، كم ستحقق؟",
+    'free_ranked' => "\u{200F}نتيجتي في Quezby: :points! :posts · هذا الأسبوع #:rank. وأنت، كم ستحقق؟",
     'daily' => "\u{200F}Quezby · خلاصة اليوم #:number\n\u{200F}:grid\n\u{200F}:points",
     'daily_ranked' => "\u{200F}Quezby · خلاصة اليوم #:number\n\u{200F}:grid\n\u{200F}:points · #:rank/:players",
 

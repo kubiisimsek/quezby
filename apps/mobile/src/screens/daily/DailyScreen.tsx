@@ -100,7 +100,7 @@ export function DailyScreen({ navigation }: Props) {
     [navigation],
   );
   const search = useCallback(
-    () => navigation.navigate('Tabs', { screen: 'Search' }),
+    () => navigation.navigate('FindFriends'),
     [navigation],
   );
   const open = useCallback(

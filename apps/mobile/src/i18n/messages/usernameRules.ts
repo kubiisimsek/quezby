@@ -24,8 +24,6 @@ const tr = {
   rules: {
     length: (min: number, max: number) => `${min}–${max} karakter`,
     charset: 'Sadece harf, rakam, nokta (.) ve yıldız (*)',
-    edges: 'Harf ya da rakamla başlar ve biter',
-    symbols: 'Nokta ve yıldız art arda gelmez',
     letter: 'En az bir harf',
   } satisfies Record<UsernameRule, unknown>,
 };
@@ -50,8 +48,6 @@ const en: UsernameRuleMessages = {
   rules: {
     length: (min, max) => `${min}–${max} characters`,
     charset: 'Only letters a–z, digits, dots (.) and stars (*)',
-    edges: 'Starts and ends with a letter or a digit',
-    symbols: 'No dot or star right after another',
     letter: 'At least one letter',
   },
 };
@@ -74,8 +70,6 @@ const de: UsernameRuleMessages = {
   rules: {
     length: (min, max) => `${min}–${max} Zeichen`,
     charset: 'Nur Buchstaben a–z, Ziffern, Punkte (.) und Sterne (*)',
-    edges: 'Beginnt und endet mit Buchstabe oder Ziffer',
-    symbols: 'Punkt und Stern nie direkt nacheinander',
     letter: 'Mindestens ein Buchstabe',
   },
 };
@@ -98,8 +92,6 @@ const ar: UsernameRuleMessages = {
   rules: {
     length: (min, max) => `من ${min} إلى ${max} حرفًا`,
     charset: 'أحرف لاتينية وأرقام ونقطة (.) ونجمة (*) فقط',
-    edges: 'يبدأ وينتهي بحرف أو رقم',
-    symbols: 'لا تتتالى النقطة والنجمة',
     letter: 'حرف واحد على الأقل',
   },
 };
@@ -122,8 +114,6 @@ const fr: UsernameRuleMessages = {
   rules: {
     length: (min, max) => `${min} à ${max} caractères`,
     charset: 'Uniquement lettres a–z, chiffres, points (.) et étoiles (*)',
-    edges: 'Commence et finit par une lettre ou un chiffre',
-    symbols: "Pas de point ni d'étoile qui se suivent",
     letter: 'Au moins une lettre',
   },
 };
@@ -146,8 +136,6 @@ const es: UsernameRuleMessages = {
   rules: {
     length: (min, max) => `De ${min} a ${max} caracteres`,
     charset: 'Solo letras a–z, números, puntos (.) y asteriscos (*)',
-    edges: 'Empieza y termina con una letra o un número',
-    symbols: 'Sin puntos ni asteriscos seguidos',
     letter: 'Al menos una letra',
   },
 };

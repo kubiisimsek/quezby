@@ -53,6 +53,36 @@ const UNITS: Record<Locale, Units> = {
   ar: { day: (n) => `${n} ي`, hour: (n) => `${n} س`, minute: (n) => `${n} د`, second: (n) => `${n} ث` },
 };
 
+/** The months, as a date in running text names them. */
+const MONTHS: Record<Locale, readonly string[]> = {
+  tr: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'],
+  en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+  de: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
+  fr: ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
+  es: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
+  ar: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'],
+};
+
+/** A day of a month the language's way: `24 Eylül`, `24. September`, `24 de septiembre`. */
+const DAY_OF_MONTH: Record<Locale, (day: number, month: string) => string> = {
+  tr: (day, month) => `${day} ${month}`,
+  en: (day, month) => `${day} ${month}`,
+  de: (day, month) => `${day}. ${month}`,
+  fr: (day, month) => `${day}${NBSP}${month}`,
+  es: (day, month) => `${day} de ${month}`,
+  ar: (day, month) => `${day} ${month}`,
+};
+
+/** What just happened is called. */
+const NOW: Record<Locale, string> = {
+  tr: 'şimdi',
+  en: 'now',
+  de: 'jetzt',
+  fr: 'maintenant',
+  es: 'ahora',
+  ar: 'الآن',
+};
+
 /** How a sentence joins the last two of a list. */
 const CONJUNCTIONS: Record<Locale, { and: string; or: string; comma: string }> = {
   tr: { and: 've', or: 'ya da', comma: ', ' },
@@ -122,6 +152,12 @@ export type Formats = {
   percent: (value: number) => string;
   /** A price on a fake receipt, from cents: `1.234,50`, `1,234.50`, `1 234,50`. */
   price: (cents: number) => string;
+  /** A day on the phone's calendar: `24 Eylül`, `24 September`. */
+  date: (iso: string) => string;
+  /** A time of day on the phone's clock, 24-hour: `14:05`. */
+  time: (iso: string) => string;
+  /** How long ago, short — `şimdi`, `5 dk`, `3 sa`, `2 g` — and past a week its date. */
+  ago: (iso: string, now?: number) => string;
 };
 
 /** Spanish `y` and `o` change before the sound they would run into. */
@@ -195,6 +231,23 @@ export function formatsFor(locale: Locale): Formats {
       const whole = Math.floor(Math.max(0, cents) / 100);
       const rest = (Math.max(0, cents) % 100).toString().padStart(2, '0');
       return `${group(whole)}${decimalMark(locale)}${rest}`;
+    },
+    date: (iso) => {
+      const at = new Date(iso);
+      return DAY_OF_MONTH[locale](at.getDate(), MONTHS[locale][at.getMonth()] ?? '');
+    },
+    time: (iso) => {
+      const at = new Date(iso);
+      return ltr(`${at.getHours().toString().padStart(2, '0')}:${at.getMinutes().toString().padStart(2, '0')}`);
+    },
+    ago: (iso, now = Date.now()) => {
+      const seconds = Math.max(0, Math.floor((now - new Date(iso).getTime()) / 1000));
+      if (seconds < 60) return NOW[locale];
+      if (seconds < 3_600) return units.minute(`${Math.floor(seconds / 60)}`);
+      if (seconds < 86_400) return units.hour(`${Math.floor(seconds / 3_600)}`);
+      if (seconds < 7 * 86_400) return units.day(`${Math.floor(seconds / 86_400)}`);
+      const at = new Date(iso);
+      return DAY_OF_MONTH[locale](at.getDate(), MONTHS[locale][at.getMonth()] ?? '');
     },
   };
 }

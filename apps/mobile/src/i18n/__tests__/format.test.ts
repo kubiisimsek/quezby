@@ -99,6 +99,32 @@ describe('formatsFor', () => {
       'جديد',
     ]);
   });
+
+  it('names a day and a time on the phone’s own clock', () => {
+    // 21:05 in Istanbul, the tests' phone — already the 25th there.
+    const at = '2026-09-24T18:05:00.000Z';
+    expect([tr, en, de, fr, es, ar].map((f) => f.date(at))).toEqual([
+      '24 Eylül',
+      '24 September',
+      '24. September',
+      '24\u00A0septembre',
+      '24 de septiembre',
+      '24 سبتمبر',
+    ]);
+    expect(tr.time(at)).toBe('21:05');
+    expect(tr.date('2026-09-24T21:30:00.000Z')).toBe('25 Eylül');
+  });
+
+  it('says how long ago, short, and past a week the date', () => {
+    const now = Date.parse('2026-09-28T12:00:00.000Z');
+    expect(tr.ago('2026-09-28T11:59:30.000Z', now)).toBe('şimdi');
+    expect(tr.ago('2026-09-28T11:55:00.000Z', now)).toBe('5 dk');
+    expect(tr.ago('2026-09-28T09:00:00.000Z', now)).toBe('3 sa');
+    expect(tr.ago('2026-09-26T12:00:00.000Z', now)).toBe('2 g');
+    expect(tr.ago('2026-09-10T12:00:00.000Z', now)).toBe('10 Eylül');
+    expect(en.ago('2026-09-28T09:00:00.000Z', now)).toBe('3h');
+    expect(ar.ago('2026-09-28T11:59:59.000Z', now)).toBe('الآن');
+  });
 });
 
 describe('in an app reading right to left', () => {

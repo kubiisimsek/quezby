@@ -13,6 +13,7 @@ export const keys = {
   runs: (query?: object) => (query ? (['runs', 'list', query] as const) : (['runs'] as const)),
   run: (id: string) => ['runs', 'one', id] as const,
   suspects: (query?: object) => (query ? (['suspects', query] as const) : (['suspects'] as const)),
+  reports: (query?: object) => (query ? (['reports', query] as const) : (['reports'] as const)),
   boards: (query?: object) => (query ? (['boards', 'rows', query] as const) : (['boards'] as const)),
   boardKeys: (query: object) => ['boards', 'keys', query] as const,
   leagues: (query?: object) => (query ? (['leagues', 'list', query] as const) : (['leagues'] as const)),

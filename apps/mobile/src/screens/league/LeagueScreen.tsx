@@ -534,6 +534,7 @@ function Group({
             key={`${member.rank}-${member.username}`}
             rank={member.rank}
             username={member.username}
+            avatarUrl={member.avatarUrl}
             score={member.points}
             detail={t.league.days(member.daysPlayed)}
             gap={member.gap}

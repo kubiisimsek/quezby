@@ -8,7 +8,7 @@
 
 return [
     'free' => '¡Hice :points en Quezby! :posts. ¿Cuántos puedes hacer tú?',
-    'free_ranked' => '¡Hice :points en Quezby! :posts · hoy #:rank. ¿Cuántos puedes hacer tú?',
+    'free_ranked' => '¡Hice :points en Quezby! :posts · esta semana #:rank. ¿Cuántos puedes hacer tú?',
     'daily' => "Quezby · Feed del día #:number\n:grid\n:points",
     'daily_ranked' => "Quezby · Feed del día #:number\n:grid\n:points · #:rank/:players",
 

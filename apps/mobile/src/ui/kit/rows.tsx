@@ -181,13 +181,14 @@ export function Toggle({
 }
 
 /**
- * A player in a list — a search result, someone you follow or who follows
- * you: who they are, their league and season best, and one action on the
- * right. The player and the action are two targets side by side, so a tap
- * on the button never opens the card and a screen reader reaches both.
+ * A player in a list — a search result, a friend request: who they are,
+ * their league and season best, and one action on the right. The player and
+ * the action are two targets side by side, so a tap on the button never
+ * opens the card and a screen reader reaches both.
  */
 export function PlayerRow({
   username,
+  src,
   tier,
   best,
   isMe = false,
@@ -195,12 +196,14 @@ export function PlayerRow({
   onPress,
 }: {
   username: string;
+  /** Their photo; null draws their initials. */
+  src?: string | null;
   /** Their league this week; null when they have none. */
   tier: LeagueTier | null;
   /** This season's best; null before their first ranked run. */
   best: number | null;
   isMe?: boolean;
-  /** One small button — follow, unfollow. */
+  /** One small button — add, accept. */
   action?: ReactNode;
   /** Opens their card. */
   onPress?: () => void;
@@ -219,7 +222,7 @@ export function PlayerRow({
 
   const who = (
     <>
-      <Avatar name={username} tone={isMe ? 'primary' : 'neutral'} size="sm" />
+      <Avatar name={username} src={src} tone={isMe ? 'primary' : 'neutral'} size="sm" />
       <View style={styles.playerText}>
         <Txt variant="heading" numberOfLines={1}>
           {isMe ? words.me(name) : name}

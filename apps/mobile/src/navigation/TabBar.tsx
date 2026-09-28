@@ -9,10 +9,12 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useT } from '@/i18n';
 import { SHRINK_TO_FIT } from '@/i18n/native';
 import { Icon } from '@/ui/icons';
 import { buttonColors } from '@/ui/kit/buttons';
 import { Slab } from '@/ui/kit/slab';
+import { Count } from '@/ui/kit/social';
 import { SPRING, SPRING_POP } from '@/ui/motion';
 import { DEPTH, FONT, RADIUS, SPACE, embossed, lh, useTheme, withAlpha } from '@/ui/theme';
 
@@ -24,7 +26,8 @@ const CENTRE = 'Home';
  * slab with a rounded top; the middle one is the lobby, a gold play slab
  * standing up out of the dock the way every game puts its "play" in the
  * thumb's reach. The slot you are on lifts into a magenta tile and says its
- * name in Rubik; the others wait, dimmed.
+ * name in Rubik; the others wait, dimmed. A slot with news on it
+ * (`tabBarBadge`) wears a red count on its corner.
  */
 export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const theme = useTheme();
@@ -70,6 +73,7 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
             label={label}
             focused={focused}
             icon={options?.tabBarIcon}
+            badge={typeof options?.tabBarBadge === 'number' ? options.tabBarBadge : 0}
             onPress={go}
           />
         );
@@ -130,14 +134,18 @@ function Slot({
   label,
   focused,
   icon,
+  badge,
   onPress,
 }: {
   label: string;
   focused: boolean;
   icon?: BottomTabBarProps['descriptors'][string]['options']['tabBarIcon'];
+  /** News waiting behind the slot; hidden at 0. */
+  badge: number;
   onPress: () => void;
 }) {
   const theme = useTheme();
+  const t = useT();
   const active = useSharedValue(focused ? 1 : 0);
 
   useEffect(() => {
@@ -160,7 +168,7 @@ function Slot({
     <Pressable
       accessibilityRole="tab"
       accessibilityState={{ selected: focused }}
-      accessibilityLabel={label}
+      accessibilityLabel={badge > 0 ? t.kit.iconButton.badge(label, badge) : label}
       onPress={onPress}
       style={styles.slot}
     >
@@ -180,6 +188,11 @@ function Slot({
           <View style={[styles.tileHi, { backgroundColor: theme.primaryHi }]} />
         </Animated.View>
         {icon?.({ focused, color, size: 23 })}
+        {badge > 0 ? (
+          <View pointerEvents="none" style={styles.badge}>
+            <Count value={badge} />
+          </View>
+        ) : null}
       </Animated.View>
       <Text
         numberOfLines={1}
@@ -232,6 +245,7 @@ const styles = StyleSheet.create({
     width: TILE,
   },
   tileHi: { height: '50%', left: 0, position: 'absolute', right: 0, top: 0 },
+  badge: { end: -2, position: 'absolute', top: -4 },
   orb: { marginTop: -34 },
   orbFace: { height: 58, width: 64 },
   // A slot's word shrinks a little rather than cut off where a language runs long.

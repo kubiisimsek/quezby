@@ -32,7 +32,8 @@ test('locally it plays runs onto every board the real way', function () {
     Artisan::call('db:seed', ['--class' => 'DemoSeeder']);
 
     expect(Artisan::output())->toContain('Demo: 6 players')
-        ->and(now()->equalTo($now))->toBeTrue();
+        ->and(now()->equalTo($now))->toBeTrue()
+        ->and(config('quezby.leagues.unlock_runs'))->toBe(20);
 
     $players = User::query()->pluck('username', 'id');
     expect($players)->toHaveCount(6);
@@ -73,15 +74,17 @@ test('locally it plays runs onto every board the real way', function () {
     $best = fn (string $username) => LeaderboardEntry::query()->where('period', 'all')->where('user_id', $players->search($username))->value('score');
     expect($best('burak07'))->toBeGreaterThan($best('ayse.nur'));
 
-    // This week's league holds whoever has played the three counted runs that open it; the
-    // lifetime numbers and follows are all filled.
-    $opened = $ranked->groupBy('user_id')->filter(fn ($played) => $played->count() >= config('quezby.leagues.unlock_runs'));
+    // This week's league holds whoever has played the counted runs that open a veteran's
+    // league; the lifetime numbers and friendships are all filled, a few requests still wait.
+    $opened = $ranked->groupBy('user_id')->filter(fn ($played) => $played->count() >= DemoSeeder::VETERAN_UNLOCK_RUNS);
     expect(LeagueGroup::query()->where('week_key', '2026-W39')->exists())->toBeTrue()
         ->and(LeagueMember::query()->where('week_key', '2026-W39')->pluck('user_id')->sort()->values()->all())
         ->toBe($opened->keys()->sort()->values()->all())
         ->and((int) PlayerStat::query()->sum('runs'))->toBe($runs->where('status', RunStatus::Ranked)->count())
-        ->and(DB::table('follows')->count())->toBeGreaterThan(0)
-        ->and(DB::table('follows')->whereNotIn('followee_id', $players->keys())->count())->toBe(0);
+        ->and(DB::table('friendships')->count())->toBeGreaterThan(0)
+        ->and(DB::table('friendships')->count() % 2)->toBe(0)
+        ->and(DB::table('friendships')->whereNotIn('friend_id', $players->keys())->count())->toBe(0)
+        ->and(DB::table('friend_requests')->count())->toBeGreaterThan(0);
 });
 
 test('it seeds once', function () {

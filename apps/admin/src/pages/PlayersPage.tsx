@@ -43,7 +43,7 @@ const COLUMNS: Column<AdminPlayerRow>[] = [
     header: 'Oyuncu',
     cell: (player) => (
       <span className="flex flex-wrap items-center gap-1.5">
-        <PlayerCell player={player} hint={player.email ?? undefined} />
+        <PlayerCell player={player} avatarUrl={player.avatarUrl} hint={player.email ?? undefined} />
         {player.isAutoUsername ? <Tag tone="neutral" dot={false} label="Otomatik ad" /> : null}
       </span>
     ),

@@ -112,6 +112,7 @@ test('each row says what the player is', function () {
             'id' => $player->id,
             'username' => 'guest48128742',
             'bannedAt' => null,
+            'avatarUrl' => null,
             'isAutoUsername' => true,
             'isGuest' => false,
             'email' => null,

@@ -226,12 +226,74 @@ return [
         'group_size' => 30,
         // Promoted and demoted per 30 members, scaled down for smaller groups.
         'zone_per_30' => 5,
-        // Counted runs (ranked, scoring) before the league opens to a new player.
-        'unlock_runs' => 3,
+        // Counted runs (ranked, scoring — never a VS) before the league opens
+        // to a new player. Once seated, a player is never locked out again.
+        'unlock_runs' => (int) env('QUEZBY_LEAGUE_UNLOCK_RUNS', 20),
     ],
 
-    'follows' => [
+    'friends' => [
+        // Friends a player can have; a request that would pass it is refused.
         'limit' => 500,
+        // Requests a player can have waiting for an answer at once.
+        'pending_limit' => 100,
+    ],
+
+    /*
+    | The inbox: a conversation per friend, made of the game's own messages —
+    | "friends now", VS invites and results — and phrases picked from a fixed
+    | list (`App\Enums\Phrase`). Nothing a player types is ever sent.
+    */
+    'inbox' => [
+        // Messages older than this are pruned (lazily, at most once an hour).
+        'keep_days' => (int) env('QUEZBY_INBOX_KEEP_DAYS', 90),
+        // Phrases one player can send one friend in an Istanbul day.
+        'phrases_per_day' => 20,
+        // A phrase pushes at most once in this many seconds per sender and friend.
+        'push_gap_seconds' => 300,
+    ],
+
+    /*
+    | Profile photos: a square JPEG, `size` pixels a side, never more than
+    | `max_bytes` (100 KB) — `AVATAR` in `@quezby/config`, tested against
+    | `fixtures/social.json`. What arrives is decoded and encoded again, so a
+    | photo's EXIF (its place included) never reaches anyone.
+    */
+    'avatars' => [
+        'disk' => 'avatars',
+        'size' => 512,
+        'max_bytes' => 100 * 1024,
+        'min_side' => 128,
+        'max_side' => 4096,
+        // JPEG qualities tried, best first, until the photo fits.
+        'qualities' => [85, 75, 65, 55, 45, 35],
+    ],
+
+    /*
+    | Push notifications through Firebase Cloud Messaging (`PushService`):
+    | friend requests and answers, VS invites and results, phrases — in the
+    | receiver's language, sent after the response has gone. Nothing is sent
+    | until the Firebase project and its service account's key are set.
+    */
+    'push' => [
+        'enabled' => (bool) env('QUEZBY_PUSH_ENABLED', true),
+        'project_id' => env('FIREBASE_PROJECT_ID'),
+        // The Firebase service account's JSON key, absolute or relative to the
+        // API's root. Never commit it; upload it to storage/app/private/.
+        'credentials' => env('FIREBASE_CREDENTIALS'),
+        'access_token_ttl_seconds' => 3000,
+        // Phones one player's pushes go to; the longest unused go first.
+        'tokens_per_player' => 10,
+    ],
+
+    /*
+    | VS: two friends, one seed, one attempt each. The challenger plays
+    | first; the friend then has `expire_hours` to answer. A VS never counts on
+    | a board, a league or a stat.
+    */
+    'duels' => [
+        'expire_hours' => (int) env('QUEZBY_DUEL_EXPIRE_HOURS', 48),
+        // VS a player can have sent and waiting for an answer at once.
+        'waiting_limit' => 20,
     ],
 
     /*

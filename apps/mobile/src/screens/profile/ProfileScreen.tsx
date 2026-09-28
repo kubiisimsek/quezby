@@ -10,18 +10,24 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { api } from '@/api/client';
 import { useSession } from '@/auth/session';
+import { BlockedSheet } from '@/components/BlockedSheet';
 import { Portrait, SeasonBest } from '@/components/PlayerCard';
 import { CredentialsSheet } from '@/components/CredentialsSheet';
 import { LanguageSheet } from '@/components/LanguageSheet';
+import { NotificationsSheet } from '@/components/NotificationsSheet';
 import { SignInWaysSheet, signInWays } from '@/components/SignInWaysSheet';
 import { UsernameField } from '@/components/UsernameField';
 import { BONUS_ORDER } from '@/game/howTo';
+import { useRemoveAvatar } from '@/hooks/useAvatar';
 import { useLeague, useStats } from '@/hooks/useBoards';
 import { rememberMe } from '@/hooks/useMe';
+import { forgetPush } from '@/hooks/usePush';
 import { useUsernameCheck } from '@/hooks/useUsernameCheck';
 import { handle, useLocale, useT } from '@/i18n';
 import { SHRINK_TO_FIT } from '@/i18n/native';
 import { messageFor } from '@/lib/errors';
+import { dropPushToken } from '@/lib/push';
+import { pickPhoto } from '@/lib/photoPicker';
 import type { RootStackParamList, TabParamList } from '@/navigation/types';
 import {
   SettingsSheet,
@@ -39,6 +45,7 @@ import {
   Field,
   IconButton,
   IconChip,
+  LobbyCard,
   Panel,
   RankChips,
   Ribbon,
@@ -50,7 +57,7 @@ import {
   TierBadge,
   Txt,
 } from '@/ui/kit';
-import { FormSheet } from '@/ui/sheet';
+import { ActionSheet, FormSheet } from '@/ui/sheet';
 import {
   DEPTH,
   RADIUS,
@@ -68,7 +75,16 @@ type Props = CompositeScreenProps<
 >;
 
 type SheetName =
-  'settings' | 'language' | 'username' | 'ways' | 'credentials' | 'delete' | null;
+  | 'settings'
+  | 'language'
+  | 'username'
+  | 'ways'
+  | 'credentials'
+  | 'delete'
+  | 'notifications'
+  | 'blocked'
+  | 'photo'
+  | null;
 
 /** What waits for the open sheet to leave the screen: another sheet, or a door out. */
 type Next = Exclude<SheetName, 'settings' | null> | SettingsDoor;
@@ -77,19 +93,23 @@ type Next = Exclude<SheetName, 'settings' | null> | SettingsDoor;
 const PORTRAIT_RISE = 46;
 
 /**
- * The player's card, the way a game shows one: who you are, your league,
- * your season best and places — then every count the API keeps, the named
- * combos you have pulled off and the friends' posts you liked most. What is
- * opened now and then — the language, Titreşim, Yardım, the account's doors — waits in
- * Ayarlar behind the gear; a guest's nudge to keep the account stays out
- * front.
+ * The player's card, the way a game shows one: who you are — your photo,
+ * changed from the camera slab on it — your league, your season best and
+ * places; the door to every game you played; then every count the API
+ * keeps, the named combos you have pulled off and the friends' posts you
+ * liked most. What is opened now and then — the language, Titreşim, Yardım,
+ * notifications, blocked players, the account's doors — waits in Ayarlar
+ * behind the gear; a guest's nudge to keep the account stays out front.
  */
 export function ProfileScreen({ navigation }: Props) {
+  const t = useT();
   const insets = useSafeAreaInsets();
   const user = useSession((state) => state.user);
   const ranks = useSession((state) => state.ranks);
   const league = useLeague();
+  const removePhoto = useRemoveAvatar();
   const [sheet, setSheet] = useState<SheetName>(null);
+  const [photoFailed, setPhotoFailed] = useState(false);
   /** What opens once the open sheet has left the screen — never over it. */
   const next = useRef<Next | null>(null);
 
@@ -107,10 +127,23 @@ export function ProfileScreen({ navigation }: Props) {
     if (then === 'help') {
       navigation.navigate('Help');
     } else if (then === 'signOut') {
+      // Both calls leave with the session's token, before it is gone.
+      forgetPush();
       void api.auth.logout().catch(() => undefined);
       void useSession.getState().signOut();
     } else if (then) {
       setSheet(then);
+    }
+  };
+
+  /** A photo from the library, framed next. */
+  const pick = async () => {
+    setPhotoFailed(false);
+    try {
+      const photo = await pickPhoto();
+      if (photo) navigation.navigate('AvatarEditor', photo);
+    } catch {
+      setPhotoFailed(true);
     }
   };
 
@@ -128,9 +161,24 @@ export function ProfileScreen({ navigation }: Props) {
           ranks={ranks}
           tier={league.data && !league.data.unlock ? league.data.tier : null}
           onSettings={() => setSheet('settings')}
+          onPhoto={() => setSheet('photo')}
         />
 
+        {photoFailed || removePhoto.isError ? (
+          <Callout tone="bad">
+            {removePhoto.isError ? messageFor(removePhoto.error, t) : t.profile.photo.failed}
+          </Callout>
+        ) : null}
+
         {user.isGuest ? <KeepNudge onPress={() => setSheet('ways')} /> : null}
+
+        <LobbyCard
+          title={t.history.door.title}
+          eyebrow={t.history.door.eyebrow}
+          icon="history"
+          tone="secondary"
+          onPress={() => navigation.navigate('History')}
+        />
 
         <Statistics />
       </ScrollView>
@@ -163,6 +211,32 @@ export function ProfileScreen({ navigation }: Props) {
         username={user.username ?? ''}
         onClose={() => setSheet(null)}
       />
+      <NotificationsSheet open={sheet === 'notifications'} onClose={() => setSheet(null)} />
+      <BlockedSheet open={sheet === 'blocked'} onClose={() => setSheet(null)} />
+      <ActionSheet
+        open={sheet === 'photo'}
+        onClose={() => setSheet(null)}
+        title={t.profile.photo.title}
+        actions={[
+          {
+            label: t.profile.photo.pick,
+            hint: t.profile.photo.pickHint,
+            icon: 'image',
+            onPress: () => void pick(),
+          },
+          ...(user.avatarUrl
+            ? [
+                {
+                  label: t.profile.photo.remove,
+                  hint: t.profile.photo.removeHint,
+                  icon: 'trash' as const,
+                  tone: 'bad' as const,
+                  onPress: () => removePhoto.mutate(),
+                },
+              ]
+            : []),
+        ]}
+      />
     </Screen>
   );
 }
@@ -178,11 +252,14 @@ function PlayerHero({
   ranks,
   tier,
   onSettings,
+  onPhoto,
 }: {
   user: Me;
   ranks: Ranks | null;
   tier: LeagueTier | null;
   onSettings: () => void;
+  /** The camera slab on the portrait: pick a photo, or take it away. */
+  onPhoto: () => void;
 }) {
   const theme = useTheme();
   const t = useT();
@@ -204,7 +281,13 @@ function PlayerHero({
 
       <View pointerEvents="box-none" style={styles.heroBody}>
         <Stamp from={1.3}>
-          <Portrait name={user.username ?? '?'} isMe />
+          <Portrait
+            name={user.username ?? '?'}
+            src={user.avatarUrl}
+            isMe
+            onEdit={onPhoto}
+            editLabel={user.avatarUrl ? t.profile.photo.change : t.profile.photo.add}
+          />
         </Stamp>
         <Text
           numberOfLines={1}
@@ -230,7 +313,6 @@ function PlayerHero({
         <View style={styles.stretch}>
           <RankChips
             items={[
-              { label: periods.daily, rank: ranks?.daily },
               { label: periods.weekly, rank: ranks?.weekly },
               { label: periods.monthly, rank: ranks?.monthly },
               { label: periods.all, rank: ranks?.all },
@@ -545,6 +627,8 @@ function DeleteSheet({
     setFailure(null);
     try {
       await api.me.delete();
+      // The account's tokens went with it; the phone's own is thrown away too.
+      void dropPushToken();
       onClose();
       await useSession.getState().signOut();
     } catch (caught) {

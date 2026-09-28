@@ -29,6 +29,16 @@ describe('Hud', () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
+  it('says who a VS run is against, and nothing of the kind otherwise', async () => {
+    const { rerender } = await render(
+      <Hud meter={shared(1000)} score={0} combo={1_000} reelIndex={0} versus="VS · @ekin" onClose={jest.fn()} />,
+    );
+    expect(screen.getByText('VS · @ekin')).toBeOnTheScreen();
+
+    await rerender(hud());
+    expect(screen.queryByText('VS · @ekin')).toBeNull();
+  });
+
   it('speaks English', async () => {
     useLanguage.setState({ locale: 'en' });
     await render(hud());

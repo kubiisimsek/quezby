@@ -1,7 +1,7 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { runRow, runsPage, suspect, suspectsPage } from '@/test/factories';
+import { adminSession, runRow, runsPage, suspect, suspectsPage } from '@/test/factories';
 import { fakeApi } from '@/test/fake-api';
 import { renderApp } from '@/test/render';
 
@@ -11,7 +11,7 @@ describe('SuspectsPage', () => {
     api.runs.list.mockResolvedValue(runsPage([runRow({ status: 'review', flags: [{ code: 'reaction_cv', severity: 'soft', details: {} }] })]));
     api.runs.approve.mockResolvedValue({ changed: true });
     const { user } = renderApp({ path: '/suspects', api });
-    api.overview.counts.mockResolvedValue({ review: 1 });
+    api.overview.counts.mockResolvedValue({ review: 1, reports: 0 });
 
     expect(await screen.findByText('Makine gibi ritim')).toBeInTheDocument();
     expect(api.runs.list).toHaveBeenCalledWith({ status: 'review', sort: 'score', page: 1 });
@@ -29,6 +29,21 @@ describe('SuspectsPage', () => {
 
     expect(await screen.findAllByText('Yavaşlatılmış oyun')).not.toHaveLength(0);
     expect(api.runs.list).toHaveBeenCalledWith({ status: 'flagged', flag: 'slow_motion', page: 1 });
+  });
+
+  it('offers no decision on a flagged VS run: it never ranks anywhere', async () => {
+    const api = fakeApi();
+    const flags = [{ code: 'wall_clock' as const, severity: 'hard' as const, details: {} }];
+    api.runs.list.mockResolvedValue(
+      runsPage([runRow({ status: 'flagged', flags }), runRow({ id: '01jrun000000000000000000cd', mode: 'vs', status: 'flagged', flags })]),
+    );
+    renderApp({ path: '/suspects?tab=flagged', api, session: adminSession({ role: 'moderator' }) });
+
+    const vs = (await screen.findByRole('link', { name: 'Tur 000000CD aç' })).closest('tr') as HTMLElement;
+    const free = screen.getByRole('link', { name: 'Tur 000000AB aç' }).closest('tr') as HTMLElement;
+    expect(within(free).getByRole('button', { name: 'Reddet' })).toBeInTheDocument();
+    expect(within(vs).getByText(/^VS · /)).toBeInTheDocument();
+    expect(within(vs).queryByRole('button', { name: 'Reddet' })).not.toBeInTheDocument();
   });
 
   it('ranks the suspect players by risk and bans from the list', async () => {

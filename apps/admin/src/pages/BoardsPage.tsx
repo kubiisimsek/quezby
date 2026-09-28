@@ -1,5 +1,5 @@
 import type { LeaderboardPeriod } from '@quezby/types';
-import { CalendarDays, CalendarRange, Crown, Infinity as AllTime, Trophy, Users } from 'lucide-react';
+import { CalendarRange, Crown, Infinity as AllTime, Trophy, Users } from 'lucide-react';
 
 import { Picker } from '@/components/base/picker';
 import { Segmented } from '@/components/base/segmented';
@@ -11,20 +11,20 @@ import { useListParams } from '@/hooks/useListParams';
 import { BOARD, formatNumber, formatPeriodKey } from '@/lib/format';
 
 const BOARDS: { value: LeaderboardPeriod; icon: React.ReactNode }[] = [
-  { value: 'daily', icon: <CalendarDays /> },
   { value: 'weekly', icon: <CalendarRange /> },
   { value: 'monthly', icon: <CalendarRange /> },
   { value: 'all', icon: <AllTime /> },
 ];
 
 /**
- * The high-score boards — today, this week, this month, all time — for any
- * past period and season. Every number comes from the API, ranked as the game
- * ranks it.
+ * The high-score boards — this week, this month, all time — for any past
+ * period and season. Every number comes from the API, ranked as the game
+ * ranks it. There is no day board: the API keeps each day's best only to add
+ * up league points.
  */
 export function BoardsPage() {
-  const { params, page, set, setPage } = useListParams({ board: 'daily', key: '', season: '' });
-  const board = (['daily', 'weekly', 'monthly', 'all'].includes(params.board) ? params.board : 'daily') as LeaderboardPeriod;
+  const { params, page, set, setPage } = useListParams({ board: 'weekly', key: '', season: '' });
+  const board = (['weekly', 'monthly', 'all'].includes(params.board) ? params.board : 'weekly') as LeaderboardPeriod;
   const season = params.season ? Number(params.season) : undefined;
 
   const keys = useBoardKeys({ board, season, limit: 60 });
@@ -35,7 +35,7 @@ export function BoardsPage() {
   return (
     <Page
       title="Sıralamalar"
-      description="Yüksek skorlar: günlük, haftalık, aylık ve tüm zamanlar. Bir satır, arkasındaki turu açar."
+      description="Yüksek skorlar: haftalık, aylık ve tüm zamanlar. Bir satır, arkasındaki turu açar."
       band={
         <BandStats
           stats={[

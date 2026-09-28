@@ -69,6 +69,21 @@ describe('PlayerCell', () => {
     expect(screen.getByText('Son sinyal dün')).toBeInTheDocument();
   });
 
+  it('shows the player\'s photo where the row carries it, and initials where it does not', () => {
+    const photo = 'https://api.quezby.com/api/v1/media/avatars/0123456789abcdef01234567.jpg';
+    const player = { id: '01jplayer00000000000000000a', username: 'kerem.35', bannedAt: null };
+    const { container } = renderWithProviders(
+      <>
+        <PlayerCell player={player} avatarUrl={photo} />
+        <PlayerCell player={{ ...player, id: '01jplayer00000000000000000b', username: 'ekin' }} />
+      </>,
+    );
+
+    expect(container.querySelectorAll('img')).toHaveLength(1);
+    expect(container.querySelector('img')).toHaveAttribute('src', photo);
+    expect(screen.getByText('EK')).toBeInTheDocument();
+  });
+
   it('says so when the player is gone', () => {
     renderWithProviders(<PlayerCell player={null} />);
 

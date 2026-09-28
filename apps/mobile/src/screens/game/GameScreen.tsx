@@ -24,7 +24,7 @@ import { REEL_ORDER, reelGuide } from '@/game/howTo';
 import { ReelCard } from '@/game/ReelCard';
 import { ResultView } from '@/game/ResultView';
 import { useGame } from '@/game/useGame';
-import { useT } from '@/i18n';
+import { handle, useT } from '@/i18n';
 import type { RootStackParamList } from '@/navigation/types';
 import { useOnboarding } from '@/stores/onboarding';
 import type { IconName } from '@/ui/icons';
@@ -67,8 +67,11 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Game' | 'Tutorial'>;
 export function GameScreen({ navigation, route }: Props) {
   const t = useT();
   const tutorial = route.name === 'Tutorial';
-  const mode = route.params?.mode ?? 'free';
-  const game = useGame(mode);
+  const params = route.params;
+  const mode = params?.mode ?? 'free';
+  const opponent = params?.mode === 'vs' ? params.opponent : null;
+  const duelId = params?.mode === 'vs' ? params.duelId : undefined;
+  const game = useGame(mode, opponent ? { opponent, duelId } : null);
   const queryClient = useQueryClient();
   const { start } = game;
 
@@ -83,10 +86,11 @@ export function GameScreen({ navigation, route }: Props) {
 
   useEffect(() => {
     if (game.phase !== 'result' || tutorial) return;
-    for (const key of ['leaderboard', 'me', 'daily', 'league', 'stats']) {
+    for (const key of ['leaderboard', 'me', 'daily', 'league', 'stats', 'history', 'inbox', 'friends', 'thread']) {
       void queryClient.invalidateQueries({ queryKey: [key] });
     }
   }, [game.phase, queryClient, tutorial]);
+
 
   const close = () => {
     if (game.phase === 'playing' || tutorial) {
@@ -106,6 +110,8 @@ export function GameScreen({ navigation, route }: Props) {
           mode={mode}
           onReplay={() => void game.start(tutorial ? 'tutorial' : null)}
           onPlayFree={() => navigation.replace('Game', { mode: 'free' })}
+          onRematch={opponent ? () => navigation.replace('Game', { mode: 'vs', opponent }) : undefined}
+          onThread={opponent ? () => navigation.replace('Thread', { username: opponent }) : undefined}
           onClose={() => navigation.goBack()}
           onRetrySubmit={game.retrySubmit}
           onOpenDaily={() => navigation.replace('Daily')}
@@ -177,6 +183,7 @@ export function GameScreen({ navigation, route }: Props) {
         score={game.score}
         combo={game.combo}
         reelIndex={game.reel?.index ?? 0}
+        versus={opponent ? t.vs.hud(handle(opponent)) : undefined}
         onClose={close}
       />
 

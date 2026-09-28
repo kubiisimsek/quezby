@@ -8,6 +8,7 @@ use App\Exceptions\ApiException;
 use App\Models\User;
 use App\Services\AccountDeletion;
 use App\Services\Identity\GuestNames;
+use App\Services\Social\ReportService;
 use App\Support\Actor;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
@@ -23,12 +24,14 @@ final class PlayerActions
         private readonly GuestNames $names,
         private readonly AccountDeletion $deletion,
         private readonly AuditLog $audit,
+        private readonly ReportService $reports,
     ) {}
 
     /**
      * Gives the player a fresh automatic name — `guest` and eight digits — in
      * place of one that should not be seen. That opens one more pick, and the
      * name they pick is theirs for good again; the old one is in the audit log.
+     * The reports about the old name close.
      */
     public function rename(User $player, string $reason, Actor $actor): string
     {
@@ -42,6 +45,7 @@ final class PlayerActions
                 $give();
             }
             $this->audit->record($actor, AuditAction::PlayerRename, $player, $reason, ['from' => $old, 'to' => $player->username]);
+            $this->reports->nameReset($player, $actor);
         });
 
         return (string) $player->username;

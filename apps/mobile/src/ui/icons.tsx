@@ -33,10 +33,20 @@ export type IconName =
   | 'search'
   | 'grid'
   | 'globe'
+  | 'camera'
+  | 'image'
+  | 'flag'
+  | 'ban'
+  | 'bell'
   // people
   | 'users'
   | 'userPlus'
   | 'userCheck'
+  | 'userMinus'
+  // friends
+  | 'inbox'
+  | 'message'
+  | 'swords'
   // time
   | 'calendar'
   | 'hourglass'
@@ -185,6 +195,36 @@ const GLYPHS: Record<IconName, (s: Stroke, color: string) => ReactNode> = {
     </>
   ),
 
+  camera: (s) => (
+    <>
+      <Path
+        d="M3.8 8.6a2 2 0 0 1 2-2h2.2l1.5-2.2h5l1.5 2.2h2.2a2 2 0 0 1 2 2v9.2a2 2 0 0 1-2 2H5.8a2 2 0 0 1-2-2V8.6Z"
+        {...s}
+      />
+      <Circle cx={12} cy={12.8} r={3.4} {...s} />
+    </>
+  ),
+  image: (s) => (
+    <>
+      <Rect x={3.6} y={4.4} width={16.8} height={15.2} rx={2.6} {...s} />
+      <Circle cx={9} cy={9.6} r={1.8} {...s} />
+      <Path d="m4.2 17.4 5.2-5.2 3.4 3.4 2.2-2.2 4.8 4.8" {...s} />
+    </>
+  ),
+  flag: (s) => <Path d="M5.6 21V4.4m0 .4h11.6l-2.4 3.9 2.4 3.9H5.6" {...s} />,
+  ban: (s) => (
+    <>
+      <Circle cx={12} cy={12} r={8.6} {...s} />
+      <Path d="m5.9 5.9 12.2 12.2" {...s} />
+    </>
+  ),
+  bell: (s) => (
+    <>
+      <Path d="M6.2 16.6V11a5.8 5.8 0 0 1 11.6 0v5.6l1.6 1.8H4.6l1.6-1.8Z" {...s} />
+      <Path d="M10 20.6a2.2 2.2 0 0 0 4 0" {...s} />
+    </>
+  ),
+
   users: (s) => (
     <>
       <Circle cx={9.2} cy={8.6} r={3.4} {...s} />
@@ -202,6 +242,36 @@ const GLYPHS: Record<IconName, (s: Stroke, color: string) => ReactNode> = {
     <>
       <Circle cx={10} cy={8.4} r={3.7} {...s} />
       <Path d="M2.9 20a7.3 7.3 0 0 1 14.2 0m-1.3-9.4 2 2 3.8-4.2" {...s} />
+    </>
+  ),
+  userMinus: (s) => (
+    <>
+      <Circle cx={10} cy={8.4} r={3.7} {...s} />
+      <Path d="M2.9 20a7.3 7.3 0 0 1 14.2 0M16 10.4h6" {...s} />
+    </>
+  ),
+
+  // The mailbox: a tray with its slot.
+  inbox: (s) => (
+    <>
+      <Path
+        d="M3.6 13.2 6.3 5.8a2 2 0 0 1 1.9-1.4h7.6a2 2 0 0 1 1.9 1.4l2.7 7.4v4.6a2 2 0 0 1-2 2H5.6a2 2 0 0 1-2-2v-4.6Z"
+        {...s}
+      />
+      <Path d="M3.6 13.2h4.6l1.4 2.6h4.8l1.4-2.6h4.6" {...s} />
+    </>
+  ),
+  message: (s) => (
+    <Path
+      d="M20 14.6a2 2 0 0 1-2 2H9.8L5.2 20.2v-3.6H6a2 2 0 0 1-2-2V6.4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8.2Z"
+      {...s}
+    />
+  ),
+  // VS: two swords crossed, hilts down.
+  swords: (s) => (
+    <>
+      <Path d="M8.8 15.2 19.4 4.6m0 0v3.6m0-3.6h-3.6M6 12.6l5.4 5.4M4.4 19.6l3-3" {...s} />
+      <Path d="M15.2 15.2 4.6 4.6m0 0v3.6m0-3.6h3.6M18 12.6 12.6 18M19.6 19.6l-3-3" {...s} />
     </>
   ),
 

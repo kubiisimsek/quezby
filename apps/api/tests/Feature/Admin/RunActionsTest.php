@@ -87,5 +87,5 @@ test('the queue\'s count is on the badge', function () {
     adminRunHeld(User::factory()->withUsername('a2')->create(), 99);
     Run::factory()->ranked(100)->create();
 
-    $this->getJson('/api/v1/admin/counts')->assertOk()->assertExactJson(['review' => 2]);
+    $this->getJson('/api/v1/admin/counts')->assertOk()->assertExactJson(['review' => 2, 'reports' => 0]);
 });

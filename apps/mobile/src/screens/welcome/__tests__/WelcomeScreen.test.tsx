@@ -104,7 +104,7 @@ describe('WelcomeScreen', () => {
     await renderWithProviders(<WelcomeScreen {...props} />);
 
     expect(screen.getByText('Your scrolling habit, now a competition.')).toBeTruthy();
-    expect(screen.getByText(/Learn them in a practice run first — it doesn't count\./)).toBeTruthy();
+    expect(screen.getByText('Four moves, one reflex. Learn them in a practice run first.')).toBeTruthy();
     expect(screen.getByText('Shall we improve the game together?')).toBeTruthy();
 
     await fireEvent.press(screen.getByRole('button', { name: "Don't allow" }));

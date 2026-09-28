@@ -38,6 +38,17 @@ return [
             'report' => false,
         ],
 
+        // Profile photos (`AvatarService`): outside the web root, served by the
+        // API itself with a year-long cache (`GET /api/v1/media/avatars/{file}`),
+        // so no `storage:link` is needed on a shared host. An update zip never
+        // carries `storage/`, so photos outlive every update.
+        'avatars' => [
+            'driver' => 'local',
+            'root' => storage_path('app/avatars'),
+            'throw' => false,
+            'report' => false,
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),

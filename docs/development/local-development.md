@@ -49,7 +49,9 @@ The same install talks to staging or production after `pnpm switch-staging` /
 
 Boards, leagues and the daily challenge look empty on a fresh database. For a
 populated local game (players with real, engine-played runs on every board,
-today's challenge, a league group, follows):
+today's challenge, a league group, friends with a few requests left waiting —
+its players count as veterans, whose league opens after 3 counted runs
+instead of 20):
 
 ```bash
 cd apps/api && php artisan db:seed --class=DemoSeeder   # refuses outside APP_ENV=local
@@ -84,13 +86,23 @@ API tests are **Pest** (`apps/api/tests`, `tests/Pest.php` for shared helpers
 and datasets); `php artisan test` runs them. Every endpoint has a feature
 test, every service a unit test. Shared fixtures come from the TS packages:
 `pnpm engine:fixtures` (engine) and `pnpm --filter @quezby/config fixtures`
-(content catalog, pace, checkpoints).
+(content catalog, pace, checkpoints, the analytics catalog, the languages, the
+phrases friends send and a profile photo's limits).
 
 Locally `QUEZBY_INTEGRITY_MODE=log`: device verdicts are recorded on runs but
 never keep one off the boards. The iOS Simulator cannot run App Attest and a
 local Android build is not "Play recognized", so a local device is unverified
 or failing — expected. To try the checks for real, install a Play internal
 testing build (Android) or run on a physical iPhone (iOS).
+
+Push is off until it is set up (`docs/development/push-setup.md`): the app
+builds with push only when Firebase's two git-ignored files are in place
+(`ios/Quezby/GoogleService-Info.plist`, `android/app/google-services.json`),
+and the API sends only with `QUEZBY_PUSH_ENABLED`, `FIREBASE_PROJECT_ID` and
+`FIREBASE_CREDENTIALS` in `apps/api/.env`. Try it end to end on a real iPhone
+or an Android emulator with Google Play, not the iOS Simulator; there,
+`xcrun simctl push` shows how a notification looks and where a tap leads.
+Profile photos need PHP's GD (`php -m | grep gd`).
 
 ## When a build breaks
 
@@ -105,4 +117,6 @@ testing build (Android) or run on a physical iPhone (iOS).
 | Parity test fails in PHP | the rules changed on one side only — see `docs/product/scoring.md` |
 | `RulesLockTest` / `lock.test.ts` fails | a rule or engine behaviour changed: that is a new season — bump `ENGINE_VERSION`, `pnpm engine:fixtures`, `pnpm engine:lock` |
 | `pod install`: *AppCheckCore depends upon GoogleUtilities…* | the Podfile's `modular_headers` lines for Google sign-in are missing |
+| Debug simulator build fails to link: undefined `facebook::react::Sealable` symbols (after `pod install`) | the prebuilt React Native core was left as its Release build, and RN's switch script assumes Debug when `Pods/React-Core-prebuilt/.last_build_configuration` is missing. From `apps/mobile/ios/Pods`: `printf Release > React-Core-prebuilt/.last_build_configuration && node ../../node_modules/react-native/scripts/replace-rncore-version.js -c Debug -r 0.86.2 -p "$(pwd)"`, then build again |
+| Xcode warning: *ios/Quezby/GoogleService-Info.plist is missing: this build has no push notifications* | expected without Firebase's files — `docs/development/push-setup.md` |
 | Apple sign-in fails on the simulator (error 1000) | no `DEVELOPMENT_TEAM` / capability yet — see `environments.md` |

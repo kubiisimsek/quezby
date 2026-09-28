@@ -6,9 +6,10 @@
  *   fixtures/checkpoints.json  checkpoint marks, SHA-256 vectors and prefix hashes
  *   fixtures/analytics.json    the analytics catalog (screens, events, milestones) and its limits
  *   fixtures/locales.json      the six languages, digit grouping, plural forms and tag matching
+ *   fixtures/social.json       the phrases friends send and a profile photo's size and weight
  *
  * `fixtures/usernames.json` is written by hand. Run `pnpm --filter @quezby/config fixtures`
- * after touching `src/content`, `src/pace.ts`, `src/checkpoints.ts`, `src/analytics.ts` or `src/locales.ts`.
+ * after touching `src/content`, `src/pace.ts`, `src/checkpoints.ts`, `src/analytics.ts`, `src/locales.ts` or `src/social.ts`.
  */
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -19,6 +20,7 @@ import {
   buildContent,
   buildLocales,
   buildPace,
+  buildSocial,
 } from '../src/fixtures';
 
 const dir = join(__dirname, '..', 'fixtures');
@@ -32,3 +34,4 @@ write('pace.json', buildPace());
 write('checkpoints.json', buildCheckpoints());
 write('analytics.json', buildAnalytics());
 write('locales.json', buildLocales());
+write('social.json', buildSocial());

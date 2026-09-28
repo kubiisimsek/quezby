@@ -1,0 +1,3 @@
+/* Why the app may ask for the photo library and the camera: the profile photo. */
+"NSPhotoLibraryUsageDescription" = "Quezby uses the photo you pick as your profile photo.";
+"NSCameraUsageDescription" = "Quezby uses the camera only if you take a profile photo.";

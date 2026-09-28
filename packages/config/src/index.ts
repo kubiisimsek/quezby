@@ -33,6 +33,7 @@ export {
   isAnalyticsEvent,
   isAnalyticsScreen,
 } from './analytics';
+export { AVATAR, PHRASES, isPhrase } from './social';
 export {
   CHECKPOINTS,
   prefixHash,

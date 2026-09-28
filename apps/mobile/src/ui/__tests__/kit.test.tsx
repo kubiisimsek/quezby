@@ -51,6 +51,14 @@ const ADDED = [
   'PlayButton',
   'RankChips',
   'PlayerRow',
+  'FaceOff',
+  'ThreadRow',
+  'Count',
+  'Bubble',
+  'EventLine',
+  'PhraseChip',
+  'RunTile',
+  'Toast',
 ] as const;
 
 describe('@/ui/kit', () => {

@@ -58,10 +58,15 @@ lanes across it, so the dark reads as a place. Nothing on it is white.
 | **Violet** `secondary*` | Everything quieter: a second choice, a stage, a gem that only labels. |
 | **Cyan** `accent` | Time. Every countdown, nothing else. |
 | **Green** `ok*` | Good: a hit, promotion, "on". |
-| **Red** `bad*` | Bad: a miss, demotion, a door that takes something away. |
+| **Red** `bad*` | Bad: a miss, demotion, a door that takes something away — and the count of what waits for you, a number on a dock slot or a button. |
 
 A colour never carries meaning alone — a status is a tag with a glyph, a
 zone is a banner with an arrow and a word, a tier's emblem changes shape.
+
+A player's **photo** is theirs, not the arena's: it fills the inside of
+their portrait, and the frame round it keeps the colour — magenta for you,
+violet for everyone else — so who is who still reads without the picture.
+With no photo, the portrait shows their initials in Rubik.
 
 ### Medals, tiers, sign-in
 
@@ -167,7 +172,7 @@ run it again; never touch an exported PNG.
 | `Panel` / `Card` | A tile; `primary` is your own, `sunken` is a well |
 | `Slab` | Anything pressable that is not a row: face + lip + outline + gloss |
 | `TopBar` | A screen's head, drawn on the arena. **There are no navigation bars.** |
-| The dock | The bottom bar: five slots, the lobby in the middle as a gold play slab standing out of it |
+| The dock | The bottom bar: five slots, the lobby in the middle as a gold play slab standing out of it; a slot with news wears a red count |
 
 No iOS list rows with chevrons on main surfaces: a row that opens something
 ends in a small arrow slab (`ArrowNub`), and rarely used settings live in a

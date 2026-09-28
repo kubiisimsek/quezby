@@ -93,6 +93,61 @@ describe('RunPage', () => {
     expect(screen.queryByRole('button', { name: 'Reddet' })).not.toBeInTheDocument();
   });
 
+  it('shows a VS run for what it is, with nothing to decide on it even when flagged', async () => {
+    const api = fakeApi();
+    api.runs.get.mockResolvedValue(
+      runResponse({}, { mode: 'vs', status: 'flagged', flags: [{ code: 'wall_clock', severity: 'hard', details: {} }] }),
+    );
+    renderApp({ path: `/runs/${ID}`, api, session: adminSession({ role: 'moderator' }) });
+
+    expect(await screen.findByText('VS turu: hiçbir yere sayılmaz')).toBeInTheDocument();
+    expect(screen.getByText(/bu yüzden onaylanmaz ve reddedilmez/)).toBeInTheDocument();
+    expect(screen.getByText('VS')).toBeInTheDocument();
+    expect(screen.getByText('Süre tutmuyor')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Onayla' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Reddet' })).not.toBeInTheDocument();
+  });
+
+  it('names both sides of the VS, their scores and how it stands', async () => {
+    const api = fakeApi();
+    api.runs.get.mockResolvedValue(
+      runResponse(
+        {},
+        {
+          mode: 'vs',
+          status: 'played',
+          duel: {
+            id: '01jduel0000000000000000001',
+            status: 'finished',
+            challenger: { id: 'p-ben', username: 'ben', bannedAt: null },
+            opponent: { id: 'p-ekin', username: 'ekin', bannedAt: null },
+            challengerScore: 12450,
+            opponentScore: null,
+            winnerId: 'p-ben',
+          },
+        },
+      ),
+    );
+    renderApp({ path: `/runs/${ID}`, api });
+
+    const challenger = await screen.findByRole('link', { name: '@ben' });
+    expect(challenger).toHaveAttribute('href', '/players/p-ben');
+    const line = within(challenger.closest('p') as HTMLElement);
+    expect(line.getByRole('link', { name: '@ekin' })).toHaveAttribute('href', '/players/p-ekin');
+    expect(line.getByText(/12\.450 –/)).toBeInTheDocument();
+    expect(line.getByText('Bitti')).toBeInTheDocument();
+  });
+
+  it('calls a clean VS run played, and says it counts nowhere', async () => {
+    const api = fakeApi();
+    api.runs.get.mockResolvedValue(runResponse({}, { mode: 'vs', status: 'played' }));
+    renderApp({ path: `/runs/${ID}`, api });
+
+    const status = await screen.findByText('Oynandı');
+    expect(status.parentElement).toHaveAttribute('title', expect.stringContaining('hiçbir tabloya, lige ya da istatistiğe sayılmaz'));
+    expect(screen.queryByRole('button', { name: 'Reddet' })).not.toBeInTheDocument();
+  });
+
   it('says so when there is no such run', async () => {
     const api = fakeApi();
     api.runs.get.mockRejectedValue(new ApiError(404, 'not_found', 'Aradığın şey bulunamadı.'));

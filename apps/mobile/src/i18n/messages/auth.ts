@@ -37,7 +37,7 @@ const tr = {
     /** Once the account is kept: "Giriş yolları". A guest's sheet is `keepAccount`. */
     title: 'Giriş yolları',
     guestBody:
-      'Bu hesap şu an yalnızca bu telefonda. Bir giriş yolu bağla; telefon değişse de skorların, ligin ve takiplerin seninle gelir.',
+      'Bu hesap şu an yalnızca bu telefonda. Bir giriş yolu bağla; telefon değişse de skorların, ligin ve arkadaşların seninle gelir.',
     body: 'Hesabına bu yollarla girersin. Birini kaldırmak için başka bir yol bağlı kalmalı.',
     linkedBody: (provider: string) => `Artık bu hesaba ${provider} ile de girersin.`,
     attached: 'Bağlı yollar',
@@ -93,7 +93,7 @@ const en: AuthMessages = {
   ways: {
     title: 'Sign-in methods',
     guestBody:
-      'This account only lives on this phone for now. Link a sign-in method and your scores, league and follows come with you, even to a new phone.',
+      'This account only lives on this phone for now. Link a sign-in method and your scores, league and friends come with you, even to a new phone.',
     body: 'These are the ways into your account. To remove one, another must stay linked.',
     linkedBody: (provider) => `You can now sign in to this account with ${provider} too.`,
     attached: 'Linked methods',
@@ -146,7 +146,7 @@ const de: AuthMessages = {
   ways: {
     title: 'Anmeldewege',
     guestBody:
-      'Dieses Konto gibt es gerade nur auf diesem Handy. Verknüpf einen Anmeldeweg – dann nimmst du Scores, Liga und alle, denen du folgst, auch auf ein neues Handy mit.',
+      'Dieses Konto gibt es gerade nur auf diesem Handy. Verknüpf einen Anmeldeweg – dann nimmst du Scores, Liga und Freunde auch auf ein neues Handy mit.',
     body: 'Mit diesen Wegen meldest du dich an. Um einen zu entfernen, muss ein anderer verknüpft bleiben.',
     linkedBody: (provider) => `Jetzt kannst du dich auch mit ${provider} anmelden.`,
     attached: 'Verknüpfte Wege',
@@ -199,7 +199,7 @@ const ar: AuthMessages = {
   ways: {
     title: 'طرق تسجيل الدخول',
     guestBody:
-      'هذا الحساب موجود على هذا الهاتف فقط حاليًا. اربط طريقة لتسجيل الدخول، وستنتقل معك نتائجك ودوريك ومن تتابعهم حتى لو تغيّر هاتفك.',
+      'هذا الحساب موجود على هذا الهاتف فقط حاليًا. اربط طريقة لتسجيل الدخول، وستنتقل معك نتائجك ودوريك وأصدقاؤك حتى لو تغيّر هاتفك.',
     body: 'تدخل إلى حسابك بهذه الطرق. لإزالة إحداها يجب أن تبقى طريقة أخرى مربوطة.',
     linkedBody: (provider) => `يمكنك الآن الدخول إلى هذا الحساب باستخدام ‎${provider}‎ أيضًا.`,
     attached: 'الطرق المربوطة',
@@ -253,7 +253,7 @@ const fr: AuthMessages = {
   ways: {
     title: 'Moyens de connexion',
     guestBody:
-      "Pour l'instant, ce compte n'existe que sur ce téléphone. Lie un moyen de connexion : même sur un nouveau téléphone, tes scores, ta ligue et tes abonnements te suivent.",
+      "Pour l'instant, ce compte n'existe que sur ce téléphone. Lie un moyen de connexion : même sur un nouveau téléphone, tes scores, ta ligue et tes amis te suivent.",
     body: 'Tu te connectes à ton compte avec ces moyens. Pour en retirer un, un autre doit rester lié.',
     linkedBody: (provider) => `Tu peux maintenant aussi te connecter à ce compte avec ${provider}.`,
     attached: 'Moyens liés',
@@ -306,7 +306,7 @@ const es: AuthMessages = {
   ways: {
     title: 'Métodos de acceso',
     guestBody:
-      'Por ahora, esta cuenta solo está en este teléfono. Vincula un método de acceso: aunque cambies de teléfono, tus puntuaciones, tu liga y a quienes sigues vienen contigo.',
+      'Por ahora, esta cuenta solo está en este teléfono. Vincula un método de acceso: aunque cambies de teléfono, tus puntuaciones, tu liga y tus amigos vienen contigo.',
     body: 'Entras a tu cuenta con estos métodos. Para quitar uno, otro debe seguir vinculado.',
     linkedBody: (provider) => `Ahora también puedes entrar a esta cuenta con ${provider}.`,
     attached: 'Métodos vinculados',

@@ -37,6 +37,7 @@ import {
 } from '@/game/howTo';
 import { useDaily, useLeaderboard, useLeague } from '@/hooks/useBoards';
 import { useMe } from '@/hooks/useMe';
+import { inboxCount, useInboxSummary } from '@/hooks/useSocial';
 import { handle, useT } from '@/i18n';
 import { IS_RTL } from '@/i18n/native';
 import { messageFor } from '@/lib/errors';
@@ -52,6 +53,7 @@ import {
   Button,
   ConsentCard,
   CountdownChip,
+  FaceOff,
   IconButton,
   LobbyCard,
   Meter,
@@ -88,10 +90,11 @@ type Navigation = Props['navigation'];
 
 /**
  * The game lobby. Everything on it points at today's one game: you and your
- * league in the status strip, "Günün akışı" as the event on the stage with
- * its countdown, the big gold play slab in the thumb's reach, then the doors
- * that bring you back tomorrow — the league, the player to pass this week,
- * your records. Every number is the API's.
+ * league in the status strip, with the mailbox that counts what waits among
+ * your friends; "Günün akışı" as the event on the stage with its countdown,
+ * the big gold play slab in the thumb's reach, then the doors that bring you
+ * back — a friend's VS waiting for you, the league, the player to pass this
+ * week, your records. Every number is the API's.
  */
 export function HomeScreen({ navigation }: Props) {
   const theme = useTheme();
@@ -106,6 +109,7 @@ export function HomeScreen({ navigation }: Props) {
   const daily = useDaily();
   const league = useLeague();
   const weekly = useLeaderboard('weekly', 'everyone', 3);
+  const inbox = useInboxSummary();
   const remindersRead = useOnboarding((state) => state.hydrated);
   const remindedFor = useOnboarding((state) => state.remindedFor);
   const [keep, setKeep] = useState<'ways' | 'email' | null>(null);
@@ -149,6 +153,7 @@ export function HomeScreen({ navigation }: Props) {
         daily.refetch(),
         league.refetch(),
         weekly.refetch(),
+        inbox.refetch(),
       ]);
     } finally {
       setPulling(false);
@@ -178,7 +183,7 @@ export function HomeScreen({ navigation }: Props) {
       >
         <Animated.View style={[styles.player, strip]}>
           <View>
-            <Avatar name={user?.username ?? '?'} tone="primary" size="lg" />
+            <Avatar name={user?.username ?? '?'} src={user?.avatarUrl} tone="primary" size="lg" />
             {tier ? (
               <View style={styles.tierPin}>
                 <TierBadge tier={tier} size="sm" />
@@ -195,6 +200,12 @@ export function HomeScreen({ navigation }: Props) {
               </Txt>
             ) : null}
           </View>
+          <IconButton
+            icon="inbox"
+            label={t.home.inbox}
+            badge={inboxCount(inbox.data)}
+            onPress={() => navigation.navigate('Friends')}
+          />
           <IconButton
             icon="help"
             label={t.home.help}
@@ -222,6 +233,18 @@ export function HomeScreen({ navigation }: Props) {
           />
         </Animated.View>
 
+        {(inbox.data?.yourTurn ?? 0) > 0 ? (
+          <Animated.View style={leagueIn}>
+            <LobbyCard
+              title={t.vs.lobby.title(inbox.data?.yourTurn ?? 0)}
+              eyebrow={t.vs.lobby.eyebrow}
+              icon="swords"
+              tone="primary"
+              onPress={() => navigation.navigate('Friends')}
+            />
+          </Animated.View>
+        ) : null}
+
         <Animated.View style={leagueIn}>
           <LeagueDoor
             league={league}
@@ -232,6 +255,7 @@ export function HomeScreen({ navigation }: Props) {
         <Animated.View style={rivalIn}>
           <RivalDoor
             name={user?.username ?? '?'}
+            avatarUrl={user?.avatarUrl ?? null}
             rival={weekly.data?.rival ?? null}
             onPlay={() => {
               track('rival');
@@ -250,7 +274,6 @@ export function HomeScreen({ navigation }: Props) {
           >
             <RankChips
               items={[
-                { label: t.home.records.boards.daily, rank: ranks?.daily },
                 { label: t.home.records.boards.weekly, rank: ranks?.weekly },
                 { label: t.home.records.boards.monthly, rank: ranks?.monthly },
                 { label: t.home.records.boards.all, rank: ranks?.all },
@@ -696,14 +719,15 @@ function ZoneTag({ league, me }: { league: LeagueResponse; me: LeagueMember }) {
  */
 function RivalDoor({
   name,
+  avatarUrl,
   rival,
   onPlay,
 }: {
   name: string;
+  avatarUrl: string | null;
   rival: LeaderboardResponse['rival'];
   onPlay: () => void;
 }) {
-  const theme = useTheme();
   const t = useT();
   if (!rival) return null;
   return (
@@ -713,13 +737,10 @@ function RivalDoor({
       icon="target"
       tone="warn"
     >
-      <View style={styles.versus}>
-        <Avatar name={name} tone="primary" size="lg" />
-        <Text style={[styles.vs, { color: theme.gold }, embossed(3)]}>
-          {t.home.rival.versus}
-        </Text>
-        <Avatar name={rival.entry.username} tone="secondary" size="lg" />
-      </View>
+      <FaceOff
+        left={{ name, src: avatarUrl }}
+        right={{ name: rival.entry.username, src: rival.entry.avatarUrl }}
+      />
       <Txt variant="title" align="center">
         {t.home.rival.gap(rival.entry.username, rival.gap, t.fmt.gap(rival.gap))}
       </Txt>
@@ -798,12 +819,4 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: SPACE.sm,
   },
-  versus: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: SPACE.lg,
-    justifyContent: 'center',
-    marginVertical: SPACE.xs,
-  },
-  vs: { fontFamily: FONT.display, fontSize: 26, lineHeight: lh(30) },
 });

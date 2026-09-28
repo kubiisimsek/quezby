@@ -14,7 +14,7 @@ class BoardKeysRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'board' => ['required', Rule::enum(LeaderboardPeriod::class)],
+            'board' => ['required', Rule::in(LeaderboardPeriod::boardValues())],
             'season' => ['nullable', 'integer', 'min:1'],
             'limit' => ['nullable', 'integer', 'min:1', 'max:90'],
         ];

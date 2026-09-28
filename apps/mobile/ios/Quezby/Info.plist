@@ -37,6 +37,10 @@
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Quezby uses the camera only if you take a profile photo.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Quezby uses the photo you pick as your profile photo.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>

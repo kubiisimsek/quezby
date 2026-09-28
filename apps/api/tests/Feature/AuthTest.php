@@ -9,7 +9,7 @@ test('a guest signs up and the token works', function () {
     $response->assertCreated()
         ->assertJsonPath('user.email', null)
         ->assertJsonPath('user.isGuest', true)
-        ->assertJsonPath('user.settings', ['haptics' => true, 'analytics' => false])
+        ->assertJsonPath('user.settings', ['haptics' => true, 'analytics' => false, 'pushFriends' => true, 'pushVs' => true, 'pushMessages' => true])
         ->assertJsonPath('user.locale', 'tr')
         ->assertJsonPath('user.best', null);
     $this->assertMatchesRegularExpression('/^guest\d{8}$/', $response->json('user.username'));
@@ -26,7 +26,7 @@ test('a guest signs up and the token works', function () {
     $this->withToken($response->json('token'))->getJson('/api/v1/me')
         ->assertOk()
         ->assertJsonPath('user.id', $response->json('user.id'))
-        ->assertJsonPath('ranks', ['daily' => null, 'weekly' => null, 'monthly' => null, 'all' => null]);
+        ->assertJsonPath('ranks', ['weekly' => null, 'monthly' => null, 'all' => null]);
 });
 
 test('a guest plays under its automatic name straight away', function () {

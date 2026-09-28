@@ -6,10 +6,11 @@ four packages.
 **Quezby turns the reels-scrolling habit into a competitive reflex game.** An
 endless vertical feed; each reel asks for one gesture — swipe up, double-tap,
 press-and-hold, or *don't touch* — before its timer runs out, while a
-dopamine meter drains faster every reel. Players compete on daily, weekly,
-monthly and all-time boards, a daily challenge everyone plays on one seed
-("Günün akışı"), weekly leagues, and against the players they follow. Start at
-`docs/product/overview.md`.
+dopamine meter drains faster every reel. Players compete on weekly, monthly
+and all-time boards, a daily challenge everyone plays on one seed ("Günün
+akışı") and weekly leagues — and with their friends: requests, an inbox of
+preset phrases, and VS (one seed, one attempt each, counted on no board).
+Start at `docs/product/overview.md`.
 
 ## Read before you write
 
@@ -19,10 +20,11 @@ monthly and all-time boards, a daily challenge everyone plays on one seed
 | --- | --- |
 | Anything with a UI in the game | `docs/design/design-language.md`, then `docs/design/mobile-design-system.md` |
 | The admin panel (`apps/admin`) | `docs/design/admin-design-system.md`, then `docs/rules/admin-rules.md` |
-| Anything user-visible | `docs/design/ui-writing.md` (six languages — every word lives in `apps/mobile/src/i18n/messages`), then `docs/product/localization.md` |
+| Anything user-visible | `docs/design/ui-writing.md` (six languages — every word of the app lives in `apps/mobile/src/i18n/messages`, a push's in `apps/api/lang`), then `docs/product/localization.md` |
 | Game rules, scoring, difficulty | `docs/product/scoring.md` |
 | Anti-cheat, device integrity, checkpoints | `docs/product/scoring.md` → "Hile koruması" |
 | Usernames | `docs/product/usernames.md` |
+| Friends, the inbox, VS, profile photos, reports, push | `docs/product/overview.md` → "Arkadaşlar", then `docs/backend/api-contract.md`; setting push up: `docs/development/environments.md` → "Push notifications" |
 | Analytics, consent, the device registry | `docs/product/analytics.md` |
 | API work | `docs/backend/api-contract.md` · admin routes: `docs/backend/admin-api.md` |
 | Mobile | `docs/rules/react-native-rules.md` |
@@ -35,13 +37,16 @@ monthly and all-time boards, a daily challenge everyone plays on one seed
 ```
 apps/mobile     Bare React Native 0.86 — ios/ and android/ are committed source
 apps/admin      Vite + React admin panel, static files for shared hosting —
-                players, bans, suspects, runs, boards, leagues, admins, audit log
+                players, bans, suspects, reports, runs, boards, leagues, admins,
+                audit log
 apps/api        Laravel + Sanctum — identity (guest, email, Apple, Google), run
-                verification, boards, daily challenge, leagues, follows, stats
+                verification, boards, daily challenge, leagues, friends, inbox,
+                VS, profile photos, reports, push, run history, stats
 packages/engine the game rules: deterministic, integer-only, replayed by the API,
                 locked by rules.lock.json
-packages/config username rules, the feed's content catalog and the app's pace
-                (shared with the API through fixtures)
+packages/config username rules, the feed's content catalog, the app's pace, the
+                friends' phrases and the photo's limits (shared with the API
+                through fixtures)
 packages/types  the API contract
 packages/sdk    the typed API client
 ```

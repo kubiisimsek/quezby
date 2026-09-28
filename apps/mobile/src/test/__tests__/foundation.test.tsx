@@ -92,9 +92,8 @@ describe('factories', () => {
       username: null,
       best: null,
     });
-    expect(buildRanks({ daily: null })).toEqual({
-      daily: null,
-      weekly: 120,
+    expect(buildRanks({ weekly: null })).toEqual({
+      weekly: null,
       monthly: 310,
       all: 1_204,
     });

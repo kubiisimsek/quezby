@@ -44,7 +44,7 @@ jest.mock('@/analytics/track', () => ({ track: jest.fn() }));
 
 jest.mock('@/api/client', () => ({
   api: {
-    me: { get: jest.fn() },
+    me: { get: jest.fn(), inbox: jest.fn() },
     daily: { get: jest.fn() },
     leagues: { current: jest.fn() },
     leaderboards: { get: jest.fn() },
@@ -52,7 +52,7 @@ jest.mock('@/api/client', () => ({
 }));
 
 const mocked = api as unknown as {
-  me: { get: jest.Mock };
+  me: { get: jest.Mock; inbox: jest.Mock };
   daily: { get: jest.Mock };
   leagues: { current: jest.Mock };
   leaderboards: { get: jest.Mock };
@@ -91,7 +91,8 @@ function group(me: number, zone: LeagueZone): LeagueMember[] {
       points: 20_000 - index * 500,
       daysPlayed: 3,
       isMe: rank === me,
-      isFollowing: false,
+      avatarUrl: null,
+      isFriend: false,
       zone:
         rank === me
           ? zone
@@ -197,6 +198,7 @@ describe('HomeScreen', () => {
       hydrated: true,
     });
     mocked.me.get.mockResolvedValue({ user: buildMe(), ranks: buildRanks() });
+    mocked.me.inbox.mockResolvedValue({ requests: 0, threads: 0, yourTurn: 0 });
     mocked.daily.get.mockResolvedValue(daily());
     mocked.leagues.current.mockResolvedValue(league());
     mocked.leaderboards.get.mockResolvedValue(weekly());
@@ -224,6 +226,33 @@ describe('HomeScreen', () => {
 
     await fireEvent.press(screen.getByRole('button', { name: 'Yardım' }));
     expect(navigate).toHaveBeenCalledWith('Help');
+  });
+
+  it('counts what waits among friends on the mailbox, which opens the friends tab', async () => {
+    mocked.me.inbox.mockResolvedValue({ requests: 1, threads: 2, yourTurn: 0 });
+    await renderLobby();
+
+    await fireEvent.press(await screen.findByRole('button', { name: 'Mesaj kutusu, 3 yeni' }));
+
+    expect(navigate).toHaveBeenCalledWith('Friends');
+  });
+
+  it('opens a door to the VS a friend is waiting on the player to play', async () => {
+    mocked.me.inbox.mockResolvedValue({ requests: 0, threads: 2, yourTurn: 2 });
+    await renderLobby();
+
+    expect(await screen.findByText('SENİ BEKLEYEN VS')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByText('2 VS seni bekliyor'));
+
+    expect(navigate).toHaveBeenCalledWith('Friends');
+  });
+
+  it('shows no VS door with none waiting', async () => {
+    await renderLobby();
+    await screen.findByText('@ekin');
+
+    expect(screen.queryByText('SENİ BEKLEYEN VS')).not.toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Mesaj kutusu' })).toBeOnTheScreen();
   });
 
   it("plays today's daily while it is open, with free play beside it", async () => {
@@ -447,12 +476,13 @@ describe('HomeScreen', () => {
 
     expect(screen.getByText('Sezon rekoru')).toBeOnTheScreen();
     expect(screen.getByText('12.345')).toBeOnTheScreen();
-    for (const rank of ['#44', '#120', '#310', '#1.204']) {
+    for (const rank of ['#120', '#310', '#1.204']) {
       expect(screen.getByText(rank)).toBeOnTheScreen();
     }
-    for (const label of ['Bugün', 'Hafta', 'Ay', 'Tüm zamanlar']) {
+    for (const label of ['Hafta', 'Ay', 'Tüm zamanlar']) {
       expect(screen.getByText(label)).toBeOnTheScreen();
     }
+    expect(screen.queryByText('Bugün')).not.toBeOnTheScreen();
 
     await fireEvent.press(screen.getByText('#310'));
     expect(navigate).toHaveBeenCalledWith('Leaderboard');
@@ -589,7 +619,7 @@ describe('HomeScreen', () => {
 
       expect(screen.getByText('Season record')).toBeOnTheScreen();
       expect(screen.getByText('12,345')).toBeOnTheScreen();
-      for (const label of ['Today', 'Week', 'Month', 'All time']) {
+      for (const label of ['Week', 'Month', 'All time']) {
         expect(screen.getByText(label)).toBeOnTheScreen();
       }
       expect(screen.getByLabelText('All time: #1,204')).toBeOnTheScreen();
@@ -686,7 +716,7 @@ describe('HomeScreen', () => {
         screen.getByText(`يسبقك ${iso('@deniz')} مباشرةً في ترتيب الأسبوع.`),
       ).toBeOnTheScreen();
       expect(screen.getByRole('button', { name: 'تجاوزه' })).toBeOnTheScreen();
-      expect(screen.getByLabelText(`اليوم: ${iso('#44')}`)).toBeOnTheScreen();
+      expect(screen.getByLabelText(`الأسبوع: ${iso('#120')}`)).toBeOnTheScreen();
     });
 
     it('turns to a language picked while the lobby is up', async () => {

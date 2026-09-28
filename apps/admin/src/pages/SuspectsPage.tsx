@@ -20,7 +20,7 @@ import { useSuspects } from '@/hooks/api/suspects';
 import { useListParams } from '@/hooks/useListParams';
 import { FLAG_OPTIONS, PlayerCell, RUN_COLUMNS } from '@/lib/columns';
 import { formatNumber, formatRelative, RUN_FLAG, SEVERITY, shortId } from '@/lib/format';
-import { can } from '@/lib/permissions';
+import { can, isApprovable, isRejectable } from '@/lib/permissions';
 import { useSession } from '@/stores/session';
 
 type Tab = 'queue' | 'flagged' | 'players';
@@ -108,17 +108,20 @@ export function SuspectsPage() {
   const [rejecting, setRejecting] = useState<AdminRunRow | null>(null);
   const [banning, setBanning] = useState<AdminPlayerRef | null>(null);
 
+  // A VS run never ranks, so a flagged one waits for no decision.
   const runActions = (run: AdminRunRow) =>
     moderator ? (
       <>
-        {run.status === 'review' ? (
+        {isApprovable(run) ? (
           <Button size="sm" tone="secondary" icon={<CircleCheck />} labelFrom="xl" onClick={() => setApproving(run)}>
             Onayla
           </Button>
         ) : null}
-        <Button size="sm" tone="ghost" icon={<CircleX />} labelFrom="xl" onClick={() => setRejecting(run)}>
-          Reddet
-        </Button>
+        {isRejectable(run) ? (
+          <Button size="sm" tone="ghost" icon={<CircleX />} labelFrom="xl" onClick={() => setRejecting(run)}>
+            Reddet
+          </Button>
+        ) : null}
       </>
     ) : null;
 

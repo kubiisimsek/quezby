@@ -31,7 +31,7 @@ describe('gateFor', () => {
   });
 
   it('shows a new account the step it is on', () => {
-    for (const step of ['tutorial', 'nickname', 'protect'] as const) {
+    for (const step of ['tutorial', 'nickname', 'notifications', 'protect'] as const) {
       expect(gateFor({ ...base, onboarding: { userId: 'u1', step } })).toBe(step);
     }
   });

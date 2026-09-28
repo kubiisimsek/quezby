@@ -22,6 +22,11 @@ apps/mobile/ios/Pods/
 apps/mobile/ios/.xcode.env.local
 # written by `pnpm switch-<env>` from apps/mobile/.env
 apps/mobile/ios/Config/Environment.generated.xcconfig
+# Firebase's app files (push notifications): public identifiers, but kept out
+# of the repo like apps/mobile/.env — downloaded from the Firebase console,
+# the builds take them when they are there (docs/development/push-setup.md)
+apps/mobile/ios/Quezby/GoogleService-Info.plist
+apps/mobile/android/app/google-services.json
 apps/mobile/vendor/bundle/
 .kotlin/
 *.iml

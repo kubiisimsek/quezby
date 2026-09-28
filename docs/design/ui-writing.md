@@ -12,6 +12,15 @@ area of the game with the six languages side by side. A line with a number, a
 name or grammar in it is a function in every language — never two lines glued
 into a sentence.
 
+Two kinds of words live elsewhere, in the six languages too. What a push
+notification says is the API's, in the receiver's language:
+`apps/api/lang/{locale}/push.php`, and the phrases friends send in
+`phrases.php` (the same lines as `messages/inbox.ts`). The phone's own
+system words are native files: iOS's reasons for the photo library and the
+camera (`ios/Quezby/<lang>.lproj/InfoPlist.strings`) and Android's
+notification channel (`android/app/src/main/res/values-<lang>/strings.xml`,
+English in `values/`).
+
 ## Two registers
 
 | Where | Voice | Examples |
@@ -43,7 +52,16 @@ not translated word for word: each language gets a joke that lands in it.
 | **Serbest oyun** | Any number of runs; the button is just "Oyna" |
 | **Zirve** | The leaderboard screen and its dock slot; **Senin katın** is the player's own row card |
 | **Oyna · Zirve · Lig · Arkadaşlar · Profil** | The dock's five slots, the lobby (Oyna) in the middle |
-| **Arkadaşlar** | Finding and following players; its screen's head says "Oyuncu ara, takip et, yarış" |
+| **Arkadaşlar** | The dock's friends slot and its screen, the inbox — requests waiting, then a conversation per friend; its head says "İstekler, mesajlar ve VS". A friend is a player who accepted your **arkadaşlık isteği**, or whose request you accepted |
+| **Arkadaş bul** · **Ekle** · **Geri al** · **Kabul et** / **Reddet** · **Sohbet** | Finding a player by the start of their name, and the one slab beside them by what they are to you; on their card the first is "Arkadaş ekle". Requests waiting for you are **İstekler**, yours "Gönderdiğin istekler" |
+| **Mesaj kutusu** · **Hazır mesajlar** | The conversations, and the lobby's mailbox that counts what waits there. Friends talk only in phrases from a fixed list ("İyi oyundu! 👏", "Rövanş? 🔥", `PHRASES` in `@quezby/config`): nothing a player types ever reaches another. A new phrase is a new code — codes are only added, never renamed — with a line in every language, in the app and in the API alike |
+| **VS** · **VS at** | A challenge between two friends: "Aynı akış; ikinize de birer hak." Whoever sends it plays first and their score stays hidden until the friend plays; "VS hiçbir sıralamaya, lige ya da istatistiğe yazılmaz." Arabic says تحدٍّ |
+| **KAZANDIN!** · **KAYBETTİN** · **BERABERE** · **Rövanş** · **Mesajlara dön** | A VS's end, stamped in Rubik, then another VS with the same friend or back to the conversation |
+| **Arkadaşlıktan çıkar** · **Engelle** · **Engeli kaldır** | The first two wait under a card's "Diğer", each saying what goes with it: "Mesajlarınız silinir, açık VS’iniz kapanır." · "Arkadaşlığınız ve istekleriniz biter; seni bulamaz, sana yazamaz." **Engeli kaldır** is the card's one action for a player you blocked, and Ayarlar lists them under **Engellenenler** |
+| **Bildir** | "Fotoğrafı bildir", "Kullanıcı adını bildir" — a player's photo and name are all another can report — with its promise: "Bir moderatör bakar; kimin bildirdiği söylenmez." |
+| **Profil fotoğrafı** · **Galeriden seç** · **Fotoğrafı kaldır** | The portrait's photo: "Kare olarak kırparsın; herkes görür." Taken away: "Yerine baş harflerin görünür." |
+| **Geçmiş oyunlar** (GEÇMİŞ OYUNLAR) | Every run played to its end, "Oynadığın her tur, sunucunun saydığı haliyle": Hepsi / Günün akışı / VS, the days as Bugün, Dün, then the date; the season's best is tagged **REKOR** |
+| **Bildirimler** · **Haberin olsun mu?** · **Bildirimleri aç** | Push notifications: the new player's step after the name ("Şimdi değil" leaves them off), the card wherever they are off ("Bildirimler kapalı" — **Ayarları aç** once only the phone's settings can turn them on, **Gizle** for a week) and Ayarlar → Bildirimler (Arkadaşlık, VS, Hazır mesajlar) |
 | **Geç onu** | The one action on a rival: play to pass them. "@ekin'e 1.240 puan" |
 | **Bronz, Gümüş, Altın, Platin, Elmas** | League tiers, capitalised as names: "Altın lig" |
 | **Terfi bölgesi / Düşme bölgesi** | League zones; "Terfiye 1.240 puan" |
@@ -57,7 +75,7 @@ not translated word for word: each language gets a joke that lands in it.
 | **Sana ne diyelim?** · **Şimdilik geç** | The name, right after the practice run, and the way past it; until then the account is `@guest48128742` ("Şimdilik adın @guest48128742") |
 | **Adını seç** | The profile's name door while the name is still the automatic one ("Şimdilik @guest48128742 · bir kez seçersin"). A picked name never changes, so after the pick Ayarlar only shows it, locked: "Kullanıcı adın · @ekin · kalıcı" — never "değiştir" |
 | **Seçtiğin ad bir daha değişmez** | Said wherever a name is picked, before it is saved — there is no confirm step |
-| **Lige 2 oyun kaldı** · **KİLİTLİ** | The league before a new player's first 3 counted runs: "Lig, ilk 3 oyunundan sonra açılır. Deneme turu sayılmaz." |
+| **Lige 2 oyun kaldı** · **KİLİTLİ** | The league before a new player's first 20 counted runs: "Lig, ilk 20 oyunundan sonra açılır. Deneme turu sayılmaz." |
 | **Hesabını koru** | Attach Apple, Google or an email to a guest account — a step after the name ("Şimdi değil" skips it), and once, when a guest's league opens ("Ligdesin!…") |
 | **Oyunu birlikte geliştirelim mi?** · **İzin ver / İzin verme** | The one question about usage analytics (ribbon "SENİN SEÇİMİN"), on the welcome before anything else — and once in the lobby of a phone that predates it. Two slabs of one size, neither gold. It says what is counted ("hangi ekranlara girdiğini ve ne kadar oynadığını sayarız") and what never leaves the phone ("Adın, e-postan ya da konumun gönderilmez") |
 | **Kullanım verisi** | The switch in Ayarlar for that answer: on — "Hangi ekranlara girdiğini ve ne kadar oynadığını sayarız."; off — "Yalnızca oyunun çalışması için gereken cihaz bilgisi gider." Never "izleme", "takip" or "tracking" to the player |
@@ -108,9 +126,20 @@ Use these and nothing else for them. A ribbon's capitals are in brackets.
 | Giriş yolları · Bağı kaldır | Sign-in methods · Unlink | Anmeldewege · Verknüpfung lösen | Moyens de connexion · Dissocier | Métodos de acceso · Desvincular | طرق تسجيل الدخول · إلغاء الربط |
 | Oyunu birlikte geliştirelim mi? · İzin ver · İzin verme | Shall we improve the game together? · Allow · Don't allow | Wollen wir das Spiel gemeinsam verbessern? · Erlauben · Nicht erlauben | On améliore le jeu ensemble ? · Autoriser · Refuser | ¿Mejoramos el juego juntos? · Permitir · No permitir | هل نطوّر اللعبة معًا؟ · السماح · عدم السماح |
 | Kullanım verisi | Usage data | Nutzungsdaten | Données d'utilisation | Datos de uso | بيانات الاستخدام |
-| Bugün · Bu hafta · Bu ay · Tüm zamanlar | Today · This week · This month · All time | Heute · Diese Woche · Dieser Monat · Allzeit | Aujourd'hui · Cette semaine · Ce mois-ci · Depuis toujours | Hoy · Esta semana · Este mes · Histórico | اليوم · هذا الأسبوع · هذا الشهر · كل الأوقات |
+| Bu hafta · Bu ay · Tüm zamanlar | This week · This month · All time | Diese Woche · Dieser Monat · Allzeit | Cette semaine · Ce mois-ci · Depuis toujours | Esta semana · Este mes · Histórico | هذا الأسبوع · هذا الشهر · كل الأوقات |
+| Bugün · Dün (a past game's day) | Today · Yesterday | Heute · Gestern | Aujourd’hui · Hier | Hoy · Ayer | اليوم · أمس |
 | Herkes · Arkadaşlar | Everyone · Friends | Alle · Freunde | Tous · Amis | Todos · Amigos | الجميع · الأصدقاء |
-| Takip et · Takibi bırak | Follow · Unfollow | Folgen · Entfolgen | Suivre · Ne plus suivre | Seguir · Dejar de seguir | تابِع · إلغاء المتابعة |
+| Arkadaş ekle · Kabul et · Reddet · Geri al · Sohbet | Add friend · Accept · Decline · Undo · Chat | Als Freund hinzufügen · Annehmen · Ablehnen · Zurückziehen · Chat | Ajouter en ami · Accepter · Refuser · Annuler · Discuter | Añadir amigo · Aceptar · Rechazar · Deshacer · Chat | أضف صديقًا · اقبل · ارفض · تراجع · محادثة |
+| arkadaşlık isteği · İstekler | friend request · Requests | Freundschaftsanfrage · Anfragen | demande d'ami · Demandes | solicitud de amistad · Solicitudes | طلب صداقة · الطلبات |
+| Mesaj kutusu · Hazır mesajlar | Inbox · Quick messages | Postfach · Schnellnachrichten | Boîte de réception · Messages rapides | Buzón · Mensajes rápidos | صندوق الرسائل · رسائل سريعة |
+| VS · VS at | VS · Send VS | VS · VS schicken | VS · Lancer un VS | VS · Mandar VS | تحدٍّ · أرسل تحديًا |
+| KAZANDIN! · KAYBETTİN · BERABERE | YOU WON! · YOU LOST · DRAW | GEWONNEN! · VERLOREN · UNENTSCHIEDEN | GAGNÉ ! · PERDU · MATCH NUL | ¡GANASTE! · PERDISTE · EMPATE | فزت! · خسرت · تعادل |
+| Rövanş · Mesajlara dön | Rematch · Back to chat | Revanche · Zurück zum Chat | Revanche · Retour à la discussion | Revancha · Volver al chat | مباراة ثأر · عد إلى المحادثة |
+| Arkadaşlıktan çıkar · Engelle · Engeli kaldır · Engellenenler | Remove friend · Block · Unblock · Blocked players | Als Freund entfernen · Blockieren · Blockierung aufheben · Blockierte Spieler | Retirer des amis · Bloquer · Débloquer · Joueurs bloqués | Eliminar de amigos · Bloquear · Desbloquear · Bloqueados | أزل من الأصدقاء · احظر · ألغِ الحظر · المحظورون |
+| Fotoğrafı bildir · Kullanıcı adını bildir | Report photo · Report username | Foto melden · Benutzernamen melden | Signaler la photo · Signaler le nom d'utilisateur | Denunciar la foto · Denunciar el nombre de usuario | أبلغ عن الصورة · أبلغ عن اسم المستخدم |
+| Profil fotoğrafı · Galeriden seç · Fotoğrafı kaldır | Profile photo · Choose from library · Remove photo | Profilfoto · Aus der Mediathek wählen · Foto entfernen | Photo de profil · Choisir dans la galerie · Retirer la photo | Foto de perfil · Elegir de la galería · Quitar la foto | صورة الملف الشخصي · اختر من المعرض · أزل الصورة |
+| Geçmiş oyunlar (GEÇMİŞ OYUNLAR) | Past games (PAST GAMES) | Vergangene Spiele (VERGANGENE SPIELE) | Parties passées (PARTIES PASSÉES) | Partidas anteriores (PARTIDAS ANTERIORES) | الألعاب السابقة |
+| Bildirimler · Bildirimleri aç | Notifications · Turn on notifications | Mitteilungen · Mitteilungen einschalten | Notifications · Activer les notifications | Notificaciones · Activar notificaciones | الإشعارات · فعّل الإشعارات |
 | Ayarlar · Titreşim · Dil · Yardım | Settings · Vibration · Language · Help | Einstellungen · Vibration · Sprache · Hilfe | Réglages · Vibrations · Langue · Aide | Ajustes · Vibración · Idioma · Ayuda | الإعدادات · الاهتزاز · اللغة · المساعدة |
 
 ## Rules
@@ -147,6 +176,11 @@ Use these and nothing else for them. A ribbon's capitals are in brackets.
 
   Rank as `#12`, an unknown rank as `—`. The API groups the share text's
   numbers the same way (`Locale::group`).
+- **Dates and times** come through `t.fmt` too, on the phone's calendar and
+  clock: `t.fmt.date` ("24 Eylül", "24. September", "24 de septiembre"),
+  `t.fmt.time` (24-hour, "14:05") and `t.fmt.ago` — how long ago, short
+  ("şimdi", "5 dk", "3 sa", "2 g"), and past a week the date. The inbox, a
+  conversation's lines and the past games use them.
 - **Directions:** no line says "top right" or "on the left" — Arabic mirrors the
   screen. Name the thing instead ("the settings button on your profile").
 - **Names:** a player's name is always written with `handle(name)` — `@ekin` —
@@ -165,3 +199,6 @@ Use these and nothing else for them. A ribbon's capitals are in brackets.
   `@ekin` comes out `ekin@`.
 - Counts take six forms: 0, 1, 2, 3–10, 11–99 and the rest
   (`pluralCategory('ar', n)`).
+- **VS** is تحدٍّ, a challenge — the mode, its sheet, the HUD's pill, the past
+  games' filter (التحديات); where two portraits face each other (`FaceOff`),
+  the word between them is ضد, "against".

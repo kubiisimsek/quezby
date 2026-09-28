@@ -23,7 +23,7 @@ class LeaderboardRequest extends FormRequest
         return (int) ($this->validated('limit') ?? config('quezby.leaderboard.default_limit'));
     }
 
-    /** `everyone`, or `friends`: the players the caller follows, and the caller. */
+    /** `everyone`, or `friends`: the caller's friends, and the caller. */
     public function scope(): string
     {
         return (string) ($this->validated('scope') ?? 'everyone');

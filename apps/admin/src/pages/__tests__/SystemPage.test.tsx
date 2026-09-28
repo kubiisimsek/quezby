@@ -51,6 +51,31 @@ describe('SystemPage', () => {
     expect(await screen.findByText('Migrated: 2026_09_27_000100_create_admins_table')).toBeInTheDocument();
   });
 
+  it('says whether photos can be kept and pushes can go out', async () => {
+    const api = fakeApi();
+    api.system.get.mockResolvedValue(system());
+    renderApp({ path: '/system', api });
+
+    expect((await screen.findByText('GD (profil fotoğrafları)')).parentElement).toHaveTextContent('Kurulu');
+    expect(screen.getByText('Push bildirimleri (Firebase)').parentElement).toHaveTextContent('Açık');
+    expect(screen.queryByText('GD eksik: profil fotoğrafları yüklenemiyor')).not.toBeInTheDocument();
+    expect(screen.queryByText('Push bildirimleri kapalı')).not.toBeInTheDocument();
+  });
+
+  it('says what is missing when photos cannot be kept or pushes cannot go out', async () => {
+    const api = fakeApi();
+    api.system.get.mockResolvedValue(system({ gd: false, push: false }));
+    renderApp({ path: '/system', api });
+
+    const alert = await screen.findByRole('alert');
+    expect(within(alert).getByText('GD eksik: profil fotoğrafları yüklenemiyor')).toBeInTheDocument();
+    expect(within(alert).getByText(/fotoğraf yüklemek hata veriyor/)).toBeInTheDocument();
+    expect(screen.getByText('Push bildirimleri kapalı')).toBeInTheDocument();
+    expect(screen.getByText(/FIREBASE_PROJECT_ID ve FIREBASE_CREDENTIALS/)).toBeInTheDocument();
+    expect(screen.getByText('GD (profil fotoğrafları)').parentElement).toHaveTextContent('Eksik');
+    expect(screen.getByText('Push bildirimleri (Firebase)').parentElement).toHaveTextContent('Kapalı');
+  });
+
   it('warns when a shared key is left open', async () => {
     const api = fakeApi();
     api.system.get.mockResolvedValue(system({ tokens: { ops: true, moderation: false } }));

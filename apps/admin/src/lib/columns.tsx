@@ -27,15 +27,26 @@ import {
  * signals, a line of the audit log.
  */
 
-/** A player's avatar and handle; a banned one says so. */
-export function PlayerCell({ player, hint, link = false }: { player: AdminPlayerRef | null; hint?: string; link?: boolean }) {
+/** A player's photo (or initials) and handle; a banned one says so. */
+export function PlayerCell({
+  player,
+  avatarUrl,
+  hint,
+  link = false,
+}: {
+  player: AdminPlayerRef | null;
+  /** Their photo, where the row carries it. */
+  avatarUrl?: string | null;
+  hint?: string;
+  link?: boolean;
+}) {
   if (!player) return <span className="text-ink-faint">Silinmiş oyuncu</span>;
   const name = playerName(player.username);
   const banned = player.bannedAt !== null;
 
   return (
     <span className="flex min-w-0 items-center gap-2.5">
-      <Avatar name={player.username} tone={banned ? 'bad' : 'secondary'} size="sm" />
+      <Avatar name={player.username} src={avatarUrl} tone={banned ? 'bad' : 'secondary'} size="sm" />
       <span className="min-w-0">
         <span className="flex items-center gap-1.5">
           {link ? (
@@ -64,9 +75,10 @@ export function When({ at, as = 'relative' }: { at: string | null | undefined; a
   );
 }
 
+/** A run's status in a word; what it means for the boards on hover. */
 export function RunStatusTag({ status }: { status: AdminRunStatus }) {
-  const { tone, label } = RUN_STATUS[status];
-  return <Tag tone={tone} label={label} />;
+  const { tone, label, hint } = RUN_STATUS[status];
+  return <Tag tone={tone} label={label} title={hint} />;
 }
 
 /** A run's signals as tags, the hard ones first; past `max` a count of the rest. */

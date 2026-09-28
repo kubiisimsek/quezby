@@ -346,15 +346,8 @@ export function ActionSheet({
   onClose: () => void;
   title: string;
   description?: string;
-  actions: Array<{
-    label: string;
-    hint?: string;
-    icon: IconName;
-    tone?: TagTone;
-    onPress: () => void;
-  }>;
+  actions: SheetAction[];
 }) {
-  const theme = useTheme();
   const chosen = useRef<(() => void) | null>(null);
 
   /** Runs the chosen action once, whichever of the two signals comes first. */
@@ -372,52 +365,82 @@ export function ActionSheet({
       title={title}
       description={description}
     >
-      <View style={styles.actions}>
-        {actions.map((action) => (
-          <Pressable
-            key={action.label}
-            accessibilityRole="button"
-            accessibilityLabel={action.label}
-            onPress={() => {
-              // The action runs once the menu is off the screen, so a share
-              // sheet or the next sheet never opens over one still leaving.
-              // The timer is the fallback for a platform that never says so.
-              chosen.current = action.onPress;
-              onClose();
-              setTimeout(runChosen, 650);
-            }}
-            style={({ pressed }) => [
-              styles.action,
-              {
-                backgroundColor: theme.raised,
-                borderColor: theme.outline,
-                transform: [{ translateY: pressed ? 3 : 0 }],
-              },
-            ]}
-          >
-            <IconChip
-              icon={action.icon}
-              tone={action.tone ?? 'primary'}
-              size="md"
-            />
-            <View style={styles.flex}>
-              <Txt
-                variant="heading"
-                tone={action.tone === 'bad' ? 'bad' : 'ink'}
-              >
-                {action.label}
-              </Txt>
-              {action.hint ? (
-                <Txt variant="meta" tone="muted">
-                  {action.hint}
-                </Txt>
-              ) : null}
-            </View>
-            <ArrowNub />
-          </Pressable>
-        ))}
-      </View>
+      <ActionList
+        actions={actions}
+        onChoose={(action) => {
+          // The action runs once the menu is off the screen, so a share
+          // sheet or the next sheet never opens over one still leaving.
+          // The timer is the fallback for a platform that never says so.
+          chosen.current = action.onPress;
+          onClose();
+          setTimeout(runChosen, 650);
+        }}
+      />
     </Sheet>
+  );
+}
+
+export type SheetAction = {
+  label: string;
+  hint?: string;
+  icon: IconName;
+  tone?: TagTone;
+  onPress: () => void;
+};
+
+/**
+ * An action sheet's list, on its own — for a sheet that keeps a few rarer
+ * actions under its main one instead of opening a second sheet over itself.
+ * `onChoose` decides when the action runs; by default, at once.
+ */
+export function ActionList({
+  actions,
+  onChoose = (action) => action.onPress(),
+}: {
+  actions: SheetAction[];
+  onChoose?: (action: SheetAction) => void;
+}) {
+  const theme = useTheme();
+  return (
+    <View style={styles.actions}>
+      {actions.map((action) => (
+        <Pressable
+          key={action.label}
+          accessibilityRole="button"
+          accessibilityLabel={action.label}
+          accessibilityHint={action.hint}
+          onPress={() => onChoose(action)}
+          style={({ pressed }) => [
+            styles.action,
+            {
+              backgroundColor: theme.raised,
+              borderColor: theme.outline,
+              transform: [{ translateY: pressed ? 3 : 0 }],
+            },
+          ]}
+        >
+          <IconChip
+            icon={action.icon}
+            tone={action.tone ?? 'primary'}
+            size="md"
+          />
+          <View style={styles.flex}>
+            <Txt
+              variant="heading"
+              tone={action.tone === 'bad' ? 'bad' : 'ink'}
+            >
+              {action.label}
+            </Txt>
+            {action.hint ? (
+              <Txt variant="meta" tone="muted">
+                {action.hint}
+              </Txt>
+            ) : null}
+          </View>
+          <ArrowNub />
+        </Pressable>
+      ))}
+    </View>
   );
 }
 

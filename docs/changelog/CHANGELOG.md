@@ -1,5 +1,172 @@
 # Changelog
 
+## 2026-09-28 — The inbox is live without a socket: the pulse
+
+With two phones open, a VS, a phrase or a request used to show only when the
+other player opened that screen: the badges asked once a minute, an open
+conversation every 20 s, and the Arkadaşlar list not at all. Shared hosting
+has no WebSocket, so the inbox now has a pulse.
+
+- **API:** `users.inbox_stamp` (migration `2026_09_30_000700`) goes up, for
+  both players, with every request sent, friendship begun or ended, block that
+  parted two friends, and every line (`Messenger::say`: a phrase, "friends
+  now", VS invite, result, refusal, expiry); for the blocker alone with a
+  block or its lifting (`InboxStamp`). `GET /me/pulse` → `{ stamp }` answers
+  with it, after settling the player's waiting VS whose time ran out
+  (`DuelService::settleDue`), so both sides hear of an expiry with nothing
+  opened. Two indexed reads; its own throttle, `pulse`, 60/min.
+- **App:** `usePulse` asks for the number every 3 s on Arkadaşlar, a
+  conversation and Arkadaş bul, every 10 s elsewhere, never mid-run or in the
+  background. When it moved, `refreshInbox` asks again for the badges and the
+  lobby's VS card, and for the list, requests or conversation on screen;
+  everything else is marked old and asked again when it shows. The screen on
+  show comes from `stores/route` (the navigator's `onStateChange`). The
+  badges' 60 s and the conversation's 20 s polling are gone. A push still
+  refreshes at once.
+- Contract: `Pulse` (types), `me.pulse` (SDK).
+- Tests: the API's `PulseTest`; the app's `usePulse.test.tsx`; the SDK's
+  endpoint list.
+
+## 2026-09-28 — Plainer words on the first screens
+
+- The welcome line ends at the practice run: "Önce bir deneme turunda
+  oynayarak öğren." The "— o tur sayılmaz" aside is gone in all six languages.
+- The username field lists three rules under it: length, the characters
+  allowed, a letter. "Harf ya da rakamla başlar ve biter" and "Nokta ve yıldız
+  art arda gelmez" are no longer listed (`UsernameRule` lost `edges` and
+  `symbols`). The rules still hold, in the app and on the API: a name that
+  breaks one hears it in the field's one-line error, only then.
+- Profil's past-games door is shorter in German, French and Spanish ("Alle
+  deine Runden", "Toutes tes parties", "Todas tus partidas"); the longer titles
+  were cut off.
+- Tests: `username.test.ts` (config), `WelcomeScreen.test.tsx`.
+
+## 2026-09-28 — Friends, VS, past games, profile photos and push
+
+- **Friends instead of follows.** A friendship takes two yeses: find a player
+  by the start of their name (`FindFriends`), send a request, and they accept
+  or turn it down. A request can be taken back, a friendship ended — its
+  conversation and any open VS go with it — and a player blocked (it ends
+  everything between the two; Ayarlar → **Engellenenler** lifts it). 500
+  friends and 100 waiting requests at most. The follows there were became
+  friends where two players followed each other and requests where only one
+  did (`FollowsToFriends`, inside the migration): nobody is anyone's friend
+  without having asked. Friends boards ("Herkes | Arkadaşlar") are your
+  friends and you; `isFollowing` became `isFriend`.
+- **The Arkadaşlar tab is the inbox.** Requests first (**Kabul et** /
+  **Reddet**), then one conversation per friend (`ThreadRow`: the newest line,
+  the unread count, a VS tag). Friends talk only in ten preset phrases
+  (`PHRASES` in `@quezby/config`, `App\Enums\Phrase`, held together by
+  `fixtures/social.json`) — nothing typed ever travels between players — at
+  most 20 to one friend a day; the game adds its own lines (friends now, a VS
+  sent, its result, turned down, run out). Lines are kept 90 days
+  (`inbox.keep_days`). The dock slot's badge and the lobby's mailbox count
+  requests and conversations that want a look (`GET /me/inbox`, asked every
+  minute while the game is open, on each push and on coming back to it).
+- **VS.** Two friends, one seed, one attempt each: the sender plays first and
+  their score stays hidden until the friend plays; the friend has 48 hours
+  (`duels.expire_hours`), then it counts for nobody. A VS run is replayed like
+  any other and never ranks: a clean one is **`played`** (a new `RunStatus`),
+  one with a hard flag is `flagged` and loses — the sender's voids the VS. It
+  counts on no board, league, stat or record, and has nothing to share. The
+  app: `VsSheet` (a `FaceOff`, the four rules, the gold "Oyna"), a "VS · @ekin"
+  pill on the HUD, the result's VS tile (sent, won, lost, drawn or void) with
+  gold **Rövanş** and **Mesajlara dön**, the conversation's VS card (send one,
+  answer with the screen's one gold "Oyna" or turn it down, or wait with the
+  countdown) and the lobby's "SENİ BEKLEYEN VS".
+- **Past games** (`History`, the profile's "GEÇMİŞ OYUNLAR" door): every run
+  played to its end, newest first, 30 a page, Hepsi / Günün akışı / VS, in
+  days (Bugün, Dün, then the date); `RunSheet` opens one with its stats,
+  bonuses and a VS's two scores (`GET /me/runs`, `GET /me/runs/{runId}`).
+- **Profile photos.** Picked from the library through the system's own
+  picker (no permission), framed in `AvatarEditor` (pinch and pan), cut,
+  scaled to 512 px and squeezed to 100 KB or less on the phone (`AVATAR`); the
+  API decodes it, crops it square, encodes a fresh JPEG with GD — no EXIF, no
+  location — under a new name each time, and serves it without a token, cached
+  for a year (`PUT|DELETE /me/avatar`, `GET /media/avatars/{file}`, the
+  `avatars` disk outside the web root). Everyone sees it: rows, the podium,
+  the climb, the league, the lobby's strip, `FaceOff`, the inbox, a card.
+- **Reports.** A player's photo or name can be reported from their card
+  ("Diğer"), once each per reporter; nobody is told who reported. The panel's
+  new **Bildirimler** page lists the reported players (open, resolved,
+  dismissed) behind a sidebar badge (`counts.reports`); the player page shows
+  the photo, the open reports, **Fotoğrafı kaldır** and **Bildirimleri kapat**
+  — both take a reason and are audited (`player.avatar_remove`,
+  `player.reports_dismiss`) — and resetting a name closes the reports about
+  it. The player page counts friends and the players who blocked them where it
+  counted follows.
+- **Push notifications** through Firebase Cloud Messaging
+  (`@react-native-firebase/messaging`; `PushService` on the API, sent after
+  the response, no queue or cron): a friend request, a request accepted, a VS
+  sent, a VS's result, a phrase (one push per friend every 5 minutes at most),
+  in the receiver's language (`lang/{locale}/push.php`, `phrases.php`). A new
+  player is asked right after the name (`NotificationsScreen`, "Haberin olsun
+  mu?"); the old ask after the first social move is gone. Where they are off, a
+  `PushNudge` offers them again — the inbox and a conversation (hideable for a
+  week) and a VS just sent — or the phone's settings once only those can.
+  Ayarlar → **Bildirimler** has three toggles kept on the account
+  (`pushFriends`, `pushVs`, `pushMessages`). A push that arrives while the game
+  is open drops in as a `Toast`; a tapped one opens its conversation — a
+  request, the Arkadaşlar tab.
+  Firebase's app files are git-ignored: a build without them has no push. The
+  panel's Sistem page says whether pushes can go out
+  (`QUEZBY_PUSH_ENABLED`, `FIREBASE_PROJECT_ID`, `FIREBASE_CREDENTIALS`) and
+  whether PHP's GD is there.
+- **No day board.** Zirve, the profile, the lobby's records, the result and the
+  panel's Sıralamalar show Hafta, Ay and Tüm zamanlar; the API keeps each day's
+  best only to add up league points, and no route serves it as a board. The
+  daily challenge's board stays. The result's players you passed are this week's
+  ("Bu hafta geçtiklerin").
+- **The league opens after 20 counted runs** (was 3;
+  `QUEZBY_LEAGUE_UNLOCK_RUNS`). A VS never counts towards it.
+- **Kit:** `FaceOff`, `ThreadRow`, `Count`, `Bubble`, `EventLine`,
+  `PhraseChip` (`ui/kit/social.tsx`), `RunTile` (`runs.tsx`), `Toast`
+  (`toast.tsx`); `ActionList` in `ui/sheet.tsx`; `Avatar`, `Portrait` (with a
+  camera slab), `PlayerRow`, `ClimbRow` and `Podium` draw the photo; the dock
+  draws a slot's badge (`tabBarBadge`). Glyphs `camera`, `image`, `flag`,
+  `ban`, `bell`, `userMinus`, `inbox`, `message`, `swords`. New catalogs
+  `inbox`, `vs`, `history` and `push`, `friends` rewritten; `t.fmt.date`,
+  `time` and `ago`; iOS's photo reasons and Android's notification channel in
+  the six languages.
+- **Panel:** VS runs are "VS" and "Oynandı" and offer neither Onayla nor
+  Reddet; a VS run's page names its VS; `Avatar` takes `src`, `alt`, `onBrand`
+  and `2xl`, `Page` a `leading` slot; the CSP lets photos load from the API.
+- **Contract:** `PlayerRelation`, `PlayerSummary.relation` and `avatarUrl`,
+  `PlayerCard.friends`, `FriendRequestsResponse`, `RelationResponse`,
+  `DuelView` / `DuelBrief` / `HeadToHead`, `InboxMessage`, `FriendThread`,
+  `ThreadResponse`, `InboxSummary`, `Phrase`, `BlocksResponse`,
+  `ReportReason`, `PushData`, `PushTokenRequest`, `UpdateAvatarRequest`,
+  `RunSummary`, `RunHistoryResponse`, `RunDetailResponse`, `Me.avatarUrl`,
+  `UserSettings.push*`, `RunMode` `vs`, `RunStatus` `played`,
+  `FinishRunResponse.duel`; `LeaderboardPeriod` without `daily`, `Ranks`
+  without it; admin `AdminReportRow`, `AdminCounts.reports`, `AdminRunDuel`,
+  `AdminPlayerResponse.social` and `openReports`, `AdminSystem.gd` and `push`.
+  The SDK's follow calls are gone; `me.inbox`, `friends`, `friendRequests`,
+  `thread`, `readThread`, `sendPhrase`, `blocks`, `runs`, `run`,
+  `updateAvatar`, `removeAvatar`, `registerPushToken`, `unregisterPushToken`,
+  `users.addFriend`, `removeFriend`, `block`, `unblock`, `report`, `duels.get`,
+  `decline`; admin `reports.list`, `players.removeAvatar`, `dismissReports`.
+- Store: the listings mention friends, VS, the inbox, past games, photos and
+  notifications; the English one says the game speaks six languages. The iOS
+  privacy manifest also declares Photos or Videos, Contacts (the friends list)
+  and Other User Content (the phrases), all linked and not tracking, for app
+  functionality; the push token falls under Device ID
+  (`apps/mobile/store/README.md` → "Gizlilik etiketleri").
+- Android: `versionName` is 1.0.0, as on iOS and in `package.json`. It was
+  the template's 0.0.1, below every environment's
+  `QUEZBY_ANDROID_MIN_VERSION`, so an Android build stopped on "Güncelleme
+  gerekli" wherever it pointed.
+- Docs: `docs/design/*`, `docs/rules/*`, `CLAUDE.md`; the product and API docs
+  describe friends, the inbox, VS, past games, photos, reports and push.
+- Tests: the app's `FriendsScreen`, `FindFriendsScreen`, `ThreadScreen`,
+  `HistoryScreen`, `NotificationsScreen`, `AvatarEditorScreen`,
+  `BlockedSheet`, `NotificationsSheet`, `PushNudge`, `usePush`, `lib/avatar`,
+  `lib/push` and the social kit (`Social.test.tsx`); `social.test.ts`
+  (config); the API's `FriendTest`, `BlockTest`, `InboxTest`, `DuelTest`,
+  `RunHistoryTest`, `AvatarTest`, `ReportTest`, `PushTest`,
+  `FollowsToFriendsTest` and `SocialParityTest`; the panel's
+  `ReportsPage.test.tsx`; and every suite the change touched.
+
 ## 2026-09-28 — Posts get formats: chats, polls, receipts, signs… and many more of them
 
 - **Every post is drawn in a format** (`packages/config/src/content/types.ts`):

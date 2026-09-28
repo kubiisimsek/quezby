@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use App\Models\SocialIdentity;
 use App\Models\User;
+use App\Services\Avatars\AvatarService;
 use App\Services\LeaderboardService;
 use App\Support\Timestamp;
 use Illuminate\Http\Request;
@@ -29,6 +30,7 @@ class MeResource extends JsonResource
         return [
             'id' => $this->id,
             'username' => $this->username,
+            'avatarUrl' => AvatarService::url($this->avatar),
             'email' => $this->email,
             'isGuest' => $this->email === null && $identities === [],
             'identities' => $identities,

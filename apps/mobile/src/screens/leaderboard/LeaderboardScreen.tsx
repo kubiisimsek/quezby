@@ -52,7 +52,7 @@ type Props = CompositeScreenProps<
 >;
 
 /** The periods, in the switch's order; their words are `t.board.summit.periods`. */
-const PERIODS: LeaderboardPeriod[] = ['daily', 'weekly', 'monthly', 'all'];
+const PERIODS: LeaderboardPeriod[] = ['weekly', 'monthly', 'all'];
 
 /** What sits under the period switch. */
 type Body = 'loading' | 'error' | 'alone' | 'empty' | 'board';
@@ -72,7 +72,7 @@ type Body = 'loading' | 'error' | 'alone' | 'empty' | 'board';
 export function LeaderboardScreen({ navigation }: Props) {
   const theme = useTheme();
   const t = useT();
-  const [period, setPeriod] = useState<LeaderboardPeriod>('daily');
+  const [period, setPeriod] = useState<LeaderboardPeriod>('weekly');
   const [scope, setScope] = useState<LeaderboardScope>('everyone');
   const [selected, setSelected] = useState<string | null>(null);
   const [floorHeight, setFloorHeight] = useState(0);
@@ -100,7 +100,7 @@ export function LeaderboardScreen({ navigation }: Props) {
     },
     [play],
   );
-  const search = useCallback(() => navigation.navigate('Search'), [navigation]);
+  const search = useCallback(() => navigation.navigate('FindFriends'), [navigation]);
   const open = useCallback(
     (entry: LeaderboardEntry) => setSelected(entry.username),
     [],
@@ -140,7 +140,7 @@ export function LeaderboardScreen({ navigation }: Props) {
               ) : null}
               <IconButton
                 icon="search"
-                label={t.friends.find}
+                label={t.friends.tab.find}
                 tone="onBrand"
                 onPress={search}
               />

@@ -15,6 +15,7 @@
 | [design/admin-design-system.md](design/admin-design-system.md) | The admin panel's look: Qesvis's language in Quezby's colours |
 | [development/environments.md](development/environments.md) | Local / staging / production |
 | [development/device-integrity-setup.md](development/device-integrity-setup.md) | App Attest and Play Integrity, console by console (Turkish) |
+| [development/push-setup.md](development/push-setup.md) | Push notifications: Firebase, APNs and the server key, console by console (Turkish) |
 | [../apps/mobile/store/README.md](../apps/mobile/store/README.md) | App Store and Google Play listing texts, keywords (Turkish) |
 | [development/local-development.md](development/local-development.md) | Running it |
 | [deployment/shared-hosting.md](deployment/shared-hosting.md) | Uploading the API and the admin panel to shared hosting |

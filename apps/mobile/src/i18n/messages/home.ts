@@ -18,6 +18,8 @@ type AttemptTag = Exclude<DailyAttempt['status'], 'ranked'> | 'unplaced';
  */
 const tr = {
   help: 'Yardım',
+  /** The status strip's mailbox: the Arkadaşlar tab, with what waits there. */
+  inbox: 'Mesaj kutusu',
   /** The eyebrow of the doors that count this week: the league, the rival. */
   thisWeek: 'BU HAFTA',
   device: {
@@ -55,7 +57,6 @@ const tr = {
   },
   rival: {
     title: 'Hedefin',
-    versus: 'VS',
     gap: (name: string, _points: number, points: string) =>
       `${handle(dativeOf(name))} ${points} puan`,
     ahead: (name: string) => `${handle(name)} haftalık sıralamada hemen önünde.`,
@@ -63,7 +64,7 @@ const tr = {
   },
   records: {
     title: 'Sezon rekoru',
-    boards: { daily: 'Bugün', weekly: 'Hafta', monthly: 'Ay', all: 'Tüm zamanlar' },
+    boards: { weekly: 'Hafta', monthly: 'Ay', all: 'Tüm zamanlar' },
   },
   protect:
     'Ligdesin! Telefonun değişirse ligin ve skorların kaybolmasın: bir giriş yolu bağla.',
@@ -82,6 +83,7 @@ export type HomeMessages = typeof tr;
 
 const en: HomeMessages = {
   help: 'Help',
+  inbox: 'Inbox',
   thisWeek: 'THIS WEEK',
   device: {
     eyebrow: 'RANKING',
@@ -136,7 +138,6 @@ const en: HomeMessages = {
   },
   rival: {
     title: 'Your target',
-    versus: 'VS',
     gap: (name, count, points) =>
       plural('en', count, {
         one: `${points} point to pass ${handle(name)}`,
@@ -147,7 +148,7 @@ const en: HomeMessages = {
   },
   records: {
     title: 'Season record',
-    boards: { daily: 'Today', weekly: 'Week', monthly: 'Month', all: 'All time' },
+    boards: { weekly: 'Week', monthly: 'Month', all: 'All time' },
   },
   protect:
     "You're in the league! Don't lose your league and scores if you change phones: link a sign-in method.",
@@ -163,6 +164,7 @@ const en: HomeMessages = {
 
 const de: HomeMessages = {
   help: 'Hilfe',
+  inbox: 'Postfach',
   thisWeek: 'DIESE WOCHE',
   device: {
     eyebrow: 'RANGLISTE',
@@ -214,7 +216,6 @@ const de: HomeMessages = {
   },
   rival: {
     title: 'Dein Ziel',
-    versus: 'VS',
     gap: (name, count, points) =>
       plural('de', count, {
         one: `Noch ${points} Punkt bis ${handle(name)}`,
@@ -225,7 +226,7 @@ const de: HomeMessages = {
   },
   records: {
     title: 'Saisonrekord',
-    boards: { daily: 'Heute', weekly: 'Woche', monthly: 'Monat', all: 'Allzeit' },
+    boards: { weekly: 'Woche', monthly: 'Monat', all: 'Allzeit' },
   },
   protect:
     'Du bist in der Liga! Damit deine Liga und deine Scores bei einem neuen Handy nicht verloren gehen: Verknüpf einen Anmeldeweg.',
@@ -241,6 +242,7 @@ const de: HomeMessages = {
 
 const ar: HomeMessages = {
   help: 'المساعدة',
+  inbox: 'صندوق الرسائل',
   thisWeek: 'هذا الأسبوع',
   device: {
     eyebrow: 'الترتيب',
@@ -306,7 +308,6 @@ const ar: HomeMessages = {
   },
   rival: {
     title: 'هدفك',
-    versus: 'ضد',
     gap: (name, count, points) =>
       plural('ar', count, {
         one: `نقطة واحدة لتجاوز ${iso(handle(name))}`,
@@ -319,7 +320,7 @@ const ar: HomeMessages = {
   },
   records: {
     title: 'الرقم القياسي للموسم',
-    boards: { daily: 'اليوم', weekly: 'الأسبوع', monthly: 'الشهر', all: 'كل الأوقات' },
+    boards: { weekly: 'الأسبوع', monthly: 'الشهر', all: 'كل الأوقات' },
   },
   protect: 'أنت في الدوري! كي لا تفقد دوريك ونتائجك إذا غيّرت هاتفك: اربط طريقة لتسجيل الدخول.',
   countdown: {
@@ -334,6 +335,7 @@ const ar: HomeMessages = {
 
 const fr: HomeMessages = {
   help: 'Aide',
+  inbox: 'Boîte de réception',
   thisWeek: 'CETTE SEMAINE',
   device: {
     eyebrow: 'CLASSEMENT',
@@ -388,7 +390,6 @@ const fr: HomeMessages = {
   },
   rival: {
     title: 'Ta cible',
-    versus: 'VS',
     gap: (name, count, points) =>
       plural('fr', count, {
         one: `${points} point pour dépasser ${handle(name)}`,
@@ -399,7 +400,7 @@ const fr: HomeMessages = {
   },
   records: {
     title: 'Record de la saison',
-    boards: { daily: "Aujourd'hui", weekly: 'Semaine', monthly: 'Mois', all: 'Depuis toujours' },
+    boards: { weekly: 'Semaine', monthly: 'Mois', all: 'Depuis toujours' },
   },
   protect:
     'Tu es dans la ligue ! Pour ne pas perdre ta ligue et tes scores si tu changes de téléphone : lie un moyen de connexion.',
@@ -415,6 +416,7 @@ const fr: HomeMessages = {
 
 const es: HomeMessages = {
   help: 'Ayuda',
+  inbox: 'Buzón',
   thisWeek: 'ESTA SEMANA',
   device: {
     eyebrow: 'CLASIFICACIÓN',
@@ -470,7 +472,6 @@ const es: HomeMessages = {
   },
   rival: {
     title: 'Tu objetivo',
-    versus: 'VS',
     gap: (name, count, points) =>
       plural('es', count, {
         one: `${points} punto para superar a ${handle(name)}`,
@@ -481,7 +482,7 @@ const es: HomeMessages = {
   },
   records: {
     title: 'Récord de la temporada',
-    boards: { daily: 'Hoy', weekly: 'Semana', monthly: 'Mes', all: 'Histórico' },
+    boards: { weekly: 'Semana', monthly: 'Mes', all: 'Histórico' },
   },
   protect:
     '¡Estás en la liga! Para no perder tu liga ni tus puntuaciones si cambias de teléfono, vincula un método de acceso.',

@@ -1,6 +1,6 @@
 import type { Locale } from '@quezby/types';
 
-import { formatsFor, handle, iso, type Formats } from '@/i18n/format';
+import { formatsFor, type Formats } from '@/i18n/format';
 import { plural } from '@/i18n/plural';
 
 /** Each language's numbers, for the lines that count something. */
@@ -14,44 +14,62 @@ const fmt: Record<Locale, Formats> = {
 };
 
 /**
- * Finding and following players: the Arkadaşlar tab, a player's card over
- * any board, and a friends board with nobody on it but you.
+ * Friends: the Arkadaşlar tab (requests and the inbox), finding a player,
+ * the one button beside a player, a player's card over any board, the
+ * blocked list, and a friends board with nobody on it but you. `name` is a
+ * player's name as `handle` writes it (`@ekin`).
  */
 const tr = {
-  /** The Arkadaşlar tab. */
-  search: {
+  /** The Arkadaşlar tab: requests waiting, then a conversation per friend. */
+  tab: {
     title: 'Arkadaşlar',
-    tagline: 'Oyuncu ara, takip et, yarış',
+    tagline: 'İstekler, mesajlar ve VS',
+    find: 'Arkadaş bul',
+    requests: 'İstekler',
+    inbox: 'Mesaj kutusu',
+    emptyTitle: 'Henüz arkadaşın yok',
+    emptyHint:
+      'Bir oyuncuyu adıyla ara, arkadaşlık isteği gönder. Kabul edince mesajlaşır, birbirinize VS atarsınız.',
+    failed: 'Arkadaşların yüklenemedi',
+    retry: 'Tekrar dene',
+  },
+  /** Finding a player by the start of their name. */
+  search: {
+    title: 'Arkadaş bul',
+    tagline: 'Oyuncuları adıyla ara',
     field: 'Kullanıcı adı',
     placeholder: 'ör. ekin',
     tooShort: (min: number) => `Aramak için en az ${min} karakter yaz.`,
-    tabs: { following: 'Takip ettiklerin', followers: 'Takipçilerin' },
     failed: 'Arama yapılamadı',
     nobody: 'Kimse bulunamadı',
     /** Nobody's name starts with what was typed. */
     nobodyHint: (term: string) => `Adı “${term}” ile başlayan bir oyuncu yok. Yazdığını kontrol et.`,
-    followingHint: 'Yukarıdan bir oyuncu ara ve takip et; arkadaş sıralamalarında onu da görürsün.',
-    noFollowers: 'Henüz takipçin yok',
-    /** Ends on your own name, for your friends to look up. */
-    noFollowersHint: (name: string) =>
-      `Seni takip edenler burada görünür. Adını arkadaşlarına söyle: ${handle(name)}`,
-    listFailed: 'Liste yüklenemedi',
-    more: 'Daha fazla',
+    idleTitle: 'Bir oyuncu ara',
+    idleHint: 'Adının ilk harflerini yaz. İsteğini kabul edenler Arkadaşlar sekmesinde belirir.',
+    /** Over the requests the player sent that still wait. */
+    sent: 'Gönderdiğin istekler',
     retry: 'Tekrar dene',
   },
-  /** Said on the Arkadaşlar tab and on an empty friends board. */
-  notFollowing: 'Henüz kimseyi takip etmiyorsun',
-  follow: 'Takip et',
-  unfollow: 'Takibi bırak',
-  /** The way to the Arkadaşlar tab — a board's search button, an empty friends board. */
-  find: 'Oyuncu ara',
+  /** The button beside a player, by what they are to you. */
+  relation: {
+    add: 'Ekle',
+    addLong: 'Arkadaş ekle',
+    cancel: 'Geri al',
+    requested: 'İstek gönderildi',
+    accept: 'Kabul et',
+    decline: 'Reddet',
+    chat: 'Sohbet',
+    unblock: 'Engeli kaldır',
+    /** Tags on a player's card. */
+    friend: 'Arkadaşın',
+    incoming: 'Seni eklemek istiyor',
+    blocked: 'Engelledin',
+  },
   /** A player's card, opened from any row. */
   sheet: {
     failed: 'Oyuncu yüklenemedi',
     you: 'Sen',
-    followsYou: 'Seni takip ediyor',
-    counts: (followers: number, following: number) =>
-      `${fmt.tr.score(followers)} takipçi · ${fmt.tr.score(following)} takip`,
+    friends: (count: number) => `${fmt.tr.score(count)} arkadaş`,
     stats: {
       weekly: 'Bu hafta',
       all: 'Tüm zamanlar',
@@ -60,6 +78,16 @@ const tr = {
       likes: 'Beğeni',
       perfects: 'Mükemmel',
     },
+    more: 'Diğer',
+    vs: 'VS at',
+    unfriend: 'Arkadaşlıktan çıkar',
+    unfriendHint: 'Mesajlarınız silinir, açık VS’iniz kapanır.',
+    block: 'Engelle',
+    blockHint: 'Arkadaşlığınız ve istekleriniz biter; seni bulamaz, sana yazamaz.',
+    reportPhoto: 'Fotoğrafı bildir',
+    reportName: 'Kullanıcı adını bildir',
+    reportHint: 'Bir moderatör bakar; kimin bildirdiği söylenmez.',
+    reported: 'Teşekkürler, bildirdin. Bir moderatör bakacak.',
   },
   /** The season best on a player card. */
   best: {
@@ -68,19 +96,42 @@ const tr = {
   },
   /** A friends board with nobody on it but you. */
   empty: {
-    waiting: 'Takip ettiklerin henüz oynamadı',
+    waiting: 'Arkadaşların henüz oynamadı',
     waitingHint: 'Onlar oynadıkça burada seninle yarışacaklar.',
     play: 'Oyna',
-    noneHint: 'Takip ettiğin oyuncular burada seninle yarışır.',
+    none: 'Henüz arkadaşın yok',
+    noneHint: 'Arkadaşların burada seninle yarışır.',
+    find: 'Arkadaş bul',
+  },
+  /** Ayarlar → Engellenenler. */
+  blocked: {
+    title: 'Engellenenler',
+    description: 'Engellediğin oyuncular seni bulamaz; sana istek, mesaj ya da VS gönderemez.',
+    none: 'Kimseyi engellemedin.',
+    unblock: 'Engeli kaldır',
+    since: (date: string) => `${date} tarihinden beri`,
+    failed: 'Liste yüklenemedi',
   },
 };
 
 export type FriendsMessages = typeof tr;
 
 const en: FriendsMessages = {
-  search: {
+  tab: {
     title: 'Friends',
-    tagline: 'Find players, follow, race',
+    tagline: 'Requests, messages and VS',
+    find: 'Find friends',
+    requests: 'Requests',
+    inbox: 'Inbox',
+    emptyTitle: 'No friends yet',
+    emptyHint:
+      'Search for a player by name and send a friend request. Once they accept, you can message each other and send VS.',
+    failed: "Couldn't load your friends",
+    retry: 'Try again',
+  },
+  search: {
+    title: 'Find friends',
+    tagline: 'Search for players by name',
     field: 'Username',
     placeholder: 'e.g. ekin',
     tooShort: (min) =>
@@ -88,31 +139,32 @@ const en: FriendsMessages = {
         one: 'Type at least 1 character to search.',
         other: `Type at least ${min} characters to search.`,
       }),
-    tabs: { following: 'Following', followers: 'Followers' },
     failed: "Couldn't search",
     nobody: 'No one found',
     nobodyHint: (term) => `No player's name starts with “${term}”. Check what you typed.`,
-    followingHint: "Search for players above and follow them; you'll see them on your friends boards too.",
-    noFollowers: 'No followers yet',
-    noFollowersHint: (name) =>
-      `Players who follow you show up here. Tell your friends your name: ${handle(name)}`,
-    listFailed: "Couldn't load the list",
-    more: 'Show more',
+    idleTitle: 'Search for a player',
+    idleHint: 'Type the first letters of their name. Players who accept show up in Friends.',
+    sent: 'Requests you sent',
     retry: 'Try again',
   },
-  notFollowing: "You're not following anyone yet",
-  follow: 'Follow',
-  unfollow: 'Unfollow',
-  find: 'Find players',
+  relation: {
+    add: 'Add',
+    addLong: 'Add friend',
+    cancel: 'Undo',
+    requested: 'Request sent',
+    accept: 'Accept',
+    decline: 'Decline',
+    chat: 'Chat',
+    unblock: 'Unblock',
+    friend: 'Your friend',
+    incoming: 'Wants to add you',
+    blocked: 'Blocked',
+  },
   sheet: {
     failed: "Couldn't load this player",
     you: 'You',
-    followsYou: 'Follows you',
-    counts: (followers, following) =>
-      `${plural('en', followers, {
-        one: '1 follower',
-        other: `${fmt.en.score(followers)} followers`,
-      })} · ${fmt.en.score(following)} following`,
+    friends: (count) =>
+      plural('en', count, { one: '1 friend', other: `${fmt.en.score(count)} friends` }),
     stats: {
       weekly: 'This week',
       all: 'All time',
@@ -121,49 +173,88 @@ const en: FriendsMessages = {
       likes: 'Likes',
       perfects: 'Perfect',
     },
+    more: 'More',
+    vs: 'Send VS',
+    unfriend: 'Remove friend',
+    unfriendHint: 'Your messages are deleted and any open VS closes.',
+    block: 'Block',
+    blockHint: "Your friendship and requests end; they can't find you or message you.",
+    reportPhoto: 'Report photo',
+    reportName: 'Report username',
+    reportHint: 'A moderator takes a look; nobody is told who reported.',
+    reported: 'Thanks for reporting. A moderator will take a look.',
   },
   best: {
     title: 'Season record',
     said: (value) => `Season record: ${value}`,
   },
   empty: {
-    waiting: "The players you follow haven't played yet",
+    waiting: "Your friends haven't played yet",
     waitingHint: "As they play, they'll race you here.",
     play: 'Play',
-    noneHint: 'Players you follow race you here.',
+    none: 'No friends yet',
+    noneHint: 'Your friends race you here.',
+    find: 'Find friends',
+  },
+  blocked: {
+    title: 'Blocked players',
+    description: "Players you block can't find you or send you requests, messages or VS.",
+    none: "You haven't blocked anyone.",
+    unblock: 'Unblock',
+    since: (date) => `Since ${date}`,
+    failed: "Couldn't load the list",
   },
 };
 
 const de: FriendsMessages = {
-  search: {
+  tab: {
     title: 'Freunde',
-    tagline: 'Spieler finden, folgen, antreten',
+    tagline: 'Anfragen, Nachrichten und VS',
+    find: 'Freunde finden',
+    requests: 'Anfragen',
+    inbox: 'Postfach',
+    emptyTitle: 'Noch keine Freunde',
+    emptyHint:
+      'Such einen Spieler nach Namen und schick eine Freundschaftsanfrage. Sobald er annimmt, schreibt ihr euch und schickt euch VS.',
+    failed: 'Deine Freunde konnten nicht geladen werden',
+    retry: 'Nochmal versuchen',
+  },
+  search: {
+    title: 'Freunde finden',
+    tagline: 'Spieler nach Namen suchen',
     field: 'Benutzername',
     placeholder: 'z. B. ekin',
-    tooShort: (min) => `Gib mindestens ${min} Zeichen ein, um zu suchen.`,
-    tabs: { following: 'Folge ich', followers: 'Follower' },
+    tooShort: (min) =>
+      plural('de', min, {
+        one: 'Gib zum Suchen mindestens 1 Zeichen ein.',
+        other: `Gib zum Suchen mindestens ${min} Zeichen ein.`,
+      }),
     failed: 'Suche fehlgeschlagen',
     nobody: 'Niemand gefunden',
     nobodyHint: (term) => `Kein Spielername beginnt mit „${term}“. Prüf deine Eingabe.`,
-    followingHint:
-      'Such oben nach Spielern und folge ihnen – dann siehst du sie auch in deinen Freunde-Ranglisten.',
-    noFollowers: 'Noch keine Follower',
-    noFollowersHint: (name) =>
-      `Wer dir folgt, erscheint hier. Sag deinen Freunden deinen Namen: ${handle(name)}`,
-    listFailed: 'Liste konnte nicht geladen werden',
-    more: 'Mehr anzeigen',
-    retry: 'Noch mal versuchen',
+    idleTitle: 'Such einen Spieler',
+    idleHint: 'Gib die ersten Buchstaben des Namens ein. Wer annimmt, erscheint unter Freunde.',
+    sent: 'Deine Anfragen',
+    retry: 'Nochmal versuchen',
   },
-  notFollowing: 'Du folgst noch niemandem',
-  follow: 'Folgen',
-  unfollow: 'Entfolgen',
-  find: 'Spieler suchen',
+  relation: {
+    add: 'Hinzufügen',
+    addLong: 'Als Freund hinzufügen',
+    cancel: 'Zurückziehen',
+    requested: 'Anfrage gesendet',
+    accept: 'Annehmen',
+    decline: 'Ablehnen',
+    chat: 'Chat',
+    unblock: 'Blockierung aufheben',
+    friend: 'Dein Freund',
+    incoming: 'Will dich hinzufügen',
+    blocked: 'Blockiert',
+  },
   sheet: {
     failed: 'Spieler konnte nicht geladen werden',
     you: 'Du',
-    followsYou: 'Folgt dir',
-    counts: (followers, following) =>
-      `${fmt.de.score(followers)} Follower · folgt ${fmt.de.score(following)}`,
+    friends: (count) =>
+      plural('de', count, { one: '1 Freund', other: `${fmt.de.score(count)} Freunde` }),
     stats: {
       weekly: 'Diese Woche',
       all: 'Allzeit',
@@ -172,60 +263,99 @@ const de: FriendsMessages = {
       likes: 'Likes',
       perfects: 'Perfekt',
     },
+    more: 'Mehr',
+    vs: 'VS schicken',
+    unfriend: 'Als Freund entfernen',
+    unfriendHint: 'Eure Nachrichten werden gelöscht, ein offenes VS endet.',
+    block: 'Blockieren',
+    blockHint: 'Eure Freundschaft und Anfragen enden; er kann dich nicht finden und dir nicht schreiben.',
+    reportPhoto: 'Foto melden',
+    reportName: 'Benutzernamen melden',
+    reportHint: 'Ein Moderator sieht es sich an; niemand erfährt, wer gemeldet hat.',
+    reported: 'Danke für die Meldung. Ein Moderator sieht es sich an.',
   },
   best: {
     title: 'Saisonrekord',
     said: (value) => `Saisonrekord: ${value}`,
   },
   empty: {
-    waiting: 'Die Spieler, denen du folgst, haben noch nicht gespielt',
+    waiting: 'Deine Freunde haben noch nicht gespielt',
     waitingHint: 'Sobald sie spielen, treten sie hier gegen dich an.',
     play: 'Spielen',
-    noneHint: 'Spieler, denen du folgst, treten hier gegen dich an.',
+    none: 'Noch keine Freunde',
+    noneHint: 'Deine Freunde treten hier gegen dich an.',
+    find: 'Freunde finden',
+  },
+  blocked: {
+    title: 'Blockierte Spieler',
+    description: 'Blockierte Spieler finden dich nicht und können dir keine Anfragen, Nachrichten oder VS schicken.',
+    none: 'Du hast niemanden blockiert.',
+    unblock: 'Blockierung aufheben',
+    since: (date) => `Seit dem ${date}`,
+    failed: 'Liste konnte nicht geladen werden',
   },
 };
 
 const ar: FriendsMessages = {
-  search: {
+  tab: {
     title: 'الأصدقاء',
-    tagline: 'ابحث عن لاعبين، تابعهم، نافسهم',
+    tagline: 'الطلبات والرسائل والتحديات',
+    find: 'ابحث عن أصدقاء',
+    requests: 'الطلبات',
+    inbox: 'صندوق الرسائل',
+    emptyTitle: 'لا أصدقاء بعد',
+    emptyHint:
+      'ابحث عن لاعب باسمه وأرسل طلب صداقة. عندما يقبل، تتراسلان ويتحدّى كل منكما الآخر.',
+    failed: 'تعذّر تحميل أصدقائك',
+    retry: 'أعد المحاولة',
+  },
+  search: {
+    title: 'ابحث عن أصدقاء',
+    tagline: 'ابحث عن اللاعبين بأسمائهم',
     field: 'اسم المستخدم',
-    placeholder: `مثال: ${iso('ekin')}`,
+    placeholder: 'مثلًا ekin',
     tooShort: (min) =>
       plural('ar', min, {
+        zero: 'اكتب حرفًا واحدًا على الأقل للبحث.',
         one: 'اكتب حرفًا واحدًا على الأقل للبحث.',
         two: 'اكتب حرفين على الأقل للبحث.',
         few: `اكتب ${min} أحرف على الأقل للبحث.`,
         many: `اكتب ${min} حرفًا على الأقل للبحث.`,
         other: `اكتب ${min} حرف على الأقل للبحث.`,
       }),
-    tabs: { following: 'من تتابعهم', followers: 'متابعوك' },
     failed: 'تعذّر البحث',
-    nobody: 'لم نعثر على أحد',
-    nobodyHint: (term) => `لا يوجد لاعب يبدأ اسمه بـ«${iso(term)}». تحقّق مما كتبته.`,
-    followingHint: 'ابحث عن لاعبين في الأعلى وتابعهم، وستراهم أيضًا في ترتيبات الأصدقاء.',
-    noFollowers: 'ليس لديك متابعون بعد',
-    noFollowersHint: (name) => `يظهر هنا من يتابعونك. أخبر أصدقاءك باسمك: ${iso(handle(name))}`,
-    listFailed: 'تعذّر تحميل القائمة',
-    more: 'عرض المزيد',
-    retry: 'حاول مجددًا',
+    nobody: 'لم يُعثر على أحد',
+    nobodyHint: (term) => `لا يبدأ اسم أي لاعب بـ «${term}». تحقّق مما كتبت.`,
+    idleTitle: 'ابحث عن لاعب',
+    idleHint: 'اكتب الأحرف الأولى من اسمه. من يقبل طلبك يظهر في الأصدقاء.',
+    sent: 'الطلبات التي أرسلتها',
+    retry: 'أعد المحاولة',
   },
-  notFollowing: 'لا تتابع أحدًا بعد',
-  follow: 'تابِع',
-  unfollow: 'إلغاء المتابعة',
-  find: 'ابحث عن لاعبين',
+  relation: {
+    add: 'أضف',
+    addLong: 'أضف صديقًا',
+    cancel: 'تراجع',
+    requested: 'أُرسل الطلب',
+    accept: 'اقبل',
+    decline: 'ارفض',
+    chat: 'محادثة',
+    unblock: 'ألغِ الحظر',
+    friend: 'صديقك',
+    incoming: 'يريد إضافتك',
+    blocked: 'محظور',
+  },
   sheet: {
-    failed: 'تعذّر تحميل اللاعب',
+    failed: 'تعذّر تحميل هذا اللاعب',
     you: 'أنت',
-    followsYou: 'يتابعك',
-    counts: (followers, following) =>
-      `${plural('ar', followers, {
-        one: 'متابع واحد',
-        two: 'متابعان',
-        few: `${fmt.ar.score(followers)} متابعين`,
-        many: `${fmt.ar.score(followers)} متابعًا`,
-        other: `${fmt.ar.score(followers)} متابع`,
-      })} · يتابع ${fmt.ar.score(following)}`,
+    friends: (count) =>
+      plural('ar', count, {
+        zero: 'لا أصدقاء',
+        one: 'صديق واحد',
+        two: 'صديقان',
+        few: `${fmt.ar.score(count)} أصدقاء`,
+        many: `${fmt.ar.score(count)} صديقًا`,
+        other: `${fmt.ar.score(count)} صديق`,
+      }),
     stats: {
       weekly: 'هذا الأسبوع',
       all: 'كل الأوقات',
@@ -234,59 +364,88 @@ const ar: FriendsMessages = {
       likes: 'الإعجابات',
       perfects: 'مثالي',
     },
+    more: 'المزيد',
+    vs: 'تحدَّه',
+    unfriend: 'أزل من الأصدقاء',
+    unfriendHint: 'تُحذف رسائلكما ويُغلق التحدي المفتوح بينكما.',
+    block: 'احظر',
+    blockHint: 'تنتهي صداقتكما وطلباتكما؛ لن يجدك ولن يراسلك.',
+    reportPhoto: 'أبلغ عن الصورة',
+    reportName: 'أبلغ عن اسم المستخدم',
+    reportHint: 'سينظر فيه مشرف؛ لا يُقال لأحد من أبلغ.',
+    reported: 'شكرًا على الإبلاغ. سينظر فيه مشرف.',
   },
   best: {
     title: 'الرقم القياسي للموسم',
     said: (value) => `الرقم القياسي للموسم: ${value}`,
   },
   empty: {
-    waiting: 'من تتابعهم لم يلعبوا بعد',
-    waitingHint: 'عندما يلعبون سينافسونك هنا.',
+    waiting: 'لم يلعب أصدقاؤك بعد',
+    waitingHint: 'عندما يلعبون، سينافسونك هنا.',
     play: 'العب',
-    noneHint: 'اللاعبون الذين تتابعهم ينافسونك هنا.',
+    none: 'لا أصدقاء بعد',
+    noneHint: 'أصدقاؤك ينافسونك هنا.',
+    find: 'ابحث عن أصدقاء',
+  },
+  blocked: {
+    title: 'المحظورون',
+    description: 'من تحظرهم لا يجدونك ولا يرسلون إليك طلبات أو رسائل أو تحديات.',
+    none: 'لم تحظر أحدًا.',
+    unblock: 'ألغِ الحظر',
+    since: (date) => `منذ ${date}`,
+    failed: 'تعذّر تحميل القائمة',
   },
 };
 
 const fr: FriendsMessages = {
-  search: {
+  tab: {
     title: 'Amis',
-    tagline: 'Trouve des joueurs, suis-les, affronte-les',
-    field: 'Pseudo',
-    placeholder: 'ex. : ekin',
-    tooShort: (min) =>
-      plural('fr', min, {
-        one: `Écris au moins ${min} caractère pour chercher.`,
-        other: `Écris au moins ${min} caractères pour chercher.`,
-      }),
-    tabs: { following: 'Suivis', followers: 'Abonnés' },
-    failed: 'Recherche impossible',
-    nobody: 'Aucun joueur trouvé',
-    nobodyHint: (term) => `Aucun pseudo ne commence par « ${term} ». Vérifie ce que tu as tapé.`,
-    followingHint:
-      'Cherche des joueurs ci-dessus et suis-les ; tu les verras aussi dans tes classements entre amis.',
-    noFollowers: "Pas encore d'abonnés",
-    noFollowersHint: (name) =>
-      `Tes abonnés apparaissent ici. Donne ton pseudo à tes amis : ${handle(name)}`,
-    listFailed: 'Impossible de charger la liste',
-    more: 'Voir plus',
+    tagline: 'Demandes, messages et VS',
+    find: 'Trouver des amis',
+    requests: 'Demandes',
+    inbox: 'Boîte de réception',
+    emptyTitle: "Pas encore d'amis",
+    emptyHint:
+      "Cherche un joueur par son nom et envoie une demande d'ami. Une fois acceptée, vous vous écrivez et vous lancez des VS.",
+    failed: 'Impossible de charger tes amis',
     retry: 'Réessayer',
   },
-  notFollowing: 'Tu ne suis encore personne',
-  follow: 'Suivre',
-  unfollow: 'Ne plus suivre',
-  find: 'Chercher des joueurs',
+  search: {
+    title: 'Trouver des amis',
+    tagline: 'Cherche des joueurs par leur nom',
+    field: "Nom d'utilisateur",
+    placeholder: 'ex. ekin',
+    tooShort: (min) =>
+      plural('fr', min, {
+        one: `Écris au moins ${min} caractère pour chercher.`,
+        other: `Écris au moins ${min} caractères pour chercher.`,
+      }),
+    failed: 'Recherche impossible',
+    nobody: 'Personne trouvé',
+    nobodyHint: (term) => `Aucun nom de joueur ne commence par « ${term} ». Vérifie ce que tu as écrit.`,
+    idleTitle: 'Cherche un joueur',
+    idleHint: 'Écris les premières lettres de son nom. Ceux qui acceptent apparaissent dans Amis.',
+    sent: 'Demandes envoyées',
+    retry: 'Réessayer',
+  },
+  relation: {
+    add: 'Ajouter',
+    addLong: 'Ajouter en ami',
+    cancel: 'Annuler',
+    requested: 'Demande envoyée',
+    accept: 'Accepter',
+    decline: 'Refuser',
+    chat: 'Discuter',
+    unblock: 'Débloquer',
+    friend: 'Ton ami',
+    incoming: "Veut t'ajouter",
+    blocked: 'Bloqué',
+  },
   sheet: {
     failed: 'Impossible de charger ce joueur',
     you: 'Toi',
-    followsYou: 'Te suit',
-    counts: (followers, following) =>
-      `${plural('fr', followers, {
-        one: `${fmt.fr.score(followers)} abonné`,
-        other: `${fmt.fr.score(followers)} abonnés`,
-      })} · ${plural('fr', following, {
-        one: `${fmt.fr.score(following)} suivi`,
-        other: `${fmt.fr.score(following)} suivis`,
-      })}`,
+    friends: (count) =>
+      plural('fr', count, { one: `${fmt.fr.score(count)} ami`, other: `${fmt.fr.score(count)} amis` }),
     stats: {
       weekly: 'Cette semaine',
       all: 'Depuis toujours',
@@ -295,23 +454,55 @@ const fr: FriendsMessages = {
       likes: 'Likes',
       perfects: 'Parfait',
     },
+    more: 'Plus',
+    vs: 'Lancer un VS',
+    unfriend: 'Retirer des amis',
+    unfriendHint: 'Vos messages sont supprimés et le VS en cours se ferme.',
+    block: 'Bloquer',
+    blockHint: 'Votre amitié et vos demandes prennent fin ; il ne peut plus te trouver ni t’écrire.',
+    reportPhoto: 'Signaler la photo',
+    reportName: "Signaler le nom d'utilisateur",
+    reportHint: 'Un modérateur y jette un œil ; personne ne sait qui a signalé.',
+    reported: 'Merci pour le signalement. Un modérateur va y jeter un œil.',
   },
   best: {
     title: 'Record de la saison',
     said: (value) => `Record de la saison : ${value}`,
   },
   empty: {
-    waiting: "Les joueurs que tu suis n'ont pas encore joué",
-    waitingHint: "Dès qu'ils joueront, ils t'affronteront ici.",
+    waiting: "Tes amis n'ont pas encore joué",
+    waitingHint: 'Dès qu’ils jouent, ils se mesurent à toi ici.',
     play: 'Jouer',
-    noneHint: "Les joueurs que tu suis t'affrontent ici.",
+    none: "Pas encore d'amis",
+    noneHint: 'Tes amis se mesurent à toi ici.',
+    find: 'Trouver des amis',
+  },
+  blocked: {
+    title: 'Joueurs bloqués',
+    description: 'Les joueurs que tu bloques ne peuvent pas te trouver ni t’envoyer de demandes, de messages ou de VS.',
+    none: "Tu n'as bloqué personne.",
+    unblock: 'Débloquer',
+    since: (date) => `Depuis le ${date}`,
+    failed: 'Impossible de charger la liste',
   },
 };
 
 const es: FriendsMessages = {
-  search: {
+  tab: {
     title: 'Amigos',
-    tagline: 'Busca jugadores, síguelos, compite',
+    tagline: 'Solicitudes, mensajes y VS',
+    find: 'Buscar amigos',
+    requests: 'Solicitudes',
+    inbox: 'Buzón',
+    emptyTitle: 'Aún no tienes amigos',
+    emptyHint:
+      'Busca a un jugador por su nombre y envíale una solicitud de amistad. Cuando acepte, podrán escribirse y mandarse VS.',
+    failed: 'No se pudieron cargar tus amigos',
+    retry: 'Reintentar',
+  },
+  search: {
+    title: 'Buscar amigos',
+    tagline: 'Busca jugadores por su nombre',
     field: 'Nombre de usuario',
     placeholder: 'p. ej. ekin',
     tooShort: (min) =>
@@ -319,36 +510,32 @@ const es: FriendsMessages = {
         one: 'Escribe al menos 1 carácter para buscar.',
         other: `Escribe al menos ${min} caracteres para buscar.`,
       }),
-    tabs: { following: 'Siguiendo', followers: 'Seguidores' },
     failed: 'No se pudo buscar',
     nobody: 'No se encontró a nadie',
-    nobodyHint: (term) =>
-      `Ningún jugador tiene un nombre que empiece por «${term}». Revisa lo que escribiste.`,
-    followingHint:
-      'Busca jugadores arriba y síguelos; también los verás en tus clasificaciones de amigos.',
-    noFollowers: 'Aún no tienes seguidores',
-    noFollowersHint: (name) =>
-      `Aquí aparecen quienes te siguen. Dile tu nombre a tus amigos: ${handle(name)}`,
-    listFailed: 'No se pudo cargar la lista',
-    more: 'Ver más',
+    nobodyHint: (term) => `Ningún nombre de jugador empieza por «${term}». Revisa lo que escribiste.`,
+    idleTitle: 'Busca a un jugador',
+    idleHint: 'Escribe las primeras letras de su nombre. Quienes acepten aparecerán en Amigos.',
+    sent: 'Solicitudes enviadas',
     retry: 'Reintentar',
   },
-  notFollowing: 'Aún no sigues a nadie',
-  follow: 'Seguir',
-  unfollow: 'Dejar de seguir',
-  find: 'Buscar jugadores',
+  relation: {
+    add: 'Añadir',
+    addLong: 'Añadir amigo',
+    cancel: 'Deshacer',
+    requested: 'Solicitud enviada',
+    accept: 'Aceptar',
+    decline: 'Rechazar',
+    chat: 'Chat',
+    unblock: 'Desbloquear',
+    friend: 'Tu amigo',
+    incoming: 'Quiere añadirte',
+    blocked: 'Bloqueado',
+  },
   sheet: {
-    failed: 'No se pudo cargar el jugador',
+    failed: 'No se pudo cargar este jugador',
     you: 'Tú',
-    followsYou: 'Te sigue',
-    counts: (followers, following) =>
-      `${plural('es', followers, {
-        one: '1 seguidor',
-        other: `${fmt.es.score(followers)} seguidores`,
-      })} · ${plural('es', following, {
-        one: '1 seguido',
-        other: `${fmt.es.score(following)} seguidos`,
-      })}`,
+    friends: (count) =>
+      plural('es', count, { one: '1 amigo', other: `${fmt.es.score(count)} amigos` }),
     stats: {
       weekly: 'Esta semana',
       all: 'Histórico',
@@ -357,16 +544,36 @@ const es: FriendsMessages = {
       likes: 'Me gusta',
       perfects: 'Perfecto',
     },
+    more: 'Más',
+    vs: 'Mandar VS',
+    unfriend: 'Eliminar de amigos',
+    unfriendHint: 'Sus mensajes se borran y el VS abierto se cierra.',
+    block: 'Bloquear',
+    blockHint: 'Su amistad y sus solicitudes terminan; no podrá encontrarte ni escribirte.',
+    reportPhoto: 'Denunciar la foto',
+    reportName: 'Denunciar el nombre de usuario',
+    reportHint: 'Un moderador lo revisará; nadie sabrá quién lo denunció.',
+    reported: 'Gracias por avisar. Un moderador lo revisará.',
   },
   best: {
     title: 'Récord de la temporada',
     said: (value) => `Récord de la temporada: ${value}`,
   },
   empty: {
-    waiting: 'Los jugadores que sigues aún no han jugado',
+    waiting: 'Tus amigos aún no han jugado',
     waitingHint: 'Cuando jueguen, competirán contigo aquí.',
     play: 'Jugar',
-    noneHint: 'Los jugadores que sigues compiten contigo aquí.',
+    none: 'Aún no tienes amigos',
+    noneHint: 'Tus amigos compiten contigo aquí.',
+    find: 'Buscar amigos',
+  },
+  blocked: {
+    title: 'Bloqueados',
+    description: 'Los jugadores que bloqueas no pueden encontrarte ni enviarte solicitudes, mensajes o VS.',
+    none: 'No has bloqueado a nadie.',
+    unblock: 'Desbloquear',
+    since: (date) => `Desde el ${date}`,
+    failed: 'No se pudo cargar la lista',
   },
 };
 

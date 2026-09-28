@@ -14,7 +14,7 @@ class BoardRequest extends PageRequest
     protected function filters(): array
     {
         return [
-            'board' => ['required', Rule::enum(LeaderboardPeriod::class)],
+            'board' => ['required', Rule::in(LeaderboardPeriod::boardValues())],
             'key' => ['nullable', 'string', 'max:10', $this->keyFitsBoard()],
             'season' => ['nullable', 'integer', 'min:1'],
         ];
@@ -25,12 +25,12 @@ class BoardRequest extends PageRequest
         return LeaderboardPeriod::from((string) $this->validated('board'));
     }
 
-    /** `2026-09-24` for a day, `2026-W39` for a week, `2026-09` for a month, `all` for all time. */
+    /** `2026-09-24` for a challenge day, `2026-W39` for a week, `2026-09` for a month, `all` for all time. */
     protected function keyFitsBoard(): Closure
     {
         return function (string $attribute, mixed $value, Closure $fail) {
             $pattern = match ($this->input('board')) {
-                'daily', 'challenge' => '/^\d{4}-\d{2}-\d{2}$/',
+                'challenge' => '/^\d{4}-\d{2}-\d{2}$/',
                 'weekly' => '/^\d{4}-W\d{2}$/',
                 'monthly' => '/^\d{4}-\d{2}$/',
                 'all' => '/^all$/',

@@ -43,24 +43,23 @@ test('a finished run is replayed, ranked and recorded on every board', function 
         ],
         'best' => ['score' => $summary['score'], 'reels' => $summary['reels']],
         'isNewBest' => true,
-        'ranks' => ['daily' => 1, 'weekly' => 1, 'monthly' => 1, 'all' => 1],
+        'ranks' => ['weekly' => 1, 'monthly' => 1, 'all' => 1],
         'rankChanges' => [
-            'daily' => ['before' => null, 'after' => 1],
             'weekly' => ['before' => null, 'after' => 1],
             'monthly' => ['before' => null, 'after' => 1],
             'all' => ['before' => null, 'after' => 1],
         ],
         'passed' => [],
         'daily' => null,
-        // A new player's first counted run: the league opens two runs later.
+        // A new player's first counted run: the league opens nineteen runs later.
         'league' => null,
-        'leagueUnlock' => ['required' => 3, 'remaining' => 2],
+        'leagueUnlock' => ['required' => 20, 'remaining' => 19],
     ]);
 
     $bonuses = $response->json('run.breakdown.bonuses');
     expect(array_map(fn (array $bonus) => $bonus['count'], $bonuses))->toBe($summary['bonuses'])
         ->and(array_sum(array_column($bonuses, 'points')))->toBe($summary['bonusPoints'])
-        ->and($response->json('shareText'))->toBe("Quezby'de ".number_format($summary['score'], 0, ',', '.')." puan yaptım! {$summary['reels']} post · bugün #1. Sen kaç yaparsın?");
+        ->and($response->json('shareText'))->toBe("Quezby'de ".number_format($summary['score'], 0, ',', '.')." puan yaptım! {$summary['reels']} post · bu hafta #1. Sen kaç yaparsın?");
 
     $stats = $response->json('run.stats');
     expect($stats['swipes'] + $stats['likes'] + $stats['holds'] + $stats['freezes'])->toBe($summary['hits'])
@@ -77,6 +76,7 @@ test('a finished run is replayed, ranked and recorded on every board', function 
         ->and($run->actions)->toBe($fixture['actions'])
         ->and($run->open_user_id)->toBeNull()
         ->and($run->stats['swipes'])->toBe($stats['swipes']);
+    // The day's row too: no board shows it, but the league adds each day's best up.
     expect(LeaderboardEntry::query()->where('user_id', $user->id)->where('season', 2)->pluck('period')->map->value->all())
         ->toEqualCanonicalizing(['daily', 'weekly', 'monthly', 'all']);
 });
@@ -93,15 +93,15 @@ test('the share text speaks the request\'s language', function (string $acceptLa
         ->assertJsonPath('run.reels', 685)
         ->assertJsonPath('shareText', $shareText);
 })->with([
-    'Turkish' => ['tr', "Quezby'de 557.623 puan yaptım! 685 post · bugün #1. Sen kaç yaparsın?"],
-    'English' => ['en', 'I scored 557,623 points on Quezby! 685 posts · today #1. How many can you score?'],
-    'German' => ['de', 'Ich habe in Quezby 557.623 Punkte geholt! 685 Posts · heute #1. Wie viele schaffst du?'],
-    'Arabic' => ['ar', "\u{200F}نتيجتي في Quezby: 557,623 نقطة! 685 منشورًا · اليوم #1. وأنت، كم ستحقق؟"],
-    'French' => ['fr', "J'ai fait 557\u{00A0}623 points sur Quezby\u{00A0}! 685 posts · aujourd'hui #1. Et toi, tu en fais combien\u{00A0}?"],
-    'Spanish' => ['es', '¡Hice 557.623 puntos en Quezby! 685 posts · hoy #1. ¿Cuántos puedes hacer tú?'],
+    'Turkish' => ['tr', "Quezby'de 557.623 puan yaptım! 685 post · bu hafta #1. Sen kaç yaparsın?"],
+    'English' => ['en', 'I scored 557,623 points on Quezby! 685 posts · this week #1. How many can you score?'],
+    'German' => ['de', 'Ich habe in Quezby 557.623 Punkte geholt! 685 Posts · diese Woche #1. Wie viele schaffst du?'],
+    'Arabic' => ['ar', "\u{200F}نتيجتي في Quezby: 557,623 نقطة! 685 منشورًا · هذا الأسبوع #1. وأنت، كم ستحقق؟"],
+    'French' => ['fr', "J'ai fait 557\u{00A0}623 points sur Quezby\u{00A0}! 685 posts · cette semaine #1. Et toi, tu en fais combien\u{00A0}?"],
+    'Spanish' => ['es', '¡Hice 557.623 puntos en Quezby! 685 posts · esta semana #1. ¿Cuántos puedes hacer tú?'],
 ]);
 
-test('a run with no rank today shares its score alone, counted the language\'s way', function (string $acceptLanguage, string $shareText) {
+test('a run with no rank this week shares its score alone, counted the language\'s way', function (string $acceptLanguage, string $shareText) {
     $this->signIn();
     $runId = $this->startRun()->json('runId');
     $this->travel(2)->seconds();
@@ -109,7 +109,7 @@ test('a run with no rank today shares its score alone, counted the language\'s w
     $this->withHeader('Accept-Language', $acceptLanguage)
         ->finishRun($runId, [], 0, 0)
         ->assertOk()
-        ->assertJsonPath('ranks.daily', null)
+        ->assertJsonPath('ranks.weekly', null)
         ->assertJsonPath('shareText', $shareText);
 })->with([
     'Turkish' => ['tr', "Quezby'de 0 puan yaptım! 0 post. Sen kaç yaparsın?"],
@@ -195,7 +195,7 @@ test('a lower run keeps the best and the rows', function () {
         ->assertJsonPath('run.status', 'ranked')
         ->assertJsonPath('isNewBest', false)
         ->assertJsonPath('best.score', $high['summary']['score'])
-        ->assertJsonPath('rankChanges.daily', ['before' => 1, 'after' => 1]);
+        ->assertJsonPath('rankChanges.weekly', ['before' => 1, 'after' => 1]);
 
     expect(LeaderboardEntry::query()->where('user_id', $user->id)->pluck('score')->unique()->values()->all())
         ->toBe([$high['summary']['score']]);
@@ -214,10 +214,10 @@ test('a log that stops before the first reel is a quit that places nobody', func
         ->assertJsonPath('isNewBest', false)
         ->assertJsonPath('best', null)
         ->assertJsonPath('league', null)
-        ->assertJsonPath('ranks', ['daily' => null, 'weekly' => null, 'monthly' => null, 'all' => null]);
+        ->assertJsonPath('ranks', ['weekly' => null, 'monthly' => null, 'all' => null]);
 
     expect(LeaderboardEntry::query()->count())->toBe(0);
-    $this->getJson('/api/v1/leaderboards/daily')->assertJsonPath('entries', [])->assertJsonPath('me', null);
+    $this->getJson('/api/v1/leaderboards/weekly')->assertJsonPath('entries', [])->assertJsonPath('me', null);
 });
 
 test('a run started on another engine cannot be verified', function () {
@@ -228,7 +228,7 @@ test('a run started on another engine cannot be verified', function () {
     $this->assertApiError($this->finishRun($runId, [], 0, 0), 422, 'engine_outdated');
 });
 
-test('the result names the players the run overtook today, closest first', function () {
+test('the result names the players the run overtook this week, closest first', function () {
     $me = $this->signIn();
     $fixture = replayFixture('average-42');
     $score = $fixture['summary']['score'];
@@ -236,16 +236,16 @@ test('the result names the players the run overtook today, closest first', funct
     $this->recordRanked($friend, $score - 10);
     $this->recordRanked(User::factory()->withUsername('uzak')->create(), $score - 5000);
     $this->recordRanked(User::factory()->withUsername('zirve')->create(), $score + 1);
-    DB::table('follows')->insert(['follower_id' => $me->id, 'followee_id' => $friend->id, 'created_at' => now()]);
+    $this->befriend($me, $friend);
 
     $this->finishRun($this->startRunFor($fixture), $fixture['actions'], $score, $fixture['summary']['reels'])
         ->assertOk()
         ->assertJsonPath('passed', [
-            ['username' => 'kanka', 'score' => $score - 10, 'isFollowing' => true],
-            ['username' => 'uzak', 'score' => $score - 5000, 'isFollowing' => false],
+            ['username' => 'kanka', 'avatarUrl' => null, 'score' => $score - 10, 'isFriend' => true],
+            ['username' => 'uzak', 'avatarUrl' => null, 'score' => $score - 5000, 'isFriend' => false],
         ])
-        ->assertJsonPath('ranks.daily', 2)
-        ->assertJsonPath('rankChanges.daily', ['before' => null, 'after' => 2]);
+        ->assertJsonPath('ranks.weekly', 2)
+        ->assertJsonPath('rankChanges.weekly', ['before' => null, 'after' => 2]);
 });
 
 test('lifetime numbers add up ranked runs only', function () {

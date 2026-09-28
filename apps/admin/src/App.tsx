@@ -22,6 +22,7 @@ const NotFoundPage = lazy(() => import('@/pages/NotFoundPage').then((module) => 
 const OverviewPage = lazy(() => import('@/pages/OverviewPage').then((module) => ({ default: module.OverviewPage })));
 const PlayerPage = lazy(() => import('@/pages/PlayerPage').then((module) => ({ default: module.PlayerPage })));
 const PlayersPage = lazy(() => import('@/pages/PlayersPage').then((module) => ({ default: module.PlayersPage })));
+const ReportsPage = lazy(() => import('@/pages/ReportsPage').then((module) => ({ default: module.ReportsPage })));
 const RunPage = lazy(() => import('@/pages/RunPage').then((module) => ({ default: module.RunPage })));
 const RunsPage = lazy(() => import('@/pages/RunsPage').then((module) => ({ default: module.RunsPage })));
 const SuspectsPage = lazy(() => import('@/pages/SuspectsPage').then((module) => ({ default: module.SuspectsPage })));
@@ -44,6 +45,7 @@ export const appRoutes: RouteObject[] = [
           { path: '/players', element: <PlayersPage /> },
           { path: '/players/:playerId', element: <PlayerPage /> },
           { path: '/suspects', element: <SuspectsPage /> },
+          { path: '/reports', element: <ReportsPage /> },
           { path: '/runs', element: <RunsPage /> },
           { path: '/runs/:runId', element: <RunPage /> },
           { path: '/boards', element: <BoardsPage /> },

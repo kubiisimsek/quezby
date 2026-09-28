@@ -15,4 +15,10 @@ final class Timestamp
     {
         return $at === null ? null : Carbon::instance($at)->utc()->format('Y-m-d\TH:i:s.v\Z');
     }
+
+    /** `iso()` of a moment as a query hands it back raw — `2026-09-24 10:00:00.123`, in UTC. */
+    public static function isoStored(?string $stored): ?string
+    {
+        return $stored === null ? null : self::iso(Carbon::parse($stored, 'UTC'));
+    }
 }

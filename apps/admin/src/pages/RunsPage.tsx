@@ -18,6 +18,7 @@ type ModeChoice = 'all' | RunMode;
 type FlagChoice = 'all' | RunFlagCode;
 
 const STATUSES = Object.keys(RUN_STATUS) as AdminRunStatus[];
+const MODES = Object.keys(RUN_MODE) as RunMode[];
 
 /** Every run the game ever started, in every state, by the filters the address carries. */
 export function RunsPage() {
@@ -50,7 +51,7 @@ export function RunsPage() {
   const filtered = status !== 'all' || mode !== 'all' || flag !== 'all' || params.player || params.from || params.to;
 
   return (
-    <Page title="Turlar" description="Başlatılan her tur: sıralamaya girenler, bayraklananlar, incelemede bekleyenler, yarım kalanlar.">
+    <Page title="Turlar" description="Başlatılan her tur: sıralamaya girenler, bayraklananlar, incelemede bekleyenler, VS’ler, yarım kalanlar.">
       <DataTable
         title={params.player ? `${playerName ? `@${playerName}` : 'Bir oyuncunun'} turları` : 'Bütün turlar'}
         description={params.sort === 'score' ? 'En yüksek skor önce' : 'Yeniden eskiye'}
@@ -87,11 +88,7 @@ export function RunsPage() {
                 aria-label="Mod"
                 value={mode}
                 onChange={(value) => set({ mode: value })}
-                options={[
-                  { value: 'all', label: 'Bütün modlar' },
-                  { value: 'free', label: RUN_MODE.free },
-                  { value: 'daily', label: RUN_MODE.daily },
-                ]}
+                options={[{ value: 'all', label: 'Bütün modlar' }, ...MODES.map((value) => ({ value, label: RUN_MODE[value] }))]}
               />
               <Picker<FlagChoice>
                 compact

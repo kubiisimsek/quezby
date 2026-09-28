@@ -15,7 +15,10 @@ export function usePlayer(id: string) {
   return useQuery({ queryKey: keys.player(id), queryFn: () => api.players.get(id) });
 }
 
-/** Ban, unban, rename, sign out and delete — every one refreshes what it touched. */
+/**
+ * Ban, unban, rename, sign out, take a photo down, let reports go and
+ * delete — every one refreshes what it touched.
+ */
 export function usePlayerActions(id: string) {
   const api = useApi();
   const queryClient = useQueryClient();
@@ -26,6 +29,8 @@ export function usePlayerActions(id: string) {
     unban: useMutation({ mutationFn: () => api.players.unban(id), onSuccess }),
     rename: useMutation({ mutationFn: (reason: string) => api.players.rename(id, { reason }), onSuccess }),
     signOut: useMutation({ mutationFn: () => api.players.signOut(id), onSuccess }),
+    removeAvatar: useMutation({ mutationFn: (reason: string) => api.players.removeAvatar(id, { reason }), onSuccess }),
+    dismissReports: useMutation({ mutationFn: (reason: string) => api.players.dismissReports(id, { reason }), onSuccess }),
     remove: useMutation({
       mutationFn: (input: AdminDeletePlayerRequest) => api.players.remove(id, input),
       onSuccess: () => {

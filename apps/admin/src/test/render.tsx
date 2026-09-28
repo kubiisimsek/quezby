@@ -1,4 +1,4 @@
-import type { AdminSession } from '@quezby/types';
+import type { AdminCounts, AdminSession } from '@quezby/types';
 import { QueryClient } from '@tanstack/react-query';
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -18,21 +18,24 @@ function testQueryClient(): QueryClient {
 /**
  * The whole panel at `path`, on a fake API, signed in as `session` (an owner
  * unless the test says otherwise; `null` for signed out). The shell's own
- * reads — who am I, what waits — answer quietly unless stubbed.
+ * reads — who am I, what waits (`counts`, nothing by default) — answer
+ * quietly unless stubbed.
  */
 export function renderApp({
   path = '/',
   api = fakeApi(),
   session = adminSession(),
+  counts = { review: 0, reports: 0 },
 }: {
   path?: string;
   api?: FakeApi;
   session?: AdminSession | null;
+  counts?: AdminCounts;
 } = {}) {
   useSession.setState({ session: session ? { ...session, remember: false } : null, ended: null });
   if (session) {
     api.me.get.mockResolvedValue({ admin: session.admin });
-    api.overview.counts.mockResolvedValue({ review: 0 });
+    api.overview.counts.mockResolvedValue(counts);
   }
   const queryClient = testQueryClient();
   const router = createMemoryRouter(appRoutes, { initialEntries: [path] });

@@ -14,6 +14,7 @@ import type {
   AnalyticsCode,
   AnalyticsEvent,
   AnalyticsScreen,
+  DuelStatus,
   LeaderboardBoard,
   LeagueOutcome,
   LeagueTier,
@@ -22,6 +23,7 @@ import type {
   Platform,
   PlayerStats,
   Ranks,
+  ReportReason,
   RunMode,
   RunStats,
   SocialProvider,
@@ -96,6 +98,8 @@ export type AdminPlayersQuery = AdminPageQuery & {
 };
 
 export type AdminPlayerRow = AdminPlayerRef & {
+  /** The player's profile photo, as players see it; null for none. */
+  avatarUrl: string | null;
   /** `guest48128742`: a name the player has not picked yet. */
   isAutoUsername: boolean;
   /** No email, Apple or Google attached: the account lives on one phone. */
@@ -189,7 +193,10 @@ export type AdminPlayerResponse = {
   sameInstall: AdminPlayerRef[];
   /** The phones the player used, most recently seen first. */
   installs: AdminPlayerDevice[];
-  follows: { following: number; followers: number };
+  /** Friends who are not banned, and how many players have blocked this one — a sign worth a look. */
+  social: { friends: number; blockedBy: number };
+  /** Reports still open about the player's photo and name. */
+  openReports: { photo: number; name: number };
   audit: AdminAuditEntry[];
 };
 
@@ -205,6 +212,8 @@ export type AdminRunStatus =
   | 'ranked'
   | 'flagged'
   | 'review'
+  /** A clean VS run: it settled its VS and ranks nowhere. */
+  | 'played'
   | 'rejected'
   | 'abandoned'
   | 'expired';
@@ -321,6 +330,19 @@ export type AdminRunStep = {
 /** Why a run has no timeline: nothing to replay, another season's rules, or a log the engine refused. */
 export type AdminTimelineUnavailable = 'no_log' | 'other_engine' | 'engine_error';
 
+/** The VS a `vs` run belongs to: who sent it, who answered, and how it stands. */
+export type AdminRunDuel = {
+  id: string;
+  status: DuelStatus;
+  challenger: AdminPlayerRef;
+  opponent: AdminPlayerRef;
+  /** Null until that side has played, and for a run left unfinished. */
+  challengerScore: number | null;
+  opponentScore: number | null;
+  /** Null until it is finished, and for a draw. */
+  winnerId: string | null;
+};
+
 export type AdminRunDetail = AdminRunRow & {
   seed: number;
   contentVersion: number;
@@ -338,6 +360,8 @@ export type AdminRunDetail = AdminRunRow & {
   clientScore: number | null;
   clientReels: number | null;
   stats: RunStats | null;
+  /** Set for a `vs` run; null for any other. */
+  duel: AdminRunDuel | null;
 };
 
 export type AdminRunResponse = {
@@ -380,7 +404,8 @@ export type AdminSuspectsResponse = AdminPage<AdminSuspect> & { days: AdminSuspe
 
 /* ------------------------------------------------------------ overview -- */
 
-export type AdminCounts = { review: number };
+/** What the sidebar's badges count: runs held for review, and players with a report still open. */
+export type AdminCounts = { review: number; reports: number };
 
 export type AdminOverview = {
   serverTime: string;
@@ -413,6 +438,26 @@ export type AdminOverview = {
   /** Runs held for review, best first. */
   queue: AdminRunRow[];
 };
+
+/* ------------------------------------------------------------- reports -- */
+
+export type AdminReportStatus = 'open' | 'resolved' | 'dismissed';
+
+export type AdminReportsQuery = AdminPageQuery & { status?: AdminReportStatus };
+
+/** A player others reported: a row per player, the newest trouble first. */
+export type AdminReportRow = {
+  player: AdminPlayerRef | null;
+  /** Their photo as it is now; null when they have none left. */
+  avatarUrl: string | null;
+  /** Reports about the photo and about the name. */
+  reasons: Record<ReportReason, number>;
+  reports: number;
+  firstAt: string;
+  lastAt: string;
+};
+
+export type AdminReportsResponse = AdminPage<AdminReportRow>;
 
 /* -------------------------------------------------------------- boards -- */
 
@@ -556,6 +601,10 @@ export type AdminAuditAction =
   | 'player.rename'
   | 'player.sign_out'
   | 'player.delete'
+  /** A moderator took a player's photo down. */
+  | 'player.avatar_remove'
+  /** A moderator let a player's open reports go. */
+  | 'player.reports_dismiss'
   | 'run.approve'
   | 'run.reject'
   | 'admin.create'
@@ -614,6 +663,10 @@ export type AdminSystem = {
    * it every player request answers 500, while the panel stays open.
    */
   appKey: boolean;
+  /** Whether PHP's GD extension is there: profile photos are re-encoded with it. */
+  gd: boolean;
+  /** Whether pushes can go out: switched on, with the Firebase project and its key. */
+  push: boolean;
   cached: { config: boolean; routes: boolean };
   pendingMigrations: string[];
   runs: { open: number; stale: number };

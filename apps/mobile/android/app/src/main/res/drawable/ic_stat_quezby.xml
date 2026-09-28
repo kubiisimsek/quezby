@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The Quezby mark as a status-bar silhouette: the Q's ring, the gold bolt of
+     its tail and the two swipe-up chevrons in its eye — white on nothing, the
+     way Android wants a notification's small icon. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M2,11a9,9 0,1 0,18 0a9,9 0,1 0,-18 0zM5.8,11a5.2,5.2 0,1 0,10.4 0a5.2,5.2 0,1 0,-10.4 0z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M15.4,14.1L20.6,13.2L18.5,17L22.6,16.5L15.9,23.4L17.8,18.9L13.9,19.6Z" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="1.6"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M8.9,10.6L11,8.5L13.1,10.6M8.9,13.5L11,11.4L13.1,13.5" />
+</vector>

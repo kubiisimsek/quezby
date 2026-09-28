@@ -15,6 +15,8 @@ import type {
   AdminPlayerResponse,
   AdminPlayerRow,
   AdminPlayersResponse,
+  AdminReportRow,
+  AdminReportsResponse,
   AdminRunResponse,
   AdminRunRow,
   AdminRunsResponse,
@@ -52,6 +54,7 @@ export function playerRow(overrides: Partial<AdminPlayerRow> = {}): AdminPlayerR
     id: '01jplayer00000000000000000a',
     username: 'kerem.35',
     bannedAt: null,
+    avatarUrl: null,
     isAutoUsername: false,
     isGuest: false,
     email: 'kerem@quezby.com',
@@ -119,7 +122,7 @@ export function playerResponse(overrides: Partial<AdminPlayerResponse> = {}, pla
     },
     season: 2,
     best: { score: 250311, reels: 377, achievedAt: '2026-09-20T10:00:00.000Z', runId: '01jrun000000000000000000ab' },
-    ranks: { daily: 3, weekly: 5, monthly: 8, all: 12 },
+    ranks: { weekly: 5, monthly: 8, all: 12 },
     stats: {
       runs: 42,
       reels: 3200,
@@ -154,10 +157,30 @@ export function playerResponse(overrides: Partial<AdminPlayerResponse> = {}, pla
         others: [{ id: '01jplayer00000000000000000b', username: 'kerem.yedek', bannedAt: null }],
       },
     ],
-    follows: { following: 3, followers: 9 },
+    social: { friends: 4, blockedBy: 0 },
+    openReports: { photo: 0, name: 0 },
     audit: [],
     ...overrides,
   };
+}
+
+/** A profile photo's address, as the API serves it. */
+export const AVATAR_URL = 'http://api.quezby.test/api/v1/media/avatars/0123456789abcdef01234567.jpg';
+
+export function reportRow(overrides: Partial<AdminReportRow> = {}): AdminReportRow {
+  return {
+    player: { id: '01jplayer00000000000000000a', username: 'kerem.35', bannedAt: null },
+    avatarUrl: AVATAR_URL,
+    reasons: { photo: 2, name: 1 },
+    reports: 3,
+    firstAt: '2026-09-24T08:00:00.000Z',
+    lastAt: '2026-09-25T08:00:00.000Z',
+    ...overrides,
+  };
+}
+
+export function reportsPage(rows: AdminReportRow[], overrides: Partial<AdminReportsResponse> = {}): AdminReportsResponse {
+  return { ...page(rows), ...overrides };
 }
 
 export function runsPage(rows: AdminRunRow[], overrides: Partial<AdminRunsResponse> = {}): AdminRunsResponse {
@@ -200,6 +223,7 @@ export function runResponse(overrides: Partial<AdminRunResponse> = {}, run: Part
       clientScore: 52340,
       clientReels: 204,
       stats: null,
+      duel: null,
       ...run,
     },
     timeline: [
@@ -284,24 +308,24 @@ export function boardRow(overrides: Partial<AdminBoardRow> = {}): AdminBoardRow 
 export function board(rows: AdminBoardRow[], overrides: Partial<AdminBoardResponse> = {}): AdminBoardResponse {
   return {
     ...page(rows),
-    board: 'daily',
-    key: '2026-09-25',
+    board: 'weekly',
+    key: '2026-W39',
     season: 2,
     seasons: [2],
     number: null,
-    startsAt: '2026-09-24T21:00:00.000Z',
-    endsAt: '2026-09-25T21:00:00.000Z',
+    startsAt: '2026-09-20T21:00:00.000Z',
+    endsAt: '2026-09-27T21:00:00.000Z',
     ...overrides,
   };
 }
 
 export function boardKeys(overrides: Partial<AdminBoardKeysResponse> = {}): AdminBoardKeysResponse {
   return {
-    board: 'daily',
+    board: 'weekly',
     season: 2,
     keys: [
-      { key: '2026-09-25', players: 40, number: null, topScore: 250311, topPlayer: { id: '01jplayer00000000000000000a', username: 'kerem.35', bannedAt: null }, attempts: null },
-      { key: '2026-09-24', players: 31, number: null, topScore: 99000, topPlayer: null, attempts: null },
+      { key: '2026-W39', players: 40, number: null, topScore: 250311, topPlayer: { id: '01jplayer00000000000000000a', username: 'kerem.35', bannedAt: null }, attempts: null },
+      { key: '2026-W38', players: 31, number: null, topScore: 99000, topPlayer: null, attempts: null },
     ],
     ...overrides,
   };
@@ -381,10 +405,12 @@ export function system(overrides: Partial<AdminSystem> = {}): AdminSystem {
     apps: { ios: { min: '1.0.0', latest: '1.1.0' }, android: { min: '1.0.0', latest: '1.1.0' } },
     tokens: { ops: false, moderation: false },
     appKey: true,
+    gd: true,
+    push: true,
     cached: { config: true, routes: true },
     pendingMigrations: [],
     runs: { open: 4, stale: 1 },
-    limits: { reviewTopAll: 10, reviewTopWeekly: 3, leagueGroupSize: 30, leagueUnlockRuns: 3, runTtlMinutes: 120, adminTokenHours: 12 },
+    limits: { reviewTopAll: 10, reviewTopWeekly: 3, leagueGroupSize: 30, leagueUnlockRuns: 20, runTtlMinutes: 120, adminTokenHours: 12 },
     ...overrides,
   };
 }

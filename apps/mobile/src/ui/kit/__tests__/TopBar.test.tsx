@@ -14,10 +14,10 @@ function Wrapped(props: Parameters<typeof TopBar>[0]) {
 
 describe('TopBar', () => {
   it('names the screen, with a subtitle when given', async () => {
-    await render(<Wrapped title="Arkadaşlar" subtitle="Oyuncu ara, takip et" />);
+    await render(<Wrapped title="Arkadaşlar" subtitle="İstekler, mesajlar ve VS" />);
 
     expect(screen.getByText('Arkadaşlar')).toBeOnTheScreen();
-    expect(screen.getByText('Oyuncu ara, takip et')).toBeOnTheScreen();
+    expect(screen.getByText('İstekler, mesajlar ve VS')).toBeOnTheScreen();
     expect(screen.queryByRole('button', { name: 'Geri' })).not.toBeOnTheScreen();
   });
 

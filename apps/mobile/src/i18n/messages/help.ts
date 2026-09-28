@@ -54,7 +54,7 @@ const tr = {
   },
   leagues: {
     title: 'Ligler',
-    lead: 'Beş lig var, Bronz’dan Elmas’a. Lig, ilk 3 sayılan oyunundan sonra açılır; deneme turu sayılmaz. Sonra haftanın ilk sıralı turunla ligindeki 30 kişilik bir gruba katılırsın.',
+    lead: 'Beş lig var, Bronz’dan Elmas’a. Lig, ilk 20 sayılan oyunundan sonra açılır; deneme turu ve VS sayılmaz. Sonra haftanın ilk sıralı turunla ligindeki 30 kişilik bir gruba katılırsın.',
     more: [
       'Lig puanın, haftanın her gününde yaptığın en iyi skorların toplamı. Her gün oynamak kazandırır.',
       'Hafta bitince ilk beş bir üst lige çıkar, son beş bir alt lige iner, gerisi yerinde kalır. Grup küçükse bu sayılar da küçülür. Elmas’tan yukarı, Bronz’dan aşağı yol yok.',
@@ -63,7 +63,7 @@ const tr = {
   },
   boards: {
     title: 'Sıralamalar',
-    lead: 'Dört sıralama var: Bugün, Bu hafta, Bu ay ve Tüm zamanlar. Her birinde o dönemdeki en iyi turun tek satır olarak durur.',
+    lead: 'Üç sıralama var: Bu hafta, Bu ay ve Tüm zamanlar. Her birinde o dönemdeki en iyi turun tek satır olarak durur.',
     more: [
       'Gün gece yarısı, hafta pazartesi, ay ayın biriyle başlar; hepsi Europe/Istanbul saatiyle.',
       'Skorlar eşitse o skora önce ulaşan önde.',
@@ -109,7 +109,7 @@ const tr = {
       {
         question: 'Arkadaşlarımla nasıl yarışırım?',
         answer:
-          'Arkadaşlar’dan onları bul ve takip et. Zirve’de Arkadaşlar’a geçince yalnızca takip ettiklerinle yarışırsın.',
+          'Arkadaşlar’dan onları adıyla bul ve arkadaşlık isteği gönder. Kabul edince Zirve’de Arkadaşlar’a geçip yalnızca arkadaşlarınla yarışırsın; mesaj kutusundan hazır mesaj ve VS gönderirsin.',
       },
       {
         question: 'Kullanıcı adımı değiştirebilir miyim?',
@@ -180,7 +180,7 @@ const en: HelpMessages = {
   },
   leagues: {
     title: 'Leagues',
-    lead: "There are five leagues, from Bronze to Diamond. The league opens after your first 3 counted games; the practice run doesn't count. Then your first ranked run of the week puts you in a group of 30 in your league.",
+    lead: "There are five leagues, from Bronze to Diamond. The league opens after your first 20 counted games; the practice run and VS games don't count. Then your first ranked run of the week puts you in a group of 30 in your league.",
     more: [
       'Your league points are the sum of your best score on each day of the week. Playing every day pays off.',
       "When the week ends, the top five move up a league, the bottom five move down and the rest stay put. In a smaller group, these numbers shrink too. There's no way up from Diamond and no way down from Bronze.",
@@ -189,7 +189,7 @@ const en: HelpMessages = {
   },
   boards: {
     title: 'Rankings',
-    lead: 'There are four rankings: Today, This week, This month and All time. Each one holds your best run of that period as a single row.',
+    lead: 'There are three rankings: This week, This month and All time. Each one holds your best run of that period as a single row.',
     more: [
       'The day starts at midnight, the week on Monday and the month on the 1st, all on Istanbul time.',
       'When scores tie, whoever reached that score first is ahead.',
@@ -234,7 +234,7 @@ const en: HelpMessages = {
       {
         question: 'How do I compete with my friends?',
         answer:
-          'Find them in Friends and follow them. On the Summit, switch to Friends to compete only with the players you follow.',
+          'Find them by name in Friends and send a friend request. Once they accept, switch to Friends on the Summit to race only your friends, and send them phrases and VS from your inbox.',
       },
       {
         question: 'Can I change my username?',
@@ -305,7 +305,7 @@ const de: HelpMessages = {
   },
   leagues: {
     title: 'Ligen',
-    lead: 'Es gibt fünf Ligen, von Bronze bis Diamant. Die Liga öffnet sich nach deinen ersten 3 gewerteten Spielen; die Proberunde zählt nicht. Mit deiner ersten gewerteten Runde der Woche kommst du dann in eine 30er-Gruppe deiner Liga.',
+    lead: 'Es gibt fünf Ligen, von Bronze bis Diamant. Die Liga öffnet sich nach deinen ersten 20 gewerteten Spielen; die Proberunde und VS-Spiele zählen nicht. Mit deiner ersten gewerteten Runde der Woche kommst du dann in eine 30er-Gruppe deiner Liga.',
     more: [
       'Deine Ligapunkte sind die Summe deiner besten Scores an jedem Tag der Woche. Jeden Tag zu spielen lohnt sich.',
       'Am Ende der Woche steigen die ersten fünf eine Liga auf, die letzten fünf eine ab, der Rest bleibt. In einer kleineren Gruppe werden diese Zahlen auch kleiner. Über Diamant geht es nicht hinaus, unter Bronze nicht hinab.',
@@ -314,7 +314,7 @@ const de: HelpMessages = {
   },
   boards: {
     title: 'Ranglisten',
-    lead: 'Es gibt vier Ranglisten: Heute, Diese Woche, Dieser Monat und Allzeit. In jeder steht deine beste Runde aus diesem Zeitraum als eine Zeile.',
+    lead: 'Es gibt drei Ranglisten: Diese Woche, Dieser Monat und Allzeit. In jeder steht deine beste Runde aus diesem Zeitraum als eine Zeile.',
     more: [
       'Der Tag beginnt um Mitternacht, die Woche am Montag, der Monat am Ersten – alles nach Istanbuler Zeit.',
       'Bei gleichem Score liegt vorn, wer ihn zuerst erreicht hat.',
@@ -359,7 +359,7 @@ const de: HelpMessages = {
       {
         question: 'Wie trete ich gegen meine Freunde an?',
         answer:
-          'Such sie unter Freunde und folge ihnen. Wechselst du auf dem Gipfel zu Freunde, trittst du nur gegen die an, denen du folgst.',
+          'Such sie unter Freunde nach Namen und schick eine Freundschaftsanfrage. Sobald sie annehmen, trittst du auf dem Gipfel unter Freunde nur gegen deine Freunde an und schickst ihnen aus deinem Postfach Nachrichten und VS.',
       },
       {
         question: 'Kann ich meinen Namen ändern?',
@@ -434,7 +434,7 @@ const ar: HelpMessages = {
   },
   leagues: {
     title: 'الدوريات',
-    lead: 'هناك خمسة دوريات، من البرونز إلى الماس. يُفتح الدوري بعد أول 3 مباريات تُحتسب لك، ولا تُحتسب الجولة التجريبية. بعدها تنضم بأول جولة مصنّفة في الأسبوع إلى مجموعة من 30 لاعبًا في دوريك.',
+    lead: 'هناك خمسة دوريات، من البرونز إلى الماس. يُفتح الدوري بعد أول 20 مباراة تُحتسب لك، ولا تُحتسب الجولة التجريبية ولا مباريات التحدي. بعدها تنضم بأول جولة مصنّفة في الأسبوع إلى مجموعة من 30 لاعبًا في دوريك.',
     more: [
       'نقاط دوريك هي مجموع أفضل نتائجك في كل يوم من أيام الأسبوع. اللعب كل يوم يؤتي ثماره.',
       'عند نهاية الأسبوع يصعد أول خمسة إلى الدوري الأعلى، وينزل آخر خمسة إلى الأدنى، ويبقى الباقون في أماكنهم. وإن كانت المجموعة أصغر صغرت هذه الأعداد أيضًا. لا صعود بعد الماس ولا هبوط بعد البرونز.',
@@ -443,7 +443,7 @@ const ar: HelpMessages = {
   },
   boards: {
     title: 'الترتيبات',
-    lead: 'هناك أربعة ترتيبات: اليوم، وهذا الأسبوع، وهذا الشهر، وكل الأوقات. في كل منها تظهر أفضل جولة لك في تلك الفترة في سطر واحد.',
+    lead: 'هناك ثلاثة ترتيبات: هذا الأسبوع، وهذا الشهر، وكل الأوقات. في كل منها تظهر أفضل جولة لك في تلك الفترة في سطر واحد.',
     more: [
       'يبدأ اليوم عند منتصف الليل، والأسبوع يوم الاثنين، والشهر في يومه الأول؛ وكلها بتوقيت إسطنبول.',
       'عند تعادل النتائج يتقدّم من وصل إلى النتيجة أولًا.',
@@ -488,7 +488,7 @@ const ar: HelpMessages = {
       {
         question: 'كيف أنافس أصدقائي؟',
         answer:
-          'ابحث عنهم في الأصدقاء وتابِعهم. وفي القمة انتقل إلى الأصدقاء لتنافس من تتابعهم فقط.',
+          'ابحث عنهم بالاسم في الأصدقاء وأرسل طلب صداقة. عندما يقبلون، انتقل إلى الأصدقاء في القمة لتنافس أصدقاءك فقط، وأرسل إليهم رسائل وتحديات من صندوق رسائلك.',
       },
       {
         question: 'هل يمكنني تغيير اسم المستخدم؟',
@@ -558,7 +558,7 @@ const fr: HelpMessages = {
   },
   leagues: {
     title: 'Ligues',
-    lead: "Il y a cinq ligues, de Bronze à Diamant. La ligue s'ouvre après tes 3 premières parties comptées ; la partie d'essai ne compte pas. Ensuite, ta première partie classée de la semaine te place dans un groupe de 30 joueurs de ta ligue.",
+    lead: "Il y a cinq ligues, de Bronze à Diamant. La ligue s'ouvre après tes 20 premières parties comptées ; la partie d'essai et les VS ne comptent pas. Ensuite, ta première partie classée de la semaine te place dans un groupe de 30 joueurs de ta ligue.",
     more: [
       'Tes points de ligue sont la somme de tes meilleurs scores de chaque jour de la semaine. Jouer tous les jours paie.',
       "À la fin de la semaine, les cinq premiers montent d'une ligue, les cinq derniers descendent, les autres restent. Dans un groupe plus petit, ces nombres baissent aussi. Rien au-dessus de Diamant, rien en dessous de Bronze.",
@@ -567,7 +567,7 @@ const fr: HelpMessages = {
   },
   boards: {
     title: 'Classements',
-    lead: "Il y a quatre classements : Aujourd'hui, Cette semaine, Ce mois-ci et Depuis toujours. Dans chacun, ta meilleure partie de la période tient sur une seule ligne.",
+    lead: 'Il y a trois classements : Cette semaine, Ce mois-ci et Depuis toujours. Dans chacun, ta meilleure partie de la période tient sur une seule ligne.',
     more: [
       "Le jour commence à minuit, la semaine le lundi et le mois le 1er, tous à l'heure d'Istanbul.",
       "À score égal, celui qui l'a atteint en premier passe devant.",
@@ -612,7 +612,7 @@ const fr: HelpMessages = {
       {
         question: 'Comment affronter mes amis ?',
         answer:
-          "Trouve-les dans Amis et suis-les. Sur le Sommet, passe à Amis pour ne te mesurer qu'aux joueurs que tu suis.",
+          "Cherche-les par leur nom dans Amis et envoie une demande d'ami. Une fois acceptée, passe à Amis sur le Sommet pour ne te mesurer qu'à tes amis, et envoie-leur des messages et des VS depuis ta boîte.",
       },
       {
         question: 'Puis-je changer de pseudo ?',
@@ -683,7 +683,7 @@ const es: HelpMessages = {
   },
   leagues: {
     title: 'Ligas',
-    lead: 'Hay cinco ligas, de Bronce a Diamante. La liga se abre después de tus primeras 3 partidas contadas; la ronda de práctica no cuenta. Luego, tu primera partida clasificada de la semana te une a un grupo de 30 jugadores de tu liga.',
+    lead: 'Hay cinco ligas, de Bronce a Diamante. La liga se abre después de tus primeras 20 partidas contadas; la ronda de práctica y los VS no cuentan. Luego, tu primera partida clasificada de la semana te une a un grupo de 30 jugadores de tu liga.',
     more: [
       'Tus puntos de liga son la suma de tus mejores puntuaciones de cada día de la semana. Jugar todos los días tiene premio.',
       'Al terminar la semana, los cinco primeros suben de liga, los cinco últimos bajan y el resto se queda. Si el grupo es más pequeño, estos números también bajan. No hay nada por encima de Diamante ni por debajo de Bronce.',
@@ -692,7 +692,7 @@ const es: HelpMessages = {
   },
   boards: {
     title: 'Clasificaciones',
-    lead: 'Hay cuatro clasificaciones: Hoy, Esta semana, Este mes e Histórico. En cada una, tu mejor partida de ese periodo aparece en una sola fila.',
+    lead: 'Hay tres clasificaciones: Esta semana, Este mes e Histórico. En cada una, tu mejor partida de ese periodo aparece en una sola fila.',
     more: [
       'El día empieza a medianoche, la semana el lunes y el mes el día 1; todo en hora de Estambul.',
       'Si hay empate, va delante quien llegó antes a esa puntuación.',
@@ -737,7 +737,7 @@ const es: HelpMessages = {
       {
         question: '¿Cómo compito con mis amigos?',
         answer:
-          'Búscalos en Amigos y síguelos. En la Cumbre, cambia a Amigos para competir solo con los jugadores que sigues.',
+          'Búscalos por su nombre en Amigos y envíales una solicitud de amistad. Cuando acepten, cambia a Amigos en la Cumbre para competir solo con tus amigos, y mándales mensajes y VS desde tu buzón.',
       },
       {
         question: '¿Puedo cambiar mi nombre de usuario?',

@@ -28,6 +28,8 @@ import type {
   AdminPlayersResponse,
   AdminReasonRequest,
   AdminRenameResponse,
+  AdminReportsQuery,
+  AdminReportsResponse,
   AdminRunResponse,
   AdminRunsQuery,
   AdminRunsResponse,
@@ -98,6 +100,12 @@ export function createAdminClient(options: AdminClientOptions) {
       /** Ends every session the player has. Refused for guests: their token is their only key. */
       signOut: (playerId: string) =>
         request<AdminActionResponse>(`/players/${id(playerId)}/sign-out`, { method: 'POST' }),
+      /** Takes the player's photo down; the reports about it close. */
+      removeAvatar: (playerId: string, input: AdminReasonRequest) =>
+        request<AdminActionResponse>(`/players/${id(playerId)}/avatar/remove`, { method: 'POST', body: input }),
+      /** Lets the player's open reports go. */
+      dismissReports: (playerId: string, input: AdminReasonRequest) =>
+        request<AdminActionResponse>(`/players/${id(playerId)}/reports/dismiss`, { method: 'POST', body: input }),
       /** Owner only. */
       remove: (playerId: string, input: AdminDeletePlayerRequest) =>
         request<void>(`/players/${id(playerId)}/delete`, { method: 'POST', body: input }),
@@ -109,6 +117,10 @@ export function createAdminClient(options: AdminClientOptions) {
         request<AdminActionResponse>(`/runs/${id(runId)}/approve`, { method: 'POST' }),
       reject: (runId: string, input: AdminReasonRequest) =>
         request<AdminActionResponse>(`/runs/${id(runId)}/reject`, { method: 'POST', body: input }),
+    },
+    /** What players reported about each other's photos and names, a row per reported player. */
+    reports: {
+      list: (query: AdminReportsQuery = {}) => request<AdminReportsResponse>('/reports', { query }),
     },
     suspects: {
       list: (query: AdminSuspectsQuery = {}) =>

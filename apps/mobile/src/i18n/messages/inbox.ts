@@ -1,0 +1,466 @@
+import type { Locale, Phrase } from '@quezby/types';
+
+import { plural } from '@/i18n/plural';
+
+/**
+ * The inbox: the phrases friends send, the last line of each conversation in
+ * the Arkadaşlar list, and a conversation — its VS card, its lines and the
+ * phrase tray. `name` is a friend's name as `handle` writes it (`@ekin`);
+ * `you` and `them` are two scores `t.fmt.score` has already written.
+ */
+const tr = {
+  /** The phrases (`PHRASES` in `@quezby/config`): the only words that go from one player to another. */
+  phrases: {
+    gg: 'İyi oyundu! 👏',
+    rematch: 'Rövanş? 🔥',
+    beat_that: 'Bunu geç bakalım 😏',
+    wow: 'Vay canına! 🤯',
+    close_one: 'Kıl payı! 😅',
+    your_turn: 'Sıra sende! ⏳',
+    daily: 'Günün akışını oynadın mı? 📅',
+    hi: 'Selam! 👋',
+    thanks: 'Teşekkürler! 🙏',
+    next_time: 'Bir dahakine! 💪',
+  } satisfies Record<Phrase, string>,
+  /** A conversation's newest line, under the friend's name in the list. */
+  preview: {
+    none: 'Henüz bir şey yok — bir VS at!',
+    friends: 'Artık arkadaşsınız 🎉',
+    mine: (phrase: string) => `Sen: ${phrase}`,
+    inviteMine: 'VS’i gönderdin',
+    inviteTheirs: 'Seni VS’e çağırdı!',
+    declinedMine: 'VS’i reddettin',
+    declinedTheirs: 'VS’ini reddetti',
+    expired: 'VS’in süresi doldu',
+    won: (you: string, them: string) => `VS’i kazandın · ${you} – ${them}`,
+    lost: (you: string, them: string) => `VS’i kaybettin · ${you} – ${them}`,
+    draw: (you: string, them: string) => `VS berabere · ${you} – ${them}`,
+  },
+  /** A friend in the inbox list. */
+  row: {
+    yourTurn: 'SENİN SIRAN',
+    theirTurn: 'ONUN SIRASI',
+    label: (name: string, line: string, when: string, unread: number) =>
+      unread > 0 ? `${name}. ${line}. ${when}. ${unread} okunmamış mesaj` : `${name}. ${line}. ${when}`,
+  },
+  /** The conversation with a friend. */
+  thread: {
+    more: 'Diğer',
+    card: 'Oyuncu kartı',
+    h2hTitle: 'Aranızdaki VS’ler',
+    you: 'SEN',
+    h2hNone: 'Henüz VS oynamadınız',
+    h2hLine: (wins: number, losses: number, draws: number) =>
+      `${wins} galibiyet · ${losses} yenilgi · ${draws} beraberlik`,
+    newVsHint: (name: string) =>
+      `Aynı akışı ikiniz de birer kez oynarsınız. Önce sen; skorun ${name} oynayana kadar gizli kalır.`,
+    newVs: 'VS at',
+    yourTurn: 'SENİN SIRAN',
+    yourTurnBody: (name: string) => `${name} seni VS’e çağırdı. Onun skoru, sen oynayınca açılır.`,
+    play: 'Oyna',
+    decline: 'Reddet',
+    theirTurn: 'SIRA ONDA',
+    theirTurnBody: (name: string, score: string) => `Skorun ${score}. ${name} oynayınca sonuç burada.`,
+    playing: 'VS turun sürüyor…',
+    /** Before the time a VS still has, on its countdown. */
+    left: 'Kalan',
+    lines: {
+      friends: 'Artık arkadaşsınız 🎉',
+      inviteMine: 'VS’i gönderdin',
+      inviteTheirs: (name: string) => `${name} seni VS’e çağırdı`,
+      won: 'KAZANDIN',
+      lost: 'KAYBETTİN',
+      draw: 'BERABERE',
+      declinedMine: 'VS’i reddettin',
+      declinedTheirs: (name: string) => `${name} VS’i reddetti`,
+      expired: 'VS’in süresi doldu',
+      /** A line read aloud: who said it, then what. */
+      said: (who: string, text: string) => `${who}: ${text}`,
+      me: 'Sen',
+    },
+    tray: 'Hazır mesajlar',
+    send: (phrase: string) => `Gönder: ${phrase}`,
+    sendFailed: 'Mesaj gönderilemedi',
+    failed: 'Sohbet yüklenemedi',
+    retry: 'Tekrar dene',
+    gone: 'Artık arkadaş değilsiniz.',
+  },
+};
+
+export type InboxMessages = typeof tr;
+
+const en: InboxMessages = {
+  phrases: {
+    gg: 'Good game! 👏',
+    rematch: 'Rematch? 🔥',
+    beat_that: 'Beat that 😏',
+    wow: 'Wow! 🤯',
+    close_one: 'That was close! 😅',
+    your_turn: 'Your turn! ⏳',
+    daily: 'Played the Daily Feed? 📅',
+    hi: 'Hi! 👋',
+    thanks: 'Thanks! 🙏',
+    next_time: 'Next time! 💪',
+  },
+  preview: {
+    none: 'Nothing yet — send a VS!',
+    friends: "You're friends now 🎉",
+    mine: (phrase) => `You: ${phrase}`,
+    inviteMine: 'You sent a VS',
+    inviteTheirs: 'Challenged you to a VS!',
+    declinedMine: 'You declined the VS',
+    declinedTheirs: 'Declined your VS',
+    expired: 'The VS ran out of time',
+    won: (you, them) => `You won the VS · ${you} – ${them}`,
+    lost: (you, them) => `You lost the VS · ${you} – ${them}`,
+    draw: (you, them) => `The VS was a draw · ${you} – ${them}`,
+  },
+  row: {
+    yourTurn: 'YOUR TURN',
+    theirTurn: 'THEIR TURN',
+    label: (name, line, when, unread) =>
+      unread > 0
+        ? `${name}. ${line}. ${when}. ${plural('en', unread, { one: '1 unread message', other: `${unread} unread messages` })}`
+        : `${name}. ${line}. ${when}`,
+  },
+  thread: {
+    more: 'More',
+    card: 'Player card',
+    h2hTitle: 'Your VS record',
+    you: 'YOU',
+    h2hNone: "You haven't played a VS yet",
+    h2hLine: (wins, losses, draws) =>
+      `${plural('en', wins, { one: '1 win', other: `${wins} wins` })} · ${plural('en', losses, { one: '1 loss', other: `${losses} losses` })} · ${plural('en', draws, { one: '1 draw', other: `${draws} draws` })}`,
+    newVsHint: (name) =>
+      `You both play the same feed, once each. You go first; your score stays hidden until ${name} plays.`,
+    newVs: 'Send VS',
+    yourTurn: 'YOUR TURN',
+    yourTurnBody: (name) => `${name} challenged you to a VS. Their score shows once you've played.`,
+    play: 'Play',
+    decline: 'Decline',
+    theirTurn: 'THEIR TURN',
+    theirTurnBody: (name, score) => `You scored ${score}. The result shows here once ${name} plays.`,
+    playing: 'Your VS run is on…',
+    left: 'Left',
+    lines: {
+      friends: "You're friends now 🎉",
+      inviteMine: 'You sent a VS',
+      inviteTheirs: (name) => `${name} challenged you to a VS`,
+      won: 'YOU WON',
+      lost: 'YOU LOST',
+      draw: 'DRAW',
+      declinedMine: 'You declined the VS',
+      declinedTheirs: (name) => `${name} declined the VS`,
+      expired: 'The VS ran out of time',
+      said: (who, text) => `${who}: ${text}`,
+      me: 'You',
+    },
+    tray: 'Quick messages',
+    send: (phrase) => `Send: ${phrase}`,
+    sendFailed: "Couldn't send the message",
+    failed: "Couldn't load the chat",
+    retry: 'Try again',
+    gone: "You're not friends any more.",
+  },
+};
+
+const de: InboxMessages = {
+  phrases: {
+    gg: 'Gutes Spiel! 👏',
+    rematch: 'Revanche? 🔥',
+    beat_that: 'Schlag das mal 😏',
+    wow: 'Wow! 🤯',
+    close_one: 'Das war knapp! 😅',
+    your_turn: 'Du bist dran! ⏳',
+    daily: 'Schon den Tages-Feed gespielt? 📅',
+    hi: 'Hallo! 👋',
+    thanks: 'Danke! 🙏',
+    next_time: 'Nächstes Mal! 💪',
+  },
+  preview: {
+    none: 'Noch nichts – schick ein VS!',
+    friends: 'Ihr seid jetzt Freunde 🎉',
+    mine: (phrase) => `Du: ${phrase}`,
+    inviteMine: 'Du hast ein VS geschickt',
+    inviteTheirs: 'Fordert dich zum VS heraus!',
+    declinedMine: 'Du hast das VS abgelehnt',
+    declinedTheirs: 'Hat dein VS abgelehnt',
+    expired: 'Das VS ist abgelaufen',
+    won: (you, them) => `VS gewonnen · ${you} – ${them}`,
+    lost: (you, them) => `VS verloren · ${you} – ${them}`,
+    draw: (you, them) => `VS unentschieden · ${you} – ${them}`,
+  },
+  row: {
+    yourTurn: 'DU BIST DRAN',
+    theirTurn: 'ER IST DRAN',
+    label: (name, line, when, unread) =>
+      unread > 0
+        ? `${name}. ${line}. ${when}. ${plural('de', unread, { one: '1 ungelesene Nachricht', other: `${unread} ungelesene Nachrichten` })}`
+        : `${name}. ${line}. ${when}`,
+  },
+  thread: {
+    more: 'Mehr',
+    card: 'Spielerkarte',
+    h2hTitle: 'Eure VS',
+    you: 'DU',
+    h2hNone: 'Ihr habt noch kein VS gespielt',
+    h2hLine: (wins, losses, draws) =>
+      `${plural('de', wins, { one: '1 Sieg', other: `${wins} Siege` })} · ${plural('de', losses, { one: '1 Niederlage', other: `${losses} Niederlagen` })} · ${draws} unentschieden`,
+    newVsHint: (name) =>
+      `Ihr spielt beide denselben Feed, jeder einmal. Du fängst an; deine Punkte bleiben verborgen, bis ${name} gespielt hat.`,
+    newVs: 'VS schicken',
+    yourTurn: 'DU BIST DRAN',
+    yourTurnBody: (name) => `${name} fordert dich zum VS heraus. Seine Punkte siehst du, sobald du gespielt hast.`,
+    play: 'Spielen',
+    decline: 'Ablehnen',
+    theirTurn: 'ER IST DRAN',
+    theirTurnBody: (name, score) => `Du hast ${score} geholt. Das Ergebnis steht hier, sobald ${name} spielt.`,
+    playing: 'Deine VS-Runde läuft…',
+    left: 'Noch',
+    lines: {
+      friends: 'Ihr seid jetzt Freunde 🎉',
+      inviteMine: 'Du hast ein VS geschickt',
+      inviteTheirs: (name) => `${name} fordert dich zum VS heraus`,
+      won: 'GEWONNEN',
+      lost: 'VERLOREN',
+      draw: 'UNENTSCHIEDEN',
+      declinedMine: 'Du hast das VS abgelehnt',
+      declinedTheirs: (name) => `${name} hat das VS abgelehnt`,
+      expired: 'Das VS ist abgelaufen',
+      said: (who, text) => `${who}: ${text}`,
+      me: 'Du',
+    },
+    tray: 'Schnellnachrichten',
+    send: (phrase) => `Senden: ${phrase}`,
+    sendFailed: 'Nachricht konnte nicht gesendet werden',
+    failed: 'Chat konnte nicht geladen werden',
+    retry: 'Nochmal versuchen',
+    gone: 'Ihr seid keine Freunde mehr.',
+  },
+};
+
+const ar: InboxMessages = {
+  phrases: {
+    gg: 'لعبة رائعة! 👏',
+    rematch: 'مباراة ثأر؟ 🔥',
+    beat_that: 'تغلّب على هذا 😏',
+    wow: 'يا للروعة! 🤯',
+    close_one: 'كانت قريبة! 😅',
+    your_turn: 'دورك! ⏳',
+    daily: 'هل لعبت خلاصة اليوم؟ 📅',
+    hi: 'مرحبًا! 👋',
+    thanks: 'شكرًا! 🙏',
+    next_time: 'في المرة القادمة! 💪',
+  },
+  preview: {
+    none: 'لا شيء بعد — أرسل تحديًا!',
+    friends: 'أصبحتما صديقين 🎉',
+    mine: (phrase) => `أنت: ${phrase}`,
+    inviteMine: 'أرسلت تحديًا',
+    inviteTheirs: 'تحدّاك!',
+    declinedMine: 'رفضت التحدي',
+    declinedTheirs: 'رفض تحديك',
+    expired: 'انتهت مهلة التحدي',
+    won: (you, them) => `فزت بالتحدي · ${you} – ${them}`,
+    lost: (you, them) => `خسرت التحدي · ${you} – ${them}`,
+    draw: (you, them) => `تعادل في التحدي · ${you} – ${them}`,
+  },
+  row: {
+    yourTurn: 'دورك',
+    theirTurn: 'دوره',
+    label: (name, line, when, unread) =>
+      unread > 0
+        ? `${name}. ${line}. ${when}. ${plural('ar', unread, { one: 'رسالة واحدة غير مقروءة', two: 'رسالتان غير مقروءتين', few: `${unread} رسائل غير مقروءة`, many: `${unread} رسالة غير مقروءة`, other: `${unread} رسالة غير مقروءة` })}`
+        : `${name}. ${line}. ${when}`,
+  },
+  thread: {
+    more: 'المزيد',
+    card: 'بطاقة اللاعب',
+    h2hTitle: 'تحدياتكما',
+    you: 'أنت',
+    h2hNone: 'لم تلعبا أي تحدٍّ بعد',
+    h2hLine: (wins, losses, draws) => `${wins} فوز · ${losses} خسارة · ${draws} تعادل`,
+    newVsHint: (name) =>
+      `تلعبان الخلاصة نفسها، مرة لكل منكما. تبدأ أنت؛ وتبقى نتيجتك مخفية حتى يلعب ${name}.`,
+    newVs: 'أرسل تحديًا',
+    yourTurn: 'دورك',
+    yourTurnBody: (name) => `${name} تحدّاك. تظهر نتيجته بعد أن تلعب.`,
+    play: 'العب',
+    decline: 'ارفض',
+    theirTurn: 'دوره',
+    theirTurnBody: (name, score) => `نتيجتك ${score}. تظهر النتيجة هنا عندما يلعب ${name}.`,
+    playing: 'جولة تحديك جارية…',
+    left: 'المتبقي',
+    lines: {
+      friends: 'أصبحتما صديقين 🎉',
+      inviteMine: 'أرسلت تحديًا',
+      inviteTheirs: (name) => `${name} تحدّاك`,
+      won: 'فزت',
+      lost: 'خسرت',
+      draw: 'تعادل',
+      declinedMine: 'رفضت التحدي',
+      declinedTheirs: (name) => `${name} رفض التحدي`,
+      expired: 'انتهت مهلة التحدي',
+      said: (who, text) => `${who}: ${text}`,
+      me: 'أنت',
+    },
+    tray: 'رسائل سريعة',
+    send: (phrase) => `أرسل: ${phrase}`,
+    sendFailed: 'تعذّر إرسال الرسالة',
+    failed: 'تعذّر تحميل المحادثة',
+    retry: 'أعد المحاولة',
+    gone: 'لم تعودا صديقين.',
+  },
+};
+
+const fr: InboxMessages = {
+  phrases: {
+    gg: 'Bien joué ! 👏',
+    rematch: 'Revanche ? 🔥',
+    beat_that: 'Fais mieux 😏',
+    wow: 'Waouh ! 🤯',
+    close_one: 'C’était serré ! 😅',
+    your_turn: 'À toi ! ⏳',
+    daily: 'Tu as joué le Fil du jour ? 📅',
+    hi: 'Salut ! 👋',
+    thanks: 'Merci ! 🙏',
+    next_time: 'La prochaine fois ! 💪',
+  },
+  preview: {
+    none: 'Rien pour l’instant — lance un VS !',
+    friends: 'Vous êtes amis maintenant 🎉',
+    mine: (phrase) => `Toi : ${phrase}`,
+    inviteMine: 'Tu as lancé un VS',
+    inviteTheirs: 'Te défie en VS !',
+    declinedMine: 'Tu as refusé le VS',
+    declinedTheirs: 'A refusé ton VS',
+    expired: 'Le VS a expiré',
+    won: (you, them) => `VS gagné · ${you} – ${them}`,
+    lost: (you, them) => `VS perdu · ${you} – ${them}`,
+    draw: (you, them) => `VS nul · ${you} – ${them}`,
+  },
+  row: {
+    yourTurn: 'À TOI',
+    theirTurn: 'À LUI',
+    label: (name, line, when, unread) =>
+      unread > 0
+        ? `${name}. ${line}. ${when}. ${plural('fr', unread, { one: `${unread} message non lu`, other: `${unread} messages non lus` })}`
+        : `${name}. ${line}. ${when}`,
+  },
+  thread: {
+    more: 'Plus',
+    card: 'Carte du joueur',
+    h2hTitle: 'Vos VS',
+    you: 'TOI',
+    h2hNone: 'Vous n’avez pas encore joué de VS',
+    h2hLine: (wins, losses, draws) =>
+      `${plural('fr', wins, { one: `${wins} victoire`, other: `${wins} victoires` })} · ${plural('fr', losses, { one: `${losses} défaite`, other: `${losses} défaites` })} · ${plural('fr', draws, { one: `${draws} nul`, other: `${draws} nuls` })}`,
+    newVsHint: (name) =>
+      `Vous jouez le même fil, une fois chacun. Tu commences ; ton score reste caché jusqu’à ce que ${name} joue.`,
+    newVs: 'Lancer un VS',
+    yourTurn: 'À TOI',
+    yourTurnBody: (name) => `${name} te défie en VS. Son score s’affiche une fois que tu as joué.`,
+    play: 'Jouer',
+    decline: 'Refuser',
+    theirTurn: 'À LUI',
+    theirTurnBody: (name, score) => `Tu as fait ${score}. Le résultat s’affiche ici dès que ${name} joue.`,
+    playing: 'Ta partie de VS est en cours…',
+    left: 'Reste',
+    lines: {
+      friends: 'Vous êtes amis maintenant 🎉',
+      inviteMine: 'Tu as lancé un VS',
+      inviteTheirs: (name) => `${name} te défie en VS`,
+      won: 'GAGNÉ',
+      lost: 'PERDU',
+      draw: 'MATCH NUL',
+      declinedMine: 'Tu as refusé le VS',
+      declinedTheirs: (name) => `${name} a refusé le VS`,
+      expired: 'Le VS a expiré',
+      said: (who, text) => `${who} : ${text}`,
+      me: 'Toi',
+    },
+    tray: 'Messages rapides',
+    send: (phrase) => `Envoyer : ${phrase}`,
+    sendFailed: 'Impossible d’envoyer le message',
+    failed: 'Impossible de charger la discussion',
+    retry: 'Réessayer',
+    gone: 'Vous n’êtes plus amis.',
+  },
+};
+
+const es: InboxMessages = {
+  phrases: {
+    gg: '¡Buena partida! 👏',
+    rematch: '¿Revancha? 🔥',
+    beat_that: 'Supera eso 😏',
+    wow: '¡Guau! 🤯',
+    close_one: '¡Por poco! 😅',
+    your_turn: '¡Te toca! ⏳',
+    daily: '¿Jugaste el Feed del día? 📅',
+    hi: '¡Hola! 👋',
+    thanks: '¡Gracias! 🙏',
+    next_time: '¡La próxima! 💪',
+  },
+  preview: {
+    none: 'Nada todavía: ¡manda un VS!',
+    friends: 'Ya son amigos 🎉',
+    mine: (phrase) => `Tú: ${phrase}`,
+    inviteMine: 'Mandaste un VS',
+    inviteTheirs: '¡Te retó a un VS!',
+    declinedMine: 'Rechazaste el VS',
+    declinedTheirs: 'Rechazó tu VS',
+    expired: 'El VS caducó',
+    won: (you, them) => `Ganaste el VS · ${you} – ${them}`,
+    lost: (you, them) => `Perdiste el VS · ${you} – ${them}`,
+    draw: (you, them) => `El VS terminó en empate · ${you} – ${them}`,
+  },
+  row: {
+    yourTurn: 'TU TURNO',
+    theirTurn: 'SU TURNO',
+    label: (name, line, when, unread) =>
+      unread > 0
+        ? `${name}. ${line}. ${when}. ${plural('es', unread, { one: '1 mensaje sin leer', other: `${unread} mensajes sin leer` })}`
+        : `${name}. ${line}. ${when}`,
+  },
+  thread: {
+    more: 'Más',
+    card: 'Tarjeta del jugador',
+    h2hTitle: 'Sus VS',
+    you: 'TÚ',
+    h2hNone: 'Aún no han jugado ningún VS',
+    h2hLine: (wins, losses, draws) =>
+      `${plural('es', wins, { one: '1 victoria', other: `${wins} victorias` })} · ${plural('es', losses, { one: '1 derrota', other: `${losses} derrotas` })} · ${plural('es', draws, { one: '1 empate', other: `${draws} empates` })}`,
+    newVsHint: (name) =>
+      `Los dos juegan el mismo feed, una vez cada uno. Empiezas tú; tu puntuación queda oculta hasta que ${name} juegue.`,
+    newVs: 'Mandar VS',
+    yourTurn: 'TU TURNO',
+    yourTurnBody: (name) => `${name} te retó a un VS. Su puntuación se muestra cuando juegues.`,
+    play: 'Jugar',
+    decline: 'Rechazar',
+    theirTurn: 'SU TURNO',
+    theirTurnBody: (name, score) => `Hiciste ${score}. El resultado aparece aquí cuando juegue ${name}.`,
+    playing: 'Tu partida de VS está en curso…',
+    left: 'Quedan',
+    lines: {
+      friends: 'Ya son amigos 🎉',
+      inviteMine: 'Mandaste un VS',
+      inviteTheirs: (name) => `${name} te retó a un VS`,
+      won: 'GANASTE',
+      lost: 'PERDISTE',
+      draw: 'EMPATE',
+      declinedMine: 'Rechazaste el VS',
+      declinedTheirs: (name) => `${name} rechazó el VS`,
+      expired: 'El VS caducó',
+      said: (who, text) => `${who}: ${text}`,
+      me: 'Tú',
+    },
+    tray: 'Mensajes rápidos',
+    send: (phrase) => `Enviar: ${phrase}`,
+    sendFailed: 'No se pudo enviar el mensaje',
+    failed: 'No se pudo cargar el chat',
+    retry: 'Reintentar',
+    gone: 'Ya no son amigos.',
+  },
+};
+
+export const inbox: Record<Locale, InboxMessages> = { tr, en, de, ar, fr, es };

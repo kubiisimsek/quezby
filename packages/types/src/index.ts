@@ -23,6 +23,12 @@ export type Locale = 'tr' | 'en' | 'de' | 'ar' | 'fr' | 'es';
 
 export type UserSettings = {
   haptics: boolean;
+  /** A push when a friend request comes or is accepted. */
+  pushFriends: boolean;
+  /** A push when a friend sends a VS, and when one you sent ends. */
+  pushVs: boolean;
+  /** A push when a friend sends a phrase. */
+  pushMessages: boolean;
   /**
    * Consent to count how the app is used — visits, screens, a few moments
    * (`docs/product/analytics.md`). Off until the player says yes; saying no
@@ -47,6 +53,8 @@ export type Me = {
    * nothing ranked is shown without it.
    */
   username: string | null;
+  /** The player's profile photo; null for none (`PUT /me/avatar`). */
+  avatarUrl: string | null;
   /** The email a password sign-in uses, when one is linked. */
   email: string | null;
   /** No email, Apple or Google attached yet — the account lives on this phone. */
@@ -67,7 +75,6 @@ export type Me = {
 };
 
 export type Ranks = {
-  daily: number | null;
   weekly: number | null;
   monthly: number | null;
   all: number | null;
@@ -132,8 +139,12 @@ export type UpdateLocaleRequest = { locale: Locale };
 /** `[gesture, t, d]` — see `@quezby/engine`'s `Action`. */
 export type RunAction = [number, number, number];
 
-/** `free`: any number a day. `daily`: "Günün akışı" — one attempt, the same seed for everyone. */
-export type RunMode = 'free' | 'daily';
+/**
+ * `free`: any number a day. `daily`: "Günün akışı" — one attempt, the same
+ * seed for everyone. `vs`: a friend's VS — one attempt each at one seed; it
+ * never ranks anywhere.
+ */
+export type RunMode = 'free' | 'daily' | 'vs';
 
 export type StartRunRequest = {
   mode: RunMode;
@@ -141,6 +152,10 @@ export type StartRunRequest = {
   engineVersion: number;
   /** The content catalog this build draws reels from. */
   contentVersion: number;
+  /** A VS against this friend, on a new seed — the challenger plays first. */
+  opponent?: string;
+  /** The VS a friend sent, answered on its seed. */
+  duel?: string;
 };
 
 export type StartRunResponse = {
@@ -149,8 +164,10 @@ export type StartRunResponse = {
   engineVersion: number;
   contentVersion: number;
   mode: RunMode;
-  /** The Istanbul day of a daily run, `2026-09-24`; null for a free run. */
+  /** The Istanbul day of a daily run, `2026-09-24`; null otherwise. */
   dayKey: string | null;
+  /** The VS a `vs` run plays; null otherwise. */
+  duelId: string | null;
   startedAt: string;
 };
 
@@ -185,9 +202,10 @@ export type CheckpointResponse = { receipt: string };
 
 /**
  * `ranked` counts; `flagged` failed a plausibility check and stays off the
- * boards; `review` is a top score held back until a person looks at it.
+ * boards; `review` is a top score held back until a person looks at it;
+ * `played` is a clean VS run — it settles its VS and counts nowhere else.
  */
-export type RunStatus = 'ranked' | 'flagged' | 'review';
+export type RunStatus = 'ranked' | 'flagged' | 'review' | 'played';
 
 export type BonusKind = 'flawless' | 'lightning' | 'coolHead' | 'comeback';
 
@@ -254,8 +272,8 @@ export type RunResult = {
 
 export type RankChange = { before: number | null; after: number | null };
 
-/** Someone this run overtook on today's board. */
-export type PassedPlayer = { username: string; score: number; isFollowing: boolean };
+/** Someone this run overtook on this week's board. */
+export type PassedPlayer = { username: string; avatarUrl: string | null; score: number; isFriend: boolean };
 
 export type DailyResult = {
   dayKey: string;
@@ -299,15 +317,52 @@ export type FinishRunResponse = {
   daily: DailyResult | null;
   /** Where this week's league stands after the run; null when it did not rank, or the league is not open yet. */
   league: LeagueStanding | null;
-  /** How far the league still is after this run; null once it is open. */
+  /** How far the league still is after this run; null once it is open, and after a VS. */
   leagueUnlock: LeagueUnlock | null;
-  /** What "Paylaş" sends, written by the API from its own numbers. */
-  shareText: string;
+  /** What "Paylaş" sends, written by the API from its own numbers; null after a VS, which is between two friends. */
+  shareText: string | null;
+  /** The VS a `vs` run played, as it stands now; null otherwise. */
+  duel: DuelView | null;
 };
+
+/* -------------------------------------------------------------- history -- */
+
+/**
+ * A VS run's VS, from the player's side, with who it was against. Deleting
+ * either account deletes the VS, so such a run comes back with `duel: null`.
+ */
+export type RunDuel = DuelBrief & { opponent: string | null };
+
+/** A past game in the player's history: a run played to its end, as the replay found it. */
+export type RunSummary = {
+  runId: string;
+  mode: RunMode;
+  status: RunStatus;
+  score: number;
+  reels: number;
+  level: number;
+  activeMs: number;
+  finishedAt: string;
+  /** The run behind this season's best. */
+  isBest: boolean;
+  /** "Günün akışı #17" of a daily run; null otherwise. */
+  dailyNumber: number | null;
+  duel: RunDuel | null;
+};
+
+/** `GET /me/runs?mode=`: thirty a page, the newest first. */
+export type RunHistoryResponse = { runs: RunSummary[]; nextCursor: string | null };
+
+/** `GET /me/runs/{runId}`: one past game with everything its replay counted. */
+export type RunDetailResponse = { summary: RunSummary; run: RunResult };
 
 /* --------------------------------------------------------- leaderboard -- */
 
-export type LeaderboardPeriod = 'daily' | 'weekly' | 'monthly' | 'all';
+/**
+ * The boards a player climbs, in Europe/Istanbul. There is no day board: the
+ * API keeps each day's best only to add up league points.
+ */
+export type LeaderboardPeriod = 'weekly' | 'monthly' | 'all';
 
 /** A period, or `challenge`: today's "Günün akışı" board. */
 export type LeaderboardBoard = LeaderboardPeriod | 'challenge';
@@ -317,17 +372,18 @@ export type LeaderboardScope = 'everyone' | 'friends';
 export type LeaderboardEntry = {
   rank: number;
   username: string;
+  avatarUrl: string | null;
   score: number;
   reels: number;
   isMe: boolean;
-  isFollowing: boolean;
+  isFriend: boolean;
   /** Points needed to pass the row above (ties go to whoever got there first). Null at #1. */
   gap: number | null;
 };
 
 export type LeaderboardResponse = {
   board: LeaderboardBoard;
-  /** `2026-09-24`, `2026-W39`, `2026-09` or `all`, in Europe/Istanbul. */
+  /** `2026-W39`, `2026-09`, `all` — or the day, `2026-09-24`, of a challenge board — in Europe/Istanbul. */
   periodKey: string;
   /** The engine version the board belongs to; a rules change starts a new season. */
   season: number;
@@ -351,8 +407,11 @@ export type LeaderboardResponse = {
 /* --------------------------------------------------------------- daily -- */
 
 export type DailyAttempt = {
-  /** `unfinished` while the run is open; `void` when it was abandoned, expired or rejected. */
-  status: RunStatus | 'unfinished' | 'void';
+  /**
+   * `unfinished` while the run is open; `void` when it was abandoned, expired
+   * or rejected. Never `played`: that is a VS run's.
+   */
+  status: Exclude<RunStatus, 'played'> | 'unfinished' | 'void';
   score: number | null;
   rank: number | null;
   grid: string | null;
@@ -376,11 +435,12 @@ export type DailyResponse = {
 export type LeagueMember = {
   rank: number;
   username: string;
+  avatarUrl: string | null;
   /** The sum of the player's best score of each day this week. */
   points: number;
   daysPlayed: number;
   isMe: boolean;
-  isFollowing: boolean;
+  isFriend: boolean;
   zone: LeagueZone;
   gap: number | null;
 };
@@ -418,24 +478,33 @@ export type LeagueResponse = {
 
 /* --------------------------------------------------------------- social -- */
 
+/**
+ * What another player is to the one asking. `requested`: your request waits
+ * for them; `incoming`: theirs waits for you; `blocked`: you blocked them.
+ * Nobody is told they were blocked — to them, the blocker is not there.
+ */
+export type PlayerRelation = 'none' | 'friend' | 'requested' | 'incoming' | 'blocked';
+
 export type PlayerSummary = {
   username: string;
+  /** Their profile photo, cached by its address for good; null for none. */
+  avatarUrl: string | null;
   best: number | null;
   league: LeagueTier | null;
-  isFollowing: boolean;
+  relation: PlayerRelation;
 };
 
 export type PlayerCard = {
   username: string;
+  avatarUrl: string | null;
   createdAt: string;
   best: BestScore | null;
   league: LeagueTier | null;
   ranks: { weekly: number | null; all: number | null };
   stats: { runs: number; reels: number; likes: number; perfects: number };
-  followers: number;
-  following: number;
-  isFollowing: boolean;
-  followsMe: boolean;
+  /** Friends who are not banned. */
+  friends: number;
+  relation: PlayerRelation;
   isMe: boolean;
 };
 
@@ -443,7 +512,170 @@ export type PlayerResponse = { player: PlayerCard };
 
 export type UserSearchResponse = { users: PlayerSummary[] };
 
-export type FollowListResponse = { users: PlayerSummary[]; nextCursor: string | null };
+/** `PUT|DELETE /users/{username}/friend` and `…/block`: where the two stand afterwards. */
+export type RelationResponse = { relation: PlayerRelation };
+
+export type FriendRequest = { player: PlayerSummary; requestedAt: string };
+
+/** `GET /me/friend-requests`: the newest hundred each way. */
+export type FriendRequestsResponse = { incoming: FriendRequest[]; outgoing: FriendRequest[] };
+
+/* ------------------------------------------------------------------ VS -- */
+
+/**
+ * `playing`: the challenger is on their run — the friend knows nothing yet.
+ * `waiting`: sent; it waits for the friend until `expiresAt`. `finished`:
+ * both played. `declined`, `expired` (nobody answered in time — it counts for
+ * nobody), `cancelled` (the two stopped being friends), `void` (the
+ * challenger's run was not clean, so it was never sent).
+ */
+export type DuelStatus = 'playing' | 'waiting' | 'finished' | 'declined' | 'expired' | 'cancelled' | 'void';
+
+export type DuelOutcome = 'won' | 'lost' | 'draw';
+
+/** One side's run: its score (null when it was left unfinished) and whether it was clean — one that was not loses. */
+export type DuelSide = { score: number | null; valid: boolean };
+
+/** A VS from the viewer's side, as short as a line in the inbox needs it. */
+export type DuelBrief = {
+  id: string;
+  status: DuelStatus;
+  /** Who plays next: `you`, `them`, or null once it is over. */
+  turn: 'you' | 'them' | null;
+  /** The viewer's run; null until they have played. */
+  you: DuelSide | null;
+  /** The other run — hidden (null) until the viewer has played too, and for good if they never do. */
+  them: DuelSide | null;
+  /** Set once it is `finished`. */
+  outcome: DuelOutcome | null;
+  /** When the friend's chance to answer runs out; only while `waiting`. Count down with `serverTime`. */
+  expiresAt: string | null;
+};
+
+/** How two friends stand over every VS they finished, from the viewer's side. */
+export type HeadToHead = { wins: number; losses: number; draws: number };
+
+export type DuelView = DuelBrief & {
+  /** True when the viewer sent it — and so played first. */
+  sent: boolean;
+  opponent: PlayerSummary;
+  h2h: HeadToHead;
+  serverTime: string;
+};
+
+/** `GET /duels/{id}`, `POST /duels/{id}/decline`. */
+export type DuelResponse = { duel: DuelView };
+
+/* --------------------------------------------------------------- inbox -- */
+
+/**
+ * A line of a conversation between two friends. `friends`: the request was
+ * accepted; `phrase`: one of `Phrase`; `vs_invite` / `vs_result` /
+ * `vs_declined` / `vs_expired`: a VS was sent, ended, turned down or ran out.
+ */
+export type MessageKind = 'friends' | 'phrase' | 'vs_invite' | 'vs_result' | 'vs_declined' | 'vs_expired';
+
+export type InboxMessage = {
+  id: number;
+  kind: MessageKind;
+  /** The viewer's own line. */
+  mine: boolean;
+  phrase: Phrase | null;
+  /** The VS a `vs_*` line is about, as it stands now. */
+  duel: DuelBrief | null;
+  createdAt: string;
+};
+
+/** A friend in the inbox, the one last heard from first. */
+export type FriendThread = {
+  player: PlayerSummary;
+  friendsSince: string;
+  lastActivityAt: string;
+  /** The conversation's newest line; null once old lines were pruned. */
+  last: InboxMessage | null;
+  /** Their lines the viewer has not read. */
+  unread: number;
+  /** The VS open between the two that the viewer knows of. */
+  duel: DuelBrief | null;
+};
+
+/** `GET /me/threads/{username}`: thirty lines a page, oldest first; `nextBefore` fetches the older ones. */
+export type ThreadResponse = {
+  player: PlayerSummary;
+  h2h: HeadToHead;
+  /** The VS open between the two that the viewer knows of. */
+  duel: DuelView | null;
+  messages: InboxMessage[];
+  nextBefore: number | null;
+};
+
+/**
+ * `GET /me/inbox`: what the badges count — requests waiting, and friends whose
+ * conversation wants a look (a line unread, or a VS waiting for the viewer).
+ */
+export type InboxSummary = { requests: number; threads: number; yourTurn: number };
+
+/**
+ * `GET /me/pulse`: a number that moves whenever the player's inbox does — a
+ * request, a friendship, a line, a VS (one whose time ran out included). The
+ * app asks for it every few seconds and fetches its lists only when it moved.
+ */
+export type Pulse = { stamp: number };
+
+export type SendPhraseRequest = { phrase: Phrase };
+
+export type SendPhraseResponse = { message: InboxMessage };
+
+/** `GET /me/friends`: fifty a page. */
+export type FriendsResponse = { friends: FriendThread[]; nextCursor: string | null };
+
+/**
+ * The words one player can send a friend — never typed, always one of these
+ * (`PHRASES` in `@quezby/config`). Each phone says them in its own language;
+ * the API's push says them in the receiver's.
+ */
+export type Phrase =
+  | 'gg'
+  | 'rematch'
+  | 'beat_that'
+  | 'wow'
+  | 'close_one'
+  | 'your_turn'
+  | 'daily'
+  | 'hi'
+  | 'thanks'
+  | 'next_time';
+
+export type BlockedPlayer = { username: string; avatarUrl: string | null; blockedAt: string };
+
+/** What about a player is reported: their photo or their name — the only things a player makes that others see. */
+export type ReportReason = 'photo' | 'name';
+
+/** `POST /users/{username}/report` → `204`, whatever becomes of it. */
+export type ReportRequest = { reason: ReportReason };
+
+/** `PUT` / `DELETE /me/push-token` → `204`: the phone's Firebase Cloud Messaging token. */
+export type PushTokenRequest = { token: string; platform: Platform };
+
+/**
+ * What a push tells a phone besides its words: which kind of news, the friend
+ * it is about and — for a VS — which one. Tapping it opens that conversation.
+ */
+export type PushData = {
+  kind: 'friend_request' | 'friends' | 'vs_invite' | 'vs_result' | 'phrase';
+  username: string;
+  duelId?: string;
+};
+
+/**
+ * `PUT /me/avatar` → `{ user: Me }`: a square photo as base64 — at most 100
+ * KB decoded (`AVATAR` in `@quezby/config`). The API keeps its own JPEG of it,
+ * without the photo's metadata.
+ */
+export type UpdateAvatarRequest = { image: string };
+
+/** `GET /me/blocks`: everyone you blocked, the latest first. */
+export type BlocksResponse = { users: BlockedPlayer[] };
 
 /* ---------------------------------------------------------------- stats -- */
 
@@ -500,7 +732,14 @@ export type AnalyticsScreen =
   | 'profile'
   | 'game'
   | 'help'
-  | 'daily';
+  | 'daily'
+  /** The Arkadaşlar tab: requests and the inbox. `search` is finding a player. */
+  | 'friends'
+  | 'thread'
+  | 'history'
+  | 'avatar'
+  /** A new player's step that asks whether the game may send notifications. */
+  | 'notifications';
 
 /** A moment worth counting that the API cannot see by itself (`@quezby/config` › ANALYTICS_EVENTS). */
 export type AnalyticsEvent =
@@ -614,8 +853,21 @@ export type ApiErrorCode =
   | 'run_rejected'
   | 'engine_outdated'
   | 'daily_already_played'
-  | 'cannot_follow_self'
-  | 'follow_limit'
+  | 'cannot_befriend_self'
+  /** Your friend list is full — checked on whoever asks or accepts. */
+  | 'friend_limit'
+  /** Too many of your requests wait for an answer. */
+  | 'request_limit'
+  /** Only between friends: a message, a VS. */
+  | 'not_friends'
+  /** Too many phrases to one friend today. */
+  | 'message_limit'
+  /** The VS was answered, declined, expired or is already open between you two. */
+  | 'duel_unavailable'
+  /** Too many of your VS wait for an answer. */
+  | 'duel_limit'
+  /** A profile photo the API could not use. */
+  | 'photo_invalid'
   /** A device-check challenge that is unknown, used or expired. */
   | 'challenge_invalid'
   /** A device-check proof the API could not read at all. */

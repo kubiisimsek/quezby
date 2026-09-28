@@ -91,7 +91,6 @@ const tr = {
   /** A board's place, and how the run moved it. The tiles are small: "Tümü", not "Tüm zamanlar". */
   ranks: {
     periods: {
-      daily: 'Bugün',
       weekly: 'Hafta',
       monthly: 'Ay',
       all: 'Tümü',
@@ -106,7 +105,7 @@ const tr = {
       up: (_places: number, shown: string) => `${shown} sıra yukarı`,
       down: (_places: number, shown: string) => `${shown} sıra aşağı`,
     },
-    /** A rank tile read aloud: "Bugün: #12, 8 sıra yukarı". */
+    /** A rank tile read aloud: "Hafta: #12, 8 sıra yukarı". */
     label: (period: string, place: string, move: string | null) =>
       move ? `${period}: ${place}, ${move}` : `${period}: ${place}`,
   },
@@ -120,9 +119,9 @@ const tr = {
   unlockBody: (required: number) => `Lig, ilk ${required} oyunundan sonra açılır.`,
   /** Over the kinds a practice run ended before. */
   unseen: 'Henüz görmediklerin',
-  /** The players this run overtook today; `name` is `handle(username)`. */
+  /** The players this run overtook this week; `name` is `handle(username)`. */
   passed: {
-    title: 'Bugün geçtiklerin',
+    title: 'Bu hafta geçtiklerin',
     name: (name: string, friend: boolean) => (friend ? `${name} · arkadaşın` : name),
     label: (name: string, friend: boolean, _score: number, shown: string) =>
       `${name}${friend ? ', arkadaşın' : ''}, ${shown} puan, geçtin`,
@@ -214,7 +213,7 @@ const en: ResultMessages = {
     combos: 'From combos',
   },
   ranks: {
-    periods: { daily: 'Today', weekly: 'Week', monthly: 'Month', all: 'Overall' },
+    periods: { weekly: 'Week', monthly: 'Month', all: 'Overall' },
     place: board.en.place,
     unranked: 'not on the board',
     moved: {
@@ -236,7 +235,7 @@ const en: ResultMessages = {
     }),
   unseen: "You haven't seen these yet",
   passed: {
-    title: 'Passed today',
+    title: 'Passed this week',
     name: (name, friend) => (friend ? `${name} · your friend` : name),
     label: (name, friend, score, shown) =>
       `${name}${friend ? ', your friend' : ''}, ${enPoints(score, shown)}, you passed them`,
@@ -322,7 +321,7 @@ const de: ResultMessages = {
     combos: 'Aus Kombos',
   },
   ranks: {
-    periods: { daily: 'Heute', weekly: 'Woche', monthly: 'Monat', all: 'Gesamt' },
+    periods: { weekly: 'Woche', monthly: 'Monat', all: 'Gesamt' },
     place: board.de.place,
     unranked: 'nicht in der Rangliste',
     moved: {
@@ -345,7 +344,7 @@ const de: ResultMessages = {
     }),
   unseen: 'Noch nicht gesehen',
   passed: {
-    title: 'Heute überholt',
+    title: 'Diese Woche überholt',
     name: (name, friend) => (friend ? `${name} · dein Freund` : name),
     label: (name, friend, score, shown) =>
       `${name}${friend ? ', dein Freund' : ''}, ${dePoints(score, shown)}, von dir überholt`,
@@ -440,7 +439,7 @@ const ar: ResultMessages = {
     combos: 'من الكومبو',
   },
   ranks: {
-    periods: { daily: 'اليوم', weekly: 'الأسبوع', monthly: 'الشهر', all: 'الكل' },
+    periods: { weekly: 'الأسبوع', monthly: 'الشهر', all: 'الكل' },
     place: board.ar.place,
     unranked: 'خارج الترتيب',
     moved: {
@@ -477,7 +476,7 @@ const ar: ResultMessages = {
     }),
   unseen: 'لم ترها بعد',
   passed: {
-    title: 'تجاوزتهم اليوم',
+    title: 'تجاوزتهم هذا الأسبوع',
     name: (name, friend) => (friend ? `${iso(name)} · صديقك` : name),
     label: (name, friend, score, shown) =>
       `${iso(name)}${friend ? '، صديقك' : ''}، ${arPoints(score, shown)}، تجاوزته`,
@@ -576,7 +575,6 @@ const fr: ResultMessages = {
   },
   ranks: {
     periods: {
-      daily: "Aujourd'hui",
       weekly: 'Semaine',
       monthly: 'Mois',
       all: 'Total',
@@ -604,7 +602,7 @@ const fr: ResultMessages = {
     }),
   unseen: 'Pas encore vus',
   passed: {
-    title: "Dépassés aujourd'hui",
+    title: 'Dépassés cette semaine',
     name: (name, friend) => (friend ? `${name} · ton ami` : name),
     label: (name, friend, score, shown) =>
       `${name}${friend ? ', ton ami' : ''}, ${frPoints(score, shown)}, désormais derrière toi`,
@@ -696,7 +694,7 @@ const es: ResultMessages = {
     combos: 'Por combos',
   },
   ranks: {
-    periods: { daily: 'Hoy', weekly: 'Semana', monthly: 'Mes', all: 'Total' },
+    periods: { weekly: 'Semana', monthly: 'Mes', all: 'Total' },
     place: board.es.place,
     unranked: 'fuera de la clasificación',
     moved: {
@@ -719,7 +717,7 @@ const es: ResultMessages = {
     }),
   unseen: 'Aún no los viste',
   passed: {
-    title: 'Superados hoy',
+    title: 'Superados esta semana',
     name: (name, friend) => (friend ? `${name} · tu amigo` : name),
     label: (name, friend, score, shown) =>
       `${name}${friend ? ', tu amigo' : ''}, ${esPoints(score, shown)}, ahora detrás de ti`,

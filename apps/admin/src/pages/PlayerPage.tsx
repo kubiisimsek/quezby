@@ -1,10 +1,15 @@
-import type { AdminDeviceCheck, AdminPlayerDevice, AdminPlayerResponse, AdminRunRow, AdminVisit } from '@quezby/types';
+import type { AdminDeviceCheck, AdminPlayerDevice, AdminPlayerResponse, AdminRunRow, AdminVisit, ReportReason } from '@quezby/types';
 import {
   Activity,
   Ban,
   CalendarDays,
+  ExternalLink,
   Fingerprint,
+  Flag,
+  FlagOff,
   Gamepad2,
+  Image as ImageIcon,
+  ImageOff,
   LogOut,
   Milestone,
   MonitorSmartphone,
@@ -23,6 +28,7 @@ import {
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
+import { Avatar } from '@/components/base/avatar';
 import { Button } from '@/components/base/button';
 import { Menu, type MenuItem } from '@/components/base/menu';
 import { Panel } from '@/components/base/panel';
@@ -33,6 +39,8 @@ import { Journey } from '@/components/analytics/journey';
 import {
   BanPlayerDialog,
   DeletePlayerDialog,
+  DismissReportsDialog,
+  RemoveAvatarDialog,
   RenamePlayerDialog,
   SignOutPlayerDialog,
   UnbanPlayerDialog,
@@ -65,6 +73,7 @@ import {
   PLATFORM,
   playerName,
   PROVIDER,
+  REPORT_REASON,
   RUN_FLAG,
   RUN_MODE,
   shortId,
@@ -73,7 +82,9 @@ import { can } from '@/lib/permissions';
 import { useSession } from '@/stores/session';
 
 type Tab = 'summary' | 'activity' | 'devices' | 'log';
-type Dialog = 'ban' | 'unban' | 'rename' | 'signOut' | 'delete' | null;
+type Dialog = 'ban' | 'unban' | 'rename' | 'signOut' | 'avatar' | 'dismiss' | 'delete' | null;
+
+const REASONS = Object.keys(REPORT_REASON) as ReportReason[];
 
 const RUN_COLUMNS: Column<AdminRunRow>[] = [
   { key: 'run', header: 'Tur', cell: (run) => shortId(run.id), tone: 'mono' },
@@ -185,14 +196,30 @@ export function PlayerPage() {
   const data = player.data;
   const me = data.player;
   const banned = me.bannedAt !== null;
+  const moderator = can(role, 'moderate');
   const flaggedRuns = (data.runs.flagged ?? 0) + (data.runs.review ?? 0) + (data.runs.rejected ?? 0);
+  const openReports = data.openReports.photo + data.openReports.name;
 
-  const actions: MenuItem[] = can(role, 'moderate')
+  const actions: MenuItem[] = moderator
     ? [
         banned
           ? { label: 'Yasağı kaldır', hint: 'Turları tablolara döner', icon: <ShieldCheck />, onSelect: () => setDialog('unban') }
           : { label: 'Yasakla', hint: 'Tablolardan sessizce çıkar', icon: <Ban />, onSelect: () => setDialog('ban'), tone: 'danger' },
         { label: 'Adı sıfırla', hint: 'Otomatik ad; oyuncu bir kez yeniden seçer', icon: <RotateCcw />, onSelect: () => setDialog('rename') },
+        ...(me.avatarUrl
+          ? [
+              {
+                label: 'Fotoğrafı kaldır',
+                hint: 'Fotoğraf bildirimleri de kapanır',
+                icon: <ImageOff />,
+                onSelect: () => setDialog('avatar'),
+                tone: 'danger',
+              } satisfies MenuItem,
+            ]
+          : []),
+        ...(openReports > 0
+          ? [{ label: 'Bildirimleri kapat', hint: 'İşlem yapmadan kapatır', icon: <FlagOff />, onSelect: () => setDialog('dismiss') } satisfies MenuItem]
+          : []),
         {
           label: 'Oturumları kapat',
           hint: me.isGuest ? 'Misafirde yapılamaz: hesap kaybolur' : 'Her cihazdan çıkarır',
@@ -210,6 +237,7 @@ export function PlayerPage() {
     <Page
       title={playerName(me.username)}
       back={{ to: '/players', label: 'Oyuncular' }}
+      leading={<Avatar name={me.username} src={me.avatarUrl} tone="onBrand" size="xl" className="ring-2 ring-on-brand/30" />}
       description={`Katıldı ${formatDate(me.createdAt)} · son oyun ${formatRelative(me.lastPlayedAt)}`}
       eyebrow={
         <>
@@ -238,6 +266,7 @@ export function PlayerPage() {
             { label: `Sezon ${data.season} rekoru`, value: formatNumber(data.best?.score ?? null), icon: <Trophy /> },
             { label: 'Sıralamadaki tur', value: formatNumber(data.runs.ranked ?? 0), icon: <Gamepad2 /> },
             { label: 'Sorunlu tur', value: formatNumber(flaggedRuns), icon: <ShieldAlert />, alert: flaggedRuns > 0 },
+            { label: 'Açık bildirim', value: formatNumber(openReports), icon: <Flag />, alert: openReports > 0 },
             { label: 'Açık oturum', value: formatNumber(me.sessions), icon: <Fingerprint /> },
           ]}
         />
@@ -262,7 +291,7 @@ export function PlayerPage() {
         </Callout>
       ) : null}
 
-      {tab === 'summary' ? <Summary data={data} /> : null}
+      {tab === 'summary' ? <Summary data={data} moderator={moderator} onDialog={setDialog} /> : null}
       {tab === 'activity' ? <ActivityTab playerId={me.id} /> : null}
       {tab === 'devices' ? (
         <div className="space-y-6">
@@ -307,6 +336,8 @@ export function PlayerPage() {
       <UnbanPlayerDialog player={me} open={dialog === 'unban'} onOpenChange={(open) => setDialog(open ? 'unban' : null)} />
       <RenamePlayerDialog player={me} open={dialog === 'rename'} onOpenChange={(open) => setDialog(open ? 'rename' : null)} />
       <SignOutPlayerDialog player={me} open={dialog === 'signOut'} onOpenChange={(open) => setDialog(open ? 'signOut' : null)} />
+      <RemoveAvatarDialog player={me} open={dialog === 'avatar'} onOpenChange={(open) => setDialog(open ? 'avatar' : null)} />
+      <DismissReportsDialog player={me} open={dialog === 'dismiss'} onOpenChange={(open) => setDialog(open ? 'dismiss' : null)} />
       <DeletePlayerDialog
         player={me}
         open={dialog === 'delete'}
@@ -317,9 +348,19 @@ export function PlayerPage() {
   );
 }
 
-function Summary({ data }: { data: AdminPlayerResponse }) {
+function Summary({
+  data,
+  moderator,
+  onDialog,
+}: {
+  data: AdminPlayerResponse;
+  /** Whether the admin may act on the player: the photo and the reports get their buttons. */
+  moderator: boolean;
+  onDialog: (dialog: 'avatar' | 'dismiss') => void;
+}) {
   const me = data.player;
   const ways = [...(me.email ? [`E-posta (${me.email})`] : []), ...me.identityDetails.map((identity) => PROVIDER[identity.provider])];
+  const openReports = data.openReports.photo + data.openReports.name;
 
   return (
     <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_24rem]">
@@ -359,6 +400,56 @@ function Summary({ data }: { data: AdminPlayerResponse }) {
       </div>
 
       <div className="space-y-6">
+        {openReports > 0 ? (
+          <Panel
+            title="Açık bildirimler"
+            description="Oyuncuların fotoğrafı ya da adı için yaptığı, henüz kapanmamış bildirimler."
+            icon={<Flag />}
+            tone="warn"
+            actions={
+              moderator ? (
+                <Button size="sm" tone="ghost" icon={<FlagOff />} onClick={() => onDialog('dismiss')}>
+                  Bildirimleri kapat
+                </Button>
+              ) : null
+            }
+          >
+            <div className="space-y-3">
+              <Facts facts={REASONS.map((reason) => ({ label: REPORT_REASON[reason], value: `${formatNumber(data.openReports[reason])} bildirim` }))} />
+              <p className="text-meta text-ink-muted">Fotoğrafı kaldırmak fotoğraf bildirimlerini, adı sıfırlamak ad bildirimlerini kapatır.</p>
+            </div>
+          </Panel>
+        ) : null}
+
+        {me.avatarUrl ? (
+          <Panel
+            title="Profil fotoğrafı"
+            description="Oyuncuların gördüğü haliyle."
+            icon={<ImageIcon />}
+            tone="secondary"
+            actions={
+              moderator ? (
+                <Button size="sm" tone="danger" icon={<ImageOff />} onClick={() => onDialog('avatar')}>
+                  Fotoğrafı kaldır
+                </Button>
+              ) : null
+            }
+          >
+            <div className="flex flex-col items-center gap-3">
+              <Avatar name={me.username} src={me.avatarUrl} alt={`${playerName(me.username)} profil fotoğrafı`} size="2xl" />
+              <a
+                href={me.avatarUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 text-meta font-semibold text-ink-muted hover:text-primary-text hover:underline"
+              >
+                <ExternalLink aria-hidden className="size-3.5" />
+                Tam boyutta aç
+              </a>
+            </div>
+          </Panel>
+        ) : null}
+
         <Panel title="Hesap" icon={<UserRound />} tone="secondary">
           <Facts
             facts={[
@@ -375,7 +466,12 @@ function Summary({ data }: { data: AdminPlayerResponse }) {
                 hint: me.analyticsAt ? undefined : 'Yalnızca cihaz kaydı ve oyun verisi tutulur.',
               },
               { label: 'Açık oturum', value: formatNumber(me.sessions) },
-              { label: 'Takip', value: `${formatNumber(data.follows.followers)} takipçi · ${formatNumber(data.follows.following)} takip` },
+              { label: 'Arkadaş', value: formatNumber(data.social.friends) },
+              {
+                label: 'Engelleyen',
+                value: formatNumber(data.social.blockedBy),
+                hint: data.social.blockedBy > 0 ? 'Onu engelleyen oyuncular: bakmaya değer bir işaret.' : undefined,
+              },
             ]}
           />
         </Panel>
@@ -392,7 +488,6 @@ function Summary({ data }: { data: AdminPlayerResponse }) {
                     ? 'Yasaklıyken tablolarda yer almaz; yasak kalkınca geri gelir.'
                     : undefined,
               },
-              { label: 'Bugün', value: data.ranks.daily ? `#${formatNumber(data.ranks.daily)}` : null },
               { label: 'Bu hafta', value: data.ranks.weekly ? `#${formatNumber(data.ranks.weekly)}` : null },
               { label: 'Bu ay', value: data.ranks.monthly ? `#${formatNumber(data.ranks.monthly)}` : null },
               { label: 'Tüm zamanlar', value: data.ranks.all ? `#${formatNumber(data.ranks.all)}` : null },

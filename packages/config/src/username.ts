@@ -154,12 +154,14 @@ export function validateUsername(input: string): UsernameValidation {
 }
 
 /** The rules a name is checked against while the player types, in the order the field lists them. */
-export type UsernameRule = 'length' | 'charset' | 'edges' | 'symbols' | 'letter';
+export type UsernameRule = 'length' | 'charset' | 'letter';
 
 /**
  * The rules as a checklist the player can watch fill in while typing. It
- * guides; `validateUsername` decides. The words are the app's
- * (`username.rules` in its catalogs), in the player's language.
+ * guides; `validateUsername` decides. A dot or star at either end, or two
+ * touching, is not listed: the field says so only when a name does it.
+ * The words are the app's (`username.rules` in its catalogs), in the
+ * player's language.
  */
 export function usernameChecklist(input: string): Array<{ rule: UsernameRule; met: boolean }> {
   const value = input.trim().toLowerCase();
@@ -170,11 +172,6 @@ export function usernameChecklist(input: string): Array<{ rule: UsernameRule; me
       met: value.length >= USERNAME_MIN_LENGTH && value.length <= USERNAME_MAX_LENGTH,
     },
     { rule: 'charset', met: filled && !TURKISH.test(input) && ALLOWED.test(value) },
-    {
-      rule: 'edges',
-      met: filled && !SYMBOL.test(value[0] ?? '') && !SYMBOL.test(value[value.length - 1] ?? ''),
-    },
-    { rule: 'symbols', met: filled && !TOUCHING_SYMBOLS.test(value) },
     { rule: 'letter', met: LETTER.test(value) },
   ];
 }

@@ -9,6 +9,7 @@ use App\Game\EngineError;
 use App\Game\Rules;
 use App\Game\Run as Engine;
 use App\Game\Step;
+use App\Models\Duel;
 use App\Models\Run;
 use App\Models\User;
 use App\Support\Timestamp;
@@ -81,10 +82,35 @@ final class AdminRuns
                 'clientScore' => $run->client_score,
                 'clientReels' => $run->client_reels,
                 'stats' => $run->stats,
+                'duel' => $this->duel($run),
             ],
             'timeline' => $timeline,
             'timelineUnavailable' => $unavailable,
             'audit' => $this->audit->about('run', $run->id)->map(fn ($entry) => $this->audit->present($entry, $withIp))->values()->all(),
+        ];
+    }
+
+    /**
+     * `AdminRunDuel`: the VS a `vs` run belongs to — both players, both
+     * scores, how it stands. Null for any other run.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function duel(Run $run): ?array
+    {
+        $duel = $run->duel_id === null ? null : Duel::query()->with(['challenger', 'opponent'])->find($run->duel_id);
+        if ($duel === null) {
+            return null;
+        }
+
+        return [
+            'id' => $duel->id,
+            'status' => $duel->status->value,
+            'challenger' => self::ref($duel->challenger),
+            'opponent' => self::ref($duel->opponent),
+            'challengerScore' => $duel->challenger_score,
+            'opponentScore' => $duel->opponent_score,
+            'winnerId' => $duel->winner_id,
         ];
     }
 

@@ -26,14 +26,15 @@ const LIP = 4;
  * The game's head-up display over the reel, drawn the way a game draws one:
  * the way out on a small dark slab, the dopamine meter as a thick bar that
  * says its name, the score in Rubik on a hard shadow, the level and the
- * combo on pills. Every piece stands in the outline, so it reads on any
- * reel's colour.
+ * combo on pills — and on a VS, who it is against. Every piece stands in the
+ * outline, so it reads on any reel's colour.
  */
 export function Hud({
   meter,
   score,
   combo,
   reelIndex,
+  versus,
   onClose,
 }: {
   meter: SharedValue<number>;
@@ -41,6 +42,8 @@ export function Hud({
   /** The combo the next hit builds on, per-mille. */
   combo: number;
   reelIndex: number;
+  /** A VS run's pill: "VS · @ekin". */
+  versus?: string;
   onClose: () => void;
 }) {
   const t = useT();
@@ -125,6 +128,14 @@ export function Hud({
         <View style={styles.level}>
           <Text style={styles.levelText}>{t.game.hud.level(levelFor(reelIndex))}</Text>
         </View>
+        {versus ? (
+          <View style={styles.level}>
+            <Icon name="swords" size={13} color={REEL.ink} strokeWidth={2.8} />
+            <Text style={styles.levelText} numberOfLines={1}>
+              {versus}
+            </Text>
+          </View>
+        ) : null}
         {combo > RULES.comboStart ? (
           <Animated.View style={[styles.combo, comboStyle]}>
             <Icon
@@ -265,10 +276,14 @@ const styles = StyleSheet.create({
     marginTop: SPACE.xs,
   },
   level: {
+    alignItems: 'center',
     backgroundColor: REEL.track,
     borderColor: REEL.outline,
     borderRadius: RADIUS.pill,
     borderWidth: 2,
+    flexDirection: 'row',
+    flexShrink: 1,
+    gap: 4,
     paddingHorizontal: SPACE.sm + 2,
     paddingVertical: 1,
   },

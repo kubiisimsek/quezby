@@ -45,9 +45,11 @@ ya da **Şimdilik geç** der ve bu adla oynar. Adlar küçük harfle saklandığ
 - Büyük/küçük harf fark etmez: `Kubi.01` → `kubi.01` olarak saklanır ve gösterilir.
 - Benzersizlik veritabanında **unique index** ile garanti edilir; aynı ada aynı
   anda başvuran iki oyuncudan biri `409 username_taken` alır.
-- Uygulama kuralları yazarken canlı gösterir (`usernameChecklist` kural
-  kimliklerini verir; kelimeler oyuncunun dilinde `username.rules` /
-  `usernameRules` kataloğundan gelir), iyi biçimli bir adı 350 ms bekleyip
+- Uygulama alanın altında yalnızca üç kuralı canlı gösterir: uzunluk, izinli
+  karakterler ve en az bir harf (`usernameChecklist` kural kimliklerini verir;
+  kelimeler oyuncunun dilinde `usernameRules` kataloğundan gelir). Baştaki,
+  sondaki ya da art arda gelen `.` / `*` listede yazmaz; ad bunu yaptığında
+  alan tek cümlelik hatasını o an söyler. İyi biçimli bir adı 350 ms bekleyip
   `GET /usernames/check` ile sorar. Sunucunun mesajları isteğin dilindedir
   (`lang/{dil}/username.php`).
 

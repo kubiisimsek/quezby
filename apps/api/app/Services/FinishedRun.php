@@ -2,9 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\Duel;
 use App\Models\Run;
 
-/** A closed run and what it did: to the boards, the league, and the daily card. */
+/** A closed run and what it did: to the boards, the league, the daily card — or, for a VS, to its VS. */
 final readonly class FinishedRun
 {
     /**
@@ -18,5 +19,6 @@ final readonly class FinishedRun
         public ?array $league,
         public ?array $leagueUnlock,
         public ?array $daily,
+        public ?Duel $duel = null,
     ) {}
 }

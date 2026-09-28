@@ -37,12 +37,12 @@ function adminBoardRow(string $board, string $key, int $score, string $achievedA
 }
 
 test('ranks a board the way the game does, ties shared', function () {
-    adminBoardRow('daily', '2026-09-25', 900);
-    adminBoardRow('daily', '2026-09-25', 500, '2026-09-25 07:00:00.000');
-    adminBoardRow('daily', '2026-09-25', 500, '2026-09-25 07:00:00.000');
-    adminBoardRow('daily', '2026-09-25', 500, '2026-09-25 09:00:00.000');
+    adminBoardRow('challenge', '2026-09-25', 900);
+    adminBoardRow('challenge', '2026-09-25', 500, '2026-09-25 07:00:00.000');
+    adminBoardRow('challenge', '2026-09-25', 500, '2026-09-25 07:00:00.000');
+    adminBoardRow('challenge', '2026-09-25', 500, '2026-09-25 09:00:00.000');
 
-    adminBoard(['board' => 'daily'])
+    adminBoard(['board' => 'challenge'])
         ->assertOk()
         ->assertJsonPath('key', '2026-09-25')
         ->assertJsonPath('season', 2)
@@ -91,7 +91,7 @@ test('numbers a day of Günün akışı', function () {
     adminBoardRow('challenge', '2026-09-26', 300);
 
     adminBoard(['board' => 'challenge', 'key' => '2026-09-26'])->assertJsonPath('number', 3);
-    adminBoard(['board' => 'daily'])->assertJsonPath('number', null);
+    adminBoard(['board' => 'weekly'])->assertJsonPath('number', null);
 });
 
 test('leaves a day before the first Günün akışı unnumbered', function () {
@@ -108,20 +108,22 @@ test('refuses a period that does not fit the board', function (array $query, str
     $this->assertApiError(adminBoard($query), 422, 'validation_failed')->assertJsonStructure(['error' => ['fields' => [$field]]]);
 })->with([
     [['board' => 'weekly', 'key' => '2026-09-25'], 'key'],
-    [['board' => 'daily', 'key' => '2026-W39'], 'key'],
+    [['board' => 'challenge', 'key' => '2026-W39'], 'key'],
+    // The day's rows only add up league points; no board shows them.
+    [['board' => 'daily'], 'board'],
     [['board' => 'all', 'key' => '2026'], 'key'],
     [['board' => 'yearly'], 'board'],
     [[], 'board'],
 ]);
 
-test('lists the days of a board, newest first, with their leader', function () {
-    adminBoardRow('daily', '2026-09-24', 100);
-    adminBoardRow('daily', '2026-09-24', 900);
-    adminBoardRow('daily', '2026-09-25', 50);
+test('lists the periods of a board, newest first, with their leader', function () {
+    adminBoardRow('weekly', '2026-W38', 100);
+    adminBoardRow('weekly', '2026-W38', 900);
+    adminBoardRow('weekly', '2026-W39', 50);
 
-    $this->getJson('/api/v1/admin/boards/keys?board=daily')
+    $this->getJson('/api/v1/admin/boards/keys?board=weekly')
         ->assertOk()
-        ->assertJsonPath('keys.*.key', ['2026-09-25', '2026-09-24'])
+        ->assertJsonPath('keys.*.key', ['2026-W39', '2026-W38'])
         ->assertJsonPath('keys.1.players', 2)
         ->assertJsonPath('keys.1.topScore', 900)
         ->assertJsonPath('keys.1.number', null)
@@ -140,4 +142,8 @@ test('lists Günün akışı with today first, even before anyone played', funct
         ->assertJsonPath('keys.0.topPlayer', null)
         ->assertJsonPath('keys.1.number', 1)
         ->assertJsonPath('keys.1.attempts', 2);
+});
+
+test('lists no day board', function () {
+    $this->assertApiError($this->getJson('/api/v1/admin/boards/keys?board=daily'), 422, 'validation_failed');
 });

@@ -158,7 +158,7 @@ describe('HelpScreen', () => {
       expect(screen.getByText(tier)).toBeOnTheScreen();
     }
     expect(screen.getByText(/30 kişilik bir gruba/)).toBeOnTheScreen();
-    expect(screen.getByText(/Lig, ilk 3 sayılan oyunundan sonra\s+açılır; deneme turu sayılmaz/)).toBeOnTheScreen();
+    expect(screen.getByText(/Lig, ilk 20 sayılan oyunundan sonra\s+açılır; deneme turu ve VS sayılmaz/)).toBeOnTheScreen();
     expect(
       screen.getByText(/her gününde yaptığın en iyi skorların\s+toplamı/),
     ).toBeOnTheScreen();

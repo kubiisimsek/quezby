@@ -1,4 +1,5 @@
 import type {
+  DuelStatus,
   AdminActivityStatus,
   AdminAuditAction,
   AdminAuditVia,
@@ -7,6 +8,7 @@ import type {
   AdminGesture,
   AdminMilestone,
   AdminPostKind,
+  AdminReportStatus,
   AdminRole,
   AdminRunStatus,
   AdminVerdict,
@@ -18,6 +20,7 @@ import type {
   LeagueZone,
   Locale,
   Platform,
+  ReportReason,
   RunFlagCode,
   RunFlagSeverity,
   RunMode,
@@ -157,7 +160,6 @@ export function formatMonthKey(key: string): string {
 /** A board's period key in words, whatever the board. */
 export function formatPeriodKey(board: LeaderboardBoard, key: string): string {
   switch (board) {
-    case 'daily':
     case 'challenge':
       return formatDayKey(key);
     case 'weekly':
@@ -183,14 +185,16 @@ export function shortId(id: string): string {
 
 type Label = { tone: TagTone; label: string };
 
-export const RUN_STATUS: Record<AdminRunStatus, Label> = {
-  started: { tone: 'neutral', label: 'Açık' },
-  ranked: { tone: 'ok', label: 'Sıralamada' },
-  flagged: { tone: 'bad', label: 'Bayraklı' },
-  review: { tone: 'warn', label: 'İncelemede' },
-  rejected: { tone: 'bad', label: 'Reddedildi' },
-  abandoned: { tone: 'neutral', label: 'Yarıda kaldı' },
-  expired: { tone: 'neutral', label: 'Süresi doldu' },
+/** Where a run stands, and what that means for the boards. A clean VS run is good news too, so `ok`. */
+export const RUN_STATUS: Record<AdminRunStatus, Label & { hint: string }> = {
+  started: { tone: 'neutral', label: 'Açık', hint: 'Tohum verildi, tur henüz bitmedi.' },
+  ranked: { tone: 'ok', label: 'Sıralamada', hint: 'Tekrarda temiz çıktı: tablolara, lige ve istatistiklere sayılır.' },
+  flagged: { tone: 'bad', label: 'Bayraklı', hint: 'Bir inandırıcılık kontrolüne takıldı: saklanır, hiçbir yere sayılmaz.' },
+  review: { tone: 'warn', label: 'İncelemede', hint: 'Yumuşak sinyalli bir zirve skor: bir moderatör bakana kadar tablolarda görünmez.' },
+  played: { tone: 'ok', label: 'Oynandı', hint: 'Temiz bir VS turu: yalnızca VS’ini belirler, hiçbir tabloya, lige ya da istatistiğe sayılmaz.' },
+  rejected: { tone: 'bad', label: 'Reddedildi', hint: 'Motor ya da bir moderatör reddetti: hiçbir yere sayılmaz.' },
+  abandoned: { tone: 'neutral', label: 'Yarıda kaldı', hint: 'Oyuncu bu turu bitirmeden yenisini açtı.' },
+  expired: { tone: 'neutral', label: 'Süresi doldu', hint: 'Tura verilen süre içinde bitirilmedi.' },
 };
 
 export const SEVERITY: Record<RunFlagSeverity, Label> = {
@@ -223,7 +227,7 @@ export const RUN_FLAG: Record<RunFlagCode, { label: string; hint: string }> = {
 
 export const ADMIN_ROLE: Record<AdminRole, Label & { hint: string }> = {
   owner: { tone: 'primary', label: 'Sahip', hint: 'Her şey: yöneticiler, sistem, hesap silme.' },
-  moderator: { tone: 'secondary', label: 'Moderatör', hint: 'Yasaklar, adlar, turları onaylama ve reddetme.' },
+  moderator: { tone: 'secondary', label: 'Moderatör', hint: 'Yasaklar, adlar, fotoğraflar, bildirimler; turları onaylama ve reddetme.' },
   viewer: { tone: 'neutral', label: 'İzleyici', hint: 'Yalnızca bakar, hiçbir şeyi değiştiremez.' },
 };
 
@@ -235,6 +239,8 @@ export const AUDIT_ACTION: Record<AdminAuditAction, Label> = {
   'player.rename': { tone: 'warn', label: 'Adı sıfırladı' },
   'player.sign_out': { tone: 'warn', label: 'Oturumları kapattı' },
   'player.delete': { tone: 'bad', label: 'Hesabı sildi' },
+  'player.avatar_remove': { tone: 'warn', label: 'Fotoğrafı kaldırdı' },
+  'player.reports_dismiss': { tone: 'neutral', label: 'Bildirimleri kapattı' },
   'run.approve': { tone: 'ok', label: 'Turu onayladı' },
   'run.reject': { tone: 'bad', label: 'Turu reddetti' },
   'admin.create': { tone: 'secondary', label: 'Yönetici ekledi' },
@@ -324,10 +330,34 @@ export const GESTURE: Record<AdminGesture, string> = {
 export const RUN_MODE: Record<RunMode, string> = {
   free: 'Serbest',
   daily: 'Günün akışı',
+  vs: 'VS',
+};
+
+/** Where a VS stands, as a VS run's page says it. */
+export const DUEL_STATUS: Record<DuelStatus, Label> = {
+  playing: { tone: 'secondary', label: 'Başlatan oynuyor' },
+  waiting: { tone: 'warn', label: 'Cevap bekliyor' },
+  finished: { tone: 'ok', label: 'Bitti' },
+  declined: { tone: 'neutral', label: 'Reddedildi' },
+  expired: { tone: 'neutral', label: 'Süresi doldu' },
+  cancelled: { tone: 'neutral', label: 'Kapandı' },
+  void: { tone: 'bad', label: 'Gönderilmedi' },
+};
+
+/** What players report about each other: the only two things a player makes that others see. */
+export const REPORT_REASON: Record<ReportReason, string> = {
+  photo: 'Fotoğraf',
+  name: 'Kullanıcı adı',
+};
+
+/** Where a report stands: waiting, put right (the photo taken down, the name reset), or let go. */
+export const REPORT_STATUS: Record<AdminReportStatus, Label & { hint: string }> = {
+  open: { tone: 'warn', label: 'Açık', hint: 'Bir moderatörün bakmasını bekleyen bildirimler, en yeni önce.' },
+  resolved: { tone: 'ok', label: 'Giderildi', hint: 'Fotoğraf kaldırılarak ya da ad sıfırlanarak giderilenler, en yeni önce.' },
+  dismissed: { tone: 'neutral', label: 'Kapatıldı', hint: 'Bir moderatörün işlem yapmadan kapattıkları, en yeni önce.' },
 };
 
 export const BOARD: Record<LeaderboardBoard, string> = {
-  daily: 'Bugün',
   weekly: 'Hafta',
   monthly: 'Ay',
   all: 'Tüm zamanlar',
@@ -371,11 +401,16 @@ export const ANALYTICS_SCREEN: Record<AnalyticsScreen, string> = {
   home: 'Lobi',
   leaderboard: 'Zirve',
   league: 'Lig',
-  search: 'Arkadaşlar',
+  search: 'Oyuncu arama',
   profile: 'Profil',
   game: 'Oyun',
   help: 'Yardım',
   daily: 'Günün akışı',
+  friends: 'Arkadaşlar',
+  thread: 'Sohbet',
+  history: 'Geçmiş oyunlar',
+  avatar: 'Fotoğraf',
+  notifications: 'Bildirim izni',
 };
 
 /** The moments a visit counts. Only a failure is bad news. */

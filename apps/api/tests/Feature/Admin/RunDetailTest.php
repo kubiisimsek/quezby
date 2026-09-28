@@ -2,7 +2,11 @@
 
 use App\Enums\AdminRole;
 use App\Enums\AuditAction;
+use App\Enums\DuelStatus;
+use App\Enums\RunMode;
 use App\Enums\RunStatus;
+use App\Game\Rules;
+use App\Models\Duel;
 use App\Game\Run as Engine;
 use App\Models\Run;
 use App\Models\User;
@@ -70,6 +74,47 @@ test('shows what was done about the run', function () {
         ->assertJsonPath('audit.0.action', 'run.reject')
         ->assertJsonPath('audit.0.subject.label', 'hileci')
         ->assertJsonPath('audit.0.ip', null);
+});
+
+test('names both sides of a VS run and how the VS stands; any other run has none', function () {
+    $ben = User::factory()->withUsername('ben')->create();
+    $ekin = User::factory()->withUsername('ekin')->create();
+    $duel = Duel::query()->create([
+        'challenger_id' => $ben->id,
+        'opponent_id' => $ekin->id,
+        'seed' => 4242,
+        'engine_version' => Rules::ENGINE_VERSION,
+        'content_version' => 1,
+        'status' => DuelStatus::Finished,
+        'challenger_score' => 12_450,
+        'opponent_score' => 9_800,
+        'challenger_valid' => true,
+        'opponent_valid' => true,
+        'winner_id' => $ben->id,
+        'sent_at' => now(),
+        'finished_at' => now(),
+    ]);
+    $run = Run::factory()->create([
+        'user_id' => $ekin->id,
+        'mode' => RunMode::Vs,
+        'status' => RunStatus::Played,
+        'duel_id' => $duel->id,
+    ]);
+
+    adminRunDetail($run)
+        ->assertOk()
+        ->assertJsonPath('run.mode', 'vs')
+        ->assertJsonPath('run.status', 'played')
+        ->assertJsonPath('run.duel', [
+            'id' => $duel->id,
+            'status' => 'finished',
+            'challenger' => ['id' => $ben->id, 'username' => 'ben', 'bannedAt' => null],
+            'opponent' => ['id' => $ekin->id, 'username' => 'ekin', 'bannedAt' => null],
+            'challengerScore' => 12_450,
+            'opponentScore' => 9_800,
+            'winnerId' => $ben->id,
+        ]);
+    adminRunDetail(adminRunDetailPlayed())->assertJsonPath('run.duel', null);
 });
 
 test('an unknown run is not found', function () {

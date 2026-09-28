@@ -3,17 +3,22 @@
 namespace App\Services;
 
 use App\Enums\LeaderboardPeriod;
+use App\Enums\PlayerRelation;
 use App\Models\LeagueMember;
 use App\Models\User;
+use App\Services\Avatars\AvatarService;
+use App\Services\Social\FriendService;
 use App\Support\Timestamp;
 use App\Support\Username;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 
 /**
- * Players as other players see them. Search, the profile card and the follow
+ * Players as other players see them. Search, the profile card and the friend
  * lists all shape a player here, with the same handful of queries whatever
- * the page size: every best, league seat and follow flag is fetched at once.
- * A banned player is shown to nobody but themselves.
+ * the page size: every best, league seat and relation is fetched at once. A
+ * banned player is shown to nobody but themselves, and a player who blocked
+ * the viewer is not there for them.
  */
 final class PlayerDirectory
 {
@@ -22,15 +27,21 @@ final class PlayerDirectory
     public function __construct(
         private readonly LeaderboardService $leaderboards,
         private readonly LeagueService $leagues,
-        private readonly FollowService $follows,
+        private readonly FriendService $friends,
     ) {}
 
-    /** The player behind a username as typed or linked; a banned one only for themselves. */
+    /**
+     * The player behind a username as typed or linked; a banned one only for
+     * themselves, and nobody who blocked the viewer.
+     */
     public function find(string $username, User $viewer): ?User
     {
         $player = $this->named($username);
+        if ($player === null || $player->is($viewer)) {
+            return $player;
+        }
 
-        return $player === null || ($player->isBanned() && ! $player->is($viewer)) ? null : $player;
+        return $player->isBanned() || $this->friends->hides($player, $viewer) ? null : $player;
     }
 
     /** Anyone by username, banned or not. */
@@ -43,13 +54,14 @@ final class PlayerDirectory
 
     /**
      * Up to twenty players whose username starts with `$prefix`, by username —
-     * never the viewer, never a banned player.
+     * never the viewer, never a banned player, nobody on either side of a
+     * block with the viewer.
      *
-     * @return list<array{username: string, best: int|null, league: string|null, isFollowing: bool}>
+     * @return list<array{username: string, avatarUrl: string|null, best: int|null, league: string|null, relation: string}>
      */
     public function search(User $viewer, string $prefix): array
     {
-        $players = User::query()
+        $players = $this->friends->withoutBlocked(User::query(), $viewer)
             ->where('username', 'like', $prefix.'%')
             ->whereKeyNot($viewer->getKey())
             ->whereNull('banned_at')
@@ -64,7 +76,7 @@ final class PlayerDirectory
      * `PlayerSummary` in `packages/types` for each player, in the order given.
      *
      * @param  Collection<int, User>  $players
-     * @return list<array{username: string, best: int|null, league: string|null, isFollowing: bool}>
+     * @return list<array{username: string, avatarUrl: string|null, best: int|null, league: string|null, relation: string}>
      */
     public function summaries(User $viewer, Collection $players): array
     {
@@ -76,19 +88,31 @@ final class PlayerDirectory
             ->pluck('score', 'user_id')
             ->all();
         $tiers = $this->tiersOf($ids);
-        $following = $this->leaderboards->followedAmong($viewer, $ids);
+        $relations = $this->friends->relations($viewer, $ids);
 
         return $players->map(fn (User $player) => [
             'username' => (string) $player->username,
+            'avatarUrl' => AvatarService::url($player->avatar),
             'best' => isset($bests[$player->id]) ? (int) $bests[$player->id] : null,
             'league' => $tiers[$player->id] ?? null,
-            'isFollowing' => isset($following[$player->id]),
+            'relation' => ($relations[$player->id] ?? PlayerRelation::None)->value,
         ])->values()->all();
     }
 
     /**
+     * One player as a `PlayerSummary`.
+     *
+     * @return array{username: string, avatarUrl: string|null, best: int|null, league: string|null, relation: string}
+     */
+    public function summary(User $viewer, User $player): array
+    {
+        return $this->summaries($viewer, new EloquentCollection([$player]))[0];
+    }
+
+    /**
      * `PlayerCard` in `packages/types`: the season's best and ranks, this
-     * week's league, lifetime numbers and who follows whom.
+     * week's league, lifetime numbers, friends and what the two are to each
+     * other.
      *
      * @return array<string, mixed>
      */
@@ -100,6 +124,7 @@ final class PlayerDirectory
 
         return [
             'username' => (string) $player->username,
+            'avatarUrl' => AvatarService::url($player->avatar),
             'createdAt' => Timestamp::iso($player->created_at),
             'best' => $best === null ? null : [
                 'score' => $best->score,
@@ -117,8 +142,8 @@ final class PlayerDirectory
                 'likes' => $stats->likes ?? 0,
                 'perfects' => $stats->perfects ?? 0,
             ],
-            ...$this->follows->counts($player),
-            ...$this->follows->between($viewer, $player),
+            'friends' => $this->friends->count($player),
+            'relation' => ($player->is($viewer) ? PlayerRelation::None : $this->friends->relation($viewer, $player))->value,
             'isMe' => $player->is($viewer),
         ];
     }

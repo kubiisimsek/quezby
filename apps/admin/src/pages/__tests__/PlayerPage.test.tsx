@@ -2,7 +2,7 @@ import { ApiError } from '@quezby/sdk/admin';
 import { screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { adminSession, playerActivity, playerResponse, playersPage } from '@/test/factories';
+import { adminSession, AVATAR_URL, playerActivity, playerResponse, playersPage } from '@/test/factories';
 import { fakeApi } from '@/test/fake-api';
 import { renderApp } from '@/test/render';
 
@@ -189,6 +189,114 @@ describe('PlayerPage', () => {
     expect(screen.getByText('iPhone 15 Pro')).toBeInTheDocument();
     expect(screen.getByText('1.0.0 (42)')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: '@kerem.yedek' })).toHaveAttribute('href', '/players/01jplayer00000000000000000b');
+  });
+
+  it('shows the player\'s photo, their friends and how many blocked them', async () => {
+    const { container } = renderApp({
+      path: `/players/${ID}`,
+      api: withPlayer(playerResponse({ social: { friends: 7, blockedBy: 2 } }, { avatarUrl: AVATAR_URL })),
+    });
+
+    expect(await screen.findByRole('img', { name: '@kerem.35 profil fotoğrafı' })).toHaveAttribute('src', AVATAR_URL);
+    expect(container.querySelector('header img')).toHaveAttribute('src', AVATAR_URL);
+    expect(screen.getByRole('link', { name: 'Tam boyutta aç' })).toHaveAttribute('href', AVATAR_URL);
+    expect(screen.getByText('Arkadaş', { selector: 'dt' }).parentElement).toHaveTextContent('7');
+    expect(screen.getByText('Engelleyen', { selector: 'dt' }).parentElement).toHaveTextContent('2');
+    expect(screen.getByText('Onu engelleyen oyuncular: bakmaya değer bir işaret.')).toBeInTheDocument();
+    expect(screen.queryByText('Takip')).not.toBeInTheDocument();
+  });
+
+  it('wears initials without a photo, and has no photo to take down', async () => {
+    const { container, user } = renderApp({ path: `/players/${ID}`, api: withPlayer() });
+
+    await screen.findByRole('heading', { name: '@kerem.35' });
+    expect(container.querySelector('header img')).toBeNull();
+    expect(screen.queryByText('Profil fotoğrafı')).not.toBeInTheDocument();
+    expect(screen.queryByText('Açık bildirimler')).not.toBeInTheDocument();
+    expect(screen.getByText('Açık bildirim', { selector: 'dt' }).parentElement).toHaveTextContent('0');
+
+    await user.click(screen.getByRole('button', { name: 'İşlemler' }));
+    await screen.findByRole('menuitem', { name: /Adı sıfırla/ });
+    expect(screen.queryByRole('menuitem', { name: /Fotoğrafı kaldır/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: /Bildirimleri kapat/ })).not.toBeInTheDocument();
+  });
+
+  it('lets a moderator take a photo down with a reason, closing the reports about it', async () => {
+    const api = withPlayer(playerResponse({ openReports: { photo: 2, name: 0 } }, { avatarUrl: AVATAR_URL }));
+    api.players.removeAvatar.mockResolvedValue({ changed: true });
+    const { user } = renderApp({ path: `/players/${ID}`, api, session: adminSession({ role: 'moderator' }) });
+
+    await user.click(await screen.findByRole('button', { name: 'İşlemler' }));
+    await user.click(await screen.findByRole('menuitem', { name: /Fotoğrafı kaldır/ }));
+    const dialog = await screen.findByRole('dialog', { name: '@kerem.35 fotoğrafı kaldırılsın mı?' });
+    expect(within(dialog).getByText(/Fotoğraf hakkındaki açık bildirimler kapanır\./)).toBeInTheDocument();
+    expect(within(dialog).getByLabelText('Sebep')).toBeRequired();
+    await user.type(within(dialog).getByLabelText('Sebep'), 'Uygunsuz fotoğraf');
+    await user.click(within(dialog).getByRole('button', { name: 'Fotoğrafı kaldır' }));
+
+    await waitFor(() => expect(api.players.removeAvatar).toHaveBeenCalledWith(ID, { reason: 'Uygunsuz fotoğraf' }));
+    expect(await screen.findByText('Fotoğraf kaldırıldı')).toBeInTheDocument();
+  });
+
+  it('takes no photo down without a reason: the API\'s word shows under it', async () => {
+    const api = withPlayer(playerResponse({}, { avatarUrl: AVATAR_URL }));
+    api.players.removeAvatar.mockRejectedValue(new ApiError(422, 'validation_failed', 'x', { reason: ['Sebep alanı gereklidir.'] }));
+    const { user } = renderApp({ path: `/players/${ID}`, api });
+
+    const photo = (await screen.findByRole('heading', { name: 'Profil fotoğrafı' })).closest('section') as HTMLElement;
+    await user.click(within(photo).getByRole('button', { name: 'Fotoğrafı kaldır' }));
+    const dialog = await screen.findByRole('dialog', { name: '@kerem.35 fotoğrafı kaldırılsın mı?' });
+    await user.click(within(dialog).getByRole('button', { name: 'Fotoğrafı kaldır' }));
+
+    expect(await within(dialog).findByText('Sebep alanı gereklidir.')).toBeInTheDocument();
+    expect(api.players.removeAvatar).toHaveBeenCalledWith(ID, { reason: '' });
+    expect(screen.getByRole('dialog', { name: '@kerem.35 fotoğrafı kaldırılsın mı?' })).toBeInTheDocument();
+  });
+
+  it('lists the open reports and lets them go with a reason', async () => {
+    const api = withPlayer(playerResponse({ openReports: { photo: 1, name: 2 } }));
+    api.players.dismissReports.mockResolvedValue({ changed: true });
+    const { user } = renderApp({ path: `/players/${ID}`, api });
+
+    const reports = (await screen.findByRole('heading', { name: 'Açık bildirimler' })).closest('section') as HTMLElement;
+    expect(within(reports).getByText('Fotoğraf', { selector: 'dt' }).parentElement).toHaveTextContent('1 bildirim');
+    expect(within(reports).getByText('Kullanıcı adı', { selector: 'dt' }).parentElement).toHaveTextContent('2 bildirim');
+    expect(screen.getByText('Açık bildirim', { selector: 'dt' }).parentElement).toHaveTextContent('3');
+
+    await user.click(within(reports).getByRole('button', { name: 'Bildirimleri kapat' }));
+    const dialog = await screen.findByRole('dialog', { name: '@kerem.35 hakkındaki bildirimler kapatılsın mı?' });
+    expect(within(dialog).getByText('Açık bildirimler işlem yapılmadan kapanır; fotoğraf ve ad olduğu gibi kalır.')).toBeInTheDocument();
+    await user.type(within(dialog).getByLabelText('Sebep'), 'Kurallara uygun');
+    await user.click(within(dialog).getByRole('button', { name: 'Bildirimleri kapat' }));
+
+    await waitFor(() => expect(api.players.dismissReports).toHaveBeenCalledWith(ID, { reason: 'Kurallara uygun' }));
+    expect(await screen.findByText('Bildirimler kapatıldı')).toBeInTheDocument();
+  });
+
+  it('offers a moderator the photo and the reports in the menu too', async () => {
+    const { user } = renderApp({
+      path: `/players/${ID}`,
+      api: withPlayer(playerResponse({ openReports: { photo: 0, name: 1 } }, { avatarUrl: AVATAR_URL })),
+      session: adminSession({ role: 'moderator' }),
+    });
+
+    await user.click(await screen.findByRole('button', { name: 'İşlemler' }));
+    expect(await screen.findByRole('menuitem', { name: /Fotoğrafı kaldır/ })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: /Bildirimleri kapat/ })).toBeInTheDocument();
+  });
+
+  it('shows a viewer the photo and the reports, but nothing to do about them', async () => {
+    renderApp({
+      path: `/players/${ID}`,
+      api: withPlayer(playerResponse({ openReports: { photo: 1, name: 2 } }, { avatarUrl: AVATAR_URL })),
+      session: adminSession({ role: 'viewer' }),
+    });
+
+    expect(await screen.findByRole('img', { name: '@kerem.35 profil fotoğrafı' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Açık bildirimler' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Fotoğrafı kaldır' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Bildirimleri kapat' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'İşlemler' })).not.toBeInTheDocument();
   });
 });
 

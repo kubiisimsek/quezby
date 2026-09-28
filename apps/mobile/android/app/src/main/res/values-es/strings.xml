@@ -1,0 +1,5 @@
+<resources>
+    <!-- The notification channel every push goes to (MainApplication, firebase.json). -->
+    <string name="notification_channel_social">Amigos y VS</string>
+    <string name="notification_channel_social_description">Solicitudes de amistad, invitaciones y resultados de VS, mensajes de tus amigos</string>
+</resources>

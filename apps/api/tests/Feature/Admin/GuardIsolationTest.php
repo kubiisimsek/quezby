@@ -27,9 +27,9 @@ test('an admin token opens no player route', function (string $method, string $u
     $this->assertApiError($response, 401, 'unauthenticated');
 })->with([
     'me' => ['GET', '/api/v1/me', []],
-    'a board' => ['GET', '/api/v1/leaderboards/daily', []],
+    'a board' => ['GET', '/api/v1/leaderboards/weekly', []],
     'starting a run' => ['POST', '/api/v1/runs', ['mode' => 'free', 'engineVersion' => Rules::ENGINE_VERSION, 'contentVersion' => Catalog::LATEST]],
-    'following a player' => ['PUT', '/api/v1/users/kerem.35/follow', []],
+    'adding a friend' => ['PUT', '/api/v1/users/kerem.35/friend', []],
 ]);
 
 test('a player token opens no admin route', function (string $method, string $uri) {

@@ -4,7 +4,13 @@ import { create } from 'zustand';
 
 const KEY = 'quezby.settings.v1';
 
-export const DEFAULT_SETTINGS: UserSettings = { haptics: true, analytics: false };
+/**
+ * The settings the phone keeps a copy of — the ones the game reads without
+ * asking the network. Which notifications to send is the API's alone.
+ */
+export type PhoneSettings = Pick<UserSettings, 'haptics' | 'analytics'>;
+
+export const DEFAULT_SETTINGS: PhoneSettings = { haptics: true, analytics: false };
 
 /**
  * Where the player's answer to usage analytics stands on this phone:
@@ -15,7 +21,7 @@ export type Consent = 'unasked' | 'pending' | 'synced';
 
 const CONSENTS: readonly Consent[] = ['unasked', 'pending', 'synced'];
 
-type Stored = UserSettings & { consent: Consent };
+type Stored = PhoneSettings & { consent: Consent };
 
 /**
  * Settings live on the phone first — the game reads them every reel and must
@@ -27,7 +33,7 @@ type SettingsState = Stored & {
   hydrated: boolean;
   hydrate: () => Promise<void>;
   /** Changes only the settings it is given. */
-  apply: (next: Partial<UserSettings>) => void;
+  apply: (next: Partial<PhoneSettings>) => void;
   /** What `/me` says the account holds. */
   fromAccount: (settings: UserSettings) => void;
   /** The player's answer — yes or no — kept here until the account has it. */
@@ -82,8 +88,8 @@ export const useSettings = create<SettingsState>((set, get) => {
 });
 
 /** Only the settings a change names — a missing one keeps what the phone has. */
-function given(value: Partial<UserSettings>): Partial<UserSettings> {
-  const next: Partial<UserSettings> = {};
+function given(value: Partial<PhoneSettings>): Partial<PhoneSettings> {
+  const next: Partial<PhoneSettings> = {};
   if (typeof value.haptics === 'boolean') next.haptics = value.haptics;
   if (typeof value.analytics === 'boolean') next.analytics = value.analytics;
   return next;

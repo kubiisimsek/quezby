@@ -86,7 +86,6 @@ const tr = {
   summit: {
     title: 'Zirve',
     periods: {
-      daily: 'Bugün',
       weekly: 'Hafta',
       monthly: 'Ay',
       all: 'Tüm zamanlar',
@@ -146,7 +145,7 @@ export type BoardMessages = typeof tr;
 const en: BoardMessages = {
   summit: {
     title: 'Summit',
-    periods: { daily: 'Today', weekly: 'Week', monthly: 'Month', all: 'All time' },
+    periods: { weekly: 'Week', monthly: 'Month', all: 'All time' },
     failed: "Couldn't load the rankings",
     retry: 'Try again',
     emptyTitle: 'The summit is empty',
@@ -195,7 +194,7 @@ const en: BoardMessages = {
 const de: BoardMessages = {
   summit: {
     title: 'Gipfel',
-    periods: { daily: 'Heute', weekly: 'Woche', monthly: 'Monat', all: 'Allzeit' },
+    periods: { weekly: 'Woche', monthly: 'Monat', all: 'Allzeit' },
     failed: 'Rangliste konnte nicht geladen werden',
     retry: 'Noch mal versuchen',
     emptyTitle: 'Der Gipfel ist leer',
@@ -236,7 +235,7 @@ const de: BoardMessages = {
 const ar: BoardMessages = {
   summit: {
     title: 'القمة',
-    periods: { daily: 'اليوم', weekly: 'الأسبوع', monthly: 'الشهر', all: 'كل الأوقات' },
+    periods: { weekly: 'الأسبوع', monthly: 'الشهر', all: 'كل الأوقات' },
     failed: 'تعذّر تحميل الترتيب',
     retry: 'حاول مجددًا',
     emptyTitle: 'القمة خالية',
@@ -293,7 +292,7 @@ const ar: BoardMessages = {
 const fr: BoardMessages = {
   summit: {
     title: 'Sommet',
-    periods: { daily: "Aujourd'hui", weekly: 'Semaine', monthly: 'Mois', all: 'Depuis toujours' },
+    periods: { weekly: 'Semaine', monthly: 'Mois', all: 'Depuis toujours' },
     failed: 'Impossible de charger le classement',
     retry: 'Réessayer',
     emptyTitle: 'Le sommet est vide',
@@ -351,7 +350,7 @@ const fr: BoardMessages = {
 const es: BoardMessages = {
   summit: {
     title: 'Cumbre',
-    periods: { daily: 'Hoy', weekly: 'Semana', monthly: 'Mes', all: 'Histórico' },
+    periods: { weekly: 'Semana', monthly: 'Mes', all: 'Histórico' },
     failed: 'No se pudo cargar la clasificación',
     retry: 'Reintentar',
     emptyTitle: 'La cumbre está vacía',

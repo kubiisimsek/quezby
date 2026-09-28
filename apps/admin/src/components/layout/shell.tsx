@@ -10,7 +10,7 @@ import { ErrorBoundary } from '@/components/patterns/error-boundary';
 import { useCounts } from '@/hooks/api/counts';
 import { useMe } from '@/hooks/api/me';
 import { useSignOut } from '@/hooks/useSignOut';
-import { navFor } from '@/nav';
+import { navBadges, navFor } from '@/nav';
 import { useSession } from '@/stores/session';
 
 /**
@@ -31,7 +31,7 @@ export function Shell() {
 
   if (!session) return null;
   const items = navFor(session.admin.role);
-  const badges = { '/suspects': counts.data?.review ?? 0 };
+  const badges = navBadges(items, counts.data);
   const sidebar = (showClose: boolean) => (
     <Sidebar
       items={items}

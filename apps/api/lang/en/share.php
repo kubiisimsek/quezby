@@ -7,7 +7,7 @@
 
 return [
     'free' => 'I scored :points on Quezby! :posts. How many can you score?',
-    'free_ranked' => 'I scored :points on Quezby! :posts · today #:rank. How many can you score?',
+    'free_ranked' => 'I scored :points on Quezby! :posts · this week #:rank. How many can you score?',
     'daily' => "Quezby · Daily Feed #:number\n:grid\n:points",
     'daily_ranked' => "Quezby · Daily Feed #:number\n:grid\n:points · #:rank/:players",
 

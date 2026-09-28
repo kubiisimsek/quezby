@@ -1,7 +1,8 @@
-import type { AdminRole } from '@quezby/types';
+import type { AdminCounts, AdminRole } from '@quezby/types';
 import {
   CalendarDays,
   ChartLine,
+  Flag,
   Gamepad2,
   GalleryVerticalEnd,
   LayoutDashboard,
@@ -28,8 +29,8 @@ export type NavItem = {
   section: NavSection;
   /** The least role that sees it; everyone when left out. */
   least?: AdminRole;
-  /** What its badge counts. */
-  badge?: 'review';
+  /** What its badge counts, from `GET /counts`. */
+  badge?: keyof AdminCounts;
 };
 
 /** The panel's one menu. Nothing here links to a page its admin cannot open. */
@@ -38,6 +39,7 @@ export const NAV: NavItem[] = [
   { href: '/analytics', label: 'Analitik', icon: ChartLine, section: 'Genel' },
   { href: '/players', label: 'Oyuncular', icon: Users, section: 'Oyuncular' },
   { href: '/suspects', label: 'Şüpheliler', icon: ShieldAlert, section: 'Oyuncular', badge: 'review' },
+  { href: '/reports', label: 'Bildirimler', icon: Flag, section: 'Oyuncular', badge: 'reports' },
   { href: '/runs', label: 'Turlar', icon: Gamepad2, section: 'Oyuncular' },
   { href: '/boards', label: 'Sıralamalar', icon: Trophy, section: 'Oyun' },
   { href: '/daily', label: 'Günün akışı', icon: CalendarDays, section: 'Oyun' },
@@ -50,6 +52,11 @@ export const NAV: NavItem[] = [
 
 export function navFor(role: AdminRole | null | undefined): NavItem[] {
   return NAV.filter((item) => item.least === undefined || atLeast(role, item.least));
+}
+
+/** What waits behind each entry that counts something, by its href — nothing until the counts arrive. */
+export function navBadges(items: NavItem[], counts: AdminCounts | undefined): Record<string, number> {
+  return Object.fromEntries(items.flatMap((item) => (item.badge ? [[item.href, counts?.[item.badge] ?? 0]] : [])));
 }
 
 /** The entry a path belongs to: the longest href it starts with, so a record keeps its list lit. */

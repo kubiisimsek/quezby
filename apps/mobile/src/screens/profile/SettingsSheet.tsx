@@ -22,8 +22,16 @@ import {
 import { Sheet } from '@/ui/sheet';
 import { SPACE } from '@/ui/theme';
 
-/** What Ayarlar opens: the language, Yardım, or one of the account's doors. */
-export type SettingsDoor = 'language' | 'help' | 'username' | 'ways' | 'signOut' | 'delete';
+/** What Ayarlar opens: the language, Yardım, the friends' two doors, or one of the account's. */
+export type SettingsDoor =
+  | 'language'
+  | 'help'
+  | 'notifications'
+  | 'blocked'
+  | 'username'
+  | 'ways'
+  | 'signOut'
+  | 'delete';
 
 const ENV_LABEL = {
   local: 'Local',
@@ -91,7 +99,8 @@ function NameRow({ username, onPick }: { username: string | null; onPick: () => 
 
 /**
  * Ayarlar — what a player opens now and then, kept off the profile's face:
- * the game's two settings, Yardım, and the account's doors. A door
+ * the game's two settings, Yardım, notifications and blocked players, and
+ * the account's doors. A door
  * never opens over this sheet: `onPick` names it, and the profile opens it
  * once this sheet has left the screen.
  */
@@ -150,6 +159,23 @@ export function SettingsSheet({
             title={t.help.title}
             subtitle={words.helpHint}
             onPress={() => onPick('help')}
+          />
+        </Panel>
+
+        <Eyebrow icon="users">{words.social}</Eyebrow>
+        <Panel tone="sunken" elevation="flat" style={styles.group}>
+          <Row
+            leading={<IconChip icon="bell" tone="primary" size="sm" />}
+            title={words.notifications}
+            subtitle={words.notificationsHint}
+            onPress={() => onPick('notifications')}
+          />
+          <Divider />
+          <Row
+            leading={<IconChip icon="ban" tone="neutral" size="sm" />}
+            title={words.blocked}
+            subtitle={words.blockedHint}
+            onPress={() => onPick('blocked')}
           />
         </Panel>
 

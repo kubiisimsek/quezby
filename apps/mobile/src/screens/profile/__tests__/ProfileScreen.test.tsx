@@ -1,13 +1,17 @@
 import { postsOf } from '@quezby/config';
 import type { LeagueResponse, PlayerStats, StatsResponse } from '@quezby/types';
 import { ApiError } from '@quezby/sdk';
+import { getApps, type ReactNativeFirebase } from '@react-native-firebase/app';
+import { deleteToken } from '@react-native-firebase/messaging';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
+import { launchImageLibrary } from 'react-native-image-picker';
 
 import { api } from '@/api/client';
 import { useSession } from '@/auth/session';
 import { iso } from '@/i18n';
 import { useLanguage } from '@/i18n/language';
 import { ProfileScreen } from '@/screens/profile/ProfileScreen';
+import { usePush } from '@/stores/push';
 import { buildMe, buildRanks } from '@/test/factories';
 import { renderWithProviders } from '@/test/renderWithProviders';
 
@@ -18,7 +22,15 @@ jest.mock('@/config/env', () => ({
 
 jest.mock('@/api/client', () => ({
   api: {
-    me: { stats: jest.fn(), updateSettings: jest.fn(), updateUsername: jest.fn(), delete: jest.fn() },
+    me: {
+      stats: jest.fn(),
+      updateSettings: jest.fn(),
+      updateUsername: jest.fn(),
+      delete: jest.fn(),
+      removeAvatar: jest.fn(),
+      unregisterPushToken: jest.fn(),
+      blocks: jest.fn(),
+    },
     auth: { logout: jest.fn() },
     leagues: { current: jest.fn() },
     usernames: { check: jest.fn() },
@@ -26,7 +38,15 @@ jest.mock('@/api/client', () => ({
 }));
 
 const mocked = api as unknown as {
-  me: { stats: jest.Mock; updateSettings: jest.Mock; updateUsername: jest.Mock; delete: jest.Mock };
+  me: {
+    stats: jest.Mock;
+    updateSettings: jest.Mock;
+    updateUsername: jest.Mock;
+    delete: jest.Mock;
+    removeAvatar: jest.Mock;
+    unregisterPushToken: jest.Mock;
+    blocks: jest.Mock;
+  };
   auth: { logout: jest.Mock };
   leagues: { current: jest.Mock };
   usernames: { check: jest.Mock };
@@ -126,6 +146,49 @@ describe('ProfileScreen', () => {
     mocked.me.updateSettings.mockResolvedValue({ user: buildMe() });
     mocked.auth.logout.mockResolvedValue(undefined);
     mocked.leagues.current.mockResolvedValue(league());
+    mocked.me.unregisterPushToken.mockResolvedValue(undefined);
+    mocked.me.blocks.mockResolvedValue({ users: [] });
+    usePush.setState({ token: null, permission: 'granted' });
+  });
+
+  describe('the photo and the history', () => {
+    it('picks a photo from the library, and frames it next', async () => {
+      jest.mocked(launchImageLibrary).mockResolvedValueOnce({
+        assets: [{ uri: 'file:///photo.jpg', width: 1200, height: 900 }],
+      });
+      await renderProfile();
+
+      await fireEvent.press(screen.getByRole('button', { name: 'Fotoğraf ekle' }));
+      expect(screen.queryByText('Fotoğrafı kaldır')).not.toBeOnTheScreen();
+      await fireEvent.press(screen.getByRole('button', { name: 'Galeriden seç' }));
+      await leave();
+
+      await waitFor(() =>
+        expect(navigate).toHaveBeenCalledWith('AvatarEditor', { uri: 'file:///photo.jpg', width: 1200, height: 900 }),
+      );
+    });
+
+    it('takes the photo away', async () => {
+      const photo = 'https://api.test/api/v1/media/avatars/0123456789abcdef01234567.jpg';
+      useSession.setState({ user: buildMe({ avatarUrl: photo }) });
+      mocked.me.removeAvatar.mockResolvedValue({ user: buildMe({ avatarUrl: null }) });
+      await renderProfile();
+
+      await fireEvent.press(screen.getByRole('button', { name: 'Fotoğrafını değiştir' }));
+      await fireEvent.press(screen.getByRole('button', { name: 'Fotoğrafı kaldır' }));
+      await leave();
+
+      await waitFor(() => expect(useSession.getState().user?.avatarUrl).toBeNull());
+      expect(mocked.me.removeAvatar).toHaveBeenCalledTimes(1);
+    });
+
+    it('opens every game the player finished', async () => {
+      await renderProfile();
+
+      await fireEvent.press(screen.getByRole('button', { name: /Oynadığın her tur/ }));
+
+      expect(navigate).toHaveBeenCalledWith('History');
+    });
   });
 
   describe('the player card', () => {
@@ -138,7 +201,6 @@ describe('ProfileScreen', () => {
       expect(screen.getByLabelText('Sezon rekoru: 12.345')).toBeOnTheScreen();
       expect(screen.getByText('87 post')).toBeOnTheScreen();
       for (const [board, rank] of [
-        ['Bugün', '#44'],
         ['Hafta', '#120'],
         ['Ay', '#310'],
         ['Tüm zamanlar', '#1.204'],
@@ -155,7 +217,7 @@ describe('ProfileScreen', () => {
       expect(screen.getByLabelText('Sezon rekoru: —')).toBeOnTheScreen();
       expect(screen.queryByLabelText(/ lig$/)).not.toBeOnTheScreen();
       expect(
-        screen.getByLabelText('Bugün: sıralamada değilsin'),
+        screen.getByLabelText('Hafta: sıralamada değilsin'),
       ).toBeOnTheScreen();
     });
 
@@ -353,6 +415,21 @@ describe('ProfileScreen', () => {
       expect(screen.getByText('Hesabı sil')).toBeOnTheScreen();
       expect(screen.queryByText('Çıkış yap')).not.toBeOnTheScreen();
       expect(screen.getByText(/^Quezby .+ · Local$/)).toBeOnTheScreen();
+    });
+
+    it('opens notifications and the players blocked, once the sheet has left the screen', async () => {
+      await renderProfile();
+      await openSettings();
+
+      await fireEvent.press(screen.getByRole('button', { name: /^Bildirimler/ }));
+      await leave();
+      expect(await screen.findByText('Hangi haberler telefonuna gelsin?')).toBeOnTheScreen();
+      await leave();
+
+      await openSettings();
+      await fireEvent.press(screen.getByRole('button', { name: /^Engellenenler/ }));
+      await leave();
+      expect(await screen.findByText('Kimseyi engellemedin.')).toBeOnTheScreen();
     });
 
     it('opens Yardım once the sheet has left the screen', async () => {
@@ -554,6 +631,21 @@ describe('ProfileScreen', () => {
       await leave();
       expect(mocked.auth.logout).toHaveBeenCalledTimes(1);
       expect(useSession.getState().token).toBeNull();
+    });
+
+    it('stops the account’s notifications on this phone as it signs out', async () => {
+      jest.mocked(getApps).mockReturnValue([{ name: '[DEFAULT]' } as ReactNativeFirebase.FirebaseApp]);
+      useSession.setState({ user: buildMe({ isGuest: false, identities: ['apple'] }) });
+      usePush.setState({ token: 'fcm-token' });
+      await renderProfile();
+      await openSettings();
+
+      await fireEvent.press(screen.getByRole('button', { name: /^Çıkış yap/ }));
+      await leave();
+
+      expect(mocked.me.unregisterPushToken).toHaveBeenCalledWith('fcm-token');
+      await waitFor(() => expect(deleteToken).toHaveBeenCalled());
+      jest.mocked(getApps).mockReturnValue([]);
     });
   });
 

@@ -68,6 +68,23 @@ const CALLS: Call[] = [
   { name: 'players.activity', call: (api) => api.players.activity(PLAYER), method: 'GET', url: `/players/${PLAYER}/activity`, auth: true },
   { name: 'players.signOut', call: (api) => api.players.signOut(PLAYER), method: 'POST', url: `/players/${PLAYER}/sign-out`, auth: true },
   {
+    name: 'players.removeAvatar',
+    call: (api) => api.players.removeAvatar(PLAYER, { reason: 'Uygunsuz fotoğraf' }),
+    method: 'POST',
+    url: `/players/${PLAYER}/avatar/remove`,
+    body: { reason: 'Uygunsuz fotoğraf' },
+    auth: true,
+  },
+  {
+    name: 'players.dismissReports',
+    call: (api) => api.players.dismissReports(PLAYER, { reason: 'Sorun yok' }),
+    method: 'POST',
+    url: `/players/${PLAYER}/reports/dismiss`,
+    body: { reason: 'Sorun yok' },
+    auth: true,
+  },
+  { name: 'reports.list', call: (api) => api.reports.list({ status: 'open', page: 2 }), method: 'GET', url: '/reports?status=open&page=2', auth: true },
+  {
     name: 'players.remove',
     call: (api) => api.players.remove(PLAYER, { reason: 'İstek', confirm: 'kerem.35' }),
     method: 'POST',

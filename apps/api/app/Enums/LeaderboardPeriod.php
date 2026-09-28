@@ -6,9 +6,14 @@ use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 
 /**
- * A board: the four calendar periods every ranked run counts on, and
- * `challenge` — the day's "Günün akışı", which only daily runs reach. All in
- * the leaderboard timezone (Europe/Istanbul).
+ * A board: the calendar periods every ranked run counts on, and `challenge` —
+ * the day's "Günün akışı", which only daily runs reach. All in the
+ * leaderboard timezone (Europe/Istanbul).
+ *
+ * `daily` is kept but never shown: a player's best of each day is what their
+ * league points add up (`LeagueService::standings`), and the period names an
+ * Istanbul day wherever one is needed. No player or admin route serves it as
+ * a board (`boards()`).
  */
 enum LeaderboardPeriod: string
 {
@@ -18,10 +23,28 @@ enum LeaderboardPeriod: string
     case All = 'all';
     case Challenge = 'challenge';
 
-    /** @return list<self> The boards every ranked run is recorded on. */
+    /** @return list<self> What every ranked run is recorded on — the day's row included, for the league. */
     public static function calendar(): array
     {
         return [self::Daily, self::Weekly, self::Monthly, self::All];
+    }
+
+    /** @return list<self> The calendar boards players climb and see a rank on: the week, the month, the season. */
+    public static function periods(): array
+    {
+        return [self::Weekly, self::Monthly, self::All];
+    }
+
+    /** @return list<self> Every board a route may serve: the periods and today's challenge. */
+    public static function boards(): array
+    {
+        return [...self::periods(), self::Challenge];
+    }
+
+    /** @return list<string> */
+    public static function boardValues(): array
+    {
+        return array_map(fn (self $board) => $board->value, self::boards());
     }
 
     /**

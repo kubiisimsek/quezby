@@ -25,7 +25,7 @@ test('a log played faster than the clock allows is flagged', function () {
         ->assertJsonPath('best', null)
         ->assertJsonPath('isNewBest', false)
         ->assertJsonPath('league', null)
-        ->assertJsonPath('ranks', ['daily' => null, 'weekly' => null, 'monthly' => null, 'all' => null]);
+        ->assertJsonPath('ranks', ['weekly' => null, 'monthly' => null, 'all' => null]);
 
     $flag = Run::query()->findOrFail($runId)->flags[0];
     expect($flag['code'])->toBe('wall_clock')->and($flag['severity'])->toBe('hard')
@@ -162,5 +162,5 @@ test('a score three times the player\'s best, after enough runs, is a soft signa
 
 test('statuses the app is told are only the ones it can act on', function () {
     expect(collect(RunStatus::cases())->filter->isVisible()->map->value->values()->all())
-        ->toBe(['ranked', 'flagged', 'review']);
+        ->toBe(['ranked', 'flagged', 'review', 'played']);
 });

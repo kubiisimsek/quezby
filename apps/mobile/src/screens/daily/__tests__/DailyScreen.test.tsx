@@ -23,7 +23,7 @@ jest.mock('@/api/client', () => ({
   api: {
     daily: { get: jest.fn() },
     leaderboards: { get: jest.fn() },
-    me: { following: jest.fn() },
+    me: { friends: jest.fn() },
     users: { get: jest.fn(), follow: jest.fn(), unfollow: jest.fn() },
   },
 }));
@@ -31,7 +31,7 @@ jest.mock('@/api/client', () => ({
 const mocked = api as unknown as {
   daily: { get: jest.Mock };
   leaderboards: { get: jest.Mock };
-  me: { following: jest.Mock };
+  me: { friends: jest.Mock };
 };
 
 type Props = ComponentProps<typeof DailyScreen>;
@@ -233,7 +233,7 @@ describe('DailyScreen — Günün akışı', () => {
 
   it('sends a player who follows nobody to the players tab', async () => {
     mocked.daily.get.mockResolvedValue(today());
-    mocked.me.following.mockResolvedValue({ users: [], nextCursor: null });
+    mocked.me.friends.mockResolvedValue({ friends: [], nextCursor: null });
     mocked.leaderboards.get.mockImplementation(
       async (
         board: LeaderboardBoard,
@@ -260,12 +260,10 @@ describe('DailyScreen — Günün akışı', () => {
     await fireEvent.press(screen.getByRole('tab', { name: 'Arkadaşlar' }));
 
     expect(
-      await screen.findByText('Henüz kimseyi takip etmiyorsun'),
+      await screen.findByText('Henüz arkadaşın yok'),
     ).toBeOnTheScreen();
-    await fireEvent.press(screen.getByRole('button', { name: 'Oyuncu ara' }));
-    expect(navigation.navigate).toHaveBeenCalledWith('Tabs', {
-      screen: 'Search',
-    });
+    await fireEvent.press(screen.getByRole('button', { name: 'Arkadaş bul' }));
+    expect(navigation.navigate).toHaveBeenCalledWith('FindFriends');
   });
 
   it('explains a failed load and tries again', async () => {

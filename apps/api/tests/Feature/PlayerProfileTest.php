@@ -6,7 +6,6 @@ use App\Models\LeagueMember;
 use App\Models\PlayerStat;
 use App\Models\User;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 
 beforeEach(function () {
     Carbon::setTestNow(Carbon::parse('2026-09-24 12:00', 'Europe/Istanbul'));
@@ -32,23 +31,22 @@ test("a player's card", function () {
         'week_key' => '2026-W39', 'tier' => LeagueTier::Gold, 'joined_at' => now(),
     ]);
     $banned = User::factory()->withUsername('banned')->create(['banned_at' => now()]);
-    foreach ([[$me, $player], [$rival, $player], [$banned, $player], [$player, $me]] as [$follower, $followee]) {
-        DB::table('follows')->insert(['follower_id' => $follower->id, 'followee_id' => $followee->id, 'created_at' => now()]);
+    foreach ([$me, $rival, $banned] as $friend) {
+        $this->befriend($player, $friend);
     }
 
     $this->getJson('/api/v1/users/ayse.nur')
         ->assertOk()
         ->assertExactJson(['player' => [
             'username' => 'ayse.nur',
+            'avatarUrl' => null,
             'createdAt' => '2026-09-01T07:00:00.000Z',
             'best' => ['score' => 8000, 'reels' => 100, 'achievedAt' => '2026-09-17T17:00:00.000Z'],
             'league' => 'gold',
             'ranks' => ['weekly' => 2, 'all' => 1],
             'stats' => ['runs' => 12, 'reels' => 2400, 'likes' => 310, 'perfects' => 42],
-            'followers' => 2,
-            'following' => 1,
-            'isFollowing' => true,
-            'followsMe' => true,
+            'friends' => 2,
+            'relation' => 'friend',
             'isMe' => false,
         ]]);
 });
@@ -63,10 +61,8 @@ test('a player who never ranked', function () {
         ->assertJsonPath('player.league', null)
         ->assertJsonPath('player.ranks', ['weekly' => null, 'all' => null])
         ->assertJsonPath('player.stats', ['runs' => 0, 'reels' => 0, 'likes' => 0, 'perfects' => 0])
-        ->assertJsonPath('player.followers', 0)
-        ->assertJsonPath('player.following', 0)
-        ->assertJsonPath('player.isFollowing', false)
-        ->assertJsonPath('player.followsMe', false)
+        ->assertJsonPath('player.friends', 0)
+        ->assertJsonPath('player.relation', 'none')
         ->assertJsonPath('player.isMe', false);
 });
 
@@ -82,21 +78,15 @@ test('last week in a league is not this week', function () {
     $this->getJson('/api/v1/users/gecen.hafta')->assertOk()->assertJsonPath('player.league', null);
 });
 
-test('only one direction of following', function () {
+test('a request shows which way it waits', function () {
     $me = $this->signIn();
-    $fan = User::factory()->withUsername('fan')->create();
-    $idol = User::factory()->withUsername('idol')->create();
-    DB::table('follows')->insert([
-        ['follower_id' => $fan->id, 'followee_id' => $me->id, 'created_at' => now()],
-        ['follower_id' => $me->id, 'followee_id' => $idol->id, 'created_at' => now()],
-    ]);
+    $asker = User::factory()->withUsername('soran')->create();
+    $asked = User::factory()->withUsername('sorulan')->create();
+    $this->requestFriend($asker, $me);
+    $this->requestFriend($me, $asked);
 
-    $this->getJson('/api/v1/users/fan')
-        ->assertJsonPath('player.isFollowing', false)
-        ->assertJsonPath('player.followsMe', true);
-    $this->getJson('/api/v1/users/idol')
-        ->assertJsonPath('player.isFollowing', true)
-        ->assertJsonPath('player.followsMe', false);
+    $this->getJson('/api/v1/users/soran')->assertJsonPath('player.relation', 'incoming');
+    $this->getJson('/api/v1/users/sorulan')->assertJsonPath('player.relation', 'requested');
 });
 
 test('players can look at their own card', function () {
@@ -106,8 +96,7 @@ test('players can look at their own card', function () {
     $this->getJson('/api/v1/users/kendim')
         ->assertOk()
         ->assertJsonPath('player.isMe', true)
-        ->assertJsonPath('player.isFollowing', false)
-        ->assertJsonPath('player.followsMe', false)
+        ->assertJsonPath('player.relation', 'none')
         ->assertJsonPath('player.best.score', 4200)
         ->assertJsonPath('player.ranks', ['weekly' => 1, 'all' => 1]);
 });

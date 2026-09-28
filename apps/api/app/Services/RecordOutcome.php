@@ -6,9 +6,9 @@ namespace App\Services;
 final readonly class RecordOutcome
 {
     /**
-     * @param  array{daily: int|null, weekly: int|null, monthly: int|null, all: int|null}  $before
-     * @param  array{daily: int|null, weekly: int|null, monthly: int|null, all: int|null}  $after
-     * @param  list<array{username: string, score: int, isFollowing: bool}>  $passed
+     * @param  array{weekly: int|null, monthly: int|null, all: int|null}  $before
+     * @param  array{weekly: int|null, monthly: int|null, all: int|null}  $after
+     * @param  list<array{username: string, avatarUrl: string|null, score: int, isFriend: bool}>  $passed
      */
     public function __construct(
         public array $before,

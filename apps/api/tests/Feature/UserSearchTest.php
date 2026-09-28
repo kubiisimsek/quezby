@@ -56,7 +56,7 @@ test('search leaves out the caller, banned players and players with no username'
         ->assertJsonPath('users.*.username', ['deniz.ege']);
 });
 
-test("each result carries the season's best, this week's league and whether the caller follows them", function () {
+test("each result carries the season's best, this week's league and what they are to the caller", function () {
     $me = $this->signIn();
     $ranked = User::factory()->withUsername('kerem.35')->create();
     $newcomer = User::factory()->withUsername('kerem.new')->create();
@@ -74,13 +74,14 @@ test("each result carries the season's best, this week's league and whether the 
             'week_key' => $group->week_key, 'tier' => $group->tier, 'joined_at' => now(),
         ]);
     }
-    DB::table('follows')->insert(['follower_id' => $me->id, 'followee_id' => $ranked->id, 'created_at' => now()]);
+    $this->befriend($me, $ranked);
+    $this->requestFriend($newcomer, $me);
 
     $this->getJson('/api/v1/users?search=kerem')
         ->assertOk()
         ->assertExactJson(['users' => [
-            ['username' => 'kerem.35', 'best' => 5000, 'league' => 'gold', 'isFollowing' => true],
-            ['username' => 'kerem.new', 'best' => null, 'league' => null, 'isFollowing' => false],
+            ['username' => 'kerem.35', 'avatarUrl' => null, 'best' => 5000, 'league' => 'gold', 'relation' => 'friend'],
+            ['username' => 'kerem.new', 'avatarUrl' => null, 'best' => null, 'league' => null, 'relation' => 'incoming'],
         ]]);
 });
 
@@ -123,7 +124,7 @@ test('the number of queries does not grow with the number of results', function 
     foreach (range(1, 20) as $i) {
         $player = User::factory()->withUsername(sprintf('many%02d', $i))->create();
         $this->recordRanked($player, 1000 * $i);
-        DB::table('follows')->insert(['follower_id' => $me->id, 'followee_id' => $player->id, 'created_at' => now()]);
+        $this->befriend($me, $player);
     }
     $this->recordRanked(User::factory()->withUsername('solo01')->create(), 1000);
 

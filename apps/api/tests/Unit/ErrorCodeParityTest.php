@@ -36,11 +36,20 @@ it('forbids an admin a role may not use with its own code', function () {
         ->and(ErrorCode::Forbidden->message())->toBe('Bu işlem için yetkin yok.');
 });
 
-it('names the follow cap, the configured one unless told', function () {
-    expect(ErrorCode::FollowLimit->message())->toBe('En fazla 500 oyuncu takip edebilirsin.')
-        ->and(ErrorCode::FollowLimit->message(['limit' => '2']))->toBe('En fazla 2 oyuncu takip edebilirsin.');
+it('names each cap, the configured one unless told', function () {
+    expect(ErrorCode::FriendLimit->message())->toBe('En fazla 500 arkadaşın olabilir.')
+        ->and(ErrorCode::FriendLimit->message(['limit' => '2']))->toBe('En fazla 2 arkadaşın olabilir.')
+        ->and(ErrorCode::RequestLimit->message())->toStartWith('Cevap bekleyen en fazla 100 isteğin olabilir.')
+        ->and(ErrorCode::MessageLimit->message())->toBe('Bu arkadaşına bugün en fazla 20 mesaj gönderebilirsin.')
+        ->and(ErrorCode::DuelLimit->message())->toBe("Cevap bekleyen en fazla 20 VS'in olabilir.");
 
-    config(['quezby.follows.limit' => 1500]);
+    config(['quezby.friends.limit' => 1500]);
     app()->setLocale('fr');
-    expect(ErrorCode::FollowLimit->message())->toBe("Tu peux suivre 1\u{00A0}500 joueurs au maximum.");
+    expect(ErrorCode::FriendLimit->message())->toBe("Tu peux avoir 1\u{00A0}500 amis au maximum.");
+});
+
+it('keeps a VS that can no longer be played a conflict', function () {
+    expect(ErrorCode::DuelUnavailable->status())->toBe(409)
+        ->and(ErrorCode::NotFriends->status())->toBe(422)
+        ->and(ErrorCode::PhotoInvalid->status())->toBe(422);
 });

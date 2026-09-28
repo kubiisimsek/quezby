@@ -6,6 +6,7 @@ use App\Content\Catalog;
 use App\Enums\RunStatus;
 use App\Game\Rules;
 use App\Models\Run;
+use App\Services\Push\PushService;
 use App\Support\AppKey;
 use App\Support\ModerationToken;
 use App\Support\OpsToken;
@@ -21,6 +22,7 @@ final class SystemStatus
 {
     public function __construct(
         private readonly Migrator $migrator,
+        private readonly PushService $push,
     ) {}
 
     /**
@@ -48,6 +50,9 @@ final class SystemStatus
             ],
             'tokens' => ['ops' => OpsToken::current() !== '', 'moderation' => ModerationToken::current() !== ''],
             'appKey' => AppKey::problem() === null,
+            // Profile photos are re-encoded with GD; pushes need Firebase's project and key.
+            'gd' => extension_loaded('gd') && function_exists('imagecreatefromstring'),
+            'push' => $this->push->isConfigured(),
             'cached' => ['config' => app()->configurationIsCached(), 'routes' => app()->routesAreCached()],
             'pendingMigrations' => $this->pendingMigrations(),
             'runs' => [

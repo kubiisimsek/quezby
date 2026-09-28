@@ -48,7 +48,9 @@ Two layers, and components only touch the second.
 `primary` is never a status colour: its magenta (hue 352) beside `bad`
 (hue 25) reads as the same red. A verdict, a state or a chart series that
 means good or bad takes `ok`, `warn` or `bad` — the neutral grey when it is
-neither — and good news is green, as in the game: a clean run, a perfect post.
+neither — and good news is green, as in the game: a clean run, a perfect post,
+a clean VS run ("Oynandı"), a report put right ("Giderildi"); a report still
+open is amber.
 
 Light and dark point the roles at different rungs of the same ramps, so no
 component carries a `dark:` class. The theme is light, dark or the system's,
@@ -94,15 +96,17 @@ exceptions). Numbers are tabular in tables and tiles.
 - **Shell** — the sidebar (264 px, 76 px folded) on a wide screen; a magenta
   bar and a drawer below `lg`. The sidebar's magenta pill springs to the page
   you are on; its groups (Genel, Oyuncular, Oyun, Yönetim) fold and are
-  remembered; badges count what waits (the review queue); the account, the
-  theme and signing out live at its foot. There is no top bar.
+  remembered; badges count what waits (`GET /counts`: the review queue on
+  Şüpheliler, the players with an open report on Bildirimler); the account,
+  the theme and signing out live at its foot. There is no top bar.
 - **Page** — every route body: the brand band (title, description, one
-  action, `BandStats` or an eyebrow of tags), the canvas rising over it, and a
-  slim bar that slides down with the title once it scrolls away. Tabs are a
-  `Segmented` on the canvas. Record pages use a two-column grid
-  (`xl:grid-cols-[minmax(0,1fr)_24rem]`). Every layout grid starts from
-  `grid-cols-1`, so a long value can never widen a phone's column; a table
-  sheds supporting columns (`hideBelow`) before it scrolls sideways.
+  action, `BandStats` or an eyebrow of tags, and `leading` — a record's
+  picture beside its title, the player's photo on a player's page), the
+  canvas rising over it, and a slim bar that slides down with the title once
+  it scrolls away. Tabs are a `Segmented` on the canvas. Record pages use a
+  two-column grid (`xl:grid-cols-[minmax(0,1fr)_24rem]`). Every layout grid
+  starts from `grid-cols-1`, so a long value can never widen a phone's column;
+  a table sheds supporting columns (`hideBelow`) before it scrolls sideways.
 - **Sign-in** — the logo's gradient on one half with the game's four moves
   floating over it, the form on the other.
 
@@ -111,7 +115,8 @@ exceptions). Numbers are tabular in tables and tiles.
 | Piece | What |
 | --- | --- |
 | `base/button` | primary, secondary, neutral, ghost, danger, onBrand, onBrandSoft; sm, md, lg, icon; `loading` |
-| `base/tag`, `icon-chip`, `avatar`, `brand-mark` | status pills, glyph squares, initials, the Q |
+| `base/tag`, `icon-chip`, `brand-mark` | status pills, glyph squares, the Q |
+| `base/avatar` | a person: a player's photo in a disc, as players see it — or two letters in a tinted one when there is none or it will not load; decoration beside the name unless `alt` names it, where the photo itself is what is looked at; `onBrand` on the band; `sm`, `md`, `lg`, `xl`, and `2xl` for the photo panel of a player's page |
 | `base/panel` | the card: icon, title, description, actions, toolbar, footer |
 | `base/text-input`, `field`, `text-area`, `checkbox`, `picker` | the input well; a labelled field with its hint or error |
 | `base/segmented` | tabs and choices with a sliding pill; arrow keys |
@@ -128,7 +133,7 @@ exceptions). Numbers are tabular in tables and tiles.
 | `patterns/secret-reveal` | a temporary password, shown once |
 | `layout/shell`, `sidebar`, `login-layout`, `gate` | the frame and the doors |
 | `moderation/*`, `boards/board-table` | the moderation dialogs and the board table every page shares |
-| `lib/columns` | the cells many tables draw: `PlayerCell`, `When` (a moment on one line, the exact time on hover), `RunStatusTag`, `FlagTags`, the audit columns |
+| `lib/columns` | the cells many tables draw: `PlayerCell` (the photo, where the row carries it), `When` (a moment on one line, the exact time on hover), `RunStatusTag` (what the status means for the boards, on hover), `FlagTags`, the audit columns |
 
 A third copy of the same markup is a missing component.
 
@@ -142,10 +147,14 @@ as its legend; every cell also says its post and verdict in words.
 ## Words
 
 Turkish, "sen", short and specific — the API's own messages speak the same
-way. Examples: "Yasakla", "Yasağı kaldır", "Adı sıfırla", "Oturumları kapat",
-"Hesabı sil", "Onayla", "Reddet", "Vazgeç". A confirm names the thing ("@kerem.35
-yasaklansın mı?") and the consequence. Dates on the game's clock
-(Europe/Istanbul): "25 Eyl 2026 14:05", "12 dk önce", "dün 14:05"; numbers
-"12.345", "%94,2"; a missing value is "—". Players are `@handle`. Game words
-follow `ui-writing.md`: a reel is a **post**; the kinds are Sıradan, Arkadaş,
-Altın and Kırmızı.
+way. Examples: "Yasakla", "Yasağı kaldır", "Adı sıfırla", "Fotoğrafı kaldır",
+"Bildirimleri kapat", "Oturumları kapat", "Hesabı sil", "Onayla", "Reddet",
+"Vazgeç". A confirm names the thing ("@kerem.35 yasaklansın mı?") and the
+consequence ("Fotoğraf silinir, artık kimse göremez"). Dates on the game's
+clock (Europe/Istanbul): "25 Eyl 2026 14:05", "12 dk önce", "dün 14:05";
+numbers "12.345", "%94,2"; a missing value is "—". Players are `@handle`.
+Game words follow `ui-writing.md`: a reel is a **post**; the kinds are
+Sıradan, Arkadaş, Altın and Kırmızı; a VS is **VS**. In the panel,
+**Bildirimler** are what players report about each other's photos and names
+(Açık, Giderildi, Kapatıldı) — the game's own "Bildirimler" are push
+notifications, which the Sistem page calls "Push bildirimleri".

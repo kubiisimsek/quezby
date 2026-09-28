@@ -35,16 +35,18 @@ alandaki "oyunları", "refleks oyunları" aramasında eşleşir. Bu yüzden:
   aranan "refleks oyunu" kaçmasın.
 
 **Google Play** başlığı, kısa açıklamayı ve **uzun açıklamayı** aramada
-kullanır. Uzun açıklama bilerek kısa tutuldu; *kaydır*, *post*, *refleks*,
-*lig*, *sıralama* ve *arkadaş* kelimeleri cümlelerin içinde kendiliğinden
-geçer. Anahtar kelime doldurmak Play politikasına aykırıdır. İki mağazada
-açıklama aynıdır.
+kullanır. Uzun açıklama bilerek kısa tutuldu; *kaydır*, *post*, *lig*,
+*sıralama*, *arkadaş* ve *VS* kelimeleri cümlelerin içinde kendiliğinden
+geçer, *refleks* başlıkta durur. Anahtar kelime doldurmak Play politikasına
+aykırıdır. İki mağazada açıklama aynıdır.
 
 ## Ses tonu
 
 Oyunu bir arkadaşına anlatır gibi yaz: kısa, samimi, sen diliyle, düz
 paragraflarla. Her özelliği sayma; açıklama oyunun ne olduğunu, Günün akışını,
-ligi ve sıralamaları anlatır, gerisini oyuncu oyunda bulur.
+arkadaşlarla VS'i, ligi ve sıralamaları anlatır. Mesaj kutusu, bildirimler,
+profil fotoğrafı ve geçmiş oyunlar bu paragrafların içinde birer cümleyle
+geçer; gerisini oyuncu oyunda bulur.
 
 Mağaza metinlerinde emoji yok; test de bunu denetler. (Ad, alt başlık ve
 Play başlığında zaten olamaz, iki mağaza da reddeder.)
@@ -78,8 +80,9 @@ yerelleştirmesini de aramada kullanır. Bu, ikinci bir ad, alt başlık ve
 100 baytlık alan demektir. `app-store/en-GB/` İngilizce arayanlar için yazıldı
 ("reaction time test", "brain", "focus"…).
 
-Bu metni cihaz dili İngilizce olanlar görür; açıklama oyunun Türkçe olduğunu
-açıkça söyler. Oyun yalnızca Türkiye'de yayınlanacaksa (Pricing and
+Bu metni cihaz dili İngilizce olanlar görür. Oyun altı dil konuşur ve
+telefonun dilinde açılır (`docs/product/localization.md`); açıklamanın son
+satırı bunu söyler. Oyun yalnızca Türkiye'de yayınlanacaksa (Pricing and
 Availability) başka ülkelerde görünmez. Google Play'de yalnızca `tr-TR`
 yeterlidir.
 
@@ -121,20 +124,52 @@ yazmak zarar vermez.
   sezon ya da hafta sonu etkinliği duyurusu için kullan. Ad, alt başlık ve
   anahtar kelimeler yalnızca yeni bir sürümle değişir.
 
-## Gizlilik etiketleri (analitik)
+## Gizlilik etiketleri
 
 Uygulama, izin veren oyuncular için kullanım verisi, herkes için cihaz kaydı
-tutar (`docs/product/analytics.md`). Mağaza beyanları buna uymalı:
+tutar (`docs/product/analytics.md`). Arkadaşlar, mesaj kutusu, profil
+fotoğrafı ve bildirimler de veri tutar:
 
-- **App Store → App Privacy:** *Usage Data → Product Interaction* (Analytics;
-  kullanıcıya bağlı; izleme için değil), *Identifiers → Device ID* ve
-  *Diagnostics → Other Diagnostic Data* (App Functionality; kullanıcıya
-  bağlı). Önceden beyan edilen e-posta ve kullanıcı kimliği de kalır.
-  `ios/Quezby/PrivacyInfo.xcprivacy` aynı türleri beyan eder.
-- **Google Play → Veri güvenliği:** *Uygulama etkinliği → Uygulama
-  etkileşimleri* (toplanır, isteğe bağlı, analitik) ve *Cihaz veya diğer
-  kimlikler* (toplanır, zorunlu, uygulama işlevi ve güvenlik). Veriler
-  aktarılırken şifrelenir; kullanıcı silinmesini isteyebilir (Hesabı sil).
+- **Arkadaş listesi:** arkadaşlar, bekleyen istekler ve engellenenler.
+  Telefonun rehberine hiç erişilmez.
+- **Hazır mesajlar:** arkadaşlar arasında gidip gelen satırlar. Oyuncu hiçbir
+  şey yazmaz, mesajlar sabit bir listeden seçilir; 90 günden eskileri silinir
+  (`QUEZBY_INBOX_KEEP_DAYS`), arkadaşlık bitince sohbet de silinir.
+- **Profil fotoğrafı:** oyuncunun sistemin kendi seçicisiyle galeriden
+  seçtiği fotoğraf. Herkes görür; API onu yeniden kaydeder ve konum dahil
+  bütün EXIF bilgisini atar. Oyuncu Profil'den kaldırabilir, moderatör panelden
+  kaldırabilir.
+- **Push token'ı:** bildirimlerin gittiği Firebase Cloud Messaging token'ı,
+  yalnızca bildirimlere izin veren telefonlar için; çıkış yapınca silinir.
+
+Mağaza beyanları buna uymalı:
+
+- **App Store → App Privacy** (hepsi kullanıcıya bağlı, hiçbiri izleme için
+  değil):
+  - *Usage Data → Product Interaction* (Analytics).
+  - *Identifiers → Device ID* (App Functionality): cihaz kaydı ve push token'ı.
+  - *Diagnostics → Other Diagnostic Data* (App Functionality).
+  - *User Content → Photos or Videos* (App Functionality): profil fotoğrafı.
+  - *Contacts → Contacts* (App Functionality): arkadaş listesi.
+  - *User Content → Other User Content* (App Functionality): hazır mesajlar.
+  - Önceden beyan edilen e-posta ve kullanıcı kimliği de kalır.
+
+  `ios/Quezby/PrivacyInfo.xcprivacy` bu listenin ilk altı türünü aynı
+  amaçlarla beyan eder; e-posta ve kullanıcı kimliği manifestte yok.
+- **Google Play → Veri güvenliği:**
+  - *Uygulama etkinliği → Uygulama etkileşimleri* (toplanır, isteğe bağlı,
+    analitik).
+  - *Cihaz veya diğer kimlikler* (toplanır, zorunlu, uygulama işlevi ve
+    güvenlik): cihaz kaydı ve push token'ı.
+  - *Fotoğraflar ve videolar → Fotoğraflar* (toplanır, isteğe bağlı,
+    uygulama işlevi): profil fotoğrafı.
+  - *Kişiler* (toplanır, isteğe bağlı, uygulama işlevi): arkadaş listesi.
+  - *Mesajlar → Diğer uygulama içi mesajlar* (toplanır, isteğe bağlı,
+    uygulama işlevi): hazır mesajlar.
+
+  Veriler aktarılırken şifrelenir; kullanıcı silinmesini isteyebilir (Hesabı
+  sil: fotoğraf, arkadaşlıklar, mesajlar, VS'ler ve push token'ları hesapla
+  birlikte gider).
 - App Tracking Transparency gerekmez: veri başka şirketlerle birleştirilmez,
   reklam için kullanılmaz.
 

@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { fakeApi } from '@/test/fake-api';
@@ -43,6 +43,22 @@ describe('RunsPage', () => {
 
     await user.click(screen.getByRole('button', { name: 'Oyuncu filtresini kaldır' }));
     await waitFor(() => expect(api.runs.list).toHaveBeenLastCalledWith(expect.objectContaining({ player: undefined })));
+  });
+
+  it('finds the VS runs, and calls a clean one played', async () => {
+    const api = fakeApi();
+    api.runs.list.mockResolvedValue(runsPage([runRow({ mode: 'vs', status: 'played' })], { counts: { played: 1 } }));
+    const { user } = renderApp({ path: '/runs', api });
+
+    const table = await screen.findByRole('table');
+    expect(await within(table).findByText(/^VS · /)).toBeInTheDocument();
+    expect(within(table).getByText('Oynandı')).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: /Oynandı/ })).toHaveTextContent('1');
+
+    await user.click(screen.getByRole('combobox', { name: 'Mod' }));
+    await user.click(await screen.findByRole('option', { name: 'VS' }));
+
+    await waitFor(() => expect(api.runs.list).toHaveBeenLastCalledWith(expect.objectContaining({ mode: 'vs', page: 1 })));
   });
 
   it('keeps day filters in the address', async () => {

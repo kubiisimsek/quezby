@@ -68,6 +68,67 @@ describe('useGame', () => {
     expect(hook.result.current.combo).toBe(1000);
   });
 
+  it('sends a VS to a friend: the start names them, and the run is played like any other', async () => {
+    runs.start.mockResolvedValue({ ...started, mode: 'vs', duelId: '01jduel0000000000000000001' });
+
+    const hook = await renderHook(() => useGame('vs', { opponent: 'ekin' }));
+    await act(async () => {
+      await hook.result.current.start();
+    });
+    await act(async () => {
+      jest.advanceTimersByTime(2000);
+    });
+
+    expect(runs.start).toHaveBeenCalledWith({
+      mode: 'vs',
+      engineVersion: ENGINE_VERSION,
+      contentVersion: CONTENT_VERSION,
+      opponent: 'ekin',
+    });
+    expect(hook.result.current.phase).toBe('playing');
+  });
+
+  it('answers a friend’s VS on its own seed', async () => {
+    runs.start.mockResolvedValue({ ...started, mode: 'vs', duelId: '01jduel0000000000000000001' });
+
+    const hook = await renderHook(() => useGame('vs', { opponent: 'ekin', duelId: '01jduel0000000000000000001' }));
+    await act(async () => {
+      await hook.result.current.start();
+    });
+
+    expect(runs.start).toHaveBeenCalledWith({
+      mode: 'vs',
+      engineVersion: ENGINE_VERSION,
+      contentVersion: CONTENT_VERSION,
+      duel: '01jduel0000000000000000001',
+    });
+  });
+
+  it('never plays a VS on the phone alone: an outdated app cannot start one', async () => {
+    runs.start.mockRejectedValue(new ApiError(422, 'engine_outdated', 'Güncelle.'));
+
+    const hook = await renderHook(() => useGame('vs', { opponent: 'ekin' }));
+    await act(async () => {
+      await hook.result.current.start();
+    });
+
+    expect(hook.result.current.phase).toBe('error');
+    expect(hook.result.current.practice).toBeNull();
+    expect(hook.result.current.startError?.code).toBe('engine_outdated');
+  });
+
+  it('says why a VS cannot start', async () => {
+    runs.start.mockRejectedValue(new ApiError(409, 'duel_unavailable', 'Bu VS artık oynanamaz.'));
+
+    const hook = await renderHook(() => useGame('vs', { opponent: 'ekin', duelId: '01jduel0000000000000000001' }));
+    await act(async () => {
+      await hook.result.current.start();
+    });
+
+    expect(hook.result.current.phase).toBe('error');
+    expect(hook.result.current.startError?.code).toBe('duel_unavailable');
+  });
+
   it('falls back to practice when the API plays another engine', async () => {
     runs.start.mockRejectedValue(new ApiError(422, 'engine_outdated', 'x'));
 

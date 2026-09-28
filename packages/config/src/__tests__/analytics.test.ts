@@ -18,7 +18,7 @@ describe('analytics catalog', () => {
   it('names every screen and moment once, and never the same code twice', () => {
     const codes = [...ANALYTICS_SCREENS, ...ANALYTICS_EVENTS];
     expect(new Set(codes).size).toBe(codes.length);
-    expect(ANALYTICS_SCREENS).toHaveLength(13);
+    expect(ANALYTICS_SCREENS).toHaveLength(18);
     expect(ANALYTICS_EVENTS).toHaveLength(13);
   });
 

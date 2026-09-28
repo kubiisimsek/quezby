@@ -16,14 +16,14 @@ import { renderWithProviders } from '@/test/renderWithProviders';
 jest.mock('@/api/client', () => ({
   api: {
     leaderboards: { get: jest.fn() },
-    me: { following: jest.fn() },
+    me: { friends: jest.fn() },
     users: { get: jest.fn(), follow: jest.fn(), unfollow: jest.fn() },
   },
 }));
 
 const mocked = api as unknown as {
   leaderboards: { get: jest.Mock };
-  me: { following: jest.Mock };
+  me: { friends: jest.Mock };
   users: { get: jest.Mock };
 };
 
@@ -37,8 +37,8 @@ function board(
 ): LeaderboardResponse {
   const entries = overrides.entries ?? buildEntries(6);
   return {
-    board: 'daily',
-    periodKey: '2026-09-24',
+    board: 'weekly',
+    periodKey: '2026-W39',
     season: 1,
     scope: 'everyone',
     startsAt: '2026-09-23T21:00:00.000Z',
@@ -77,10 +77,9 @@ function playerCard(username: string) {
       league: 'gold',
       ranks: { weekly: 4, all: 40 },
       stats: { runs: 12, reels: 800, likes: 90, perfects: 14 },
-      followers: 2,
-      following: 1,
-      isFollowing: false,
-      followsMe: false,
+      avatarUrl: null,
+      friends: 3,
+      relation: 'none',
       isMe: false,
     },
   };
@@ -126,7 +125,7 @@ describe('LeaderboardScreen — Zirve', () => {
     expect(screen.getAllByText('▲ 1.241')).toHaveLength(3);
     expect(screen.getByText('5.120 oyuncu')).toBeOnTheScreen();
     expect(screen.getByText('Bitmesine 11 sa 0 dk')).toBeOnTheScreen();
-    expect(mocked.leaderboards.get).toHaveBeenCalledWith('daily', {
+    expect(mocked.leaderboards.get).toHaveBeenCalledWith('weekly', {
       scope: 'everyone',
       limit: 100,
     });
@@ -176,7 +175,7 @@ describe('LeaderboardScreen — Zirve', () => {
     await fireEvent.press(screen.getByRole('tab', { name: 'Arkadaşlar' }));
 
     expect(await screen.findByText('7 oyuncu')).toBeOnTheScreen();
-    expect(mocked.leaderboards.get).toHaveBeenLastCalledWith('daily', {
+    expect(mocked.leaderboards.get).toHaveBeenLastCalledWith('weekly', {
       scope: 'friends',
       limit: 100,
     });
@@ -193,19 +192,19 @@ describe('LeaderboardScreen — Zirve', () => {
           ? board({ board: period, scope, entries: [], players: 0 })
           : board({ board: period, scope }),
     );
-    mocked.me.following.mockResolvedValue({ users: [], nextCursor: null });
+    mocked.me.friends.mockResolvedValue({ friends: [], nextCursor: null });
     const navigation = await renderZirve();
     await boardArrived();
 
     await fireEvent.press(screen.getByRole('tab', { name: 'Arkadaşlar' }));
 
     expect(
-      await screen.findByText('Henüz kimseyi takip etmiyorsun'),
+      await screen.findByText('Henüz arkadaşın yok'),
     ).toBeOnTheScreen();
     expect(screen.queryByText('SENİN KATIN')).not.toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByText('Oyuncu ara'));
-    expect(navigation.navigate).toHaveBeenCalledWith('Search');
+    await fireEvent.press(screen.getByText('Arkadaş bul'));
+    expect(navigation.navigate).toHaveBeenCalledWith('FindFriends');
   });
 
   it('pins your floor with the rival to pass, and "Geç onu" starts a run', async () => {
@@ -286,9 +285,9 @@ describe('LeaderboardScreen — Zirve', () => {
     const navigation = await renderZirve();
     await boardArrived();
 
-    await fireEvent.press(screen.getByRole('button', { name: 'Oyuncu ara' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Arkadaş bul' }));
 
-    expect(navigation.navigate).toHaveBeenCalledWith('Search');
+    expect(navigation.navigate).toHaveBeenCalledWith('FindFriends');
   });
 
   it('invites a player with no run this period to play', async () => {
@@ -390,11 +389,12 @@ describe('LeaderboardScreen — in other languages', () => {
     ).toBeOnTheScreen();
     expect(screen.getByText('Summit')).toBeOnTheScreen();
     expect(screen.getByText('5,120 players')).toBeOnTheScreen();
-    expect(screen.getByRole('tab', { name: 'Today' })).toBeSelected();
+    expect(screen.getByRole('tab', { name: 'Week' })).toBeSelected();
     expect(screen.getByRole('tab', { name: 'Everyone' })).toBeSelected();
-    ['Week', 'Month', 'All time', 'Friends'].forEach((name) =>
+    ['Month', 'All time', 'Friends'].forEach((name) =>
       expect(screen.getByRole('tab', { name })).toBeOnTheScreen(),
     );
+    expect(screen.queryByRole('tab', { name: 'Today' })).not.toBeOnTheScreen();
     expect(
       screen.getByRole('button', {
         name: '4th place, @deniz, 20,280 points, 1,241 points to pass',
@@ -406,7 +406,7 @@ describe('LeaderboardScreen — in other languages', () => {
     expect(screen.getByText('121 pts to @oya')).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Pass them' })).toBeOnTheScreen();
     expect(
-      screen.getByRole('button', { name: 'Find players' }),
+      screen.getByRole('button', { name: 'Find friends' }),
     ).toBeOnTheScreen();
   });
 
@@ -436,7 +436,7 @@ describe('LeaderboardScreen — in other languages', () => {
     ).toBeOnTheScreen();
     expect(screen.getByText('القمة')).toBeOnTheScreen();
     expect(screen.getByText('5,120 لاعبًا')).toBeOnTheScreen();
-    expect(screen.getByRole('tab', { name: 'اليوم' })).toBeSelected();
+    expect(screen.getByRole('tab', { name: 'الأسبوع' })).toBeSelected();
     expect(screen.getByRole('tab', { name: 'الأصدقاء' })).toBeOnTheScreen();
     expect(screen.getByText('طابقك')).toBeOnTheScreen();
     expect(

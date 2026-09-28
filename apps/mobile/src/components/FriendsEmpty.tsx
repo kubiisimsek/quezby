@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 
-import { useFollowing } from '@/hooks/useBoards';
+import { useFriendThreads } from '@/hooks/useSocial';
 import { useT } from '@/i18n';
 import { Icon } from '@/ui/icons';
 import { Button, IconChip, Panel, SkeletonList, Txt } from '@/ui/kit';
@@ -8,8 +8,8 @@ import { RADIUS, SPACE, useTheme, withAlpha } from '@/ui/theme';
 
 /**
  * A friends board with nobody on it but you. Two different nothings: you
- * follow nobody yet — the fix is to find players — or the players you follow
- * have not played in this period — the fix is to set the bar yourself. Either
+ * have no friends yet — the fix is to find players — or your friends have
+ * not played in this period — the fix is to set the bar yourself. Either
  * way a tile with the empty seats of a friends' match, waiting to be filled.
  */
 export function FriendsEmpty({
@@ -22,9 +22,9 @@ export function FriendsEmpty({
 }) {
   const t = useT();
   const words = t.friends.empty;
-  const following = useFollowing();
+  const friends = useFriendThreads();
 
-  if (following.isLoading) {
+  if (friends.isLoading) {
     return (
       <View style={styles.pad}>
         <SkeletonList rows={2} />
@@ -32,7 +32,7 @@ export function FriendsEmpty({
     );
   }
 
-  const followsSomeone = (following.data?.users.length ?? 0) > 0;
+  const hasFriends = (friends.data?.pages[0]?.friends.length ?? 0) > 0;
 
   return (
     <View style={styles.pad}>
@@ -40,13 +40,13 @@ export function FriendsEmpty({
         <View style={styles.seats}>
           <EmptySeat />
           <IconChip
-            icon={followsSomeone ? 'users' : 'userPlus'}
-            tone={followsSomeone ? 'secondary' : 'primary'}
+            icon={hasFriends ? 'users' : 'userPlus'}
+            tone={hasFriends ? 'secondary' : 'primary'}
             size="lg"
           />
           <EmptySeat />
         </View>
-        {followsSomeone ? (
+        {hasFriends ? (
           <>
             <Txt variant="title" align="center">
               {words.waiting}
@@ -67,13 +67,13 @@ export function FriendsEmpty({
         ) : (
           <>
             <Txt variant="title" align="center">
-              {t.friends.notFollowing}
+              {words.none}
             </Txt>
             <Txt variant="meta" tone="muted" align="center">
               {words.noneHint}
             </Txt>
             <Button
-              label={t.friends.find}
+              label={words.find}
               icon="search"
               onPress={onSearch}
               style={styles.action}

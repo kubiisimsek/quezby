@@ -1,7 +1,7 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator, Linking, StatusBar, StyleSheet } from 'react-native';
 
 import { track, trackScreen } from '@/analytics/track';
@@ -13,6 +13,9 @@ import { useDeviceCheck } from '@/hooks/useDeviceCheck';
 import { useLanguageSync } from '@/hooks/useLanguageSync';
 import { useMe } from '@/hooks/useMe';
 import { usePendingRunSender } from '@/hooks/usePendingRunSender';
+import { usePulse } from '@/hooks/usePulse';
+import { usePushEvents, usePushRegistration } from '@/hooks/usePush';
+import { inboxCount, useInboxSummary } from '@/hooks/useSocial';
 import { useLanguage, useT } from '@/i18n';
 import { messageFor } from '@/lib/errors';
 import { gateFor } from '@/navigation/gate';
@@ -21,32 +24,45 @@ import { TabBar } from '@/navigation/TabBar';
 import type { RootStackParamList, TabParamList } from '@/navigation/types';
 import { LoginScreen } from '@/screens/auth/LoginScreen';
 import { DailyScreen } from '@/screens/daily/DailyScreen';
+import { FindFriendsScreen } from '@/screens/friends/FindFriendsScreen';
+import { FriendsScreen } from '@/screens/friends/FriendsScreen';
+import { ThreadScreen } from '@/screens/friends/ThreadScreen';
 import { GameScreen } from '@/screens/game/GameScreen';
 import { HelpScreen } from '@/screens/help/HelpScreen';
+import { HistoryScreen } from '@/screens/history/HistoryScreen';
 import { HomeScreen } from '@/screens/home/HomeScreen';
 import { LeaderboardScreen } from '@/screens/leaderboard/LeaderboardScreen';
 import { LeagueScreen } from '@/screens/league/LeagueScreen';
+import { NotificationsScreen } from '@/screens/onboarding/NotificationsScreen';
 import { ProtectScreen } from '@/screens/onboarding/ProtectScreen';
+import { AvatarEditorScreen } from '@/screens/profile/AvatarEditorScreen';
 import { ProfileScreen } from '@/screens/profile/ProfileScreen';
-import { SearchScreen } from '@/screens/search/SearchScreen';
 import { UsernameScreen } from '@/screens/username/UsernameScreen';
 import { WelcomeScreen } from '@/screens/welcome/WelcomeScreen';
 import { useOnboarding } from '@/stores/onboarding';
+import { usePush } from '@/stores/push';
+import { threadFriend, useCurrentRoute } from '@/stores/route';
 import { useSettings } from '@/stores/settings';
 import { BrandMark } from '@/ui/brand-mark';
-import { Button, Screen, Stamp, Txt } from '@/ui/kit';
+import { Button, Screen, Stamp, Toast, Txt } from '@/ui/kit';
 import { SPACE, useTheme } from '@/ui/theme';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tabs = createBottomTabNavigator<TabParamList>();
 
-/** The screen on show, for the visit's journey. */
+/** The screen on show, for the visit's journey and the inbox's pulse. */
 const navigationRef = createNavigationContainerRef<RootStackParamList>();
 
-const onScreen = () => trackScreen(navigationRef.getCurrentRoute()?.name);
+const onScreen = () => {
+  const route = navigationRef.getCurrentRoute();
+  trackScreen(route?.name);
+  useCurrentRoute.setState({ name: route?.name ?? null, username: threadFriend(route) });
+};
 
 function TabsShell() {
   const { tabs } = useT().nav;
+  const inbox = useInboxSummary();
+  const waiting = inboxCount(inbox.data);
   return (
     <Tabs.Navigator
       initialRouteName="Home"
@@ -56,7 +72,11 @@ function TabsShell() {
       <Tabs.Screen name="Leaderboard" component={LeaderboardScreen} options={tab(tabs.leaderboard, 'mountain')} />
       <Tabs.Screen name="League" component={LeagueScreen} options={tab(tabs.league, 'shield')} />
       <Tabs.Screen name="Home" component={HomeScreen} options={tab(tabs.play, 'play')} />
-      <Tabs.Screen name="Search" component={SearchScreen} options={tab(tabs.friends, 'users')} />
+      <Tabs.Screen
+        name="Friends"
+        component={FriendsScreen}
+        options={{ ...tab(tabs.friends, 'users'), tabBarBadge: waiting > 0 ? waiting : undefined }}
+      />
       <Tabs.Screen name="Profile" component={ProfileScreen} options={tab(tabs.profile, 'account')} />
     </Tabs.Navigator>
   );
@@ -66,9 +86,9 @@ function TabsShell() {
  * What mounts is `gateFor`'s answer: a build the API no longer accepts → the
  * update screen; storage not read yet — or the app still turning to read its
  * language the right way — → the splash; no account → the
- * welcome; a new account's first steps — the practice run, the name, keeping
- * the account — one screen at a time; an account from before automatic names
- * → the name question; otherwise the game.
+ * welcome; a new account's first steps — the practice run, the name,
+ * notifications, keeping the account — one screen at a time; an account from
+ * before automatic names → the name question; otherwise the game.
  */
 export function RootNavigator() {
   const navTheme = useNavTheme();
@@ -88,6 +108,12 @@ export function RootNavigator() {
   useConsentSync();
   useLanguageSync();
   useAnalytics();
+  usePushRegistration();
+  usePushEvents();
+  const notice = usePush((state) => state.notice);
+  const opened = usePush((state) => state.opened);
+  /** The navigator has mounted: a tapped notification can be opened. */
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     void useLanguage.getState().hydrate();
@@ -104,12 +130,25 @@ export function RootNavigator() {
     meFailed: me.isError,
     onboarding: { userId: onboardingUser, step: onboardingStep },
   });
+  usePulse(gate === 'game');
 
   // The two screens outside the navigator, counted as moments of the visit.
   useEffect(() => {
     if (gate === 'offline') track('offline_gate');
     if (gate === 'update') track('update_gate');
   }, [gate]);
+
+  // A tapped notification opens what it is about once the game is up: a
+  // request, the friends tab; anything else, that friend's conversation.
+  useEffect(() => {
+    if (!opened || gate !== 'game' || !navigationRef.isReady()) return;
+    usePush.getState().consumed();
+    if (opened.kind === 'friend_request') {
+      navigationRef.navigate('Tabs', { screen: 'Friends' });
+    } else {
+      navigationRef.navigate('Thread', { username: opened.username });
+    }
+  }, [gate, opened, ready]);
 
   if (status?.status === 'update_required') {
     return (
@@ -142,7 +181,16 @@ export function RootNavigator() {
   }
 
   return (
-    <NavigationContainer ref={navigationRef} theme={navTheme} onReady={onScreen} onStateChange={onScreen}>
+    <>
+    <NavigationContainer
+      ref={navigationRef}
+      theme={navTheme}
+      onReady={() => {
+        setReady(true);
+        onScreen();
+      }}
+      onStateChange={onScreen}
+    >
       <Stack.Navigator screenOptions={stackOptions}>
         {gate === 'welcome' ? (
           <>
@@ -157,6 +205,8 @@ export function RootNavigator() {
           />
         ) : gate === 'nickname' || gate === 'username' ? (
           <Stack.Screen name="Username" component={UsernameScreen} options={{ headerShown: false }} />
+        ) : gate === 'notifications' ? (
+          <Stack.Screen name="Notifications" component={NotificationsScreen} options={{ headerShown: false }} />
         ) : gate === 'protect' ? (
           <Stack.Screen name="Protect" component={ProtectScreen} options={{ headerShown: false }} />
         ) : (
@@ -175,10 +225,25 @@ export function RootNavigator() {
             />
             <Stack.Screen name="Help" component={HelpScreen} />
             <Stack.Screen name="Daily" component={DailyScreen} />
+            <Stack.Screen name="FindFriends" component={FindFriendsScreen} />
+            <Stack.Screen name="Thread" component={ThreadScreen} />
+            <Stack.Screen name="History" component={HistoryScreen} />
+            <Stack.Screen name="AvatarEditor" component={AvatarEditorScreen} options={{ gestureEnabled: false }} />
           </>
         )}
       </Stack.Navigator>
     </NavigationContainer>
+    {gate === 'game' ? (
+      <Toast
+        notice={notice}
+        onPress={() => {
+          const data = usePush.getState().notice?.data;
+          usePush.getState().hide();
+          if (data) usePush.getState().open(data);
+        }}
+      />
+    ) : null}
+    </>
   );
 }
 

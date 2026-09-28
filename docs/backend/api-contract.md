@@ -8,7 +8,7 @@ sees after a run**. The app never tells the API a score: it tells it what the
 player did, and the API replays that with its own copy of the engine
 (`apps/api/app/Game`, the PHP twin of `@quezby/engine`). The app runs the
 engine only to draw the game; ranks, gaps, stats, league standings, daily
-cards, share texts and period end times all come from here.
+cards, VS results, share texts and period end times all come from here.
 
 A contract change is one commit: `packages/types` → Laravel request/resource →
 `packages/sdk` → the screen that reads it.
@@ -16,8 +16,8 @@ A contract change is one commit: `packages/types` → Laravel request/resource �
 ## Conventions
 
 - JSON in, JSON out, camelCase keys. Timestamps are ISO-8601 UTC strings with
-  milliseconds. Boards that count down also send `serverTime`: the app counts
-  from the server's clock, never the phone's.
+  milliseconds. Boards and a VS that count down also send `serverTime`: the
+  app counts from the server's clock, never the phone's.
 - Auth is a Sanctum personal access token: `Authorization: Bearer <token>`.
 - **Language.** The API speaks the game's six languages — `tr`, `en`, `de`,
   `ar`, `fr`, `es` (`Locale` in `packages/types`) — and the app names the one
@@ -27,6 +27,8 @@ A contract change is one commit: `packages/types` → Laravel request/resource �
   none of them (or is empty), in the signed-in player's own language
   (`Me.locale`); else in Turkish. Every error `message` (401s and 429s
   included), every validation line in `fields`, and the share texts follow it.
+  A push does not: it is written in its receiver's own language (`Me.locale`),
+  whatever the request that caused it spoke (*Push*).
   The admin panel (`/admin/*`) and the ops routes always answer in Turkish,
   whatever the browser sends — and so does whatever is answered before a route
   is found (an unknown path, a wrong method, maintenance).
@@ -48,23 +50,29 @@ A contract change is one commit: `packages/types` → Laravel request/resource �
   `code` is one of `ApiErrorCode` in `packages/types`. `message` is in the
   request's language (see *Language*) and safe to show; the app prefers its own
   line per `code` and shows the server's only for `validation_failed`. A
-  username problem keeps its code in `fields` in every language.
+  username problem keeps its code in `fields` in every language. A limit's
+  message names the limit (`friend_limit`, `request_limit`, `message_limit`,
+  `duel_limit`: "You can have up to 500 friends.").
 
 | Status | When |
 | ------ | ---- |
 | 401 | `unauthenticated` — missing or revoked token |
 | 403 | `forbidden` — the admin panel only: the admin's role may not do this (`docs/backend/admin-api.md`) |
-| 404 | `not_found` — also another player's run, an unknown board, a banned player |
-| 409 | `username_taken`, `username_locked`, `email_taken`, `already_linked`, `identity_taken`, `last_sign_in_method`, `run_already_finished`, `daily_already_played`, `attest_key_unknown` |
+| 404 | `not_found` — also another player's run, an unknown board (`daily` included), a banned player, a player who blocked you, a VS that is not yours to see |
+| 409 | `username_taken`, `username_locked`, `email_taken`, `already_linked`, `identity_taken`, `last_sign_in_method`, `run_already_finished`, `daily_already_played`, `attest_key_unknown`, `duel_unavailable` |
 | 410 | `run_expired` |
-| 422 | `validation_failed`, `username_invalid`, `invalid_credentials`, `identity_invalid`, `run_rejected`, `engine_outdated`, `cannot_follow_self`, `follow_limit`, `challenge_invalid`, `integrity_invalid` |
+| 422 | `validation_failed`, `username_invalid`, `invalid_credentials`, `identity_invalid`, `run_rejected`, `engine_outdated`, `cannot_befriend_self`, `friend_limit`, `request_limit`, `not_friends`, `message_limit`, `duel_limit`, `photo_invalid`, `challenge_invalid`, `integrity_invalid` |
 | 429 | `too_many_requests` |
 
 Throttles: guest sign-up 10/h/IP · login 10/min/IP · nonce 20/min/IP · Apple/Google
 10/min/IP · identities 10/min · username check 60/min · username pick 10/min · run start 30/min · run
 checkpoint 12/min · run finish 20/min · device challenge 20/min · device checks
-(Android, iOS attest and assert together) 10/min · analytics visits 12/min · search 30/min · follow 60/min ·
-every read (boards, daily, league, stats, players, follow lists) 60/min.
+(Android, iOS attest and assert together) 10/min · analytics visits 12/min · search 30/min ·
+friend requests and answers, blocks, marking a conversation read and declining a VS
+(`social`) 60/min · phrases 30/min · profile photo 10/h · reports 10/h · push token 20/min ·
+every read (boards, daily, league, stats, players, past games, inbox, friends, requests,
+blocks, conversations, VS) 60/min · the inbox's pulse (`pulse`, its own budget) 60/min ·
+profile photos served 600/min/IP.
 
 ## Health and app
 
@@ -131,12 +139,13 @@ Revokes the current token. `204`.
 ### `GET /me`
 
 ```json
-{ "user": Me, "ranks": { "daily": 12, "weekly": 40, "monthly": 88, "all": 311 } }
+{ "user": Me, "ranks": { "weekly": 40, "monthly": 88, "all": 311 } }
 ```
 
-`Me` = `{ id, username, email, isGuest, identities: ("apple"|"google")[], settings: { haptics, analytics }, locale, best: { score, reels, achievedAt } | null, createdAt }`.
-`settings.analytics` is the player's consent to usage analytics — false until
-they say yes.
+`Me` = `{ id, username, avatarUrl, email, isGuest, identities: ("apple"|"google")[], settings: { haptics, pushFriends, pushVs, pushMessages, analytics }, locale, best: { score, reels, achievedAt } | null, createdAt }`.
+`avatarUrl` is the profile photo's address (*Profile photo* below), null for
+none. `settings.analytics` is the player's consent to usage analytics — false
+until they say yes; the three `push*` settings are true until turned off.
 `locale` is the language the player plays in: the request's when the account
 was made, then whatever the phone last set (`PUT /me/locale`); accounts from
 before languages are `tr`. A phone signing in to the account takes it.
@@ -145,7 +154,8 @@ before languages are `tr`. A phone signing in to the account takes it.
 before automatic names.
 `best` is this season's best (the season's all-time row). `isGuest` is true
 while no email, Apple or Google is attached. A rank is null without a ranked
-run in that period.
+run in that period. There is no day rank: the boards a player climbs are the
+week, the month and the season (*Boards*).
 
 ### `GET /me/stats`
 
@@ -169,8 +179,11 @@ is available to them); `{ "haptics": false }` → `{ "settings": … }`.
 `PUT /me/settings` also takes `{ "analytics": true | false }` — the player's
 answer to usage analytics, kept as its moment (`users.analytics_at`), never in
 the settings column. A yes starts today's count at once; a no deletes the
-player's visits, days and firsts (only anonymous daily totals stay). Every
-setting is a JSON boolean (`422 validation_failed` otherwise).
+player's visits, days and firsts (only anonymous daily totals stay).
+`pushFriends` (a friend request came, or yours was accepted), `pushVs` (a VS
+sent to you, the end of one you sent) and `pushMessages` (a phrase) choose
+which news reaches the player's phones as a push (*Push*). Every setting is a
+JSON boolean (`422 validation_failed` otherwise); unknown keys are ignored.
 
 `PUT /me/username` `{ "username" }` → `{ "user": Me }` picks a name **once**:
 only while the account's name is the automatic one or there is none
@@ -210,11 +223,40 @@ email and no other identity). Unlinking Apple revokes its grant.
 
 ### `DELETE /me`
 
-Deletes the account, its runs, board rows, league seats, follows, stats, device
-checks, App Attest keys and challenges, its phones in the device registry, its
-usage analytics (visits, days, firsts) and every token; revokes Apple's grant
-when there is one (never blocks). Anonymous daily totals stay. `204`.
+Deletes the account, its runs, board rows, league seats, friendships and
+their conversations, friend requests, blocks, VS, reports (made and received),
+push tokens, stats, device checks, App Attest keys and challenges, its phones
+in the device registry, its usage analytics (visits, days, firsts), every
+token and its profile photo's file; revokes Apple's grant when there is one
+(never blocks). Anonymous daily totals stay. `204`.
 Required by App Store guideline 5.1.1(v).
+
+### `PUT /me/avatar` · `DELETE /me/avatar` — profile photo
+
+`{ "image": "<base64>" }` → `{ "user": Me }`, with the new `avatarUrl`;
+`DELETE` takes the photo away (idempotent) → `{ "user": Me }`. The app crops
+the square the player framed, scales it to 512 px and squeezes a JPEG to at
+most 100 KB (`AVATAR` in `@quezby/config`). The API trusts none of it
+(`AvatarService`, PHP's GD): it takes a JPEG, PNG or WebP of 128–4096 px a
+side and at most 102,400 bytes decoded, cuts the middle square, scales it to
+at most 512 px (never up) and encodes a fresh JPEG — quality 85 down to 35,
+then at 384 px — until it fits in 102,400 bytes. Re-encoding drops every byte
+of metadata, the EXIF location included; a see-through PNG lands on white.
+Anything else → `422 photo_invalid` (no `image` at all → `422
+validation_failed`). Each photo gets a new random name (24 hex characters +
+`.jpg`) on the `avatars` disk, `storage/app/avatars` — outside the web root and
+never in an update zip; the one before it is deleted. Every player the API
+shows carries their `avatarUrl`: summaries, cards, board rows, league
+members, passed players, the blocks list. Deleting the account deletes the
+file; a moderator can take a photo down (`docs/backend/admin-api.md`).
+
+### `GET /media/avatars/{file}` — public
+
+The JPEG, for anyone with its address — no token, no language:
+`Cache-Control: public, max-age=31536000, immutable` (a photo never changes
+under its name), `X-Content-Type-Options: nosniff`,
+`Content-Security-Policy: default-src 'none'`. Any other name, or a photo that
+is gone → 404.
 
 ## Device
 
@@ -307,10 +349,12 @@ one (`counter`) — which then moves up.
 
 ### `POST /runs`
 
-`{ "mode": "free" | "daily", "engineVersion": 2, "contentVersion": 1 }` →
+`{ "mode": "free" | "daily" | "vs", "engineVersion": 2, "contentVersion": 1 }` —
+a VS also names the friend it challenges (`"opponent": "ekin"`) or the VS it
+answers (`"duel": "01J…"`) — → `201`
 
 ```json
-{ "runId": "01J…", "seed": 3141592653, "engineVersion": 2, "contentVersion": 1, "mode": "daily", "dayKey": "2026-09-26", "startedAt": "…" }
+{ "runId": "01J…", "seed": 3141592653, "engineVersion": 2, "contentVersion": 1, "mode": "daily", "dayKey": "2026-09-26", "duelId": null, "startedAt": "…" }
 ```
 
 - An engine or catalog the API does not play (or no body — the v1 app) →
@@ -325,12 +369,18 @@ one (`counter`) — which then moves up.
   `hash_hmac('sha256', "quezby-daily|{day}|{engine}", QUEZBY_DAILY_SECRET)` —
   the same for everyone; one attempt per Istanbul day, taken when started
   (`409 daily_already_played`, also under a race).
+- `vs`: `opponent` opens a new VS against a friend on a fresh seed; `duel`
+  answers one on its seed and catalog. Exactly one of the two, `duel` a ULID
+  (`422 validation_failed` otherwise); the rest — who may, and when — is *VS*.
+  `duelId` names the VS; it is null in the other modes, as `dayKey` is outside
+  `daily`.
 
 ### `POST /runs/{runId}/checkpoint`
 
 `{ "reel": 162, "prefixHash": "3f5c…" }` → `{ "receipt": "…" }` (200).
 
-A few times in a ranked run — right at the first verdict after the game clock
+A few times in a run from `POST /runs` (a VS's too — never a practice run) —
+right at the first verdict after the game clock
 (after the countdown) passes 45 s, 120 s and 240 s (`CHECKPOINTS.marksMs` in
 `@quezby/config`) — the app sends how many reels it has played (`reel`, 1–5000)
 and `prefixHash(actions, reel)`: the lower-case hex SHA-256 of the first `reel`
@@ -367,7 +417,9 @@ The API:
    hard flags (`wall_clock`, `fast_decisions`, `hold_bounds`, `client_mismatch`,
    `banned`, and from the receipts and the device below) make the run
    `flagged`; soft signals hold a score that would reach the season's top 10
-   or the week's top 3 as `review`.
+   or the week's top 3 as `review`. A `vs` run answers to the hard flags only
+   — nothing of it is held for review: clean, it is `played`; flagged, it
+   loses its VS (a challenger's is never sent).
 
    **Receipts.** Each is held against the log and the clock: not one the API
    signed for this run → hard `checkpoint_forged`; `n` past the log or `h` not
@@ -391,9 +443,11 @@ The API:
    run; `off` — devices are neither checked nor recorded.
 4. Counts the run from the replay (stats, which posts were shown and liked).
 5. A `ranked` run adds to the player's lifetime stats and, when it scored,
-   upserts today's, this week's, this month's and the season's rows (plus
-   today's `challenge` row for a daily run) and — once the league is open to
-   them — seats the player in this week's league group.
+   upserts this week's, this month's and the season's rows, the day's row
+   (kept only to add up league points — no route serves it) and, for a daily
+   run, today's `challenge` row — and, once the league is open to them, seats
+   the player in this week's league group.
+6. A `vs` run touches none of that: it settles its VS (*VS*).
 
 →
 
@@ -402,26 +456,29 @@ The API:
   "run": RunResult,
   "best": { "score": 240310, "reels": 405, "achievedAt": "…" },
   "isNewBest": true,
-  "ranks": { "daily": 12, "weekly": 44, "monthly": 80, "all": 311 },
-  "rankChanges": { "daily": { "before": 20, "after": 12 }, "weekly": { "before": null, "after": 44 }, … },
-  "passed": [{ "username": "ayse", "score": 239000, "isFollowing": true }],
+  "ranks": { "weekly": 44, "monthly": 80, "all": 311 },
+  "rankChanges": { "weekly": { "before": 51, "after": 44 }, "monthly": { "before": null, "after": 80 }, … },
+  "passed": [{ "username": "ayse", "avatarUrl": null, "score": 239000, "isFriend": true }],
   "daily": { "dayKey": "2026-09-26", "number": 3, "rank": 37, "players": 1204, "grid": "🟩🟩🟨🟥⬛", "shareText": "…" },
   "league": { "tier": "gold", "rank": 4, "members": 30, "zone": "promote", "points": 812000 },
   "leagueUnlock": null,
-  "shareText": "Quezby'de 240.310 puan yaptım! 405 post · bugün #12. Sen kaç yaparsın?"
+  "shareText": "Quezby · Günün akışı #3\n🟩🟩🟨🟥⬛\n240.310 puan · #37/1.204",
+  "duel": null
 }
 ```
 
-`RunResult` = `{ runId, mode, status: "ranked"|"flagged"|"review", score, reels,
+`RunResult` = `{ runId, mode, status: "ranked"|"flagged"|"review"|"played", score, reels,
 hits, misses, perfects, maxStreak, level, accuracy, avgReactionMs, activeMs,
 endedBy, maxCombo, breakdown: { reelPoints, bonusPoints, bonuses: { flawless|lightning|coolHead|comeback: { count, points } } },
 stats: { swipes, likes, holds, perfects, freezes, misses: { timeout, wrong, holdEarly, holdLate, caught }, avgReactionMs, bestReactionMs, levelMisses[] },
 flagReason: "device" | null }`.
 `shareText` is what "Paylaş" sends, built from the server's own numbers in the
 request's language (`lang/{locale}/share.php`): `Quezby'de 240.310 puan
-yaptım! 405 post · bugün #12. Sen kaç yaparsın?`, `I scored 240,310 points on
-Quezby! 405 posts · today #12. How many can you score?` — without "today #…"
-when the run has no rank today. For a daily run it is `daily.shareText`. Every
+yaptım! 405 post · bu hafta #12. Sen kaç yaparsın?`, `I scored 240,310 points
+on Quezby! 405 posts · this week #12. How many can you score?` — the rank is
+the player's on this week's board, and "this week #…" is left out while they
+have none. For a daily run it is `daily.shareText`; after a VS it is null —
+a VS is between two friends. Every
 number is grouped the language's way (`Locale::group`, the app's
 `groupDigits`); counts take the language's forms (six in Arabic). Every line of
 an Arabic share text starts with U+200F (RIGHT-TO-LEFT MARK), so a messaging
@@ -430,25 +487,58 @@ app lays it out right to left.
 phone failed its integrity check, so its runs never rank, and the app says so
 ("Bu cihazda skorlar sıralamaya girmiyor"). It is null for every other flag:
 the other checks are not explained to the player.
-`passed` lists up to three players the run overtook on today's board. `daily`
-is null for a free run; `league` is null when the run did not rank, or the
-league is not open to the player yet. `leagueUnlock` is `{ required, remaining }`
-until it opens — `{ "required": 3, "remaining": 2 }` after a new player's first
-counted run — and null once it has.
+`passed` lists up to three players the run overtook on this week's board,
+closest first. `daily` is null outside a daily run; `league` is null when the
+run did not rank, or the league is not open to the player yet. `leagueUnlock`
+is `{ required, remaining }` until it opens — `{ "required": 20, "remaining": 19 }`
+after a new player's first counted run — and null once it has, and after a VS.
+`duel` is the VS a `vs` run played (`DuelView`, *VS*) as it stands after the
+run; null otherwise. A VS run's `ranks` are the player's ranks as they stand,
+its `rankChanges` show no move and its `passed` is empty.
 A `flagged` or `review` run still answers 200.
+
+## Past games
+
+### `GET /me/runs?cursor=&mode=`
+
+```json
+{
+  "runs": [{ "runId": "01J…", "mode": "vs", "status": "played", "score": 88120, "reels": 231, "level": 12,
+             "activeMs": 201000, "finishedAt": "…", "isBest": false, "dailyNumber": null,
+             "duel": { "id": "01J…", "status": "finished", "turn": null, "you": { "score": 88120, "valid": true },
+                       "them": { "score": 79410, "valid": true }, "outcome": "won", "expiresAt": null, "opponent": "ekin" } }],
+  "nextCursor": "…"
+}
+```
+
+Every run the player played to its end and the API replayed — `ranked`,
+`review`, `flagged` or `played` — the newest first, thirty a page; `mode`
+(`free`, `daily`, `vs`) keeps to one. Pass `nextCursor` back as `?cursor=`
+(null on the last page; a cursor the API did not write → `422
+validation_failed`). Runs left open, abandoned, expired or refused are not
+games the player finished and are left out. `isBest` marks the run behind this
+season's best; `dailyNumber` is a daily run's "Günün akışı #…"; `duel` is a VS
+run's VS from the player's side (`DuelBrief`, *VS*, settled as it is read)
+with the other player's username.
+
+### `GET /me/runs/{runId}`
+
+`{ "summary": RunSummary, "run": RunResult }` — one past game with everything
+its replay counted. Another player's run, or one not in the history → 404.
 
 ## Boards
 
 ### `GET /leaderboards/{board}?scope=everyone|friends&limit=50`
 
-`board` ∈ `daily`, `weekly`, `monthly`, `all`, `challenge` (today's Günün akışı).
+`board` ∈ `weekly`, `monthly`, `all`, `challenge` (today's Günün akışı). There
+is no day board: `/leaderboards/daily` is 404.
 
 ```json
 {
   "board": "weekly", "periodKey": "2026-W39", "season": 2, "scope": "everyone",
   "startsAt": "2026-09-20T21:00:00.000Z", "endsAt": "2026-09-27T21:00:00.000Z", "serverTime": "…",
-  "entries": [{ "rank": 1, "username": "kubi", "score": 250311, "reels": 377, "isMe": false, "isFollowing": true, "gap": null }],
-  "me": { "rank": 44, "username": "…", "score": 39960, "reels": 204, "isMe": true, "isFollowing": false, "gap": 1241 },
+  "entries": [{ "rank": 1, "username": "kubi", "avatarUrl": "https://…/api/v1/media/avatars/3f5c….jpg", "score": 250311, "reels": 377, "isMe": false, "isFriend": true, "gap": null }],
+  "me": { "rank": 44, "username": "…", "avatarUrl": null, "score": 39960, "reels": 204, "isMe": true, "isFriend": false, "gap": 1241 },
   "neighbors": [ …two above, me, two below… ],
   "rival": { "entry": { "rank": 43, "username": "ekin", … }, "gap": 1241 },
   "nextRankProgress": 969,
@@ -457,11 +547,12 @@ A `flagged` or `review` run still answers 200.
 ```
 
 One row per player: their best ranked score in the period, this season.
-Periods are in `Europe/Istanbul` — a day starts at 00:00 there, a week on
-Monday (ISO week, `2026-W39`), a month on the 1st (`2026-09`); `all` never
-ends. Ties go to whoever got there first. `gap` is what it takes to pass the
+Periods are in `Europe/Istanbul` — a week starts on Monday (ISO week,
+`2026-W39`), a month on the 1st (`2026-09`); `all` never ends; the
+`challenge` board is today's, keyed by the day (`2026-09-26`), which starts at
+00:00 there. Ties go to whoever got there first. `gap` is what it takes to pass the
 row above (its score − yours + 1); `nextRankProgress` is your score towards the
-rival's, per-mille. `friends` = the players you follow, and you. `limit` 1–100.
+rival's, per-mille. `friends` = your friends, and you. `limit` 1–100.
 
 ### `GET /daily`
 
@@ -472,7 +563,8 @@ rival's, per-mille. `friends` = the players you follow, and you. `limit` 1–100
 ```
 
 `attempt` is null before today's run starts; `unfinished` while it is open;
-`void` when it was abandoned, expired or rejected; otherwise the run's status.
+`void` when it was abandoned, expired or rejected; otherwise the run's status
+(never `played`, a VS run's).
 `shareText` is built for every request, never stored, so it is in the
 request's language: `Quezby · Günün akışı #3`, the grid and `52.340 puan ·
 #37/1.204` on three lines (`Daily Feed`, `Tages-Feed`, `خلاصة اليوم`, `Fil du
@@ -482,16 +574,20 @@ jour`, `Feed del día` in the other five; each Arabic line opens with U+200F).
 
 ```json
 { "season": 2, "weekKey": "2026-W39", "tier": "gold", "endsAt": "…", "serverTime": "…", "joined": true, "unlock": null,
-  "members": [{ "rank": 1, "username": "…", "points": 912000, "daysPlayed": 5, "isMe": false, "isFollowing": false, "zone": "promote", "gap": null }],
-  "me": LeagueMember, "promoteCount": 5, "demoteCount": 5,
+  "members": [{ "rank": 1, "username": "…", "avatarUrl": null, "points": 912000, "daysPlayed": 5, "isMe": false, "isFriend": false, "zone": "promote", "gap": null }],
+  "me": LeagueMember, "promoteCount": 5, "demoteCount": 5, "promotionGap": 42000, "nextRankProgress": 870,
   "lastWeek": { "weekKey": "2026-W38", "tier": "silver", "rank": 3, "members": 28, "outcome": "promoted", "newTier": "gold" } }
 ```
 
-Points are the sum of each day's best score this week. **The league opens to a
-player after their first 3 counted runs** — ranked and scoring
-(`config/quezby.php` › `leagues.unlock_runs`); zero-score, flagged and held
-runs do not count, and a new player's practice run never reaches the API.
-Until then `unlock` is `{ "required": 3, "remaining": n }` and nobody is seated;
+Points are the sum of each day's best score this week — the day rows the
+boards keep for this alone. `promotionGap` is what would take you into the
+promotion zone (null when you are in it, or there is none); `nextRankProgress`
+is your points towards the member above, per-mille. **The league opens to a
+player after their first 20 counted runs** — ranked and scoring
+(`QUEZBY_LEAGUE_UNLOCK_RUNS`, `config/quezby.php` › `leagues.unlock_runs`);
+zero-score, flagged, held and VS runs do not count, and a new player's
+practice run never reaches the API.
+Until then `unlock` is `{ "required": 20, "remaining": n }` and nobody is seated;
 anyone who has ever sat in a league is never locked again. A player is seated
 on their first ranked run of the week once it is open (`joined: false` until
 then, with the tier they will play); a player who opens it mid-week brings the
@@ -541,29 +637,265 @@ records nothing for a day. Nothing is written in that case.
   is not 32 hex characters, a journey over 40 steps or a step that is not
   `[code, seconds]`, a count over 999, an unknown `platform`.
 
-## Players and follows
+## Players and friends
+
+A friendship takes two yeses: one player asks, the other accepts — or asks
+back, which is the same thing (`FriendService`). It lasts until either ends
+it or blocks the other. What another player is to you is their `relation`
+(`PlayerRelation`): `none`, `friend`, `requested` (your request waits for
+them), `incoming` (theirs waits for you) or `blocked` (you blocked them).
+Nobody is told they were blocked. The follows from before friends became
+friendships where two players followed each other, and requests from the
+follower where only one did (`FollowsToFriends`, in the migration).
 
 ### `GET /users?search=ku`
 
 `search` is lower-cased and must match `^[a-z0-9.*]{2,20}$`. Prefix match,
-yourself and banned players excluded, 20 at most →
-`{ "users": [{ "username", "best", "league", "isFollowing" }] }`.
+by username — yourself, banned players and anyone on either side of a block
+with you left out — 20 at most → `{ "users": [PlayerSummary] }`.
+`PlayerSummary` = `{ username, avatarUrl, best, league, relation }`: `best` is
+this season's best score, `league` this week's tier (null when not seated).
 
 ### `GET /users/{username}`
 
-`{ "player": { username, createdAt, best, league, ranks: { weekly, all }, stats: { runs, reels, likes, perfects }, followers, following, isFollowing, followsMe, isMe } }`.
-Unknown or banned → 404.
+`{ "player": { username, avatarUrl, createdAt, best, league, ranks: { weekly, all }, stats: { runs, reels, likes, perfects }, friends, relation, isMe } }`.
+`friends` counts their friends who are not banned. Unknown, banned, or a
+player who blocked you → 404.
 
-### `PUT /users/{username}/follow` · `DELETE /users/{username}/follow`
+### `PUT /users/{username}/friend` · `DELETE /users/{username}/friend`
 
-Idempotent, `204`. Yourself → `422 cannot_follow_self`; 500 already →
-`422 follow_limit`; unknown or banned → 404; a player without a username yet
-→ `422 validation_failed`.
+→ `{ "relation": "requested" }` (`RelationResponse`: where the two stand
+afterwards). Idempotent.
 
-### `GET /me/following` · `GET /me/followers`
+- `PUT` sends a request — or accepts theirs when it waits; two requests
+  crossing make friends too. A new request pushes to them; accepting opens the
+  two's conversation with a `friends` line and pushes to the one who asked
+  (*Inbox*, *Push*). Yourself → `422 cannot_befriend_self`; unknown, banned,
+  or a block either way → 404; the caller at `quezby.friends.limit` (500)
+  friends — banned ones do not count — → `422 friend_limit`, for a request and
+  for an answer; `quezby.friends.pending_limit` (100) of the caller's requests
+  still waiting (to players who are not banned) → `422 request_limit`; a
+  caller without a username yet → `422 validation_failed`.
+- `DELETE` takes a request back, turns one down or ends a friendship —
+  whichever there is. Ending it deletes the two's conversation and cancels the
+  VS open between them. A banned player can still be let go of; only an
+  unknown one → 404. A block stays: only unblocking lifts it.
 
-`{ "users": [PlayerSummary], "nextCursor": "…" | null }`, newest first, 50 a
-page; pass `?cursor=` for the next.
+### `GET /me/friend-requests`
+
+`{ "incoming": [{ "player": PlayerSummary, "requestedAt": "…" }], "outgoing": [ … ] }`
+— the newest hundred each way, banned players left out.
+
+### `PUT /users/{username}/block` · `DELETE /users/{username}/block`
+
+→ `{ "relation": "blocked" }`. Idempotent. Blocking ends everything between
+the two — the friendship and its conversation, a request either way, the VS
+open between them (`cancelled`) — and keeps the blocked player away: to them
+the blocker is not there (the card, a friend request, a conversation and a VS
+answer 404), and neither finds the other in a search. The blocker sees
+`blocked` and cannot add them before lifting it (404). Boards and league
+groups still show both. Yourself or an unknown player → 404. `DELETE` lifts
+it — a banned player's too — and the two are strangers again (`none`).
+
+### `GET /me/blocks`
+
+`{ "users": [{ "username", "avatarUrl", "blockedAt" }] }` — everyone you
+blocked, the latest first, banned players too.
+
+### `POST /users/{username}/report`
+
+`{ "reason": "photo" | "name" }` → `204`, whatever becomes of it: the reporter
+is never told. A player reports each photo or name of another once; a new
+photo or a new name can be reported afresh; a player without a photo has none
+to report (still `204`). Yourself, unknown or banned → 404. Moderators take a
+photo down, reset a name or let the reports go in the admin panel —
+`docs/backend/admin-api.md` → *Reports*.
+
+## Inbox
+
+One conversation per friend, made of the game's own lines and phrases picked
+from a fixed list — nothing a player types ever reaches another
+(`InboxService`). A line goes from whoever made it happen to the other
+friend, who has it unread until they open the conversation:
+
+| `kind` | From → to |
+| --- | --- |
+| `friends` | the one who accepted → the one who asked |
+| `phrase` | the sender → the friend |
+| `vs_invite` | the challenger → the friend, once the challenger's clean run sent the VS |
+| `vs_result`, `vs_declined`, `vs_expired` | the friend → the challenger |
+
+`InboxMessage` = `{ id, kind, mine, phrase, duel: DuelBrief | null, createdAt }`
+— `duel` is a `vs_*` line's VS as it stands now. Lines are kept
+`inbox.keep_days` (90, `QUEZBY_INBOX_KEEP_DAYS`) days and pruned lazily: after
+the response of a friends list or a conversation, at most once an hour, a
+thousand lines at a time — no cron. A friendship that ends, or a block,
+deletes the conversation.
+
+### `GET /me/inbox`
+
+`{ "requests": 2, "threads": 3, "yourTurn": 1 }` — what the badges count:
+requests waiting for you, friends whose conversation wants a look (a line
+unread, or a VS waiting for you to play) and how many friends' VS wait for
+you. Banned players are left out; the player's open VS are settled first.
+
+### `GET /me/pulse`
+
+`{ "stamp": 42 }` — a number that moves whenever the player's inbox does
+(`users.inbox_stamp`, `InboxStamp`). It goes up, for both players, with a
+friend request sent, a friendship begun or ended, a block that parted two
+friends, every line (a phrase, "friends now", a VS invite, result, refusal or
+expiry); for the blocker alone with a block or its lifting. Reading a
+conversation moves nothing. Nothing is on a clock, so the pulse itself first
+settles the player's waiting VS whose 48 hours ran out (`settleDue`): both
+players then hear of it without opening anything.
+
+This is how the inbox is live without a socket (shared hosting has none): the
+app asks every 3 s on Arkadaşlar, a conversation and Arkadaş bul, every 10 s
+elsewhere, never mid-run or in the background, and fetches its lists only when
+the number moved. A push, when the player allowed them, gets there first. The
+answer costs two indexed reads; it has its own throttle, apart from the other
+reads.
+
+### `GET /me/friends?cursor=`
+
+`{ "friends": [FriendThread], "nextCursor": "…" | null }` — fifty a page, the
+friend last heard from first, banned friends left out; pass `nextCursor` back
+as `?cursor=` (one the API did not write → `422 validation_failed`).
+`FriendThread` = `{ player: PlayerSummary, friendsSince, lastActivityAt, last: InboxMessage | null, unread, duel: DuelBrief | null }`
+— `last` is null once the conversation's lines were pruned; `duel` is the VS
+open between the two that you know of.
+
+### `GET /me/threads/{username}?before=`
+
+`{ "player": PlayerSummary, "h2h": { "wins", "losses", "draws" }, "duel": DuelView | null, "messages": [InboxMessage], "nextBefore": 812 | null }`
+— the conversation with a friend, thirty lines a page, oldest first within
+it; `nextBefore` (a message id) as `?before=` fetches the thirty before them.
+`h2h` is how you stand over every VS the two finished. Not a friend, unknown,
+banned, or a player who blocked you → 404.
+
+### `POST /me/threads/{username}/read`
+
+Marks the conversation read up to its newest line. `204`.
+
+### `POST /me/threads/{username}/messages`
+
+`{ "phrase": "gg" }` → `201 { "message": InboxMessage }`. One of the ten codes
+of `PHRASES` in `@quezby/config` (`App\Enums\Phrase`, tested against
+`packages/config/fixtures/social.json`): `gg`, `rematch`, `beat_that`, `wow`,
+`close_one`, `your_turn`, `daily`, `hi`, `thanks`, `next_time`. Each phone
+says a phrase in its own language, a push in the receiver's
+(`lang/{locale}/phrases.php`). Anything else → `422 validation_failed`; not a
+friend → `422 not_friends`; `inbox.phrases_per_day` (20) to one friend in an
+Istanbul day already → `422 message_limit`.
+
+## VS
+
+Two friends, one seed, one attempt each (`DuelService`); both runs start with
+`POST /runs` and `"mode": "vs"` (*Runs*).
+
+1. **The challenger plays first.** `{ "mode": "vs", "opponent": "ekin" }`
+   opens a VS on a fresh seed, `playing`: the friend knows nothing of it yet.
+   Only a friend can be challenged (`422 not_friends`; unknown, banned or a
+   player who blocked you → 404); two friends have one open VS at a time,
+   whoever sent it (`409 duel_unavailable`); a player has at most
+   `duels.waiting_limit` (20) VS waiting for an answer (`422 duel_limit`).
+2. **A clean run sends it.** When the challenger's run comes back `played`,
+   the VS is `waiting`: the friend gets a `vs_invite` line and a push — never
+   the score — and has `QUEZBY_DUEL_EXPIRE_HOURS` (48) to start theirs
+   (`expiresAt`). A challenger's run that is `flagged`, or never finished
+   (abandoned for another run, expired, refused), makes it `void`: it is never
+   sent.
+3. **The friend answers** with `{ "mode": "vs", "duel": "<id>" }`, on the
+   VS's seed and catalog — only a VS made out to them (else 404), once it was
+   sent, while it is `waiting` and before they started it (else
+   `409 duel_unavailable`) — or turns it down.
+4. **The higher clean score wins**; a tie is a draw; the friend's run that is
+   flagged, or left unfinished, loses. `finished`: the challenger gets a
+   `vs_result` line and a push.
+5. Nobody answered by `expiresAt` → `expired`, counting for nobody (a
+   `vs_expired` line, no push); a VS still waiting when the rules change
+   (another engine version) expires too. Declined → `declined` (a
+   `vs_declined` line, no push). The friendship ending, or a block, while it
+   is open → `cancelled`.
+6. **Nothing runs on a clock:** a VS is settled whenever one of the two looks
+   — the inbox, the friends list, a conversation, the VS, the history, a new
+   VS.
+7. **A VS counts nowhere.** Its runs are replayed and checked like any other,
+   but only the hard flags matter (*Runs* › finish); they never reach a board,
+   a league, the lifetime stats, the season's best or the league's unlock
+   count, and a moderator can neither approve nor reject one. Its finish
+   answers `duel` and no share text.
+
+### `GET /duels/{id}`
+
+```json
+{ "duel": { "id": "01J…", "status": "waiting", "turn": "you", "you": null, "them": null, "outcome": null,
+            "expiresAt": "…", "sent": false, "opponent": PlayerSummary,
+            "h2h": { "wins": 3, "losses": 2, "draws": 0 }, "serverTime": "…" } }
+```
+
+The first seven fields are a `DuelBrief` — what an inbox line, a friends row
+and a past game carry: `turn` is who plays next (`you`, `them`, null once it
+is over); `you` and `them` are each side's run, `{ score, valid }` (`score`
+null for a run left unfinished, `valid` false for one that was not clean):
+`you` null until you played, `them` null until it is `finished` — the
+challenger's score stays hidden from the friend until they have played, and
+for good if they never do; `outcome` (`won`, `lost`, `draw`) once `finished`;
+`expiresAt` only while `waiting`. `DuelView` adds `sent` (you sent it, and
+played first), the other player (`opponent`), how the two stand over every VS
+they finished (`h2h`) and `serverTime` to count down with. Only its two players
+see a VS, the friend only once it was sent; anyone else → 404.
+
+### `POST /duels/{id}/decline`
+
+→ `{ "duel": DuelView }`, now `declined`. Only the friend, and only a VS still
+waiting for them that they have not started (else 404 / `409
+duel_unavailable`).
+
+## Push
+
+### `PUT /me/push-token` · `DELETE /me/push-token`
+
+`{ "token": "…", "platform": "ios" | "android" }` → `204`. The phone's Firebase
+Cloud Messaging token (20–255 characters of `A-Za-z0-9:_-.`), which the app
+makes only once the player allowed notifications and sends at sign-in and
+whenever Firebase hands out a new one. A token belongs to one account at a
+time: a phone that signs in to another account takes its token along. A
+player keeps the ten phones registered most recently
+(`push.tokens_per_player`). `DELETE` with `{ "token" }`, before signing out,
+stops this phone getting the account's news; idempotent.
+
+What `PushService` sends, through FCM's HTTP v1 API once the response has
+gone (`defer()` — no queue, no cron):
+
+| News | To | Setting | Words (`lang/{locale}/push.php`) | `data.kind` |
+| --- | --- | --- | --- | --- |
+| A friend request | the player asked | `pushFriends` | `friend_request` | `friend_request` |
+| A request accepted | the player who asked | `pushFriends` | `friend_accepted` | `friends` |
+| A VS sent | the friend | `pushVs` | `vs_invite` | `vs_invite` |
+| A VS ended | the challenger | `pushVs` | `vs_won`, `vs_lost` or `vs_draw`, with both scores | `vs_result` |
+| A phrase | the friend | `pushMessages` | `phrase` (`lang/{locale}/phrases.php`) | `phrase` |
+
+- The title is "Quezby"; the words are in the receiver's language
+  (`Me.locale`) and name the friend (`@ekin`); `data` is `PushData`,
+  `{ kind, username, duelId? }` (`duelId` for a VS) — what a tap opens.
+- A phrase pushes at most once per sender and friend in
+  `inbox.push_gap_seconds` (300 s); the rest wait in the inbox. A VS declined
+  or run out only lands in the inbox. Nothing a banned player does pushes, and
+  a banned player gets none.
+- Every phone of the receiver gets it: Android on the channel `social` at high
+  priority, one notification per friend (`tag`); iOS at APNs priority 10 with
+  the default sound, grouped per friend (`thread-id`).
+- The access token comes from a JWT signed with the service account's key
+  (`scope firebase.messaging`), traded at `oauth2.googleapis.com` and kept
+  about 50 minutes (dropped on a 401). A token FCM calls gone — 404,
+  `UNREGISTERED`, or an invalid `message.token` — is deleted; any other
+  refusal is logged ("Firebase refused a push.").
+- Nothing is sent, and nothing breaks, until `QUEZBY_PUSH_ENABLED`,
+  `FIREBASE_PROJECT_ID` and a readable `FIREBASE_CREDENTIALS` are all set; the
+  admin panel's Sistem page says whether they are. Setup:
+  `docs/development/push-setup.md`.
 
 ## Ops (no SSH on shared hosting)
 
@@ -592,3 +924,6 @@ A board row is `(season, period, period_key, user_id)` → best `score`, its
 `reels`, `run_id` and `achieved_at` (ms). A row only ever moves to a strictly
 higher score. Rank = `1 + count(score > mine) + count(score = mine and achieved_at < mine)`.
 The season is the engine version; a rules change starts every board fresh.
+`period` is `weekly`, `monthly`, `all` or `challenge` — and `daily`: every
+ranked run also keeps its Istanbul day's best, which no route serves as a
+board; the league adds those rows up (`LeaderboardPeriod::calendar()`).

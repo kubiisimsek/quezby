@@ -119,6 +119,22 @@ export function SystemPage() {
           </p>
         </Callout>
       ) : null}
+      {!data.gd ? (
+        <Callout tone="bad" title="GD eksik: profil fotoğrafları yüklenemiyor">
+          <p>
+            PHP’nin GD eklentisi kurulu değil; API gelen her fotoğrafı onunla yeniden kaydeder, bu yüzden fotoğraf yüklemek hata veriyor. Hostun PHP
+            eklentilerinden gd’yi aç.
+          </p>
+        </Callout>
+      ) : null}
+      {!data.push ? (
+        <Callout tone="warn" title="Push bildirimleri kapalı">
+          <p>
+            Telefonlara bildirim gitmiyor. Sunucudaki .env dosyasında QUEZBY_PUSH_ENABLED açık, FIREBASE_PROJECT_ID ve FIREBASE_CREDENTIALS (Firebase
+            hizmet hesabının JSON anahtarının yolu) dolu olmalı; sonra önbelleği yenile.
+          </p>
+        </Callout>
+      ) : null}
       {pending > 0 ? (
         <Callout
           tone="warn"
@@ -152,6 +168,8 @@ export function SystemPage() {
               { label: 'Saat dilimi', value: data.timezone },
               { label: 'Sunucu saati', value: formatDateTime(data.serverTime) },
               { label: 'APP_KEY', value: <Tag tone={data.appKey ? 'ok' : 'bad'} label={data.appKey ? 'Tanımlı' : 'Eksik'} /> },
+              { label: 'GD (profil fotoğrafları)', value: <Tag tone={data.gd ? 'ok' : 'bad'} label={data.gd ? 'Kurulu' : 'Eksik'} /> },
+              { label: 'Push bildirimleri (Firebase)', value: <Tag tone={data.push ? 'ok' : 'warn'} label={data.push ? 'Açık' : 'Kapalı'} /> },
               { label: 'Yapılandırma önbelleği', value: <Tag tone={data.cached.config ? 'ok' : 'neutral'} label={data.cached.config ? 'Açık' : 'Kapalı'} /> },
               { label: 'Rota önbelleği', value: <Tag tone={data.cached.routes ? 'ok' : 'neutral'} label={data.cached.routes ? 'Açık' : 'Kapalı'} /> },
             ]}

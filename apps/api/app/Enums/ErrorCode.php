@@ -22,8 +22,14 @@ enum ErrorCode: string
     case RunRejected = 'run_rejected';
     case EngineOutdated = 'engine_outdated';
     case DailyAlreadyPlayed = 'daily_already_played';
-    case CannotFollowSelf = 'cannot_follow_self';
-    case FollowLimit = 'follow_limit';
+    case CannotBefriendSelf = 'cannot_befriend_self';
+    case FriendLimit = 'friend_limit';
+    case RequestLimit = 'request_limit';
+    case NotFriends = 'not_friends';
+    case MessageLimit = 'message_limit';
+    case DuelUnavailable = 'duel_unavailable';
+    case DuelLimit = 'duel_limit';
+    case PhotoInvalid = 'photo_invalid';
     case ChallengeInvalid = 'challenge_invalid';
     case IntegrityInvalid = 'integrity_invalid';
     case AttestKeyUnknown = 'attest_key_unknown';
@@ -38,10 +44,11 @@ enum ErrorCode: string
             self::Forbidden => 403,
             self::NotFound => 404,
             self::UsernameTaken, self::UsernameLocked, self::EmailTaken, self::AlreadyLinked, self::IdentityTaken, self::LastSignInMethod,
-            self::RunAlreadyFinished, self::DailyAlreadyPlayed, self::AttestKeyUnknown => 409,
+            self::RunAlreadyFinished, self::DailyAlreadyPlayed, self::AttestKeyUnknown, self::DuelUnavailable => 409,
             self::RunExpired => 410,
             self::ValidationFailed, self::UsernameInvalid, self::InvalidCredentials, self::IdentityInvalid,
-            self::RunRejected, self::EngineOutdated, self::CannotFollowSelf, self::FollowLimit,
+            self::RunRejected, self::EngineOutdated, self::CannotBefriendSelf, self::FriendLimit, self::RequestLimit,
+            self::NotFriends, self::MessageLimit, self::DuelLimit, self::PhotoInvalid,
             self::ChallengeInvalid, self::IntegrityInvalid => 422,
             self::TooManyRequests => 429,
             self::ServerError => 500,
@@ -50,14 +57,21 @@ enum ErrorCode: string
 
     /**
      * What the player reads, in the request's language (`lang/{locale}/errors.php`).
-     * `follow_limit` names the cap: `$replace['limit']`, else the configured one.
+     * A cap names itself: `$replace['limit']`, else the configured one.
      *
      * @param  array<string, int|string>  $replace
      */
     public function message(array $replace = []): string
     {
-        if ($this === self::FollowLimit) {
-            $replace += ['limit' => Locale::current()->group((int) config('quezby.follows.limit'))];
+        $limit = match ($this) {
+            self::FriendLimit => 'quezby.friends.limit',
+            self::RequestLimit => 'quezby.friends.pending_limit',
+            self::MessageLimit => 'quezby.inbox.phrases_per_day',
+            self::DuelLimit => 'quezby.duels.waiting_limit',
+            default => null,
+        };
+        if ($limit !== null) {
+            $replace += ['limit' => Locale::current()->group((int) config($limit))];
         }
 
         return __('errors.'.$this->value, $replace);

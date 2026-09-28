@@ -9,7 +9,8 @@ use Illuminate\Validation\Rule;
 /**
  * `StartRunRequest` in `packages/types`. An app that sends no versions is one
  * that predates them — it gets `engine_outdated`, not a validation error, so
- * it can tell the player to update.
+ * it can tell the player to update. A VS names either the friend it
+ * challenges (`opponent`) or the VS it answers (`duel`) — one of the two.
  */
 class StartRunRequest extends FormRequest
 {
@@ -22,7 +23,26 @@ class StartRunRequest extends FormRequest
             'mode' => ['sometimes', Rule::enum(RunMode::class)],
             'engineVersion' => ['sometimes', 'integer', 'min:0', 'max:65535'],
             'contentVersion' => ['sometimes', 'integer', 'min:0', 'max:65535'],
+            'opponent' => [
+                'nullable', 'string', 'max:40', 'prohibits:duel',
+                Rule::requiredIf(fn () => $this->input('mode') === RunMode::Vs->value && ! $this->filled('duel')),
+            ],
+            'duel' => ['nullable', 'string', 'ulid'],
         ];
+    }
+
+    public function opponent(): ?string
+    {
+        $opponent = $this->validated('opponent');
+
+        return $this->mode() === RunMode::Vs && is_string($opponent) && $opponent !== '' ? $opponent : null;
+    }
+
+    public function duel(): ?string
+    {
+        $duel = $this->validated('duel');
+
+        return $this->mode() === RunMode::Vs && is_string($duel) && $duel !== '' ? strtolower($duel) : null;
     }
 
     public function mode(): RunMode

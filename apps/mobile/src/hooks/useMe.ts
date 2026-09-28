@@ -55,7 +55,7 @@ export function rememberMe(user: Me, ranks?: Ranks | null): void {
   const next = useSession.getState();
   queryClient.setQueryData<MeResponse>(meKey(next.token), {
     user,
-    ranks: next.ranks ?? { daily: null, weekly: null, monthly: null, all: null },
+    ranks: next.ranks ?? { weekly: null, monthly: null, all: null },
   });
   appliedAt = queryClient.getQueryState(meKey(next.token))?.dataUpdatedAt ?? appliedAt;
 }

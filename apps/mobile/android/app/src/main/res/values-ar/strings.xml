@@ -1,0 +1,5 @@
+<resources>
+    <!-- The notification channel every push goes to (MainApplication, firebase.json). -->
+    <string name="notification_channel_social">الأصدقاء والتحديات</string>
+    <string name="notification_channel_social_description">طلبات الصداقة، ودعوات التحدي ونتائجه، ورسائل الأصدقاء</string>
+</resources>

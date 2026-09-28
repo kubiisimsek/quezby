@@ -70,6 +70,17 @@ için bu duraklama sonucu hiç değiştirmez — kurallar kilitli kalır. Sıral
 turda aynı duraklama checkpoint'lerde `slow_motion` olurdu; bu yüzden koç
 kartı yalnızca yerel deneme turunda vardır.
 
+### VS (iki arkadaş)
+
+VS turu da aynı motorla, aynı kurallarla oynanır: iki arkadaş aynı seed'i
+(dolayısıyla aynı reel dizisini) birer kez oynar, önce gönderen. Tur sunucuda
+tekrar oynatılır, checkpoint'leri alınır ve sert bayraklarla sıralı bir tur
+gibi denetlenir (*Hile koruması*). Temiz VS turu `played` olur; sert bayraklı
+tur `flagged` olur ve VS'i kaybeder — gönderenin turuysa VS hiç gönderilmez.
+Yüksek temiz skor kazanır, eşitlik beraberliktir. VS hiçbir tabloya, lige,
+istatistiğe ya da rekora yazılmaz ve ligin açılması için sayılmaz; kurallar ve
+akış: [overview.md](./overview.md) → *Arkadaşlar*.
+
 ## Zorluk eğrileri (reel `n`, 0'dan başlar)
 
 Pencere, altın çubuğun dolum süresi ve yeşil bölge aynı hiperbolik eğriyi izler:
@@ -183,6 +194,8 @@ altın skoru ve geçmişi tutar.
   (`leaderboard_entries.season`) ve her sorgu geçerli sezona bakar. Kurallar bir
   gün değişirse eski skorlar yenileriyle asla aynı tabloya çıkmaz; "Tüm
   zamanlar" sezonun tüm zamanlarıdır. Oyuncunun rekoru da sezonun rekorudur.
+  Eski motorla açılmış, cevap bekleyen bir VS de düşer (`expired`): iki turu
+  aynı kurallarla oynanamaz.
 
 ### Bir kuralı değiştirmek (yeni sezon)
 
@@ -220,7 +233,8 @@ görünen her sayı sunucudan gelir.
    altınların ≥%90'ı mükemmel, oyuncunun sezon rekorunun ≥3 katı, aynı telefondan
    ikinci hesabın aynı günlük akışı. Sinyalli bir skor sezonun ilk 10'una ya da
    haftanın ilk 3'üne girecekse `review` olur ve bir moderatör bakana kadar
-   tabloya çıkmaz.
+   tabloya çıkmaz. VS turunda yumuşak sinyale bakılmaz: sıralamaya girmediği
+   için bekletilecek bir skoru yoktur; yalnızca sert bayraklar sayılır.
 6. Eşikler 8.000 simüle tura karşı kalibre edildi; hiçbir dürüst profil
    yakalanmaz (`tests/Unit/RunVerifierTest.php`).
 7. Moderasyon: **yönetim paneli** (`apps/admin` — Şüpheliler: inceleme
@@ -229,10 +243,13 @@ görünen her sayı sunucudan gelir.
    `quezby:run:approve|reject`, `quezby:user:ban|unban`, `quezby:runs:expire`;
    SSH'sız hostlarda `POST /api/v1/ops/moderate` (`MODERATION_TOKEN`). Hangi
    yoldan yapılırsa yapılsın her karar, kimin verdiğiyle denetim kaydına geçer.
+   VS turları bunun dışındadır: hiçbir yerde sıralanmadıkları için ne
+   onaylanır ne reddedilir.
 8. **Kontrol noktaları — yavaşlatılmış oyuna karşı.** `wall_clock` yalnızca alt
-   sınırdır: yavaşlatılmış (speed-hack) bir oyun onu geçer. Bu yüzden sıralı bir
-   turda uygulama, geri sayımdan sonraki oyun saatinin 45., 120. ve 240.
-   saniyelerinde (`CHECKPOINTS.marksMs`) sunucuya kaç reel oynadığını ve tam o
+   sınırdır: yavaşlatılmış (speed-hack) bir oyun onu geçer. Bu yüzden
+   sunucunun açtığı her turda (VS dahil; deneme turu hariç) uygulama, geri
+   sayımdan sonraki oyun saatinin 45., 120. ve 240. saniyelerinde
+   (`CHECKPOINTS.marksMs`) sunucuya kaç reel oynadığını ve tam o
    hareketlerin SHA-256 özetini (`prefixHash`) bildirir. Sunucu gördüğü anı
    imzalayıp **veritabanına yazmadan** bir makbuz döner; bitiş bu makbuzları
    taşır. Yolda kaybolan bir bildirim (yanıt yok, zaman aşımı ya da 5xx) borç

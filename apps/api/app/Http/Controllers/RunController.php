@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ErrorCode;
 use App\Enums\Locale;
+use App\Enums\RunMode;
+use App\Exceptions\ApiException;
 use App\Http\Requests\CheckpointRequest;
 use App\Http\Requests\FinishRunRequest;
 use App\Http\Requests\StartRunRequest;
@@ -10,7 +13,9 @@ use App\Http\Resources\MeResource;
 use App\Http\Resources\RunResultResource;
 use App\Models\User;
 use App\Services\LeaderboardService;
+use App\Services\PlayerDirectory;
 use App\Services\RunService;
+use App\Services\Social\DuelService;
 use App\Support\Timestamp;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\JsonResponse;
@@ -21,14 +26,17 @@ class RunController extends Controller
         private readonly RunService $runs,
     ) {}
 
-    public function store(StartRunRequest $request, #[CurrentUser] User $user): JsonResponse
+    public function store(StartRunRequest $request, #[CurrentUser] User $user, PlayerDirectory $players): JsonResponse
     {
+        $opponent = $request->opponent();
         $run = $this->runs->start(
             $user,
             $request->mode(),
             $request->engineVersion(),
             $request->contentVersion(),
             $request->appVersion(),
+            $opponent === null ? null : ($players->find($opponent, $user) ?? throw ApiException::of(ErrorCode::NotFound)),
+            $request->duel(),
         );
 
         return response()->json([
@@ -38,6 +46,7 @@ class RunController extends Controller
             'contentVersion' => $run->content_version,
             'mode' => $run->mode->value,
             'dayKey' => $run->daily_key,
+            'duelId' => $run->duel_id,
             'startedAt' => Timestamp::iso($run->started_at),
         ], 201);
     }
@@ -55,6 +64,8 @@ class RunController extends Controller
         string $runId,
         #[CurrentUser] User $user,
         LeaderboardService $leaderboards,
+        DuelService $duels,
+        PlayerDirectory $players,
     ): JsonResponse {
         $finished = $this->runs->finish(
             $user,
@@ -67,6 +78,7 @@ class RunController extends Controller
 
         $outcome = $finished->outcome;
         $ranks = $outcome?->after ?? $leaderboards->ranksFor($user);
+        $duel = $finished->duel;
 
         return response()->json([
             'run' => new RunResultResource($finished->run),
@@ -78,16 +90,20 @@ class RunController extends Controller
             'daily' => $finished->daily,
             'league' => $finished->league,
             'leagueUnlock' => $finished->leagueUnlock,
-            'shareText' => $finished->daily['shareText'] ?? $this->shareText($finished->run->score ?? 0, $finished->run->reels ?? 0, $ranks['daily']),
+            // A VS is between two friends: nothing of it is for sharing.
+            'shareText' => $finished->run->mode === RunMode::Vs
+                ? null
+                : $finished->daily['shareText'] ?? $this->shareText($finished->run->score ?? 0, $finished->run->reels ?? 0, $ranks['weekly']),
+            'duel' => $duel === null ? null : $duels->view($user, $duel, $players->summary($user, User::query()->findOrFail($duel->otherOf($user)))),
         ]);
     }
 
     /**
      * What "Paylaş" sends after a free run, from the server's own numbers, in
-     * the request's language (`lang/{locale}/share.php`) — with today's rank
-     * once the run has one.
+     * the request's language (`lang/{locale}/share.php`) — with this week's
+     * rank once the run has one.
      */
-    private function shareText(int $score, int $reels, ?int $dailyRank): string
+    private function shareText(int $score, int $reels, ?int $weekRank): string
     {
         $locale = Locale::current();
         $replace = [
@@ -95,8 +111,8 @@ class RunController extends Controller
             'posts' => trans_choice('share.posts', $reels, ['count' => $locale->group($reels)]),
         ];
 
-        return $dailyRank === null
+        return $weekRank === null
             ? __('share.free', $replace)
-            : __('share.free_ranked', $replace + ['rank' => $locale->group($dailyRank)]);
+            : __('share.free_ranked', $replace + ['rank' => $locale->group($weekRank)]);
     }
 }

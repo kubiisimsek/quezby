@@ -7,8 +7,10 @@
  *   except under `assets/`, where a missing file is a 404 — never HTML
  *   parsed as JavaScript after a deploy;
  * - `index.html` is never cached and the hashed assets are cached for good;
- * - the Content-Security-Policy lets scripts come only from the panel itself
- *   and requests go only to the panel and the API it was built for.
+ * - the Content-Security-Policy lets scripts come only from the panel itself,
+ *   requests go only to the panel and the API it was built for, and images
+ *   only from the panel and that API — players' profile photos are served
+ *   by it (`/api/v1/media/avatars/…`).
  *
  * Styles allow 'unsafe-inline': Radix and Sonner insert small `<style>` tags.
  */
@@ -19,12 +21,13 @@
  */
 export function contentSecurityPolicy({ apiOrigin }) {
   const connect = ["'self'", apiOrigin].filter(Boolean).join(' ');
+  const img = ["'self'", 'data:', apiOrigin].filter(Boolean).join(' ');
 
   return [
     "default-src 'self'",
     "script-src 'self'",
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data:",
+    `img-src ${img}`,
     "font-src 'self'",
     `connect-src ${connect}`,
     "frame-ancestors 'none'",

@@ -20,6 +20,13 @@ const tr = {
     badge: (label: string, count: number) => `${label}, ${count} yeni`,
   },
   socialButton: { apple: 'Apple ile devam et', google: 'Google ile devam et' },
+  faceOff: {
+    versus: 'VS',
+    /** Two players face to face, as a screen reader says it. */
+    label: (left: string, right: string) => `${left} VS ${right}`,
+  },
+  /** A notification over the game while it is open. */
+  toast: { open: 'Açmak için dokun' },
   passwordField: { show: 'Şifreyi göster', hide: 'Şifreyi gizle' },
   playerRow: {
     me: (name: string) => `${name} · sen`,
@@ -39,6 +46,8 @@ const en: KitMessages = {
     badge: (label, count) => `${label}, ${count} new`,
   },
   socialButton: { apple: 'Continue with Apple', google: 'Continue with Google' },
+  faceOff: { versus: 'VS', label: (left, right) => `${left} VS ${right}` },
+  toast: { open: 'Tap to open' },
   passwordField: { show: 'Show password', hide: 'Hide password' },
   playerRow: {
     me: (name) => `${name} · you`,
@@ -56,6 +65,8 @@ const de: KitMessages = {
     badge: (label, count) => `${label}, ${count} neu`,
   },
   socialButton: { apple: 'Mit Apple fortfahren', google: 'Weiter mit Google' },
+  faceOff: { versus: 'VS', label: (left, right) => `${left} VS ${right}` },
+  toast: { open: 'Zum Öffnen tippen' },
   passwordField: { show: 'Passwort anzeigen', hide: 'Passwort verbergen' },
   playerRow: {
     me: (name) => `${name} · du`,
@@ -73,6 +84,8 @@ const ar: KitMessages = {
     badge: (label, count) => `${label}، الجديد: ${count}`,
   },
   socialButton: { apple: 'المتابعة باستخدام Apple', google: 'المتابعة باستخدام Google' },
+  faceOff: { versus: 'ضد', label: (left, right) => `${left} ضد ${right}` },
+  toast: { open: 'اضغط للفتح' },
   passwordField: { show: 'إظهار كلمة المرور', hide: 'إخفاء كلمة المرور' },
   playerRow: {
     me: (name) => `${iso(name)} · أنت`,
@@ -94,6 +107,8 @@ const fr: KitMessages = {
       }),
   },
   socialButton: { apple: 'Continuer avec Apple', google: 'Continuer avec Google' },
+  faceOff: { versus: 'VS', label: (left, right) => `${left} VS ${right}` },
+  toast: { open: 'Touche pour ouvrir' },
   passwordField: { show: 'Afficher le mot de passe', hide: 'Masquer le mot de passe' },
   playerRow: {
     me: (name) => `${name} · toi`,
@@ -115,6 +130,8 @@ const es: KitMessages = {
       }),
   },
   socialButton: { apple: 'Continuar con Apple', google: 'Continuar con Google' },
+  faceOff: { versus: 'VS', label: (left, right) => `${left} VS ${right}` },
+  toast: { open: 'Toca para abrir' },
   passwordField: { show: 'Mostrar contraseña', hide: 'Ocultar contraseña' },
   playerRow: {
     me: (name) => `${name} · tú`,

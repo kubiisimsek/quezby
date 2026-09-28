@@ -7,7 +7,11 @@
 - **The panel judges nothing.** It never imports `@quezby/engine` (lint) and
   never computes a score, rank, flag, risk or rate: it shows what the API
   sends. Approving or rejecting a run goes through `ModerationService`, nowhere
-  else.
+  else; a VS run never ranks, so it is neither approved nor rejected — the API
+  changes nothing (`changed: false`) and the panel offers neither
+  (`isApprovable` / `isRejectable` in `lib/permissions.ts`). Taking a photo
+  down and letting a player's reports go are `ReportService`'s; resetting a
+  name closes the reports about it too.
 - **The API decides every permission.** Every admin route but the login
   declares its least role (`admin.role:viewer|moderator|owner`) and is listed
   in `RolesTest`. The panel only hides what a role cannot use (`lib/permissions.ts`,
@@ -18,8 +22,14 @@
 - **Every change is on record.** A new mutating admin route writes an
   `AuditEntry` (with an `AuditAction` added on both sides of the contract) in
   the same transaction as the change. The audit log is never updated or deleted.
-- **Moderation says why.** Banning, renaming, rejecting and deleting take a
-  reason (3–191 characters); deleting a player also takes their username typed out.
+- **Moderation says why.** Banning, renaming, removing a photo, dismissing
+  reports, rejecting and deleting take a reason (3–191 characters), and each is
+  audited with it — a photo taken down as `player.avatar_remove`, reports let
+  go as `player.reports_dismiss`; deleting a player also takes their username
+  typed out.
+- **A report never names its reporter.** The game promises it ("kimin
+  bildirdiği söylenmez"): `AdminReportRow` carries none, and the panel asks
+  for none.
 - Secrets never reach the bundle. `VITE_*` values are public; only
   `VITE_API_ORIGIN` exists, and `scripts/package-admin.mjs` refuses a build
   with any other. The system page shows whether a token is set, never its value.
@@ -46,5 +56,5 @@
   `src/test/`. Every admin endpoint has a Pest feature test.
 - Hosting: `pnpm admin:package:staging|production` → one zip for the
   subdomain's document root (`docs/deployment/shared-hosting.md`). The build
-  writes `.htaccess` (routing, caching, CSP naming the API) from
-  `deploy/htaccess.mjs`; edit that, never the output.
+  writes `.htaccess` (routing, caching, a CSP naming the API for requests and
+  for players' photos) from `deploy/htaccess.mjs`; edit that, never the output.

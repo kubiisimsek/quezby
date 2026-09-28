@@ -11,34 +11,36 @@ use App\Services\LeagueService;
 use Illuminate\Support\Carbon;
 
 /*
-| The league opens to a new player after three counted runs — ranked, and
-| scoring. The first-launch practice run never reaches the API, so it never
-| counts. Once a player has sat in a league, it stays open to them.
+| The league opens to a new player after twenty counted runs — ranked, and
+| scoring (`leagues.unlock_runs`). The first-launch practice run never
+| reaches the API and a VS never ranks, so neither counts. Once a player has
+| sat in a league, it stays open to them.
 */
 
 beforeEach(function () {
     Carbon::setTestNow(Carbon::parse('2026-09-23 12:00', 'Europe/Istanbul')); // Wednesday, 2026-W39
 });
 
-test('the third counted run opens the league', function () {
-    $this->signIn();
+test('the twentieth counted run opens the league', function () {
+    $user = $this->signIn();
     $this->getJson('/api/v1/leagues/current')->assertOk()
         ->assertJsonPath('joined', false)
-        ->assertJsonPath('unlock', ['required' => 3, 'remaining' => 3]);
+        ->assertJsonPath('unlock', ['required' => 20, 'remaining' => 20]);
 
     $this->playFeed()->assertOk()
         ->assertJsonPath('league', null)
-        ->assertJsonPath('leagueUnlock', ['required' => 3, 'remaining' => 2]);
+        ->assertJsonPath('leagueUnlock', ['required' => 20, 'remaining' => 19]);
+    Run::factory()->for($user)->ranked(100)->count(17)->create();
     $this->playFeed()->assertOk()
         ->assertJsonPath('league', null)
-        ->assertJsonPath('leagueUnlock', ['required' => 3, 'remaining' => 1]);
+        ->assertJsonPath('leagueUnlock', ['required' => 20, 'remaining' => 1]);
     $this->getJson('/api/v1/leagues/current')
         ->assertJsonPath('joined', false)
-        ->assertJsonPath('unlock', ['required' => 3, 'remaining' => 1]);
+        ->assertJsonPath('unlock', ['required' => 20, 'remaining' => 1]);
 
-    $third = $this->playFeed()->assertOk();
+    $twentieth = $this->playFeed()->assertOk();
 
-    $third->assertJsonPath('league.tier', 'bronze')
+    $twentieth->assertJsonPath('league.tier', 'bronze')
         ->assertJsonPath('league.rank', 1)
         ->assertJsonPath('leagueUnlock', null);
     $this->getJson('/api/v1/leagues/current')
@@ -54,18 +56,18 @@ test('runs that scored nothing, were flagged or are held do not count', function
     Run::factory()->for($user)->ranked(5000)->create(['status' => RunStatus::Review]);
     Run::factory()->for($user)->create();
 
-    $this->getJson('/api/v1/leagues/current')->assertJsonPath('unlock', ['required' => 3, 'remaining' => 3]);
+    $this->getJson('/api/v1/leagues/current')->assertJsonPath('unlock', ['required' => 20, 'remaining' => 20]);
 
     Run::factory()->for($user)->ranked(10)->create();
-    $this->getJson('/api/v1/leagues/current')->assertJsonPath('unlock', ['required' => 3, 'remaining' => 2]);
+    $this->getJson('/api/v1/leagues/current')->assertJsonPath('unlock', ['required' => 20, 'remaining' => 19]);
 });
 
 test('only the player\'s own runs count', function () {
     $user = $this->signIn();
     Run::factory()->ranked(5000)->count(3)->create();
 
-    $this->getJson('/api/v1/leagues/current')->assertJsonPath('unlock', ['required' => 3, 'remaining' => 3]);
-    expect(app(LeagueService::class)->unlock($user))->toBe(['required' => 3, 'remaining' => 3]);
+    $this->getJson('/api/v1/leagues/current')->assertJsonPath('unlock', ['required' => 20, 'remaining' => 20]);
+    expect(app(LeagueService::class)->unlock($user))->toBe(['required' => 20, 'remaining' => 20]);
 });
 
 test('a player who has sat in a league before is seated on their first run', function () {
@@ -88,6 +90,7 @@ test('a player who has sat in a league before is seated on their first run', fun
 });
 
 test('the player who opens the league mid-week brings the week\'s earlier bests', function () {
+    config(['quezby.leagues.unlock_runs' => 3]);
     $player = User::factory()->withUsername('hafta.ici')->create();
     $leagues = app(LeagueService::class);
 

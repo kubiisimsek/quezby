@@ -98,10 +98,31 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('search', fn (Request $request) => Limit::perMinute(30)
             ->by($request->user()?->getAuthIdentifier() ?? $request->ip()));
 
-        RateLimiter::for('follow', fn (Request $request) => Limit::perMinute(60)
+        // Friend requests, answers and blocks; declining a VS.
+        RateLimiter::for('social', fn (Request $request) => Limit::perMinute(60)
+            ->by($request->user()?->getAuthIdentifier() ?? $request->ip()));
+
+        // Phrases sent to friends; each friend also has a daily cap (`inbox.phrases_per_day`).
+        RateLimiter::for('messages', fn (Request $request) => Limit::perMinute(30)
+            ->by($request->user()?->getAuthIdentifier() ?? $request->ip()));
+
+        // Profile photos are fetched without a token: a board shows up to a hundred at once.
+        RateLimiter::for('media', fn (Request $request) => Limit::perMinute(600)->by($request->ip()));
+
+        RateLimiter::for('avatar', fn (Request $request) => Limit::perHour(10)
+            ->by($request->user()?->getAuthIdentifier() ?? $request->ip()));
+
+        RateLimiter::for('reports', fn (Request $request) => Limit::perHour(10)
+            ->by($request->user()?->getAuthIdentifier() ?? $request->ip()));
+
+        RateLimiter::for('push-token', fn (Request $request) => Limit::perMinute(20)
             ->by($request->user()?->getAuthIdentifier() ?? $request->ip()));
 
         RateLimiter::for('reads', fn (Request $request) => Limit::perMinute(60)
+            ->by($request->user()?->getAuthIdentifier() ?? $request->ip()));
+
+        // The inbox's pulse: every 3 s on the friends screens, every 10 s elsewhere — with room for a second phone.
+        RateLimiter::for('pulse', fn (Request $request) => Limit::perMinute(60)
             ->by($request->user()?->getAuthIdentifier() ?? $request->ip()));
 
         // A phone sends its visits as it goes to the background — a few a day; a burst after a long offline stretch fits.

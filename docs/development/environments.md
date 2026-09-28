@@ -90,6 +90,10 @@ go to TestFlight / Play internal testing, production builds to the stores —
 "Quezby Staging" on the home screen tells them apart. They share one build
 number sequence, so every upload needs a higher build number (iOS
 `CURRENT_PROJECT_VERSION`, Android `versionCode`) than any before it.
+The version players see is one number on both (iOS `MARKETING_VERSION`,
+Android `versionName`, `apps/mobile/package.json` — 1.0.0 today), and the
+API holds it against `QUEZBY_IOS_MIN_VERSION` / `QUEZBY_ANDROID_MIN_VERSION`:
+a build below the minimum opens on "Güncelleme gerekli" and goes no further.
 
 A release build is signed with the Google Play upload key when
 `~/.gradle/gradle.properties` names it (`QUEZBY_UPLOAD_STORE_FILE`,
@@ -102,7 +106,17 @@ installs on a phone, Google Play refuses it. Making the key:
 
 Usage analytics and the device registry (`QUEZBY_ANALYTICS_*`,
 `QUEZBY_DEVICE_DAYS`) have the same defaults in every environment — what they
-do and when to turn them: `docs/product/analytics.md`.
+do and when to turn them: `docs/product/analytics.md`. So do the league's
+threshold (`QUEZBY_LEAGUE_UNLOCK_RUNS`, 20 counted runs), how long a VS waits
+for its answer (`QUEZBY_DUEL_EXPIRE_HOURS`, 48) and how long conversation
+lines stay (`QUEZBY_INBOX_KEEP_DAYS`, 90). Push has three variables of its
+own — *Push notifications* below.
+
+Profile photos are re-encoded with PHP's **GD** extension, so every
+environment needs it (without it an upload answers `500`; the admin panel's
+Sistem page says "GD eksik"). They are kept in `storage/app/avatars` —
+outside the web root, served by the API itself (`GET /api/v1/media/avatars/{file}`),
+and never part of an update zip.
 
 `apps/api/.env.example` is local development (SQLite, debug on).
 `.env.staging.example` and `.env.production.example` are the hosting
@@ -186,12 +200,68 @@ for review).
   at production never ranks either. App Attest does not run in the iOS
   Simulator — there a device simply stays unverified.
 
+## Push notifications (Firebase Cloud Messaging)
+
+Friends' news — a request, a request accepted, a VS sent or ended, a phrase —
+reaches the phone through Firebase Cloud Messaging.
+`docs/development/push-setup.md` walks through the consoles step by step;
+`docs/backend/api-contract.md` → *Push* says what is sent when.
+
+- **One Firebase project for every environment.** The app has one id, so it
+  carries one Firebase config: the owner's project, `quezby-staging`, serves
+  local, staging and production alike. An FCM token belongs to the project
+  whose config made it, so every API — production included — sends with
+  `FIREBASE_PROJECT_ID=quezby-staging` and a service-account key from that
+  project.
+- **The app's two Firebase files are git-ignored**, downloaded from the
+  Firebase console: `apps/mobile/ios/Quezby/GoogleService-Info.plist` and
+  `apps/mobile/android/app/google-services.json`. Without them the app still
+  builds, with no push: the Xcode build phase **Copy Firebase config** copies
+  the plist into the app when it is there (and warns when it is not),
+  `AppDelegate.swift` calls `FirebaseApp.configure()` only when the plist is
+  bundled, and `android/app/build.gradle` applies the `google-services` plugin
+  only when the json exists. The app then counts push as unavailable: no
+  notifications step, and Ayarlar → Bildirimler says so.
+- **No token before a yes.** `apps/mobile/firebase.json` turns messaging
+  auto-init off: the app asks Firebase for a token only once the player
+  allowed notifications, and hands it to the API (`PUT /me/push-token`);
+  signing out takes it back and deletes it on the phone.
+- **iOS** — `aps-environment` in `Quezby/Quezby.entitlements` reads the
+  `APS_ENVIRONMENT` build setting: `development` for Debug, `production` for
+  Release (TestFlight and the App Store always use production). The App ID
+  needs Push Notifications, and Firebase an APNs key. The Podfile sets
+  `$RNFirebaseDisableSPM = true` — Firebase comes as pods, since the app links
+  its pods as static libraries, which Firebase's Swift packages do not
+  support — and gives the Firebase pods `modular_headers`. Google stops
+  publishing new Firebase versions to CocoaPods after October 2026
+  ([Migrate from CocoaPods](https://firebase.google.com/docs/ios/cocoapods-deprecation)):
+  the versions in `Podfile.lock` keep installing and working, but a newer
+  Firebase will mean Swift Package Manager.
+- **Android** — `POST_NOTIFICATIONS` (asked on Android 13 and later), the
+  notification channel `social` created in `MainApplication.kt` and named in
+  the phone's language (`res/values*/strings.xml`), the status-bar icon
+  `@drawable/ic_stat_quezby` tinted `@color/notification`.
+- **API** — `QUEZBY_PUSH_ENABLED` (true), `FIREBASE_PROJECT_ID`,
+  `FIREBASE_CREDENTIALS` (the service account's JSON key, absolute or relative
+  to the API's root: `storage/app/private/firebase-push.json`, never in git or
+  a zip). Nothing is sent until all three are set; the admin panel's Sistem
+  page says whether they are.
+- **Trying it** — end to end on a real iPhone, or an Android emulator with
+  Google Play; the iOS Simulator is not used for that. There,
+  `xcrun simctl push` shows how a notification looks and where a tap leads
+  (`push-setup.md` → *Deneme*).
+
 ## Outside the repo
 
 - Apple Developer: one App ID, `com.kubisimsek.game.quezby`, with
-  "Sign in with Apple" and "App Attest"; one app in App Store Connect.
+  "Sign in with Apple", "App Attest" and "Push Notifications"; an APNs key;
+  one app in App Store Connect.
 - Google Cloud: the OAuth clients above; the Play Integrity API and its
   service account.
+- Firebase: the project `quezby-staging` with the iOS and the Android app
+  `com.kubisimsek.game.quezby`, the APNs key uploaded, the Firebase Cloud
+  Messaging API (V1) on, and a service account with "Firebase Cloud Messaging
+  API Admin".
 - Google Play: one app, `com.kubisimsek.game.quezby`.
 - DNS: `staging-api.quezby.com` and `api.quezby.com` (or whatever you set in
   `apps/mobile/.env`) pointing at the hosting, each with HTTPS.

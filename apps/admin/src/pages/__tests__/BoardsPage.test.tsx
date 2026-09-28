@@ -13,7 +13,7 @@ function withBoard(rows = [boardRow(), boardRow({ rank: 2, player: { id: '01jpla
 }
 
 describe('BoardsPage', () => {
-  it('shows today\'s board ranked, with the signals behind each row', async () => {
+  it('shows this week\'s board ranked, with the signals behind each row', async () => {
     const api = withBoard();
     renderApp({ path: '/boards', api });
 
@@ -22,18 +22,19 @@ describe('BoardsPage', () => {
     expect(screen.getAllByText('250.311').length).toBeGreaterThan(0);
     expect(screen.getByText('Cihaz kararı yok')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: '#2 turunu aç' })).toHaveAttribute('href', '/runs/01jrun000000000000000000cd');
-    expect(api.boards.get).toHaveBeenCalledWith({ board: 'daily', key: undefined, season: undefined, page: 1 });
+    expect(api.boards.get).toHaveBeenCalledWith({ board: 'weekly', key: undefined, season: undefined, page: 1 });
+    expect(screen.queryByRole('tab', { name: 'Bugün' })).not.toBeInTheDocument();
   });
 
   it('switches boards and starts each at its current period', async () => {
     const api = withBoard();
-    const { user } = renderApp({ path: '/boards?key=2026-09-24', api });
+    const { user } = renderApp({ path: '/boards?key=2026-W38', api });
 
     await screen.findByText('@ekin');
-    await user.click(screen.getByRole('tab', { name: 'Hafta' }));
+    await user.click(screen.getByRole('tab', { name: 'Ay' }));
 
-    await waitFor(() => expect(api.boards.get).toHaveBeenLastCalledWith({ board: 'weekly', key: undefined, season: undefined, page: 1 }));
-    expect(api.boards.keys).toHaveBeenLastCalledWith({ board: 'weekly', season: undefined, limit: 60 });
+    await waitFor(() => expect(api.boards.get).toHaveBeenLastCalledWith({ board: 'monthly', key: undefined, season: undefined, page: 1 }));
+    expect(api.boards.keys).toHaveBeenLastCalledWith({ board: 'monthly', season: undefined, limit: 60 });
   });
 
   it('lets a moderator throw out the run behind a row', async () => {

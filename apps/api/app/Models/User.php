@@ -27,6 +27,8 @@ use Laravel\Sanctum\HasApiTokens;
  * @property Carbon|null $banned_at
  * @property string|null $ban_reason
  * @property Carbon|null $analytics_at When the player said yes to usage analytics.
+ * @property string|null $avatar The profile photo's file on the `avatars` disk (`AvatarService`).
+ * @property int $inbox_stamp Moves with every request, friendship, line and VS of the player's (`InboxStamp`).
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
@@ -37,7 +39,8 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, HasUlids;
 
-    public const DEFAULT_SETTINGS = ['haptics' => true];
+    /** A setting the player never touched: haptics on, and a push for each kind of news. */
+    public const DEFAULT_SETTINGS = ['haptics' => true, 'pushFriends' => true, 'pushVs' => true, 'pushMessages' => true];
 
     /**
      * Eloquent does not read the columns' defaults back after an insert, so a
@@ -63,6 +66,7 @@ class User extends Authenticatable
             'settings' => 'array',
             'banned_at' => 'datetime',
             'analytics_at' => 'datetime',
+            'inbox_stamp' => 'integer',
         ];
     }
 
@@ -108,16 +112,10 @@ class User extends Authenticatable
         return $this->hasOne(PlayerStat::class);
     }
 
-    /** @return BelongsToMany<User, $this> Players this one follows. */
-    public function following(): BelongsToMany
+    /** @return BelongsToMany<User, $this> This player's friends — one row of each friendship is theirs (`FriendService`). */
+    public function friends(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'follows', 'follower_id', 'followee_id');
-    }
-
-    /** @return BelongsToMany<User, $this> Players who follow this one. */
-    public function followers(): BelongsToMany
-    {
-        return $this->belongsToMany(User::class, 'follows', 'followee_id', 'follower_id');
+        return $this->belongsToMany(User::class, 'friendships', 'user_id', 'friend_id');
     }
 
     /** No email, Apple or Google attached yet — the account lives on one phone. */
@@ -136,7 +134,7 @@ class User extends Authenticatable
      * The settings as the app reads them. `analytics` is the consent, kept as
      * its moment (`analytics_at`), never in the settings column.
      *
-     * @return array{haptics: bool, analytics: bool}
+     * @return array{haptics: bool, analytics: bool, pushFriends: bool, pushVs: bool, pushMessages: bool}
      */
     public function resolvedSettings(): array
     {
@@ -145,6 +143,15 @@ class User extends Authenticatable
         return [
             'haptics' => (bool) $settings['haptics'],
             'analytics' => $this->analytics_at !== null,
+            'pushFriends' => (bool) $settings['pushFriends'],
+            'pushVs' => (bool) $settings['pushVs'],
+            'pushMessages' => (bool) $settings['pushMessages'],
         ];
+    }
+
+    /** @return HasMany<PushToken, $this> The phones that take this player's pushes. */
+    public function pushTokens(): HasMany
+    {
+        return $this->hasMany(PushToken::class);
     }
 }

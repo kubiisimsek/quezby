@@ -14,6 +14,7 @@ use App\Game\EngineError;
 use App\Models\Run;
 use App\Models\User;
 use App\Services\Integrity\DeviceIntegrity;
+use App\Services\Social\DuelService;
 use Carbon\CarbonInterface;
 use Illuminate\Container\Attributes\Config;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -39,6 +40,7 @@ final class RunService
         private readonly LeagueService $leagues,
         private readonly DeviceIntegrity $devices,
         private readonly Checkpoint $checkpoints,
+        private readonly DuelService $duels,
         #[Config('quezby.plausibility')]
         private readonly array $plausibility,
     ) {}
@@ -47,8 +49,11 @@ final class RunService
      * Hands out a seed. A player has one open run at a time — starting
      * another abandons it — and one daily run per Istanbul day. The run
      * records the player's device verdict standing now; the finish judges it.
+     *
+     * A VS run either opens a VS against `$opponent`, on a fresh seed, or
+     * answers the one `$duelId` names, on its seed.
      */
-    public function start(User $user, RunMode $mode, int $engineVersion, int $contentVersion, ?string $appVersion): Run
+    public function start(User $user, RunMode $mode, int $engineVersion, int $contentVersion, ?string $appVersion, ?User $opponent = null, ?string $duelId = null): Run
     {
         if ($user->username === null) {
             throw ValidationException::withMessages([
@@ -70,24 +75,37 @@ final class RunService
 
         for ($attempt = 0; ; $attempt++) {
             try {
-                return DB::transaction(function () use ($user, $mode, $dayKey, $contentVersion, $appVersion, $deviceVerdict, $now) {
+                return DB::transaction(function () use ($user, $mode, $dayKey, $contentVersion, $appVersion, $deviceVerdict, $now, $opponent, $duelId) {
                     Run::query()
                         ->where('open_user_id', $user->id)
                         ->where('status', RunStatus::Started)
                         ->update(['status' => RunStatus::Abandoned, 'open_user_id' => null, 'finished_at' => $now]);
 
-                    return $user->runs()->create([
-                        'seed' => $dayKey === null ? random_int(1, 4294967295) : $this->daily->seed($dayKey),
+                    $duel = null;
+                    if ($mode === RunMode::Vs) {
+                        $duel = $duelId !== null
+                            ? $this->duels->answer($user, $duelId)
+                            : $this->duels->challenge($user, $opponent ?? throw ApiException::of(ErrorCode::NotFound), $contentVersion);
+                    }
+
+                    $run = $user->runs()->create([
+                        'seed' => $duel?->seed ?? ($dayKey === null ? random_int(1, 4294967295) : $this->daily->seed($dayKey)),
                         'engine_version' => config('quezby.engine_version'),
-                        'content_version' => $contentVersion,
+                        'content_version' => $duel?->content_version ?? $contentVersion,
                         'app_version' => $appVersion === null ? null : mb_substr($appVersion, 0, 32),
                         'device_verdict' => $deviceVerdict,
                         'status' => RunStatus::Started,
                         'mode' => $mode,
                         'daily_key' => $dayKey,
+                        'duel_id' => $duel?->id,
                         'open_user_id' => $user->id,
                         'started_at' => $now,
                     ]);
+                    if ($duel !== null) {
+                        $this->duels->attach($duel, $run);
+                    }
+
+                    return $run;
                 });
             } catch (UniqueConstraintViolationException $error) {
                 if ($dayKey !== null && $user->runs()->where('daily_key', $dayKey)->exists()) {
@@ -127,7 +145,8 @@ final class RunService
     /**
      * Replays the player's log and stores the server's result. Only a
      * `ranked` run touches the boards, the league and the lifetime numbers;
-     * a run quit before the first point is kept but places nobody.
+     * a run quit before the first point is kept but places nobody. A VS run
+     * is `played` (or `flagged`): it only settles its VS.
      *
      * @param  array<mixed>  $actions
      * @param  list<string>  $checkpoints  the receipts the app collected on the way
@@ -171,9 +190,15 @@ final class RunService
         }
 
         $summary = $verification->summary();
-        $verification = $verification->withSoft($this->historySignals($user, $run, $summary->score));
+        $ranks = $run->mode->ranks();
+        if ($ranks) {
+            $verification = $verification->withSoft($this->historySignals($user, $run, $summary->score));
+        }
         $stats = $this->statsBuilder->build($verification->replay, $run->seed, $run->content_version);
-        $status = $this->statusOf($verification, $user, $summary->score, $now);
+        $status = $ranks
+            ? $this->statusOf($verification, $user, $summary->score, $now)
+            // A VS never ranks, so nothing needs holding for a moderator: a clean run is played, a hard flag loses it.
+            : ($verification->hard === [] ? RunStatus::Played : RunStatus::Flagged);
 
         return DB::transaction(function () use ($user, $run, $claim, $verification, $summary, $stats, $status) {
             $closed = $this->close($run, $claim + [
@@ -207,10 +232,11 @@ final class RunService
                     $league = $this->leagues->join($run);
                 }
             }
-            $leagueUnlock = $league === null ? $this->leagues->unlock($user) : null;
+            $leagueUnlock = $league === null && $run->mode->ranks() ? $this->leagues->unlock($user) : null;
             $daily = $run->mode === RunMode::Daily ? $this->daily->resultFor($run) : null;
+            $duel = $run->mode === RunMode::Vs ? $this->duels->onRunFinished($run) : null;
 
-            return new FinishedRun($run, $outcome, $league, $leagueUnlock, $daily);
+            return new FinishedRun($run, $outcome, $league, $leagueUnlock, $daily, $duel);
         });
     }
 

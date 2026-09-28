@@ -12,6 +12,8 @@ enum AuditAction: string
     case PlayerRename = 'player.rename';
     case PlayerSignOut = 'player.sign_out';
     case PlayerDelete = 'player.delete';
+    case AvatarRemove = 'player.avatar_remove';
+    case ReportsDismiss = 'player.reports_dismiss';
     case RunApprove = 'run.approve';
     case RunReject = 'run.reject';
     case AdminCreate = 'admin.create';

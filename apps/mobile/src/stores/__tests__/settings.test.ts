@@ -4,6 +4,9 @@ import { useSettings } from '@/stores/settings';
 
 const KEY = 'quezby.settings.v1';
 
+/** What the account holds besides the two settings the phone keeps. */
+const ACCOUNT = { pushFriends: true, pushVs: true, pushMessages: true };
+
 async function stored(): Promise<unknown> {
   return JSON.parse((await AsyncStorage.getItem(KEY)) ?? 'null');
 }
@@ -33,7 +36,7 @@ describe('settings', () => {
     expect(useSettings.getState()).toMatchObject({ analytics: true, consent: 'pending' });
 
     // `/me` from before the answer reached the account must not undo it.
-    useSettings.getState().fromAccount({ haptics: false, analytics: false });
+    useSettings.getState().fromAccount({ ...ACCOUNT, haptics: false, analytics: false });
     expect(useSettings.getState()).toMatchObject({ haptics: false, analytics: true, consent: 'pending' });
 
     useSettings.getState().synced(true);
@@ -43,17 +46,17 @@ describe('settings', () => {
   it('lets the account win once it has the answer', () => {
     useSettings.setState({ analytics: true, consent: 'synced' });
 
-    useSettings.getState().fromAccount({ haptics: true, analytics: false });
+    useSettings.getState().fromAccount({ ...ACCOUNT, haptics: true, analytics: false });
 
     expect(useSettings.getState()).toMatchObject({ analytics: false, consent: 'synced' });
   });
 
   it('takes a yes given on another phone, and still asks here after a no', () => {
-    useSettings.getState().fromAccount({ haptics: true, analytics: true });
+    useSettings.getState().fromAccount({ ...ACCOUNT, haptics: true, analytics: true });
     expect(useSettings.getState()).toMatchObject({ analytics: true, consent: 'synced' });
 
     useSettings.setState({ analytics: false, consent: 'unasked' });
-    useSettings.getState().fromAccount({ haptics: true, analytics: false });
+    useSettings.getState().fromAccount({ ...ACCOUNT, haptics: true, analytics: false });
     expect(useSettings.getState()).toMatchObject({ analytics: false, consent: 'unasked' });
   });
 

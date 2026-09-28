@@ -1,3 +1,4 @@
+import FirebaseCore
 import GoogleSignIn
 import UIKit
 import React
@@ -15,6 +16,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
   ) -> Bool {
+    // Push notifications (Firebase Cloud Messaging) need Firebase, and Firebase
+    // needs GoogleService-Info.plist — copied into the app by the "Copy Firebase
+    // config" build phase when it is in ios/Quezby/. Without it there is no push,
+    // and nothing else changes.
+    if Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil {
+      FirebaseApp.configure()
+    }
+
     let delegate = ReactNativeDelegate()
     let factory = RCTReactNativeFactory(delegate: delegate)
     delegate.dependencyProvider = RCTAppDependencyProvider()

@@ -1,5 +1,5 @@
 import type { AdminPlayerRef } from '@quezby/types';
-import { Ban, KeyRound, LogOut, RotateCcw, ShieldCheck, Trash2 } from 'lucide-react';
+import { Ban, FlagOff, ImageOff, KeyRound, LogOut, RotateCcw, ShieldCheck, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -122,6 +122,75 @@ export function RenamePlayerDialog({ player, open, onOpenChange, onDone }: Dialo
       }
     >
       <ReasonField error={fields.reason} placeholder="Ör. küfürlü ad" />
+    </FormModal>
+  );
+}
+
+export function RemoveAvatarDialog({ player, open, onOpenChange, onDone }: DialogProps) {
+  const { removeAvatar } = usePlayerActions(player.id);
+  const fields = fieldErrors(removeAvatar.error);
+
+  return (
+    <FormModal
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) removeAvatar.reset();
+        onOpenChange(next);
+      }}
+      title={`${playerName(player.username)} fotoğrafı kaldırılsın mı?`}
+      description="Fotoğraf silinir, artık kimse göremez; oyuncu yeni bir fotoğraf yükleyebilir. Fotoğraf hakkındaki açık bildirimler kapanır."
+      icon={<ImageOff />}
+      tone="bad"
+      submitLabel="Fotoğrafı kaldır"
+      submitTone="danger"
+      loading={removeAvatar.isPending}
+      error={removeAvatar.error && !fields.reason ? errorMessage(removeAvatar.error) : null}
+      onSubmit={(data) =>
+        removeAvatar.mutate(reasonOf(data), {
+          onSuccess: ({ changed }) => {
+            if (changed) toast.success('Fotoğraf kaldırıldı', { description: 'Fotoğraf hakkındaki bildirimler kapandı.' });
+            else toast.info('Değişen bir şey yok: oyuncunun fotoğrafı yok.');
+            onOpenChange(false);
+            onDone?.();
+          },
+        })
+      }
+    >
+      <ReasonField error={fields.reason} placeholder="Ör. uygunsuz fotoğraf" />
+    </FormModal>
+  );
+}
+
+export function DismissReportsDialog({ player, open, onOpenChange, onDone }: DialogProps) {
+  const { dismissReports } = usePlayerActions(player.id);
+  const fields = fieldErrors(dismissReports.error);
+
+  return (
+    <FormModal
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) dismissReports.reset();
+        onOpenChange(next);
+      }}
+      title={`${playerName(player.username)} hakkındaki bildirimler kapatılsın mı?`}
+      description="Açık bildirimler işlem yapılmadan kapanır; fotoğraf ve ad olduğu gibi kalır."
+      icon={<FlagOff />}
+      tone="secondary"
+      submitLabel="Bildirimleri kapat"
+      loading={dismissReports.isPending}
+      error={dismissReports.error && !fields.reason ? errorMessage(dismissReports.error) : null}
+      onSubmit={(data) =>
+        dismissReports.mutate(reasonOf(data), {
+          onSuccess: ({ changed }) => {
+            if (changed) toast.success('Bildirimler kapatıldı');
+            else toast.info('Değişen bir şey yok: açık bildirim yoktu.');
+            onOpenChange(false);
+            onDone?.();
+          },
+        })
+      }
+    >
+      <ReasonField error={fields.reason} placeholder="Ör. fotoğrafta kural dışı bir şey yok" />
     </FormModal>
   );
 }

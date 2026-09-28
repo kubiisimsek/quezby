@@ -11,6 +11,8 @@ use App\Models\LeagueGroup;
 use App\Models\LeagueMember;
 use App\Models\Run;
 use App\Models\User;
+use App\Services\Avatars\AvatarService;
+use App\Services\Social\FriendService;
 use App\Support\Timestamp;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
@@ -30,6 +32,7 @@ final class LeagueService
 {
     public function __construct(
         private readonly LeaderboardService $leaderboards,
+        private readonly FriendService $friends,
         #[Config('quezby.leagues.group_size')]
         private readonly int $groupSize,
         #[Config('quezby.leagues.zone_per_30')]
@@ -139,7 +142,7 @@ final class LeagueService
 
         $standings = $this->standings($member->group);
         [$promote, $demote] = $this->zones($member->tier, count($standings));
-        $following = $this->leaderboards->followedAmong($user, array_map(fn (array $row) => $row['userId'], $standings));
+        $friends = $this->friends->among($user, array_map(fn (array $row) => $row['userId'], $standings));
 
         $members = [];
         $over = null;
@@ -149,10 +152,11 @@ final class LeagueService
             $entry = [
                 'rank' => $row['rank'],
                 'username' => $row['username'],
+                'avatarUrl' => AvatarService::url($row['avatar']),
                 'points' => $row['points'],
                 'daysPlayed' => $row['days'],
                 'isMe' => $row['userId'] === $user->id,
-                'isFollowing' => isset($following[$row['userId']]),
+                'isFriend' => isset($friends[$row['userId']]),
                 'zone' => $this->zoneOf($row['rank'], count($standings), $promote, $demote),
                 'gap' => $over === null ? null : $over['points'] - $row['points'] + 1,
             ];
@@ -269,7 +273,7 @@ final class LeagueService
      * A group's members, best first: points (each day's best, summed), then
      * whoever joined first. Banned players are left out.
      *
-     * @return list<array{userId: string, username: string, points: int, days: int, rank: int}>
+     * @return list<array{userId: string, username: string, avatar: string|null, points: int, days: int, rank: int}>
      */
     private function standings(LeagueGroup $group): array
     {
@@ -277,7 +281,7 @@ final class LeagueService
             ->where('group_id', $group->id)
             ->join('users', 'users.id', '=', 'league_members.user_id')
             ->whereNull('users.banned_at')
-            ->get(['league_members.user_id', 'league_members.joined_at', 'users.username']);
+            ->get(['league_members.user_id', 'league_members.joined_at', 'users.username', 'users.avatar']);
 
         $totals = LeaderboardEntry::query()
             ->where('season', $group->season)
@@ -292,6 +296,7 @@ final class LeagueService
         $rows = $members->map(fn (LeagueMember $member) => [
             'userId' => $member->user_id,
             'username' => (string) $member->getAttribute('username'),
+            'avatar' => $member->getAttribute('avatar'),
             'points' => (int) ($totals[$member->user_id]->points ?? 0),
             'days' => (int) ($totals[$member->user_id]->days ?? 0),
             'joinedAt' => $member->getRawOriginal('joined_at'),
@@ -301,6 +306,7 @@ final class LeagueService
         return $rows->map(fn (array $row, int $i) => [
             'userId' => $row['userId'],
             'username' => $row['username'],
+            'avatar' => $row['avatar'],
             'points' => $row['points'],
             'days' => $row['days'],
             'rank' => $i + 1,
@@ -424,7 +430,7 @@ final class LeagueService
      * A group's table for the admin panel: every member's standing and zone,
      * and how many go up and down.
      *
-     * @return array{standings: list<array{userId: string, username: string, points: int, days: int, rank: int, zone: string}>, promote: int, demote: int}
+     * @return array{standings: list<array{userId: string, username: string, avatar: string|null, points: int, days: int, rank: int, zone: string}>, promote: int, demote: int}
      */
     public function table(LeagueGroup $group): array
     {

@@ -13,7 +13,9 @@ use App\Models\Run;
 use App\Models\User;
 use App\Services\LeaderboardService;
 use App\Services\RunClock;
+use App\Support\Timestamp;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\TestResponse;
 use Laravel\Sanctum\Sanctum;
 
@@ -124,11 +126,14 @@ abstract class TestCase extends BaseTestCase
 
     /**
      * Plays a run of `$mode` cleanly for `$reels` reels, like a human thumb,
-     * and finishes it through the API as if it had just been played.
+     * and finishes it through the API as if it had just been played. `$body`
+     * adds to the start — a VS's `opponent` or `duel`.
+     *
+     * @param  array<string, mixed>  $body
      */
-    protected function playFeed(string $mode = 'free', int $reels = 60, int $decisionMs = 430): TestResponse
+    protected function playFeed(string $mode = 'free', int $reels = 60, int $decisionMs = 430, array $body = []): TestResponse
     {
-        $start = $this->startRun(['mode' => $mode])->assertCreated();
+        $start = $this->startRun(['mode' => $mode] + $body)->assertCreated();
         $actions = playedLog($start->json('seed'), $reels, $decisionMs, 110);
         $summary = Engine::replay($start->json('seed'), $actions)->summary;
         Run::query()->whereKey($start->json('runId'))->update(['started_at' => now()->subMinutes(10)]);
@@ -201,8 +206,8 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
-     * A ranked run of `$score` by `$player`, put on today's, this week's,
-     * this month's and the season's board.
+     * A ranked run of `$score` by `$player`, put on this week's, this month's
+     * and the season's board (and the day's row the league adds up).
      */
     public function recordRanked(User $player, int $score): Run
     {
@@ -210,5 +215,27 @@ abstract class TestCase extends BaseTestCase
         app(LeaderboardService::class)->record($run);
 
         return $run;
+    }
+
+    /** Two players made friends, both rows at once — as an accepted request leaves them. */
+    public function befriend(User $a, User $b): void
+    {
+        $now = now()->format(Timestamp::STORAGE_FORMAT);
+        DB::table('friendships')->insert([
+            ['user_id' => $a->id, 'friend_id' => $b->id, 'created_at' => $now, 'last_activity_at' => $now],
+            ['user_id' => $b->id, 'friend_id' => $a->id, 'created_at' => $now, 'last_activity_at' => $now],
+        ]);
+    }
+
+    /** `$from`'s friend request, waiting for `$to`. */
+    public function requestFriend(User $from, User $to): void
+    {
+        DB::table('friend_requests')->insert(['sender_id' => $from->id, 'recipient_id' => $to->id, 'created_at' => now()->format(Timestamp::STORAGE_FORMAT)]);
+    }
+
+    /** `$blocker` blocked `$blocked`. */
+    public function block(User $blocker, User $blocked): void
+    {
+        DB::table('blocks')->insert(['blocker_id' => $blocker->id, 'blocked_id' => $blocked->id, 'created_at' => now()->format(Timestamp::STORAGE_FORMAT)]);
     }
 }

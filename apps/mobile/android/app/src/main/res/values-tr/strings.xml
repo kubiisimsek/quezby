@@ -1,0 +1,5 @@
+<resources>
+    <!-- The notification channel every push goes to (MainApplication, firebase.json). -->
+    <string name="notification_channel_social">Arkadaşlar ve VS</string>
+    <string name="notification_channel_social_description">Arkadaşlık istekleri, VS davetleri ve sonuçları, arkadaşlarından mesajlar</string>
+</resources>

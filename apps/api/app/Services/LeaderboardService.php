@@ -8,6 +8,8 @@ use App\Enums\RunStatus;
 use App\Models\LeaderboardEntry;
 use App\Models\Run;
 use App\Models\User;
+use App\Services\Avatars\AvatarService;
+use App\Services\Social\FriendService;
 use App\Support\Timestamp;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
@@ -30,6 +32,7 @@ final class LeaderboardService
         private readonly string $timezone,
         #[Config('quezby.season')]
         private readonly int $season,
+        private readonly FriendService $friends,
     ) {}
 
     public function season(): int
@@ -56,24 +59,24 @@ final class LeaderboardService
     }
 
     /**
-     * Puts a ranked run on today's, this week's, this month's and the season's
-     * board — and on today's challenge board when it was the daily run. A row
-     * only ever moves to a strictly higher score, so an equal score keeps the
-     * earlier `achieved_at`.
+     * Puts a ranked run on this week's, this month's and the season's board —
+     * and on today's challenge board when it was the daily run — and keeps the
+     * day's best for the league. A row only ever moves to a strictly higher
+     * score, so an equal score keeps the earlier `achieved_at`.
      */
     public function record(Run $run): RecordOutcome
     {
         $user = $run->user;
         $before = $this->ranksFor($user, $run->finished_at);
-        $dailyBefore = $this->rowOf($user, LeaderboardPeriod::Daily, $this->keyAt(LeaderboardPeriod::Daily, $run->finished_at));
+        $weekBefore = $this->rowOf($user, LeaderboardPeriod::Weekly, $this->keyAt(LeaderboardPeriod::Weekly, $run->finished_at));
 
         $raised = [];
         foreach ($this->boardsFor($run) as $period) {
             $raised[$period->value] = $this->put($run, $period);
         }
 
-        $passed = $raised[LeaderboardPeriod::Daily->value]
-            ? $this->passedOn(LeaderboardPeriod::Daily, $run, $dailyBefore?->score ?? 0)
+        $passed = $raised[LeaderboardPeriod::Weekly->value]
+            ? $this->passedOn(LeaderboardPeriod::Weekly, $run, $weekBefore?->score ?? 0)
             : [];
 
         return new RecordOutcome(
@@ -131,7 +134,7 @@ final class LeaderboardService
      * Up to three players this run overtook on a board: those at or above the
      * player's old score and below the new one, closest first.
      *
-     * @return list<array{username: string, score: int, isFollowing: bool}>
+     * @return list<array{username: string, avatarUrl: string|null, score: int, isFriend: bool}>
      */
     private function passedOn(LeaderboardPeriod $period, Run $run, int $oldScore): array
     {
@@ -143,32 +146,34 @@ final class LeaderboardService
             ->orderByDesc('leaderboard_entries.score')
             ->orderBy('leaderboard_entries.achieved_at')
             ->limit(3)
-            ->get(['leaderboard_entries.user_id', 'leaderboard_entries.score', 'users.username']);
+            ->get(['leaderboard_entries.user_id', 'leaderboard_entries.score', 'users.username', 'users.avatar']);
 
-        $following = $this->followedAmong($run->user, $rows->pluck('user_id')->all());
+        $friends = $this->friends->among($run->user, $rows->pluck('user_id')->all());
 
         return $rows->map(fn (LeaderboardEntry $entry) => [
             'username' => (string) $entry->username,
+            'avatarUrl' => AvatarService::url($entry->getAttribute('avatar')),
             'score' => $entry->score,
-            'isFollowing' => isset($following[$entry->user_id]),
+            'isFriend' => isset($friends[$entry->user_id]),
         ])->values()->all();
     }
 
     /**
-     * The player's rank on each calendar board right now.
+     * The player's rank on each board they climb right now: the week, the
+     * month, the season.
      *
-     * @return array{daily: int|null, weekly: int|null, monthly: int|null, all: int|null}
+     * @return array{weekly: int|null, monthly: int|null, all: int|null}
      */
     public function ranksFor(User $user, ?CarbonInterface $at = null): array
     {
         $at ??= now();
-        $ranks = ['daily' => null, 'weekly' => null, 'monthly' => null, 'all' => null];
+        $ranks = ['weekly' => null, 'monthly' => null, 'all' => null];
 
         $entries = LeaderboardEntry::query()
             ->where('season', $this->season)
             ->where('user_id', $user->id)
             ->where(function (Builder $query) use ($at) {
-                foreach (LeaderboardPeriod::calendar() as $period) {
+                foreach (LeaderboardPeriod::periods() as $period) {
                     $query->orWhere(fn (Builder $query) => $query
                         ->where('period', $period->value)
                         ->where('period_key', $this->keyAt($period, $at)));
@@ -247,7 +252,7 @@ final class LeaderboardService
             ->orderBy('leaderboard_entries.achieved_at')
             ->orderBy('leaderboard_entries.id')
             ->limit($limit)
-            ->get(['leaderboard_entries.*', 'users.username']);
+            ->get(['leaderboard_entries.*', 'users.username', 'users.avatar']);
 
         $mine = $query()->where('leaderboard_entries.user_id', $viewer->id)->first();
         $myRank = $mine === null ? null : $this->rankOf($mine, $among);
@@ -267,7 +272,7 @@ final class LeaderboardService
                 ->orderByDesc('leaderboard_entries.achieved_at')
                 ->orderByDesc('leaderboard_entries.id')
                 ->limit(3)
-                ->get(['leaderboard_entries.*', 'users.username'])
+                ->get(['leaderboard_entries.*', 'users.username', 'users.avatar'])
                 ->reverse()
                 ->values();
             $below = $query()
@@ -281,13 +286,13 @@ final class LeaderboardService
                 ->orderBy('leaderboard_entries.achieved_at')
                 ->orderBy('leaderboard_entries.id')
                 ->limit(2)
-                ->get(['leaderboard_entries.*', 'users.username']);
+                ->get(['leaderboard_entries.*', 'users.username', 'users.avatar']);
         }
 
         $userIds = $top->pluck('user_id')->merge($above->pluck('user_id'))->merge($below->pluck('user_id'))->unique()->values()->all();
-        $following = $this->followedAmong($viewer, $userIds);
+        $friends = $this->friends->among($viewer, $userIds);
         $present = fn (LeaderboardEntry $entry, int $rank, ?LeaderboardEntry $over) => $this->present(
-            $entry, $rank, (string) ($entry->username ?? $viewer->username), $viewer, $following, $over,
+            $entry, $rank, (string) ($entry->username ?? $viewer->username), $viewer, $friends, $over,
         );
 
         $entries = [];
@@ -388,37 +393,13 @@ final class LeaderboardService
     }
 
     /**
-     * A player's friends board: the players they follow, and themselves.
+     * A player's friends board: their friends, and themselves.
      *
      * @return list<string>
      */
     public function friendsOf(User $user): array
     {
-        return DB::table('follows')->where('follower_id', $user->id)->pluck('followee_id')
-            ->push($user->id)
-            ->unique()
-            ->values()
-            ->all();
-    }
-
-    /**
-     * Which of `$userIds` the viewer follows.
-     *
-     * @param  list<string>  $userIds
-     * @return array<string, true>
-     */
-    public function followedAmong(User $viewer, array $userIds): array
-    {
-        if ($userIds === []) {
-            return [];
-        }
-
-        return DB::table('follows')
-            ->where('follower_id', $viewer->id)
-            ->whereIn('followee_id', $userIds)
-            ->pluck('followee_id')
-            ->mapWithKeys(fn (string $id) => [$id => true])
-            ->all();
+        return [...$this->friends->ids($user), $user->id];
     }
 
     /**
@@ -437,18 +418,19 @@ final class LeaderboardService
      * `LeaderboardEntry` in `packages/types`. `gap` is what it takes to pass
      * the row above: its score plus one, since a tie goes to whoever was first.
      *
-     * @param  array<string, true>  $following
-     * @return array{rank: int, username: string, score: int, reels: int, isMe: bool, isFollowing: bool, gap: int|null}
+     * @param  array<string, true>  $friends
+     * @return array{rank: int, username: string, avatarUrl: string|null, score: int, reels: int, isMe: bool, isFriend: bool, gap: int|null}
      */
-    private function present(LeaderboardEntry $entry, int $rank, string $username, User $viewer, array $following, ?LeaderboardEntry $over): array
+    private function present(LeaderboardEntry $entry, int $rank, string $username, User $viewer, array $friends, ?LeaderboardEntry $over): array
     {
         return [
             'rank' => $rank,
             'username' => $username,
+            'avatarUrl' => AvatarService::url($entry->user_id === $viewer->id ? $viewer->avatar : $entry->getAttribute('avatar')),
             'score' => $entry->score,
             'reels' => $entry->reels,
             'isMe' => $entry->user_id === $viewer->id,
-            'isFollowing' => isset($following[$entry->user_id]),
+            'isFriend' => isset($friends[$entry->user_id]),
             'gap' => $over === null ? null : $over->score - $entry->score + 1,
         ];
     }

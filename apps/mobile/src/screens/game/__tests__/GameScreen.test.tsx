@@ -7,7 +7,7 @@ import { useGame, type GameController } from '@/game/useGame';
 import { useLanguage } from '@/i18n/language';
 import { GameScreen } from '@/screens/game/GameScreen';
 import { useOnboarding } from '@/stores/onboarding';
-import { buildMe } from '@/test/factories';
+import { buildDuel, buildMe, buildSummary } from '@/test/factories';
 import { renderWithProviders } from '@/test/renderWithProviders';
 
 jest.mock('@/game/useGame', () => ({ useGame: jest.fn() }));
@@ -55,12 +55,16 @@ function controller(overrides: Partial<GameController> = {}): GameController {
   };
 }
 
-function setup(game: GameController, mode: 'free' | 'daily' = 'free') {
+function setup(
+  game: GameController,
+  mode: 'free' | 'daily' | 'vs' = 'free',
+  vs: { opponent: string; duelId?: string } | null = null,
+) {
   jest.mocked(useGame).mockReturnValue(game);
   const navigation = { goBack: jest.fn(), replace: jest.fn() };
   const props = {
     navigation,
-    route: { key: 'Game', name: 'Game', params: { mode } },
+    route: { key: 'Game', name: 'Game', params: { mode, ...vs } },
   } as unknown as Props;
   return {
     navigation,
@@ -215,6 +219,104 @@ describe('GameScreen', () => {
     expect(game.retrySubmit).toHaveBeenCalled();
     await fireEvent.press(screen.getByText('Ana sayfaya dön'));
     expect(navigation.goBack).toHaveBeenCalled();
+  });
+
+  describe('as a VS', () => {
+    it('asks for the VS with the friend, and names them over the game', async () => {
+      await setup(controller({ phase: 'playing' }), 'vs', { opponent: 'ekin' }).render();
+
+      expect(useGame).toHaveBeenCalledWith('vs', { opponent: 'ekin', duelId: undefined });
+      expect(screen.getByText('VS · @ekin')).toBeTruthy();
+    });
+
+    it('answers the VS the friend sent', async () => {
+      await setup(controller(), 'vs', { opponent: 'ekin', duelId: '01jduel0000000000000000001' }).render();
+
+      expect(useGame).toHaveBeenCalledWith('vs', { opponent: 'ekin', duelId: '01jduel0000000000000000001' });
+    });
+
+    it('never offers offline practice for a VS', async () => {
+      await setup(controller({ phase: 'error' }), 'vs', { opponent: 'ekin' }).render();
+
+      expect(screen.queryByText('Çevrimdışı antrenman')).toBeNull();
+    });
+
+    it('leads on from a VS to the rematch, or back to the conversation', async () => {
+      jest.mocked(useReducedMotion).mockReturnValue(true);
+      const bonus = { count: 0, points: 0 };
+      const game = controller({
+        phase: 'result',
+        outcome: {
+          mode: 'verified',
+          response: {
+            run: {
+              runId: 'r1',
+              mode: 'vs',
+              status: 'played',
+              score: 12_450,
+              reels: 80,
+              hits: 75,
+              misses: 5,
+              perfects: 4,
+              maxStreak: 30,
+              level: 4,
+              accuracy: 937,
+              avgReactionMs: 500,
+              activeMs: 120_000,
+              endedBy: 'drained',
+              maxCombo: 1_300,
+              breakdown: {
+                reelPoints: 12_450,
+                bonusPoints: 0,
+                bonuses: { flawless: bonus, lightning: bonus, coolHead: bonus, comeback: bonus },
+              },
+              stats: {
+                swipes: 40,
+                likes: 20,
+                holds: 10,
+                perfects: 4,
+                freezes: 5,
+                misses: { timeout: 2, wrong: 1, holdEarly: 1, holdLate: 1, caught: 0 },
+                avgReactionMs: 500,
+                bestReactionMs: 300,
+                levelMisses: [0, 1, 2, 2],
+              },
+              flagReason: null,
+            },
+            best: null,
+            isNewBest: false,
+            ranks: { weekly: null, monthly: null, all: null },
+            rankChanges: {
+              weekly: { before: null, after: null },
+              monthly: { before: null, after: null },
+              all: { before: null, after: null },
+            },
+            passed: [],
+            daily: null,
+            league: null,
+            leagueUnlock: null,
+            shareText: null,
+            duel: buildDuel({
+              status: 'finished',
+              turn: null,
+              sent: false,
+              you: { score: 12_450, valid: true },
+              them: { score: 9_800, valid: true },
+              outcome: 'won',
+              expiresAt: null,
+              opponent: buildSummary({ username: 'ekin', relation: 'friend' }),
+            }),
+          },
+        },
+      });
+      const { navigation, render } = setup(game, 'vs', { opponent: 'ekin', duelId: '01jduel0000000000000000001' });
+      await render();
+
+      await fireEvent.press(screen.getByText('Rövanş'));
+      expect(navigation.replace).toHaveBeenCalledWith('Game', { mode: 'vs', opponent: 'ekin' });
+      await fireEvent.press(screen.getByText('Mesajlara dön'));
+      expect(navigation.replace).toHaveBeenCalledWith('Thread', { username: 'ekin' });
+    });
   });
 
   describe('as a new player\'s practice run', () => {

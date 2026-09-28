@@ -4,10 +4,10 @@
 **Server:** `apps/api/app/Http/Controllers/Admin`, `app/Services/Admin` · **Tests:** Pest, `apps/api/tests/Feature/Admin`
 **Panel:** `apps/admin` — `docs/design/admin-design-system.md`, `docs/rules/admin-rules.md`
 
-The admin panel's API: players, runs, suspects, boards, leagues, content,
-the audit log, the panel's own accounts and the system. It shares the player
-API's conventions (`docs/backend/api-contract.md`): JSON with camelCase keys,
-ISO-8601 UTC timestamps with milliseconds, one error shape.
+The admin panel's API: players, runs, suspects, reports, boards, leagues,
+content, the audit log, the panel's own accounts and the system. It shares
+the player API's conventions (`docs/backend/api-contract.md`): JSON with
+camelCase keys, ISO-8601 UTC timestamps with milliseconds, one error shape.
 
 A contract change is one commit, as for the player API: `packages/types`
 (`admin.ts`) → Laravel → `packages/sdk` (`admin.ts`) → the panel screen.
@@ -27,7 +27,7 @@ comes from here; `apps/admin` may not import `@quezby/engine` (lint).
   | Role | `role` | May |
   | --- | --- | --- |
   | İzleyici | `viewer` | read every page |
-  | Moderatör | `moderator` | ban and unban, reset a name, sign a player out, approve and reject runs |
+  | Moderatör | `moderator` | ban and unban, reset a name, take a photo down, dismiss reports, sign a player out, approve and reject runs |
   | Sahip | `owner` | delete a player's account, manage admins, run the system chores, see IP addresses in the audit log |
 
   Every admin route but the login carries `admin.role:<least role>`
@@ -90,6 +90,12 @@ the language the player plays in (`tr | en | de | ar | fr | es`, `Me.locale`);
 the panel names it in Turkish ("Almanca"). The panel itself is answered in
 Turkish whatever the browser's `Accept-Language` says.
 
+A row's `avatarUrl` is the player's profile photo as players see it — an
+absolute URL on the API, `/api/v1/media/avatars/<24 hex>.jpg`, served to
+anyone who has it without a token and cached for a year (a new photo gets a
+new name) — or `null` for none. The panel shows it as a plain `<img>`, so its
+CSP names the API's origin in `img-src` (`apps/admin/deploy/htaccess.mjs`).
+
 ### `GET /players/{id}` — viewer
 
 `AdminPlayerResponse`: the player (identities without their Apple tokens,
@@ -98,7 +104,10 @@ this season's best and ranks, lifetime stats, this week's league seat (none
 while banned), runs by status, the ten latest runs, the flag codes of the last
 30 days, device checks (20 latest), other accounts on the same install,
 `installs` — the phones the player used, from the device registry, each with
-the other accounts seen on it — follows and the audit entries about them.
+the other accounts seen on it — `social` (`friends`: their friends who are
+not banned; `blockedBy`: how many players blocked them, a sign worth a look),
+`openReports` (the reports still open about their photo and their name,
+`{ photo, name }`) and the audit entries about them.
 
 ### `GET /players/{id}/activity` — viewer
 
@@ -127,12 +136,26 @@ automatic name (`GuestNames`) in place of one that should not be seen. A
 picked name never changes otherwise, so this is the only way out of one: it
 opens exactly one more pick for the player, and that name is permanent again
 (`docs/product/usernames.md` → "Kalıcı ad"). The old name is in the audit
-entry's details.
+entry's details. The open reports about the name close as `resolved`.
 
 ### `POST /players/{id}/sign-out` — moderator
 
 Ends every session the player has. A guest cannot be signed out — their token
 is the only key to the account — `422 validation_failed`.
+
+### `POST /players/{id}/avatar/remove` — moderator
+
+`{ "reason" }` (3–191 characters). Takes the player's photo down — its file is
+deleted — and closes the open reports about the photo as `resolved`, recorded
+as `player.avatar_remove` with the file's name in the details. The player may
+upload a new photo. A player with no photo: `changed: false`, nothing recorded.
+
+### `POST /players/{id}/reports/dismiss` — moderator
+
+`{ "reason" }` (3–191 characters). Lets every open report about the player go
+— they close as `dismissed`, the photo and the name stay as they are —
+recorded as `player.reports_dismiss` with how many in the details. None open:
+`changed: false`, nothing recorded.
 
 ### `POST /players/{id}/delete` — owner
 
@@ -146,11 +169,21 @@ DELETE's body.
 
 ### `GET /runs` — viewer
 
-Filters: `status` (every `AdminRunStatus`), `mode` (`free | daily`), `flag`
-(a `RunFlagCode`, matched exactly), `player` (id), `from` / `to` (Istanbul
-days `Y-m-d`, both inclusive, by start), `sort` (`newest | score`). Rows are
-`AdminRunRow` — never the action log. `counts` is per status under the other
-filters.
+Filters: `status` (every `AdminRunStatus`), `mode` (`free | daily | vs`),
+`flag` (a `RunFlagCode`, matched exactly), `player` (id), `from` / `to`
+(Istanbul days `Y-m-d`, both inclusive, by start), `sort` (`newest | score`).
+Rows are `AdminRunRow` — never the action log. `counts` is per status under
+the other filters.
+
+**VS runs** (`mode: vs`) are the runs of a VS between two friends, one attempt
+each at one seed. The API replays one like any other run, but it never ranks:
+a clean one is `played` — it settles its VS and counts on no board, league,
+stat or record — and one with a hard flag is `flagged` (it loses its VS; the
+challenger's voids it). Its soft signals are kept but hold nothing, and the
+checks against the player's history are not run for it, so a VS run is never
+held for `review` and there is nothing to decide on it: `approve` and
+`reject` answer `changed: false` (`ModerationService`), and the panel offers
+neither. Neither the row nor the detail says which VS a run played.
 
 ### `GET /runs/{id}` — viewer
 
@@ -171,7 +204,7 @@ the player's stats and league. Any other status: `changed: false`.
 
 `{ "reason" }`. A `ranked`, `review` or `flagged` run becomes `rejected` with a
 hard `moderator` flag carrying the reason; the player's boards are rebuilt
-from the runs left.
+from the runs left. A VS run, and any other status: `changed: false`.
 
 ### Finding runs by a flag
 
@@ -206,6 +239,26 @@ shares their install. Banned players are left out unless asked for.
 `App\Enums\RunFlag` holds the list, the severities and the weights; a unit
 test holds it to every `'code' => …` the API writes and to `RunFlagCode`.
 
+## Reports
+
+Players report each other's photo or name — the only things a player makes
+that others see (`POST /users/{username}/report`). A player reports each photo
+or name of another once; a new photo or a new name can be reported afresh. A
+report stays `open` until a moderator removes what it was about (`resolved`:
+the photo taken down with `avatar/remove`, the name reset with `rename`) or
+lets it be (`dismissed`: `reports/dismiss`).
+
+### `GET /reports?status=open|resolved|dismissed` — viewer
+
+`AdminReportRow`s, one per reported player, the latest report first; `status`
+is `open` when left out. A row: `player` (`AdminPlayerRef`; `null` should the
+account be gone — its reports go with it), `avatarUrl` — their photo as it
+is now, `null` when they have none — `reasons`
+(`{ photo, name }`, how many reports about each), `reports` (all of them),
+`firstAt` and `lastAt`. Who reported is never shown. The panel lists them on
+its Bildirimler page and decides on the player's page, where the photo and
+the name can be seen.
+
 ## Overview
 
 ### `GET /overview` — viewer
@@ -220,7 +273,8 @@ runs. Days are Istanbul days: each series is one query that buckets rows with
 
 ### `GET /counts` — viewer
 
-`{ "review": n }` — the sidebar's badge.
+`{ "review", "reports" }` — the sidebar's badges: runs held for review, and
+players with a report still open.
 
 ## Analytics
 
@@ -254,9 +308,11 @@ The API keeps the answer for a minute under one cache key per window. A
 
 ### `GET /boards?board=&key=&season=` — viewer
 
-Any board (`daily | weekly | monthly | all | challenge`) for any period key
-(`2026-09-24`, `2026-W39`, `2026-09`, `all`; the current one when left out)
-and season (this one when left out). Rows are ranked as the game ranks them —
+Any board (`weekly | monthly | all | challenge`) for any period key
+(`2026-W39`, `2026-09`, `all`, or a challenge day `2026-09-24`; the current
+one when left out) and season (this one when left out). There is no day
+board: the API keeps each day's best only to add up league points, and
+`daily` is `422` on `board`. Rows are ranked as the game ranks them —
 score, then who got there first; ties share a rank, across pages too — with
 the run behind each row and its signals. Adds `seasons` (every season with
 rows), `number` ("Günün akışı #N" on the challenge board; `null` for a day
@@ -308,6 +364,7 @@ subject { type, id, label }, reason, details, ip` — `ip` only for an owner.
   (`/ops/moderate`, `/ops/admins`) or `system`.
 - `action`: `auth.login`, `auth.password_changed`, `player.ban`,
   `player.unban`, `player.rename`, `player.sign_out`, `player.delete`,
+  `player.avatar_remove`, `player.reports_dismiss`,
   `run.approve`, `run.reject`, `admin.create`, `admin.update`,
   `admin.reset_password`, `system.migrate`, `system.optimize`,
   `system.expire_runs`, `system.analytics_prune`.
@@ -336,12 +393,17 @@ subject { type, id, label }, reason, details, ip` — `ip` only for an owner.
   timezone, season and engine, content version, integrity mode, the daily
   epoch, the apps' minimum and latest versions, whether `OPS_TOKEN` and
   `MODERATION_TOKEN` are set (**never their values**), `appKey` — whether
-  `APP_KEY` is set and well-formed (never the key) — whether config and
-  routes are cached, the migrations uploaded but not run, open and stale runs,
-  and the limits the game runs with. The panel says in red when `appKey` is
-  false: without the key the API answers every player 500 (`RequireAppKey`),
-  while `/admin/*` and `/ops/*` stay open so the key can be put right and the
-  cache rebuilt.
+  `APP_KEY` is set and well-formed (never the key) — `gd` — whether PHP's GD
+  extension is there: profile photos are re-encoded with it, so without it
+  every upload fails — `push` — whether pushes can go out: switched on
+  (`QUEZBY_PUSH_ENABLED`) with the Firebase project (`FIREBASE_PROJECT_ID`)
+  and a readable service-account key (`FIREBASE_CREDENTIALS`) — whether config
+  and routes are cached, the migrations uploaded but not run, open and stale
+  runs, and the limits the game runs with. The panel says in red when
+  `appKey` is false: without the key the API answers every player 500
+  (`RequireAppKey`), while `/admin/*` and `/ops/*` stay open so the key can be
+  put right and the cache rebuilt. It says in red too when `gd` is false, and
+  in amber when `push` is.
 - `POST /system/migrate | optimize | expire-runs | analytics-prune` →
   `{ "output" }`: the same chores as `/ops/migrate`, `/ops/optimize`,
   `quezby:runs:expire` and `quezby:analytics:prune` (`OpsChores`). A failure

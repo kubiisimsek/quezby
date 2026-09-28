@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\AuditAction;
 use App\Enums\RunFlag;
+use App\Enums\RunMode;
 use App\Enums\RunStatus;
 use App\Game\Run as Engine;
 use App\Models\LeaderboardEntry;
@@ -69,10 +70,14 @@ final class ModerationService
         });
     }
 
-    /** Throws a run out and rebuilds its player's boards from what is left. False when it cannot be. */
+    /**
+     * Throws a run out and rebuilds its player's boards from what is left.
+     * False when it cannot be — a VS run never ranks, so there is nothing to
+     * throw out of anywhere.
+     */
     public function reject(Run $run, string $reason, Actor $actor): bool
     {
-        if (! in_array($run->status, [RunStatus::Ranked, RunStatus::Review, RunStatus::Flagged], true)) {
+        if ($run->mode === RunMode::Vs || ! in_array($run->status, [RunStatus::Ranked, RunStatus::Review, RunStatus::Flagged], true)) {
             return false;
         }
 

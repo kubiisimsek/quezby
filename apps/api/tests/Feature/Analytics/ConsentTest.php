@@ -25,7 +25,7 @@ test('saying yes keeps usage from now on, today included', function () {
     app('auth')->forgetGuards();
     $this->withToken($token)->putJson('/api/v1/me/settings', ['analytics' => true])
         ->assertOk()
-        ->assertExactJson(['settings' => ['haptics' => true, 'analytics' => true]]);
+        ->assertExactJson(['settings' => ['haptics' => true, 'analytics' => true, 'pushFriends' => true, 'pushVs' => true, 'pushMessages' => true]]);
 
     expect($player->fresh()->analytics_at?->equalTo(now()))->toBeTrue()
         ->and($player->fresh()->settings)->toBe(['haptics' => true]);

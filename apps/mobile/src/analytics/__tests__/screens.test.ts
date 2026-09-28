@@ -7,7 +7,11 @@ describe('screenOf', () => {
     ['Home', 'home'],
     ['Leaderboard', 'leaderboard'],
     ['League', 'league'],
-    ['Search', 'search'],
+    ['Friends', 'friends'],
+    ['FindFriends', 'search'],
+    ['Thread', 'thread'],
+    ['History', 'history'],
+    ['AvatarEditor', 'avatar'],
     ['Profile', 'profile'],
     ['Game', 'game'],
     ['Daily', 'daily'],
@@ -17,6 +21,7 @@ describe('screenOf', () => {
 
   it('names nothing it does not know', () => {
     expect(screenOf('Tabs')).toBeNull();
+    expect(screenOf('Search')).toBeNull();
     expect(screenOf('toString')).toBeNull();
     expect(screenOf(undefined)).toBeNull();
   });

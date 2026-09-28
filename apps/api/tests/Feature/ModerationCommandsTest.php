@@ -78,8 +78,8 @@ test('approving a held run puts it on the boards of the day it was played', func
     expect($run->status)->toBe(RunStatus::Review)
         ->and(LeaderboardEntry::query()->count())->toBe(0)
         ->and(PlayerStat::query()->find($player->id))->toBeNull();
-    // Two counted runs before it, so the approved one opens the league.
-    Run::factory()->for($player)->ranked(100)->count(2)->create();
+    // One counted run short of the league before it, so the approved one opens it.
+    Run::factory()->for($player)->ranked(100)->count(config('quezby.leagues.unlock_runs') - 1)->create();
     Carbon::setTestNow(Carbon::parse('2026-09-26 12:00', 'Europe/Istanbul'));
 
     $this->artisan('quezby:run:approve', ['run' => strtoupper($run->id)])

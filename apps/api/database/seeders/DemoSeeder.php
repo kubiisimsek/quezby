@@ -15,11 +15,11 @@ use App\Game\Run as Engine;
 use App\Models\LeagueGroup;
 use App\Models\Run;
 use App\Models\User;
-use App\Services\FollowService;
 use App\Services\Integrity\DeviceCheckResult;
 use App\Services\Integrity\DeviceIntegrity;
 use App\Services\RunClock;
 use App\Services\RunService;
+use App\Services\Social\FriendService;
 use App\Support\Username;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Seeder;
@@ -61,6 +61,13 @@ final class DemoSeeder extends Seeder
     /** Less time than this left in a day, and a player does not start another run. */
     private const MIN_RUN_MS = 45000;
 
+    /**
+     * Counted runs that open a demo player's league. The players stand for
+     * veterans: with the real threshold (`leagues.unlock_runs`, 20) a week of
+     * demo play would open hardly anyone's league.
+     */
+    public const VETERAN_UNLOCK_RUNS = 3;
+
     public function __construct(
         /** How many of the demo players to create, at most 24. */
         public int $players = 24,
@@ -68,7 +75,7 @@ final class DemoSeeder extends Seeder
         public int $days = 8,
     ) {}
 
-    public function run(RunService $runs, FollowService $follows, DeviceIntegrity $devices, RunClock $clock): void
+    public function run(FriendService $friends, DeviceIntegrity $devices, RunClock $clock): void
     {
         if (! app()->environment('local')) {
             throw new RuntimeException('DemoSeeder only runs locally (APP_ENV=local): it plays hundreds of made-up runs onto the boards.');
@@ -83,15 +90,19 @@ final class DemoSeeder extends Seeder
 
         $began = hrtime(true);
         $testNow = Carbon::getTestNow();
+        $unlockRuns = config('quezby.leagues.unlock_runs');
+        config(['quezby.leagues.unlock_runs' => self::VETERAN_UNLOCK_RUNS]);
+        // Resolved after the line above, so its league service opens at the veterans' threshold.
+        $runs = app(RunService::class);
         $now = CarbonImmutable::now('UTC');
         $timezone = (string) config('quezby.leaderboard.timezone');
         $today = $now->setTimezone($timezone)->startOfDay();
         $first = $today->subDays(max(1, $this->days) - 1);
 
         try {
-            DB::transaction(function () use ($runs, $follows, $devices, $clock, $names, $now, $today, $first) {
+            DB::transaction(function () use ($runs, $friends, $devices, $clock, $names, $now, $today, $first) {
                 $players = $this->createPlayers($names, $first);
-                $this->follow($players, $follows, $first);
+                $this->befriend($players, $friends, $first);
 
                 for ($day = $first; $day->lessThanOrEqualTo($today); $day = $day->addDay()) {
                     foreach ($players as $player) {
@@ -101,6 +112,7 @@ final class DemoSeeder extends Seeder
             });
         } finally {
             Carbon::setTestNow($testNow);
+            config(['quezby.leagues.unlock_runs' => $unlockRuns]);
         }
 
         $this->report($names, (hrtime(true) - $began) / 1e9);
@@ -139,12 +151,13 @@ final class DemoSeeder extends Seeder
     }
 
     /**
-     * Everyone follows a few players near them in the list, and every other
-     * player follows the best one — through the service, like the app does.
+     * Everyone asks a few players near them in the list to be friends, and
+     * every other player asks the best one — through the service, like the
+     * app does. Most say yes; a few requests are left waiting.
      *
      * @param  list<array{user: User, skill: float, top: bool}>  $players
      */
-    private function follow(array $players, FollowService $follows, CarbonImmutable $first): void
+    private function befriend(array $players, FriendService $friends, CarbonImmutable $first): void
     {
         $count = count($players);
         $at = $first->subDay()->setTime(9, 0);
@@ -162,7 +175,11 @@ final class DemoSeeder extends Seeder
                 }
                 $at = $at->addMinutes(11 + ($i + $j) % 17);
                 Carbon::setTestNow($at->utc());
-                $follows->follow($player['user'], $players[$j]['user']);
+                $friends->add($player['user'], $players[$j]['user']);
+                if (($i + $j) % 5 !== 0) {
+                    Carbon::setTestNow($at->addMinutes(3)->utc());
+                    $friends->add($players[$j]['user'], $player['user']);
+                }
             }
         }
     }
@@ -389,15 +406,15 @@ final class DemoSeeder extends Seeder
     {
         $users = User::query()->whereIn('username', $names)->pluck('id');
         $runs = Run::query()->whereIn('user_id', $users)->toBase()->selectRaw('status, count(*) as runs')->groupBy('status')->pluck('runs', 'status');
-        $follows = DB::table('follows')->whereIn('follower_id', $users)->count();
+        $friendships = intdiv(DB::table('friendships')->whereIn('user_id', $users)->count(), 2);
 
         $this->command?->outputComponents()->info(sprintf(
-            'Demo: %d players, %d runs (%d ranked, %d held for review), %d follows, %d league groups — %.1f s.',
+            'Demo: %d players, %d runs (%d ranked, %d held for review), %d friendships, %d league groups — %.1f s.',
             $users->count(),
             $runs->sum(),
             $runs[RunStatus::Ranked->value] ?? 0,
             $runs[RunStatus::Review->value] ?? 0,
-            $follows,
+            $friendships,
             LeagueGroup::query()->count(),
             $seconds,
         ));
