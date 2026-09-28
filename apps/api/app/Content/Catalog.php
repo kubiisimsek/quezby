@@ -16,9 +16,15 @@ final class Catalog
 {
     public const LATEST = 1;
 
-    /** @var array<int, array<string, int>> */
+    /**
+     * While the game is on staging, catalog 1 grows in place — at the end of
+     * each list — and these lengths grow with it; once the app is in the
+     * stores, a list that grows is a new version.
+     *
+     * @var array<int, array<string, int>>
+     */
     public const SIZES = [
-        1 => ['skip' => 18, 'like' => 10, 'hold' => 6, 'freeze' => 5],
+        1 => ['skip' => 560, 'like' => 200, 'hold' => 120, 'freeze' => 120],
     ];
 
     public static function has(int $version): bool

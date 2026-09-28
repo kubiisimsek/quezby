@@ -178,4 +178,30 @@ export const reel = {
   miss: 'oklch(0.66 0.22 25)',
   gold: 'oklch(0.85 0.17 86)',
   goldInk: 'oklch(0.32 0.075 55)',
+
+  // A post's props — what its format draws with. White glass and faint
+  // patterns sit on any kind's colour without changing it; paper, a photo's
+  // frame and a sign are the only light things, small against the reel.
+  glass: 'oklch(1 0 0 / 0.12)',
+  glassStrong: 'oklch(1 0 0 / 0.2)',
+  pattern: 'oklch(1 0 0 / 0.07)',
+  paper: 'oklch(0.965 0.012 85)',
+  paperInk: 'oklch(0.3 0.015 60)',
+  paperFaint: 'oklch(0.58 0.015 60)',
+  photo: 'oklch(0.985 0.004 90)',
+  tape: 'oklch(0.97 0.03 90 / 0.62)',
+  bubble: 'oklch(0.95 0.02 200)',
+  bubbleInk: 'oklch(0.3 0.045 225)',
+  // A friend's photos: four pinks from the like reel's own.
+  likeTiles: [
+    'oklch(0.8 0.1 355)',
+    'oklch(0.38 0.15 355)',
+    'oklch(0.47 0.18 352)',
+    'oklch(0.9 0.06 355)',
+  ],
+  holdRay: 'oklch(0.97 0.09 95 / 0.24)',
+  hazard: 'oklch(0.18 0.06 25)',
+  sign: 'oklch(0.95 0.025 70)',
+  signInk: 'oklch(0.32 0.13 25)',
+  scan: 'oklch(0 0 0 / 0.16)',
 };

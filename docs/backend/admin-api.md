@@ -287,12 +287,15 @@ settles it, as a player's visit would.
 
 ## Content
 
-### `GET /content?kind=&sort=` — viewer
+### `GET /content?kind=&sort=&page=&perPage=` — viewer
 
-Every post of the latest catalog, shown or not: `shows, likes, misses` and
-their per-mille rates of shows (`null` before a post is shown), sorted by
-`shows`, `likeRate` or `missRate`. The panel labels posts from
-`@quezby/config` (`postsOf`).
+The latest catalog's posts, shown or not, a page at a time like every list:
+`shows, likes, misses` and their per-mille rates of shows (`null` before a
+post is shown), sorted by `shows`, `likeRate` or `missRate`. `totals` and
+`topMissed` / `topLiked` — the five highest rates among the posts ever
+missed or liked — cover every post of the kind asked for, not just the
+page. The panel labels posts, and names their format, from `@quezby/config`
+(`postsOf`).
 
 ## Audit log
 

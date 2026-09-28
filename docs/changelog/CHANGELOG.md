@@ -1,5 +1,59 @@
 # Changelog
 
+## 2026-09-28 — Posts get formats: chats, polls, receipts, signs… and many more of them
+
+- **Every post is drawn in a format** (`packages/config/src/content/types.ts`):
+  a chat screenshot, a poll, a line chart, a till receipt, one big number, a
+  tier list, a lock screen of notifications, a quote card, a scene (the emoji
+  as a photo: disc, crop, frame, wallpaper or spotlight), a friend's polaroid
+  or photo dump, a gold post's treasure, a red post's warning sign or security
+  camera. A kind wears only its own formats (`FORMATS_OF`) and keeps its
+  colour and badge, so it still reads first. No photos, no downloads: every
+  format is drawn by the app (`apps/mobile/src/game/formats/`), whole on its
+  first frame and the same offline.
+- **The same post dresses differently from run to run** (`game/dress.ts`):
+  the pattern on its colour (dots, stripes, grid, waves, confetti or the old
+  glows), the format's layout, a tilt, a sticker and the parts a format
+  borrows — a receipt's other items, a lock screen's other notifications, a
+  poll's shares, a chart's line — from `content/pools.ts`. All from the seed
+  and the reel's place (`SALT.dress`): a run always looks the same and the
+  daily feed is one look for everyone. None of it reaches the API.
+- **The catalog grows from 39 to 1,000 posts** (skip 560, like 200, hold 120,
+  freeze 120) in six languages, with 42 new accounts (63 in all): 284 by
+  format in `content/posts/*.ts`, then 677 in twelve themes in
+  `content/posts/themes/` — home, food & shopping, school, work, family,
+  friends, the phone, the outdoors, animals, hobbies, travel, sleep — each
+  written by one hand so no joke is told twice. The parts pools hold 70
+  receipt items and 60 notifications. At about 70 ordinary posts a run, a
+  100-post run meets a post it has already seen about 5 times (it was 66),
+  and then in another dress. The first 39 keep their places (the fixtures
+  now hold each id's emoji and format too). The
+  content version stays **1** while the game is on staging: the lists grow in
+  place, at their ends; once the app is in the stores, a list that grows is a
+  new version. `apps/api/app/Content/Catalog.php` has the new lengths —
+  **deploy the API with the app**, or the API credits likes and misses to the
+  wrong posts.
+- **Every line is checked** (`packages/config/scripts/content-rules.ts`): a
+  length for each field so it fits its box, French no-break spaces, Spanish
+  ¿¡, Arabic's own punctuation and Latin digits, capitals typed (never
+  transformed) where a till or a sign prints them, the same digits in every
+  language for a big number. `scripts/check-content.ts` runs them on a file
+  while it is being written; `scripts/similar-content.ts` lists the posts
+  whose Turkish words overlap most, for a writer to read for repeats.
+- **The admin panel's Content page is paged** like every other list
+  (`GET /admin/content?page=&perPage=`); its totals and the most missed /
+  most liked are ranked by the API over every page (`topMissed`,
+  `topLiked`), and each post names its format.
+- New palette props in `design/palette.mjs` → `reel` (glass, pattern, paper,
+  photo, tape, bubble, likeTiles, holdRay, hazard, sign, scan); new words in
+  `messages/game.ts` → `post` (ANKET, TOPLAM, çevrimiçi, the axis' days and
+  months…); `t.fmt.percent` and `t.fmt.price`.
+- Tests: `dress.test.ts`, `formats.test.tsx`, `ReelCard.test.tsx`,
+  `content.test.ts` (app); `content.test.ts` (config: every post and pool
+  through the rules, every format worn, no joke twice); `ContentTest.php`
+  (pages, top fives); `ContentPage.test.tsx`; the SDK's content call with a
+  page.
+
 ## 2026-09-26 — Fair timing: a post starts when it is drawn, a swipe counts when it is recognised
 
 - **A post goes live on its first drawn frame** (`useGame`: `beginReel` arms

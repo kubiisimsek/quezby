@@ -14,6 +14,8 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { lookOf } from '@/game/content';
+import { Backdrop } from '@/game/formats/Backdrop';
+import { PostMedia } from '@/game/formats/PostMedia';
 import { reelGuide } from '@/game/howTo';
 import { useT } from '@/i18n';
 import { Icon, type IconName } from '@/ui/icons';
@@ -82,10 +84,11 @@ export function ReelCard({
     transform: [{ translateY: values.dragY.value + (1 - values.enter.value) * 90 }],
   }));
 
-  const discStyle = useAnimatedStyle(() => ({
+  // A post's picture breathes while it is live — gently: it may be a whole screenshot.
+  const mediaStyle = useAnimatedStyle(() => ({
     transform: [
-      { scale: 1 + pulse.value * 0.05 },
-      { translateY: -pulse.value * 6 },
+      { scale: 1 + pulse.value * 0.025 },
+      { translateY: -pulse.value * 4 },
     ],
   }));
 
@@ -106,8 +109,7 @@ export function ReelCard({
       pointerEvents="none"
       style={[styles.card, { backgroundColor: look.background }, cardStyle]}
     >
-      <View style={[styles.glow, styles.glowTop]} />
-      <View style={[styles.glow, styles.glowBottom]} />
+      <Backdrop kind={reel.kind} format={look.media.format} pattern={look.dress.pattern} paused={paused} />
 
       {reel.kind === 'freeze' ? (
         <Animated.View style={[styles.alarm, alarmStyle]} />
@@ -121,16 +123,8 @@ export function ReelCard({
           </View>
         ) : null}
 
-        <Animated.View
-          style={[
-            styles.disc,
-            reel.kind === 'like' ? styles.discLike : null,
-            reel.kind === 'hold' ? styles.discHold : null,
-            reel.kind === 'freeze' ? styles.discFreeze : null,
-            discStyle,
-          ]}
-        >
-          <Text style={styles.emoji}>{look.emoji}</Text>
+        <Animated.View testID={`post-${look.media.format}`} style={[styles.media, mediaStyle]}>
+          <PostMedia look={look} kind={reel.kind} />
         </Animated.View>
 
         {look.headline ? (
@@ -218,14 +212,6 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFill,
     overflow: 'hidden',
   },
-  glow: {
-    borderRadius: RADIUS.pill,
-    height: 420,
-    position: 'absolute',
-    width: 420,
-  },
-  glowTop: { backgroundColor: REEL.skipDisc, left: -160, top: -140 },
-  glowBottom: { backgroundColor: REEL.shade, bottom: -180, right: -140 },
   alarm: {
     ...StyleSheet.absoluteFill,
     borderColor: REEL.freezeAlarm,
@@ -236,7 +222,7 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: SPACE.xl,
     justifyContent: 'center',
-    paddingBottom: 150,
+    paddingBottom: 180,
     paddingHorizontal: SPACE.xxl,
   },
   badge: {
@@ -250,18 +236,7 @@ const styles = StyleSheet.create({
   },
   badgeAlarm: { backgroundColor: REEL.freezeAlarm },
   badgeText: { ...TYPE.heading, color: REEL.ink },
-  disc: {
-    alignItems: 'center',
-    backgroundColor: REEL.skipDisc,
-    borderRadius: RADIUS.pill,
-    height: 190,
-    justifyContent: 'center',
-    width: 190,
-  },
-  discLike: { borderColor: REEL.likeGlow, borderWidth: 4 },
-  discHold: { backgroundColor: REEL.holdDeep, borderColor: REEL.holdBar, borderWidth: 4 },
-  discFreeze: { backgroundColor: REEL.shade, borderColor: REEL.freezeAlarm, borderWidth: 4 },
-  emoji: { fontSize: 104, lineHeight: 124 },
+  media: { alignItems: 'center', alignSelf: 'stretch' },
   headlineBlock: { alignItems: 'center', gap: SPACE.xs },
   headline: { ...TYPE.display, color: REEL.ink, fontSize: 30, lineHeight: lh(36), textAlign: 'center' },
   subline: { ...TYPE.heading, color: REEL.inkSoft },

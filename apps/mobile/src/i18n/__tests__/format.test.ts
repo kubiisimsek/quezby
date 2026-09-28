@@ -70,6 +70,26 @@ describe('formatsFor', () => {
     expect(en.compact(842)).toBe('842');
   });
 
+  it('writes a fake post’s per cents and prices each language’s way', () => {
+    expect([tr, en, de, fr, es, ar].map((f) => f.percent(97))).toEqual([
+      '%97',
+      '97%',
+      '97 %',
+      '97 %',
+      '97 %',
+      '97%',
+    ]);
+    expect([tr, en, de, fr, es, ar].map((f) => f.price(123450))).toEqual([
+      '1.234,50',
+      '1,234.50',
+      '1.234,50',
+      '1 234,50',
+      '1234,50',
+      '1,234.50',
+    ]);
+    expect(en.price(5)).toBe('0.05');
+  });
+
   it('says a rank is new in each language', () => {
     expect([en, de, fr, es, ar].map((f) => f.rankChange(null, 3))).toEqual([
       'new',

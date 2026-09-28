@@ -3,7 +3,19 @@ import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-import { CATALOGS, CONTENT_VERSION, SALT, mix, postFor, postsOf, type ContentKind } from '../content';
+import { draftProblems, poolProblems } from '../../scripts/content-rules';
+import {
+  CATALOGS,
+  CONTENT_VERSION,
+  FORMATS_OF,
+  NOTICES,
+  RECEIPT_ITEMS,
+  SALT,
+  mix,
+  postFor,
+  postsOf,
+  type ContentKind,
+} from '../content';
 import { buildContent, buildPace } from '../fixtures';
 import { LOCALES } from '../locales';
 import { validateUsername } from '../username';
@@ -38,8 +50,25 @@ describe('content catalog', () => {
 
   it('spreads picks over the whole list', () => {
     const seen = new Set<string>();
-    for (let index = 0; index < 400; index += 1) seen.add(postFor(2024, index, 'skip').id);
+    for (let index = 0; index < 5000; index += 1) seen.add(postFor(2024, index, 'skip').id);
     expect(seen.size).toBe(CATALOGS[CONTENT_VERSION]!.skip.length);
+  });
+
+  it('dresses every kind only in the formats it may wear, and wears each of them', () => {
+    const catalog = CATALOGS[CONTENT_VERSION]!;
+    for (const kind of Object.keys(FORMATS_OF) as ContentKind[]) {
+      const worn = new Set(catalog[kind].map((post) => post.body.format));
+      expect([...worn].every((format) => FORMATS_OF[kind].includes(format)), kind).toBe(true);
+      expect([...worn].sort(), kind).toEqual([...FORMATS_OF[kind]].sort());
+    }
+  });
+
+  it('never tells the same joke twice', () => {
+    const posts = Object.values(CATALOGS[CONTENT_VERSION]!).flat();
+    // Freeze posts share their line under the headline; the headline is the joke.
+    const jokes = posts.map((post) => post.headline?.tr ?? post.caption.tr);
+    const repeated = jokes.filter((joke, i) => jokes.indexOf(joke) !== i);
+    expect(repeated).toEqual([]);
   });
 
   it('refuses a catalog version it does not have', () => {
@@ -51,8 +80,13 @@ describe('content catalog', () => {
     expect(postsOf().get('like-001')?.user.tr).toBe('@zeynep.k');
   });
 
-  it('keeps every published post in its place: an id always names the same post', () => {
-    const emojis = (kind: ContentKind) => CATALOGS[1]![kind].map((post) => post.emoji).join(' ');
+  it('keeps the first posts in their places: an id always names the same post', () => {
+    const first = { skip: 18, like: 10, hold: 6, freeze: 5 };
+    const emojis = (kind: ContentKind) =>
+      CATALOGS[1]![kind]
+        .slice(0, first[kind])
+        .map((post) => post.emoji)
+        .join(' ');
     expect(emojis('skip')).toBe('☕️ 🍝 🧊 🔁 ⏱️ 📉 🧦 🚌 🥬 📺 🎵 🛋️ 🧾 🌧️ 🥪 🗂️ 🥱 🪴');
     expect(emojis('like')).toBe('🐱 🎂 🍳 🏖️ 🐶 💇 🎤 🥟 🐰 🦦');
     expect(emojis('hold')).toBe('💎 👑 🍀 🏆 ⏳ 🪙');
@@ -83,6 +117,20 @@ describe('content words', () => {
     }
   });
 
+  it('keeps every line of every format inside its box, each language typed its way', () => {
+    const catalog = CATALOGS[CONTENT_VERSION]!;
+    const problems = (Object.keys(catalog) as ContentKind[]).flatMap((kind) =>
+      catalog[kind].flatMap((post) => draftProblems(kind, post).map((problem) => `${post.id} ${problem}`)),
+    );
+    expect(problems).toEqual([]);
+  });
+
+  it('writes the parts formats borrow as cleanly as the posts', () => {
+    expect(poolProblems()).toEqual([]);
+    expect(RECEIPT_ITEMS.length).toBeGreaterThanOrEqual(3);
+    expect(NOTICES.length).toBeGreaterThanOrEqual(3);
+  });
+
   it('writes every handle as a name a player could pick', () => {
     for (const post of posts) {
       for (const locale of LOCALES) {
@@ -105,8 +153,9 @@ describe('content words', () => {
     const catalog = CATALOGS[CONTENT_VERSION]!;
     expect(catalog.skip[0]?.caption.tr).toBe('POV: pazartesi sabahı');
     expect(catalog.skip[5]?.caption.tr).toBe('Bunu izleyenlerin %97’si kaydırdı');
-    expect(catalog.freeze.map((post) => post.caption.tr)).toEqual(Array(5).fill('Kıpırdama. Dokunma.'));
-    expect(catalog.freeze.map((post) => post.headline?.tr)).toEqual([
+    const first = catalog.freeze.slice(0, 5);
+    expect(first.map((post) => post.caption.tr)).toEqual(Array(5).fill('Kıpırdama. Dokunma.'));
+    expect(first.map((post) => post.headline?.tr)).toEqual([
       'Annen odaya girdi',
       'Patron arkanda',
       'Hoca bakıyor',
@@ -122,8 +171,8 @@ describe('content words', () => {
       // Spanish opens what it asks or exclaims.
       if (words.es.includes('?')) expect(words.es).toContain('¿');
       if (words.es.includes('!')) expect(words.es).toContain('¡');
-      // Arabic: Latin digits, and its own comma and question mark.
-      expect(words.ar, words.ar).not.toMatch(/[٠-٩۰-۹,?]/);
+      // Arabic: Latin digits, and its own comma and question mark — a Latin comma only groups digits.
+      expect(words.ar, words.ar).not.toMatch(/[٠-٩۰-۹?]|,(?!\d{3})|(?<!\d),/);
     }
   });
 });
@@ -137,12 +186,16 @@ describe('fixtures', () => {
     expect(read('pace.json')).toEqual(JSON.parse(JSON.stringify(buildPace())));
   });
 
-  it('never rewrites a published catalog: ids only grow at the end', () => {
+  it('never rewrites a published catalog: posts only grow at the end, each in its place', () => {
     const published = (read('content.json') as ReturnType<typeof buildContent>).catalogs;
-    for (const { version, ids } of published) {
+    for (const { version, ids, faces } of published) {
       const catalog = CATALOGS[version]!;
       for (const [kind, list] of Object.entries(ids)) {
         expect(catalog[kind as keyof typeof catalog].slice(0, list.length).map((post) => post.id)).toEqual(list);
+      }
+      for (const [kind, list] of Object.entries(faces)) {
+        const posts = catalog[kind as keyof typeof catalog].slice(0, list.length);
+        expect(posts.map((post) => `${post.emoji} ${post.body.format}`)).toEqual(list);
       }
     }
   });

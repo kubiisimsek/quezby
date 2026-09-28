@@ -3,15 +3,14 @@
 namespace App\Http\Requests\Admin;
 
 use App\Game\ReelKind;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class ContentRequest extends FormRequest
+class ContentRequest extends PageRequest
 {
     /**
      * @return array<string, mixed>
      */
-    public function rules(): array
+    protected function filters(): array
     {
         return [
             'kind' => ['nullable', Rule::enum(ReelKind::class)],

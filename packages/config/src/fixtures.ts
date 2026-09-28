@@ -27,6 +27,10 @@ export function buildContent() {
     catalogs: Object.entries(CATALOGS).map(([version, catalog]) => ({
       version: Number(version),
       ids: Object.fromEntries(KINDS.map((kind) => [kind, catalog[kind].map((post) => post.id)])),
+      // Each id's emoji and format: a post slipped into another's place shows in the diff.
+      faces: Object.fromEntries(
+        KINDS.map((kind) => [kind, catalog[kind].map((post) => `${post.emoji} ${post.body.format}`)]),
+      ),
     })),
     mix: SEEDS.flatMap((seed) =>
       [0, 1, 7, 19, 500, 4999].flatMap((index) =>

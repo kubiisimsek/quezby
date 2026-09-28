@@ -132,11 +132,37 @@ değişir; hayır diyenin kayıtları silinir.
 
 ## İçerik
 
-Gerçek video yok. Her reel bir renk ve bir sahte gönderi: emoji, hesap adı,
-espri — `packages/config/src/content/`, sürümlü ve yalnızca sona eklenen bir
-katalog. Gönderi seed + reel sırasından seçilir; sunucu aynı seçimi yapar
-(`app/Content`), böylece hangi gönderinin beğenildiğini uygulamaya sormadan
-bilir. Telif, moderasyon ve bant genişliği derdi yoktur; oyun anında okunur.
+Gerçek video ya da fotoğraf yok: her post, uygulamanın kendisinin çizdiği
+sahte bir gönderi. Türü renginden okunur (gri sıradan, pembe arkadaş, altın,
+kırmızı); postu özgün yapan **formatıdır**: sohbet ekran görüntüsü, anket,
+grafik, market fişi, büyük sayı, tier list, kilit ekranı bildirimleri, alıntı
+kartı, sahne (emojinin fotoğrafı), polaroid, foto dump, hazine, uyarı levhası,
+güvenlik kamerası. Her tür yalnızca kendine uyan formatları giyer
+(`FORMATS_OF`).
+
+- **Katalog** (`packages/config/src/content/`): 1.000 post — 560 sıradan, 200
+  arkadaş, 120 altın, 120 kırmızı; her biri bir espri, bir hesap ve bir
+  format, altı dilde. İlk postlar formatlara göre (`posts/*.ts`), sonrakiler
+  on iki temada (`posts/themes/`: ev, yemek, okul, iş, aile, arkadaşlar,
+  telefon, doğa, hayvanlar, hobiler, seyahat, uyku) yazıldı; 100 reellik bir
+  koşuda aynı post ortalama 5 kez tekrar eder, o da başka bir kıyafetle.
+  Yalnızca sona eklenir: bir postun id'si türü ve
+  listedeki yeridir (`like-007`), fixture'lar her id'nin emojisini ve
+  formatını tutar. Oyun staging'deyken katalog sürüm 1'de yerinde büyür;
+  mağazadaki oyuncular olunca liste uzunluğunu değiştiren her ekleme yeni
+  sürümdür.
+- **Giydirme** (`apps/mobile/src/game/dress.ts`): aynı post her koşuda başka
+  görünür — arka plan deseni, formatın düzeni, eğim, çıkartma ve formatın
+  ödünç aldığı parçalar (fişin öbür kalemleri, kilit ekranının öbür
+  bildirimleri, anketin oranları, grafiğin çizgisi; havuzları
+  `content/pools.ts`). Hepsi seed + reel sırasından seçilir: bir koşu hep aynı
+  görünür, Günün akışı herkese aynıdır.
+- Gönderi seed + reel sırasından seçilir; sunucu aynı seçimi yapar
+  (`app/Content`), böylece hangi gönderinin beğenildiğini uygulamaya sormadan
+  bilir. Görünüş sunucuya hiç gitmez.
+
+Telif, moderasyon, bant genişliği ve yükleme gecikmesi derdi yoktur: post ilk
+karesinde tam çizilmiştir ve internetsiz de aynı görünür.
 
 ## Sonraki adımlar
 

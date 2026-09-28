@@ -346,15 +346,17 @@ export function leagueGroup(overrides: Partial<AdminLeagueGroupResponse> = {}): 
   };
 }
 
+/** The first page of a long catalog: three posts on it, the top fives ranked by the API over all of them. */
 export function contentResponse(overrides: Partial<AdminContentResponse> = {}): AdminContentResponse {
+  const coffee = { contentId: 'skip-003', kind: 'skip', shows: 1000, likes: 0, misses: 400, likeRate: 0, missRate: 400 } as const;
+  const cat = { contentId: 'like-001', kind: 'like', shows: 200, likes: 150, misses: 50, likeRate: 750, missRate: 250 } as const;
+  const diamond = { contentId: 'hold-001', kind: 'hold', shows: 0, likes: 0, misses: 0, likeRate: null, missRate: null } as const;
   return {
+    ...page([coffee, cat, diamond], { perPage: 3, total: 323 }),
     contentVersion: 1,
-    items: [
-      { contentId: 'skip-003', kind: 'skip', shows: 1000, likes: 0, misses: 400, likeRate: 0, missRate: 400 },
-      { contentId: 'like-001', kind: 'like', shows: 200, likes: 150, misses: 50, likeRate: 750, missRate: 250 },
-      { contentId: 'hold-001', kind: 'hold', shows: 0, likes: 0, misses: 0, likeRate: null, missRate: null },
-    ],
     totals: { shows: 1200, likes: 150, misses: 450 },
+    topMissed: [coffee, cat],
+    topLiked: [cat],
     ...overrides,
   };
 }

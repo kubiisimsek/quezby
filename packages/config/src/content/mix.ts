@@ -10,5 +10,9 @@ export function mix(seed: number, index: number, salt: number): number {
   return (h ^ (h >>> 16)) >>> 0;
 }
 
-/** Salts in use. The post is one pick, so a reel's emoji, account and caption belong together. */
-export const SALT = { background: 1, post: 2, likes: 7, comments: 8 } as const;
+/**
+ * Salts in use. The post is one pick, so a reel's emoji, account and caption
+ * belong together. `dress` and the salts after it choose how the post is drawn
+ * (the app's `game/dress.ts`) — the API never needs them.
+ */
+export const SALT = { background: 1, post: 2, likes: 7, comments: 8, dress: 16 } as const;

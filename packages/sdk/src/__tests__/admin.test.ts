@@ -132,6 +132,13 @@ const CALLS: Call[] = [
     auth: true,
   },
   {
+    name: 'content.list, a page of it',
+    call: (api) => api.content.list({ sort: 'shows', page: 3, perPage: 50 }),
+    method: 'GET',
+    url: '/content?sort=shows&page=3&perPage=50',
+    auth: true,
+  },
+  {
     name: 'audit.list',
     call: (api) => api.audit.list({ action: 'player.ban', via: 'cli', subjectType: 'player', subjectId: PLAYER }),
     method: 'GET',

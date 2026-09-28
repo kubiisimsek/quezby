@@ -11,10 +11,11 @@ import { BandStats } from '@/components/patterns/band-stats';
 import { DataTable, type Column } from '@/components/patterns/data-table';
 import { FilterChips } from '@/components/patterns/filter-chips';
 import { Page } from '@/components/patterns/page';
+import { Pager } from '@/components/patterns/pager';
 import { ShareList } from '@/components/patterns/share-list';
 import { useContent } from '@/hooks/api/content';
 import { useListParams } from '@/hooks/useListParams';
-import { formatNumber, formatPerMille, POST_KIND } from '@/lib/format';
+import { formatNumber, formatPerMille, POST_FORMAT, POST_KIND } from '@/lib/format';
 
 type KindChip = 'all' | AdminPostKind;
 
@@ -23,7 +24,7 @@ function wordsOf(post: Post | undefined): string | undefined {
   return post?.headline?.tr ?? post?.caption.tr;
 }
 
-/** A post as the feed shows it: its emoji, who posted it and what it says. */
+/** A post as the feed shows it: its emoji, who posted it, how it is drawn and what it says. */
 function PostCell({ post, id }: { post: Post | undefined; id: string }) {
   return (
     <span className="flex min-w-0 items-center gap-2.5">
@@ -33,7 +34,7 @@ function PostCell({ post, id }: { post: Post | undefined; id: string }) {
       <span className="min-w-0">
         <span className="block truncate font-semibold text-ink">{wordsOf(post) ?? id}</span>
         <span className="block truncate text-micro font-medium text-ink-faint">
-          {post ? `${post.user.tr} · ` : ''}
+          {post ? `${post.user.tr} · ${POST_FORMAT[post.body.format]} · ` : ''}
           <span className="font-mono">{id}</span>
         </span>
       </span>
@@ -56,9 +57,9 @@ function rate(value: number | null, tone: 'ok' | 'bad', label: string) {
  * balancing the catalog. Labels come from the catalog the app plays with.
  */
 export function ContentPage() {
-  const { params, set } = useListParams({ kind: 'all', sort: 'shows' });
+  const { params, page, set, setPage } = useListParams({ kind: 'all', sort: 'shows' });
   const kind = params.kind as KindChip;
-  const content = useContent({ kind: kind === 'all' ? undefined : kind, sort: params.sort as AdminContentSort });
+  const content = useContent({ kind: kind === 'all' ? undefined : kind, sort: params.sort as AdminContentSort, page });
   const data = content.data;
   const posts = useMemo(() => {
     try {
@@ -80,14 +81,9 @@ export function ContentPage() {
     const post = posts.get(row.contentId);
     return `${post?.emoji ?? ''} ${wordsOf(post) ?? row.contentId}`.trim();
   };
-  // The five highest rates the API sent, among posts it happened to at all.
-  const topBy = (rate: 'likeRate' | 'missRate', count: 'likes' | 'misses') =>
-    [...(data?.items ?? [])]
-      .filter((row) => row[rate] !== null && row[count] > 0)
-      .sort((a, b) => (b[rate] ?? 0) - (a[rate] ?? 0))
-      .slice(0, 5);
-  const missed = topBy('missRate', 'misses');
-  const liked = topBy('likeRate', 'likes');
+  // The API ranks these over every page, not just the one on screen.
+  const missed = data?.topMissed ?? [];
+  const liked = data?.topLiked ?? [];
 
   return (
     <Page
@@ -139,6 +135,7 @@ export function ContentPage() {
             </>
           }
           empty={{ title: 'Katalogda post yok', icon: <GalleryVerticalEnd /> }}
+          footer={data ? <Pager page={data.page} perPage={data.perPage} total={data.total} onPage={setPage} noun="post" /> : undefined}
         />
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-1 xl:self-start">
           <Panel title="En çok kaçırılanlar" description="Oyuncuların en çok takıldığı postlar." icon={<TriangleAlert />} tone="bad">

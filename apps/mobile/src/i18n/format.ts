@@ -118,6 +118,10 @@ export type Formats = {
   rankChange: (before: number | null, after: number | null) => string;
   /** A fake post's like count: `842`, `1,2 B`, `1.2K`. */
   compact: (value: number) => string;
+  /** A whole per cent, where the language puts the sign: `%97`, `97%`, `97 %`. */
+  percent: (value: number) => string;
+  /** A price on a fake receipt, from cents: `1.234,50`, `1,234.50`, `1 234,50`. */
+  price: (cents: number) => string;
 };
 
 /** Spanish `y` and `o` change before the sound they would run into. */
@@ -185,6 +189,12 @@ export function formatsFor(locale: Locale): Formats {
     compact: (value) => {
       if (value < 1000) return `${value}`;
       return THOUSANDS[locale](decimals(value / 1000, 1));
+    },
+    percent: (value) => ltr(PERCENT[locale](group(value))),
+    price: (cents) => {
+      const whole = Math.floor(Math.max(0, cents) / 100);
+      const rest = (Math.max(0, cents) % 100).toString().padStart(2, '0');
+      return `${group(whole)}${decimalMark(locale)}${rest}`;
     },
   };
 }

@@ -66,7 +66,8 @@ bağladığında dil onunla gelir. Dillerden önceki hesaplar Türkçe sayılır
 | Hesapla eşitleme | `apps/mobile/src/hooks/useLanguageSync.ts` |
 | Sayı, süre, liste biçimleri | `t.fmt` (`apps/mobile/src/i18n/format.ts`) |
 | Sunucu metinleri | `apps/api/lang/{tr,en,de,ar,fr,es}/` |
-| Sahte postlar | `packages/config/src/content/catalog.ts` (espri ve hesap adları dil başına) |
+| Sahte postlar | `packages/config/src/content/`: `posts/*.ts` ve `posts/themes/*.ts` (espriler ve formatların sözcükleri), `pools.ts` (fiş kalemleri, bildirimler), `accounts.ts` (hesap adları dil başına); kurallar `scripts/content-rules.ts`, yazarken `scripts/check-content.ts`, tekrar avı `scripts/similar-content.ts` |
+| Formatların sabit sözcükleri | `apps/mobile/src/i18n/messages/game.ts` → `post` (ANKET, TOPLAM, çevrimiçi, gün ve ay kısaltmaları…) |
 
 ## Yeni bir satır
 

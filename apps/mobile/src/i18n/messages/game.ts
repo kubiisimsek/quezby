@@ -1,7 +1,9 @@
+import { groupDigits } from '@quezby/config';
 import type { Verdict } from '@quezby/engine';
 import type { Locale } from '@quezby/types';
 
 import { iso } from '@/i18n/format';
+import { plural } from '@/i18n/plural';
 
 /**
  * The run and the screen around it. Inside a run the game speaks in one or
@@ -33,10 +35,32 @@ const tr = {
     level: (level: number) => `Seviye ${level}`,
     close: 'Oyundan çık',
   },
-  /** A post's own chrome (ReelCard); its captions are the content catalog's. */
+  /**
+   * A post's own chrome (ReelCard and the formats in `game/formats`); its
+   * captions and a format's words are the content catalog's.
+   */
   post: {
     share: 'Paylaş',
     holdMeter: 'Basılı tut · yeşilde bırak',
+    /** Under a chat screenshot's contact. */
+    online: 'çevrimiçi',
+    /** A poll's ribbon and how many voted. */
+    poll: 'ANKET',
+    votes: (count: number) => `${groupDigits(count, 'tr')} oy`,
+    /** A receipt's number, under the shop, and its last line. */
+    receipt: (number: string) => `FİŞ NO ${number}`,
+    total: 'TOPLAM',
+    /** A big number's ribbon, when the post has none of its own. */
+    didYouKnow: 'BİLİYOR MUYDUN?',
+    /** How long ago a notification came: now, minutes, hours. */
+    ago: (minutes: number) =>
+      minutes === 0 ? 'şimdi' : minutes < 60 ? `${minutes} dk` : `${Math.floor(minutes / 60)} sa`,
+    /** A chart's x axis: the week from Monday, and half a year from January. */
+    days: ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'] as readonly string[],
+    months: ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz'] as readonly string[],
+    /** A security camera's corner. */
+    rec: 'REC',
+    camera: (n: number) => `KAM ${n}`,
   },
   /** The practice run's card before the first post of each kind (CoachCard). */
   coach: {
@@ -89,6 +113,18 @@ const en: GameMessages = {
   post: {
     share: 'Share',
     holdMeter: 'Hold · let go in the green',
+    online: 'online',
+    poll: 'POLL',
+    votes: (count) => plural('en', count, { one: '1 vote', other: `${groupDigits(count, 'en')} votes` }),
+    receipt: (number) => `RECEIPT #${number}`,
+    total: 'TOTAL',
+    didYouKnow: 'DID YOU KNOW?',
+    ago: (minutes) =>
+      minutes === 0 ? 'now' : minutes < 60 ? `${minutes}m` : `${Math.floor(minutes / 60)}h`,
+    days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    rec: 'REC',
+    camera: (n) => `CAM ${n}`,
   },
   coach: {
     ribbon: (step, of) => `NEW POST · ${step}/${of}`,
@@ -133,6 +169,18 @@ const de: GameMessages = {
   post: {
     share: 'Teilen',
     holdMeter: 'Halten · im Grünen loslassen',
+    online: 'online',
+    poll: 'UMFRAGE',
+    votes: (count) => plural('de', count, { one: '1 Stimme', other: `${groupDigits(count, 'de')} Stimmen` }),
+    receipt: (number) => `BON-NR. ${number}`,
+    total: 'SUMME',
+    didYouKnow: 'WUSSTEST DU SCHON?',
+    ago: (minutes) =>
+      minutes === 0 ? 'jetzt' : minutes < 60 ? `${minutes} Min.` : `${Math.floor(minutes / 60)} Std.`,
+    days: ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'],
+    months: ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun'],
+    rec: 'REC',
+    camera: (n) => `KAM ${n}`,
   },
   coach: {
     ribbon: (step, of) => `NEUER POST · ${step}/${of}`,
@@ -177,6 +225,28 @@ const ar: GameMessages = {
   post: {
     share: 'مشاركة',
     holdMeter: 'اضغط مطولًا · ارفع في الأخضر',
+    online: 'متصل الآن',
+    poll: 'استطلاع',
+    votes: (count) => {
+      const n = groupDigits(count, 'ar');
+      return plural('ar', count, {
+        zero: `${n} صوت`,
+        one: 'صوت واحد',
+        two: 'صوتان',
+        few: `${n} أصوات`,
+        many: `${n} صوتًا`,
+        other: `${n} صوت`,
+      });
+    },
+    receipt: (number) => `فاتورة رقم ${iso(number)}`,
+    total: 'المجموع',
+    didYouKnow: 'هل تعلم؟',
+    ago: (minutes) =>
+      minutes === 0 ? 'الآن' : minutes < 60 ? `${minutes} د` : `${Math.floor(minutes / 60)} س`,
+    days: ['إثن', 'ثلا', 'أرب', 'خمي', 'جمع', 'سبت', 'أحد'],
+    months: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'],
+    rec: 'تسجيل',
+    camera: (n) => `كاميرا ${n}`,
   },
   coach: {
     ribbon: (step, of) => `منشور جديد · ${iso(`${step}/${of}`)}`,
@@ -221,6 +291,23 @@ const fr: GameMessages = {
   post: {
     share: 'Partager',
     holdMeter: 'Reste appuyé · relâche dans le vert',
+    online: 'en ligne',
+    poll: 'SONDAGE',
+    votes: (count) =>
+      plural('fr', count, {
+        one: `${groupDigits(count, 'fr')} vote`,
+        many: `${groupDigits(count, 'fr')} de votes`,
+        other: `${groupDigits(count, 'fr')} votes`,
+      }),
+    receipt: (number) => `TICKET N° ${number}`,
+    total: 'TOTAL',
+    didYouKnow: 'LE SAVAIS-TU ?',
+    ago: (minutes) =>
+      minutes === 0 ? 'maintenant' : minutes < 60 ? `${minutes} min` : `${Math.floor(minutes / 60)} h`,
+    days: ['lun', 'mar', 'mer', 'jeu', 'ven', 'sam', 'dim'],
+    months: ['janv', 'févr', 'mars', 'avr', 'mai', 'juin'],
+    rec: 'REC',
+    camera: (n) => `CAM ${n}`,
   },
   coach: {
     ribbon: (step, of) => `NOUVEAU POST · ${step}/${of}`,
@@ -265,6 +352,23 @@ const es: GameMessages = {
   post: {
     share: 'Compartir',
     holdMeter: 'Mantén · suelta en el verde',
+    online: 'en línea',
+    poll: 'ENCUESTA',
+    votes: (count) =>
+      plural('es', count, {
+        one: '1 voto',
+        many: `${groupDigits(count, 'es')} de votos`,
+        other: `${groupDigits(count, 'es')} votos`,
+      }),
+    receipt: (number) => `TICKET N.º ${number}`,
+    total: 'TOTAL',
+    didYouKnow: '¿LO SABÍAS?',
+    ago: (minutes) =>
+      minutes === 0 ? 'ahora' : minutes < 60 ? `${minutes} min` : `${Math.floor(minutes / 60)} h`,
+    days: ['lun', 'mar', 'mié', 'jue', 'vie', 'sáb', 'dom'],
+    months: ['ene', 'feb', 'mar', 'abr', 'may', 'jun'],
+    rec: 'REC',
+    camera: (n) => `CÁM ${n}`,
   },
   coach: {
     ribbon: (step, of) => `POST NUEVO · ${step}/${of}`,

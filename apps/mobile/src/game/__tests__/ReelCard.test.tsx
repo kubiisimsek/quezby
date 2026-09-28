@@ -2,6 +2,7 @@ import type { Reel, ReelKind } from '@quezby/engine';
 import { render, screen } from '@testing-library/react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
+import { lookOf } from '@/game/content';
 import { ReelCard, type ReelValues } from '@/game/ReelCard';
 import { useLanguage } from '@/i18n/language';
 
@@ -45,6 +46,15 @@ describe('ReelCard', () => {
 
     expect(screen.getByText('Altın post')).toBeOnTheScreen();
     expect(screen.getByText('Basılı tut · yeşilde bırak')).toBeOnTheScreen();
+  });
+
+  it('draws each post in the format the catalog gave it, on its kind’s backdrop', async () => {
+    for (const kind of ['skip', 'like', 'hold', 'freeze'] as const) {
+      const look = lookOf(42, reel(kind));
+      await render(<ReelCard reel={reel(kind)} seed={42} values={VALUES} hint={false} />);
+      expect(screen.getByTestId(`post-${look.media.format}`)).toBeOnTheScreen();
+    }
+    expect(screen.getByTestId(lookOf(42, reel('freeze')).media.format === 'sign' ? 'backdrop-tape' : 'backdrop-scan')).toBeOnTheScreen();
   });
 
   it('draws the time bar while a post is live', async () => {

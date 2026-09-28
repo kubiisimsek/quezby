@@ -83,8 +83,15 @@ game/
                      for a gold hold begun in time
   gesture.ts         raw touches → swipe / like / hold / touch (pure, tested); a swipe counts
                      the moment it is recognised — mid-drag past its threshold, or at the lift
-  ReelCard.tsx       one reel, full screen; a gold post's time bar hides while it is held
+  ReelCard.tsx       one reel, full screen: the kind's backdrop, badge, the post in its format,
+                     the side actions and caption; a gold post's time bar hides while it is held
                      (`values.timerShown`) — its fill bar is the clock then
+  dress.ts           how a reel draws its post, from seed + index: the pattern, the format's
+                     layout, a tilt, a sticker and the parts a format borrows (pools in
+                     `@quezby/config`); `mediaOf` puts the format's words in the language
+  formats/           one component per format — Scene, Chat, Poll, Chart, Receipt, Fact, Tier,
+                     Notifications, Quote, Polaroid, Dump, Treasure, Sign, Cctv; `PostMedia` picks
+                     it, `Backdrop` lays the kind's pattern (or the old glows), rays, tape or scanlines
   Hud.tsx            a close slab · the chunky dopamine meter (notched, labelled) · the score in
                      Rubik · level and a gold combo pill (x1,00–x1,50) on their own row
   FeedbackLayer.tsx  points rising in Rubik, heart burst, a miss slammed on a red slab and shaken,
@@ -100,7 +107,7 @@ game/
                      "Bir daha dene"
   howTo.ts           the one source of rule copy: reels (and the move each coach card acts
                      out), bonuses, their order
-  content.ts         what a reel looks like — the post the catalog picks for seed + index
+  content.ts         what a reel looks like — the post the catalog picks for seed + index, dressed
 components/          screen-sized pieces shared between screens (below)
 ```
 

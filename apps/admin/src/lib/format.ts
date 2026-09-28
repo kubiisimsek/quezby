@@ -23,6 +23,7 @@ import type {
   RunMode,
   SocialProvider,
 } from '@quezby/types';
+import type { PostFormat } from '@quezby/config';
 
 import type { TagTone } from '@/components/base/tag';
 
@@ -280,6 +281,24 @@ export const POST_KIND: Record<AdminPostKind, { label: string; move: string }> =
   like: { label: 'Arkadaş', move: 'Çift dokun' },
   hold: { label: 'Altın', move: 'Basılı tut' },
   freeze: { label: 'Kırmızı', move: 'Dokunma' },
+};
+
+/** How the feed draws a post — its format in the catalog (`@quezby/config`). */
+export const POST_FORMAT: Record<PostFormat, string> = {
+  scene: 'Sahne',
+  chat: 'Sohbet',
+  poll: 'Anket',
+  chart: 'Grafik',
+  receipt: 'Fiş',
+  fact: 'Büyük sayı',
+  tier: 'Tier list',
+  notifications: 'Bildirimler',
+  quote: 'Alıntı',
+  polaroid: 'Polaroid',
+  dump: 'Foto dump',
+  treasure: 'Hazine',
+  sign: 'Uyarı levhası',
+  cctv: 'Güvenlik kamerası',
 };
 
 /** How the replay judged a post. A perfect is good news too, so `ok` — never `primary`, whose magenta reads as `bad`. */

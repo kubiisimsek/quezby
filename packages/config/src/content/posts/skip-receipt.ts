@@ -1,0 +1,433 @@
+import { ACCOUNTS } from '../accounts';
+import type { Draft } from '../types';
+
+/** Ordinary posts that are shop receipts (`receipt`). Append only: a published post keeps its place. */
+export const SKIP_RECEIPT: readonly Draft[] = [
+  {
+    emoji: '🧄',
+    user: ACCOUNTS.food,
+    body: {
+      format: 'receipt',
+      store: { tr: 'MANAV', en: 'PRODUCE MARKET', de: 'OBST & GEMÜSE', ar: 'خضار وفواكه', fr: 'PRIMEUR', es: 'FRUTERÍA' },
+      items: [
+        {
+          tr: 'SARIMSAK (5 BAŞ)',
+          en: 'GARLIC (5 BULBS)',
+          de: 'KNOBLAUCH (5 KNOLLEN)',
+          ar: 'ثوم (5 رؤوس)',
+          fr: 'AIL (5 TÊTES)',
+          es: 'AJO (5 CABEZAS)',
+        },
+      ],
+    },
+    caption: {
+      tr: 'Tarif 1 diş diyor. Kalbim 5 baş diyor.',
+      en: 'Recipe says 1 clove. My heart says 5 bulbs.',
+      de: 'Rezept: 1 Zehe. Mein Herz: 5 Knollen.',
+      ar: 'الوصفة تقول فصًّا واحدًا. وقلبي يقول 5 رؤوس.',
+      fr: 'Recette : 1 gousse. Mon cœur : 5 têtes.',
+      es: 'Receta: 1 diente. Mi corazón: 5 cabezas.',
+    },
+  },
+  {
+    emoji: '📦',
+    user: ACCOUNTS.receipts,
+    body: {
+      format: 'receipt',
+      store: {
+        tr: 'PET SHOP',
+        en: 'PET STORE',
+        de: 'ZOOHANDLUNG',
+        ar: 'متجر الحيوانات',
+        fr: 'ANIMALERIE',
+        es: 'TIENDA DE MASCOTAS',
+      },
+      items: [
+        {
+          tr: 'KEDİ YATAĞI (LÜKS)',
+          en: 'DELUXE CAT BED',
+          de: 'LUXUS-KATZENBETT',
+          ar: 'سرير قطط فاخر',
+          fr: 'PANIER CHAT DE LUXE',
+          es: 'CAMA PARA GATO (LUJO)',
+        },
+      ],
+    },
+    caption: {
+      tr: 'Kedim yatağın kutusunda uyuyor',
+      en: 'My cat sleeps in the box it came in',
+      de: 'Meine Katze schläft lieber im Karton',
+      ar: 'قطتي تفضّل العلبة على السرير',
+      fr: 'Mon chat dort dans le carton',
+      es: 'Mi gato duerme en la caja',
+    },
+  },
+  {
+    emoji: '📱',
+    user: ACCOUNTS.plain,
+    body: {
+      format: 'receipt',
+      store: {
+        tr: 'TEKNOLOJİ MAĞAZASI',
+        en: 'ELECTRONICS STORE',
+        de: 'ELEKTRONIKLADEN',
+        ar: 'متجر الإلكترونيات',
+        fr: 'ÉLECTRONIQUE',
+        es: 'ELECTRÓNICA',
+      },
+      items: [
+        {
+          tr: 'TELEFON KILIFI',
+          en: 'PHONE CASE',
+          de: 'HANDYHÜLLE',
+          ar: 'غطاء هاتف',
+          fr: 'COQUE DE TÉLÉPHONE',
+          es: 'FUNDA PARA TELÉFONO',
+        },
+      ],
+    },
+    caption: {
+      tr: 'Telefonum benden çok kıyafet değiştiriyor',
+      en: 'My phone changes outfits more than I do',
+      de: 'Mein Handy wechselt öfter das Outfit als ich',
+      ar: 'هاتفي يغيّر ملابسه أكثر مني',
+      fr: 'Mon téléphone se change plus souvent que moi',
+      es: 'Mi teléfono se cambia de ropa más que yo',
+    },
+  },
+  {
+    emoji: '🥐',
+    user: ACCOUNTS.food,
+    body: {
+      format: 'receipt',
+      store: { tr: 'FIRIN', en: 'BAKERY', de: 'BÄCKEREI', ar: 'المخبز', fr: 'BOULANGERIE', es: 'PANADERÍA' },
+      items: [
+        {
+          tr: 'KRUVASAN (6 ADET)',
+          en: 'CROISSANTS (6)',
+          de: 'CROISSANTS (6 STÜCK)',
+          ar: 'كرواسون (6 قطع)',
+          fr: 'CROISSANTS (6)',
+          es: 'CROISSANTS (6)',
+        },
+      ],
+    },
+    caption: {
+      tr: 'Biri benim. Kalan beşi de benim.',
+      en: "One's for me. So are the other five.",
+      de: 'Einer ist für mich. Die anderen fünf auch.',
+      ar: 'واحدة لي. والخمس الباقية لي أيضًا.',
+      fr: 'Un pour moi. Les cinq autres aussi.',
+      es: 'Uno es para mí. Los otros cinco también.',
+    },
+  },
+  {
+    emoji: '🖊️',
+    user: ACCOUNTS.receipts,
+    body: {
+      format: 'receipt',
+      store: {
+        tr: 'KIRTASİYE',
+        en: 'STATIONERY STORE',
+        de: 'SCHREIBWAREN',
+        ar: 'قرطاسية',
+        fr: 'PAPETERIE',
+        es: 'PAPELERÍA',
+      },
+      items: [
+        {
+          tr: 'TÜKENMEZ KALEM (10)',
+          en: 'BALLPOINT PENS (10)',
+          de: 'KUGELSCHREIBER (10)',
+          ar: 'أقلام جافة (10)',
+          fr: 'STYLOS BILLE (10)',
+          es: 'BOLÍGRAFOS (10)',
+        },
+      ],
+    },
+    caption: {
+      tr: 'Evde 60 kalem var. Hiçbiri yazmıyor.',
+      en: 'I own 60 pens. Not one of them works.',
+      de: 'Ich hab 60 Stifte. Keiner schreibt.',
+      ar: 'في البيت 60 قلمًا. ولا واحد منها يكتب.',
+      fr: "J'ai 60 stylos. Aucun n'écrit.",
+      es: 'Tengo 60 bolígrafos. Ninguno escribe.',
+    },
+  },
+  {
+    emoji: '🥶',
+    user: ACCOUNTS.vlog,
+    body: {
+      format: 'receipt',
+      store: { tr: 'KAFE', en: 'COFFEE SHOP', de: 'CAFÉ', ar: 'مقهى', fr: 'CAFÉ', es: 'CAFETERÍA' },
+      items: [
+        {
+          tr: 'BUZLU KAHVE (BÜYÜK)',
+          en: 'ICED COFFEE (LARGE)',
+          de: 'EISKAFFEE (GROSS)',
+          ar: 'قهوة مثلجة كبيرة',
+          fr: 'CAFÉ GLACÉ (GRAND)',
+          es: 'CAFÉ HELADO (GRANDE)',
+        },
+      ],
+    },
+    caption: {
+      tr: 'Dışarısı eksi 5, biliyorum',
+      en: "It's freezing outside. I know.",
+      de: 'Draußen sind minus 5 Grad. Ich weiß.',
+      ar: 'الحرارة 5 تحت الصفر في الخارج. أعرف.',
+      fr: 'Il fait moins 5 dehors, je sais.',
+      es: 'Hace 5 grados bajo cero. Ya lo sé.',
+    },
+  },
+  {
+    emoji: '🔋',
+    user: ACCOUNTS.receipts,
+    body: {
+      format: 'receipt',
+      store: {
+        tr: 'MARKET',
+        en: 'GROCERY STORE',
+        de: 'SUPERMARKT',
+        ar: 'البقالة',
+        fr: 'SUPÉRETTE',
+        es: 'SUPERMERCADO',
+      },
+      items: [
+        {
+          tr: 'AAA PİL (4 ADET)',
+          en: 'AAA BATTERIES (4)',
+          de: 'BATTERIEN AAA (4)',
+          ar: 'بطاريات AAA (4)',
+          fr: 'PILES AAA (4)',
+          es: 'PILAS AAA (4)',
+        },
+      ],
+    },
+    caption: {
+      tr: 'Kumanda için aldım. AA’ymış.',
+      en: 'Got them for the remote. It takes AA.',
+      de: 'Für die Fernbedienung. Die braucht AA.',
+      ar: 'اشتريتها لجهاز التحكم… وهو يعمل ببطاريات AA.',
+      fr: 'Pour la télécommande. Elle prend des AA.',
+      es: 'Eran para el control remoto. Usa AA.',
+    },
+  },
+  {
+    emoji: '🏺',
+    user: ACCOUNTS.home,
+    body: {
+      format: 'receipt',
+      store: {
+        tr: 'HIRDAVAT',
+        en: 'HARDWARE STORE',
+        de: 'BAUMARKT',
+        ar: 'محل الخردوات',
+        fr: 'QUINCAILLERIE',
+        es: 'FERRETERÍA',
+      },
+      items: [
+        {
+          tr: 'HIZLI YAPIŞTIRICI',
+          en: 'INSTANT GLUE',
+          de: 'SEKUNDENKLEBER',
+          ar: 'لاصق فوري',
+          fr: 'COLLE EXTRA-FORTE',
+          es: 'PEGAMENTO INSTANTÁNEO',
+        },
+      ],
+    },
+    caption: {
+      tr: 'Vazo hâlâ kırık. Parmaklarım yapıştı.',
+      en: 'Vase: still broken. Fingers: glued.',
+      de: 'Vase: kaputt. Finger: verklebt.',
+      ar: 'المزهرية ما زالت مكسورة… وأصابعي التصقت.',
+      fr: 'Vase : toujours cassé. Doigts : collés.',
+      es: 'El jarrón sigue roto. Mis dedos, pegados.',
+    },
+  },
+  {
+    emoji: '✉️',
+    user: ACCOUNTS.receipts,
+    body: {
+      format: 'receipt',
+      store: {
+        tr: 'HEDİYELİK EŞYA',
+        en: 'GIFT SHOP',
+        de: 'GESCHENKELADEN',
+        ar: 'متجر الهدايا',
+        fr: 'BOUTIQUE CADEAUX',
+        es: 'TIENDA DE REGALOS',
+      },
+      items: [
+        {
+          tr: 'DOĞUM GÜNÜ KARTI',
+          en: 'BIRTHDAY CARD',
+          de: 'GEBURTSTAGSKARTE',
+          ar: 'بطاقة عيد ميلاد',
+          fr: "CARTE D'ANNIVERSAIRE",
+          es: 'TARJETA DE CUMPLEAÑOS',
+        },
+      ],
+    },
+    caption: {
+      tr: 'Kartı aldım. Doğum günü dündü.',
+      en: 'Got the card. The birthday was yesterday.',
+      de: 'Karte gekauft. Der Geburtstag war gestern.',
+      ar: 'اشتريت البطاقة. عيد الميلاد كان أمس.',
+      fr: "Carte achetée. L'anniversaire, c'était hier.",
+      es: 'Compré la tarjeta. El cumpleaños fue ayer.',
+    },
+  },
+  {
+    emoji: '👓',
+    user: ACCOUNTS.receipts,
+    body: {
+      format: 'receipt',
+      store: { tr: 'OPTİK', en: 'OPTICAL SHOP', de: 'OPTIKER', ar: 'محل النظارات', fr: 'OPTICIEN', es: 'ÓPTICA' },
+      items: [
+        {
+          tr: 'MAVİ IŞIK GÖZLÜĞÜ',
+          en: 'BLUE LIGHT GLASSES',
+          de: 'BLAULICHTBRILLE',
+          ar: 'نظارة الضوء الأزرق',
+          fr: 'LUNETTES ANTI-BLEU',
+          es: 'LENTES ANTILUZ AZUL',
+        },
+      ],
+    },
+    caption: {
+      tr: 'Artık 9 saat vicdanım rahat kaydırıyorum',
+      en: 'Now I can scroll 9 hours guilt-free',
+      de: 'Jetzt scroll ich 9 Stunden ohne Reue',
+      ar: 'الآن أتصفح 9 ساعات بضمير مرتاح',
+      fr: 'Je peux scroller 9 heures sans culpabiliser',
+      es: 'Ahora deslizo 9 horas sin culpa',
+    },
+  },
+  {
+    emoji: '🧀',
+    user: ACCOUNTS.food,
+    body: {
+      format: 'receipt',
+      store: { tr: 'ŞARKÜTERİ', en: 'DELI', de: 'KÄSETHEKE', ar: 'محل الأجبان', fr: 'FROMAGERIE', es: 'QUESERÍA' },
+      items: [
+        {
+          tr: 'KAŞAR (100 G)',
+          en: 'CHEDDAR (4 OZ)',
+          de: 'BERGKÄSE (100 G)',
+          ar: 'جبنة قشقوان (100 غ)',
+          fr: 'COMTÉ (100 G)',
+          es: 'MANCHEGO (100 G)',
+        },
+      ],
+    },
+    caption: {
+      tr: '7 çeşidin tadına baktım. 100 gram aldım.',
+      en: 'Tried 7 samples. Bought 4 ounces.',
+      de: '7 Sorten probiert. 100 Gramm gekauft.',
+      ar: 'تذوّقت 7 أنواع… واشتريت 100 غرام.',
+      fr: 'Goûté 7 fromages. Acheté 100 grammes.',
+      es: 'Probé 7 quesos. Compré 100 gramos.',
+    },
+  },
+  {
+    emoji: '🏎️',
+    user: ACCOUNTS.vlog,
+    body: {
+      format: 'receipt',
+      store: {
+        tr: 'OYUNCAKÇI',
+        en: 'TOY STORE',
+        de: 'SPIELWARENLADEN',
+        ar: 'متجر الألعاب',
+        fr: 'MAGASIN DE JOUETS',
+        es: 'JUGUETERÍA',
+      },
+      items: [
+        {
+          tr: 'KUMANDALI ARABA',
+          en: 'REMOTE CONTROL CAR',
+          de: 'FERNGESTEUERTES AUTO',
+          ar: 'سيارة بجهاز تحكم',
+          fr: 'VOITURE TÉLÉCOMMANDÉE',
+          es: 'AUTO A CONTROL REMOTO',
+        },
+      ],
+    },
+    caption: {
+      tr: 'Yeğenime aldım. Önce ben test ediyorum.',
+      en: 'Got it for my nephew. Testing it first.',
+      de: 'Für meinen Neffen. Ich teste nur kurz.',
+      ar: 'اشتريتها لابن أختي. أجرّبها أنا أولًا.',
+      fr: "C'est pour mon neveu. Je teste d'abord.",
+      es: 'Es para mi sobrino. Primero lo pruebo yo.',
+    },
+  },
+  {
+    emoji: '🏠',
+    user: ACCOUNTS.home,
+    body: {
+      format: 'receipt',
+      store: {
+        tr: 'EV TEKSTİLİ',
+        en: 'HOME DECOR',
+        de: 'WOHNACCESSOIRES',
+        ar: 'مفروشات منزلية',
+        fr: 'DÉCO MAISON',
+        es: 'DECORACIÓN',
+      },
+      items: [
+        {
+          tr: 'KIRLENT (8.)',
+          en: 'THROW PILLOW (8TH)',
+          de: 'ZIERKISSEN (8.)',
+          ar: 'وسادة زينة (الثامنة)',
+          fr: 'COUSSIN DÉCO (8E)',
+          es: 'COJÍN (EL 8.º)',
+        },
+      ],
+    },
+    caption: {
+      tr: 'Kanepede bana yer kalmadı',
+      en: "There's no room for me on the couch now",
+      de: 'Auf dem Sofa ist kein Platz mehr für mich',
+      ar: 'لم يعد لي مكان على الأريكة',
+      fr: 'Plus de place pour moi sur le canapé',
+      es: 'Ya no hay lugar para mí en el sofá',
+    },
+  },
+  {
+    emoji: '🍟',
+    user: ACCOUNTS.hacks,
+    body: {
+      format: 'receipt',
+      store: {
+        tr: 'ZÜCCACİYE',
+        en: 'HOUSEWARES',
+        de: 'HAUSHALTSWAREN',
+        ar: 'الأدوات المنزلية',
+        fr: 'ÉLECTROMÉNAGER',
+        es: 'ELECTRODOMÉSTICOS',
+      },
+      items: [
+        {
+          tr: 'SICAK HAVA FRİTÖZÜ',
+          en: 'AIR FRYER',
+          de: 'HEISSLUFTFRITTEUSE',
+          ar: 'مقلاة هوائية',
+          fr: 'FRITEUSE SANS HUILE',
+          es: 'FREIDORA DE AIRE',
+        },
+      ],
+    },
+    caption: {
+      tr: 'Hayatım değişti (patates yaptım)',
+      en: 'It changed my life (I made fries)',
+      de: 'Hat mein Leben verändert (es gab Pommes)',
+      ar: 'غيّرت حياتي (حضّرت بطاطس مقلية)',
+      fr: "Ça a changé ma vie (j'ai fait des frites)",
+      es: 'Me cambió la vida (hice alitas)',
+    },
+  },
+];

@@ -516,7 +516,7 @@ export type AdminLeagueGroupResponse = {
 
 export type AdminContentSort = 'shows' | 'likeRate' | 'missRate';
 
-export type AdminContentQuery = { kind?: AdminPostKind; sort?: AdminContentSort };
+export type AdminContentQuery = AdminPageQuery & { kind?: AdminPostKind; sort?: AdminContentSort };
 
 export type AdminContentRow = {
   /** `like-007` — the panel labels it from `@quezby/config`'s catalog. */
@@ -530,10 +530,17 @@ export type AdminContentRow = {
   missRate: number | null;
 };
 
-export type AdminContentResponse = {
+/**
+ * A page of the catalog's posts, shown or not. `totals` and the two top
+ * fives cover every post of the kind asked for, not just this page.
+ */
+export type AdminContentResponse = AdminPage<AdminContentRow> & {
   contentVersion: number;
-  items: AdminContentRow[];
   totals: { shows: number; likes: number; misses: number };
+  /** The five highest miss rates among the posts ever missed. */
+  topMissed: AdminContentRow[];
+  /** The five highest like rates among the posts ever liked. */
+  topLiked: AdminContentRow[];
 };
 
 /* --------------------------------------------------------------- audit -- */

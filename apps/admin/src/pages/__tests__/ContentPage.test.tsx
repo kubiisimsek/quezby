@@ -11,16 +11,17 @@ describe('ContentPage', () => {
     api.content.list.mockResolvedValue(contentResponse());
     renderApp({ path: '/content', api });
 
-    expect(await screen.findByText('Kimse sormadı ama kahvem soğudu')).toBeInTheDocument();
-    expect(screen.getByText('kedim yine beni yargılıyor')).toBeInTheDocument();
-    // The catalog speaks six languages; the panel reads its Turkish source.
-    expect(screen.getByText('@zeynep.k ·')).toBeInTheDocument();
+    expect(await screen.findAllByText('Kimse sormadı ama kahvem soğudu')).not.toHaveLength(0);
+    expect(screen.getAllByText('kedim yine beni yargılıyor')).not.toHaveLength(0);
+    // The catalog speaks six languages; the panel reads its Turkish source, and names the post's format.
+    expect(screen.getByText('@zeynep.k · Polaroid ·')).toBeInTheDocument();
+    expect(screen.getByText('@evden.notlar · Sahne ·')).toBeInTheDocument();
     expect(screen.getAllByText('%75').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Gösterilmedi')).toHaveLength(2);
     expect(screen.getByRole('list', { name: 'En çok kaçırılan postlar' })).toBeInTheDocument();
   });
 
-  it('ranks the most missed and the most liked posts by their rate', async () => {
+  it('shows the most missed and the most liked posts the API ranked over every page', async () => {
     const api = fakeApi();
     api.content.list.mockResolvedValue(contentResponse());
     renderApp({ path: '/content', api });
@@ -35,12 +36,23 @@ describe('ContentPage', () => {
     expect(within(liked).getByText(/kedim yine beni yargılıyor/)).toBeInTheDocument();
   });
 
-  it('filters by kind and sorts by a rate', async () => {
+  it('pages through the catalog, 323 posts three at a time', async () => {
     const api = fakeApi();
     api.content.list.mockResolvedValue(contentResponse());
     const { user } = renderApp({ path: '/content', api });
 
+    expect(await screen.findByText('1–3')).toBeInTheDocument();
+    expect(screen.getByText(/323 post/)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Sonraki sayfa' }));
+    await waitFor(() => expect(api.content.list).toHaveBeenLastCalledWith({ kind: undefined, sort: 'shows', page: 2 }));
+  });
+
+  it('filters by kind and sorts by a rate, from the first page', async () => {
+    const api = fakeApi();
+    api.content.list.mockResolvedValue(contentResponse());
+    const { user } = renderApp({ path: '/content?page=4', api });
+
     await user.click(await screen.findByRole('radio', { name: 'Arkadaş' }));
-    await waitFor(() => expect(api.content.list).toHaveBeenLastCalledWith({ kind: 'like', sort: 'shows' }));
+    await waitFor(() => expect(api.content.list).toHaveBeenLastCalledWith({ kind: 'like', sort: 'shows', page: 1 }));
   });
 });

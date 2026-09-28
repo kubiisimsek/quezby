@@ -2,6 +2,7 @@ import { CONTENT_VERSION, SALT, mix, postFor } from '@quezby/config';
 import type { Reel } from '@quezby/engine';
 import type { Locale } from '@quezby/types';
 
+import { dressOf, mediaOf, type Dress, type Media } from '@/game/dress';
 import { currentLocale, messagesOf } from '@/i18n';
 import { reel as REEL } from '@/ui/tokens';
 
@@ -10,7 +11,8 @@ import { reel as REEL } from '@/ui/tokens';
  * knows kinds and timings. The post comes from the shared catalog in
  * `@quezby/config`, picked from the seed and the reel's index: the same run
  * always wears the same clothes, and the API makes the same pick to know
- * which posts a player liked. Only its words change with the language.
+ * which posts a player liked. How it is drawn — its format, dressed from the
+ * seed (`dress.ts`) — and its words in the language are the app's own.
  */
 export type ReelLook = {
   postId: string;
@@ -22,6 +24,8 @@ export type ReelLook = {
   headline: string | null;
   likes: string;
   comments: string;
+  dress: Dress;
+  media: Media;
 };
 
 /** A made-up count, shortened the language's way: `842`, `1,2 B`, `1.2K`. */
@@ -54,5 +58,7 @@ export function lookOf(seed: number, reel: Reel, locale: Locale = currentLocale(
     headline: post.headline?.[locale] ?? null,
     likes: count(seed, reel.index, SALT.likes, 90000, locale),
     comments: count(seed, reel.index, SALT.comments, 900, locale),
+    dress: dressOf(post, seed, reel.index),
+    media: mediaOf(post, seed, reel.index, locale),
   };
 }

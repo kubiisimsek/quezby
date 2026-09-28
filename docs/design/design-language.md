@@ -78,6 +78,15 @@ rotating slate, like is pink, hold is gold, freeze is deep red; the kind must
 read from colour and badge before any text. The HUD's dopamine meter runs
 `meter` → `meterMid` → `meterLow` as it empties, always labelled "Dopamin".
 
+A post's **format** — a chat, a poll, a receipt, a sign — draws with the
+reel's props: white `glass` and a faint `pattern` that sit on any kind's
+colour without changing it, and the few light things — `paper`, a `photo`
+frame, a `sign`, a chat `bubble` — kept small against the reel. A format
+never brings a colour of its own: a friend's photos are the like reel's own
+pinks (`likeTiles`), a gold post's light is `holdRay`, a red post's tape is
+`freezeAlarm` on `hazard`. However a post is dressed, its kind still reads
+first.
+
 ---
 
 ## Type
