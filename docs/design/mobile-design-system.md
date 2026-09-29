@@ -14,26 +14,29 @@
 navigation/
   RootNavigator.tsx  update required → splash → Welcome/Login → a new account's first
                      steps (Tutorial → Username → Notifications → Protect) → Username (an
-                     old account with no name) → Tabs (Zirve · Lig · Oyna · Arkadaşlar ·
-                     Profil) + Game, Help, Daily, FindFriends, Thread, History,
-                     AvatarEditor. `gate.ts` decides which, from the session and
+                     old account with no name) → Tabs (Zirve · Lig · Oyna · Mesajlar ·
+                     Profil) + Game, Help, Daily, FindFriends, Thread, Friends (a friend
+                     list, one screen per player: `getId`), Account, Alerts (the bell's
+                     list), History, AvatarEditor. `gate.ts` decides which, from the session and
                      `stores/onboarding` (the steps, kept on the phone per account).
                      No navigation bars anywhere (`headerShown: false`); a screen that
                      needs a head draws `TopBar`. A push that arrives while the game is
                      open drops in over it as a `Toast`; a tapped one — or the one the app
-                     was opened from — opens once the game is up: a request the Arkadaşlar
-                     tab, anything else that friend's Thread
+                     was opened from — opens once the game is up: a request the bell's
+                     list (Alerts, where it is answered), anything else that friend's Thread
   TabBar.tsx         the dock: five slots on a dark slab, the lobby in the middle as a gold
                      play slab standing out of it; the slot you are on lifts into a magenta
                      tile; a slot with news (`tabBarBadge`) wears the kit's red `Count` —
-                     on Arkadaşlar, the requests waiting and the conversations that want a
-                     look (a line unread, a VS waiting for you)
+                     on Mesajlar, the conversations that want a look (a line unread, a VS
+                     waiting for you) and the friend requests waiting
   options.tsx        stack options (no header, night behind transitions), tab(), nav theme
   types.ts           one param list per navigator; Game takes { mode: 'free' | 'daily' } or
                      { mode: 'vs', opponent, duelId? } (a VS sent to a friend, or the answer
                      to theirs); Tutorial is the same GameScreen, as a new player's practice
-                     run; the Arkadaşlar slot is `Friends` (the inbox) — finding players is
-                     the stack screen `FindFriends`
+                     run; the Mesajlar slot is `Inbox` ({ segment? } opens it on its
+                     friends' side); `Friends` is the stack screen of a
+                     friend list ({ username? } — none is yours); finding players is the
+                     stack screen `FindFriends`; Hesap bilgileri is `Account`
 screens/
   welcome/           the arena, the mark stamped in, "Quezby" in Rubik, the four moves as gems,
                      one gold "Oyna" (a guest account, then the practice run) and "Hesabım var,
@@ -52,18 +55,28 @@ screens/
                      Apple / Google, "E-postayla koru", ghost "Şimdi değil"; a kept account
                      says so before "Devam et", and an Apple / Google account that is
                      another player's can be switched to
-  home/              the lobby: a status strip (framed portrait — your photo — with the league
-                     emblem; the mailbox `IconButton`, its badge counting what waits in
-                     Arkadaşlar, which it opens; Yardım); "Günün akışı" on a stage with a fan of
-                     the four reels and its countdown (your score in gold, place and Paylaş once
-                     played); the big breathing gold play slab; "SENİ BEKLEYEN VS", a
-                     `LobbyCard` to Arkadaşlar, while friends' VS wait for you; the league tile
-                     with its progress bar ("KİLİTLİ · Lige 2 oyun kaldı" before a new player's
-                     first 20 counted runs), the rival as a `FaceOff`, records (Hafta · Ay ·
-                     Tüm zamanlar); a guest just seated in a league is asked once to keep the
-                     account (SignInWaysSheet, "Ligdesin!");
-                     a warn tile up top while the API keeps this phone's runs off the boards
-                     (a failed Play Integrity / App Attest check, `enforced` only)
+  home/              the lobby, drawn as a lock screen: a status strip (framed portrait — your
+                     photo — with the league emblem; the bell, `IconButton` "bell" with a red
+                     count of what you have not seen yet, → Alerts; Yardım); the clock — "SEZON REKORU", the
+                     season best in gold Rubik 64, `RankChips` (Hafta · Ay · Tüm zamanlar)
+                     under it, all of it a door to Zirve; then what waits, as `NoticeCard`s of
+                     one height: the warn notice while the API keeps this phone's runs off
+                     the boards (a failed Play Integrity / App Attest check, `enforced`
+                     only); each VS waiting for you (at most three, the one running out
+                     first on top — `InboxSummary.waiting`): the friend's portrait, "@deniz
+                     sana VS attı", its countdown, a green ✓ (`IconButton tone="ok"`: plays
+                     it — playing is the answer) and a red ✗ (declines it), the body opens
+                     the Thread; "+N VS daha" opens Mesajlar; "GÜNÜN AKIŞI #17" — open, the
+                     rule, its countdown and a small magenta "Oyna"; played, your place,
+                     your score in gold and the countdown to the next; the body opens
+                     Daily (its stage, board and Paylaş); the league ("KİLİTLİ · Lige 2 oyun
+                     kaldı" with a `Meter` before a new player's first 20 counted runs, your
+                     place and zone, or "Ligine katıl"); the rival with "Geç onu". Pinned
+                     over the dock, outside the scroll: `SwipePlay` — the screen's one gold
+                     slab, breathing, chevrons climbing over it, "Yukarı kaydır, oyna" under
+                     it: a tap or a swipe up plays free. The consent card comes before the
+                     notices while unasked; a guest just seated in a league is asked once
+                     to keep the account (SignInWaysSheet, "Ligdesin!")
   leaderboard/       Zirve — a stage with TopBar (countdown, players, search → FindFriends),
                      Herkes / Arkadaşlar, the podium on 3D metal pedestals (crown and a spotlight
                      for #1), the period tabs (Hafta · Ay · Tüm zamanlar — there is no day
@@ -75,13 +88,31 @@ screens/
                      player's first 20 counted runs, "Lige N oyun kaldı" with a gold "Oyna"
   daily/             Günün akışı: TopBar with a back slab, "AKIŞ #17", your score and place in a
                      well with the share grid, then "GÜNÜN ZİRVESİ" — its podium and climb
-  friends/           Arkadaşlar — the dock's inbox (FriendsScreen): a `PushNudge` while
-                     notifications are off; "İstekler", each request a tile — its `PlayerRow`,
-                     and under it Kabul et and Reddet side by side; then "Mesaj kutusu", a
+  friends/           Mesajlar — the dock's social tab (InboxScreen): its head carries a
+                     `userPlus` slab ("Arkadaş ekle" → FindFriends), and a `Segmented` switch
+                     under it: **Mesajlar** · **Arkadaşlar**, each counting what waits on it. Mesajlar: a `PushNudge` while notifications are off; a
                      `ThreadRow` per friend, the one last heard from first (the newest line,
-                     when, what is unread, a VS tag: SENİN SIRAN / ONUN SIRASI); with
-                     neither, "Henüz arkadaşın yok" and "Arkadaş bul". The corner's slab
-                     opens FindFriends too.
+                     when, what is unread, a VS tag: SENİN SIRAN / ONUN SIRASI); with none,
+                     "Henüz mesajın yok" and "Arkadaş bul", which turns to the other side.
+                     Arkadaşlar: the search field (by the start of a name; with two letters
+                     typed its answers replace the list, a `FriendButton` on each row), and
+                     with nothing typed `FriendListView` — "İstekler" first, each request a
+                     tile with Kabul et and Reddet, then your friends A to Z. The profile's
+                     Arkadaş counter opens this side.
+                     Friends — a friend list as a screen (`GET /users/{username}/friends`,
+                     the same `FriendListView`): a friend's from the count on their card
+                     (TopBar @name and the count, read-only, you among them as "· sen"),
+                     yours from your own card; anyone else's is locked: `EmptyState` with a
+                     lock, "Bu liste kilitli".
+  alerts/            Bildirimler (TopBar with a back slab), behind the lobby's bell: what
+                     happened among friends, newest first, as `NoticeCard`s — a request
+                     (✓ / ✗ right there; the body opens the card), a request accepted, a
+                     VS sent to you (✓ plays it, ✗ turns it down, while it waits), and
+                     what became of the ones you sent (won, lost, draw, turned down, run
+                     out); the body opens the conversation. What was new since the last
+                     look is lit (`fresh`) while the list is open; opening it takes the
+                     bell's badge to zero (`POST /me/notifications/seen`). Phrases are not
+                     here: they are Mesajlar's.
                      FindFriends, a stack screen: search by the start of a name, a
                      `FriendButton` on each row, and "Gönderdiğin istekler" while nothing is
                      typed. Thread — a conversation: TopBar with the name, the head-to-head
@@ -96,20 +127,28 @@ screens/
                      newest first, as the API counted it — a `Segmented` Hepsi / Günün akışı /
                      VS, day headings (Bugün, Dün, then the date), a `RunTile` each; a tap
                      opens RunSheet; with none yet, the gold "Oyna"
-  profile/           a player card (framed portrait — your photo or your initials — with a
-                     camera `IconButton` slab on its corner that opens the "Profil fotoğrafı"
-                     `ActionSheet`: "Galeriden seç", and "Fotoğrafı kaldır" in red once there
-                     is one; tier, season best in gold, place on each board), a "Hesabını
-                     koru" tile for guests, the "GEÇMİŞ OYUNLAR" `LobbyCard` to History,
-                     İstatistikler (stat tiles, named combos, most-liked posts as little
-                     reels); the gear opens Ayarlar (SettingsSheet): Dil (LanguageSheet),
+  profile/           kept short: a player card (framed portrait — your photo or your
+                     initials — with a camera `IconButton` slab on its corner that opens the
+                     "Profil fotoğrafı" `ActionSheet`: "Galeriden seç", and "Fotoğrafı
+                     kaldır" in red once there is one; your name, tier, a guest's tag;
+                     `Counters` — Rekor in gold, Arkadaş (the friends' side of Mesajlar,
+                     wearing the requests waiting), Tur; your place on each board), a "Hesabını koru"
+                     tile for guests, the "İSTATİSTİKLER" `LobbyCard` with four numbers
+                     (Post, Mükemmel, En iyi tepki, En yüksek kombo) opening StatsSheet (all
+                     of them grouped — Oyun, Hareketler, En iyiler — the named combos, the
+                     most-liked posts as little reels), and the "GEÇMİŞ OYUNLAR" `LobbyCard`
+                     to History. The gear opens Ayarlar (SettingsSheet): Dil (LanguageSheet),
                      Titreşim, Kullanım verisi, Yardım; "Arkadaşlar" — Bildirimler
-                     (NotificationsSheet) and Engellenenler (BlockedSheet); and the account
-                     doors — "Adını seç"
-                     while the name is automatic (a picked one sits there locked, no arrow:
-                     "Kullanıcı adın · @ekin · kalıcı"), "Hesabını koru" / "Giriş yolları"
-                     (SignInWaysSheet), e-posta, çıkış, silme.
+                     (NotificationsSheet) and Engellenenler (BlockedSheet); "Hesap" — Hesap
+                     bilgileri, then Çıkış yap last (kept accounts only).
                      Each door opens only after Ayarlar has left the screen (`onClosed`).
+                     Account — Hesap bilgileri (TopBar with a back slab): "Kullanıcı adı" —
+                     "Adını seç" while the name is automatic (UsernameSheet), a picked one
+                     locked, no arrow: "Kullanıcı adın · @ekin · kalıcı"; "Bağlı hesaplar" —
+                     a guest's "Hesabını koru" callout, then `SignInWays` (Apple / Google
+                     tiles with Bağı kaldır, the email's address, what can still be linked;
+                     e-posta → CredentialsSheet); last, the red "Hesabı sil" (DeleteSheet —
+                     the name typed to confirm). Its sheets open straight over the page.
                      AvatarEditor frames the picked photo in a circle: one finger moves it,
                      two zoom it (RNGH 3's gesture hooks on Reanimated), never past its own
                      edge; magenta "Kaydet" cuts out the square, scales it to 512 px at most
@@ -233,14 +272,14 @@ A new shape goes into the family it belongs to and into that list.
 | `BrandBand` | The stage — magenta into violet with lanes, for a hero |
 | `Gradient` | A two-colour SVG wash |
 | `Slab` | Anything pressable that is not a row: face on a lip in the outline, gloss on top; sinks under the thumb |
-| `Button` | A slab with a Rubik label. `play` (gold — starts a game, one per screen) / `primary` (magenta) / `secondary` (violet) / `neutral` (tile) / `ghost` (text) / `danger` (red) / `onBrand` (gold on a stage) / `onBrandSoft` (violet on a stage); `sm/md/lg/xl`; `icon`; `loading`; the label shrinks to fit |
-| `IconButton` | A square glyph slab: `neutral` on the arena, `onBrand` on a stage; `label` is read aloud; `badge` counts what is new (the lobby's mailbox) |
+| `Button` | A slab with a Rubik label. `play` (gold — starts a game, one per screen) / `primary` (magenta) / `secondary` (violet) / `neutral` (tile) / `ghost` (text) / `danger` (red) / `onBrand` (gold on a stage) / `onBrandSoft` (violet on a stage); `sm/md/lg/xl`; `icon`; `loading`; `accessibilityLabel` when a short label needs its context read aloud ("Oyna" → "Günün akışını oyna"); the label shrinks to fit. Never green: green is only the ✓ `IconButton` |
+| `IconButton` | A square glyph slab: `neutral` on the arena, `onBrand` on a stage, `ok` (green) and `danger` (red) for the ✓ and ✗ of an answer — a VS on the lobby; `size` `md` 42 / `sm` 34; `loading`; `label` is read aloud; `badge` counts what is new |
 | `SocialButton` | "Apple ile devam et" / "Google ile devam et", flat as each company asks, a large `Button`'s height and corners |
 | `Divider`, `Avatar`, `IconChip` | A groove; a player's framed portrait (their photo, `src`, over their initials in Rubik — the initials show when there is none or it will not load; `primary` = you); a gem — a glyph on a bright outlined tile |
 | `Row`, `ArrowNub`, `SwitchRow`, `Toggle` | A line that opens something (ends in a small arrow slab) — or, without `onPress`, a line that only says something, with no arrow and no press (a picked username, locked) / that arrow / a setting with the game's toggle (green groove, springing knob, role `switch`) |
 | `PlayerRow` | A player in a list: portrait (`src`), @name, league, season best — and one action beside it (a `FriendButton`), a separate target from the row that opens their card |
 | `Tag`, `Callout`, `Stat`, `StatRow`, `Meter` | A status pill; a message with a gem (copy built from pieces is set in its text); a stat tile (gem, label, Rubik number); a chunky bar with a shine |
-| `StatGrid` | Stat tiles in 2 or 3 even columns |
+| `StatGrid` | Stat tiles in 2 or 3 even columns; a value's size steps down with its length (`valueSize`) — never iOS's shrink-to-fit, which draws a sheet's first row a few points tall |
 | `Field`, `PasswordField` | A dark well with a label, glyph and trailing control; the ring lights magenta while you type |
 | `Segmented` | A tab strip: the chosen view raised as a magenta slab out of a dark groove |
 | `Loading`, `Skeleton`, `SkeletonList`, `EmptyState` | Waiting (gold spinner, dark skeleton tiles) and nothing-yet (a gem, a title, the fix) |
@@ -253,9 +292,12 @@ A new shape goes into the family it belongs to and into that list.
 | `FloorCard` | "Senin katın" — your floor pinned under a board: rank in gold, who to pass and how far, "Geç onu" |
 | `BonusChip` | A named combo as a pill with its gem: Kusursuz seviye, Şimşek, Soğukkanlı, Geri dönüş, `×count`, `+points` |
 | `ShareGrid` | The server's emoji share grid, one square to a cell |
-| `LobbyCard` | A door in the lobby: a gem, its capital name over a Rubik title, live state on the right, an arrow slab when it opens something; sinks under the thumb |
-| `PlayButton` | The lobby's gold play slab: breathes 1 → 1.04 → 1 (1.6 s each way) with a glint crossing it — the only loop outside a reel; `breathing` pauses it, reduced motion never starts it |
+| `LobbyCard` | A door: a gem, its capital name over a Rubik title, live state on the right, an arrow slab when it opens something; sinks under the thumb — the profile's İSTATİSTİKLER and GEÇMİŞ OYUNLAR |
+| `NoticeCard` | A notification — on the lobby's lock screen and in Bildirimler: a gem or a portrait (`lead`), what it is in capitals over one line, one live line (`meta`: words, a `CountdownChip`, a `Meter`, a `Tag`), its answer at the end (`right`). All the same height (76). `fresh` lights its edge and its name in magenta: not seen yet. The body (`onPress`) and the answer are two targets side by side — ✓ never opens the body |
+| `PlayButton` | The gold play slab: breathes 1 → 1.04 → 1 (1.6 s each way) with a glint crossing it — the only loop outside a reel; `breathing` pauses it, reduced motion never starts it |
+| `SwipePlay` | The lobby's one gold action, as a lock screen's unlock: `PlayButton` under three climbing chevrons, a line under it ("Yukarı kaydır, oyna"). A tap plays, and so does a swipe up (`usePanGesture`: ≥ 44 pt or a flick), the slab following the thumb and springing back; the chevrons climb on the slab's breath |
 | `RankChips` | Your place on each board in gold, one well per board; "—" where you have not placed |
+| `Counters` | A few numbers side by side, each in a well over its name — the profile's Rekor (gold) · Arkadaş · Tur, the statistics tile's four; a counter with `onPress` sinks and may wear a `Count` (`badge`) |
 | `FaceOff` | Two players face to face: you on the start side framed in magenta, them on the end side in violet, a caption under each portrait when given ("SEN", `@ekin`), and a gold "VS" between — or, for two who have played before, how they stand (`middle`: `3 – 2`). The lobby's rival, a conversation's head-to-head, the VS sheet and a VS just sent |
 | `ThreadRow` | A friend in the inbox: portrait, name over the conversation's newest line (lit while unread, quiet once read), when it came, the unread `Count`, and a VS tag under the line while one waits on either of you |
 | `Count` | How many wait: a red pill, `9+` past nine — on a `ThreadRow`, and on a dock slot (`TabBar` draws it from `tabBarBadge`) |
@@ -269,24 +311,26 @@ A new shape goes into the family it belongs to and into that list.
 | `Stamp`, `CountUp`, `Confetti`, `useShake` | Juice: slam a value in; count a number up (the final value is its accessibility label); a burst of confetti on a key; a small shake |
 
 Overlays are `ui/sheet.tsx`: `Sheet` (a dark tile rising from the bottom, a
-Rubik title, a red close slab), `FormSheet` (the profile's one username pick,
-email and delete flows), `ActionSheet` (tile rows with arrow slabs — the
+Rubik title, a red close slab), `FormSheet` (Hesap bilgileri's one username
+pick and delete, the email flow), `ActionSheet` (tile rows with arrow slabs — the
 profile photo's "Galeriden seç" / "Fotoğrafı kaldır"), `ActionList` (those
 rows on their own, for a sheet that keeps a few rarer actions under its main
 one — PlayerSheet's "Diğer" — instead of opening a second sheet over itself).
 Never a `Modal` with `animationType="slide"`. One sheet never opens over
 another that is still leaving: the next one waits for `onClosed` (the
 profile's "E-postayla koru" does exactly this, and so does a player card's
-"VS at" before `VsSheet`). Apple's and Google's own sign-in sheets may open
+"VS at" before `VsSheet`; Ayarlar's Hesap bilgileri and a card's friend
+count wait the same way before they open a screen). Apple's and Google's own sign-in sheets may open
 over a sheet — they are the system's, not ours.
 
 Icons are `ui/icons.tsx` — our own 24×24 stroke set, game glyphs included
 (`trophy`, `crown`, `medal`, `flame`, `heart`, `bolt`, `arrowUp`, `hand`,
 `handStop`, `vibrate`, `podium`, `mountain`, `trendUp`, `trendDown`,
 `target`), people (`users`, `userPlus`, `userCheck`, `userMinus`), friends
-(`inbox`, `message`, `swords` for VS), time (`calendar`, `hourglass`,
-`clock`) and affordances (`help`, `search`, `grid`, `camera`, `image`,
-`flag`, `ban`, `bell`, …). `apple`
+(`inbox`, `message` — the Mesajlar slot — `swords` for VS), time
+(`calendar`, `hourglass`, `clock`) and affordances (`help`, `search`, `grid`,
+`camera`, `image`, `flag`, `ban`, `bell`, `chevronUp` over the unlock slab,
+…). `apple`
 is the one filled glyph: Apple's logo is solid in every colour it comes in.
 **Add a glyph there rather than importing a set.** Logos live in
 `ui/brand-mark.tsx`: our `BrandMark` (the app icon as an Arena tile, a bitmap
@@ -299,15 +343,16 @@ which takes a tint.
 | --- | --- |
 | `LanguageSheet` | The six languages, each in its own words and its own script (Cairo for Arabic, whatever the game speaks), its name in the language on screen under it; a language read the other way (to or from Arabic) asks first — the game reloads to turn around |
 | `UsernameField` | The username input everywhere: lower case as typed, three rules ticking off under it (length, characters, a letter; a misplaced dot or star is only said when typed), availability in the trailing slot |
-| `PlayerSheet` | A player's card from any row: portrait, tier, what you are to each other as a tag (Arkadaşın, İstek gönderildi, Seni eklemek istiyor, Engelledin), their friends count, season best in gold, weekly and all-time place, a few lifetime counts — then the one main action the relation allows: "Arkadaş ekle"; "Kabul et" / "Reddet"; "Geri al"; "VS at" and "Sohbet" for a friend (no "Sohbet" when opened from the conversation); "Engeli kaldır". "Diğer" opens an `ActionList` in place: "Arkadaşlıktan çıkar" (a friend), "Engelle", "Fotoğrafı bildir" (when there is a photo), "Kullanıcı adını bildir". The VS sheet or the conversation opens once the card has left the screen |
+| `PlayerSheet` | A player's card from any row: portrait, tier, what you are to each other as a tag (Arkadaşın, İstek gönderildi, Seni eklemek istiyor, Engelledin), their friends count — a neutral slab that opens the list (once the card has left the screen) on your own card and a friend's, plain words on anyone else's, season best in gold, weekly and all-time place, a few lifetime counts — then the one main action the relation allows: "Arkadaş ekle"; "Kabul et" / "Reddet"; "Geri al"; "VS at" and "Sohbet" for a friend (no "Sohbet" when opened from the conversation); "Engeli kaldır". "Diğer" opens an `ActionList` in place: "Arkadaşlıktan çıkar" (a friend), "Engelle", "Fotoğrafı bildir" (when there is a photo), "Kullanıcı adını bildir". The VS sheet or the conversation opens once the card has left the screen |
 | `PlayerCard` | `Portrait` (the 72/92pt framed portrait of a profile — the photo, or the initials; `onEdit` pins a camera `IconButton` slab to its corner) and `SeasonBest` (the gold record well) |
 | `FriendButton` | The small slab beside a player in FindFriends, by what they are to you: "Ekle"; "Geri al" while your request waits; "Kabul et" and a close glyph slab (read aloud "Reddet") while theirs waits, so the name keeps its room; "Sohbet" once you are friends; nothing for a player you blocked. Only the pressed row shows a spinner, and the API's answer shows at once |
 | `VsSheet` | Sending a VS: `FaceOff`, the four rules (one feed, a try each; you play first and your score stays hidden; your friend has a while, then it counts for nobody; a VS counts on no board, league or stat) and the sheet's one gold "Oyna" — the game opens once the sheet is gone |
 | `RunSheet` | A past game from Geçmiş oyunlar: the score (gold and "REKOR" when it is the season's best), when it ended, what became of it, the stat tiles and bonus chips of the replay, and a VS's two scores; `runTitle`, `runLook` and `runTag` name, gem and tag a run for its `RunTile` too |
-| `PushNudge` | Notifications are off, in a warn card with a bell: never asked → "Bildirimleri aç" (the system's question); turned down → "Ayarları aç" (the phone's settings). In the Arkadaşlar tab and a conversation, where "Gizle" puts it away for a week, and on a VS just sent; nothing while they are on or in a build without push |
+| `PushNudge` | Notifications are off, in a warn card with a bell: never asked → "Bildirimleri aç" (the system's question); turned down → "Ayarları aç" (the phone's settings). In the Mesajlar tab and a conversation, where "Gizle" puts it away for a week, and on a VS just sent; nothing while they are on or in a build without push |
 | `NotificationsSheet` | Ayarlar → Bildirimler: where the phone stands (a slab to allow them, the way to the phone's settings, or not in this build) over three toggles kept on the account — Arkadaşlık, VS, Hazır mesajlar (`pushFriends`, `pushVs`, `pushMessages`) |
 | `BlockedSheet` | Ayarlar → Engellenenler: the players you blocked, the latest first, each with "Engeli kaldır" |
-| `SignInWaysSheet` | "Hesabını koru" for a guest, "Giriş yolları" once kept: the attached ways (Apple / Google with "Bağı kaldır" — the API keeps the last one), `SocialButton`s for the rest, and "E-postayla koru", which hands over to the email `FormSheet`; `description` says why when it comes up on its own |
+| `SignInWays` | The ways in, outside any sheet: the attached ones (Apple / Google with "Bağı kaldır" — the API keeps the last one; the email with its address), `SocialButton`s for the rest, and "E-postayla koru" / "E-posta ve şifre bağla", which hands over to the caller (`onEmail`). On Hesap bilgileri, with `attachedHeading={false}` |
+| `SignInWaysSheet` | "Hesabını koru" for a guest, "Giriş yolları" once kept: `SignInWays` in a sheet — the lobby's reminder and the profile's nudge; `description` says why when it comes up on its own |
 | `CredentialsSheet` | The email and password `FormSheet` — a guest's "Hesabı koru", or one more way in; opened from the profile, the Protect step and the lobby's reminder |
 | `ScopeSwitch` | Herkes / Arkadaşlar — a dark well with a magenta slab that springs to the side that is on |
 | `SummitBoard` | `layoutBoard()` — which entries stand on the podium, which climb, where the break before your own rows goes — and the podium stage that holds its place while a board loads |
@@ -317,13 +362,17 @@ which takes a tint.
 
 Data comes through hooks over `@/api/client` — never a `fetch` in a screen:
 `hooks/useBoards.ts` (boards, the daily, the league, stats, players, search),
-`hooks/useSocial.ts` (what the badges count, the inbox, requests, a
-conversation, phrases, blocks, reports, declining a VS — none of it polls on
-its own), `usePulse` (the inbox's heartbeat: one number, `GET /me/pulse`,
-asked every 3 s on Arkadaşlar, a conversation and Arkadaş bul, every 10 s
-elsewhere, never mid-run or in the background; when it moved, `refreshInbox`
-asks again for the badges and the lobby's VS card, and for the list or
-conversation on screen — the current route comes from `stores/route`; a push
+`hooks/useSocial.ts` (what the badges count — with the friend count, the
+bell's unseen count and the VS waiting on the lobby, `useInboxSummary` — the
+bell's list and its "seen" (`useNotifications`, `useSeeNotifications`), the
+inbox, requests, a friend
+list (`useFriendList`, `['friend-list', username]`; `['friends']` is the
+inbox's conversations), a conversation, phrases, blocks, reports, declining a
+VS — none of it polls on its own), `usePulse` (the inbox's heartbeat: one
+number, `GET /me/pulse`, asked every 3 s on Mesajlar, a conversation, a friend
+list, Bildirimler and Arkadaş bul, every 10 s elsewhere, never mid-run or in the
+background; when it moved, `refreshInbox` asks again for the badges and the
+lobby's VS notices, and for the list or conversation on screen — the current route comes from `stores/route`; a push
 refreshes at once), `useHistory`, `useAvatar`,
 `usePush`, `useMe`, `useSocialAuth`, `usePendingRunSender`. Push lives in
 `lib/push.ts` (Firebase Cloud Messaging; a build without Firebase's files

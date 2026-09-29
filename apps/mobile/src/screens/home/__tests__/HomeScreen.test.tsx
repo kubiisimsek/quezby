@@ -9,7 +9,7 @@ import type {
 } from '@quezby/types';
 import type { QueryClient } from '@tanstack/react-query';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
-import { Share } from 'react-native';
+import { usePanGesture } from 'react-native-gesture-handler';
 import {
   useReducedMotion,
   withRepeat,
@@ -26,7 +26,7 @@ import { HomeScreen } from '@/screens/home/HomeScreen';
 import { useDeviceVerdict } from '@/stores/deviceVerdict';
 import { useOnboarding } from '@/stores/onboarding';
 import { useSettings } from '@/stores/settings';
-import { buildEntry, buildMe, buildRanks } from '@/test/factories';
+import { buildEntry, buildInbox, buildMe, buildRanks, buildSummary, buildWaiting } from '@/test/factories';
 import { renderWithProviders } from '@/test/renderWithProviders';
 
 /** The official mock has no `useReducedMotion`; the breath is spied on. */
@@ -48,6 +48,7 @@ jest.mock('@/api/client', () => ({
     daily: { get: jest.fn() },
     leagues: { current: jest.fn() },
     leaderboards: { get: jest.fn() },
+    duels: { decline: jest.fn() },
   },
 }));
 
@@ -56,6 +57,7 @@ const mocked = api as unknown as {
   daily: { get: jest.Mock };
   leagues: { current: jest.Mock };
   leaderboards: { get: jest.Mock };
+  duels: { decline: jest.Mock };
 };
 
 type Props = Parameters<typeof HomeScreen>[0];
@@ -173,6 +175,14 @@ async function settle(client: QueryClient) {
   });
 }
 
+/** The swipe the gold slab listens for, as the lobby gave it to Gesture Handler. */
+function swipe() {
+  const config = jest.mocked(usePanGesture).mock.lastCall?.[0] as unknown as {
+    onDeactivate: (event: { translationY: number; velocityY: number; canceled: boolean }) => void;
+  };
+  return config.onDeactivate;
+}
+
 async function renderLobby() {
   const result = await renderWithProviders(<HomeScreen {...props} />);
   await settle(result.queryClient);
@@ -198,7 +208,7 @@ describe('HomeScreen', () => {
       hydrated: true,
     });
     mocked.me.get.mockResolvedValue({ user: buildMe(), ranks: buildRanks() });
-    mocked.me.inbox.mockResolvedValue({ requests: 0, threads: 0, yourTurn: 0 });
+    mocked.me.inbox.mockResolvedValue(buildInbox({ serverTime: NOW }));
     mocked.daily.get.mockResolvedValue(daily());
     mocked.leagues.current.mockResolvedValue(league());
     mocked.leaderboards.get.mockResolvedValue(weekly());
@@ -217,170 +227,272 @@ describe('HomeScreen', () => {
     }
   });
 
-  it('shows who is playing, in which league, and opens help', async () => {
+  it('shows who is playing, in which league, and opens help — and no mailbox: Mesajlar is on the dock', async () => {
     mocked.leagues.current.mockResolvedValue(league({ tier: 'platinum' }));
     await renderLobby();
 
     expect(screen.getByText('@ekin')).toBeOnTheScreen();
     expect(await screen.findByText('Platin lig')).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: /^Mesaj kutusu/ })).not.toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole('button', { name: 'Yardım' }));
     expect(navigate).toHaveBeenCalledWith('Help');
   });
 
-  it('counts what waits among friends on the mailbox, which opens the friends tab', async () => {
-    mocked.me.inbox.mockResolvedValue({ requests: 1, threads: 2, yourTurn: 0 });
+  it('rings the bell with what has not been seen yet, and opens Bildirimler', async () => {
+    mocked.me.inbox.mockResolvedValue(buildInbox({ serverTime: NOW, notifications: 2 }));
     await renderLobby();
 
-    await fireEvent.press(await screen.findByRole('button', { name: 'Mesaj kutusu, 3 yeni' }));
+    await fireEvent.press(await screen.findByRole('button', { name: 'Bildirimler, 2 yeni' }));
 
-    expect(navigate).toHaveBeenCalledWith('Friends');
+    expect(navigate).toHaveBeenCalledWith('Alerts');
   });
 
-  it('opens a door to the VS a friend is waiting on the player to play', async () => {
-    mocked.me.inbox.mockResolvedValue({ requests: 0, threads: 2, yourTurn: 2 });
+  it('keeps the bell quiet when nothing is new', async () => {
     await renderLobby();
 
-    expect(await screen.findByText('SENİ BEKLEYEN VS')).toBeOnTheScreen();
-    await fireEvent.press(screen.getByText('2 VS seni bekliyor'));
-
-    expect(navigate).toHaveBeenCalledWith('Friends');
+    expect(screen.getByRole('button', { name: 'Bildirimler' })).toBeOnTheScreen();
   });
 
-  it('shows no VS door with none waiting', async () => {
-    await renderLobby();
-    await screen.findByText('@ekin');
+  describe('the clock', () => {
+    it('keeps the season best where a lock screen keeps the time, the places under it', async () => {
+      await renderLobby();
 
-    expect(screen.queryByText('SENİ BEKLEYEN VS')).not.toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: 'Mesaj kutusu' })).toBeOnTheScreen();
+      expect(screen.getByText('SEZON REKORU')).toBeOnTheScreen();
+      expect(screen.getByText('12.345')).toBeOnTheScreen();
+      for (const rank of ['#120', '#310', '#1.204']) {
+        expect(screen.getByText(rank)).toBeOnTheScreen();
+      }
+      for (const label of ['Hafta', 'Ay', 'Tüm zamanlar']) {
+        expect(screen.getByText(label)).toBeOnTheScreen();
+      }
+
+      await fireEvent.press(screen.getByRole('button', { name: 'Sezon rekoru: 12.345' }));
+      expect(navigate).toHaveBeenCalledWith('Leaderboard');
+    });
+
+    it('shows a dash before the first ranked run', async () => {
+      useSession.setState({ user: buildMe({ best: null }) });
+      mocked.me.get.mockResolvedValue({ user: buildMe({ best: null }), ranks: buildRanks() });
+      await renderLobby();
+
+      expect(screen.getByRole('button', { name: 'Sezon rekoru' })).toBeOnTheScreen();
+      expect(screen.getAllByText('—').length).toBeGreaterThan(0);
+    });
   });
 
-  it("plays today's daily while it is open, with free play beside it", async () => {
-    await renderLobby();
+  describe('the gold slab', () => {
+    it('is the one way to free play: a tap', async () => {
+      await renderLobby();
 
-    expect(
-      screen.getByText('Herkes aynı akışı oynar · tek hak'),
-    ).toBeOnTheScreen();
-    expect(screen.getByText('Günün akışı #17')).toBeOnTheScreen();
-    expect(screen.getByText('Bitmesine 11 sa 0 dk')).toBeOnTheScreen();
+      expect(screen.getByText('Yukarı kaydır, oyna')).toBeOnTheScreen();
+      await fireEvent.press(screen.getByRole('button', { name: 'Oyna' }));
 
-    await fireEvent.press(
-      screen.getByRole('button', { name: 'Günün akışını oyna' }),
-    );
-    expect(navigate).toHaveBeenCalledWith('Game', { mode: 'daily' });
+      expect(navigate).toHaveBeenCalledWith('Game', { mode: 'free' });
+    });
 
-    await fireEvent.press(screen.getByRole('button', { name: 'Serbest oyna' }));
-    expect(navigate).toHaveBeenCalledWith('Game', { mode: 'free' });
+    it('plays on a swipe up, far or fast enough', async () => {
+      await renderLobby();
+
+      await act(async () => swipe()({ translationY: -80, velocityY: -200, canceled: false }));
+      expect(navigate).toHaveBeenCalledWith('Game', { mode: 'free' });
+
+      navigate.mockClear();
+      await act(async () => swipe()({ translationY: -20, velocityY: -1_200, canceled: false }));
+      expect(navigate).toHaveBeenCalledWith('Game', { mode: 'free' });
+    });
+
+    it('stays put for a short swipe, or one the system took over', async () => {
+      await renderLobby();
+
+      await act(async () => swipe()({ translationY: -20, velocityY: -200, canceled: false }));
+      await act(async () => swipe()({ translationY: -200, velocityY: -2_000, canceled: true }));
+
+      expect(navigate).not.toHaveBeenCalled();
+    });
+
+    it('breathes while the lobby is up', async () => {
+      await renderLobby();
+
+      expect(withRepeat).toHaveBeenCalledWith(expect.anything(), -1);
+      expect(withTiming).toHaveBeenCalledWith(
+        1.04,
+        expect.objectContaining({ duration: 1600 }),
+      );
+    });
+
+    it('does not loop for a player who reduces motion', async () => {
+      jest.mocked(useReducedMotion).mockReturnValue(true);
+      await renderLobby();
+
+      expect(screen.getByRole('button', { name: 'Oyna' })).toBeOnTheScreen();
+      expect(withTiming).not.toHaveBeenCalledWith(1.04, expect.anything());
+      expect(withRepeat).not.toHaveBeenCalledWith(expect.anything(), -1);
+    });
   });
 
-  it("shows today's result once played, and the button turns to free play", async () => {
-    const share = jest
-      .spyOn(Share, 'share')
-      .mockResolvedValue({ action: Share.sharedAction });
-    const shareText = 'Quezby · Günün akışı #17 · 18.420\n🟩🟩🟨⬛';
-    mocked.daily.get.mockResolvedValue(
-      daily({
-        status: 'ranked',
-        score: 18_420,
-        rank: 12,
-        grid: '🟩🟩🟨⬛',
-        shareText,
-      }),
-    );
-    await renderLobby();
+  describe('a VS waiting for you', () => {
+    it('comes in as a notice: who sent it and the time left to answer', async () => {
+      mocked.me.inbox.mockResolvedValue(buildInbox({ serverTime: NOW, yourTurn: 1, threads: 1, waiting: [buildWaiting()] }));
+      await renderLobby();
 
-    expect(screen.getByText('18.420')).toBeOnTheScreen();
-    expect(screen.getByText('#12 / 1.204 oyuncu')).toBeOnTheScreen();
-    expect(screen.getByText('Yeni akışa 11 sa 0 dk')).toBeOnTheScreen();
-    expect(screen.queryByText('Günün akışını oyna')).not.toBeOnTheScreen();
-    expect(screen.queryByText('Serbest oyna')).not.toBeOnTheScreen();
+      expect(await screen.findByText('SENİ BEKLEYEN VS')).toBeOnTheScreen();
+      expect(screen.getByText('@deniz sana VS attı')).toBeOnTheScreen();
+      expect(screen.getByText('Bitmesine 23 sa 0 dk')).toBeOnTheScreen();
+    });
 
-    await fireEvent.press(screen.getByRole('button', { name: 'Paylaş' }));
-    expect(share).toHaveBeenCalledWith({ message: shareText });
-    expect(track).toHaveBeenCalledWith('share_daily');
+    it('is played with ✓ — playing it is the answer', async () => {
+      mocked.me.inbox.mockResolvedValue(buildInbox({ serverTime: NOW, yourTurn: 1, waiting: [buildWaiting()] }));
+      await renderLobby();
 
-    await fireEvent.press(
-      screen.getByRole('button', { name: 'Sıralamayı gör' }),
-    );
-    expect(navigate).toHaveBeenCalledWith('Daily');
+      await fireEvent.press(await screen.findByRole('button', { name: 'Kabul et' }));
 
-    await fireEvent.press(screen.getByRole('button', { name: 'Oyna' }));
-    expect(navigate).toHaveBeenCalledWith('Game', { mode: 'free' });
-    expect(navigate).not.toHaveBeenCalledWith('Game', { mode: 'daily' });
+      expect(navigate).toHaveBeenCalledWith('Game', {
+        mode: 'vs',
+        opponent: 'deniz',
+        duelId: '01jduel0000000000000000001',
+      });
+      expect(mocked.duels.decline).not.toHaveBeenCalled();
+    });
+
+    it('is turned down with ✗', async () => {
+      mocked.me.inbox
+        .mockResolvedValueOnce(buildInbox({ serverTime: NOW, yourTurn: 1, waiting: [buildWaiting()] }))
+        .mockResolvedValue(buildInbox({ serverTime: NOW }));
+      mocked.duels.decline.mockResolvedValue({ duel: {} });
+      await renderLobby();
+
+      await fireEvent.press(await screen.findByRole('button', { name: 'Reddet' }));
+
+      expect(mocked.duels.decline).toHaveBeenCalledWith('01jduel0000000000000000001');
+      await waitFor(() => expect(screen.queryByText('SENİ BEKLEYEN VS')).not.toBeOnTheScreen());
+      expect(navigate).not.toHaveBeenCalled();
+    });
+
+    it('opens the conversation from the friend', async () => {
+      mocked.me.inbox.mockResolvedValue(buildInbox({ serverTime: NOW, yourTurn: 1, waiting: [buildWaiting()] }));
+      await renderLobby();
+
+      await fireEvent.press(await screen.findByRole('button', { name: '@deniz sana VS attı, sohbeti aç' }));
+
+      expect(navigate).toHaveBeenCalledWith('Thread', { username: 'deniz' });
+    });
+
+    it('shows three, and counts the rest on the way to the inbox', async () => {
+      const three = ['deniz', 'mert', 'oya'].map((username, index) =>
+        buildWaiting({ id: `duel-${index}`, opponent: buildSummary({ username, relation: 'friend' }) }),
+      );
+      mocked.me.inbox.mockResolvedValue(buildInbox({ serverTime: NOW, yourTurn: 5, threads: 5, waiting: three }));
+      await renderLobby();
+
+      expect(await screen.findAllByText('SENİ BEKLEYEN VS')).toHaveLength(3);
+      await fireEvent.press(screen.getByRole('button', { name: '2 VS daha' }));
+
+      expect(navigate).toHaveBeenCalledWith('Inbox');
+    });
+
+    it('is not there with none waiting', async () => {
+      await renderLobby();
+
+      expect(screen.queryByText('SENİ BEKLEYEN VS')).not.toBeOnTheScreen();
+      expect(screen.queryByRole('button', { name: 'Kabul et' })).not.toBeOnTheScreen();
+    });
   });
 
-  it('says so when today’s score is held for a look', async () => {
-    mocked.daily.get.mockResolvedValue(
-      daily({
-        status: 'review',
-        score: 250_000,
-        rank: null,
-        grid: null,
-        shareText: null,
-      }),
-    );
-    await renderLobby();
+  describe('today’s feed', () => {
+    it('is one notice while it is open, with a small Oyna for the daily', async () => {
+      await renderLobby();
 
-    expect(screen.getByText('250.000')).toBeOnTheScreen();
-    expect(screen.getByText('Skorun inceleniyor')).toBeOnTheScreen();
-    expect(screen.queryByText('Paylaş')).not.toBeOnTheScreen();
+      expect(screen.getByText('GÜNÜN AKIŞI #17')).toBeOnTheScreen();
+      expect(screen.getByText('Herkes aynı akışı oynar · tek hak')).toBeOnTheScreen();
+      expect(screen.getByText('Bitmesine 11 sa 0 dk')).toBeOnTheScreen();
+
+      await fireEvent.press(screen.getByRole('button', { name: 'Günün akışını oyna' }));
+      expect(navigate).toHaveBeenCalledWith('Game', { mode: 'daily' });
+
+      await fireEvent.press(screen.getByText('Herkes aynı akışı oynar · tek hak'));
+      expect(navigate).toHaveBeenCalledWith('Daily');
+    });
+
+    it('shows your place and score once played, and counts down to the next', async () => {
+      mocked.daily.get.mockResolvedValue(
+        daily({ status: 'ranked', score: 18_420, rank: 12, grid: '🟩🟩🟨⬛', shareText: 'Quezby' }),
+      );
+      await renderLobby();
+
+      expect(screen.getByText('18.420')).toBeOnTheScreen();
+      expect(screen.getByText('#12 / 1.204 oyuncu')).toBeOnTheScreen();
+      expect(screen.getByText('Yeni akışa 11 sa 0 dk')).toBeOnTheScreen();
+      expect(screen.queryByRole('button', { name: 'Günün akışını oyna' })).not.toBeOnTheScreen();
+
+      await fireEvent.press(screen.getByText('#12 / 1.204 oyuncu'));
+      expect(navigate).toHaveBeenCalledWith('Daily');
+    });
+
+    it('says so when today’s score is held for a look', async () => {
+      mocked.daily.get.mockResolvedValue(
+        daily({ status: 'review', score: 250_000, rank: null, grid: null, shareText: null }),
+      );
+      await renderLobby();
+
+      expect(screen.getByText('250.000')).toBeOnTheScreen();
+      expect(screen.getByText('Skorun inceleniyor')).toBeOnTheScreen();
+    });
+
+    it('still offers a game when the daily cannot be loaded, and asks again', async () => {
+      mocked.daily.get.mockRejectedValueOnce(new Error('offline')).mockResolvedValue(daily());
+      await renderLobby();
+
+      expect(screen.getByText('Bir şeyler ters gitti. Tekrar dene.')).toBeOnTheScreen();
+      await fireEvent.press(screen.getByRole('button', { name: 'Oyna' }));
+      expect(navigate).toHaveBeenCalledWith('Game', { mode: 'free' });
+
+      await fireEvent.press(screen.getByRole('button', { name: 'Tekrar dene' }));
+      expect(await screen.findByText('GÜNÜN AKIŞI #17')).toBeOnTheScreen();
+    });
   });
 
-  it('still offers a game when the daily cannot be loaded', async () => {
-    mocked.daily.get.mockRejectedValue(new Error('offline'));
-    await renderLobby();
+  describe('the league', () => {
+    it('shows your place and what promotion takes', async () => {
+      mocked.leagues.current.mockResolvedValue(joined(7, 'stay'));
+      await renderLobby();
 
-    expect(
-      screen.getByText('Bir şeyler ters gitti. Tekrar dene.'),
-    ).toBeOnTheScreen();
-    await fireEvent.press(screen.getByRole('button', { name: 'Oyna' }));
-    expect(navigate).toHaveBeenCalledWith('Game', { mode: 'free' });
-    expect(
-      screen.getByRole('button', { name: 'Tekrar dene' }),
-    ).toBeOnTheScreen();
-  });
+      expect(await screen.findByText('#7/30 · 17.000 puan')).toBeOnTheScreen();
+      // Fifth place holds 18.000; a tie goes to whoever got there first.
+      expect(screen.getByText('Terfiye 1.001 puan')).toBeOnTheScreen();
+      expect(screen.getByText('LİG')).toBeOnTheScreen();
 
-  it('shows your place in the league and what promotion takes', async () => {
-    mocked.leagues.current.mockResolvedValue(joined(7, 'stay'));
-    await renderLobby();
+      await fireEvent.press(screen.getByText('#7/30 · 17.000 puan'));
+      expect(navigate).toHaveBeenCalledWith('League');
+    });
 
-    expect(await screen.findByText('#7/30 · 17.000 puan')).toBeOnTheScreen();
-    // Fifth place holds 18.000; a tie goes to whoever got there first.
-    expect(screen.getByText('Terfiye 1.001 puan')).toBeOnTheScreen();
-    expect(screen.getByText(/^Bitmesine 3 g/)).toBeOnTheScreen();
+    it.each<[LeagueZone, number, string]>([
+      ['promote', 2, 'Terfi bölgesindesin'],
+      ['demote', 28, 'Düşme bölgesindesin'],
+    ])('names the %s zone', async (zone, rank, line) => {
+      mocked.leagues.current.mockResolvedValue(joined(rank, zone));
+      await renderLobby();
 
-    await fireEvent.press(screen.getByText('Terfiye 1.001 puan'));
-    expect(navigate).toHaveBeenCalledWith('League');
-  });
+      expect(await screen.findByText(line)).toBeOnTheScreen();
+    });
 
-  it.each<[LeagueZone, number, string]>([
-    ['promote', 2, 'Terfi bölgesindesin'],
-    ['demote', 28, 'Düşme bölgesindesin'],
-  ])('names the %s zone', async (zone, rank, line) => {
-    mocked.leagues.current.mockResolvedValue(joined(rank, zone));
-    await renderLobby();
+    it('invites you in before your first ranked run', async () => {
+      await renderLobby();
 
-    expect(await screen.findByText(line)).toBeOnTheScreen();
-  });
+      expect(await screen.findByText('Ligine katıl')).toBeOnTheScreen();
+      expect(screen.getByText(/^Bitmesine 3 g/)).toBeOnTheScreen();
+      expect(screen.queryByText(/Terfi/)).not.toBeOnTheScreen();
+    });
 
-  it('invites you into the league before your first ranked run', async () => {
-    await renderLobby();
+    it('shows a locked league with the runs it waits for, and no tier yet', async () => {
+      mocked.leagues.current.mockResolvedValue(league({ unlock: { required: 3, remaining: 2 } }));
+      await renderLobby();
 
-    expect(
-      await screen.findByText('Bu hafta ilk turunu oyna, ligine katıl.'),
-    ).toBeOnTheScreen();
-    expect(screen.queryByText(/Terfi/)).not.toBeOnTheScreen();
-  });
-
-  it('shows a locked league with the runs it waits for, and no tier yet', async () => {
-    mocked.leagues.current.mockResolvedValue(league({ unlock: { required: 3, remaining: 2 } }));
-    await renderLobby();
-
-    expect(await screen.findByText('Lige 2 oyun kaldı')).toBeOnTheScreen();
-    expect(screen.getByText('KİLİTLİ')).toBeOnTheScreen();
-    expect(screen.getByText('Lig, ilk 3 oyunundan sonra açılır. Deneme turu sayılmaz.')).toBeOnTheScreen();
-    expect(screen.queryByText('Altın lig')).not.toBeOnTheScreen();
-    expect(screen.queryByText('Bu hafta ilk turunu oyna, ligine katıl.')).not.toBeOnTheScreen();
+      expect(await screen.findByText('Lige 2 oyun kaldı')).toBeOnTheScreen();
+      expect(screen.getByText('KİLİTLİ')).toBeOnTheScreen();
+      expect(screen.queryByText('Altın lig')).not.toBeOnTheScreen();
+      expect(screen.queryByText('Ligine katıl')).not.toBeOnTheScreen();
+    });
   });
 
   describe('on a phone that never answered the usage question', () => {
@@ -449,11 +561,9 @@ describe('HomeScreen', () => {
     );
     await renderLobby();
 
-    expect(await screen.findByText('Hedefin')).toBeOnTheScreen();
+    expect(await screen.findByText('HEDEFİN · BU HAFTA')).toBeOnTheScreen();
     expect(screen.getByText("@deniz'e 1.001 puan")).toBeOnTheScreen();
-    expect(
-      screen.getByText('@deniz haftalık sıralamada hemen önünde.'),
-    ).toBeOnTheScreen();
+    expect(screen.getByText('@deniz haftalık sıralamada hemen önünde.')).toBeOnTheScreen();
     expect(mocked.leaderboards.get).toHaveBeenCalledWith('weekly', {
       scope: 'everyone',
       limit: 3,
@@ -467,28 +577,11 @@ describe('HomeScreen', () => {
   it('shows no target with nobody right above you', async () => {
     await renderLobby();
 
-    expect(screen.queryByText('Hedefin')).not.toBeOnTheScreen();
+    expect(screen.queryByText('HEDEFİN · BU HAFTA')).not.toBeOnTheScreen();
     expect(screen.queryByText('Geç onu')).not.toBeOnTheScreen();
   });
 
-  it('keeps your records on a strip that opens the boards', async () => {
-    await renderLobby();
-
-    expect(screen.getByText('Sezon rekoru')).toBeOnTheScreen();
-    expect(screen.getByText('12.345')).toBeOnTheScreen();
-    for (const rank of ['#120', '#310', '#1.204']) {
-      expect(screen.getByText(rank)).toBeOnTheScreen();
-    }
-    for (const label of ['Hafta', 'Ay', 'Tüm zamanlar']) {
-      expect(screen.getByText(label)).toBeOnTheScreen();
-    }
-    expect(screen.queryByText('Bugün')).not.toBeOnTheScreen();
-
-    await fireEvent.press(screen.getByText('#310'));
-    expect(navigate).toHaveBeenCalledWith('Leaderboard');
-  });
-
-  it('warns up top when this phone failed the integrity check: its scores never rank', async () => {
+  it('warns when this phone failed the integrity check: its scores never rank', async () => {
     useDeviceVerdict.setState({
       userId: buildMe().id,
       verdict: 'fail',
@@ -503,7 +596,7 @@ describe('HomeScreen', () => {
       screen.getByText(/güvenlik kontrolü bu cihazı onaylamadı: .* Oynayabilirsin ama skorların sıralamaya girmez\./),
     ).toBeOnTheScreen();
     // The game is still there to play.
-    expect(screen.getByRole('button', { name: 'Günün akışını oyna' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Oyna' })).toBeOnTheScreen();
   });
 
   it.each([
@@ -520,34 +613,14 @@ describe('HomeScreen', () => {
     expect(screen.queryByText('Bu cihazda kapalı')).not.toBeOnTheScreen();
   });
 
-  it('breathes the play button while the lobby is up', async () => {
-    await renderLobby();
-
-    expect(withRepeat).toHaveBeenCalledWith(expect.anything(), -1);
-    expect(withTiming).toHaveBeenCalledWith(
-      1.04,
-      expect.objectContaining({ duration: 1600 }),
-    );
-  });
-
-  it('does not loop for a player who reduces motion', async () => {
-    jest.mocked(useReducedMotion).mockReturnValue(true);
-    await renderLobby();
-
-    expect(
-      screen.getByRole('button', { name: 'Günün akışını oyna' }),
-    ).toBeOnTheScreen();
-    expect(withTiming).not.toHaveBeenCalledWith(1.04, expect.anything());
-    expect(withRepeat).not.toHaveBeenCalledWith(expect.anything(), -1);
-  });
-
-  it('pulls to refresh you, the daily, the league and the week', async () => {
+  it('pulls to refresh you, the daily, the league, the week and the inbox', async () => {
     const { queryClient } = await renderLobby();
     const before = {
       me: mocked.me.get.mock.calls.length,
       daily: mocked.daily.get.mock.calls.length,
       league: mocked.leagues.current.mock.calls.length,
       board: mocked.leaderboards.get.mock.calls.length,
+      inbox: mocked.me.inbox.mock.calls.length,
     };
 
     await act(async () => {
@@ -559,6 +632,7 @@ describe('HomeScreen', () => {
     expect(mocked.daily.get).toHaveBeenCalledTimes(before.daily + 1);
     expect(mocked.leagues.current).toHaveBeenCalledTimes(before.league + 1);
     expect(mocked.leaderboards.get).toHaveBeenCalledTimes(before.board + 1);
+    expect(mocked.me.inbox).toHaveBeenCalledTimes(before.inbox + 1);
   });
 
   it('spins only for a pull, never for a refetch of its own', async () => {
@@ -582,8 +656,9 @@ describe('HomeScreen', () => {
   });
 
   describe('in the player\'s language', () => {
-    it('speaks English: today\'s feed, the league, the rival and the records', async () => {
+    it('speaks English: the clock, today\'s feed, a VS, the league and the rival', async () => {
       speak('en');
+      mocked.me.inbox.mockResolvedValue(buildInbox({ serverTime: NOW, yourTurn: 1, waiting: [buildWaiting()] }));
       mocked.leagues.current.mockResolvedValue(joined(7, 'stay'));
       mocked.leaderboards.get.mockResolvedValue(
         weekly({
@@ -593,69 +668,51 @@ describe('HomeScreen', () => {
       );
       await renderLobby();
 
-      expect(screen.getByText('DAILY FEED')).toBeOnTheScreen();
-      expect(screen.getByText('Daily Feed #17')).toBeOnTheScreen();
-      expect(
-        screen.getByText('Everyone plays the same feed · one shot'),
-      ).toBeOnTheScreen();
-      expect(screen.getByText('Ends in 11h 0m')).toBeOnTheScreen();
-      expect(
-        screen.getByRole('button', { name: 'Play the Daily Feed' }),
-      ).toBeOnTheScreen();
-      expect(screen.getByRole('button', { name: 'Free play' })).toBeOnTheScreen();
-
-      expect(await screen.findByText('#7/30 · 17,000 points')).toBeOnTheScreen();
-      expect(screen.getByText('Gold league')).toBeOnTheScreen();
-      expect(screen.getByText('1,001 points to promotion')).toBeOnTheScreen();
-      expect(screen.getByText('Ends in 3d 11h')).toBeOnTheScreen();
-      expect(screen.getAllByText('THIS WEEK')).toHaveLength(2);
-
-      expect(screen.getByText('Your target')).toBeOnTheScreen();
-      expect(screen.getByText('1,001 points to pass @deniz')).toBeOnTheScreen();
-      expect(
-        screen.getByText('@deniz is right ahead of you in the weekly ranking.'),
-      ).toBeOnTheScreen();
-      expect(screen.getByRole('button', { name: 'Pass them' })).toBeOnTheScreen();
-
-      expect(screen.getByText('Season record')).toBeOnTheScreen();
+      expect(screen.getByText('SEASON RECORD')).toBeOnTheScreen();
       expect(screen.getByText('12,345')).toBeOnTheScreen();
       for (const label of ['Week', 'Month', 'All time']) {
         expect(screen.getByText(label)).toBeOnTheScreen();
       }
       expect(screen.getByLabelText('All time: #1,204')).toBeOnTheScreen();
+
+      expect(await screen.findByText('VS WAITING FOR YOU')).toBeOnTheScreen();
+      expect(screen.getByText('@deniz sent you a VS')).toBeOnTheScreen();
+      expect(screen.getByRole('button', { name: 'Accept' })).toBeOnTheScreen();
+      expect(screen.getByRole('button', { name: 'Decline' })).toBeOnTheScreen();
+
+      expect(screen.getByText('DAILY FEED #17')).toBeOnTheScreen();
+      expect(screen.getByText('Everyone plays the same feed · one shot')).toBeOnTheScreen();
+      expect(screen.getByText('Ends in 11h 0m')).toBeOnTheScreen();
+      expect(screen.getByRole('button', { name: 'Play the Daily Feed' })).toBeOnTheScreen();
+
+      expect(screen.getByText('LEAGUE')).toBeOnTheScreen();
+      expect(await screen.findByText('#7/30 · 17,000 points')).toBeOnTheScreen();
+      expect(screen.getByText('Gold league')).toBeOnTheScreen();
+      expect(screen.getByText('1,001 points to promotion')).toBeOnTheScreen();
+
+      expect(screen.getByText('YOUR TARGET · THIS WEEK')).toBeOnTheScreen();
+      expect(screen.getByText('1,001 points to pass @deniz')).toBeOnTheScreen();
+      expect(screen.getByText('@deniz is right ahead of you in the weekly ranking.')).toBeOnTheScreen();
+      expect(screen.getByRole('button', { name: 'Pass them' })).toBeOnTheScreen();
+
+      expect(screen.getByText('Swipe up to play')).toBeOnTheScreen();
+      expect(screen.getByRole('button', { name: 'Play' })).toBeOnTheScreen();
       expect(screen.getByRole('button', { name: 'Help' })).toBeOnTheScreen();
     });
 
     it('counts one game to the league in English, and a played day', async () => {
       speak('en');
       mocked.daily.get.mockResolvedValue(
-        daily({
-          status: 'review',
-          score: 250_000,
-          rank: null,
-          grid: null,
-          shareText: null,
-        }),
+        daily({ status: 'review', score: 250_000, rank: null, grid: null, shareText: null }),
       );
-      mocked.leagues.current.mockResolvedValue(
-        league({ unlock: { required: 3, remaining: 1 } }),
-      );
+      mocked.leagues.current.mockResolvedValue(league({ unlock: { required: 3, remaining: 1 } }));
       await renderLobby();
 
       expect(await screen.findByText('1 game to the league')).toBeOnTheScreen();
       expect(screen.getByText('LOCKED')).toBeOnTheScreen();
-      expect(
-        screen.getByText(
-          "The league opens after your first 3 games. The practice run doesn't count.",
-        ),
-      ).toBeOnTheScreen();
-
-      expect(screen.getByText('Your score today')).toBeOnTheScreen();
       expect(screen.getByText('250,000')).toBeOnTheScreen();
       expect(screen.getByText('Your score is being reviewed')).toBeOnTheScreen();
       expect(screen.getByText('Next feed in 11h 0m')).toBeOnTheScreen();
-      expect(screen.getByRole('button', { name: 'See ranking' })).toBeOnTheScreen();
-      expect(screen.getByRole('button', { name: 'Play' })).toBeOnTheScreen();
     });
 
     it('warns in English when this phone failed the integrity check', async () => {
@@ -677,18 +734,11 @@ describe('HomeScreen', () => {
 
     it('speaks Arabic, with names and ranks kept whole inside the line', async () => {
       speak('ar');
+      mocked.me.inbox.mockResolvedValue(buildInbox({ serverTime: NOW, yourTurn: 1, waiting: [buildWaiting()] }));
       mocked.daily.get.mockResolvedValue(
-        daily({
-          status: 'ranked',
-          score: 18_420,
-          rank: 12,
-          grid: '🟩🟩🟨⬛',
-          shareText: 'Quezby',
-        }),
+        daily({ status: 'ranked', score: 18_420, rank: 12, grid: '🟩🟩🟨⬛', shareText: 'Quezby' }),
       );
-      mocked.leagues.current.mockResolvedValue(
-        league({ unlock: { required: 3, remaining: 2 } }),
-      );
+      mocked.leagues.current.mockResolvedValue(league({ unlock: { required: 3, remaining: 2 } }));
       mocked.leaderboards.get.mockResolvedValue(
         weekly({
           entry: buildEntry({ username: 'deniz', rank: 11 }),
@@ -697,42 +747,36 @@ describe('HomeScreen', () => {
       );
       await renderLobby();
 
-      expect(screen.getByText('خلاصة اليوم')).toBeOnTheScreen();
+      expect(screen.getByText('الرقم القياسي للموسم')).toBeOnTheScreen();
+      expect(await screen.findByText('تحدٍّ بانتظارك')).toBeOnTheScreen();
       expect(screen.getByText(`خلاصة اليوم ${iso('#17')}`)).toBeOnTheScreen();
       expect(screen.getByText('18,420')).toBeOnTheScreen();
       // 1.204 players: the tail 4 takes the plural of three to ten.
       expect(screen.getByText(`${iso('#12')} / 1,204 لاعبين`)).toBeOnTheScreen();
       expect(screen.getByText('الخلاصة التالية بعد 11 س 0 د')).toBeOnTheScreen();
-      expect(screen.getByRole('button', { name: 'شارِك' })).toBeOnTheScreen();
 
       expect(await screen.findByText('مباراتان للوصول إلى الدوري')).toBeOnTheScreen();
       expect(screen.getByText('مقفل')).toBeOnTheScreen();
 
-      expect(screen.getByText('ضد')).toBeOnTheScreen();
-      expect(
-        screen.getByText(`1,001 نقطة لتجاوز ${iso('@deniz')}`),
-      ).toBeOnTheScreen();
-      expect(
-        screen.getByText(`يسبقك ${iso('@deniz')} مباشرةً في ترتيب الأسبوع.`),
-      ).toBeOnTheScreen();
+      expect(screen.getByText(`1,001 نقطة لتجاوز ${iso('@deniz')}`)).toBeOnTheScreen();
+      expect(screen.getByText(`يسبقك ${iso('@deniz')} مباشرةً في ترتيب الأسبوع.`)).toBeOnTheScreen();
       expect(screen.getByRole('button', { name: 'تجاوزه' })).toBeOnTheScreen();
       expect(screen.getByLabelText(`الأسبوع: ${iso('#120')}`)).toBeOnTheScreen();
+      expect(screen.getByText('اسحب للأعلى والعب')).toBeOnTheScreen();
     });
 
     it('turns to a language picked while the lobby is up', async () => {
       speak('tr');
       await renderLobby();
-      expect(screen.getByText('Günün akışı #17')).toBeOnTheScreen();
+      expect(screen.getByText('GÜNÜN AKIŞI #17')).toBeOnTheScreen();
 
       await act(async () => {
         speak('es');
       });
 
-      expect(screen.getByText('Feed del día #17')).toBeOnTheScreen();
+      expect(screen.getByText('FEED DEL DÍA #17')).toBeOnTheScreen();
       expect(screen.getByText('Termina en 11 h 0 min')).toBeOnTheScreen();
-      expect(
-        screen.getByRole('button', { name: 'Jugar el Feed del día' }),
-      ).toBeOnTheScreen();
+      expect(screen.getByRole('button', { name: 'Jugar el Feed del día' })).toBeOnTheScreen();
     });
   });
 });

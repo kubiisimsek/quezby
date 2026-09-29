@@ -131,7 +131,9 @@ tutar (`docs/product/analytics.md`). Arkadaşlar, mesaj kutusu, profil
 fotoğrafı ve bildirimler de veri tutar:
 
 - **Arkadaş listesi:** arkadaşlar, bekleyen istekler ve engellenenler.
-  Telefonun rehberine hiç erişilmez.
+  Telefonun rehberine hiç erişilmez. Bir oyuncunun arkadaş sayısını herkes,
+  arkadaş listesini yalnızca kendisi ve arkadaşları görür (2026-09-29'dan
+  beri); engellenenler ve banlılar listede görünmez.
 - **Hazır mesajlar:** arkadaşlar arasında gidip gelen satırlar. Oyuncu hiçbir
   şey yazmaz, mesajlar sabit bir listeden seçilir; 90 günden eskileri silinir
   (`QUEZBY_INBOX_KEEP_DAYS`), arkadaşlık bitince sohbet de silinir.

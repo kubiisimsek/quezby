@@ -26,6 +26,7 @@ return [
     'friend_limit' => 'Du kannst höchstens :limit Freunde haben.',
     'request_limit' => 'Du kannst höchstens :limit offene Anfragen haben. Schick eine neue, sobald jemand antwortet.',
     'not_friends' => 'Das geht nur mit Freunden.',
+    'friends_hidden' => 'Nur Freunde können diese Liste sehen.',
     'message_limit' => 'Du kannst diesem Freund höchstens :limit Nachrichten am Tag schicken.',
     'duel_unavailable' => 'Dieses VS kann nicht mehr gespielt werden.',
     'duel_limit' => 'Du kannst höchstens :limit VS gleichzeitig offen haben.',

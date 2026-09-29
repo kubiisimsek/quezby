@@ -9,16 +9,18 @@ const ROUTES = [
   { key: 'Leaderboard-1', name: 'Leaderboard', options: tab('Zirve', 'mountain') },
   { key: 'League-1', name: 'League', options: tab('Lig', 'shield') },
   { key: 'Home-1', name: 'Home', options: tab('Oyna', 'play') },
-  { key: 'Friends-1', name: 'Friends', options: tab('Arkadaşlar', 'users') },
+  { key: 'Inbox-1', name: 'Inbox', options: tab('Mesajlar', 'message') },
   { key: 'Profile-1', name: 'Profile', options: tab('Profil', 'account') },
 ];
 
-function renderDock(index: number, badge?: number) {
+/** The dock on slot `index`, with conversations waiting on Mesajlar and requests on Profil. */
+function renderDock(index: number, badges: { Inbox?: number; Profile?: number } = {}) {
   const navigate = jest.fn();
   const emit = jest.fn(() => ({ defaultPrevented: false }));
-  const routes = ROUTES.map((route) =>
-    route.name === 'Friends' ? { ...route, options: { ...route.options, tabBarBadge: badge } } : route,
-  );
+  const routes = ROUTES.map((route) => {
+    const badge = badges[route.name as keyof typeof badges];
+    return badge === undefined ? route : { ...route, options: { ...route.options, tabBarBadge: badge } };
+  });
   const props = {
     state: { index, routes: routes.map(({ key, name }) => ({ key, name })) },
     descriptors: Object.fromEntries(routes.map((route) => [route.key, { options: route.options }])),
@@ -45,7 +47,7 @@ describe('TabBar — the dock', () => {
       'Zirve',
       'Lig',
       'Oyna',
-      'Arkadaşlar',
+      'Mesajlar',
       'Profil',
     ]);
     expect(screen.getByRole('tab', { name: 'Oyna' })).toBeSelected();
@@ -56,9 +58,9 @@ describe('TabBar — the dock', () => {
     const { rendered, navigate, emit } = renderDock(0);
     await rendered;
 
-    await fireEvent.press(screen.getByRole('tab', { name: 'Arkadaşlar' }));
-    expect(emit).toHaveBeenCalledWith(expect.objectContaining({ type: 'tabPress', target: 'Friends-1' }));
-    expect(navigate).toHaveBeenCalledWith('Friends');
+    await fireEvent.press(screen.getByRole('tab', { name: 'Mesajlar' }));
+    expect(emit).toHaveBeenCalledWith(expect.objectContaining({ type: 'tabPress', target: 'Inbox-1' }));
+    expect(navigate).toHaveBeenCalledWith('Inbox');
 
     await fireEvent.press(screen.getByRole('tab', { name: 'Oyna' }));
     expect(navigate).toHaveBeenCalledWith('Home');
@@ -68,18 +70,20 @@ describe('TabBar — the dock', () => {
     expect(navigate).not.toHaveBeenCalled();
   });
 
-  it('counts what waits among friends on their slot, and says so', async () => {
-    const { rendered } = renderDock(2, 3);
+  it('counts the conversations waiting on Mesajlar and the requests on Profil, and says so', async () => {
+    const { rendered } = renderDock(2, { Inbox: 3, Profile: 1 });
     await rendered;
 
     expect(screen.getByText('3')).toBeOnTheScreen();
-    expect(screen.getByRole('tab', { name: 'Arkadaşlar, 3 yeni' })).toBeOnTheScreen();
+    expect(screen.getByRole('tab', { name: 'Mesajlar, 3 yeni' })).toBeOnTheScreen();
+    expect(screen.getByRole('tab', { name: 'Profil, 1 yeni' })).toBeOnTheScreen();
   });
 
   it('shows no count when nothing waits', async () => {
     const { rendered } = renderDock(2);
     await rendered;
 
-    expect(screen.getByRole('tab', { name: 'Arkadaşlar' })).toBeOnTheScreen();
+    expect(screen.getByRole('tab', { name: 'Mesajlar' })).toBeOnTheScreen();
+    expect(screen.getByRole('tab', { name: 'Profil' })).toBeOnTheScreen();
   });
 });

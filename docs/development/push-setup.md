@@ -17,7 +17,7 @@ için ayrı bir Firebase projesi açma. Aşağıdaki her kurulum **bir kez** yap
 1. **Telefon izin verir.** Yeni oyuncunun ilk adımlarında, addan sonra
    **Bildirimler** adımı sorar: "Haberin olsun mu?" → **Bildirimleri aç**
    telefonun kendi sorusunu getirir. Adım yalnızca soru hâlâ sorulabiliyorsa
-   görünür. Hayır diyen oyuncuya Arkadaşlar sekmesi, bir sohbet ve az önce
+   görünür. Hayır diyen oyuncuya Mesajlar sekmesi, bir sohbet ve az önce
    gönderilen VS bir kartla yeniden sorar; telefon artık sormuyorsa kart
    telefonun ayarlarını açar. Türler **Ayarlar → Bildirimler**'dedir.
 2. **Token API'ye gider.** Firebase'in otomatik başlatması kapalıdır
@@ -38,7 +38,7 @@ için ayrı bir Firebase projesi açma. Aşağıdaki her kurulum **bir kez** yap
    tanımadığı token'ı (uygulama silinmiş) API sessizce siler.
 5. **Telefon gösterir.** Oyun kapalıyken ya da arka plandayken sistem gösterir:
    Android'de "social" kanalında, arkadaş başına tek bildirim; iOS'ta arkadaş
-   başına gruplanır. Dokununca istek Arkadaşlar sekmesini, gerisi o arkadaşın
+   başına gruplanır. Dokununca istek arkadaş listesini, gerisi o arkadaşın
    sohbetini açar. Oyun açıkken sistem göstermez; üstte kısa bir şerit çıkar,
    dokununca aynı yer açılır.
 
@@ -297,7 +297,8 @@ xcrun simctl push booted com.kubisimsek.game.quezby /tmp/quezby-push.apns
 ```
 
 - Uygulama arka plandayken sistem gösterir. Dokununca `friend_request`
-  Arkadaşlar sekmesini, `friends`, `vs_invite`, `vs_result` ve `phrase` o
+  arkadaş listesini (Profil'den açılan `Friends` ekranı), `friends`,
+  `vs_invite`, `vs_result` ve `phrase` o
   oyuncunun sohbetini açar.
 - Uygulama açıkken üstte şerit çıkar; dokununca aynı yer açılır.
 

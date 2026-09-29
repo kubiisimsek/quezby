@@ -1,6 +1,9 @@
 <?php
 
+use App\Content\Catalog;
+use App\Enums\DuelStatus;
 use App\Enums\MessageKind;
+use App\Models\Duel;
 use App\Models\Message;
 use App\Models\User;
 use App\Services\Social\InboxService;
@@ -22,10 +25,10 @@ test('accepting a request opens the conversation with "friends now", unread for 
     expect($message->kind)->toBe(MessageKind::Friends)
         ->and($message->sender_id)->toBe($me->id)
         ->and($message->recipient_id)->toBe($asker->id);
-    $this->getJson('/api/v1/me/inbox')->assertExactJson(['requests' => 0, 'threads' => 0, 'yourTurn' => 0]);
+    $this->getJson('/api/v1/me/inbox')->assertExactJson(['requests' => 0, 'threads' => 0, 'yourTurn' => 0, 'friends' => 1, 'waiting' => [], 'notifications' => 0, 'serverTime' => '2026-09-24T09:00:00.000Z']);
 
     $this->signIn($asker);
-    $this->getJson('/api/v1/me/inbox')->assertExactJson(['requests' => 0, 'threads' => 1, 'yourTurn' => 0]);
+    $this->getJson('/api/v1/me/inbox')->assertExactJson(['requests' => 0, 'threads' => 1, 'yourTurn' => 0, 'friends' => 1, 'waiting' => [], 'notifications' => 1, 'serverTime' => '2026-09-24T09:00:00.000Z']);
     $this->getJson('/api/v1/me/friends')
         ->assertJsonPath('friends.0.player.username', 'kabul')
         ->assertJsonPath('friends.0.unread', 1)
@@ -40,7 +43,7 @@ test('a request waiting counts on the badge', function () {
     $this->requestFriend(User::factory()->withUsername('iki')->create(), $me);
     $this->requestFriend(User::factory()->withUsername('yasakli')->create(['banned_at' => now()]), $me);
 
-    $this->getJson('/api/v1/me/inbox')->assertExactJson(['requests' => 2, 'threads' => 0, 'yourTurn' => 0]);
+    $this->getJson('/api/v1/me/inbox')->assertExactJson(['requests' => 2, 'threads' => 0, 'yourTurn' => 0, 'friends' => 0, 'waiting' => [], 'notifications' => 2, 'serverTime' => '2026-09-24T09:00:00.000Z']);
 });
 
 test('a phrase goes to a friend, and reading the conversation clears it', function () {
@@ -173,4 +176,104 @@ test('phrases are throttled', function () {
 
     $this->assertApiError($this->postJson('/api/v1/me/threads/kanka/messages', ['phrase' => 'hi']), 429, 'too_many_requests');
     expect(DB::table('messages')->count())->toBe(30);
+});
+
+/** A VS `$from` played and sent `$to`, waiting for them to play it until `$hours` from now. */
+function vsWaitingFor(User $to, User $from, int $hours): Duel
+{
+    return Duel::query()->create([
+        'challenger_id' => $from->id,
+        'opponent_id' => $to->id,
+        'seed' => 4242,
+        'engine_version' => config('quezby.engine_version'),
+        'content_version' => Catalog::LATEST,
+        'status' => DuelStatus::Waiting,
+        'challenger_score' => 1000,
+        'challenger_valid' => true,
+        'open_pair' => Duel::pairOf($from->id, $to->id),
+        'sent_at' => now(),
+        'expires_at' => now()->addHours($hours),
+    ]);
+}
+
+test('the summary counts the friends who are not banned', function () {
+    $me = $this->signIn();
+    foreach (User::factory()->withUsername()->count(3)->create() as $friend) {
+        $this->befriend($me, $friend);
+    }
+    $this->befriend($me, User::factory()->withUsername()->create(['banned_at' => now()]));
+    $this->requestFriend(User::factory()->withUsername()->create(), $me);
+
+    $this->getJson('/api/v1/me/inbox')->assertOk()->assertJsonPath('friends', 3)->assertJsonPath('requests', 1);
+});
+
+test('the summary names the VS waiting for the player, the one running out first first, three at most', function () {
+    $me = $this->signIn();
+    $friends = [];
+    foreach (['ada', 'bora', 'cem', 'deniz'] as $name) {
+        $friends[$name] = User::factory()->withUsername($name)->create();
+        $this->befriend($me, $friends[$name]);
+    }
+    $this->recordRanked($friends['bora'], 4200);
+    $ada = vsWaitingFor($me, $friends['ada'], 30);
+    $bora = vsWaitingFor($me, $friends['bora'], 2);
+    vsWaitingFor($me, $friends['cem'], 47);
+    $deniz = vsWaitingFor($me, $friends['deniz'], 10);
+    // Not the player's to play: one they sent, and one from a friend who is banned now.
+    $sent = User::factory()->withUsername('eren')->create();
+    $this->befriend($me, $sent);
+    vsWaitingFor($sent, $me, 5);
+    $banned = User::factory()->withUsername('fikret')->create();
+    $this->befriend($me, $banned);
+    vsWaitingFor($me, $banned, 1);
+    $banned->forceFill(['banned_at' => now()])->save();
+
+    $this->getJson('/api/v1/me/inbox')
+        ->assertOk()
+        ->assertJsonPath('yourTurn', 4)
+        ->assertJsonPath('threads', 4)
+        ->assertJsonPath('friends', 5)
+        ->assertJsonPath('serverTime', '2026-09-24T09:00:00.000Z')
+        ->assertJsonPath('waiting', [
+            [
+                'id' => $bora->id,
+                'opponent' => ['username' => 'bora', 'avatarUrl' => null, 'best' => 4200, 'league' => null, 'relation' => 'friend'],
+                'expiresAt' => '2026-09-24T11:00:00.000Z',
+            ],
+            [
+                'id' => $deniz->id,
+                'opponent' => ['username' => 'deniz', 'avatarUrl' => null, 'best' => null, 'league' => null, 'relation' => 'friend'],
+                'expiresAt' => '2026-09-24T19:00:00.000Z',
+            ],
+            [
+                'id' => $ada->id,
+                'opponent' => ['username' => 'ada', 'avatarUrl' => null, 'best' => null, 'league' => null, 'relation' => 'friend'],
+                'expiresAt' => '2026-09-25T15:00:00.000Z',
+            ],
+        ]);
+});
+
+test('a waiting VS leaves the summary once it is declined, started or run out', function () {
+    $me = $this->signIn();
+    $friends = User::factory()->withUsername()->count(3)->create()->all();
+    foreach ($friends as $friend) {
+        $this->befriend($me, $friend);
+    }
+    $declined = vsWaitingFor($me, $friends[0], 1);
+    $started = vsWaitingFor($me, $friends[1], 2);
+    $expiring = vsWaitingFor($me, $friends[2], 3);
+    $this->getJson('/api/v1/me/inbox')->assertJsonPath('yourTurn', 3)->assertJsonPath('waiting.*.id', [$declined->id, $started->id, $expiring->id]);
+
+    $this->postJson("/api/v1/duels/{$declined->id}/decline")->assertOk();
+    $this->getJson('/api/v1/me/inbox')->assertJsonPath('yourTurn', 2)->assertJsonPath('waiting.*.id', [$started->id, $expiring->id]);
+
+    $this->startRun(['mode' => 'vs', 'duel' => $started->id])->assertCreated();
+    $this->getJson('/api/v1/me/inbox')->assertJsonPath('yourTurn', 1)->assertJsonPath('waiting.*.id', [$expiring->id]);
+
+    Carbon::setTestNow(now()->addHours(4));
+    $this->getJson('/api/v1/me/inbox')
+        ->assertJsonPath('yourTurn', 0)
+        ->assertJsonPath('waiting', [])
+        ->assertJsonPath('serverTime', '2026-09-24T13:00:00.000Z');
+    expect(Duel::query()->find($expiring->id)->status)->toBe(DuelStatus::Expired);
 });

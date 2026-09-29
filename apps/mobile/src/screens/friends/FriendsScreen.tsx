@@ -1,16 +1,16 @@
-import type { FriendRequest, FriendThread, InboxMessage } from '@quezby/types';
-import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import { useFocusEffect, type CompositeScreenProps } from '@react-navigation/native';
+import { ApiError } from '@quezby/sdk';
+import type { FriendRequest } from '@quezby/types';
+import { useFocusEffect } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useCallback, useRef, useState } from 'react';
 import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 
+import { useSession } from '@/auth/session';
 import { PlayerSheet } from '@/components/PlayerSheet';
-import { PushNudge } from '@/components/PushNudge';
-import { useFriendRequests, useFriendship, useFriendThreads } from '@/hooks/useSocial';
-import { handle, useT, type Messages } from '@/i18n';
+import { useFriendList, useFriendRequests, useFriendship } from '@/hooks/useSocial';
+import { handle, useT } from '@/i18n';
 import { messageFor } from '@/lib/errors';
-import type { RootStackParamList, TabParamList } from '@/navigation/types';
+import type { RootStackParamList } from '@/navigation/types';
 import {
   Button,
   Callout,
@@ -21,37 +21,70 @@ import {
   PlayerRow,
   Screen,
   SkeletonList,
-  ThreadRow,
   TopBar,
-  type TagTone,
 } from '@/ui/kit';
 import { SPACE, useTheme } from '@/ui/theme';
 
-type Props = CompositeScreenProps<
-  BottomTabScreenProps<TabParamList, 'Friends'>,
-  NativeStackScreenProps<RootStackParamList>
->;
+type Props = NativeStackScreenProps<RootStackParamList, 'Friends'>;
 
 /**
- * Arkadaşlar, the dock's friends tab — the inbox. With notifications off, a
- * card to turn them on leads; then requests waiting for you, each with Kabul
- * et and Reddet; then one conversation per friend, the one last heard from
- * first, with its newest line, what is unread and a VS waiting on either of
- * you. Finding new players is the glyph in the corner.
+ * A friend list as a screen of its own: a friend's — opened from the count on
+ * their card — or the player's own, from their own card, with "Arkadaş bul"
+ * in the corner. Anyone else's is locked, which the API decides. The
+ * player's own list lives on the Mesajlar tab too, beside the search.
  */
-export function FriendsScreen({ navigation }: Props) {
+export function FriendsScreen({ navigation, route }: Props) {
+  const t = useT();
+  const words = t.friends.list;
+  const me = useSession((state) => state.user?.username) ?? '';
+  const name = route.params?.username ?? me;
+  const own = name === me;
+  // The same query the list asks: its answer carries the count.
+  const total = useFriendList(name).data?.pages[0]?.total;
+  const find = () => navigation.navigate('FindFriends');
+
+  return (
+    <Screen>
+      <TopBar
+        title={own ? words.title : handle(name)}
+        subtitle={total === undefined ? undefined : t.friends.sheet.friends(total)}
+        onBack={() => navigation.goBack()}
+        right={own ? <IconButton icon="userPlus" label={words.find} onPress={find} /> : undefined}
+      />
+      <FriendListView name={name} own={own} onFind={find} />
+    </Screen>
+  );
+}
+
+/**
+ * A friend list's body, A to Z: for the player's own, the requests waiting
+ * first with Kabul et and Reddet; a friend's, only who they are friends with;
+ * anyone else's, locked. A row opens the player's card. The friend list
+ * screen and the Mesajlar tab's Arkadaşlar side both draw it.
+ */
+export function FriendListView({
+  name,
+  own,
+  onFind,
+}: {
+  name: string;
+  own: boolean;
+  /** "Arkadaş bul", from an empty list of your own. */
+  onFind: () => void;
+}) {
   const theme = useTheme();
   const t = useT();
-  const words = t.friends.tab;
-  const threads = useFriendThreads();
-  const requests = useFriendRequests();
+  const words = t.friends.list;
+  const me = useSession((state) => state.user?.username) ?? '';
+  const list = useFriendList(name);
+  const requests = useFriendRequests(own);
   const friendship = useFriendship();
   const [opened, setOpened] = useState<string | null>(null);
   const [pulling, setPulling] = useState(false);
 
-  // Coming back to the tab asks again; the first visit has just asked.
+  // Coming back asks again; the first visit has just asked.
   const seen = useRef(false);
-  const { refetch: refetchThreads } = threads;
+  const { refetch: refetchList } = list;
   const { refetch: refetchRequests } = requests;
   useFocusEffect(
     useCallback(() => {
@@ -59,39 +92,35 @@ export function FriendsScreen({ navigation }: Props) {
         seen.current = true;
         return;
       }
-      void refetchThreads();
-      void refetchRequests();
-    }, [refetchRequests, refetchThreads]),
+      void refetchList();
+      if (own) void refetchRequests();
+    }, [own, refetchList, refetchRequests]),
   );
 
   const refresh = async () => {
     setPulling(true);
     try {
-      await Promise.all([threads.refetch(), requests.refetch()]);
+      await Promise.all([list.refetch(), own ? requests.refetch() : null]);
     } finally {
       setPulling(false);
     }
   };
 
-  const friends = threads.data?.pages.flatMap((page) => page.friends) ?? [];
-  const incoming = requests.data?.incoming ?? [];
-  const find = () => navigation.navigate('FindFriends');
-  const chat = (username: string) => navigation.navigate('Thread', { username });
+  const friends = list.data?.pages.flatMap((page) => page.friends) ?? [];
+  const incoming = own ? (requests.data?.incoming ?? []) : [];
+  const locked = list.error instanceof ApiError && list.error.code === 'friends_hidden';
 
   return (
-    <Screen>
-      <TopBar
-        title={words.title}
-        subtitle={words.tagline}
-        right={<IconButton icon="userPlus" label={words.find} onPress={find} />}
-      />
+    <>
       <FlatList
         data={friends}
-        keyExtractor={(thread) => thread.player.username}
+        keyExtractor={(player) => player.username}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
         contentContainerStyle={friends.length === 0 && incoming.length === 0 ? styles.emptyList : styles.list}
         ItemSeparatorComponent={Gap}
         onEndReached={() => {
-          if (threads.hasNextPage && !threads.isFetchingNextPage) void threads.fetchNextPage();
+          if (list.hasNextPage && !list.isFetchingNextPage) void list.fetchNextPage();
         }}
         onEndReachedThreshold={0.4}
         refreshControl={
@@ -103,49 +132,61 @@ export function FriendsScreen({ navigation }: Props) {
           />
         }
         ListHeaderComponent={
-          <View style={styles.head}>
-            <PushNudge hideable />
-            {incoming.length > 0 ? (
-              <>
-                <Eyebrow icon="userPlus">{words.requests}</Eyebrow>
-                {incoming.map((request) => (
-                  <Request
-                    key={request.player.username}
-                    request={request}
-                    friendship={friendship}
-                    onOpen={() => setOpened(request.player.username)}
-                  />
-                ))}
-              </>
-            ) : null}
-            {friendship.isError ? <Callout tone="bad">{messageFor(friendship.error, t)}</Callout> : null}
-            {friends.length > 0 ? <Eyebrow icon="inbox">{words.inbox}</Eyebrow> : null}
-          </View>
+          incoming.length > 0 || friendship.isError ? (
+            <View style={styles.head}>
+              {incoming.length > 0 ? (
+                <>
+                  <Eyebrow icon="userPlus">{words.requests}</Eyebrow>
+                  {incoming.map((request) => (
+                    <Request
+                      key={request.player.username}
+                      request={request}
+                      friendship={friendship}
+                      onOpen={() => setOpened(request.player.username)}
+                    />
+                  ))}
+                </>
+              ) : null}
+              {friendship.isError ? <Callout tone="bad">{messageFor(friendship.error, t)}</Callout> : null}
+              {friends.length > 0 ? <Eyebrow icon="users">{words.friends}</Eyebrow> : null}
+            </View>
+          ) : null
         }
         renderItem={({ item }) => (
-          <Thread thread={item} onPress={() => chat(item.player.username)} />
+          <PlayerRow
+            username={item.username}
+            src={item.avatarUrl}
+            tier={item.league}
+            best={item.best}
+            isMe={item.username === me}
+            onPress={() => setOpened(item.username)}
+          />
         )}
         ListEmptyComponent={
-          threads.isLoading ? (
+          list.isLoading ? (
             <SkeletonList rows={4} />
-          ) : threads.isError ? (
+          ) : locked ? (
+            <EmptyState icon="lock" title={words.locked} hint={words.lockedHint(handle(name))} />
+          ) : list.isError ? (
             <View style={styles.pad}>
               <Callout tone="bad" title={words.failed}>
-                {messageFor(threads.error, t)}
+                {messageFor(list.error, t)}
               </Callout>
-              <Button label={words.retry} tone="neutral" icon="refresh" onPress={() => void threads.refetch()} />
+              <Button label={words.retry} tone="neutral" icon="refresh" onPress={() => void list.refetch()} />
             </View>
+          ) : !own ? (
+            <EmptyState icon="users" title={words.othersEmpty} />
           ) : incoming.length === 0 ? (
             <EmptyState
               icon="users"
               title={words.emptyTitle}
               hint={words.emptyHint}
-              action={<Button label={words.find} icon="search" tone="primary" onPress={find} />}
+              action={<Button label={words.find} icon="search" tone="primary" onPress={onFind} />}
             />
           ) : null
         }
         ListFooterComponent={
-          threads.isFetchingNextPage ? (
+          list.isFetchingNextPage ? (
             <View style={styles.more}>
               <SkeletonList rows={1} />
             </View>
@@ -153,7 +194,7 @@ export function FriendsScreen({ navigation }: Props) {
         }
       />
       <PlayerSheet username={opened} onClose={() => setOpened(null)} />
-    </Screen>
+    </>
   );
 }
 
@@ -204,69 +245,6 @@ function Request({
       </View>
     </Panel>
   );
-}
-
-function Thread({ thread, onPress }: { thread: FriendThread; onPress: () => void }) {
-  const t = useT();
-  const { player, duel } = thread;
-  const name = handle(player.username);
-  const line = previewOf(thread.last, t);
-  const when = t.fmt.ago(thread.lastActivityAt);
-  const tag: { label: string; tone: TagTone } | null =
-    duel?.turn === 'you'
-      ? { label: t.inbox.row.yourTurn, tone: 'warn' }
-      : duel?.turn === 'them'
-        ? { label: t.inbox.row.theirTurn, tone: 'secondary' }
-        : null;
-
-  return (
-    <ThreadRow
-      name={player.username}
-      title={name}
-      src={player.avatarUrl}
-      line={line}
-      when={when}
-      unread={thread.unread}
-      tag={tag}
-      label={t.inbox.row.label(name, line, when, thread.unread)}
-      onPress={onPress}
-    />
-  );
-}
-
-/** A conversation's newest line, as the list says it under the friend's name. */
-export function previewOf(last: InboxMessage | null, t: Messages): string {
-  const words = t.inbox.preview;
-  if (!last) return words.none;
-  switch (last.kind) {
-    case 'friends':
-      return words.friends;
-    case 'phrase': {
-      const text = last.phrase ? t.inbox.phrases[last.phrase] : '';
-      return last.mine ? words.mine(text) : text;
-    }
-    case 'vs_invite':
-      return last.mine ? words.inviteMine : words.inviteTheirs;
-    case 'vs_declined':
-      return last.mine ? words.declinedMine : words.declinedTheirs;
-    case 'vs_expired':
-      return words.expired;
-    case 'vs_result': {
-      const duel = last.duel;
-      const you = scoreOf(duel?.you?.score, t);
-      const them = scoreOf(duel?.them?.score, t);
-      if (duel?.outcome === 'won') return words.won(you, them);
-      if (duel?.outcome === 'lost') return words.lost(you, them);
-      return words.draw(you, them);
-    }
-    default:
-      return words.none;
-  }
-}
-
-/** A VS score as a line shows it; a run left unfinished has none. */
-export function scoreOf(score: number | null | undefined, t: Messages): string {
-  return score === null || score === undefined ? '—' : t.fmt.score(score);
 }
 
 function Gap() {

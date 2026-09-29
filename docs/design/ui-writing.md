@@ -51,10 +51,14 @@ not translated word for word: each language gets a joke that lands in it.
 | **Günün akışı** (#17) | The daily challenge: "Herkes aynı akışı oynar · tek hak" |
 | **Serbest oyun** | Any number of runs; the button is just "Oyna" |
 | **Zirve** | The leaderboard screen and its dock slot; **Senin katın** is the player's own row card |
-| **Oyna · Zirve · Lig · Arkadaşlar · Profil** | The dock's five slots, the lobby (Oyna) in the middle |
-| **Arkadaşlar** | The dock's friends slot and its screen, the inbox — requests waiting, then a conversation per friend; its head says "İstekler, mesajlar ve VS". A friend is a player who accepted your **arkadaşlık isteği**, or whose request you accepted |
+| **Oyna · Zirve · Lig · Mesajlar · Profil** | The dock's five slots, the lobby (Oyna) in the middle |
+| **SEZON REKORU** · **Yukarı kaydır, oyna** | The lobby is a lock screen: the season best stands where the time would ("SEZON REKORU"), and the line under the gold slab says what a lock screen says, as the game's own move. Tapping plays too |
+| **SENİ BEKLEYEN VS** · **@deniz sana VS attı** · **+2 VS daha** | A VS waiting for you, as a notice on the lobby: ✓ and ✗ are read aloud as **Kabul et** and **Reddet**; past three, the rest are counted on the way to Mesajlar |
+| **Mesajlar** · **Mesajlar / Arkadaşlar** | The dock's social slot and its screen, split by a switch: the conversations, and the friends — the search, the requests, the list. Empty conversations: "Henüz mesajın yok" |
+| **Bildirimler** (the bell) | The lobby's bell and its list: "@mert sana arkadaşlık isteği gönderdi", "@ada isteğini kabul etti", "@deniz sana VS attı", "@oya ile VS’i kazandın / kaybettin", "… berabere bitti", "@deniz VS’ini reddetti", "@deniz VS’ine zamanında bakmadı"; ribbons ARKADAŞLIK İSTEĞİ, YENİ ARKADAŞ, VS, VS SONUCU. Empty: "Henüz bildirim yok". Ayarlar → **Bildirimler** is the other one: which pushes the phone gets |
+| **Arkadaşlar** | A friend list: yours, from the Arkadaş counter on your profile — the requests waiting (**İstekler**) first, then your friends A to Z — or a friend's, from the count on their card. Anyone else's is locked: "Bu liste kilitli" · "@deniz ile arkadaş olunca listesini görürsün." A friend is a player who accepted your **arkadaşlık isteği**, or whose request you accepted |
 | **Arkadaş bul** · **Ekle** · **Geri al** · **Kabul et** / **Reddet** · **Sohbet** | Finding a player by the start of their name, and the one slab beside them by what they are to you; on their card the first is "Arkadaş ekle". Requests waiting for you are **İstekler**, yours "Gönderdiğin istekler" |
-| **Mesaj kutusu** · **Hazır mesajlar** | The conversations, and the lobby's mailbox that counts what waits there. Friends talk only in phrases from a fixed list ("İyi oyundu! 👏", "Rövanş? 🔥", `PHRASES` in `@quezby/config`): nothing a player types ever reaches another. A new phrase is a new code — codes are only added, never renamed — with a line in every language, in the app and in the API alike |
+| **Mesaj kutusu** · **Hazır mesajlar** | The conversations (the Mesajlar slot's screen), and what friends say in them. Friends talk only in phrases from a fixed list ("İyi oyundu! 👏", "Rövanş? 🔥", `PHRASES` in `@quezby/config`): nothing a player types ever reaches another. A new phrase is a new code — codes are only added, never renamed — with a line in every language, in the app and in the API alike |
 | **VS** · **VS at** | A challenge between two friends: "Aynı akış; ikinize de birer hak." Whoever sends it plays first and their score stays hidden until the friend plays; "VS hiçbir sıralamaya, lige ya da istatistiğe yazılmaz." Arabic says تحدٍّ |
 | **KAZANDIN!** · **KAYBETTİN** · **BERABERE** · **Rövanş** · **Mesajlara dön** | A VS's end, stamped in Rubik, then another VS with the same friend or back to the conversation |
 | **Arkadaşlıktan çıkar** · **Engelle** · **Engeli kaldır** | The first two wait under a card's "Diğer", each saying what goes with it: "Mesajlarınız silinir, açık VS’iniz kapanır." · "Arkadaşlığınız ve istekleriniz biter; seni bulamaz, sana yazamaz." **Engeli kaldır** is the card's one action for a player you blocked, and Ayarlar lists them under **Engellenenler** |
@@ -73,7 +77,9 @@ not translated word for word: each language gets a joke that lands in it.
 | **Deneme turu** (DENEME TURU) | A new player's first run: coached, played on the phone, counted nowhere — "Bu tur hiçbir yere sayılmadı." Its score is the "deneme puanı". Never "tutorial" to the player |
 | **YENİ POST · 2/4** · **Anladım** | A coach card's ribbon, and the gold slab that starts the post it explained |
 | **Sana ne diyelim?** · **Şimdilik geç** | The name, right after the practice run, and the way past it; until then the account is `@guest48128742` ("Şimdilik adın @guest48128742") |
-| **Adını seç** | The profile's name door while the name is still the automatic one ("Şimdilik @guest48128742 · bir kez seçersin"). A picked name never changes, so after the pick Ayarlar only shows it, locked: "Kullanıcı adın · @ekin · kalıcı" — never "değiştir" |
+| **Adını seç** | The name door on Hesap bilgileri while the name is still the automatic one ("Şimdilik @guest48128742 · bir kez seçersin"). A picked name never changes, so after the pick Hesap bilgileri only shows it, locked: "Kullanıcı adın · @ekin · kalıcı" — never "değiştir" |
+| **Hesap bilgileri** | Ayarlar's account door, right above **Çıkış yap** ("@ekin · Apple bağlı", a guest's "Misafir hesap"), and its page: **Kullanıcı adı**, **Bağlı hesaplar**, and **Hesabı sil** last, in red |
+| **Rekor · Arkadaş · Tur** · **İSTATİSTİKLER** | The three numbers under a profile's name (Arkadaş opens the friend list and wears the requests waiting), and the tile with four more whose sheet has all of them: **Oyun**, **Hareketler**, **En iyiler** |
 | **Seçtiğin ad bir daha değişmez** | Said wherever a name is picked, before it is saved — there is no confirm step |
 | **Lige 2 oyun kaldı** · **KİLİTLİ** | The league before a new player's first 20 counted runs: "Lig, ilk 20 oyunundan sonra açılır. Deneme turu sayılmaz." |
 | **Hesabını koru** | Attach Apple, Google or an email to a guest account — a step after the name ("Şimdi değil" skips it), and once, when a guest's league opens ("Ligdesin!…") |
@@ -81,7 +87,7 @@ not translated word for word: each language gets a joke that lands in it.
 | **Kullanım verisi** | The switch in Ayarlar for that answer: on — "Hangi ekranlara girdiğini ve ne kadar oynadığını sayarız."; off — "Yalnızca oyunun çalışması için gereken cihaz bilgisi gider." Never "izleme", "takip" or "tracking" to the player |
 | **Dil** | The language row in Ayarlar and the small button on the welcome: the six languages, each in its own words ("Türkçe", "English", "Deutsch", "العربية", "Français", "Español") |
 | **Apple hesabıma geç** | An Apple or Google account already belongs to another player: switch to it, leaving the fresh guest behind |
-| **Giriş yolları** | The same place once the account is kept: what is attached ("Apple ve e-posta bağlı"), **Bağı kaldır** to take Apple or Google off |
+| **Giriş yolları** | The same place once the account is kept: what is attached, **Bağı kaldır** to take Apple or Google off. On Hesap bilgileri the same tiles stand under **Bağlı hesaplar** |
 
 ## The same words in six languages
 
@@ -96,7 +102,14 @@ Use these and nothing else for them. A ribbon's capitals are in brackets.
 | Kırmızı post · Dokunma! | Red post · Don't touch! | Roter Post · Nicht berühren! | Post rouge · Touche pas ! | Post rojo · ¡No toques! | منشور أحمر · لا تلمس! |
 | Günün akışı (GÜNÜN AKIŞI) | Daily Feed (DAILY FEED) | Tages-Feed (TAGES-FEED) | Fil du jour (FIL DU JOUR) | Feed del día (FEED DEL DÍA) | خلاصة اليوم |
 | Serbest oyun | Free play | Freies Spiel | Partie libre | Juego libre | لعب حر |
-| Oyna · Zirve · Lig · Arkadaşlar · Profil | Play · Summit · League · Friends · Profile | Spielen · Gipfel · Liga · Freunde · Profil | Jouer · Sommet · Ligue · Amis · Profil | Jugar · Cumbre · Liga · Amigos · Perfil | العب · القمة · الدوري · الأصدقاء · الملف |
+| Oyna · Zirve · Lig · Mesajlar · Profil | Play · Summit · League · Messages · Profile | Spielen · Gipfel · Liga · Chats · Profil | Jouer · Sommet · Ligue · Messages · Profil | Jugar · Cumbre · Liga · Mensajes · Perfil | العب · القمة · الدوري · الرسائل · الملف |
+| SEZON REKORU · Yukarı kaydır, oyna | SEASON RECORD · Swipe up to play | SAISONREKORD · Nach oben wischen und spielen | RECORD DE LA SAISON · Glisse vers le haut pour jouer | RÉCORD DE LA TEMPORADA · Desliza hacia arriba para jugar | الرقم القياسي للموسم · اسحب للأعلى والعب |
+| SENİ BEKLEYEN VS · @deniz sana VS attı | VS WAITING FOR YOU · @deniz sent you a VS | EIN VS WARTET AUF DICH · @deniz hat dir ein VS geschickt | UN VS T’ATTEND · @deniz t’a lancé un VS | UN VS TE ESPERA · @deniz te mandó un VS | تحدٍّ بانتظارك · ‎@deniz‎ أرسل لك تحديًا |
+| Arkadaşlar · Bu liste kilitli | Friends · This list is locked | Freunde · Diese Liste ist gesperrt | Amis · Cette liste est verrouillée | Amigos · Esta lista está bloqueada | الأصدقاء · هذه القائمة مقفلة |
+| Rekor · Arkadaş · Tur | Record · Friends · Runs | Rekord · Freunde · Runden | Record · Amis · Parties | Récord · Amigos · Partidas | الرقم القياسي · الأصدقاء · الجولات |
+| Hesap bilgileri · Kullanıcı adı · Bağlı hesaplar | Account info · Username · Linked accounts | Kontoinfos · Benutzername · Verknüpfte Konten | Infos du compte · Nom d’utilisateur · Comptes liés | Datos de la cuenta · Nombre de usuario · Cuentas vinculadas | معلومات الحساب · اسم المستخدم · الحسابات المرتبطة |
+| Bildirimler (the bell) · Henüz bildirim yok | Notifications · No notifications yet | Mitteilungen · Noch keine Mitteilungen | Notifications · Pas encore de notifications | Notificaciones · Aún no hay notificaciones | الإشعارات · لا إشعارات بعد |
+| @deniz sana VS attı · @oya ile VS’i kazandın | @deniz sent you a VS · You won the VS with @oya | @deniz hat dir ein VS geschickt · Du hast das VS gegen @oya gewonnen | @deniz t’a lancé un VS · Tu as gagné le VS contre @oya | @deniz te mandó un VS · Ganaste el VS contra @oya | ‎@deniz‎ أرسل لك تحديًا · فزت في التحدي مع ‎@oya‎ |
 | Senin katın (SENİN KATIN) | Your floor (YOUR FLOOR) | Deine Etage (DEINE ETAGE) | Ton étage (TON ÉTAGE) | Tu piso (TU PISO) | طابقك |
 | Geç onu | Pass them | Überholen | Dépasser | Superar | تجاوزه |
 | Bronz · Gümüş · Altın · Platin · Elmas | Bronze · Silver · Gold · Platinum · Diamond | Bronze · Silber · Gold · Platin · Diamant | Bronze · Argent · Or · Platine · Diamant | Bronce · Plata · Oro · Platino · Diamante | البرونز · الفضة · الذهب · البلاتين · الماس |

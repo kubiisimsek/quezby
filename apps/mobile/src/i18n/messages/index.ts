@@ -2,6 +2,7 @@ import type { Locale } from '@quezby/types';
 
 import { formatsFor, type Formats } from '@/i18n/format';
 
+import { alerts } from './alerts';
 import { auth } from './auth';
 import { board } from './board';
 import { bonus } from './bonus';
@@ -36,6 +37,7 @@ import { welcome } from './welcome';
  * line missing in any language does not compile.
  */
 const AREAS = {
+  alerts,
   auth,
   board,
   bonus,

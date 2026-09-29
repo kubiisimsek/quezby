@@ -7,16 +7,18 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type {
   DailyAttempt,
   DailyResponse,
+  InboxSummary,
   LeaderboardResponse,
   LeagueMember,
   LeagueResponse,
+  WaitingDuel,
 } from '@quezby/types';
 import type { UseQueryResult } from '@tanstack/react-query';
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
+  Pressable,
   RefreshControl,
   ScrollView,
-  Share,
   StatusBar,
   StyleSheet,
   Text,
@@ -30,56 +32,36 @@ import { useSession } from '@/auth/session';
 import { CredentialsSheet } from '@/components/CredentialsSheet';
 import { SignInWaysSheet } from '@/components/SignInWaysSheet';
 import { APP_PLATFORM } from '@/config/env';
-import {
-  deviceFailed as deviceFailedWords,
-  reelGuide,
-  REEL_ORDER,
-} from '@/game/howTo';
+import { deviceFailed as deviceFailedWords } from '@/game/howTo';
 import { useDaily, useLeaderboard, useLeague } from '@/hooks/useBoards';
 import { useMe } from '@/hooks/useMe';
-import { inboxCount, useInboxSummary } from '@/hooks/useSocial';
+import { useDeclineDuel, useInboxSummary } from '@/hooks/useSocial';
 import { handle, useT } from '@/i18n';
-import { IS_RTL } from '@/i18n/native';
 import { messageFor } from '@/lib/errors';
 import type { RootStackParamList, TabParamList } from '@/navigation/types';
 import { deviceFailed, useDeviceVerdict } from '@/stores/deviceVerdict';
 import { useOnboarding } from '@/stores/onboarding';
 import { useSettings } from '@/stores/settings';
-import { Icon, type IconName } from '@/ui/icons';
+import { type IconName } from '@/ui/icons';
 import {
   Arena,
   Avatar,
-  BrandBand,
   Button,
   ConsentCard,
   CountdownChip,
-  FaceOff,
   IconButton,
-  LobbyCard,
   Meter,
-  PlayButton,
+  NoticeCard,
   RankChips,
-  Ribbon,
   Skeleton,
-  Stamp,
+  SwipePlay,
   Tag,
   TierBadge,
   Txt,
   type TagTone,
 } from '@/ui/kit';
 import { useEntrance } from '@/ui/motion';
-import {
-  DEPTH,
-  FONT,
-  RADIUS,
-  SPACE,
-  TYPE,
-  embossed,
-  lh,
-  useTheme,
-  withAlpha,
-} from '@/ui/theme';
-import { reel as REEL } from '@/ui/tokens';
+import { FONT, SPACE, TYPE, embossed, lh, useTheme } from '@/ui/theme';
 
 type Props = CompositeScreenProps<
   BottomTabScreenProps<TabParamList, 'Home'>,
@@ -88,13 +70,18 @@ type Props = CompositeScreenProps<
 
 type Navigation = Props['navigation'];
 
+/** How far the dock's gold orb rises into the screen: the play slab stands clear of it. */
+const ORB_RISE = 34;
+
 /**
- * The game lobby. Everything on it points at today's one game: you and your
- * league in the status strip, with the mailbox that counts what waits among
- * your friends; "Günün akışı" as the event on the stage with its countdown,
- * the big gold play slab in the thumb's reach, then the doors that bring you
- * back — a friend's VS waiting for you, the league, the player to pass this
- * week, your records. Every number is the API's.
+ * The game lobby, drawn as the phone's lock screen — Quezby is the phone
+ * habit turned into a game. Up top, you, the bell (Bildirimler, with what
+ * you have not seen yet) and Yardım. Where a lock screen keeps the time, the
+ * lobby keeps your season best, with your places under it. What waits for you
+ * comes in as notifications, all the same size: a friend's VS (with ✓ and ✗),
+ * today's feed, the league, the player to pass. At the bottom, where the
+ * phone says "swipe up", the one gold slab: tap it, or swipe it up, to play.
+ * Every number is the API's.
  */
 export function HomeScreen({ navigation }: Props) {
   const theme = useTheme();
@@ -132,11 +119,11 @@ export function HomeScreen({ navigation }: Props) {
   }, [asking, focused, joined, remindedFor, remindersRead, settingsRead, user?.id, user?.isGuest]);
 
   const strip = useEntrance(0, 10);
-  const warning = useEntrance(0, 10);
-  const hero = useEntrance(1, 22);
-  const leagueIn = useEntrance(2);
-  const rivalIn = useEntrance(3);
-  const recordsIn = useEntrance(4);
+  const clock = useEntrance(1, 16);
+  const vsIn = useEntrance(2);
+  const dailyIn = useEntrance(3);
+  const leagueIn = useEntrance(4);
+  const rivalIn = useEntrance(5);
 
   /**
    * Only a pull shows the spinner. The lobby refetches on its own when it
@@ -162,6 +149,7 @@ export function HomeScreen({ navigation }: Props) {
 
   const tier = league.data && !league.data.unlock ? league.data.tier : null;
   const best = user?.best ?? null;
+  const playFree = () => navigation.navigate('Game', { mode: 'free' });
 
   return (
     <View style={[styles.fill, { backgroundColor: theme.canvas }]}>
@@ -201,10 +189,10 @@ export function HomeScreen({ navigation }: Props) {
             ) : null}
           </View>
           <IconButton
-            icon="inbox"
-            label={t.home.inbox}
-            badge={inboxCount(inbox.data)}
-            onPress={() => navigation.navigate('Friends')}
+            icon="bell"
+            label={t.alerts.title}
+            badge={inbox.data?.notifications ?? 0}
+            onPress={() => navigation.navigate('Alerts')}
           />
           <IconButton
             icon="help"
@@ -213,75 +201,77 @@ export function HomeScreen({ navigation }: Props) {
           />
         </Animated.View>
 
+        <Animated.View style={[styles.clock, clock]}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={
+              best ? t.friends.best.said(t.fmt.score(best.score)) : t.home.records.title
+            }
+            onPress={() => navigation.navigate('Leaderboard')}
+            style={styles.clockFace}
+          >
+            <Text style={[TYPE.label, { color: theme.inkMuted }]}>{t.home.clock.label}</Text>
+            <Text
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              style={[styles.record, { color: best ? theme.gold : theme.inkFaint }, embossed(3)]}
+            >
+              {best ? t.fmt.score(best.score) : '—'}
+            </Text>
+          </Pressable>
+          <RankChips
+            items={[
+              { label: t.home.records.boards.weekly, rank: ranks?.weekly },
+              { label: t.home.records.boards.monthly, rank: ranks?.monthly },
+              { label: t.home.records.boards.all, rank: ranks?.all },
+            ]}
+          />
+        </Animated.View>
+
         {asking ? (
-          <Animated.View style={warning}>
+          <Animated.View style={clock}>
             <ConsentCard onAnswer={(yes) => useSettings.getState().answer(yes)} />
           </Animated.View>
         ) : null}
 
         {unranked ? (
-          <Animated.View style={warning}>
-            <DeviceWarning />
+          <Animated.View style={clock}>
+            <DeviceNotice />
           </Animated.View>
         ) : null}
 
-        <Animated.View style={hero}>
-          <DailyHero
-            daily={daily}
-            breathing={focused}
-            navigation={navigation}
-          />
+        {inbox.data && inbox.data.waiting.length > 0 ? (
+          <Animated.View style={[styles.stack, vsIn]}>
+            <VsNotices inbox={inbox} navigation={navigation} />
+          </Animated.View>
+        ) : null}
+
+        <Animated.View style={dailyIn}>
+          <DailyNotice daily={daily} navigation={navigation} />
         </Animated.View>
 
-        {(inbox.data?.yourTurn ?? 0) > 0 ? (
-          <Animated.View style={leagueIn}>
-            <LobbyCard
-              title={t.vs.lobby.title(inbox.data?.yourTurn ?? 0)}
-              eyebrow={t.vs.lobby.eyebrow}
-              icon="swords"
-              tone="primary"
-              onPress={() => navigation.navigate('Friends')}
-            />
-          </Animated.View>
-        ) : null}
-
         <Animated.View style={leagueIn}>
-          <LeagueDoor
-            league={league}
-            onPress={() => navigation.navigate('League')}
-          />
+          <LeagueNotice league={league} onPress={() => navigation.navigate('League')} />
         </Animated.View>
 
         <Animated.View style={rivalIn}>
-          <RivalDoor
-            name={user?.username ?? '?'}
-            avatarUrl={user?.avatarUrl ?? null}
+          <RivalNotice
             rival={weekly.data?.rival ?? null}
             onPlay={() => {
               track('rival');
-              navigation.navigate('Game', { mode: 'free' });
+              playFree();
             }}
           />
         </Animated.View>
-
-        <Animated.View style={recordsIn}>
-          <LobbyCard
-            title={best ? t.fmt.score(best.score) : '—'}
-            eyebrow={t.home.records.title}
-            icon="trophy"
-            tone="warn"
-            onPress={() => navigation.navigate('Leaderboard')}
-          >
-            <RankChips
-              items={[
-                { label: t.home.records.boards.weekly, rank: ranks?.weekly },
-                { label: t.home.records.boards.monthly, rank: ranks?.monthly },
-                { label: t.home.records.boards.all, rank: ranks?.all },
-              ]}
-            />
-          </LobbyCard>
-        </Animated.View>
       </ScrollView>
+
+      <SwipePlay
+        label={t.nav.tabs.play}
+        hint={t.home.swipe}
+        breathing={focused}
+        onPlay={playFree}
+        style={styles.unlock}
+      />
 
       <SignInWaysSheet
         open={keep === 'ways'}
@@ -304,190 +294,123 @@ export function HomeScreen({ navigation }: Props) {
 
 /**
  * The API's check came back against this phone — rooted, an emulator, a
- * changed app. It plays on, but its runs never rank; the lobby says so up
- * top, before a game starts, as the result of every run does.
+ * changed app. It plays on, but its runs never rank; the lobby says so
+ * before a game starts, as the result of every run does.
  */
-function DeviceWarning() {
+function DeviceNotice() {
   const t = useT();
   return (
-    <LobbyCard
-      title={t.home.device.title}
+    <NoticeCard
       eyebrow={t.home.device.eyebrow}
+      title={t.home.device.title}
       icon="alert"
       tone="warn"
-    >
-      <Txt variant="meta" tone="muted">
-        {t.home.device.body(deviceFailedWords(t).why[APP_PLATFORM])}
-      </Txt>
-    </LobbyCard>
+      meta={
+        <Txt variant="meta" tone="muted">
+          {t.home.device.body(deviceFailedWords(t).why[APP_PLATFORM])}
+        </Txt>
+      }
+    />
   );
 }
 
 /**
- * The four reels of the game, fanned out like a hand of cards — what today's
- * feed is made of, in the feed's own colours. Pictures only: the rules live in
- * Yardım. The cards lean out from the middle, which a row read right to left
- * does not turn by itself.
+ * The VS waiting for you, the one running out first on top: ✓ plays it —
+ * playing it is the answer — and ✗ turns it down. The friend opens the
+ * conversation. Past three, a line counts the rest and opens the inbox.
  */
-function ReelFan() {
-  const theme = useTheme();
-  const t = useT();
-  const guide = reelGuide(t);
-  const lean = IS_RTL ? -1 : 1;
-  const tilt = [-11, -4, 4, 11];
-  const drop = [10, 0, 0, 10];
-  const faces: Record<string, { bg: string; ink: string }> = {
-    skip: { bg: REEL.skip[0] ?? theme.tile, ink: REEL.ink },
-    like: { bg: REEL.like, ink: REEL.ink },
-    hold: { bg: REEL.hold, ink: REEL.goldInk },
-    freeze: { bg: REEL.freeze, ink: REEL.ink },
-  };
-  return (
-    <View style={styles.fan} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-      {REEL_ORDER.map((kind, index) => {
-        const face = faces[kind] ?? { bg: theme.tile, ink: theme.ink };
-        return (
-          <Stamp key={kind} delay={180 + index * 90} from={0.3}>
-            <View
-              style={[
-                styles.reel,
-                {
-                  backgroundColor: face.bg,
-                  borderColor: theme.outline,
-                  transform: [
-                    { rotate: `${lean * (tilt[index] ?? 0)}deg` },
-                    { translateY: drop[index] ?? 0 },
-                  ],
-                },
-              ]}
-            >
-              <View style={[styles.reelShine, { backgroundColor: withAlpha(theme.onBrand, 0.16) }]} />
-              <Icon name={guide[kind].icon} size={26} color={face.ink} strokeWidth={2.8} />
-            </View>
-          </Stamp>
-        );
-      })}
-    </View>
-  );
-}
-
-/**
- * "Günün akışı": everyone's same feed, one attempt — the lobby's event, on
- * its stage. Open, it is the breathing gold button under the stage; played,
- * it is your score and place with the way to show them off, and the button
- * turns to free play.
- */
-function DailyHero({
-  daily,
-  breathing,
+function VsNotices({
+  inbox,
   navigation,
 }: {
-  daily: UseQueryResult<DailyResponse>;
-  breathing: boolean;
+  inbox: UseQueryResult<InboxSummary>;
   navigation: Navigation;
 }) {
   const t = useT();
-  const data = daily.data;
-  const attempt = data?.attempt ?? null;
-  const playFree = () => navigation.navigate('Game', { mode: 'free' });
-
-  if (!data && daily.isError) {
-    return (
-      <View style={styles.heroBlock}>
-        <Stage>
-          <Ribbon label={t.daily.ribbon} />
-          <Txt variant="display" align="center">
-            {t.daily.name}
-          </Txt>
-          <Txt variant="meta" tone="onSolid" align="center">
-            {messageFor(daily.error, t)}
-          </Txt>
-        </Stage>
-        <PlayButton
-          label={t.nav.tabs.play}
-          icon="play"
-          tone="play"
-          breathing={breathing}
-          onPress={playFree}
-        />
-        <Button
-          label={t.nav.retry}
-          icon="refresh"
-          tone="secondary"
-          size="md"
-          onPress={() => void daily.refetch()}
-        />
-      </View>
-    );
-  }
-
+  const data = inbox.data;
+  if (!data) return null;
+  const more = data.yourTurn - data.waiting.length;
   return (
-    <View style={styles.heroBlock}>
-      <Stage>
-        <Ribbon label={t.daily.ribbon} />
-        <Txt variant="display" align="center" style={styles.heroTitle}>
-          {data ? t.daily.numbered(t.fmt.score(data.number)) : t.daily.name}
-        </Txt>
-        <Txt variant="meta" tone="onSolid" align="center">
-          {t.daily.rule}
-        </Txt>
-        {attempt ? null : <ReelFan />}
-        {data ? (
-          <View style={styles.centred}>
-            <CountdownChip
-              endsAt={data.endsAt}
-              serverTime={data.serverTime}
-              prefix={attempt ? t.daily.nextIn : t.home.countdown.endsIn}
-              tone="onBrand"
-              onElapsed={() => void daily.refetch()}
-            />
-          </View>
-        ) : null}
-
-        {data && attempt ? (
-          <Attempt
-            attempt={attempt}
-            players={data.players}
-            onOpenDaily={() => navigation.navigate('Daily')}
-          />
-        ) : null}
-      </Stage>
-
-      <PlayButton
-        label={attempt ? t.nav.tabs.play : t.home.today.play}
-        icon="play"
-        tone="play"
-        loading={!data}
-        breathing={breathing && Boolean(data)}
-        onPress={
-          attempt
-            ? playFree
-            : () => navigation.navigate('Game', { mode: 'daily' })
-        }
-      />
-      {attempt ? null : (
-        <Button
-          label={t.home.today.free}
-          tone="secondary"
-          size="lg"
-          onPress={playFree}
+    <>
+      {data.waiting.map((duel) => (
+        <VsNotice
+          key={duel.id}
+          duel={duel}
+          serverTime={data.serverTime}
+          onElapsed={() => void inbox.refetch()}
+          navigation={navigation}
         />
-      )}
-    </View>
+      ))}
+      {more > 0 ? (
+        <Button
+          label={t.vs.notice.more(more, t.fmt.score(more))}
+          tone="ghost"
+          size="sm"
+          icon="message"
+          onPress={() => navigation.navigate('Inbox')}
+        />
+      ) : null}
+    </>
   );
 }
 
-/**
- * The event's stage: the brand's magenta-to-violet slab in the outline,
- * standing on its lip like every tile, with light from the top and lanes
- * across it.
- */
-function Stage({ children }: { children: ReactNode }) {
-  const theme = useTheme();
+function VsNotice({
+  duel,
+  serverTime,
+  onElapsed,
+  navigation,
+}: {
+  duel: WaitingDuel;
+  serverTime: string;
+  onElapsed: () => void;
+  navigation: Navigation;
+}) {
+  const t = useT();
+  const { opponent } = duel;
+  const decline = useDeclineDuel(opponent.username);
+  const name = handle(opponent.username);
   return (
-    <View style={[styles.stageShell, { borderColor: theme.outline }]}>
-      <BrandBand style={styles.stage}>{children}</BrandBand>
-    </View>
+    <NoticeCard
+      eyebrow={t.vs.notice.eyebrow}
+      title={t.vs.notice.title(name)}
+      lead={<Avatar name={opponent.username} src={opponent.avatarUrl} size="md" />}
+      accessibilityLabel={t.vs.notice.label(name)}
+      meta={
+        decline.isError ? (
+          messageFor(decline.error, t)
+        ) : (
+          <CountdownChip
+            endsAt={duel.expiresAt}
+            serverTime={serverTime}
+            prefix={t.home.countdown.endsIn}
+            onElapsed={onElapsed}
+          />
+        )
+      }
+      onPress={() => navigation.navigate('Thread', { username: opponent.username })}
+      right={
+        <>
+          <IconButton
+            icon="check"
+            tone="ok"
+            size="sm"
+            label={t.friends.relation.accept}
+            disabled={decline.isPending}
+            onPress={() =>
+              navigation.navigate('Game', { mode: 'vs', opponent: opponent.username, duelId: duel.id })
+            }
+          />
+          <IconButton
+            icon="close"
+            tone="danger"
+            size="sm"
+            label={t.friends.relation.decline}
+            loading={decline.isPending}
+            onPress={() => decline.mutate(duel.id)}
+          />
+        </>
+      }
+    />
   );
 }
 
@@ -506,92 +429,107 @@ const ATTEMPT_TAG: Record<AttemptTag, { tone: TagTone; icon: IconName }> = {
   unplaced: { tone: 'neutral', icon: 'info' },
 };
 
-function Attempt({
-  attempt,
-  players,
-  onOpenDaily,
+function tagOf(attempt: DailyAttempt): AttemptTag | null {
+  if (attempt.status !== 'ranked') return attempt.status;
+  return attempt.rank === null ? 'unplaced' : null;
+}
+
+/**
+ * "Günün akışı": everyone's same feed, one attempt — one notice among the
+ * others. Open, it counts down to the end of the day with a small Oyna;
+ * played, it is your place and score, and counts down to the next feed. The
+ * whole day — its board, sharing — is behind it on the Daily screen.
+ */
+function DailyNotice({
+  daily,
+  navigation,
 }: {
-  attempt: DailyAttempt;
-  players: number;
-  onOpenDaily: () => void;
+  daily: UseQueryResult<DailyResponse>;
+  navigation: Navigation;
 }) {
   const theme = useTheme();
   const t = useT();
-  const shareText = attempt.shareText;
-  const placed = attempt.status === 'ranked' && attempt.rank !== null;
-  const tag: AttemptTag | null =
-    attempt.status === 'ranked'
-      ? placed
-        ? null
-        : 'unplaced'
-      : attempt.status;
+  const data = daily.data;
+  const openDaily = () => navigation.navigate('Daily');
 
-  return (
-    <View style={styles.attempt}>
-      {attempt.score === null ? null : (
-        <>
-          <Text style={[TYPE.label, { color: withAlpha(theme.onBrand, 0.85) }]}>
-            {t.home.today.score}
-          </Text>
-          <Stamp delay={120}>
-            <Text style={[styles.attemptScore, { color: theme.gold }, embossed(3)]}>
-              {t.fmt.score(attempt.score)}
-            </Text>
-          </Stamp>
-        </>
-      )}
-      {placed ? (
-        <Txt variant="heading" tone="onSolid" align="center">
-          {t.home.today.placed(
-            t.fmt.rank(attempt.rank),
-            players,
-            t.fmt.score(players),
-          )}
-        </Txt>
-      ) : null}
-      {tag ? (
-        <View style={styles.centred}>
-          <Tag
-            label={t.home.today.tags[tag]}
-            tone={ATTEMPT_TAG[tag].tone}
-            icon={ATTEMPT_TAG[tag].icon}
-          />
-        </View>
-      ) : null}
-      <View style={styles.actions}>
-        {shareText ? (
+  if (!data) {
+    return (
+      <NoticeCard
+        eyebrow={t.daily.ribbon}
+        title={daily.isError ? messageFor(daily.error, t) : t.daily.rule}
+        icon="calendar"
+        meta={daily.isError ? undefined : <Skeleton height={14} width={120} />}
+        right={
+          daily.isError ? (
+            <IconButton icon="refresh" label={t.nav.retry} size="sm" onPress={() => void daily.refetch()} />
+          ) : undefined
+        }
+      />
+    );
+  }
+
+  const attempt = data.attempt;
+  const countdown = (
+    <CountdownChip
+      endsAt={data.endsAt}
+      serverTime={data.serverTime}
+      prefix={attempt ? t.daily.nextIn : t.home.countdown.endsIn}
+      onElapsed={() => void daily.refetch()}
+    />
+  );
+  const eyebrow = t.home.notice.daily(t.fmt.score(data.number));
+
+  if (!attempt) {
+    return (
+      <NoticeCard
+        eyebrow={eyebrow}
+        title={t.daily.rule}
+        icon="calendar"
+        meta={countdown}
+        onPress={openDaily}
+        right={
           <Button
-            label={t.daily.share}
-            icon="share"
+            label={t.home.notice.play}
+            accessibilityLabel={t.home.notice.playLabel}
             tone="primary"
-            size="md"
-            style={styles.flex}
-            onPress={() => {
-              track('share_daily');
-              void Share.share({ message: shareText });
-            }}
+            size="sm"
+            onPress={() => navigation.navigate('Game', { mode: 'daily' })}
           />
-        ) : null}
-        <Button
-          label={t.home.today.board}
-          icon="podium"
-          tone="secondary"
-          size="md"
-          style={styles.flex}
-          onPress={onOpenDaily}
-        />
-      </View>
-    </View>
+        }
+      />
+    );
+  }
+
+  const tag = tagOf(attempt);
+  return (
+    <NoticeCard
+      eyebrow={eyebrow}
+      title={
+        tag
+          ? t.home.today.tags[tag]
+          : t.home.today.placed(t.fmt.rank(attempt.rank), data.players, t.fmt.score(data.players))
+      }
+      icon={tag ? ATTEMPT_TAG[tag].icon : 'calendar'}
+      tone={tag ? ATTEMPT_TAG[tag].tone : 'primary'}
+      meta={countdown}
+      onPress={openDaily}
+      right={
+        attempt.score === null ? undefined : (
+          <Text style={[styles.score, { color: theme.gold }, embossed(2)]}>
+            {t.fmt.score(attempt.score)}
+          </Text>
+        )
+      }
+    />
   );
 }
 
 /**
- * This week's league: your tier, place and zone, and how long the week has
- * left — or, before your first ranked run, the invitation to take a seat.
- * Before a new player's first few counted runs it is locked, and says how
- * many runs are left.
+ * This week's league: your tier, place and zone — or, before your first
+ * ranked run, the invitation to take a seat. Before a new player's first few
+ * counted runs it is locked, and says how many runs are left.
  */
-function LeagueDoor({
+function LeagueNotice({
   league,
   onPress,
 }: {
@@ -600,95 +538,70 @@ function LeagueDoor({
 }) {
   const t = useT();
   const data = league.data;
+  const eyebrow = t.home.notice.league;
 
   if (!data) {
     return (
-      <LobbyCard
-        title={t.home.league.title}
-        eyebrow={t.home.thisWeek}
+      <NoticeCard
+        eyebrow={eyebrow}
+        title={league.isError ? messageFor(league.error, t) : t.home.league.title}
         icon="shield"
         tone="secondary"
+        meta={league.isError ? undefined : <Skeleton height={14} width={120} />}
         onPress={onPress}
-      >
-        {league.isError ? (
-          <Txt variant="meta" tone="muted">
-            {messageFor(league.error, t)}
-          </Txt>
-        ) : (
-          <Skeleton height={14} width="60%" />
-        )}
-      </LobbyCard>
+      />
     );
   }
 
   if (data.unlock) {
     const { required, remaining } = data.unlock;
     return (
-      <LobbyCard
-        title={t.home.league.title}
+      <NoticeCard
         eyebrow={t.home.league.locked}
+        title={t.home.league.remaining(remaining)}
         icon="lock"
         tone="secondary"
+        meta={
+          <View style={styles.meter}>
+            <Meter value={(required - remaining) / required} tone="secondary" />
+          </View>
+        }
         onPress={onPress}
-      >
-        <Txt variant="title" style={styles.leagueLine}>
-          {t.home.league.remaining(remaining)}
-        </Txt>
-        <Meter value={(required - remaining) / required} tone="secondary" />
-        <Txt variant="meta" tone="muted">
-          {t.home.league.opensAfter(required)}
-        </Txt>
-      </LobbyCard>
+      />
     );
   }
 
   const me = data.joined ? data.me : null;
-  const progress = data.nextRankProgress;
-
   return (
-    <LobbyCard
-      title={t.home.league.title}
-      eyebrow={t.home.thisWeek}
-      icon="shield"
-      tone="secondary"
-      right={<TierBadge tier={data.tier} size="lg" showLabel />}
-      onPress={onPress}
-    >
-      {me ? (
-        <>
-          <Txt variant="title" style={styles.leagueLine}>
-            {t.home.league.standing(
+    <NoticeCard
+      eyebrow={eyebrow}
+      title={
+        me
+          ? t.home.league.standing(
               t.fmt.rank(me.rank),
               t.fmt.score(data.members.length),
               me.points,
               t.fmt.score(me.points),
-            )}
-          </Txt>
-          {progress === null ? null : <Meter value={progress / 1000} tone="ok" />}
-          <View style={styles.chips}>
-            <ZoneTag league={data} me={me} />
-            <CountdownChip
-              endsAt={data.endsAt}
-              serverTime={data.serverTime}
-              prefix={t.home.countdown.endsIn}
-              onElapsed={() => void league.refetch()}
-            />
-          </View>
-        </>
-      ) : (
-        <>
-          <Txt variant="body" tone="muted">
-            {t.home.league.join}
-          </Txt>
+            )
+          : t.home.notice.join
+      }
+      icon="shield"
+      tone="secondary"
+      meta={
+        me ? (
+          <ZoneTag league={data} me={me} />
+        ) : (
           <CountdownChip
             endsAt={data.endsAt}
             serverTime={data.serverTime}
             prefix={t.home.countdown.endsIn}
             onElapsed={() => void league.refetch()}
           />
-        </>
-      )}
-    </LobbyCard>
+        )
+      }
+      right={<TierBadge tier={data.tier} size="md" />}
+      onPress={onPress}
+    />
   );
 }
 
@@ -715,108 +628,44 @@ function ZoneTag({ league, me }: { league: LeagueResponse; me: LeagueMember }) {
 /**
  * The player right above you on this week's board and the points it takes
  * to pass them — the API's `gap`, where a tie goes to whoever got there
- * first — set as a face-off: you, VS, them.
+ * first — with the one action on a rival: Geç onu.
  */
-function RivalDoor({
-  name,
-  avatarUrl,
+function RivalNotice({
   rival,
   onPlay,
 }: {
-  name: string;
-  avatarUrl: string | null;
   rival: LeaderboardResponse['rival'];
   onPlay: () => void;
 }) {
   const t = useT();
   if (!rival) return null;
+  const { entry } = rival;
   return (
-    <LobbyCard
-      title={t.home.rival.title}
-      eyebrow={t.home.thisWeek}
-      icon="target"
-      tone="warn"
-    >
-      <FaceOff
-        left={{ name, src: avatarUrl }}
-        right={{ name: rival.entry.username, src: rival.entry.avatarUrl }}
-      />
-      <Txt variant="title" align="center">
-        {t.home.rival.gap(rival.entry.username, rival.gap, t.fmt.gap(rival.gap))}
-      </Txt>
-      <Txt variant="meta" tone="muted" align="center">
-        {t.home.rival.ahead(rival.entry.username)}
-      </Txt>
-      <Button
-        label={t.home.rival.pass}
-        icon="play"
-        tone="primary"
-        size="md"
-        onPress={onPlay}
-      />
-    </LobbyCard>
+    <NoticeCard
+      eyebrow={t.home.notice.rival}
+      title={t.home.rival.gap(entry.username, rival.gap, t.fmt.gap(rival.gap))}
+      lead={<Avatar name={entry.username} src={entry.avatarUrl} size="md" />}
+      meta={t.home.rival.ahead(entry.username)}
+      right={<Button label={t.home.rival.pass} tone="primary" size="sm" onPress={onPlay} />}
+    />
   );
 }
 
 const styles = StyleSheet.create({
   fill: { flex: 1 },
-  flex: { flex: 1 },
-  scroll: { gap: SPACE.lg, paddingBottom: SPACE.xxl, paddingHorizontal: SPACE.lg },
+  scroll: { gap: SPACE.md, paddingBottom: SPACE.xl, paddingHorizontal: SPACE.lg },
   player: { alignItems: 'center', flexDirection: 'row', gap: SPACE.md },
   playerText: { flex: 1, gap: 1 },
   tierPin: { bottom: -8, position: 'absolute', right: -8 },
-  heroBlock: { gap: SPACE.md },
-  stageShell: {
-    borderBottomWidth: DEPTH.outline + DEPTH.lip,
-    borderRadius: RADIUS.overlay,
-    borderWidth: DEPTH.outline,
-    overflow: 'hidden',
-  },
-  stage: {
-    alignItems: 'center',
-    gap: SPACE.xs,
-    paddingBottom: SPACE.lg,
+  clock: { gap: SPACE.md, paddingBottom: SPACE.sm, paddingTop: SPACE.lg },
+  clockFace: { alignItems: 'center', gap: SPACE.xxs },
+  record: { fontFamily: FONT.display, fontSize: 64, lineHeight: lh(72) },
+  stack: { gap: SPACE.sm },
+  score: { fontFamily: FONT.display, fontSize: 22, lineHeight: lh(26) },
+  meter: { alignSelf: 'stretch', paddingTop: SPACE.xs },
+  unlock: {
+    paddingBottom: ORB_RISE + SPACE.xs,
     paddingHorizontal: SPACE.lg,
-    paddingTop: SPACE.lg,
-  },
-  heroTitle: { marginTop: SPACE.xs },
-  fan: {
-    flexDirection: 'row',
-    gap: SPACE.sm,
-    justifyContent: 'center',
-    marginBottom: SPACE.sm,
-    marginTop: SPACE.md,
-  },
-  reel: {
-    alignItems: 'center',
-    borderBottomWidth: DEPTH.outline + 3,
-    borderRadius: 14,
-    borderWidth: DEPTH.outline,
-    height: 76,
-    justifyContent: 'center',
-    overflow: 'hidden',
-    width: 54,
-  },
-  reelShine: { height: '40%', left: 0, position: 'absolute', right: 0, top: 0 },
-  centred: { alignSelf: 'center', marginTop: SPACE.xs },
-  attempt: {
-    alignItems: 'center',
-    alignSelf: 'stretch',
-    gap: SPACE.xs,
-    marginTop: SPACE.md,
-  },
-  attemptScore: { fontFamily: FONT.display, fontSize: 46, lineHeight: lh(54) },
-  actions: {
-    alignSelf: 'stretch',
-    flexDirection: 'row',
-    gap: SPACE.sm,
-    marginTop: SPACE.sm,
-  },
-  leagueLine: { fontSize: 19 },
-  chips: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: SPACE.sm,
+    paddingTop: SPACE.sm,
   },
 });

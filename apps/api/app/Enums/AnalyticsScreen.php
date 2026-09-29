@@ -27,6 +27,9 @@ enum AnalyticsScreen: string
     case History = 'history';
     case Avatar = 'avatar';
     case Notifications = 'notifications';
+    case FriendList = 'friend_list';
+    case Account = 'account';
+    case Alerts = 'alerts';
 
     /** The total a screen's views add to: `screen:home`. */
     public function bucket(): string

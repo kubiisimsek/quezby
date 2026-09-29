@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react-native';
 
 import { StatGrid } from '@/ui/kit';
+import { valueSize } from '@/ui/kit/status';
 import { arena } from '@/ui/tokens';
 
 describe('StatGrid', () => {
@@ -24,6 +25,34 @@ describe('StatGrid', () => {
     expect(screen.getByText('312 ms')).toBeOnTheScreen();
     expect(screen.getByText('x2,50')).toBeOnTheScreen();
     expect(screen.getByText('%94,2')).toHaveStyle({ color: arena.okText });
+  });
+
+  it('sizes a number by its length, never by shrink-to-fit', async () => {
+    await render(
+      <StatGrid
+        columns={3}
+        items={[
+          { label: 'Tur', value: 4 },
+          { label: 'Post', value: '12.345' },
+          { label: 'Oyun süresi', value: '12 sa 44 dk' },
+        ]}
+      />,
+    );
+
+    const short = screen.getByText('4');
+    expect(short).toHaveStyle({ fontSize: 21, alignSelf: 'stretch', textAlign: 'center' });
+    expect(short.props.adjustsFontSizeToFit).toBeFalsy();
+    expect(screen.getByText('12.345')).toHaveStyle({ fontSize: 21 });
+    expect(screen.getByText('12 sa 44 dk')).toHaveStyle({ fontSize: 13 });
+  });
+
+  it('steps a value down as it grows', () => {
+    expect(valueSize('x1,45').fontSize).toBe(21);
+    expect(valueSize('312 ms').fontSize).toBe(21);
+    expect(valueSize('2 sa 1 dk').fontSize).toBe(15);
+    expect(valueSize('1.204.310').fontSize).toBe(15);
+    expect(valueSize('#1.204').fontSize).toBe(21);
+    expect(valueSize('2 sa 14 dk').fontSize).toBe(15);
   });
 
   it('keeps a short last row in step with the full ones', async () => {

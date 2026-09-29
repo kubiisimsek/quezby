@@ -29,6 +29,7 @@ return [
     'friend_limit' => 'En fazla :limit arkadaşın olabilir.',
     'request_limit' => 'Cevap bekleyen en fazla :limit isteğin olabilir. Biri cevap verince yenisini gönder.',
     'not_friends' => 'Bunu yalnızca bir arkadaşınla yapabilirsin.',
+    'friends_hidden' => 'Bu listeyi yalnızca arkadaşları görebilir.',
     'message_limit' => 'Bu arkadaşına bugün en fazla :limit mesaj gönderebilirsin.',
     'duel_unavailable' => 'Bu VS artık oynanamıyor.',
     'duel_limit' => 'Cevap bekleyen en fazla :limit VS\'in olabilir.',

@@ -36,6 +36,11 @@ it('forbids an admin a role may not use with its own code', function () {
         ->and(ErrorCode::Forbidden->message())->toBe('Bu işlem için yetkin yok.');
 });
 
+it('hides a friend list from anyone but the player and their friends as a 403', function () {
+    expect(ErrorCode::FriendsHidden->status())->toBe(403)
+        ->and(ErrorCode::FriendsHidden->message())->toBe('Bu listeyi yalnızca arkadaşları görebilir.');
+});
+
 it('names each cap, the configured one unless told', function () {
     expect(ErrorCode::FriendLimit->message())->toBe('En fazla 500 arkadaşın olabilir.')
         ->and(ErrorCode::FriendLimit->message(['limit' => '2']))->toBe('En fazla 2 arkadaşın olabilir.')

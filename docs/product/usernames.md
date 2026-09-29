@@ -18,9 +18,10 @@ ya da **Şimdilik geç** der ve bu adla oynar. Adlar küçük harfle saklandığ
 
 - `isAutoUsername` (TS) / `Username::isAutomatic` (PHP): ad hâlâ otomatik mi.
 - `canPickUsername` (TS) / `Username::isPickable` (PHP): oyuncu hâlâ ad seçebilir
-  mi — yalnızca ad otomatikken ya da hiç yokken. Profil → Ayarlar'da satır
-  "Adını seç" der ve form boş açılır; seçildikten sonra aynı yerde kilitli,
-  basılmayan bir satır durur: "Kullanıcı adın · @ekin · kalıcı".
+  mi — yalnızca ad otomatikken ya da hiç yokken. Profil → Ayarlar → Hesap
+  bilgileri'nde satır "Adını seç" der ve form boş açılır; seçildikten sonra
+  aynı yerde kilitli, basılmayan bir satır durur: "Kullanıcı adın · @ekin ·
+  kalıcı".
 - **Otomatik görünen adlar ayrılmıştır:** sembolleri atılınca `guest` ya da
   `misafir` + yalnızca rakam kalan her ad (`guest12345678`, `Guest.4812`,
   `misafir*7`) `reserved` döner — seçilmiş bir ad verilmiş gibi görünmesin.

@@ -57,7 +57,7 @@ A contract change is one commit: `packages/types` → Laravel request/resource �
 | Status | When |
 | ------ | ---- |
 | 401 | `unauthenticated` — missing or revoked token |
-| 403 | `forbidden` — the admin panel only: the admin's role may not do this (`docs/backend/admin-api.md`) |
+| 403 | `forbidden` — the admin panel only: the admin's role may not do this (`docs/backend/admin-api.md`) · `friends_hidden` — another player's friend list, to someone who is not their friend |
 | 404 | `not_found` — also another player's run, an unknown board (`daily` included), a banned player, a player who blocked you, a VS that is not yours to see |
 | 409 | `username_taken`, `username_locked`, `email_taken`, `already_linked`, `identity_taken`, `last_sign_in_method`, `run_already_finished`, `daily_already_played`, `attest_key_unknown`, `duel_unavailable` |
 | 410 | `run_expired` |
@@ -68,9 +68,9 @@ Throttles: guest sign-up 10/h/IP · login 10/min/IP · nonce 20/min/IP · Apple/
 10/min/IP · identities 10/min · username check 60/min · username pick 10/min · run start 30/min · run
 checkpoint 12/min · run finish 20/min · device challenge 20/min · device checks
 (Android, iOS attest and assert together) 10/min · analytics visits 12/min · search 30/min ·
-friend requests and answers, blocks, marking a conversation read and declining a VS
-(`social`) 60/min · phrases 30/min · profile photo 10/h · reports 10/h · push token 20/min ·
-every read (boards, daily, league, stats, players, past games, inbox, friends, requests,
+friend requests and answers, blocks, marking a conversation read or the notifications seen and
+declining a VS (`social`) 60/min · phrases 30/min · profile photo 10/h · reports 10/h · push token 20/min ·
+every read (boards, daily, league, stats, players, friend lists, past games, inbox, notifications, friends, requests,
 blocks, conversations, VS) 60/min · the inbox's pulse (`pulse`, its own budget) 60/min ·
 profile photos served 600/min/IP.
 
@@ -662,6 +662,25 @@ this season's best score, `league` this week's tier (null when not seated).
 `friends` counts their friends who are not banned. Unknown, banned, or a
 player who blocked you → 404.
 
+### `GET /users/{username}/friends?cursor=`
+
+`{ "friends": [PlayerSummary], "total": 42, "nextCursor": "…" | null }`
+(`FriendListResponse`) — a player's friends A to Z by username, fifty a page.
+Only the player themselves and their friends see it; anyone else →
+`403 friends_hidden`. Unknown, banned, or a player who blocked you → 404, as
+for the card.
+
+- Banned players are left out, and so is anyone on either side of a block
+  with you. `total` counts that same list, every page together — so a
+  friend's total can be lower than their card's `friends`.
+- Each `relation` is that player's to **you**, not to the list's owner: on a
+  friend's list, a friend of yours is `friend`, someone you asked
+  `requested`, a stranger `none` — and you are on it as `none`.
+- Pass `nextCursor` back as `?cursor=`; it names the last player of the page
+  (base64url of the username). One that cannot be a username →
+  `422 validation_failed`. The queries are the same few whatever the list's
+  length.
+
 ### `PUT /users/{username}/friend` · `DELETE /users/{username}/friend`
 
 → `{ "relation": "requested" }` (`RelationResponse`: where the two stand
@@ -734,10 +753,28 @@ deletes the conversation.
 
 ### `GET /me/inbox`
 
-`{ "requests": 2, "threads": 3, "yourTurn": 1 }` — what the badges count:
-requests waiting for you, friends whose conversation wants a look (a line
-unread, or a VS waiting for you to play) and how many friends' VS wait for
-you. Banned players are left out; the player's open VS are settled first.
+```json
+{
+  "requests": 2,
+  "threads": 3,
+  "yourTurn": 4,
+  "friends": 12,
+  "waiting": [{ "id": "01k…", "opponent": PlayerSummary, "expiresAt": "…" }],
+  "notifications": 3,
+  "serverTime": "…"
+}
+```
+
+What the badges count: requests waiting for you, friends whose conversation
+wants a look (a line unread, or a VS waiting for you to play) and how many
+friends' VS wait for you (`yourTurn`). `friends` is your friends who are not
+banned. `waiting` (`WaitingDuel`) names the VS waiting for you to play — the
+one running out first first, three at most while `yourTurn` counts them all —
+each with the friend who sent it and when the chance to answer runs out;
+count down with `serverTime`. A VS leaves it once you decline it, start your
+run or its time runs out. `notifications` is how many of the bell's
+notifications you have not seen yet (*Notifications*). Banned players are left
+out; the player's open VS are settled first.
 
 ### `GET /me/pulse`
 
@@ -745,13 +782,14 @@ you. Banned players are left out; the player's open VS are settled first.
 (`users.inbox_stamp`, `InboxStamp`). It goes up, for both players, with a
 friend request sent, a friendship begun or ended, a block that parted two
 friends, every line (a phrase, "friends now", a VS invite, result, refusal or
-expiry); for the blocker alone with a block or its lifting. Reading a
-conversation moves nothing. Nothing is on a clock, so the pulse itself first
+expiry); for the blocker alone with a block or its lifting; for the player
+alone when they open the bell's list with something in it unseen, so their
+other phone's badge clears too. Reading a conversation moves nothing. Nothing is on a clock, so the pulse itself first
 settles the player's waiting VS whose 48 hours ran out (`settleDue`): both
 players then hear of it without opening anything.
 
 This is how the inbox is live without a socket (shared hosting has none): the
-app asks every 3 s on Arkadaşlar, a conversation and Arkadaş bul, every 10 s
+app asks every 3 s on Mesajlar, a conversation, a friend list and Arkadaş bul, every 10 s
 elsewhere, never mid-run or in the background, and fetches its lists only when
 the number moved. A push, when the player allowed them, gets there first. The
 answer costs two indexed reads; it has its own throttle, apart from the other
@@ -788,6 +826,72 @@ says a phrase in its own language, a push in the receiver's
 (`lang/{locale}/phrases.php`). Anything else → `422 validation_failed`; not a
 friend → `422 not_friends`; `inbox.phrases_per_day` (20) to one friend in an
 Istanbul day already → `422 message_limit`.
+
+## Notifications
+
+The bell on the lobby: what happened to the player among friends
+(`NotificationService`). Nothing is stored for it — it reads the requests
+waiting for the player and the game's lines a friend's move sent them:
+
+| `kind` | What happened | `player` |
+| --- | --- | --- |
+| `friend_request` | a request waits for you | the one who asked |
+| `friends` | your request was accepted | the one who accepted |
+| `vs_invite` | a friend sent you a VS | the challenger |
+| `vs_result` | the friend you challenged played it | that friend |
+| `vs_declined` | … turned it down | that friend |
+| `vs_expired` | … let it run out | that friend |
+
+Phrases are not here: they are the inbox's. Neither are your own lines — the
+challenger is never told of the VS they sent. Banned players and anyone on
+either side of a block with you are left out; a friendship that ends or a
+block deletes the lines anyway, and a request answered, taken back or turned
+down is gone with it.
+
+### `GET /me/notifications`
+
+```json
+{
+  "notifications": [
+    {
+      "id": "request:ada",
+      "kind": "friend_request",
+      "player": PlayerSummary,
+      "duel": null,
+      "createdAt": "2026-09-26T10:06:00.000Z",
+      "unseen": true
+    },
+    {
+      "id": "message:812",
+      "kind": "vs_invite",
+      "player": PlayerSummary,
+      "duel": DuelBrief,
+      "createdAt": "2026-09-26T10:03:00.000Z",
+      "unseen": false
+    }
+  ],
+  "unseen": 1
+}
+```
+
+The newest fifty, newest first (`NotificationItem`). `id` is
+`request:{username}` for a request and `message:{id}` for the rest; `player`
+is the other player as you see them (`relation` `incoming` for a request,
+`friend` for the rest); `duel` is a `vs_*` notification's VS as it stands now,
+from your side (a `vs_invite` you have not played says `turn: "you"`). An item
+is `unseen` when it came after the last time you opened the list — all of
+them, until you first do. `unseen` counts every unseen one, not only the fifty
+shown; `GET /me/inbox` carries the same count as `notifications`. A VS of yours
+whose time ran out is settled first, as the pulse does. The same handful of
+queries however many there are.
+
+### `POST /me/notifications/seen`
+
+The player opened the list: everything so far is seen
+(`users.notifications_seen_at` = now, to the millisecond). `204`. When
+something was unseen, the player's pulse moves, so their other phone's badge
+clears too; opening it again with nothing new moves nothing. It changes nothing
+else — a request still waits, a conversation stays unread.
 
 ## VS
 

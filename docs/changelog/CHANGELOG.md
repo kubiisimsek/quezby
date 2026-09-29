@@ -1,5 +1,111 @@
 # Changelog
 
+## 2026-09-29 — The bell, and Mesajlar in two
+
+The owner asked where the notifications were ("VS geldi" had no place of its
+own) and why the lobby lost its mailbox, and wanted the friends and the
+search on the Mesajlar tab.
+
+- **The bell:** the lobby's status strip has a bell (`IconButton` "bell")
+  with a red count of what the player has not seen yet (`InboxSummary.
+  notifications`); it opens **Bildirimler** (`Alerts`): a request (✓ / ✗ right
+  there), a request accepted, a VS sent to you (✓ plays it, ✗ turns it down,
+  while it waits), and what became of the ones you sent — won, lost, draw,
+  turned down, run out — newest first, as `NoticeCard`s (`fresh` lights what
+  is new). Opening it clears the badge. A tapped friend-request push opens it.
+  Phrases stay in Mesajlar.
+- **Mesajlar in two:** a `Segmented` switch — **Mesajlar** (the
+  conversations) · **Arkadaşlar** (a search by name, the requests, the friend
+  list — `FriendListView`, shared with the friend list screen). Each side
+  counts what waits; the dock slot counts both. The profile's Arkadaş counter
+  opens the friends' side (`Inbox { segment: 'friends' }`); Profil's slot no
+  longer carries a badge.
+- **Arkadaş ekle:** a `userPlus` slab beside Mesajlar's title opens Arkadaş
+  bul.
+- **API:** `GET /me/notifications` → `{ notifications, unseen }` and
+  `POST /me/notifications/seen`; `users.notifications_seen_at`;
+  `InboxSummary.notifications`.
+- Copy in six languages (`alerts` catalog; Mesajlar's switch). Analytics
+  screen `alerts`.
+- Contract: `NotificationKind`, `NotificationItem`, `NotificationsResponse`,
+  `InboxSummary.notifications` (types); `me.notifications`,
+  `me.seeNotifications` (SDK).
+- Tests: the API's `NotificationsTest` and the inbox's exact JSON; the app's
+  `AlertsScreen`, `InboxScreen` (the switch, the search, the requests),
+  `HomeScreen` (the bell), `ProfileScreen`, `useSocial`, `usePulse`,
+  `NoticeCard`, analytics screens.
+
+## 2026-09-29 — A lock-screen lobby, Mesajlar, friend lists, a shorter profile
+
+The daily challenge took about two thirds of the lobby, so a day without it
+made the game look empty; the lobby's mailbox opened a "friends" tab that was
+really an inbox, with no friend list anywhere; the profile stacked eight stat
+tiles, two panels and every account door. The owner asked for an original
+lobby, not another game's.
+
+- **Lobby — "kilit ekranı":** drawn as the phone's lock screen. The season
+  best stands where the time would ("SEZON REKORU", gold Rubik 64) with the
+  places under it (→ Zirve). What waits comes in as `NoticeCard`s of one
+  height: a VS waiting for you — the friend's portrait, "@deniz sana VS
+  attı", its countdown, a green ✓ that plays it (playing is the answer) and a
+  red ✗ that declines it, three at most then "+N VS daha" → Mesajlar; "GÜNÜN
+  AKIŞI #17" with a small magenta Oyna (read aloud "Günün akışını oyna"), or
+  your place and score once played (the stage, board and Paylaş are on the
+  Daily screen); the league; the rival with Geç onu; the device warning.
+  Pinned over the dock: `SwipePlay`, the screen's one gold slab — "Yukarı
+  kaydır, oyna", a tap or a swipe up plays free. Gone: the daily stage and
+  reel fan, the VS door, the records card, the mailbox button.
+- **Dock:** Zirve · Lig · Oyna · **Mesajlar** · Profil. Mesajlar (`Inbox`,
+  was `Friends`) is the conversations and their VS only; its badge counts
+  those. Requests moved to the friend list; Profil's slot counts them.
+- **Friend lists:** a stack screen `Friends` ({ username? }; one screen per
+  player through `getId`). Yours opens from the profile's Arkadaş counter —
+  requests first with Kabul et / Reddet, then friends A to Z, "Arkadaş bul"
+  in the corner; a friend's opens from the count on their card (PlayerSheet's
+  count is a slab for you and friends, plain words for anyone else); anyone
+  else's is locked ("Bu liste kilitli"). A tapped friend-request push opens
+  your list.
+- **Profile:** portrait, name, league, `Counters` Rekor · Arkadaş · Tur, the
+  places, an İSTATİSTİKLER tile with four numbers opening `StatsSheet`
+  (grouped: Oyun, Hareketler, En iyiler; named combos; most-liked posts), and
+  Geçmiş oyunlar. The "… ile bağlı" tag moved to Hesap bilgileri.
+- **Ayarlar → Hesap bilgileri:** one row right above Çıkış yap ("@ekin ·
+  Apple bağlı", a guest's "Misafir hesap") opens the `Account` screen:
+  Kullanıcı adı (Adını seç while automatic, locked after), Bağlı hesaplar
+  (`SignInWays`, split out of `SignInWaysSheet`), and Hesabı sil in red.
+  The name, ways and delete rows left the sheet; `UsernameSheet` and
+  `DeleteSheet` have files of their own.
+- **API:** `GET /users/{username}/friends?cursor=` → `{ friends, total,
+  nextCursor }`, A to Z, 50 a page (`NameCursor`, `FriendListRequest`), only
+  for the player and their friends — anyone else `403 friends_hidden`; banned
+  players and both sides of a block with the viewer left out; `relation` is
+  the viewer's. `GET /me/inbox` adds `friends`, `waiting` (the VS waiting for
+  the player, soonest expiry first, three at most) and `serverTime`
+  (`InboxService::waitingFor`, one query).
+- **Kit:** `NoticeCard`, `SwipePlay`, `Counters`; `IconButton` gains `ok` /
+  `danger` tones, `size="sm"` and `loading`; `Button` an `accessibilityLabel`;
+  the `chevronUp` glyph.
+- **Analytics:** screens `friend_list` and `account` (codes only added; the
+  Mesajlar tab keeps `friends`); the admin panel labels them.
+- **Copy:** new lines in all six languages; the dock word is Mesajlar /
+  Messages / Chats / الرسائل / Messages / Mensajes; Yardım's answers point to
+  Hesap bilgileri and the friend count.
+- Contract: `WaitingDuel`, `InboxSummary`, `FriendListResponse`,
+  `friends_hidden`, `AnalyticsScreen` (types); `users.friends` (SDK).
+- **Stat tiles:** a value is sized by its length (`valueSize`: 21 → 17 → 15 →
+  13 pt) instead of iOS's shrink-to-fit, which drew the first row of a
+  sheet's `StatGrid` a few points tall ("…" on the stats sheet's Tur, Post and
+  Oyun süresi, tiny ranks on a player card).
+- **API tests:** `phpunit.xml` sets `memory_limit` to 512M. The suite
+  (1.833 tests in one process) had outgrown the CLI's 128M and died in
+  `CheckpointTest` with "Allowed memory size exhausted".
+- Tests: Pest `FriendListTest`, `InboxTest`, `DuelTest`, `ErrorCodeParityTest`;
+  SDK endpoints; config analytics; the app's `HomeScreen`, `InboxScreen`,
+  `FriendsScreen`, `ProfileScreen`, `StatsSheet`, `AccountScreen`,
+  `SettingsSheet`, `PlayerSheet`, `SignInWays`, `TabBar`, `usePulse`,
+  `useSocial`, `NoticeCard`, `SwipePlay`, `Counters`, `IconButton`, icons,
+  analytics screens, Help.
+
 ## 2026-09-28 — The inbox is live without a socket: the pulse
 
 With two phones open, a VS, a phrase or a request used to show only when the

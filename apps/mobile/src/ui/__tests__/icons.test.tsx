@@ -25,7 +25,7 @@ describe('Icon', () => {
     for (const name of ['chevron', 'back', 'logout', 'trendUp'] as const) {
       expect(JSON.stringify(await svgStyle(<Icon name={name} color="#000000" />))).toContain('"scaleX":-1');
     }
-    for (const name of ['play', 'arrowUp', 'heart'] as const) {
+    for (const name of ['play', 'arrowUp', 'heart', 'chevronUp', 'check', 'close'] as const) {
       expect(JSON.stringify(await svgStyle(<Icon name={name} color="#000000" />))).not.toContain('scaleX');
     }
   });

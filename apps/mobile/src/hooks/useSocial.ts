@@ -1,8 +1,10 @@
 import type {
   BlocksResponse,
+  FriendListResponse,
   FriendRequestsResponse,
   FriendsResponse,
   InboxSummary,
+  NotificationsResponse,
   Phrase,
   ReportReason,
   ThreadResponse,
@@ -16,6 +18,8 @@ import {
   type QueryClient,
 } from '@tanstack/react-query';
 
+import { ApiError } from '@quezby/sdk';
+
 import { api } from '@/api/client';
 
 /**
@@ -28,19 +32,25 @@ import { api } from '@/api/client';
 
 export const threadKey = (username: string) => ['thread', username] as const;
 
+/** A player's friend list. `['friends']` is the inbox's conversations, not this. */
+export const friendListKey = (username: string) => ['friend-list', username] as const;
+
 /** The screen on show, as the pulse sees it (`stores/route`). */
 type OnScreen = { name: string | null; username: string | null };
 
 /**
- * What a moved pulse asks again: the badges and the lobby's VS card always;
- * the inbox list, the requests, a search or a conversation only while on
- * screen. The rest is marked old and asked again when it next shows.
+ * What a moved pulse asks again: the badges and the lobby's VS notices
+ * always; the inbox list, the requests, a friend list, a search or a
+ * conversation only while on screen. The rest is marked old and asked again
+ * when it next shows.
  */
 export function refreshInbox(client: QueryClient, on: OnScreen): void {
   void client.invalidateQueries({ queryKey: ['inbox'] });
   const shown: Record<string, boolean> = {
-    friends: on.name === 'Friends',
-    'friend-requests': on.name === 'Friends' || on.name === 'FindFriends',
+    friends: on.name === 'Inbox',
+    'friend-requests': on.name === 'Inbox' || on.name === 'Friends' || on.name === 'FindFriends',
+    'friend-list': on.name === 'Inbox' || on.name === 'Friends',
+    notifications: on.name === 'Alerts',
     search: on.name === 'FindFriends',
     thread: false,
     player: false,
@@ -55,11 +65,21 @@ export function refreshInbox(client: QueryClient, on: OnScreen): void {
 
 /**
  * Everything that shows what two players are to each other, asked again —
- * the inbox and its badges, requests, blocks, search results, player cards
- * and the friends boards.
+ * the inbox and its badges, requests, friend lists, blocks, search results,
+ * player cards and the friends boards.
  */
 export function refreshSocial(client: QueryClient, username?: string): void {
-  for (const key of ['inbox', 'friends', 'friend-requests', 'blocks', 'search', 'leaderboard', 'league']) {
+  for (const key of [
+    'inbox',
+    'friends',
+    'friend-requests',
+    'friend-list',
+    'notifications',
+    'blocks',
+    'search',
+    'leaderboard',
+    'league',
+  ]) {
     void client.invalidateQueries({ queryKey: [key] });
   }
   if (username) {
@@ -68,7 +88,11 @@ export function refreshSocial(client: QueryClient, username?: string): void {
   }
 }
 
-/** What the badges count: requests waiting, and friends whose conversation wants a look. */
+/**
+ * What the badges count — requests waiting (the Profil slot), friends whose
+ * conversation wants a look (the Mesajlar slot) — with the player's friend
+ * count and the VS waiting for them on the lobby.
+ */
 export function useInboxSummary() {
   return useQuery<InboxSummary>({
     queryKey: ['inbox'],
@@ -76,9 +100,29 @@ export function useInboxSummary() {
   });
 }
 
-/** The badge on the Arkadaşlar slot and the lobby's mailbox. */
-export function inboxCount(summary: InboxSummary | undefined): number {
-  return summary ? summary.requests + summary.threads : 0;
+/** The bell's list: requests, VS and what became of them, newest first. */
+export function useNotifications() {
+  return useQuery<NotificationsResponse>({
+    queryKey: ['notifications'],
+    queryFn: () => api.me.notifications(),
+  });
+}
+
+/**
+ * The player has looked at the bell's list: its badge goes back to zero. The
+ * list itself keeps what was new lit until the player leaves it.
+ */
+export function useSeeNotifications() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: () => api.me.seeNotifications(),
+    onSuccess: () => {
+      client.setQueryData<InboxSummary>(['inbox'], (summary) =>
+        summary ? { ...summary, notifications: 0 } : summary,
+      );
+      void client.invalidateQueries({ queryKey: ['notifications'], refetchType: 'none' });
+    },
+  });
 }
 
 /** The inbox: a conversation per friend, the one last heard from first, a page at a time. */
@@ -91,10 +135,33 @@ export function useFriendThreads() {
   });
 }
 
-export function useFriendRequests() {
+/**
+ * A player's friends, A to Z, a page at a time: the player's own, or a
+ * friend's. Anyone else's answers `friends_hidden` — a lock, not a hiccup,
+ * so an answer the API gave is never asked again on its own.
+ */
+export function useFriendList(username: string) {
+  return useInfiniteQuery<
+    FriendListResponse,
+    Error,
+    InfiniteData<FriendListResponse>,
+    readonly string[],
+    string | undefined
+  >({
+    queryKey: friendListKey(username),
+    queryFn: ({ pageParam }) => api.users.friends(username, pageParam),
+    initialPageParam: undefined,
+    getNextPageParam: (last) => last.nextCursor ?? undefined,
+    retry: (count, error) =>
+      !(error instanceof ApiError && error.status >= 400 && error.status < 500) && count < 1,
+  });
+}
+
+export function useFriendRequests(enabled = true) {
   return useQuery<FriendRequestsResponse>({
     queryKey: ['friend-requests'],
     queryFn: () => api.me.friendRequests(),
+    enabled,
   });
 }
 

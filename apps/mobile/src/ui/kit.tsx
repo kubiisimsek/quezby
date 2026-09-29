@@ -43,7 +43,15 @@ export { CountdownChip } from '@/ui/kit/countdown';
 export { Podium, Spotlight, type PodiumEntry } from '@/ui/kit/podium';
 export { ClimbRow, FloorCard } from '@/ui/kit/climb';
 export { BonusChip, ShareGrid } from '@/ui/kit/result';
-export { LobbyCard, PlayButton, RankChips } from '@/ui/kit/lobby';
+export {
+  Counters,
+  LobbyCard,
+  NoticeCard,
+  PlayButton,
+  RankChips,
+  SwipePlay,
+  type CounterItem,
+} from '@/ui/kit/lobby';
 export { Bubble, Count, EventLine, FaceOff, PhraseChip, ThreadRow } from '@/ui/kit/social';
 export { RunTile } from '@/ui/kit/runs';
 export { Toast } from '@/ui/kit/toast';

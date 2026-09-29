@@ -49,10 +49,13 @@ hesabına giren doğrudan lobiye geçer.
 
 ## Döngü
 
-1. **Lobi** (Oyna sekmesi): bugünün **Günün akışı**, ligdeki yerin, bu hafta
-   hemen üstündeki rakip ve rekorların; üstte arkadaşlarından bekleyenleri
-   sayan mesaj kutusu, sırası sende bir VS varsa onun kapısı. Tek büyük düğme
-   bugünün turunu başlatır.
+1. **Lobi** (Oyna sekmesi), telefonun kilit ekranı gibi çizilir — Quezby,
+   telefon alışkanlığının oyunu: saatin yerinde sezon rekorun, altında
+   sıraların; bekleyen her şey aynı boyda bir bildirim: arkadaşının VS'i
+   (✓ oynar, ✗ reddeder), bugünün **Günün akışı** (küçük bir **Oyna** ile),
+   ligdeki yerin, bu hafta hemen üstündeki rakip. Günün akışı oynanmasa da
+   lobi boş durmaz. Dock'un üstündeki tek altın düğme — "Yukarı kaydır, oyna",
+   dokunmak da yeter — serbest bir tur başlatır.
 2. **Oyna** → sunucudan seed'li bir tur açılır (`POST /runs`, `free`, `daily`
    ya da bir arkadaşla `vs`).
 3. 3-2-1, sonra reeller: kaydır, çift dokun, basılı tut, dokunma.
@@ -107,10 +110,19 @@ Ayrıntılar: [scoring.md](./scoring.md).
 
 ## Arkadaşlar
 
-Dock'taki **Arkadaşlar** sekmesi oyunun mesaj kutusudur (rozeti bekleyenleri
-sayar): önce cevap bekleyen istekler, sonra arkadaş başına bir sohbet, sesi en
-son gelen üstte. Sözleşme: [api-contract.md](../backend/api-contract.md)
-(*Players and friends*, *Inbox*, *VS*, *Push*).
+Dock'taki **Mesajlar** sekmesi iki taraflıdır (üstte bir anahtar; rozeti
+bakılmayı bekleyen sohbetleri ve istekleri sayar): **Mesajlar** — arkadaş
+başına bir sohbet, sesi en son gelen üstte; **Arkadaşlar** — adla arama,
+cevap bekleyen istekler ve arkadaşların A'dan Z'ye. Profil'deki **Arkadaş**
+sayısı bu tarafı açar. Lobideki **zil** **Bildirimler**'i açar: gelen
+istekler (orada kabul edilir ya da reddedilir), kabul edilen isteğin, gelen
+VS (orada oynanır ya da reddedilir) ve gönderdiğin VS'lerin sonu — kazandın,
+kaybettin, berabere, reddedildi, süresi doldu. Zilin rozeti görülmemişleri
+sayar; liste açılınca sıfırlanır. Hazır mesajlar Bildirimler'e düşmez. Bir oyuncunun kartında arkadaş sayısı herkese
+görünür; listesi yalnızca kendisine ve arkadaşlarına açılır (başkasına "Bu
+liste kilitli"). Sırası sende olan VS'ler lobide de bildirim olarak durur.
+Sözleşme: [api-contract.md](../backend/api-contract.md) (*Players and
+friends*, *Inbox*, *VS*, *Push*).
 
 - **Arkadaşlık iki evetle olur.** **Arkadaş bul** (adın ilk harfleriyle arama)
   ya da oyuncu kartındaki **Ekle** istek gönderir; öteki **Kabul et** ya da
@@ -144,8 +156,8 @@ son gelen üstte. Sözleşme: [api-contract.md](../backend/api-contract.md)
   ve hazır mesaj telefona alıcının dilinde gelir; aynı arkadaştan hazır mesaj
   5 dakikada en fazla bir kez. Reddedilen ya da süresi dolan VS yalnızca mesaj
   kutusuna düşer. Oyun açıkken bildirim üstte kısa bir şerit olur. Dokununca
-  istek Arkadaşlar sekmesini, gerisi o arkadaşın sohbetini açar. Bildirimler
-  kapalıysa Arkadaşlar sekmesi, sohbet ve az önce gönderilen VS bir kartla
+  istek Bildirimler'i, gerisi o arkadaşın sohbetini açar. Bildirimler
+  kapalıysa Mesajlar sekmesi, sohbet ve az önce gönderilen VS bir kartla
   **Bildirimleri aç** der; telefon artık sormuyorsa düğme **Ayarları aç** olur
   ve telefonun ayarlarını açar (sekmedeki ve sohbetteki kart bir haftalığına
   gizlenebilir). Türler **Ayarlar → Bildirimler**'den ayrı ayrı kapatılır.
@@ -159,7 +171,8 @@ son gelen üstte. Sözleşme: [api-contract.md](../backend/api-contract.md)
   alır — oyuncu seçene kadar `guest48128742`; seçtiği ad bir daha değişmez
   ([usernames.md](./usernames.md)).
 - Misafir kalan oyuncuya, ligi açıldığı ilk an lobide **bir kez** "Hesabını
-  koru" sorulur: kaybedecek bir şeyi olduğu an. Sonrası yalnızca Profil'dedir.
+  koru" sorulur: kaybedecek bir şeyi olduğu an. Sonrası yalnızca Profil'de ve
+  **Hesap bilgileri**'ndedir.
 - **Hesabını koru:** misafir hesaba Apple, Google ya da e-posta + şifre
   bağlanır; turlar hesapla kalır. Başka cihazdan girilebilir. Hesaplar e-postaya
   göre asla birleştirilmez. Korunan hesapta aynı yer **Giriş yolları** olur:
@@ -176,6 +189,14 @@ son gelen üstte. Sözleşme: [api-contract.md](../backend/api-contract.md)
 - **Geçmiş oyunlar:** Profil'den, oynanan her tur sunucunun saydığıyla —
   sıralı, bekleyen, bayraklı ya da VS; yalnızca Günün akışı ya da yalnızca
   VS'ler süzülebilir.
+- **Profil** sadedir: portre, ad, lig; altında **Rekor · Arkadaş · Tur**
+  sayaçları ve sıraların; dört sayılık **İstatistikler** kutusu (hepsi ve
+  isimli kombolar, en çok beğenilen postlar bir sayfada açılır) ve Geçmiş
+  oyunlar.
+- **Hesap bilgileri** (Ayarlar'da, **Çıkış yap**'ın hemen üstünde):
+  kullanıcı adı (otomatik adla **Adını seç**, seçilmişse kilitli), bağlı
+  hesaplar (Apple, Google, e-posta; ekle ya da bağı kaldır) ve en altta
+  **Hesabı sil**.
 - Ayarlar: **dil** ve titreşim (ikisi de telefonda saklanır, hesaba da
   yazılır). Dil, hesabın kaydıdır: başka bir telefonda o hesaba giren oyunu
   hesabın dilinde bulur ([localization.md](./localization.md)). Ayrıca

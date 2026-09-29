@@ -15,7 +15,7 @@ import { useDeclineDuel, useReadThread, useSendPhrase, useThread } from '@/hooks
 import { handle, ltr, useT, type Messages } from '@/i18n';
 import { messageFor } from '@/lib/errors';
 import type { RootStackParamList } from '@/navigation/types';
-import { scoreOf } from '@/screens/friends/FriendsScreen';
+import { scoreOf } from '@/screens/friends/InboxScreen';
 import {
   Bubble,
   Button,

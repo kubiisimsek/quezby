@@ -406,11 +406,14 @@ export const ANALYTICS_SCREEN: Record<AnalyticsScreen, string> = {
   game: 'Oyun',
   help: 'Yardım',
   daily: 'Günün akışı',
-  friends: 'Arkadaşlar',
+  friends: 'Mesajlar',
   thread: 'Sohbet',
   history: 'Geçmiş oyunlar',
   avatar: 'Fotoğraf',
   notifications: 'Bildirim izni',
+  friend_list: 'Arkadaş listesi',
+  account: 'Hesap bilgileri',
+  alerts: 'Bildirimler',
 };
 
 /** The moments a visit counts. Only a failure is bad news. */

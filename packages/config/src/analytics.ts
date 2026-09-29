@@ -28,6 +28,9 @@ const SCREENS: Record<AnalyticsScreen, true> = {
   history: true,
   avatar: true,
   notifications: true,
+  friend_list: true,
+  account: true,
+  alerts: true,
 };
 
 const EVENTS: Record<AnalyticsEvent, true> = {

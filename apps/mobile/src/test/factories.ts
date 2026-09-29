@@ -3,12 +3,15 @@ import type {
   DuelView,
   FriendThread,
   InboxMessage,
+  InboxSummary,
+  NotificationItem,
   LeaderboardEntry,
   Me,
   PlayerCard,
   PlayerSummary,
   Ranks,
   RunSummary,
+  WaitingDuel,
 } from '@quezby/types';
 
 /** A named guest with a season best. Override only what a test is about. */
@@ -140,6 +143,43 @@ export function buildDuel(overrides: Partial<DuelView> = {}): DuelView {
     opponent: buildSummary({ username: 'deniz', relation: 'friend' }),
     h2h: { wins: 0, losses: 0, draws: 0 },
     serverTime: '2026-09-24T09:00:00.000Z',
+    ...overrides,
+  };
+}
+
+/** A VS waiting for the viewer: @deniz sent it, 24 hours left. */
+export function buildWaiting(overrides: Partial<WaitingDuel> = {}): WaitingDuel {
+  return {
+    id: '01jduel0000000000000000001',
+    opponent: buildSummary({ username: 'deniz', relation: 'friend' }),
+    expiresAt: '2026-09-25T09:00:00.000Z',
+    ...overrides,
+  };
+}
+
+/** What the badges count: nothing waiting, three friends. */
+export function buildInbox(overrides: Partial<InboxSummary> = {}): InboxSummary {
+  return {
+    requests: 0,
+    threads: 0,
+    yourTurn: 0,
+    friends: 3,
+    waiting: [],
+    notifications: 0,
+    serverTime: '2026-09-24T09:00:00.000Z',
+    ...overrides,
+  };
+}
+
+/** A notice on the bell's list: @deniz's VS, waiting for the viewer, not seen yet. */
+export function buildNotification(overrides: Partial<NotificationItem> = {}): NotificationItem {
+  return {
+    id: 'message:7',
+    kind: 'vs_invite',
+    player: buildSummary({ username: 'deniz', relation: 'friend' }),
+    duel: buildBrief({ id: '01jduel0000000000000000001', turn: 'you', you: null }),
+    createdAt: '2026-09-24T08:55:00.000Z',
+    unseen: true,
     ...overrides,
   };
 }

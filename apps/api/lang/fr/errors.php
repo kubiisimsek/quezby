@@ -27,6 +27,7 @@ return [
     'friend_limit' => 'Tu peux avoir :limit amis au maximum.',
     'request_limit' => "Tu peux avoir :limit demandes en attente au maximum. Envoie-en une nouvelle quand quelqu'un répond.",
     'not_friends' => "Tu ne peux faire ça qu'avec un ami.",
+    'friends_hidden' => 'Seuls ses amis peuvent voir cette liste.',
     'message_limit' => 'Tu peux envoyer :limit messages par jour au maximum à cet ami.',
     'duel_unavailable' => 'Ce VS ne peut plus être joué.',
     'duel_limit' => 'Tu peux avoir :limit VS en attente au maximum.',

@@ -8,18 +8,18 @@ import { plural } from '@/i18n/plural';
 type AttemptTag = Exclude<DailyAttempt['status'], 'ranked'> | 'unplaced';
 
 /**
- * The lobby: the status strip, today's tile (the daily's own name and rule
- * are `t.daily`), the league and rival doors, the records strip, the device
- * warning and the one reminder to keep the account. `countdown` and
- * `rankChips` are the kit's CountdownChip and RankChips, wherever they stand.
+ * The lobby, drawn as a lock screen: the status strip, the clock (the season
+ * best; its places are `rankChips`), the notifications — today's feed (its
+ * name and rule are `t.daily`), the league, the rival, the device warning —
+ * the line under the gold slab, and the one reminder to keep the account.
+ * `countdown` and `rankChips` are the kit's CountdownChip and RankChips,
+ * wherever they stand.
  *
  * A line with a count takes the number twice: as a number for the plural,
  * and written by `t.fmt` for the eye.
  */
 const tr = {
   help: 'Yardım',
-  /** The status strip's mailbox: the Arkadaşlar tab, with what waits there. */
-  inbox: 'Mesaj kutusu',
   /** The eyebrow of the doors that count this week: the league, the rival. */
   thisWeek: 'BU HAFTA',
   device: {
@@ -28,11 +28,8 @@ const tr = {
     body: (why: string) => `${why} Oynayabilirsin ama skorların sıralamaya girmez.`,
   },
   today: {
-    play: 'Günün akışını oyna',
     free: 'Serbest oyna',
-    score: 'Bugünkü skorun',
     placed: (rank: string, _players: number, players: string) => `${rank} / ${players} oyuncu`,
-    board: 'Sıralamayı gör',
     tags: {
       review: 'Skorun inceleniyor',
       flagged: 'Doğrulanamadı, tabloya girmedi',
@@ -62,6 +59,20 @@ const tr = {
     ahead: (name: string) => `${handle(name)} haftalık sıralamada hemen önünde.`,
     pass: 'Geç onu',
   },
+  /** The lobby's clock: the season best, where a lock screen keeps the time. */
+  clock: { label: 'SEZON REKORU' },
+  /** Under the gold slab, as a lock screen says it. */
+  swipe: 'Yukarı kaydır, oyna',
+  /** The lobby's notifications: what each says it is, and their small actions. */
+  notice: {
+    daily: (day: string) => `GÜNÜN AKIŞI #${day}`,
+    play: 'Oyna',
+    /** The daily's small Oyna, as a screen reader says it. */
+    playLabel: 'Günün akışını oyna',
+    league: 'LİG',
+    join: 'Ligine katıl',
+    rival: 'HEDEFİN · BU HAFTA',
+  },
   records: {
     title: 'Sezon rekoru',
     boards: { weekly: 'Hafta', monthly: 'Ay', all: 'Tüm zamanlar' },
@@ -83,7 +94,6 @@ export type HomeMessages = typeof tr;
 
 const en: HomeMessages = {
   help: 'Help',
-  inbox: 'Inbox',
   thisWeek: 'THIS WEEK',
   device: {
     eyebrow: 'RANKING',
@@ -91,15 +101,12 @@ const en: HomeMessages = {
     body: (why) => `${why} You can still play, but your scores won't rank.`,
   },
   today: {
-    play: 'Play the Daily Feed',
     free: 'Free play',
-    score: 'Your score today',
     placed: (rank, count, players) =>
       plural('en', count, {
         one: `${rank} / ${players} player`,
         other: `${rank} / ${players} players`,
       }),
-    board: 'See ranking',
     tags: {
       review: 'Your score is being reviewed',
       flagged: "Couldn't be verified, not on the board",
@@ -146,6 +153,16 @@ const en: HomeMessages = {
     ahead: (name) => `${handle(name)} is right ahead of you in the weekly ranking.`,
     pass: 'Pass them',
   },
+  clock: { label: 'SEASON RECORD' },
+  swipe: 'Swipe up to play',
+  notice: {
+    daily: (day) => `DAILY FEED #${day}`,
+    play: 'Play',
+    playLabel: 'Play the Daily Feed',
+    league: 'LEAGUE',
+    join: 'Join your league',
+    rival: 'YOUR TARGET · THIS WEEK',
+  },
   records: {
     title: 'Season record',
     boards: { weekly: 'Week', monthly: 'Month', all: 'All time' },
@@ -164,7 +181,6 @@ const en: HomeMessages = {
 
 const de: HomeMessages = {
   help: 'Hilfe',
-  inbox: 'Postfach',
   thisWeek: 'DIESE WOCHE',
   device: {
     eyebrow: 'RANGLISTE',
@@ -173,11 +189,8 @@ const de: HomeMessages = {
       `${why} Du kannst spielen, aber deine Scores kommen nicht in die Rangliste.`,
   },
   today: {
-    play: 'Tages-Feed spielen',
     free: 'Frei spielen',
-    score: 'Dein Score heute',
     placed: (rank, _count, players) => `${rank} / ${players} Spieler`,
-    board: 'Zur Rangliste',
     tags: {
       review: 'Dein Score wird geprüft',
       flagged: 'Nicht bestätigt, nicht in der Rangliste',
@@ -224,6 +237,16 @@ const de: HomeMessages = {
     ahead: (name) => `${handle(name)} liegt in der Wochenrangliste direkt vor dir.`,
     pass: 'Überholen',
   },
+  clock: { label: 'SAISONREKORD' },
+  swipe: 'Nach oben wischen und spielen',
+  notice: {
+    daily: (day) => `TAGES-FEED #${day}`,
+    play: 'Spielen',
+    playLabel: 'Tages-Feed spielen',
+    league: 'LIGA',
+    join: 'Tritt deiner Liga bei',
+    rival: 'DEIN ZIEL · DIESE WOCHE',
+  },
   records: {
     title: 'Saisonrekord',
     boards: { weekly: 'Woche', monthly: 'Monat', all: 'Allzeit' },
@@ -242,7 +265,6 @@ const de: HomeMessages = {
 
 const ar: HomeMessages = {
   help: 'المساعدة',
-  inbox: 'صندوق الرسائل',
   thisWeek: 'هذا الأسبوع',
   device: {
     eyebrow: 'الترتيب',
@@ -250,9 +272,7 @@ const ar: HomeMessages = {
     body: (why) => `${why} يمكنك اللعب، لكن نتائجك لن تدخل الترتيب.`,
   },
   today: {
-    play: 'العب خلاصة اليوم',
     free: 'العب بحرية',
-    score: 'نتيجتك اليوم',
     placed: (rank, count, players) =>
       plural('ar', count, {
         one: `${iso(rank)} / لاعب واحد`,
@@ -261,7 +281,6 @@ const ar: HomeMessages = {
         many: `${iso(rank)} / ${players} لاعبًا`,
         other: `${iso(rank)} / ${players} لاعب`,
       }),
-    board: 'عرض الترتيب',
     tags: {
       review: 'نتيجتك قيد المراجعة',
       flagged: 'تعذّر التحقق، فلم تدخل الترتيب',
@@ -318,6 +337,16 @@ const ar: HomeMessages = {
     ahead: (name) => `يسبقك ${iso(handle(name))} مباشرةً في ترتيب الأسبوع.`,
     pass: 'تجاوزه',
   },
+  clock: { label: 'الرقم القياسي للموسم' },
+  swipe: 'اسحب للأعلى والعب',
+  notice: {
+    daily: (day) => `خلاصة اليوم ${iso(`#${day}`)}`,
+    play: 'العب',
+    playLabel: 'العب خلاصة اليوم',
+    league: 'الدوري',
+    join: 'انضم إلى دوريك',
+    rival: 'هدفك · هذا الأسبوع',
+  },
   records: {
     title: 'الرقم القياسي للموسم',
     boards: { weekly: 'الأسبوع', monthly: 'الشهر', all: 'كل الأوقات' },
@@ -335,7 +364,6 @@ const ar: HomeMessages = {
 
 const fr: HomeMessages = {
   help: 'Aide',
-  inbox: 'Boîte de réception',
   thisWeek: 'CETTE SEMAINE',
   device: {
     eyebrow: 'CLASSEMENT',
@@ -343,15 +371,12 @@ const fr: HomeMessages = {
     body: (why) => `${why} Tu peux jouer, mais tes scores ne seront pas classés.`,
   },
   today: {
-    play: 'Jouer le Fil du jour',
     free: 'Jouer librement',
-    score: 'Ton score du jour',
     placed: (rank, count, players) =>
       plural('fr', count, {
         one: `${rank} / ${players} joueur`,
         other: `${rank} / ${players} joueurs`,
       }),
-    board: 'Classement',
     tags: {
       review: 'Ton score est en cours de vérification',
       flagged: 'Vérification impossible, hors classement',
@@ -398,6 +423,16 @@ const fr: HomeMessages = {
     ahead: (name) => `${handle(name)} est juste devant toi au classement de la semaine.`,
     pass: 'Dépasser',
   },
+  clock: { label: 'RECORD DE LA SAISON' },
+  swipe: 'Glisse vers le haut pour jouer',
+  notice: {
+    daily: (day) => `FIL DU JOUR #${day}`,
+    play: 'Jouer',
+    playLabel: 'Jouer le Fil du jour',
+    league: 'LIGUE',
+    join: 'Rejoins ta ligue',
+    rival: 'TA CIBLE · CETTE SEMAINE',
+  },
   records: {
     title: 'Record de la saison',
     boards: { weekly: 'Semaine', monthly: 'Mois', all: 'Depuis toujours' },
@@ -416,7 +451,6 @@ const fr: HomeMessages = {
 
 const es: HomeMessages = {
   help: 'Ayuda',
-  inbox: 'Buzón',
   thisWeek: 'ESTA SEMANA',
   device: {
     eyebrow: 'CLASIFICACIÓN',
@@ -425,15 +459,12 @@ const es: HomeMessages = {
       `${why} Puedes jugar, pero tus puntuaciones no entrarán en la clasificación.`,
   },
   today: {
-    play: 'Jugar el Feed del día',
     free: 'Jugar libre',
-    score: 'Tu puntuación de hoy',
     placed: (rank, count, players) =>
       plural('es', count, {
         one: `${rank} / ${players} jugador`,
         other: `${rank} / ${players} jugadores`,
       }),
-    board: 'Clasificación',
     tags: {
       review: 'Tu puntuación está en revisión',
       flagged: 'Sin verificar, fuera de la clasificación',
@@ -479,6 +510,16 @@ const es: HomeMessages = {
       }),
     ahead: (name) => `${handle(name)} va justo delante de ti en la clasificación semanal.`,
     pass: 'Superar',
+  },
+  clock: { label: 'RÉCORD DE LA TEMPORADA' },
+  swipe: 'Desliza hacia arriba para jugar',
+  notice: {
+    daily: (day) => `FEED DEL DÍA #${day}`,
+    play: 'Jugar',
+    playLabel: 'Jugar el Feed del día',
+    league: 'LIGA',
+    join: 'Únete a tu liga',
+    rival: 'TU OBJETIVO · ESTA SEMANA',
   },
   records: {
     title: 'Récord de la temporada',

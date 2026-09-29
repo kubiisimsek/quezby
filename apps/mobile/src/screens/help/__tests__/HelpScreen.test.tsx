@@ -54,10 +54,13 @@ describe('HelpScreen', () => {
     expect(screen.queryByText(answer)).not.toBeOnTheScreen();
   });
 
-  it('points to where things are now: Ayarlar on the profile', async () => {
+  it('points to where things are now: Hesap bilgileri in Ayarlar, the friend list on the profile', async () => {
     await renderWithProviders(<HelpScreen {...props} />);
 
-    expect(screen.getByText(/Profil’deki Ayarlar’dan/)).toBeOnTheScreen();
+    expect(screen.getByText(/^Hesabını Ayarlar’daki Hesap bilgileri’nden kalıcı olarak silebilirsin/)).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Arkadaşlarımla nasıl yarışırım?' }));
+    expect(screen.getByText(/^Profil’deki arkadaş sayına dokun/)).toBeOnTheScreen();
+    expect(screen.getByText(/Mesajlar’dan hazır mesaj ve VS gönderirsin\.$/)).toBeOnTheScreen();
     await fireEvent.press(
       screen.getByRole('button', { name: 'Titreşimi nasıl kapatırım?' }),
     );

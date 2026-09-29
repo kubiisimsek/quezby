@@ -4,7 +4,7 @@ import { api } from '@/api/client';
 import { useSession } from '@/auth/session';
 import { iso } from '@/i18n';
 import { useLanguage } from '@/i18n/language';
-import { SettingsSheet, keepHint } from '@/screens/profile/SettingsSheet';
+import { SettingsSheet } from '@/screens/profile/SettingsSheet';
 import { useSettings } from '@/stores/settings';
 import { buildMe } from '@/test/factories';
 import { renderWithProviders } from '@/test/renderWithProviders';
@@ -40,18 +40,28 @@ describe('SettingsSheet', () => {
     const onPick = await renderSheet();
 
     expect(screen.getByText('Ayarlar')).toBeOnTheScreen();
-    expect(screen.getByText(keepHint())).toBeOnTheScreen();
+    expect(screen.getByText('Misafir hesap')).toBeOnTheScreen();
+    // A guest has no way back in: no way out either.
     expect(screen.queryByText('Çıkış yap')).not.toBeOnTheScreen();
 
     for (const [name, door] of [
       [/^Yardım/, 'help'],
-      [/^Hesabını koru/, 'ways'],
-      [/^Hesabı sil/, 'delete'],
+      [/^Hesap bilgileri/, 'account'],
     ] as const) {
       await fireEvent.press(screen.getByRole('button', { name }));
       expect(onPick).toHaveBeenLastCalledWith(door);
     }
-    expect(onPick).toHaveBeenCalledTimes(3);
+    expect(onPick).toHaveBeenCalledTimes(2);
+  });
+
+  it('keeps the name, the ways in and deleting on Hesap bilgileri, not here', async () => {
+    await renderSheet();
+
+    expect(screen.queryByText('Kullanıcı adın')).not.toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: /^Adını seç/ })).not.toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: /^Hesabını koru/ })).not.toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: /^Giriş yolları/ })).not.toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: /^Hesabı sil/ })).not.toBeOnTheScreen();
   });
 
   it('opens with the language, named in its own words, as the first setting of the game', async () => {
@@ -69,52 +79,21 @@ describe('SettingsSheet', () => {
     expect(screen.getByText('Deutsch')).toBeOnTheScreen();
   });
 
-  it('shows a picked name locked, with no door to change it', async () => {
-    const onPick = await renderSheet();
-
-    expect(screen.getByText('Kullanıcı adın')).toBeOnTheScreen();
-    expect(screen.getByText('@ekin · kalıcı')).toBeOnTheScreen();
-    expect(screen.queryByRole('button', { name: /Kullanıcı adın/ })).not.toBeOnTheScreen();
-    expect(screen.queryByText(/değiştir/)).not.toBeOnTheScreen();
-
-    await fireEvent.press(screen.getByText('Kullanıcı adın'));
-    expect(onPick).not.toHaveBeenCalled();
-  });
-
-  it('opens the one pick while the name is still the automatic one', async () => {
-    useSession.setState({ user: buildMe({ username: 'guest48128742' }) });
-    const onPick = await renderSheet();
-
-    expect(screen.getByText('Şimdilik @guest48128742 · bir kez seçersin')).toBeOnTheScreen();
-    await fireEvent.press(screen.getByRole('button', { name: /^Adını seç/ }));
-    expect(onPick).toHaveBeenCalledWith('username');
-  });
-
-  it('asks an account with no name for one, without an empty @', async () => {
-    useSession.setState({ user: buildMe({ username: null }) });
-    await renderSheet();
-
-    expect(screen.getByRole('button', { name: /^Adını seç/ })).toBeOnTheScreen();
-    expect(screen.getByText('Henüz bir adın yok')).toBeOnTheScreen();
-    expect(screen.queryByText(/@null/)).not.toBeOnTheScreen();
-  });
-
-  it('offers a kept account its ways in and the way out', async () => {
+  it('puts Hesap bilgileri right above Çıkış yap, the last door, for a kept account', async () => {
     useSession.setState({
       user: buildMe({ isGuest: false, identities: ['google'] }),
     });
     const onPick = await renderSheet();
 
-    expect(screen.getByText('Google bağlı')).toBeOnTheScreen();
-    expect(
-      screen.getByText('Tekrar Google ile girebilirsin.'),
-    ).toBeOnTheScreen();
-    expect(screen.queryByText('Hesabını koru')).not.toBeOnTheScreen();
+    expect(screen.getByText('@ekin · Google bağlı')).toBeOnTheScreen();
+    expect(screen.getByText('Tekrar Google ile girebilirsin.')).toBeOnTheScreen();
+    const doors = screen
+      .getAllByText(/^(Dil|Yardım|Bildirimler|Engellenenler|Hesap bilgileri|Çıkış yap)$/)
+      .map((node) => node.props.children as string);
+    expect(doors.slice(-2)).toEqual(['Hesap bilgileri', 'Çıkış yap']);
 
-    await fireEvent.press(
-      screen.getByRole('button', { name: /^Giriş yolları/ }),
-    );
-    expect(onPick).toHaveBeenLastCalledWith('ways');
+    await fireEvent.press(screen.getByRole('button', { name: /^Hesap bilgileri/ }));
+    expect(onPick).toHaveBeenLastCalledWith('account');
     await fireEvent.press(screen.getByRole('button', { name: /^Çıkış yap/ }));
     expect(onPick).toHaveBeenLastCalledWith('signOut');
   });
@@ -172,7 +151,7 @@ describe('SettingsSheet', () => {
       useLanguage.setState({ locale, account: buildMe().id });
     };
 
-    it('speaks English, and still never offers to change a picked name', async () => {
+    it('speaks English', async () => {
       speak('en');
       const onPick = await renderSheet();
 
@@ -184,19 +163,13 @@ describe('SettingsSheet', () => {
       expect(
         screen.getByText('Only the device info the game needs to run is sent.'),
       ).toBeOnTheScreen();
-      expect(screen.getByText('Your username')).toBeOnTheScreen();
-      expect(screen.getByText('@ekin · permanent')).toBeOnTheScreen();
-      expect(screen.queryByText(/change/i)).not.toBeOnTheScreen();
-      expect(
-        screen.getByText('Link Apple or email and your scores stay with you, even on a new phone.'),
-      ).toBeOnTheScreen();
-      expect(screen.getByText(keepHint())).toBeOnTheScreen();
+      expect(screen.getByText('Guest account')).toBeOnTheScreen();
       expect(screen.getByText(/^Quezby .+ · Local$/)).toBeOnTheScreen();
 
       await fireEvent.press(screen.getByRole('button', { name: /^Help/ }));
       expect(onPick).toHaveBeenLastCalledWith('help');
-      await fireEvent.press(screen.getByRole('button', { name: /^Delete account/ }));
-      expect(onPick).toHaveBeenLastCalledWith('delete');
+      await fireEvent.press(screen.getByRole('button', { name: /^Account info/ }));
+      expect(onPick).toHaveBeenLastCalledWith('account');
     });
 
     it('names a kept account’s ways in and the way out in English', async () => {
@@ -206,28 +179,24 @@ describe('SettingsSheet', () => {
       });
       await renderSheet();
 
-      expect(screen.getByText('Google linked')).toBeOnTheScreen();
+      expect(screen.getByText('@ekin · Google linked')).toBeOnTheScreen();
       expect(screen.getByText('You can sign back in with Google.')).toBeOnTheScreen();
-      expect(screen.getByRole('button', { name: /^Sign-in methods/ })).toBeOnTheScreen();
+      expect(screen.getByRole('button', { name: /^Account info/ })).toBeOnTheScreen();
       expect(screen.getByRole('button', { name: /^Sign out/ })).toBeOnTheScreen();
-      expect(screen.queryByText('Protect your account')).not.toBeOnTheScreen();
     });
 
     it('speaks Arabic, a name kept whole inside its line', async () => {
       speak('ar');
-      useSession.setState({ user: buildMe({ username: 'guest48128742' }) });
+      useSession.setState({ user: buildMe({ isGuest: false, identities: ['apple'] }) });
       const onPick = await renderSheet();
 
       expect(screen.getByText('الإعدادات')).toBeOnTheScreen();
       expect(screen.getByRole('switch', { name: 'الاهتزاز' })).toBeChecked();
       expect(screen.getByRole('switch', { name: 'بيانات الاستخدام' })).toBeOnTheScreen();
-      expect(
-        screen.getByText(`حاليًا ${iso('@guest48128742')} · تختار مرة واحدة فقط`),
-      ).toBeOnTheScreen();
-      expect(screen.getByText('اربط Apple أو البريد الإلكتروني، فلا تضيع نتائجك حتى لو تغيّر هاتفك.')).toBeOnTheScreen();
+      expect(screen.getByText(`${iso('@ekin')} · مرتبط بـ Apple`)).toBeOnTheScreen();
 
-      await fireEvent.press(screen.getByRole('button', { name: /^اختر اسمك/ }));
-      expect(onPick).toHaveBeenCalledWith('username');
+      await fireEvent.press(screen.getByRole('button', { name: /^معلومات الحساب/ }));
+      expect(onPick).toHaveBeenCalledWith('account');
     });
   });
 });

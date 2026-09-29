@@ -9,11 +9,11 @@ import { useCurrentRoute } from '@/stores/route';
 /** How often the pulse is asked on the friends' screens: a line or a VS shows within seconds. */
 export const PULSE_NEAR_MS = 3_000;
 
-/** …and anywhere else in the game, for the badges and the lobby's VS card. */
+/** …and anywhere else in the game, for the badges and the lobby's VS notices. */
 export const PULSE_FAR_MS = 10_000;
 
-/** Where the inbox is what the player is looking at. */
-const NEAR = new Set(['Friends', 'Thread', 'FindFriends']);
+/** Where the inbox, a friend list or the bell's list is what the player is looking at. */
+const NEAR = new Set(['Inbox', 'Thread', 'FindFriends', 'Friends', 'Alerts']);
 
 /**
  * The inbox's heartbeat. While the game is open, and not mid-run, it asks

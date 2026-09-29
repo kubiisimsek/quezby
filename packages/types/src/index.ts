@@ -609,11 +609,57 @@ export type ThreadResponse = {
   nextBefore: number | null;
 };
 
+/** A VS waiting for the viewer to play, as the lobby shows it. */
+export type WaitingDuel = {
+  id: string;
+  /** The friend who sent it and played first. */
+  opponent: PlayerSummary;
+  /** When the chance to answer runs out. Count down with `InboxSummary.serverTime`. */
+  expiresAt: string;
+};
+
 /**
  * `GET /me/inbox`: what the badges count — requests waiting, and friends whose
- * conversation wants a look (a line unread, or a VS waiting for the viewer).
+ * conversation wants a look (a line unread, or a VS waiting for the viewer) —
+ * with the player's friend count and the VS waiting for them.
  */
-export type InboxSummary = { requests: number; threads: number; yourTurn: number };
+export type InboxSummary = {
+  requests: number;
+  threads: number;
+  yourTurn: number;
+  /** The player's friends who are not banned. */
+  friends: number;
+  /** The VS waiting for the player, the one running out first first; at most three (`yourTurn` counts them all). */
+  waiting: WaitingDuel[];
+  /** Notifications the player has not seen yet — the bell's badge (`GET /me/notifications`). */
+  notifications: number;
+  serverTime: string;
+};
+
+/**
+ * What happened to the player among friends, as the bell lists it:
+ * `friend_request` — a request waits for them; `friends` — their request was
+ * accepted; `vs_invite` — a friend sent them a VS; `vs_result` — the friend
+ * they challenged played it; `vs_declined` — turned it down; `vs_expired` —
+ * let it run out. Phrases are not here: they are the inbox's.
+ */
+export type NotificationKind = 'friend_request' | 'friends' | 'vs_invite' | 'vs_result' | 'vs_declined' | 'vs_expired';
+
+export type NotificationItem = {
+  /** `request:{username}` for a request, `message:{id}` for the rest. */
+  id: string;
+  kind: NotificationKind;
+  /** Who it is about, as the player sees them. */
+  player: PlayerSummary;
+  /** The VS a `vs_*` notification is about, as it stands now. */
+  duel: DuelBrief | null;
+  createdAt: string;
+  /** Newer than the last time the player opened the list. */
+  unseen: boolean;
+};
+
+/** `GET /me/notifications`: the newest fifty, newest first. */
+export type NotificationsResponse = { notifications: NotificationItem[]; unseen: number };
 
 /**
  * `GET /me/pulse`: a number that moves whenever the player's inbox does — a
@@ -628,6 +674,17 @@ export type SendPhraseResponse = { message: InboxMessage };
 
 /** `GET /me/friends`: fifty a page. */
 export type FriendsResponse = { friends: FriendThread[]; nextCursor: string | null };
+
+/**
+ * `GET /users/{username}/friends`: a player's friends A to Z, fifty a page —
+ * only to that player and their friends. `relation` is each one's to the viewer.
+ */
+export type FriendListResponse = {
+  friends: PlayerSummary[];
+  /** Everyone in the list, every page together. */
+  total: number;
+  nextCursor: string | null;
+};
 
 /**
  * The words one player can send a friend — never typed, always one of these
@@ -733,13 +790,19 @@ export type AnalyticsScreen =
   | 'game'
   | 'help'
   | 'daily'
-  /** The Arkadaşlar tab: requests and the inbox. `search` is finding a player. */
+  /** The Mesajlar tab: the inbox (until 2026-09-29 it held the requests too). `search` is finding a player. */
   | 'friends'
   | 'thread'
   | 'history'
   | 'avatar'
   /** A new player's step that asks whether the game may send notifications. */
-  | 'notifications';
+  | 'notifications'
+  /** A friend list: yours with the requests waiting, or a friend's. */
+  | 'friend_list'
+  /** Ayarlar → Hesap bilgileri: the name, the ways in, deleting the account. */
+  | 'account'
+  /** The bell on the lobby: requests, VS and what became of them. */
+  | 'alerts';
 
 /** A moment worth counting that the API cannot see by itself (`@quezby/config` › ANALYTICS_EVENTS). */
 export type AnalyticsEvent =
@@ -860,6 +923,8 @@ export type ApiErrorCode =
   | 'request_limit'
   /** Only between friends: a message, a VS. */
   | 'not_friends'
+  /** A player's friend list is shown to them and their friends only. */
+  | 'friends_hidden'
   /** Too many phrases to one friend today. */
   | 'message_limit'
   /** The VS was answered, declined, expired or is already open between you two. */

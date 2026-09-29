@@ -5,8 +5,9 @@ import { iso } from '@/i18n/format';
 import { plural } from '@/i18n/plural';
 
 /**
- * The profile: the player's card, the guest's nudge to keep the account, the
- * statistics, the name and delete sheets, and Ayarlar. `name` is always a
+ * The profile: the player's card and its three counters, the guest's nudge
+ * to keep the account, the statistics tile and sheet, Ayarlar and Hesap
+ * bilgileri with its name and delete sheets. `name` is always a
  * player's name as `handle` writes it (`@ekin`); `ways` a list `t.fmt.list`
  * has already joined ("Apple ve e-posta").
  */
@@ -14,7 +15,6 @@ const tr = {
   hero: {
     ribbon: 'PROFİL',
     guest: 'Misafir hesap',
-    linked: (ways: string) => `${ways} ile bağlı`,
   },
   /**
    * Under "Hesabını koru" (`t.auth.keepAccount`), out front on a guest's
@@ -36,7 +36,13 @@ const tr = {
     bestReaction: 'En iyi tepki',
     milliseconds: (ms: string) => `${ms} ms`,
     playTime: 'Oyun süresi',
+    /** The profile's tile of four; its sheet, grouped. */
+    ribbon: 'İSTATİSTİKLER',
+    open: 'Tümünü gör',
+    groups: { game: 'Oyun', moves: 'Hareketler', best: 'En iyiler' },
   },
+  /** The three numbers under the name; the friends' one opens the friend list. */
+  counters: { record: 'Rekor', friends: 'Arkadaş', runs: 'Tur' },
   combos: {
     title: 'İsimli kombolar',
     empty: 'Henüz isimli kombo yapmadın. Nasıl yapıldıkları Yardım’da.',
@@ -81,11 +87,10 @@ const tr = {
     mismatch: 'Onaylamak için kullanıcı adını aynen yaz.',
   },
   /**
-   * Ayarlar: the game's settings, Yardım, and the account's doors. A door
-   * is called what it opens: Yardım is `t.help.title`, Adını seç
-   * `pickName.title`, Giriş yolları `t.auth.ways.title`, Hesabını koru
-   * `t.auth.keepAccount`, Hesabı sil `deleteAccount.title`; the gear on the
-   * card is `settings.title`.
+   * Ayarlar: the game's settings, Yardım, the friends' two doors, and the
+   * account: Hesap bilgileri, then Çıkış yap. Hesap bilgileri shows the name
+   * (Adını seç is `pickName.title`), the ways in (`t.auth.ways`) and Hesabı
+   * sil (`deleteAccount.title`); the gear on the card is `settings.title`.
    */
   settings: {
     title: 'Ayarlar',
@@ -108,11 +113,13 @@ const tr = {
     /** A picked name, locked — never "değiştir". */
     name: 'Kullanıcı adın',
     nameLocked: (name: string) => `${name} · kalıcı`,
-    waysLinked: (ways: string) => `${ways} bağlı`,
+    accountInfo: 'Hesap bilgileri',
+    accountHint: (name: string, ways: string) => `${name} · ${ways} bağlı`,
     signOut: 'Çıkış yap',
     signOutHint: (ways: string) => `Tekrar ${ways} ile girebilirsin.`,
-    deleteHint: 'Skorların ve adın kalıcı olarak silinir.',
   },
+  /** Hesap bilgileri: its head and its two sections. */
+  account: { title: 'Hesap bilgileri', name: 'Kullanıcı adı', linked: 'Bağlı hesaplar' },
 };
 
 export type ProfileMessages = typeof tr;
@@ -121,7 +128,6 @@ const en: ProfileMessages = {
   hero: {
     ribbon: 'PROFILE',
     guest: 'Guest account',
-    linked: (ways) => `Linked with ${ways}`,
   },
   keepHint: (ways) => `Link ${ways} and your scores stay with you, even on a new phone.`,
   stats: {
@@ -132,7 +138,11 @@ const en: ProfileMessages = {
     bestReaction: 'Best reaction',
     milliseconds: (ms) => `${ms} ms`,
     playTime: 'Play time',
+    ribbon: 'STATS',
+    open: 'See all',
+    groups: { game: 'Games', moves: 'Moves', best: 'Bests' },
   },
+  counters: { record: 'Record', friends: 'Friends', runs: 'Runs' },
   combos: {
     title: 'Named combos',
     empty: "You haven't pulled off a named combo yet. Help shows you how.",
@@ -197,18 +207,18 @@ const en: ProfileMessages = {
     noName: "You don't have a name yet",
     name: 'Your username',
     nameLocked: (name) => `${name} · permanent`,
-    waysLinked: (ways) => `${ways} linked`,
+    accountInfo: 'Account info',
+    accountHint: (name, ways) => `${name} · ${ways} linked`,
     signOut: 'Sign out',
     signOutHint: (ways) => `You can sign back in with ${ways}.`,
-    deleteHint: 'Your scores and your name are deleted for good.',
   },
+  account: { title: 'Account info', name: 'Username', linked: 'Linked accounts' },
 };
 
 const de: ProfileMessages = {
   hero: {
     ribbon: 'PROFIL',
     guest: 'Gastkonto',
-    linked: (ways) => `Verknüpft mit ${ways}`,
   },
   keepHint: (ways) =>
     `Verknüpf ${ways} mit deinem Konto, dann bleiben deine Scores auch auf einem neuen Handy erhalten.`,
@@ -220,7 +230,11 @@ const de: ProfileMessages = {
     bestReaction: 'Beste Reaktion',
     milliseconds: (ms) => `${ms} ms`,
     playTime: 'Spielzeit',
+    ribbon: 'STATISTIKEN',
+    open: 'Alle ansehen',
+    groups: { game: 'Spiele', moves: 'Züge', best: 'Bestwerte' },
   },
+  counters: { record: 'Rekord', friends: 'Freunde', runs: 'Runden' },
   combos: {
     title: 'Spezialkombos',
     empty: 'Du hast noch keine Spezialkombo geschafft. Wie das geht, steht in der Hilfe.',
@@ -282,18 +296,18 @@ const de: ProfileMessages = {
     noName: 'Du hast noch keinen Namen',
     name: 'Dein Name',
     nameLocked: (name) => `${name} · dauerhaft`,
-    waysLinked: (ways) => `${ways} verknüpft`,
+    accountInfo: 'Kontoinfos',
+    accountHint: (name, ways) => `${name} · ${ways} verknüpft`,
     signOut: 'Abmelden',
     signOutHint: (ways) => `Du kannst dich wieder mit ${ways} anmelden.`,
-    deleteHint: 'Deine Scores und dein Name werden endgültig gelöscht.',
   },
+  account: { title: 'Kontoinfos', name: 'Benutzername', linked: 'Verknüpfte Konten' },
 };
 
 const ar: ProfileMessages = {
   hero: {
     ribbon: 'الملف',
     guest: 'حساب ضيف',
-    linked: (ways) => `مرتبط بـ ${ways}`,
   },
   keepHint: (ways) => `اربط ${ways}، فلا تضيع نتائجك حتى لو تغيّر هاتفك.`,
   stats: {
@@ -304,7 +318,11 @@ const ar: ProfileMessages = {
     bestReaction: 'أفضل ردّ فعل',
     milliseconds: (ms) => `${ms} مللي ثانية`,
     playTime: 'وقت اللعب',
+    ribbon: 'الإحصاءات',
+    open: 'عرض الكل',
+    groups: { game: 'اللعب', moves: 'الحركات', best: 'الأفضل' },
   },
+  counters: { record: 'الرقم القياسي', friends: 'الأصدقاء', runs: 'الجولات' },
   combos: {
     title: 'الكومبو الخاصة',
     empty: 'لم تحقق أي كومبو خاص بعد. تجد طريقة ذلك في المساعدة.',
@@ -375,18 +393,18 @@ const ar: ProfileMessages = {
     noName: 'ليس لديك اسم بعد',
     name: 'اسم المستخدم',
     nameLocked: (name) => `${iso(name)} · دائم`,
-    waysLinked: (ways) => `مرتبط بـ ${ways}`,
+    accountInfo: 'معلومات الحساب',
+    accountHint: (name, ways) => `${iso(name)} · مرتبط بـ ${ways}`,
     signOut: 'تسجيل الخروج',
     signOutHint: (ways) => `يمكنك الدخول مجددًا باستخدام ${ways}.`,
-    deleteHint: 'تُحذف نتائجك واسمك نهائيًا.',
   },
+  account: { title: 'معلومات الحساب', name: 'اسم المستخدم', linked: 'الحسابات المرتبطة' },
 };
 
 const fr: ProfileMessages = {
   hero: {
     ribbon: 'PROFIL',
     guest: 'Compte invité',
-    linked: (ways) => `Lié à ${ways}`,
   },
   keepHint: (ways) =>
     `Lie ${ways} à ton compte : tes scores te suivent même sur un nouveau téléphone.`,
@@ -398,7 +416,11 @@ const fr: ProfileMessages = {
     bestReaction: 'Meilleure réaction',
     milliseconds: (ms) => `${ms} ms`,
     playTime: 'Temps de jeu',
+    ribbon: 'STATISTIQUES',
+    open: 'Tout voir',
+    groups: { game: 'Parties', moves: 'Gestes', best: 'Records' },
   },
+  counters: { record: 'Record', friends: 'Amis', runs: 'Parties' },
   combos: {
     title: 'Combos spéciaux',
     empty: "Tu n'as encore réussi aucun combo spécial. L'Aide explique comment faire.",
@@ -460,18 +482,18 @@ const fr: ProfileMessages = {
     noName: "Tu n'as pas encore de nom",
     name: 'Ton pseudo',
     nameLocked: (name) => `${name} · définitif`,
-    waysLinked: (ways) => `Connecté avec ${ways}`,
+    accountInfo: 'Infos du compte',
+    accountHint: (name, ways) => `${name} · connecté avec ${ways}`,
     signOut: 'Se déconnecter',
     signOutHint: (ways) => `Tu pourras te reconnecter avec ${ways}.`,
-    deleteHint: 'Tes scores et ton nom sont supprimés définitivement.',
   },
+  account: { title: 'Infos du compte', name: 'Nom d’utilisateur', linked: 'Comptes liés' },
 };
 
 const es: ProfileMessages = {
   hero: {
     ribbon: 'PERFIL',
     guest: 'Cuenta de invitado',
-    linked: (ways) => `Vinculada a ${ways}`,
   },
   keepHint: (ways) =>
     `Vincula ${ways} a tu cuenta: tus puntuaciones no se pierden aunque cambies de teléfono.`,
@@ -483,7 +505,11 @@ const es: ProfileMessages = {
     bestReaction: 'Mejor reacción',
     milliseconds: (ms) => `${ms} ms`,
     playTime: 'Tiempo de juego',
+    ribbon: 'ESTADÍSTICAS',
+    open: 'Ver todo',
+    groups: { game: 'Partidas', moves: 'Movimientos', best: 'Mejores marcas' },
   },
+  counters: { record: 'Récord', friends: 'Amigos', runs: 'Partidas' },
   combos: {
     title: 'Combos especiales',
     empty: 'Aún no has logrado ningún combo especial. En Ayuda te explicamos cómo.',
@@ -550,11 +576,12 @@ const es: ProfileMessages = {
     noName: 'Aún no tienes nombre',
     name: 'Tu nombre de usuario',
     nameLocked: (name) => `${name} · permanente`,
-    waysLinked: (ways) => `Vinculada a ${ways}`,
+    accountInfo: 'Datos de la cuenta',
+    accountHint: (name, ways) => `${name} · vinculada a ${ways}`,
     signOut: 'Cerrar sesión',
     signOutHint: (ways) => `Podrás volver a entrar con ${ways}.`,
-    deleteHint: 'Tus puntuaciones y tu nombre se borran para siempre.',
   },
+  account: { title: 'Datos de la cuenta', name: 'Nombre de usuario', linked: 'Cuentas vinculadas' },
 };
 
 export const profile: Record<Locale, ProfileMessages> = { tr, en, de, ar, fr, es };

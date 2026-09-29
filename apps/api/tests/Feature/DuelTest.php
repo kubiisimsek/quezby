@@ -67,7 +67,19 @@ test('the challenger plays first; the friend is told without the score; the high
 
     // Ekin sees whose turn it is — and nothing of the score.
     $this->signIn($this->ekin);
-    $this->getJson('/api/v1/me/inbox')->assertExactJson(['requests' => 0, 'threads' => 1, 'yourTurn' => 1]);
+    $this->getJson('/api/v1/me/inbox')->assertExactJson([
+        'requests' => 0,
+        'threads' => 1,
+        'yourTurn' => 1,
+        'friends' => 1,
+        'waiting' => [[
+            'id' => $duelId,
+            'opponent' => ['username' => 'ben', 'avatarUrl' => null, 'best' => null, 'league' => null, 'relation' => 'friend'],
+            'expiresAt' => '2026-09-26T09:00:00.000Z',
+        ]],
+        'notifications' => 1,
+        'serverTime' => '2026-09-24T09:00:00.000Z',
+    ]);
     $this->getJson('/api/v1/me/threads/ben')
         ->assertJsonPath('duel.turn', 'you')
         ->assertJsonPath('duel.sent', false)

@@ -6,7 +6,7 @@ const tr = {
     leaderboard: 'Zirve',
     league: 'Lig',
     play: 'Oyna',
-    friends: 'Arkadaşlar',
+    inbox: 'Mesajlar',
     profile: 'Profil',
   },
   updateTitle: 'Güncelleme gerekli',
@@ -20,7 +20,7 @@ const tr = {
 export type NavMessages = typeof tr;
 
 const en: NavMessages = {
-  tabs: { leaderboard: 'Summit', league: 'League', play: 'Play', friends: 'Friends', profile: 'Profile' },
+  tabs: { leaderboard: 'Summit', league: 'League', play: 'Play', inbox: 'Messages', profile: 'Profile' },
   updateTitle: 'Update required',
   updateBody: (minVersion) =>
     `This version (below ${minVersion}) is no longer supported. Update to keep playing.`,
@@ -30,7 +30,7 @@ const en: NavMessages = {
 };
 
 const de: NavMessages = {
-  tabs: { leaderboard: 'Gipfel', league: 'Liga', play: 'Spielen', friends: 'Freunde', profile: 'Profil' },
+  tabs: { leaderboard: 'Gipfel', league: 'Liga', play: 'Spielen', inbox: 'Chats', profile: 'Profil' },
   updateTitle: 'Update erforderlich',
   updateBody: (minVersion) =>
     `Diese Version (unter ${minVersion}) wird nicht mehr unterstützt. Aktualisiere, um weiterzuspielen.`,
@@ -40,7 +40,7 @@ const de: NavMessages = {
 };
 
 const ar: NavMessages = {
-  tabs: { leaderboard: 'القمة', league: 'الدوري', play: 'العب', friends: 'الأصدقاء', profile: 'الملف' },
+  tabs: { leaderboard: 'القمة', league: 'الدوري', play: 'العب', inbox: 'الرسائل', profile: 'الملف' },
   updateTitle: 'التحديث مطلوب',
   updateBody: (minVersion) =>
     `هذا الإصدار (أقدم من ‎${minVersion}‎) لم يعد مدعومًا. حدّث اللعبة لتواصل اللعب.`,
@@ -50,7 +50,7 @@ const ar: NavMessages = {
 };
 
 const fr: NavMessages = {
-  tabs: { leaderboard: 'Sommet', league: 'Ligue', play: 'Jouer', friends: 'Amis', profile: 'Profil' },
+  tabs: { leaderboard: 'Sommet', league: 'Ligue', play: 'Jouer', inbox: 'Messages', profile: 'Profil' },
   updateTitle: 'Mise à jour requise',
   updateBody: (minVersion) =>
     `Cette version (antérieure à ${minVersion}) n'est plus prise en charge. Mets à jour pour continuer à jouer.`,
@@ -60,7 +60,7 @@ const fr: NavMessages = {
 };
 
 const es: NavMessages = {
-  tabs: { leaderboard: 'Cumbre', league: 'Liga', play: 'Jugar', friends: 'Amigos', profile: 'Perfil' },
+  tabs: { leaderboard: 'Cumbre', league: 'Liga', play: 'Jugar', inbox: 'Mensajes', profile: 'Perfil' },
   updateTitle: 'Actualización necesaria',
   updateBody: (minVersion) =>
     `Esta versión (anterior a ${minVersion}) ya no es compatible. Actualiza para seguir jugando.`,

@@ -62,7 +62,7 @@ Oyunun kendisi (turlar, skorlar, her post ve hareket) zaten `runs` ve
 | --- | --- | --- |
 | 1 | Zaten bilineni toplama | Tur, skor, post, arkadaşlık, mesaj, VS, lig analitik olayı değildir; oyunla ilgili sayılar mevcut tablolardan gelir. En büyük olası akış (post başına olay) baştan yoktur. |
 | 2 | Olay değil, ziyaret özeti | Telefon bir ziyareti kendi içinde toplar. Uygulama arka plana geçince **tek istek** gider: süre, ekran yolculuğu (en çok 40 adım), olay sayıları. Olay başına bir istek yerine ziyaret başına bir istek olur. |
-| 3 | Kapalı katalog | 18 ekran ve 13 an `@quezby/config`'te durur, API ile `fixtures/analytics.json` üzerinden eşlenir. Serbest metin ya da özellik yoktur. API bilmediği bir kodu atar ve `dropped` olarak sayar. |
+| 3 | Kapalı katalog | 21 ekran ve 13 an `@quezby/config`'te durur, API ile `fixtures/analytics.json` üzerinden eşlenir. Serbest metin ya da özellik yoktur. API bilmediği bir kodu atar ve `dropped` olarak sayar. |
 | 4 | Sert sınırlar | İstekte ≤ 10 ziyaret, yolculukta ≤ 40 adım, kod başına ≤ 999, telefonda bekleyen ≤ 20 ziyaret, ≤ 7 günlük ziyaret, ziyaret başına ≤ 4 saat, oyuncu başına günde ≤ 50 ziyaret. İstek sınırı dakikada 12'dir. |
 | 5 | İki kez sayma yok | Ziyaret kimliğini telefon üretir. `unique(user_id, client_id)` ve `insertOrIgnore` vardır. Önce ziyaret satırı yazılır, sonra sayaçlar: bir hata sayı kaybettirir ama asla çift saydırmaz. |
 | 6 | Katmanlı saklama, anında özet | Sayaçlar yazılırken artar, sonradan toplu işe gerek kalmaz. Ziyaretler 30 gün (en az 8), oyuncu-günleri 90 gün kalır. Anonim günlük toplamlar süresizdir, günde birkaç düzine satır. |
@@ -126,8 +126,8 @@ Diğer ayrıntılar:
   - "Ertesi gün döndü" yalnızca dünden önce katılanlar arasında hesaplanır.
 - **Ekranlar, anlar, cihazlar:** Cihazlar kayıttan gelir; izin aranmaz.
   - Ekran kodları uygulamanın rotalarıdır (`src/analytics/screens.ts`; yeni bir rota burada adlandırılmadan derlenmez).
-  - Arkadaşlarla gelenler: `friends` Arkadaşlar sekmesi (istekler ve mesaj kutusu), `search` **Arkadaş bul**, `thread` bir arkadaşla sohbet.
-  - Profille ve ilk adımlarla gelenler: `history` geçmiş oyunlar, `avatar` profil fotoğrafını çerçeveleme, `notifications` yeni oyuncunun bildirim adımı.
+  - Arkadaşlarla gelenler: `friends` Mesajlar sekmesi, yani mesaj kutusu (2026-09-29'a kadar adı Arkadaşlar'dı ve istekler de oradaydı), `friend_list` bir arkadaş listesi (oyuncunun kendi listesi bekleyen istekleriyle ya da bir arkadaşının listesi), `search` **Arkadaş bul**, `thread` bir arkadaşla sohbet, `alerts` lobideki zilin açtığı **Bildirimler** listesi (istekler, VS'ler ve sonuçları). Yeni oyuncunun bildirim izni adımı `notifications`'tır, bu değil.
+  - Profille ve ilk adımlarla gelenler: `history` geçmiş oyunlar, `avatar` profil fotoğrafını çerçeveleme, `notifications` yeni oyuncunun bildirim adımı, `account` Ayarlar → **Hesap bilgileri** (ad, giriş yolları, hesabı silme).
 - **Veri hacmi:** Her katmanın satır sayısı, en eski kaydı ve saklama süresi, bir de son 7 günde geri çevrilenler. Şişme gözle görülür.
 - **Oyuncunun Etkinlik sekmesi:**
   - 30 günlük şerit (gelmediği gün gri, kaldıkça yeşil);

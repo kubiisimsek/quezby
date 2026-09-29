@@ -21,6 +21,7 @@ use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MeController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\ModerationController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OpsController;
 use App\Http\Controllers\PushTokenController;
 use App\Http\Controllers\ReportController;
@@ -77,6 +78,8 @@ Route::prefix('v1')->group(function () {
             Route::get('me/runs/{runId}', [RunHistoryController::class, 'show'])->middleware('throttle:reads');
             Route::get('me/inbox', [InboxController::class, 'summary'])->middleware('throttle:reads');
             Route::get('me/pulse', [InboxController::class, 'pulse'])->middleware('throttle:pulse');
+            Route::get('me/notifications', [NotificationController::class, 'index'])->middleware('throttle:reads');
+            Route::post('me/notifications/seen', [NotificationController::class, 'seen'])->middleware('throttle:social');
             Route::get('me/friends', [InboxController::class, 'friends'])->middleware('throttle:reads');
             Route::get('me/threads/{username}', [InboxController::class, 'thread'])->middleware('throttle:reads');
             Route::post('me/threads/{username}/read', [InboxController::class, 'read'])->middleware('throttle:social');
@@ -103,6 +106,7 @@ Route::prefix('v1')->group(function () {
 
             Route::get('users', [UserController::class, 'search'])->middleware('throttle:search');
             Route::get('users/{username}', [UserController::class, 'show'])->middleware('throttle:reads');
+            Route::get('users/{username}/friends', [FriendController::class, 'index'])->middleware('throttle:reads');
             Route::put('users/{username}/friend', [FriendController::class, 'store'])->middleware('throttle:social');
             Route::delete('users/{username}/friend', [FriendController::class, 'destroy'])->middleware('throttle:social');
             Route::put('users/{username}/block', [BlockController::class, 'store'])->middleware('throttle:social');

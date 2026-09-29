@@ -26,6 +26,7 @@ enum ErrorCode: string
     case FriendLimit = 'friend_limit';
     case RequestLimit = 'request_limit';
     case NotFriends = 'not_friends';
+    case FriendsHidden = 'friends_hidden';
     case MessageLimit = 'message_limit';
     case DuelUnavailable = 'duel_unavailable';
     case DuelLimit = 'duel_limit';
@@ -41,7 +42,7 @@ enum ErrorCode: string
     {
         return match ($this) {
             self::Unauthenticated => 401,
-            self::Forbidden => 403,
+            self::Forbidden, self::FriendsHidden => 403,
             self::NotFound => 404,
             self::UsernameTaken, self::UsernameLocked, self::EmailTaken, self::AlreadyLinked, self::IdentityTaken, self::LastSignInMethod,
             self::RunAlreadyFinished, self::DailyAlreadyPlayed, self::AttestKeyUnknown, self::DuelUnavailable => 409,

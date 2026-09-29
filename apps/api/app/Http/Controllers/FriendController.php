@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\ErrorCode;
 use App\Exceptions\ApiException;
+use App\Http\Requests\FriendListRequest;
 use App\Models\User;
 use App\Services\PlayerDirectory;
 use App\Services\Social\FriendService;
@@ -18,6 +19,25 @@ class FriendController extends Controller
         private readonly FriendService $friends,
         private readonly PlayerDirectory $players,
     ) {}
+
+    /**
+     * `FriendListResponse`: a player's friends A to Z, as the viewer sees
+     * them — only to that player and their friends.
+     */
+    public function index(FriendListRequest $request, string $username, #[CurrentUser] User $user): JsonResponse
+    {
+        $owner = $this->players->find($username, $user) ?? throw ApiException::of(ErrorCode::NotFound);
+        if (! $this->friends->canSeeFriends($user, $owner)) {
+            throw ApiException::of(ErrorCode::FriendsHidden);
+        }
+        $list = $this->friends->listOf($owner, $user, $request->afterUsername());
+
+        return response()->json([
+            'friends' => $this->players->summaries($user, $list['friends']),
+            'total' => $list['total'],
+            'nextCursor' => $list['nextCursor'],
+        ]);
+    }
 
     /** Sends a request, or accepts theirs. Idempotent — `RelationResponse`. */
     public function store(string $username, #[CurrentUser] User $user): JsonResponse

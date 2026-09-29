@@ -12,10 +12,10 @@ an app. Arena is drawn the way games are.
 Quezby is a game, so it looks like one: a night arena instead of a canvas,
 slabs that sink under the thumb instead of flat buttons, tiles with an
 outline and a lip instead of cards with a soft shadow, titles set in a heavy
-face on a hard shadow, gold for the one thing that starts a game. The rules
-below come from how the games players already know are built — Duolingo's
-3D buttons, Clash Royale's and Brawl Stars' lobbies, docks and ladders — and
-the research behind them is summarised at the end.
+face on a hard shadow, gold for the one thing that starts a game. The
+toolkit — 3D buttons, outlines, docks and ladders — is the one games share;
+the lobby itself is Quezby's own, drawn from what the game is about: the
+phone habit. The research behind it is summarised at the end.
 
 ---
 
@@ -168,11 +168,12 @@ run it again; never touch an exported PNG.
 | Surface | What it is |
 | --- | --- |
 | `Screen` / `Arena` | The night every screen stands on |
-| `BrandBand` | The stage: magenta running into violet with lanes across it, for a hero — the lobby's event, a podium, a result |
+| `BrandBand` | The stage: magenta running into violet with lanes across it, for a hero — the daily's stage, a podium, a result, the profile's banner |
 | `Panel` / `Card` | A tile; `primary` is your own, `sunken` is a well |
 | `Slab` | Anything pressable that is not a row: face + lip + outline + gloss |
 | `TopBar` | A screen's head, drawn on the arena. **There are no navigation bars.** |
 | The dock | The bottom bar: five slots, the lobby in the middle as a gold play slab standing out of it; a slot with news wears a red count |
+| The lobby | A lock screen: the season best where the time would be, the places under it, what waits as equal notices (`NoticeCard`), and the gold unlock slab (`SwipePlay`) above the dock |
 
 No iOS list rows with chevrons on main surfaces: a row that opens something
 ends in a small arrow slab (`ArrowNub`), and rarely used settings live in a
@@ -190,8 +191,9 @@ sheet.
    lands in ~100 ms, transitions in 200–300 ms, stamps ~100 ms apart; a long
    celebration can be skipped with a tap.
 4. **What loops:** a playing reel (it is live), the lobby's play slab — it
-   breathes 1 → 1.04 → 1, 1.6 s each way, and a glint crosses it every few
-   seconds, because the game is waiting — and nothing else. Loops pause while
+   breathes 1 → 1.04 → 1, 1.6 s each way, a glint crosses it every few
+   seconds and the unlock chevrons over it climb on the same breath, because
+   the game is waiting — and nothing else. Loops pause while
    covered: a reel under a coach card holds still, since it is not live yet.
    The coach card's hand acts its move out **twice** and rests on the last
    frame — a demonstration, not a loop.
@@ -215,9 +217,15 @@ great deal and needs a native module — a separate decision.
   lip in a darker shade), thick dark outlines, a lit top edge, white display
   text on a hard shadow, ribbons for titles, one accent kept for the main
   action (Clash Royale's yellow "Battle").
-- Lobbies put status at the top, the event in the middle, the main action in
-  the thumb's reach and a fixed dock at the bottom with the play slot raised
-  in the centre (Clash Royale, Brawl Stars, Stumble Guys).
+- The lobby is not borrowed from another game (2026-09-29). Quezby turns the
+  phone habit into a game, so its lobby is drawn as the phone's lock screen:
+  the season best where the clock stands, the places under it like the date,
+  and whatever waits — a friend's VS, today's feed, the league, the rival —
+  as notifications of one size, so none of them fills the screen (the daily
+  used to take two thirds of it and made the game look empty without it).
+  The one gold action is the unlock: "Yukarı kaydır, oyna", tapped or swiped
+  up — the move the whole feed is made of. The dock stays fixed below with
+  the play slot raised in the centre.
 - Ladders that centre on *you* and the player just above you retain better
   than "top players" boards; demotion pressure brings players back more
   reliably than promotion (Duolingo leagues). "Geç onu" is that pattern.

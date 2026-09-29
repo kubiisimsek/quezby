@@ -15,7 +15,7 @@ import { useMe } from '@/hooks/useMe';
 import { usePendingRunSender } from '@/hooks/usePendingRunSender';
 import { usePulse } from '@/hooks/usePulse';
 import { usePushEvents, usePushRegistration } from '@/hooks/usePush';
-import { inboxCount, useInboxSummary } from '@/hooks/useSocial';
+import { useInboxSummary } from '@/hooks/useSocial';
 import { useLanguage, useT } from '@/i18n';
 import { messageFor } from '@/lib/errors';
 import { gateFor } from '@/navigation/gate';
@@ -26,6 +26,7 @@ import { LoginScreen } from '@/screens/auth/LoginScreen';
 import { DailyScreen } from '@/screens/daily/DailyScreen';
 import { FindFriendsScreen } from '@/screens/friends/FindFriendsScreen';
 import { FriendsScreen } from '@/screens/friends/FriendsScreen';
+import { InboxScreen } from '@/screens/friends/InboxScreen';
 import { ThreadScreen } from '@/screens/friends/ThreadScreen';
 import { GameScreen } from '@/screens/game/GameScreen';
 import { HelpScreen } from '@/screens/help/HelpScreen';
@@ -35,6 +36,8 @@ import { LeaderboardScreen } from '@/screens/leaderboard/LeaderboardScreen';
 import { LeagueScreen } from '@/screens/league/LeagueScreen';
 import { NotificationsScreen } from '@/screens/onboarding/NotificationsScreen';
 import { ProtectScreen } from '@/screens/onboarding/ProtectScreen';
+import { AlertsScreen } from '@/screens/alerts/AlertsScreen';
+import { AccountScreen } from '@/screens/profile/AccountScreen';
 import { AvatarEditorScreen } from '@/screens/profile/AvatarEditorScreen';
 import { ProfileScreen } from '@/screens/profile/ProfileScreen';
 import { UsernameScreen } from '@/screens/username/UsernameScreen';
@@ -62,7 +65,8 @@ const onScreen = () => {
 function TabsShell() {
   const { tabs } = useT().nav;
   const inbox = useInboxSummary();
-  const waiting = inboxCount(inbox.data);
+  // Conversations wanting a look and requests waiting: both live on Mesajlar.
+  const waiting = (inbox.data?.threads ?? 0) + (inbox.data?.requests ?? 0);
   return (
     <Tabs.Navigator
       initialRouteName="Home"
@@ -73,9 +77,9 @@ function TabsShell() {
       <Tabs.Screen name="League" component={LeagueScreen} options={tab(tabs.league, 'shield')} />
       <Tabs.Screen name="Home" component={HomeScreen} options={tab(tabs.play, 'play')} />
       <Tabs.Screen
-        name="Friends"
-        component={FriendsScreen}
-        options={{ ...tab(tabs.friends, 'users'), tabBarBadge: waiting > 0 ? waiting : undefined }}
+        name="Inbox"
+        component={InboxScreen}
+        options={{ ...tab(tabs.inbox, 'message'), tabBarBadge: waiting > 0 ? waiting : undefined }}
       />
       <Tabs.Screen name="Profile" component={ProfileScreen} options={tab(tabs.profile, 'account')} />
     </Tabs.Navigator>
@@ -139,12 +143,13 @@ export function RootNavigator() {
   }, [gate]);
 
   // A tapped notification opens what it is about once the game is up: a
-  // request, the friends tab; anything else, that friend's conversation.
+  // request, the bell's list (it answers there); anything else, that
+  // friend's conversation.
   useEffect(() => {
     if (!opened || gate !== 'game' || !navigationRef.isReady()) return;
     usePush.getState().consumed();
     if (opened.kind === 'friend_request') {
-      navigationRef.navigate('Tabs', { screen: 'Friends' });
+      navigationRef.navigate('Alerts');
     } else {
       navigationRef.navigate('Thread', { username: opened.username });
     }
@@ -227,6 +232,14 @@ export function RootNavigator() {
             <Stack.Screen name="Daily" component={DailyScreen} />
             <Stack.Screen name="FindFriends" component={FindFriendsScreen} />
             <Stack.Screen name="Thread" component={ThreadScreen} />
+            <Stack.Screen
+              name="Friends"
+              component={FriendsScreen}
+              // Yours and a friend's are two screens: opening one never replaces the other.
+              getId={({ params }) => params?.username ?? 'me'}
+            />
+            <Stack.Screen name="Account" component={AccountScreen} />
+            <Stack.Screen name="Alerts" component={AlertsScreen} />
             <Stack.Screen name="History" component={HistoryScreen} />
             <Stack.Screen name="AvatarEditor" component={AvatarEditorScreen} options={{ gestureEnabled: false }} />
           </>

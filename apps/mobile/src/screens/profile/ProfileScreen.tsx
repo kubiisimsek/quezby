@@ -1,32 +1,26 @@
-import { postsOf } from '@quezby/config';
-import type { LeagueTier, Me, Ranks } from '@quezby/types';
+import type { LeagueTier, Me, PlayerStats, Ranks } from '@quezby/types';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { CompositeScreenProps } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useQueryClient } from '@tanstack/react-query';
-import { useMemo, useRef, useState } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { api } from '@/api/client';
 import { useSession } from '@/auth/session';
 import { BlockedSheet } from '@/components/BlockedSheet';
-import { Portrait, SeasonBest } from '@/components/PlayerCard';
+import { Portrait } from '@/components/PlayerCard';
 import { CredentialsSheet } from '@/components/CredentialsSheet';
 import { LanguageSheet } from '@/components/LanguageSheet';
 import { NotificationsSheet } from '@/components/NotificationsSheet';
-import { SignInWaysSheet, signInWays } from '@/components/SignInWaysSheet';
-import { UsernameField } from '@/components/UsernameField';
-import { BONUS_ORDER } from '@/game/howTo';
+import { SignInWaysSheet } from '@/components/SignInWaysSheet';
 import { useRemoveAvatar } from '@/hooks/useAvatar';
 import { useLeague, useStats } from '@/hooks/useBoards';
-import { rememberMe } from '@/hooks/useMe';
 import { forgetPush } from '@/hooks/usePush';
-import { useUsernameCheck } from '@/hooks/useUsernameCheck';
-import { handle, useLocale, useT } from '@/i18n';
+import { useInboxSummary } from '@/hooks/useSocial';
+import { handle, useT } from '@/i18n';
 import { SHRINK_TO_FIT } from '@/i18n/native';
 import { messageFor } from '@/lib/errors';
-import { dropPushToken } from '@/lib/push';
 import { pickPhoto } from '@/lib/photoPicker';
 import type { RootStackParamList, TabParamList } from '@/navigation/types';
 import {
@@ -34,15 +28,13 @@ import {
   keepHint,
   type SettingsDoor,
 } from '@/screens/profile/SettingsSheet';
+import { StatsSheet, headlines } from '@/screens/profile/StatsSheet';
 import {
   ArrowNub,
-  BonusChip,
   BrandBand,
   Button,
   Callout,
-  Divider,
-  Eyebrow,
-  Field,
+  Counters,
   IconButton,
   IconChip,
   LobbyCard,
@@ -50,24 +42,14 @@ import {
   RankChips,
   Ribbon,
   Screen,
-  SkeletonList,
+  Skeleton,
   Stamp,
-  StatGrid,
   Tag,
   TierBadge,
   Txt,
 } from '@/ui/kit';
-import { ActionSheet, FormSheet } from '@/ui/sheet';
-import {
-  DEPTH,
-  RADIUS,
-  SPACE,
-  TYPE,
-  embossed,
-  useTheme,
-  withAlpha,
-} from '@/ui/theme';
-import { reel as REEL } from '@/ui/tokens';
+import { ActionSheet } from '@/ui/sheet';
+import { DEPTH, RADIUS, SPACE, TYPE, embossed, useTheme } from '@/ui/theme';
 
 type Props = CompositeScreenProps<
   BottomTabScreenProps<TabParamList, 'Profile'>,
@@ -77,13 +59,12 @@ type Props = CompositeScreenProps<
 type SheetName =
   | 'settings'
   | 'language'
-  | 'username'
   | 'ways'
   | 'credentials'
-  | 'delete'
   | 'notifications'
   | 'blocked'
   | 'photo'
+  | 'stats'
   | null;
 
 /** What waits for the open sheet to leave the screen: another sheet, or a door out. */
@@ -93,13 +74,15 @@ type Next = Exclude<SheetName, 'settings' | null> | SettingsDoor;
 const PORTRAIT_RISE = 46;
 
 /**
- * The player's card, the way a game shows one: who you are — your photo,
- * changed from the camera slab on it — your league, your season best and
- * places; the door to every game you played; then every count the API
- * keeps, the named combos you have pulled off and the friends' posts you
- * liked most. What is opened now and then — the language, Titreşim, Yardım,
- * notifications, blocked players, the account's doors — waits in Ayarlar
- * behind the gear; a guest's nudge to keep the account stays out front.
+ * The player's card, kept short: who you are — your photo, changed from the
+ * camera slab on it — and three numbers under your name, as a profile shows
+ * them: your season best, your friends (the door to the list, with the
+ * requests waiting), your runs; your places; then one tile with the
+ * statistics that matter most (the rest in a sheet) and the door to every
+ * game you played. What is opened now and then — the language, Titreşim,
+ * Yardım, notifications, blocked players, Hesap bilgileri — waits in
+ * Ayarlar behind the gear; a guest's nudge to keep the account stays out
+ * front.
  */
 export function ProfileScreen({ navigation }: Props) {
   const t = useT();
@@ -107,6 +90,8 @@ export function ProfileScreen({ navigation }: Props) {
   const user = useSession((state) => state.user);
   const ranks = useSession((state) => state.ranks);
   const league = useLeague();
+  const inbox = useInboxSummary();
+  const stats = useStats();
   const removePhoto = useRemoveAvatar();
   const [sheet, setSheet] = useState<SheetName>(null);
   const [photoFailed, setPhotoFailed] = useState(false);
@@ -126,6 +111,8 @@ export function ProfileScreen({ navigation }: Props) {
     next.current = null;
     if (then === 'help') {
       navigation.navigate('Help');
+    } else if (then === 'account') {
+      navigation.navigate('Account');
     } else if (then === 'signOut') {
       // Both calls leave with the session's token, before it is gone.
       forgetPush();
@@ -147,6 +134,11 @@ export function ProfileScreen({ navigation }: Props) {
     }
   };
 
+  const counts = stats.data?.stats;
+  const friends = inbox.data?.friends;
+  const requests = inbox.data?.requests ?? 0;
+  const words = t.profile.counters;
+
   return (
     <Screen>
       <ScrollView
@@ -162,6 +154,32 @@ export function ProfileScreen({ navigation }: Props) {
           tier={league.data && !league.data.unlock ? league.data.tier : null}
           onSettings={() => setSheet('settings')}
           onPhoto={() => setSheet('photo')}
+          counters={
+            <Counters
+              items={[
+                {
+                  label: words.record,
+                  value: user.best ? t.fmt.score(user.best.score) : '—',
+                  gold: Boolean(user.best),
+                },
+                {
+                  label: words.friends,
+                  value: friends === undefined ? '—' : t.fmt.score(friends),
+                  badge: requests,
+                  // The friends' side of Mesajlar: the search, the requests, the list.
+                  onPress: () => navigation.navigate('Inbox', { segment: 'friends' }),
+                  accessibilityLabel:
+                    requests > 0
+                      ? t.kit.iconButton.badge(t.friends.sheet.friends(friends ?? 0), requests)
+                      : t.friends.sheet.friends(friends ?? 0),
+                },
+                {
+                  label: words.runs,
+                  value: counts ? t.fmt.score(counts.runs) : '—',
+                },
+              ]}
+            />
+          }
         />
 
         {photoFailed || removePhoto.isError ? (
@@ -173,14 +191,39 @@ export function ProfileScreen({ navigation }: Props) {
         {user.isGuest ? <KeepNudge onPress={() => setSheet('ways')} /> : null}
 
         <LobbyCard
+          title={t.profile.stats.open}
+          eyebrow={t.profile.stats.ribbon}
+          icon="grid"
+          tone="primary"
+          onPress={() => setSheet('stats')}
+        >
+          {counts ? (
+            <StatHeadlines stats={counts} />
+          ) : stats.isError ? (
+            <>
+              <Txt variant="meta" tone="muted">
+                {messageFor(stats.error, t)}
+              </Txt>
+              <Button
+                label={t.profile.stats.retry}
+                tone="neutral"
+                size="sm"
+                icon="refresh"
+                onPress={() => void stats.refetch()}
+              />
+            </>
+          ) : (
+            <Skeleton height={52} />
+          )}
+        </LobbyCard>
+
+        <LobbyCard
           title={t.history.door.title}
           eyebrow={t.history.door.eyebrow}
           icon="history"
           tone="secondary"
           onPress={() => navigation.navigate('History')}
         />
-
-        <Statistics />
       </ScrollView>
 
       <SettingsSheet
@@ -189,12 +232,8 @@ export function ProfileScreen({ navigation }: Props) {
         onClosed={settle}
         onPick={leaveFor}
       />
+      <StatsSheet open={sheet === 'stats'} onClose={() => setSheet(null)} />
       <LanguageSheet open={sheet === 'language'} onClose={() => setSheet(null)} />
-      <UsernameSheet
-        open={sheet === 'username'}
-        current={user.username}
-        onClose={() => setSheet(null)}
-      />
       <SignInWaysSheet
         open={sheet === 'ways'}
         onClose={() => setSheet(null)}
@@ -204,11 +243,6 @@ export function ProfileScreen({ navigation }: Props) {
       <CredentialsSheet
         open={sheet === 'credentials'}
         guest={user.isGuest}
-        onClose={() => setSheet(null)}
-      />
-      <DeleteSheet
-        open={sheet === 'delete'}
-        username={user.username ?? ''}
         onClose={() => setSheet(null)}
       />
       <NotificationsSheet open={sheet === 'notifications'} onClose={() => setSheet(null)} />
@@ -243,20 +277,21 @@ export function ProfileScreen({ navigation }: Props) {
 
 /**
  * Your card: a banner in the brand's stage with the gear on it, your
- * portrait rising out of it, your name, league and how the account is
- * kept, then the season best in gold and your place on each board — all of
- * it the API's.
+ * portrait rising out of it, your name and league, your three numbers and
+ * your place on each board — all of it the API's.
  */
 function PlayerHero({
   user,
   ranks,
   tier,
+  counters,
   onSettings,
   onPhoto,
 }: {
   user: Me;
   ranks: Ranks | null;
   tier: LeagueTier | null;
+  counters: ReactNode;
   onSettings: () => void;
   /** The camera slab on the portrait: pick a photo, or take it away. */
   onPhoto: () => void;
@@ -265,7 +300,6 @@ function PlayerHero({
   const t = useT();
   const words = t.profile.hero;
   const periods = t.board.summit.periods;
-  const ways = signInWays(user, t);
 
   return (
     <Panel tone="primary" style={styles.hero}>
@@ -297,19 +331,13 @@ function PlayerHero({
         >
           {handle(user.username ?? '')}
         </Text>
-        <View style={styles.badges}>
-          {tier ? <TierBadge tier={tier} size="md" showLabel /> : null}
-          {user.isGuest ? (
-            <Tag label={words.guest} tone="warn" icon="alert" />
-          ) : (
-            <Tag
-              label={user.email ?? words.linked(t.fmt.list(ways, 'and'))}
-              tone="ok"
-              icon="shield"
-            />
-          )}
-        </View>
-        <SeasonBest best={user.best} delay={140} />
+        {tier || user.isGuest ? (
+          <View style={styles.badges}>
+            {tier ? <TierBadge tier={tier} size="md" showLabel /> : null}
+            {user.isGuest ? <Tag label={words.guest} tone="warn" icon="alert" /> : null}
+          </View>
+        ) : null}
+        <View style={styles.stretch}>{counters}</View>
         <View style={styles.stretch}>
           <RankChips
             items={[
@@ -321,6 +349,29 @@ function PlayerHero({
         </View>
       </View>
     </Panel>
+  );
+}
+
+/** The four numbers the statistics tile shows, two by two; the sheet has the rest. */
+function StatHeadlines({ stats }: { stats: PlayerStats }) {
+  const t = useT();
+  const best = headlines(stats, t);
+  const counted = t.friends.sheet.stats;
+  return (
+    <View style={styles.headlines}>
+      <Counters
+        items={[
+          { label: counted.posts, value: best.posts },
+          { label: counted.perfects, value: best.perfects },
+        ]}
+      />
+      <Counters
+        items={[
+          { label: t.profile.stats.bestReaction, value: best.reaction },
+          { label: t.result.stats.maxCombo, value: best.combo },
+        ]}
+      />
+    </View>
   );
 }
 
@@ -357,315 +408,6 @@ function KeepNudge({ onPress }: { onPress: () => void }) {
   );
 }
 
-/**
- * What the player has played, as the API's replays counted it: the lifetime
- * numbers, the named combos they have pulled off, and the friends' posts
- * they liked most — known on the phone by id, drawn from the content catalog.
- */
-function Statistics() {
-  const t = useT();
-  const words = t.profile.stats;
-  /** The counts a player card shows too, in the card's words. */
-  const counted = t.friends.sheet.stats;
-  const stats = useStats();
-  const posts = useMemo(() => postsOf(), []);
-  const locale = useLocale();
-
-  if (stats.isLoading) {
-    return (
-      <>
-        <Eyebrow icon="grid">{words.title}</Eyebrow>
-        <SkeletonList rows={2} />
-      </>
-    );
-  }
-
-  if (!stats.data) {
-    return (
-      <>
-        <Eyebrow icon="grid">{words.title}</Eyebrow>
-        <Callout tone="bad" title={words.failed}>
-          {messageFor(stats.error, t)}
-        </Callout>
-        <Button
-          label={words.retry}
-          tone="neutral"
-          icon="refresh"
-          onPress={() => void stats.refetch()}
-        />
-      </>
-    );
-  }
-
-  const { stats: counts, topLiked } = stats.data;
-  const combos = BONUS_ORDER.filter((kind) => counts.bonuses[kind] > 0);
-  const liked = topLiked.slice(0, 5).flatMap((item) => {
-    const post = posts.get(item.contentId);
-    return post ? [{ ...item, post }] : [];
-  });
-
-  return (
-    <>
-      <Eyebrow icon="grid">{words.title}</Eyebrow>
-      <StatGrid
-        items={[
-          { label: counted.runs, value: t.fmt.score(counts.runs), icon: 'play' },
-          { label: counted.posts, value: t.fmt.score(counts.reels), icon: 'grid' },
-          {
-            label: words.swipes,
-            value: t.fmt.score(counts.swipes),
-            icon: 'arrowUp',
-          },
-          {
-            label: counted.likes,
-            value: t.fmt.score(counts.likes),
-            icon: 'heart',
-            tone: 'primary',
-          },
-          {
-            label: counted.perfects,
-            value: t.fmt.score(counts.perfects),
-            icon: 'star',
-            tone: 'warn',
-          },
-          {
-            label: words.bestReaction,
-            value:
-              counts.bestReactionMs === null
-                ? '—'
-                : words.milliseconds(t.fmt.score(counts.bestReactionMs)),
-            icon: 'bolt',
-            tone: 'warn',
-          },
-          {
-            label: words.playTime,
-            value: t.fmt.playTime(counts.activeMs),
-            icon: 'clock',
-          },
-          {
-            label: t.result.stats.maxCombo,
-            value: counts.maxCombo > 0 ? t.fmt.combo(counts.maxCombo) : '—',
-            icon: 'flame',
-            tone: 'primary',
-          },
-        ]}
-      />
-
-      <Eyebrow icon="sparkle">{t.profile.combos.title}</Eyebrow>
-      <Panel style={styles.section}>
-        {combos.length > 0 ? (
-          <View style={styles.chips}>
-            {combos.map((kind) => (
-              <BonusChip key={kind} kind={kind} count={counts.bonuses[kind]} />
-            ))}
-          </View>
-        ) : (
-          <Txt variant="meta" tone="muted">
-            {t.profile.combos.empty}
-          </Txt>
-        )}
-      </Panel>
-
-      <Eyebrow icon="heart">{t.profile.liked.title}</Eyebrow>
-      <Panel style={styles.section}>
-        {liked.length > 0 ? (
-          liked.map((item, index) => (
-            <View key={item.contentId} style={styles.section}>
-              {index > 0 ? <Divider /> : null}
-              <LikedPost
-                emoji={item.post.emoji}
-                user={item.post.user[locale]}
-                caption={item.post.caption[locale]}
-                likes={item.likes}
-              />
-            </View>
-          ))
-        ) : (
-          <Txt variant="meta" tone="muted">
-            {t.profile.liked.empty}
-          </Txt>
-        )}
-      </Panel>
-    </>
-  );
-}
-
-/**
- * One of the posts liked most: the post as a little pink reel — a friend's
- * post is a like reel in the feed — with its account, caption and how many
- * times you liked it.
- */
-function LikedPost({
-  emoji,
-  user,
-  caption,
-  likes,
-}: {
-  emoji: string;
-  user: string;
-  caption: string;
-  likes: number;
-}) {
-  const theme = useTheme();
-  const t = useT();
-  return (
-    <View style={styles.post}>
-      <View
-        style={[
-          styles.thumb,
-          { backgroundColor: REEL.like, borderColor: theme.outline },
-        ]}
-      >
-        <View
-          pointerEvents="none"
-          style={[
-            styles.thumbShine,
-            { backgroundColor: withAlpha(theme.onBrand, 0.16) },
-          ]}
-        />
-        <Text style={styles.emoji}>{emoji}</Text>
-      </View>
-      <View style={styles.flex}>
-        <Txt variant="heading" numberOfLines={1}>
-          {user}
-        </Txt>
-        <Txt variant="meta" tone="muted" numberOfLines={2}>
-          {caption}
-        </Txt>
-      </View>
-      <Tag label={t.profile.liked.times(likes)} tone="primary" icon="heart" />
-    </View>
-  );
-}
-
-/**
- * The player's one pick of a name, over the automatic one (`guest48128742`)
- * — Ayarlar only opens it while the name can still be picked. What is saved
- * here never changes, and the sheet says so before it is saved.
- */
-function UsernameSheet({
-  open,
-  current,
-  onClose,
-}: {
-  open: boolean;
-  current: string | null;
-  onClose: () => void;
-}) {
-  const t = useT();
-  const words = t.profile.pickName;
-  const [value, setValue] = useState('');
-  const [pending, setPending] = useState(false);
-  /** What went wrong, kept as it came — its words are read in the language of the moment. */
-  const [failure, setFailure] = useState<{ error: unknown } | null>(null);
-  const check = useUsernameCheck(value, current);
-  const queryClient = useQueryClient();
-
-  const ready = check.state === 'available' || check.state === 'unknown';
-
-  const save = async () => {
-    if (check.state !== 'available' && check.state !== 'unknown') return;
-    setPending(true);
-    setFailure(null);
-    try {
-      const { user } = await api.me.updateUsername(check.normalized);
-      rememberMe(user);
-      void queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
-      onClose();
-    } catch (caught) {
-      setFailure({ error: caught });
-    } finally {
-      setPending(false);
-    }
-  };
-
-  return (
-    <FormSheet
-      open={open}
-      onClose={onClose}
-      title={words.title}
-      description={
-        current ? words.description(handle(current)) : words.descriptionNoName
-      }
-      onSubmit={() => void save()}
-      pending={pending}
-      disabled={!ready}
-      error={failure ? messageFor(failure.error, t) : null}
-    >
-      <UsernameField value={value} onChange={setValue} check={check} />
-    </FormSheet>
-  );
-}
-
-function DeleteSheet({
-  open,
-  username,
-  onClose,
-}: {
-  open: boolean;
-  username: string;
-  onClose: () => void;
-}) {
-  const t = useT();
-  const words = t.profile.deleteAccount;
-  const [typed, setTyped] = useState('');
-  const [pending, setPending] = useState(false);
-  /**
-   * What went wrong, kept as it came — the name typed wrong, or the API's
-   * answer — and put in words in the language of the moment.
-   */
-  const [failure, setFailure] = useState<'mismatch' | { error: unknown } | null>(null);
-  // The label shows the name as `@ekin`: typed with or without its `@`, it confirms.
-  const confirmed = typed.trim().toLowerCase().replace(/^@/, '') === username;
-
-  const remove = async () => {
-    if (!confirmed) {
-      setFailure('mismatch');
-      return;
-    }
-    setPending(true);
-    setFailure(null);
-    try {
-      await api.me.delete();
-      // The account's tokens went with it; the phone's own is thrown away too.
-      void dropPushToken();
-      onClose();
-      await useSession.getState().signOut();
-    } catch (caught) {
-      setFailure({ error: caught });
-      setPending(false);
-    }
-  };
-
-  const error =
-    failure === 'mismatch' ? words.mismatch : failure ? messageFor(failure.error, t) : null;
-
-  return (
-    <FormSheet
-      open={open}
-      onClose={onClose}
-      title={words.title}
-      description={words.description}
-      submitLabel={words.submit}
-      submitIcon="trash"
-      submitTone="danger"
-      onSubmit={() => void remove()}
-      pending={pending}
-      disabled={!confirmed}
-      error={error}
-    >
-      <Field
-        label={words.confirm(handle(username))}
-        value={typed}
-        onChangeText={setTyped}
-        autoCapitalize="none"
-        autoCorrect={false}
-        placeholder={username}
-      />
-    </FormSheet>
-  );
-}
-
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   content: {
@@ -699,6 +441,7 @@ const styles = StyleSheet.create({
     gap: SPACE.sm,
     justifyContent: 'center',
   },
+  headlines: { gap: SPACE.sm },
   nudge: {
     alignItems: 'center',
     borderBottomWidth: DEPTH.outline + DEPTH.lipSm,
@@ -711,25 +454,4 @@ const styles = StyleSheet.create({
   },
   nudgeEdge: { height: 3, left: 0, position: 'absolute', right: 0, top: 0 },
   sunk: { transform: [{ translateY: 3 }] },
-  section: { gap: SPACE.ms },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACE.sm },
-  post: { alignItems: 'center', flexDirection: 'row', gap: SPACE.md },
-  thumb: {
-    alignItems: 'center',
-    borderBottomWidth: DEPTH.outline + 3,
-    borderRadius: 12,
-    borderWidth: DEPTH.outline,
-    height: 64,
-    justifyContent: 'center',
-    overflow: 'hidden',
-    width: 48,
-  },
-  thumbShine: {
-    height: '40%',
-    left: 0,
-    position: 'absolute',
-    right: 0,
-    top: 0,
-  },
-  emoji: { fontSize: 28, lineHeight: 34 },
 });

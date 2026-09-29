@@ -128,6 +128,7 @@ export function Button({
   disabled,
   loading,
   icon,
+  accessibilityLabel,
   style,
 }: {
   label: string;
@@ -137,6 +138,8 @@ export function Button({
   disabled?: boolean;
   loading?: boolean;
   icon?: IconName;
+  /** What a screen reader says, when the short label needs its context — "Günün akışını oyna" for "Oyna". */
+  accessibilityLabel?: string;
   style?: StyleProp<ViewStyle>;
 }) {
   const theme = useTheme();
@@ -147,6 +150,7 @@ export function Button({
     return (
       <AnimatedPressable
         accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel}
         accessibilityState={{ disabled: inactive }}
         onPress={onPress}
         onPressIn={press.onPressIn}
@@ -183,7 +187,7 @@ export function Button({
       lip={lip}
       onPress={onPress}
       disabled={inactive}
-      accessibilityLabel={label}
+      accessibilityLabel={accessibilityLabel ?? label}
       accessibilityState={{ busy: Boolean(loading) }}
       style={[{ opacity: disabled && !loading ? 0.5 : 1 }, style]}
       faceStyle={[
@@ -229,41 +233,58 @@ export function Button({
 
 /**
  * A glyph-only action: a small square slab. `onBrand` on a brand band,
- * `neutral` on the arena. The label is never shown; it is what a screen
- * reader says.
+ * `neutral` on the arena; `ok` and `danger` are the green yes and the red no
+ * of an answer — a VS on the lobby. The label is never shown; it is what a
+ * screen reader says.
  */
 export function IconButton({
   icon,
   label,
   onPress,
   tone = 'neutral',
+  size = 'md',
   badge = 0,
+  loading,
+  disabled,
   style,
 }: {
   icon: IconName;
   label: string;
   onPress: () => void;
-  tone?: 'onBrand' | 'neutral';
+  tone?: 'onBrand' | 'neutral' | 'ok' | 'danger';
+  /** `md` is 42pt; `sm`, 34pt, sits inside a row. */
+  size?: 'md' | 'sm';
   /** A count on the corner. Hidden at 0, `9+` past nine. */
   badge?: number;
+  loading?: boolean;
+  disabled?: boolean;
   style?: StyleProp<ViewStyle>;
 }) {
   const theme = useTheme();
   const t = useT();
-  const colors = buttonColors(theme, tone === 'onBrand' ? 'secondary' : 'neutral');
+  const colors = iconColors(theme, tone);
+  const small = size === 'sm';
+  const inactive = Boolean(disabled || loading);
 
   return (
     <View style={style}>
       <Slab
         colors={colors}
-        radius={RADIUS.control - 2}
+        radius={RADIUS.control - (small ? 4 : 2)}
         lip={DEPTH.lipSm}
         onPress={onPress}
-        hitSlop={8}
+        disabled={inactive}
+        hitSlop={small ? 6 : 8}
         accessibilityLabel={badge > 0 ? t.kit.iconButton.badge(label, badge) : label}
-        faceStyle={styles.square}
+        accessibilityState={{ disabled: inactive, busy: Boolean(loading) }}
+        style={disabled && !loading ? styles.dim : null}
+        faceStyle={small ? styles.squareSm : styles.square}
       >
-        <Icon name={icon} size={21} color={theme.ink} strokeWidth={2.6} />
+        {loading ? (
+          <ActivityIndicator color={colors.ink} size="small" />
+        ) : (
+          <Icon name={icon} size={small ? 18 : 21} color={colors.ink} strokeWidth={small ? 3 : 2.6} />
+        )}
       </Slab>
       {badge > 0 ? (
         <View
@@ -280,6 +301,23 @@ export function IconButton({
       ) : null}
     </View>
   );
+}
+
+function iconColors(
+  theme: Theme,
+  tone: 'onBrand' | 'neutral' | 'ok' | 'danger',
+): SlabColors & { ink: string } {
+  switch (tone) {
+    case 'ok':
+      // Green is never a Button's: it only says yes, next to a red no.
+      return { hi: theme.okHi, face: theme.ok, lip: theme.okLip, ink: theme.outline };
+    case 'danger':
+      return buttonColors(theme, 'danger');
+    case 'onBrand':
+      return { ...buttonColors(theme, 'secondary'), ink: theme.ink };
+    default:
+      return { ...buttonColors(theme, 'neutral'), ink: theme.ink };
+  }
 }
 
 /**
@@ -372,6 +410,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACE.xl,
   },
   square: { height: 42, width: 42 },
+  squareSm: { height: 34, width: 34 },
+  dim: { opacity: 0.5 },
   badge: {
     alignItems: 'center',
     borderRadius: RADIUS.pill,

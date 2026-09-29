@@ -14,23 +14,38 @@ const fmt: Record<Locale, Formats> = {
 };
 
 /**
- * Friends: the Arkadaşlar tab (requests and the inbox), finding a player,
+ * Friends: the Mesajlar tab (the inbox), a friend list, finding a player,
  * the one button beside a player, a player's card over any board, the
  * blocked list, and a friends board with nobody on it but you. `name` is a
  * player's name as `handle` writes it (`@ekin`).
  */
 const tr = {
-  /** The Arkadaşlar tab: requests waiting, then a conversation per friend. */
-  tab: {
+  /** Mesajlar, the dock's social tab: the conversations, and the friends beside them. */
+  inbox: {
+    title: 'Mesajlar',
+    /** The switch at its top. */
+    segments: { messages: 'Mesajlar', friends: 'Arkadaşlar' },
+    find: 'Arkadaş bul',
+    emptyTitle: 'Henüz mesajın yok',
+    emptyHint:
+      'Bir arkadaş ekle. Kabul edince burada mesajlaşır, birbirinize VS atarsınız.',
+    failed: 'Mesajların yüklenemedi',
+    retry: 'Tekrar dene',
+  },
+  /** A friend list: yours, with the requests waiting for you, or a friend's. */
+  list: {
     title: 'Arkadaşlar',
-    tagline: 'İstekler, mesajlar ve VS',
     find: 'Arkadaş bul',
     requests: 'İstekler',
-    inbox: 'Mesaj kutusu',
+    friends: 'Arkadaşların',
     emptyTitle: 'Henüz arkadaşın yok',
-    emptyHint:
-      'Bir oyuncuyu adıyla ara, arkadaşlık isteği gönder. Kabul edince mesajlaşır, birbirinize VS atarsınız.',
-    failed: 'Arkadaşların yüklenemedi',
+    emptyHint: 'Bir oyuncuyu adıyla ara, arkadaşlık isteği gönder.',
+    /** A friend's list with nobody on it. */
+    othersEmpty: 'Burada henüz kimse yok',
+    /** Someone else's list: only their friends see it. */
+    locked: 'Bu liste kilitli',
+    lockedHint: (name: string) => `${name} ile arkadaş olunca listesini görürsün.`,
+    failed: 'Liste yüklenemedi',
     retry: 'Tekrar dene',
   },
   /** Finding a player by the start of their name. */
@@ -45,7 +60,7 @@ const tr = {
     /** Nobody's name starts with what was typed. */
     nobodyHint: (term: string) => `Adı “${term}” ile başlayan bir oyuncu yok. Yazdığını kontrol et.`,
     idleTitle: 'Bir oyuncu ara',
-    idleHint: 'Adının ilk harflerini yaz. İsteğini kabul edenler Arkadaşlar sekmesinde belirir.',
+    idleHint: 'Adının ilk harflerini yaz. İsteğini kabul edenler arkadaş listende belirir.',
     /** Over the requests the player sent that still wait. */
     sent: 'Gönderdiğin istekler',
     retry: 'Tekrar dene',
@@ -117,16 +132,27 @@ const tr = {
 export type FriendsMessages = typeof tr;
 
 const en: FriendsMessages = {
-  tab: {
+  inbox: {
+    title: 'Messages',
+    segments: { messages: 'Messages', friends: 'Friends' },
+    find: 'Find friends',
+    emptyTitle: 'No messages yet',
+    emptyHint:
+      'Add a friend. Once they accept, you can message each other and send VS here.',
+    failed: "Couldn't load your messages",
+    retry: 'Try again',
+  },
+  list: {
     title: 'Friends',
-    tagline: 'Requests, messages and VS',
     find: 'Find friends',
     requests: 'Requests',
-    inbox: 'Inbox',
+    friends: 'Your friends',
     emptyTitle: 'No friends yet',
-    emptyHint:
-      'Search for a player by name and send a friend request. Once they accept, you can message each other and send VS.',
-    failed: "Couldn't load your friends",
+    emptyHint: 'Search for a player by name and send a friend request.',
+    othersEmpty: 'Nobody here yet',
+    locked: 'This list is locked',
+    lockedHint: (name) => `Become friends with ${name} to see their list.`,
+    failed: "Couldn't load the list",
     retry: 'Try again',
   },
   search: {
@@ -143,7 +169,7 @@ const en: FriendsMessages = {
     nobody: 'No one found',
     nobodyHint: (term) => `No player's name starts with “${term}”. Check what you typed.`,
     idleTitle: 'Search for a player',
-    idleHint: 'Type the first letters of their name. Players who accept show up in Friends.',
+    idleHint: 'Type the first letters of their name. Players who accept show up in your friend list.',
     sent: 'Requests you sent',
     retry: 'Try again',
   },
@@ -207,16 +233,27 @@ const en: FriendsMessages = {
 };
 
 const de: FriendsMessages = {
-  tab: {
+  inbox: {
+    title: 'Chats',
+    segments: { messages: 'Chats', friends: 'Freunde' },
+    find: 'Freunde finden',
+    emptyTitle: 'Noch keine Nachrichten',
+    emptyHint:
+      'Füge einen Freund hinzu. Sobald er annimmt, schreibt ihr euch hier und schickt euch VS.',
+    failed: 'Deine Nachrichten konnten nicht geladen werden',
+    retry: 'Nochmal versuchen',
+  },
+  list: {
     title: 'Freunde',
-    tagline: 'Anfragen, Nachrichten und VS',
     find: 'Freunde finden',
     requests: 'Anfragen',
-    inbox: 'Postfach',
+    friends: 'Deine Freunde',
     emptyTitle: 'Noch keine Freunde',
-    emptyHint:
-      'Such einen Spieler nach Namen und schick eine Freundschaftsanfrage. Sobald er annimmt, schreibt ihr euch und schickt euch VS.',
-    failed: 'Deine Freunde konnten nicht geladen werden',
+    emptyHint: 'Such einen Spieler nach Namen und schick eine Freundschaftsanfrage.',
+    othersEmpty: 'Hier ist noch niemand',
+    locked: 'Diese Liste ist gesperrt',
+    lockedHint: (name) => `Werde Freund von ${name}, um die Liste zu sehen.`,
+    failed: 'Die Liste konnte nicht geladen werden',
     retry: 'Nochmal versuchen',
   },
   search: {
@@ -233,7 +270,7 @@ const de: FriendsMessages = {
     nobody: 'Niemand gefunden',
     nobodyHint: (term) => `Kein Spielername beginnt mit „${term}“. Prüf deine Eingabe.`,
     idleTitle: 'Such einen Spieler',
-    idleHint: 'Gib die ersten Buchstaben des Namens ein. Wer annimmt, erscheint unter Freunde.',
+    idleHint: 'Gib die ersten Buchstaben des Namens ein. Wer annimmt, erscheint in deiner Freundesliste.',
     sent: 'Deine Anfragen',
     retry: 'Nochmal versuchen',
   },
@@ -297,16 +334,27 @@ const de: FriendsMessages = {
 };
 
 const ar: FriendsMessages = {
-  tab: {
+  inbox: {
+    title: 'الرسائل',
+    segments: { messages: 'الرسائل', friends: 'الأصدقاء' },
+    find: 'ابحث عن أصدقاء',
+    emptyTitle: 'لا رسائل بعد',
+    emptyHint:
+      'أضف صديقًا. عندما يقبل، تتراسلان هنا ويتحدّى كل منكما الآخر.',
+    failed: 'تعذّر تحميل رسائلك',
+    retry: 'أعد المحاولة',
+  },
+  list: {
     title: 'الأصدقاء',
-    tagline: 'الطلبات والرسائل والتحديات',
     find: 'ابحث عن أصدقاء',
     requests: 'الطلبات',
-    inbox: 'صندوق الرسائل',
+    friends: 'أصدقاؤك',
     emptyTitle: 'لا أصدقاء بعد',
-    emptyHint:
-      'ابحث عن لاعب باسمه وأرسل طلب صداقة. عندما يقبل، تتراسلان ويتحدّى كل منكما الآخر.',
-    failed: 'تعذّر تحميل أصدقائك',
+    emptyHint: 'ابحث عن لاعب باسمه وأرسل طلب صداقة.',
+    othersEmpty: 'لا أحد هنا بعد',
+    locked: 'هذه القائمة مقفلة',
+    lockedHint: (name) => `صادِق ${name} لترى قائمته.`,
+    failed: 'تعذّر تحميل القائمة',
     retry: 'أعد المحاولة',
   },
   search: {
@@ -327,7 +375,7 @@ const ar: FriendsMessages = {
     nobody: 'لم يُعثر على أحد',
     nobodyHint: (term) => `لا يبدأ اسم أي لاعب بـ «${term}». تحقّق مما كتبت.`,
     idleTitle: 'ابحث عن لاعب',
-    idleHint: 'اكتب الأحرف الأولى من اسمه. من يقبل طلبك يظهر في الأصدقاء.',
+    idleHint: 'اكتب الأحرف الأولى من اسمه. من يقبل طلبك يظهر في قائمة أصدقائك.',
     sent: 'الطلبات التي أرسلتها',
     retry: 'أعد المحاولة',
   },
@@ -398,16 +446,27 @@ const ar: FriendsMessages = {
 };
 
 const fr: FriendsMessages = {
-  tab: {
+  inbox: {
+    title: 'Messages',
+    segments: { messages: 'Messages', friends: 'Amis' },
+    find: 'Trouver des amis',
+    emptyTitle: 'Pas encore de messages',
+    emptyHint:
+      "Ajoute un ami. Dès qu'il accepte, vous vous écrivez ici et vous lancez des VS.",
+    failed: 'Impossible de charger tes messages',
+    retry: 'Réessayer',
+  },
+  list: {
     title: 'Amis',
-    tagline: 'Demandes, messages et VS',
     find: 'Trouver des amis',
     requests: 'Demandes',
-    inbox: 'Boîte de réception',
+    friends: 'Tes amis',
     emptyTitle: "Pas encore d'amis",
-    emptyHint:
-      "Cherche un joueur par son nom et envoie une demande d'ami. Une fois acceptée, vous vous écrivez et vous lancez des VS.",
-    failed: 'Impossible de charger tes amis',
+    emptyHint: "Cherche un joueur par son nom et envoie une demande d'ami.",
+    othersEmpty: "Personne ici pour l'instant",
+    locked: 'Cette liste est verrouillée',
+    lockedHint: (name) => `Deviens ami avec ${name} pour voir sa liste.`,
+    failed: 'Impossible de charger la liste',
     retry: 'Réessayer',
   },
   search: {
@@ -424,7 +483,7 @@ const fr: FriendsMessages = {
     nobody: 'Personne trouvé',
     nobodyHint: (term) => `Aucun nom de joueur ne commence par « ${term} ». Vérifie ce que tu as écrit.`,
     idleTitle: 'Cherche un joueur',
-    idleHint: 'Écris les premières lettres de son nom. Ceux qui acceptent apparaissent dans Amis.',
+    idleHint: 'Écris les premières lettres de son nom. Ceux qui acceptent apparaissent dans ta liste d’amis.',
     sent: 'Demandes envoyées',
     retry: 'Réessayer',
   },
@@ -488,16 +547,27 @@ const fr: FriendsMessages = {
 };
 
 const es: FriendsMessages = {
-  tab: {
+  inbox: {
+    title: 'Mensajes',
+    segments: { messages: 'Mensajes', friends: 'Amigos' },
+    find: 'Buscar amigos',
+    emptyTitle: 'Aún no tienes mensajes',
+    emptyHint:
+      'Añade un amigo. Cuando acepte, podrán escribirse aquí y mandarse VS.',
+    failed: 'No se pudieron cargar tus mensajes',
+    retry: 'Reintentar',
+  },
+  list: {
     title: 'Amigos',
-    tagline: 'Solicitudes, mensajes y VS',
     find: 'Buscar amigos',
     requests: 'Solicitudes',
-    inbox: 'Buzón',
+    friends: 'Tus amigos',
     emptyTitle: 'Aún no tienes amigos',
-    emptyHint:
-      'Busca a un jugador por su nombre y envíale una solicitud de amistad. Cuando acepte, podrán escribirse y mandarse VS.',
-    failed: 'No se pudieron cargar tus amigos',
+    emptyHint: 'Busca a un jugador por su nombre y envíale una solicitud de amistad.',
+    othersEmpty: 'Aún no hay nadie aquí',
+    locked: 'Esta lista está bloqueada',
+    lockedHint: (name) => `Hazte amigo de ${name} para ver su lista.`,
+    failed: 'No se pudo cargar la lista',
     retry: 'Reintentar',
   },
   search: {
@@ -514,7 +584,7 @@ const es: FriendsMessages = {
     nobody: 'No se encontró a nadie',
     nobodyHint: (term) => `Ningún nombre de jugador empieza por «${term}». Revisa lo que escribiste.`,
     idleTitle: 'Busca a un jugador',
-    idleHint: 'Escribe las primeras letras de su nombre. Quienes acepten aparecerán en Amigos.',
+    idleHint: 'Escribe las primeras letras de su nombre. Quienes acepten aparecerán en tu lista de amigos.',
     sent: 'Solicitudes enviadas',
     retry: 'Reintentar',
   },

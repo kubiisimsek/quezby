@@ -1,4 +1,4 @@
-import { LOCALE_NAMES, canPickUsername } from '@quezby/config';
+import { LOCALE_NAMES } from '@quezby/config';
 import type { Me } from '@quezby/types';
 import { StyleSheet, View } from 'react-native';
 
@@ -22,16 +22,14 @@ import {
 import { Sheet } from '@/ui/sheet';
 import { SPACE } from '@/ui/theme';
 
-/** What Ayarlar opens: the language, Yardım, the friends' two doors, or one of the account's. */
+/** What Ayarlar opens: the language, Yardım, the friends' two doors, Hesap bilgileri, or signing out. */
 export type SettingsDoor =
   | 'language'
   | 'help'
   | 'notifications'
   | 'blocked'
-  | 'username'
-  | 'ways'
-  | 'signOut'
-  | 'delete';
+  | 'account'
+  | 'signOut';
 
 const ENV_LABEL = {
   local: 'Local',
@@ -71,38 +69,11 @@ function setHaptics(user: Me, value: boolean) {
 }
 
 /**
- * The name, as Ayarlar shows it: a door to pick one while the account still
- * plays under the automatic name (or none), and after that only the name
- * itself, locked — a picked name never changes.
- */
-function NameRow({ username, onPick }: { username: string | null; onPick: () => void }) {
-  const t = useT();
-  const words = t.profile.settings;
-  if (canPickUsername(username)) {
-    return (
-      <Row
-        leading={<IconChip icon="edit" tone="primary" size="sm" />}
-        title={t.profile.pickName.title}
-        subtitle={username ? words.pickNameHint(handle(username)) : words.noName}
-        onPress={onPick}
-      />
-    );
-  }
-  return (
-    <Row
-      leading={<IconChip icon="lock" tone="neutral" size="sm" />}
-      title={words.name}
-      subtitle={words.nameLocked(handle(username ?? ''))}
-    />
-  );
-}
-
-/**
  * Ayarlar — what a player opens now and then, kept off the profile's face:
- * the game's two settings, Yardım, notifications and blocked players, and
- * the account's doors. A door
- * never opens over this sheet: `onPick` names it, and the profile opens it
- * once this sheet has left the screen.
+ * the game's two settings, Yardım, notifications and blocked players, then
+ * the account: Hesap bilgileri (the name, the ways in, deleting it) and,
+ * last, Çıkış yap. A door never opens over this sheet: `onPick` names it,
+ * and the profile opens it once this sheet has left the screen.
  */
 export function SettingsSheet({
   open,
@@ -181,23 +152,21 @@ export function SettingsSheet({
 
         <Eyebrow icon="account">{words.account}</Eyebrow>
         <Panel tone="sunken" elevation="flat" style={styles.group}>
-          <NameRow username={user.username} onPick={() => onPick('username')} />
-          <Divider />
-          {user.isGuest ? (
-            <Row
-              leading={<IconChip icon="shield" tone="warn" size="sm" />}
-              title={t.auth.keepAccount}
-              subtitle={keepHint(t)}
-              onPress={() => onPick('ways')}
-            />
-          ) : (
+          <Row
+            leading={<IconChip icon="account" tone={user.isGuest ? 'warn' : 'primary'} size="sm" />}
+            title={words.accountInfo}
+            subtitle={
+              user.isGuest
+                ? t.profile.hero.guest
+                : words.accountHint(
+                    user.username ? handle(user.username) : words.noName,
+                    t.fmt.list(ways, 'and'),
+                  )
+            }
+            onPress={() => onPick('account')}
+          />
+          {user.isGuest ? null : (
             <>
-              <Row
-                leading={<IconChip icon="shield" tone="ok" size="sm" />}
-                title={t.auth.ways.title}
-                subtitle={words.waysLinked(t.fmt.list(ways, 'and'))}
-                onPress={() => onPick('ways')}
-              />
               <Divider />
               <Row
                 leading={<IconChip icon="logout" tone="neutral" size="sm" />}
@@ -207,13 +176,6 @@ export function SettingsSheet({
               />
             </>
           )}
-          <Divider />
-          <Row
-            leading={<IconChip icon="trash" tone="bad" size="sm" />}
-            title={t.profile.deleteAccount.title}
-            subtitle={words.deleteHint}
-            onPress={() => onPick('delete')}
-          />
         </Panel>
 
         <Txt variant="micro" tone="faint" align="center" style={styles.version}>

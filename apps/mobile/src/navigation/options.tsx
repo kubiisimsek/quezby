@@ -35,7 +35,7 @@ export function tab(title: string, icon: IconName): BottomTabNavigationOptions {
 }
 
 /** Glyphs with a closed body, washed in their colour when their slot is on. */
-const FILLED: ReadonlySet<IconName> = new Set(['shield', 'account', 'users', 'mountain', 'podium']);
+const FILLED: ReadonlySet<IconName> = new Set(['shield', 'account', 'users', 'mountain', 'podium', 'message']);
 
 export function useNavTheme(): NavTheme {
   const theme = useTheme();

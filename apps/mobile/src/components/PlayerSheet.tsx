@@ -29,7 +29,11 @@ import { SPACE } from '@/ui/theme';
 type Navigation = NativeStackNavigationProp<RootStackParamList>;
 
 /** What waits for the card to leave the screen. */
-type Then = { to: 'vs'; opponent: VsOpponent } | { to: 'thread'; username: string };
+type Then =
+  | { to: 'vs'; opponent: VsOpponent }
+  | { to: 'thread'; username: string }
+  /** A friend list: a friend's, or yours (no username). */
+  | { to: 'friends'; username?: string };
 
 /**
  * A player's card, over whatever board or list it was opened from: their
@@ -84,6 +88,9 @@ export function PlayerSheet({
     then.current = null;
     if (next?.to === 'vs') setVs(next.opponent);
     if (next?.to === 'thread') navigation.navigate('Thread', { username: next.username });
+    if (next?.to === 'friends') {
+      navigation.navigate('Friends', next.username ? { username: next.username } : undefined);
+    }
   };
 
   const failure = friendship.error ?? block.error ?? report.error;
@@ -111,9 +118,23 @@ export function PlayerSheet({
               <View style={styles.who}>
                 {card.league ? <TierBadge tier={card.league} size="md" showLabel /> : null}
                 <RelationTag card={card} />
-                <Txt variant="meta" tone="muted">
-                  {words.friends(card.friends)}
-                </Txt>
+                {card.isMe || card.relation === 'friend' ? (
+                  // Your list, or a friend's: theirs to show you.
+                  <Button
+                    label={words.friends(card.friends)}
+                    icon="users"
+                    tone="neutral"
+                    size="sm"
+                    onPress={() =>
+                      leaveFor({ to: 'friends', username: card.isMe ? undefined : card.username })
+                    }
+                    style={styles.friends}
+                  />
+                ) : (
+                  <Txt variant="meta" tone="muted">
+                    {words.friends(card.friends)}
+                  </Txt>
+                )}
               </View>
             </View>
 
@@ -266,6 +287,7 @@ const styles = StyleSheet.create({
   body: { gap: SPACE.lg },
   identity: { alignItems: 'center', flexDirection: 'row', gap: SPACE.lg },
   who: { alignItems: 'flex-start', flex: 1, gap: SPACE.sm },
+  friends: { alignSelf: 'flex-start' },
   pair: { flexDirection: 'row', gap: SPACE.sm },
   grow: { flex: 1 },
 });

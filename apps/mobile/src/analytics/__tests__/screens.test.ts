@@ -7,7 +7,11 @@ describe('screenOf', () => {
     ['Home', 'home'],
     ['Leaderboard', 'leaderboard'],
     ['League', 'league'],
-    ['Friends', 'friends'],
+    // The Mesajlar tab keeps the code of the slot it took over.
+    ['Inbox', 'friends'],
+    ['Friends', 'friend_list'],
+    ['Account', 'account'],
+    ['Alerts', 'alerts'],
     ['FindFriends', 'search'],
     ['Thread', 'thread'],
     ['History', 'history'],

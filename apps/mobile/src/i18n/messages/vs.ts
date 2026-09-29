@@ -1,10 +1,11 @@
 import type { Locale } from '@quezby/types';
 
+import { iso } from '@/i18n/format';
 import { plural } from '@/i18n/plural';
 
 /**
- * VS: the sheet that sends one, the result of a VS run, and the lobby's door
- * to a VS waiting for the player. `name` is a friend's name as `handle`
+ * VS: the sheet that sends one, the result of a VS run, and the lobby's
+ * notice for a VS waiting for the player. `name` is a friend's name as `handle`
  * writes it (`@ekin`).
  */
 const tr = {
@@ -37,13 +38,15 @@ const tr = {
     rematch: 'Rövanş',
     toThread: 'Mesajlara dön',
   },
-  /** The lobby's door while a friend's VS waits for the player. */
-  lobby: {
+  /** The lobby's notice for each VS waiting for the player: ✓ plays it, ✗ turns it down. */
+  notice: {
     eyebrow: 'SENİ BEKLEYEN VS',
-    /** One line on the lobby's door: short enough for its Rubik title. */
-    title: (count: number) => (count === 1 ? 'Sıra sende' : `${count} VS seni bekliyor`),
+    title: (name: string) => `${name} sana VS attı`,
+    /** The notice's body, which opens the conversation. */
+    label: (name: string) => `${name} sana VS attı, sohbeti aç`,
+    /** Past the three the lobby shows. */
+    more: (_count: number, count: string) => `${count} VS daha`,
   },
-  /** Over the game while a VS run is played. */
   hud: (name: string) => `VS · ${name}`,
 };
 
@@ -77,9 +80,11 @@ const en: VsMessages = {
     rematch: 'Rematch',
     toThread: 'Back to chat',
   },
-  lobby: {
+  notice: {
     eyebrow: 'VS WAITING FOR YOU',
-    title: (count) => plural('en', count, { one: 'Your turn', other: `${count} VS waiting` }),
+    title: (name) => `${name} sent you a VS`,
+    label: (name) => `${name} sent you a VS, open the chat`,
+    more: (_count, count) => `${count} more VS`,
   },
   hud: (name) => `VS · ${name}`,
 };
@@ -112,9 +117,11 @@ const de: VsMessages = {
     rematch: 'Revanche',
     toThread: 'Zurück zum Chat',
   },
-  lobby: {
+  notice: {
     eyebrow: 'EIN VS WARTET AUF DICH',
-    title: (count) => plural('de', count, { one: 'Du bist dran', other: `${count} VS warten` }),
+    title: (name) => `${name} hat dir ein VS geschickt`,
+    label: (name) => `${name} hat dir ein VS geschickt, Chat öffnen`,
+    more: (_count, count) => `${count} weitere VS`,
   },
   hud: (name) => `VS · ${name}`,
 };
@@ -147,15 +154,17 @@ const ar: VsMessages = {
     rematch: 'مباراة ثأر',
     toThread: 'عد إلى المحادثة',
   },
-  lobby: {
+  notice: {
     eyebrow: 'تحدٍّ بانتظارك',
-    title: (count) =>
+    title: (name) => `${iso(name)} أرسل لك تحديًا`,
+    label: (name) => `${iso(name)} أرسل لك تحديًا، افتح المحادثة`,
+    more: (count, text) =>
       plural('ar', count, {
-        one: 'دورك الآن',
-        two: 'تحدّيان بانتظارك',
-        few: `${count} تحديات بانتظارك`,
-        many: `${count} تحديًا بانتظارك`,
-        other: `${count} تحدٍّ بانتظارك`,
+        one: 'تحدٍّ آخر',
+        two: 'تحدّيان آخران',
+        few: `${text} تحديات أخرى`,
+        many: `${text} تحديًا آخر`,
+        other: `${text} تحدٍّ آخر`,
       }),
   },
   hud: (name) => `تحدٍّ · ${name}`,
@@ -189,9 +198,11 @@ const fr: VsMessages = {
     rematch: 'Revanche',
     toThread: 'Retour à la discussion',
   },
-  lobby: {
+  notice: {
     eyebrow: 'UN VS T’ATTEND',
-    title: (count) => plural('fr', count, { one: 'À toi de jouer', other: `${count} VS t’attendent` }),
+    title: (name) => `${name} t’a lancé un VS`,
+    label: (name) => `${name} t’a lancé un VS, ouvrir la discussion`,
+    more: (_count, count) => `${count} VS de plus`,
   },
   hud: (name) => `VS · ${name}`,
 };
@@ -224,9 +235,11 @@ const es: VsMessages = {
     rematch: 'Revancha',
     toThread: 'Volver al chat',
   },
-  lobby: {
+  notice: {
     eyebrow: 'UN VS TE ESPERA',
-    title: (count) => plural('es', count, { one: 'Te toca', other: `${count} VS te esperan` }),
+    title: (name) => `${name} te mandó un VS`,
+    label: (name) => `${name} te mandó un VS, abrir el chat`,
+    more: (_count, count) => `${count} VS más`,
   },
   hud: (name) => `VS · ${name}`,
 };

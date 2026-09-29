@@ -1,5 +1,5 @@
 import type { PlayerCard } from '@quezby/types';
-import { fireEvent, screen, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 
 import { track } from '@/analytics/track';
 import { api } from '@/api/client';
@@ -9,6 +9,20 @@ import { buildCard } from '@/test/factories';
 import { renderWithProviders } from '@/test/renderWithProviders';
 
 jest.mock('@/analytics/track', () => ({ track: jest.fn() }));
+
+const mockNavigate = jest.fn();
+jest.mock('@react-navigation/native', () => ({
+  ...jest.requireActual('@react-navigation/native'),
+  useNavigation: () => ({ navigate: mockNavigate }),
+}));
+
+/** iOS says the sheet has left the screen through its modal's `onDismiss`, which the Modal mock never calls. */
+async function leave() {
+  const modals = screen.container.queryAll((node) => node.type === 'Modal');
+  await act(async () => {
+    for (const modal of modals) (modal.props.onDismiss as (() => void) | undefined)?.();
+  });
+}
 
 jest.mock('@/api/client', () => ({
   api: {
@@ -75,6 +89,38 @@ describe('PlayerSheet', () => {
 
     expect(await screen.findByLabelText('Sezon rekoru: —')).toBeTruthy();
     expect(screen.queryByLabelText(/ lig$/)).toBeNull();
+  });
+
+  it('shows a stranger’s friend count, and no way into the list', async () => {
+    mocked.users.get.mockResolvedValue(card({ relation: 'none' }));
+
+    await renderWithProviders(<PlayerSheet username="ekin" onClose={jest.fn()} />);
+
+    expect(await screen.findByText('8 arkadaş')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: '8 arkadaş' })).toBeNull();
+  });
+
+  it('opens a friend’s list from their count, once the card has left the screen', async () => {
+    mocked.users.get.mockResolvedValue(card({ relation: 'friend' }));
+    const onClose = jest.fn();
+
+    await renderWithProviders(<PlayerSheet username="ekin" onClose={onClose} />);
+    await fireEvent.press(await screen.findByRole('button', { name: '8 arkadaş' }));
+
+    expect(onClose).toHaveBeenCalled();
+    expect(mockNavigate).not.toHaveBeenCalled();
+    await leave();
+    expect(mockNavigate).toHaveBeenCalledWith('Friends', { username: 'ekin' });
+  });
+
+  it('opens your own list from your own card', async () => {
+    mocked.users.get.mockResolvedValue(card({ isMe: true }));
+
+    await renderWithProviders(<PlayerSheet username="ekin" onClose={jest.fn()} />);
+    await fireEvent.press(await screen.findByRole('button', { name: '8 arkadaş' }));
+    await leave();
+
+    expect(mockNavigate).toHaveBeenCalledWith('Friends', undefined);
   });
 
   it('asks a stranger to be friends, then shows the card the API sends back', async () => {

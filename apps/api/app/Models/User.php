@@ -29,6 +29,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property Carbon|null $analytics_at When the player said yes to usage analytics.
  * @property string|null $avatar The profile photo's file on the `avatars` disk (`AvatarService`).
  * @property int $inbox_stamp Moves with every request, friendship, line and VS of the player's (`InboxStamp`).
+ * @property Carbon|null $notifications_seen_at When the player last opened the bell's list (`NotificationService`).
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
@@ -67,6 +68,7 @@ class User extends Authenticatable
             'banned_at' => 'datetime',
             'analytics_at' => 'datetime',
             'inbox_stamp' => 'integer',
+            'notifications_seen_at' => 'datetime',
         ];
     }
 

@@ -56,6 +56,14 @@ describe('usePulse', () => {
     await act(async () => useCurrentRoute.setState({ name: 'Thread', username: 'ekin' }));
     await wait(PULSE_NEAR_MS);
     expect(mocked.me.pulse).toHaveBeenCalledTimes(3);
+
+    // The inbox tab and the friend list are the friends' screens too.
+    await act(async () => useCurrentRoute.setState({ name: 'Inbox', username: null }));
+    await wait(PULSE_NEAR_MS);
+    expect(mocked.me.pulse).toHaveBeenCalledTimes(4);
+    await act(async () => useCurrentRoute.setState({ name: 'Friends', username: null }));
+    await wait(PULSE_NEAR_MS);
+    expect(mocked.me.pulse).toHaveBeenCalledTimes(5);
     await hook.unmount();
   });
 
@@ -110,17 +118,40 @@ describe('refreshInbox', () => {
     expect(refetch).toHaveBeenCalledWith({ queryKey: threadKey('ekin'), type: 'active' });
   });
 
-  it('asks again for the inbox list and the requests on Arkadaşlar', () => {
+  it('asks again for both sides of Mesajlar: the conversations, the requests and the friend list', () => {
     const client = createTestQueryClient();
     const invalidate = jest.spyOn(client, 'invalidateQueries').mockResolvedValue();
     const refetch = jest.spyOn(client, 'refetchQueries').mockResolvedValue();
 
-    refreshInbox(client, { name: 'Friends', username: null });
+    refreshInbox(client, { name: 'Inbox', username: null });
 
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ['friends'], refetchType: 'active' });
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ['friend-requests'], refetchType: 'active' });
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['friend-list'], refetchType: 'active' });
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['notifications'], refetchType: 'none' });
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ['search'], refetchType: 'none' });
     expect(refetch).not.toHaveBeenCalled();
+  });
+
+  it('asks again for the bell\'s list while it is on screen', () => {
+    const client = createTestQueryClient();
+    const invalidate = jest.spyOn(client, 'invalidateQueries').mockResolvedValue();
+
+    refreshInbox(client, { name: 'Alerts', username: null });
+
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['notifications'], refetchType: 'active' });
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['friends'], refetchType: 'none' });
+  });
+
+  it('asks again for the requests and the friend list on the friend list', () => {
+    const client = createTestQueryClient();
+    const invalidate = jest.spyOn(client, 'invalidateQueries').mockResolvedValue();
+
+    refreshInbox(client, { name: 'Friends', username: null });
+
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['friend-requests'], refetchType: 'active' });
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['friend-list'], refetchType: 'active' });
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['friends'], refetchType: 'none' });
   });
 });
 

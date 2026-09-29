@@ -140,7 +140,7 @@ export function LeaderboardScreen({ navigation }: Props) {
               ) : null}
               <IconButton
                 icon="search"
-                label={t.friends.tab.find}
+                label={t.friends.list.find}
                 tone="onBrand"
                 onPress={search}
               />

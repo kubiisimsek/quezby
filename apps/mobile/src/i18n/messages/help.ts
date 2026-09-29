@@ -84,7 +84,7 @@ const tr = {
     lead: 'İlk açılışta bir deneme turuyla başlarsın; o tur hiçbir yere sayılmaz. Hesabın misafir olarak bu telefonda durur ve bir ad seçene kadar guest48128742 gibi bir adla oynarsın. Seçtiğin ad kalıcıdır; bir daha değişmez.',
     more: [
       'Profil’de “Hesabını koru” ile Apple, Google ya da e-posta bağla; telefonun değişse de adın ve skorların seninle gelir.',
-      'Hesabını Profil’deki Ayarlar’dan kalıcı olarak silebilirsin: adın, skorların ve sıralamadaki yerin silinir. Bu geri alınamaz.',
+      'Hesabını Ayarlar’daki Hesap bilgileri’nden kalıcı olarak silebilirsin: adın, skorların ve sıralamadaki yerin silinir. Bu geri alınamaz.',
     ],
   },
   faq: {
@@ -109,12 +109,12 @@ const tr = {
       {
         question: 'Arkadaşlarımla nasıl yarışırım?',
         answer:
-          'Arkadaşlar’dan onları adıyla bul ve arkadaşlık isteği gönder. Kabul edince Zirve’de Arkadaşlar’a geçip yalnızca arkadaşlarınla yarışırsın; mesaj kutusundan hazır mesaj ve VS gönderirsin.',
+          'Profil’deki arkadaş sayına dokun, oyuncuları adıyla bul ve arkadaşlık isteği gönder. Kabul edince Zirve’de Arkadaşlar’a geçip yalnızca arkadaşlarınla yarışırsın; Mesajlar’dan hazır mesaj ve VS gönderirsin.',
       },
       {
         question: 'Kullanıcı adımı değiştirebilir miyim?',
         answer:
-          'Hayır. Adını bir kez seçersin ve bir daha değişmez; Zirve’de ve ligde herkes seni o adla tanır. Acelen yoksa önce guest adıyla oyna, adını sonra Profil’deki Ayarlar’dan seç.',
+          'Hayır. Adını bir kez seçersin ve bir daha değişmez; Zirve’de ve ligde herkes seni o adla tanır. Acelen yoksa önce guest adıyla oyna, adını sonra Ayarlar’daki Hesap bilgileri’nden seç.',
       },
       {
         question: 'Telefonumu değiştirirsem ne olur?',
@@ -210,7 +210,7 @@ const en: HelpMessages = {
     lead: 'On your first launch you start with a practice run; it counts nowhere. Your account is a guest account on this phone, and until you pick a name you play under one like guest48128742. The name you pick is permanent; it never changes.',
     more: [
       'On your profile, link Apple, Google or email with “Protect your account”; even on a new phone, your name and scores come with you.',
-      "You can delete your account for good from Settings on your profile: your name, your scores and your place in the rankings are deleted. This can't be undone.",
+      "You can delete your account for good from Account info in Settings: your name, your scores and your place in the rankings are deleted. This can't be undone.",
     ],
   },
   faq: {
@@ -234,12 +234,12 @@ const en: HelpMessages = {
       {
         question: 'How do I compete with my friends?',
         answer:
-          'Find them by name in Friends and send a friend request. Once they accept, switch to Friends on the Summit to race only your friends, and send them phrases and VS from your inbox.',
+          'Tap your friend count on your profile, find players by name and send a friend request. Once they accept, switch to Friends on the Summit to race only your friends, and send them phrases and VS from Messages.',
       },
       {
         question: 'Can I change my username?',
         answer:
-          "No. You pick your name once and it never changes; everyone on the Summit and in your league knows you by it. If you're in no hurry, play under your guest name first and pick your name later from Settings on your profile.",
+          "No. You pick your name once and it never changes; everyone on the Summit and in your league knows you by it. If you're in no hurry, play under your guest name first and pick your name later from Account info in Settings.",
       },
       {
         question: 'What happens if I switch phones?',
@@ -335,7 +335,7 @@ const de: HelpMessages = {
     lead: 'Beim ersten Start beginnst du mit einer Proberunde; sie zählt nirgends. Dein Konto ist ein Gastkonto auf diesem Handy, und bis du einen Namen wählst, spielst du unter einem Namen wie guest48128742. Dein gewählter Name bleibt für immer; er ändert sich nie.',
     more: [
       'Verknüpf in deinem Profil über „Konto sichern“ Apple, Google oder eine E-Mail – dann kommen dein Name und deine Scores auch auf ein neues Handy mit.',
-      'Du kannst dein Konto in den Einstellungen deines Profils endgültig löschen: Dein Name, deine Scores und deine Plätze in den Ranglisten werden gelöscht. Das lässt sich nicht rückgängig machen.',
+      'Du kannst dein Konto unter Kontoinfos in den Einstellungen endgültig löschen: Dein Name, deine Scores und deine Plätze in den Ranglisten werden gelöscht. Das lässt sich nicht rückgängig machen.',
     ],
   },
   faq: {
@@ -359,12 +359,12 @@ const de: HelpMessages = {
       {
         question: 'Wie trete ich gegen meine Freunde an?',
         answer:
-          'Such sie unter Freunde nach Namen und schick eine Freundschaftsanfrage. Sobald sie annehmen, trittst du auf dem Gipfel unter Freunde nur gegen deine Freunde an und schickst ihnen aus deinem Postfach Nachrichten und VS.',
+          'Tipp in deinem Profil auf deine Freundeszahl, such Spieler nach Namen und schick eine Freundschaftsanfrage. Sobald sie annehmen, trittst du auf dem Gipfel unter Freunde nur gegen deine Freunde an und schickst ihnen unter Chats Nachrichten und VS.',
       },
       {
         question: 'Kann ich meinen Namen ändern?',
         answer:
-          'Nein. Du wählst deinen Namen einmal, und er ändert sich nie; auf dem Gipfel und in der Liga kennen dich alle unter diesem Namen. Wenn du es nicht eilig hast, spiel erst mit deinem Gastnamen und wähl deinen Namen später in den Einstellungen deines Profils.',
+          'Nein. Du wählst deinen Namen einmal, und er ändert sich nie; auf dem Gipfel und in der Liga kennen dich alle unter diesem Namen. Wenn du es nicht eilig hast, spiel erst mit deinem Gastnamen und wähl deinen Namen später unter Kontoinfos in den Einstellungen.',
       },
       {
         question: 'Was passiert, wenn ich mein Handy wechsle?',
@@ -464,7 +464,7 @@ const ar: HelpMessages = {
     lead: `عند أول تشغيل تبدأ بجولة تجريبية لا تُحتسب في أي مكان. يبقى حسابك حساب ضيف على هذا الهاتف، وإلى أن تختار اسمًا تلعب باسم مثل ${iso('guest48128742')}. الاسم الذي تختاره دائم ولن يتغيّر أبدًا.`,
     more: [
       'من ملفك، اربط Apple أو Google أو بريدًا إلكترونيًا عبر «احمِ حسابك»؛ فحتى لو تغيّر هاتفك يبقى اسمك ونتائجك معك.',
-      'يمكنك حذف حسابك نهائيًا من الإعدادات في ملفك: يُحذف اسمك ونتائجك ومكانك في الترتيب. لا يمكن التراجع عن ذلك.',
+      'يمكنك حذف حسابك نهائيًا من معلومات الحساب في الإعدادات: يُحذف اسمك ونتائجك ومكانك في الترتيب. لا يمكن التراجع عن ذلك.',
     ],
   },
   faq: {
@@ -488,12 +488,12 @@ const ar: HelpMessages = {
       {
         question: 'كيف أنافس أصدقائي؟',
         answer:
-          'ابحث عنهم بالاسم في الأصدقاء وأرسل طلب صداقة. عندما يقبلون، انتقل إلى الأصدقاء في القمة لتنافس أصدقاءك فقط، وأرسل إليهم رسائل وتحديات من صندوق رسائلك.',
+          'المس عدد أصدقائك في ملفك، وابحث عن اللاعبين بالاسم وأرسل طلب صداقة. عندما يقبلون، انتقل إلى الأصدقاء في القمة لتنافس أصدقاءك فقط، وأرسل إليهم رسائل وتحديات من الرسائل.',
       },
       {
         question: 'هل يمكنني تغيير اسم المستخدم؟',
         answer:
-          'لا. تختار اسمك مرة واحدة ولن يتغيّر أبدًا؛ فالجميع في القمة وفي الدوري يعرفونك به. إن لم تكن مستعجلًا فالعب أولًا باسم الضيف، واختر اسمك لاحقًا من الإعدادات في ملفك.',
+          'لا. تختار اسمك مرة واحدة ولن يتغيّر أبدًا؛ فالجميع في القمة وفي الدوري يعرفونك به. إن لم تكن مستعجلًا فالعب أولًا باسم الضيف، واختر اسمك لاحقًا من معلومات الحساب في الإعدادات.',
       },
       {
         question: 'ماذا يحدث إن غيّرت هاتفي؟',
@@ -588,7 +588,7 @@ const fr: HelpMessages = {
     lead: "Au premier lancement, tu commences par une partie d'essai ; elle ne compte nulle part. Ton compte est un compte invité sur ce téléphone, et tant que tu n'as pas choisi de nom, tu joues sous un nom comme guest48128742. Le nom choisi est définitif ; il ne change plus jamais.",
     more: [
       'Sur ton profil, lie Apple, Google ou une adresse e-mail avec « Protège ton compte » ; même sur un nouveau téléphone, ton nom et tes scores te suivent.',
-      "Tu peux supprimer définitivement ton compte depuis les Réglages de ton profil : ton nom, tes scores et ta place au classement sont supprimés. C'est irréversible.",
+      "Tu peux supprimer définitivement ton compte depuis Infos du compte, dans les Réglages : ton nom, tes scores et ta place au classement sont supprimés. C'est irréversible.",
     ],
   },
   faq: {
@@ -612,12 +612,12 @@ const fr: HelpMessages = {
       {
         question: 'Comment affronter mes amis ?',
         answer:
-          "Cherche-les par leur nom dans Amis et envoie une demande d'ami. Une fois acceptée, passe à Amis sur le Sommet pour ne te mesurer qu'à tes amis, et envoie-leur des messages et des VS depuis ta boîte.",
+          "Touche ton nombre d'amis sur ton profil, cherche des joueurs par leur nom et envoie une demande d'ami. Une fois acceptée, passe à Amis sur le Sommet pour ne te mesurer qu'à tes amis, et envoie-leur des messages et des VS depuis Messages.",
       },
       {
         question: 'Puis-je changer de pseudo ?',
         answer:
-          "Non. Tu choisis ton nom une seule fois et il ne change plus jamais ; au Sommet et dans ta ligue, tout le monde te connaît sous ce nom. Si tu n'es pas pressé, joue d'abord avec ton nom d'invité, puis choisis ton nom plus tard dans les Réglages de ton profil.",
+          "Non. Tu choisis ton nom une seule fois et il ne change plus jamais ; au Sommet et dans ta ligue, tout le monde te connaît sous ce nom. Si tu n'es pas pressé, joue d'abord avec ton nom d'invité, puis choisis ton nom plus tard dans Infos du compte, dans les Réglages.",
       },
       {
         question: 'Que se passe-t-il si je change de téléphone ?',
@@ -713,7 +713,7 @@ const es: HelpMessages = {
     lead: 'La primera vez que abres el juego empiezas con una ronda de práctica; esa ronda no cuenta en ningún sitio. Tu cuenta es una cuenta de invitado en este teléfono y, hasta que elijas un nombre, juegas con uno como guest48128742. El nombre que elijas es permanente: no cambia nunca.',
     more: [
       'En tu perfil, vincula Apple, Google o un correo con «Protege tu cuenta»; aunque cambies de teléfono, tu nombre y tus puntuaciones van contigo.',
-      'Puedes eliminar tu cuenta para siempre desde Ajustes, en tu perfil: se borran tu nombre, tus puntuaciones y tu lugar en la clasificación. No se puede deshacer.',
+      'Puedes eliminar tu cuenta para siempre desde Datos de la cuenta, en Ajustes: se borran tu nombre, tus puntuaciones y tu lugar en la clasificación. No se puede deshacer.',
     ],
   },
   faq: {
@@ -737,12 +737,12 @@ const es: HelpMessages = {
       {
         question: '¿Cómo compito con mis amigos?',
         answer:
-          'Búscalos por su nombre en Amigos y envíales una solicitud de amistad. Cuando acepten, cambia a Amigos en la Cumbre para competir solo con tus amigos, y mándales mensajes y VS desde tu buzón.',
+          'Toca tu número de amigos en tu perfil, busca jugadores por su nombre y envíales una solicitud de amistad. Cuando acepten, cambia a Amigos en la Cumbre para competir solo con tus amigos, y mándales mensajes y VS desde Mensajes.',
       },
       {
         question: '¿Puedo cambiar mi nombre de usuario?',
         answer:
-          'No. Eliges tu nombre una sola vez y no cambia nunca; en la Cumbre y en la liga todos te conocen por ese nombre. Si no tienes prisa, juega primero con tu nombre de invitado y elige tu nombre más tarde en Ajustes, en tu perfil.',
+          'No. Eliges tu nombre una sola vez y no cambia nunca; en la Cumbre y en la liga todos te conocen por ese nombre. Si no tienes prisa, juega primero con tu nombre de invitado y elige tu nombre más tarde en Datos de la cuenta, en Ajustes.',
       },
       {
         question: '¿Qué pasa si cambio de teléfono?',

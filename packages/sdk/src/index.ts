@@ -15,6 +15,7 @@ import type {
   DuelResponse,
   FinishRunRequest,
   FinishRunResponse,
+  FriendListResponse,
   FriendRequestsResponse,
   FriendsResponse,
   GoogleLinkRequest,
@@ -33,6 +34,7 @@ import type {
   Me,
   MeResponse,
   NonceResponse,
+  NotificationsResponse,
   Platform,
   PlayerResponse,
   Phrase,
@@ -221,6 +223,10 @@ export function createApiClient({ device, ...options }: ApiClientOptions) {
       blocks: () => request<BlocksResponse>('/me/blocks'),
       /** What the badges count: requests waiting, conversations wanting a look. */
       inbox: () => request<InboxSummary>('/me/inbox'),
+      /** What happened among friends, newest first — the bell's list. */
+      notifications: () => request<NotificationsResponse>('/me/notifications'),
+      /** The player has looked at the list: the bell's badge goes back to zero. */
+      seeNotifications: () => request<void>('/me/notifications/seen', { method: 'POST' }),
       /** A number that moves whenever the inbox does: asked every few seconds, it says when to fetch the lists. */
       pulse: () => request<Pulse>('/me/pulse'),
       /** The conversation with a friend; `before` a message id fetches older lines. */
@@ -305,6 +311,9 @@ export function createApiClient({ device, ...options }: ApiClientOptions) {
       search: (query: string) =>
         request<UserSearchResponse>('/users', { query: { search: query } }),
       get: (username: string) => request<PlayerResponse>(`/users/${encodeURIComponent(username)}`),
+      /** A player's friends, A to Z — theirs and their friends' to see (`friends_hidden` otherwise). */
+      friends: (username: string, cursor?: string) =>
+        request<FriendListResponse>(`/users/${encodeURIComponent(username)}/friends`, { query: { cursor } }),
       /** Sends a friend request — or accepts theirs, when it waits. */
       addFriend: (username: string) =>
         request<RelationResponse>(`/users/${encodeURIComponent(username)}/friend`, { method: 'PUT' }),

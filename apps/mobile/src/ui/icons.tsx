@@ -18,6 +18,7 @@ export type IconName =
   // affordances
   | 'chevron'
   | 'chevronDown'
+  | 'chevronUp'
   | 'back'
   | 'close'
   | 'check'
@@ -116,6 +117,7 @@ const GLYPHS: Record<IconName, (s: Stroke, color: string) => ReactNode> = {
 
   chevron: (s) => <Path d="M9.5 5.5 16 12l-6.5 6.5" {...s} />,
   chevronDown: (s) => <Path d="M5.5 9.5 12 16l6.5-6.5" {...s} />,
+  chevronUp: (s) => <Path d="M5.5 14.5 12 8l6.5 6.5" {...s} />,
   back: (s) => <Path d="M19 12H5m0 0 6.2-6.2M5 12l6.2 6.2" {...s} />,
   close: (s) => <Path d="M6 6l12 12M18 6L6 18" {...s} />,
   check: (s) => <Path d="m4.8 12.6 4.8 4.8 9.6-10.8" {...s} />,
@@ -251,7 +253,7 @@ const GLYPHS: Record<IconName, (s: Stroke, color: string) => ReactNode> = {
     </>
   ),
 
-  // The mailbox: a tray with its slot.
+  // The inbox: a tray with its slot.
   inbox: (s) => (
     <>
       <Path

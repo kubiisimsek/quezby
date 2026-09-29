@@ -29,7 +29,8 @@ type Props = NativeStackScreenProps<RootStackParamList, 'FindFriends'>;
 
 type Friendship = ReturnType<typeof useFriendship>;
 
-const SEARCH_MIN_LENGTH = 2;
+/** How much of a name a search waits for. */
+export const SEARCH_MIN_LENGTH = 2;
 
 /**
  * Arkadaş bul: a player by the start of their name, and from their row what
@@ -94,7 +95,7 @@ export function FindFriendsScreen({ navigation }: Props) {
  * (`usernameMessage`) — or null. Length is not a problem here: a search
  * is a prefix.
  */
-function nameProblem(term: string, t: Messages): string | null {
+export function nameProblem(term: string, t: Messages): string | null {
   if (term === '') return null;
   const checked = validateUsername(term);
   if (checked.ok) return null;
@@ -103,7 +104,7 @@ function nameProblem(term: string, t: Messages): string | null {
     : null;
 }
 
-type ListProps = {
+export type ListProps = {
   friendship: Friendship;
   onOpen: (username: string) => void;
   onChat: (username: string) => void;
@@ -114,7 +115,7 @@ type ListProps = {
  * just typed is on its way, the last answer stays up, narrowed to the names
  * that still match; "nobody" is only said once the API has said it.
  */
-function Results({ term, search, ...list }: ListProps & { term: string; search: ReturnType<typeof useUserSearch> }) {
+export function Results({ term, search, ...list }: ListProps & { term: string; search: ReturnType<typeof useUserSearch> }) {
   const t = useT();
   const words = t.friends.search;
   const data = search.data;

@@ -153,8 +153,13 @@ export function Stat({
       {icon ? <IconChip icon={icon} tone={STAT_GEM[tone]} size="sm" /> : null}
       <Animated.Text
         numberOfLines={1}
-        adjustsFontSizeToFit={SHRINK_TO_FIT}
-        style={[styles.statValue, { color: toneColor(theme, tone) }, embossed(2), style]}
+        style={[
+          styles.statValue,
+          valueSize(String(value)),
+          { color: toneColor(theme, tone) },
+          embossed(2),
+          style,
+        ]}
       >
         {value}
       </Animated.Text>
@@ -168,6 +173,16 @@ export function Stat({
       </Text>
     </View>
   );
+}
+
+/**
+ * A value's size by its length, so a long one ("12 sa 44 dk") still fits a
+ * third of a row. Not iOS's shrink-to-fit: inside a sheet it drew the first
+ * row a few points tall.
+ */
+export function valueSize(text: string): { fontSize: number; lineHeight: number } {
+  const size = text.length <= 6 ? 21 : text.length <= 8 ? 17 : text.length <= 10 ? 15 : 13;
+  return { fontSize: size, lineHeight: lh(size + 5) };
 }
 
 /** A stat's gem follows its tone; an ordinary number gets violet. */
@@ -269,7 +284,7 @@ const styles = StyleSheet.create({
   },
   statEdge: { height: 3, left: 0, position: 'absolute', right: 0, top: 0 },
   statLabel: { alignSelf: 'stretch', textAlign: 'center' },
-  statValue: { fontFamily: FONT.display, fontSize: 21, lineHeight: lh(26) },
+  statValue: { alignSelf: 'stretch', fontFamily: FONT.display, textAlign: 'center' },
   statRow: { flexDirection: 'row', gap: SPACE.ms },
   statGrid: { gap: SPACE.ms },
 });

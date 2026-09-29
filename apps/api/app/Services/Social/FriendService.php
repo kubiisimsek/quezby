@@ -12,6 +12,7 @@ use App\Models\Duel;
 use App\Models\User;
 use App\Services\Push\PushService;
 use App\Support\Cursor;
+use App\Support\NameCursor;
 use App\Support\Timestamp;
 use Illuminate\Container\Attributes\Config;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
@@ -282,6 +283,43 @@ final class FriendService
     public function count(User $user): int
     {
         return $this->visible($user)->count();
+    }
+
+    /** Whether `$viewer` may see `$owner`'s friend list: their own, or a friend's. */
+    public function canSeeFriends(User $viewer, User $owner): bool
+    {
+        return $viewer->is($owner) || $this->areFriends($viewer, $owner);
+    }
+
+    /**
+     * A page of `$owner`'s friends as `$viewer` sees them, A to Z: no banned
+     * player, nobody on either side of a block with the viewer. `total`
+     * counts the whole list, every page together.
+     *
+     * @param  string|null  $after  The last username of the page before.
+     * @return array{friends: Collection<int, User>, total: int, nextCursor: string|null}
+     */
+    public function listOf(User $owner, User $viewer, ?string $after): array
+    {
+        $query = $this->withoutBlocked(User::query(), $viewer)
+            ->join('friendships', 'friendships.friend_id', '=', 'users.id')
+            ->where('friendships.user_id', $owner->id)
+            ->whereNull('users.banned_at');
+
+        $rows = (clone $query)
+            ->when($after !== null, fn (EloquentBuilder $query) => $query->where('users.username', '>', $after))
+            ->orderBy('users.username')
+            ->limit(self::PAGE_SIZE + 1)
+            ->get(['users.*']);
+
+        $page = $rows->take(self::PAGE_SIZE)->values();
+        $last = $page->last();
+
+        return [
+            'friends' => $page,
+            'total' => $query->count(),
+            'nextCursor' => $rows->count() > self::PAGE_SIZE && $last !== null ? NameCursor::encode((string) $last->username) : null,
+        ];
     }
 
     /**

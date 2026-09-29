@@ -6,9 +6,11 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
+import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 import Animated, {
   Easing,
   cancelAnimation,
+  runOnJS,
   useAnimatedStyle,
   useReducedMotion,
   useSharedValue,
@@ -17,6 +19,7 @@ import Animated, {
   withSequence,
   withSpring,
   withTiming,
+  type SharedValue,
 } from 'react-native-reanimated';
 
 import { useT } from '@/i18n';
@@ -26,10 +29,12 @@ import { buttonColors } from '@/ui/kit/buttons';
 import { IconChip } from '@/ui/kit/identity';
 import { AnimatedPressable, common } from '@/ui/kit/shared';
 import { Slab } from '@/ui/kit/slab';
+import { Count } from '@/ui/kit/social';
 import { Txt } from '@/ui/kit/text';
 import { type TagTone } from '@/ui/kit/tones';
-import { SPRING_PRESS } from '@/ui/motion';
+import { SPRING, SPRING_PRESS, usePressScale } from '@/ui/motion';
 import {
+  DEPTH,
   FONT,
   RADIUS,
   SPACE,
@@ -120,6 +125,124 @@ export function LobbyCard({
     >
       {content}
     </AnimatedPressable>
+  );
+}
+
+/**
+ * A notification on the lobby — the lobby is drawn as the phone's lock
+ * screen, and what waits for the player comes in as its notifications: a VS,
+ * today's feed, the league, the rival. Every one is the same height: a gem
+ * or a portrait, what it is (small, in capitals) over one line, one live
+ * line under it, and its answer at the end.
+ *
+ * The body and the answer are two targets side by side, never one inside
+ * the other: pressing ✓ never opens the body, and a screen reader reaches
+ * each on its own.
+ */
+export function NoticeCard({
+  eyebrow,
+  title,
+  meta,
+  icon,
+  tone = 'primary',
+  lead,
+  right,
+  onPress,
+  accessibilityLabel,
+  fresh = false,
+  style,
+}: {
+  /** What kind of notice — "GÜNÜN AKIŞI #17", typed in capitals. */
+  eyebrow: string;
+  title: string;
+  /** One live line: a countdown, a meter, a tag or a few words. */
+  meta?: ReactNode;
+  icon?: IconName;
+  /** The gem's colour. */
+  tone?: TagTone;
+  /** Drawn instead of the gem — a friend's portrait. */
+  lead?: ReactNode;
+  /** The notice's answer: a slab or two, a score, a badge. */
+  right?: ReactNode;
+  onPress?: () => void;
+  /** What a screen reader says for the body; the visible lines otherwise. */
+  accessibilityLabel?: string;
+  /** Not seen yet: its top edge and its name lit in magenta. */
+  fresh?: boolean;
+  style?: StyleProp<ViewStyle>;
+}) {
+  const theme = useTheme();
+  const down = useSharedValue(0);
+  const sink = useAnimatedStyle(() => ({
+    transform: [{ translateY: down.value * 3 }],
+  }));
+
+  const body = (
+    <>
+      {lead ?? (icon ? <IconChip icon={icon} tone={tone} size="md" /> : null)}
+      <View style={styles.noticeText}>
+        <Text style={[TYPE.label, { color: fresh ? theme.primaryText : theme.inkFaint }]} numberOfLines={1}>
+          {eyebrow}
+        </Text>
+        <Text
+          numberOfLines={1}
+          adjustsFontSizeToFit={SHRINK_TO_FIT}
+          minimumFontScale={0.8}
+          style={[TYPE.heading, { color: theme.ink }]}
+        >
+          {title}
+        </Text>
+        {typeof meta === 'string' ? (
+          <Txt variant="meta" tone="muted" numberOfLines={1}>
+            {meta}
+          </Txt>
+        ) : meta ? (
+          <View style={styles.noticeMeta}>{meta}</View>
+        ) : null}
+      </View>
+    </>
+  );
+
+  return (
+    <Animated.View
+      style={[
+        common.panel,
+        styles.notice,
+        { backgroundColor: theme.tile, borderColor: theme.outline },
+        sink,
+        style,
+      ]}
+    >
+      <View
+        pointerEvents="none"
+        style={[styles.edge, { backgroundColor: fresh ? theme.primary : theme.tileHi }]}
+      />
+      {onPress ? (
+        <AnimatedPressable
+          accessibilityRole="button"
+          accessibilityLabel={accessibilityLabel}
+          onPress={onPress}
+          onPressIn={() => {
+            down.value = withTiming(1, { duration: 60 });
+          }}
+          onPressOut={() => {
+            down.value = withSpring(0, SPRING_PRESS);
+          }}
+          style={styles.noticeBody}
+        >
+          {body}
+        </AnimatedPressable>
+      ) : (
+        <View
+          accessible={Boolean(accessibilityLabel)}
+          accessibilityLabel={accessibilityLabel}
+          style={styles.noticeBody}
+        >
+          {body}
+        </View>
+      )}
+      {right ? <View style={styles.noticeRight}>{right}</View> : null}
+    </Animated.View>
   );
 }
 
@@ -255,6 +378,195 @@ export function PlayButton({
   );
 }
 
+/** How far the slab follows the thumb, and how far (or how fast) a swipe must go to start a game. */
+const LIFT = { max: 56, start: 44, flick: -700 } as const;
+
+/**
+ * The lobby's one gold action, drawn as the lock screen's "swipe up to
+ * unlock": the breathing `PlayButton` with chevrons climbing over it. A tap
+ * starts a game like any button; so does a swipe up, the move the whole feed
+ * is made of — the slab follows the thumb and springs back if the swipe was
+ * too short. The chevrons climb on the slab's breath, the lobby's one loop;
+ * they stand still wherever the slab does.
+ */
+export function SwipePlay({
+  label,
+  hint,
+  onPlay,
+  breathing = true,
+  style,
+}: {
+  label: string;
+  /** A line under the slab — "Yukarı kaydır, oyna". */
+  hint?: string;
+  onPlay: () => void;
+  breathing?: boolean;
+  style?: StyleProp<ViewStyle>;
+}) {
+  const theme = useTheme();
+  const reduced = useReducedMotion();
+  const live = breathing && !reduced;
+  const lift = useSharedValue(0);
+  const climb = useSharedValue(0);
+
+  useEffect(() => {
+    if (!live) {
+      cancelAnimation(climb);
+      climb.value = 0;
+      return;
+    }
+    climb.value = withRepeat(
+      withSequence(withTiming(1, BREATH_CURVE), withTiming(0, BREATH_CURVE)),
+      -1,
+    );
+    return () => cancelAnimation(climb);
+  }, [live, climb]);
+
+  const pan = usePanGesture({
+    activeOffsetY: -10,
+    failOffsetX: [-24, 24],
+    onUpdate: (event) => {
+      'worklet';
+      lift.value = Math.min(LIFT.max, Math.max(0, -event.translationY));
+    },
+    onDeactivate: (event) => {
+      'worklet';
+      if (event.canceled) return;
+      if (-event.translationY >= LIFT.start || event.velocityY <= LIFT.flick) {
+        runOnJS(onPlay)();
+      }
+    },
+    onFinalize: () => {
+      'worklet';
+      lift.value = reduced ? 0 : withSpring(0, SPRING);
+    },
+  });
+
+  const liftStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: -lift.value }],
+  }));
+  const chevrons = [0, 1, 2];
+
+  return (
+    <View style={[styles.swipe, style]}>
+      <View pointerEvents="none" style={styles.chevrons}>
+        {chevrons.map((i) => (
+          <Chevron key={i} step={i} climb={climb} color={theme.gold} />
+        ))}
+      </View>
+      <GestureDetector gesture={pan}>
+        <Animated.View style={liftStyle}>
+          <PlayButton label={label} onPress={onPlay} breathing={breathing} />
+        </Animated.View>
+      </GestureDetector>
+      {hint ? (
+        <Txt variant="micro" tone="faint" align="center" numberOfLines={1}>
+          {hint}
+        </Txt>
+      ) : null}
+    </View>
+  );
+}
+
+/** One of the chevrons over the slab: the higher, the fainter; all rise a little on the breath. */
+function Chevron({
+  step,
+  climb,
+  color,
+}: {
+  step: number;
+  climb: SharedValue<number>;
+  color: string;
+}) {
+  const style = useAnimatedStyle(() => ({
+    opacity: (1 - step * 0.3) * (0.55 + 0.45 * climb.value),
+    transform: [{ translateY: -3 * climb.value }],
+  }));
+  return (
+    <Animated.View style={[styles.chevron, style]}>
+      <Icon name="chevronUp" size={22} color={color} strokeWidth={3.4} />
+    </Animated.View>
+  );
+}
+
+export type CounterItem = {
+  label: string;
+  value: string;
+  /** A record, drawn in gold. */
+  gold?: boolean;
+  /** What waits behind it: a red count on the corner. */
+  badge?: number;
+  onPress?: () => void;
+  /** What a screen reader says; the value and the label otherwise. */
+  accessibilityLabel?: string;
+};
+
+/**
+ * A few numbers side by side, each in its own well: the value in Rubik over
+ * its name — a profile's REKOR · ARKADAŞ · TUR, a stats tile's headlines. A
+ * counter that opens something sinks under the thumb and may wear a count.
+ */
+export function Counters({ items }: { items: CounterItem[] }) {
+  return (
+    <View style={styles.ranks}>
+      {items.map((item) => (
+        <Counter key={item.label} item={item} />
+      ))}
+    </View>
+  );
+}
+
+function Counter({ item }: { item: CounterItem }) {
+  const theme = useTheme();
+  const press = usePressScale(0.95);
+  const well = [styles.rank, { backgroundColor: theme.well, borderColor: theme.wellLine }];
+  const content = (
+    <>
+      <Text
+        numberOfLines={1}
+        adjustsFontSizeToFit={SHRINK_TO_FIT}
+        style={[styles.rankValue, { color: item.gold ? theme.gold : theme.ink }]}
+      >
+        {item.value}
+      </Text>
+      <Text
+        style={[TYPE.micro, { color: theme.inkFaint }]}
+        numberOfLines={1}
+        adjustsFontSizeToFit={SHRINK_TO_FIT}
+        minimumFontScale={0.7}
+      >
+        {item.label}
+      </Text>
+      {item.badge ? (
+        <View pointerEvents="none" style={styles.counterBadge}>
+          <Count value={item.badge} />
+        </View>
+      ) : null}
+    </>
+  );
+  const label = item.accessibilityLabel ?? `${item.value} ${item.label}`;
+
+  if (!item.onPress) {
+    return (
+      <View accessible accessibilityLabel={label} style={well}>
+        {content}
+      </View>
+    );
+  }
+  return (
+    <AnimatedPressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      onPress={item.onPress}
+      onPressIn={press.onPressIn}
+      onPressOut={press.onPressOut}
+      style={[...well, press.style]}
+    >
+      {content}
+    </AnimatedPressable>
+  );
+}
+
 /**
  * Where you stand on each board — today, this week, this month, all time:
  * one well per board, the place in gold over its name, "—" where you have not
@@ -321,6 +633,21 @@ const styles = StyleSheet.create({
     width: 28,
   },
   body: { gap: SPACE.sm },
+  notice: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: SPACE.md,
+    minHeight: 76,
+    paddingVertical: SPACE.md,
+  },
+  noticeBody: { alignItems: 'center', flex: 1, flexDirection: 'row', gap: SPACE.md },
+  noticeText: { flex: 1, gap: 1 },
+  noticeMeta: { alignItems: 'flex-start', marginTop: 2 },
+  noticeRight: { alignItems: 'center', flexDirection: 'row', gap: SPACE.sm },
+  swipe: { gap: SPACE.xs },
+  chevrons: { alignItems: 'center', marginBottom: -SPACE.xs },
+  chevron: { height: 12, justifyContent: 'center' },
+  counterBadge: { position: 'absolute', right: -DEPTH.outline, top: -DEPTH.outline },
   playFace: {
     flexDirection: 'row',
     gap: SPACE.md,

@@ -15,6 +15,7 @@ use App\Services\PlayerDirectory;
 use App\Support\Timestamp;
 use Illuminate\Container\Attributes\Config;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -31,6 +32,9 @@ final class InboxService
 {
     public const THREAD_PAGE = 30;
 
+    /** The VS waiting for the player that the summary names. */
+    public const WAITING_SHOWN = 3;
+
     private const PRUNE_KEY = 'inbox:prune';
 
     private const PRUNE_CHUNK = 1000;
@@ -41,6 +45,7 @@ final class InboxService
         private readonly DuelService $duels,
         private readonly PlayerDirectory $players,
         private readonly InboxStamp $stamp,
+        private readonly NotificationService $notifications,
         #[Config('quezby.inbox.phrases_per_day')]
         private readonly int $phrasesPerDay,
         #[Config('quezby.inbox.keep_days')]
@@ -51,20 +56,35 @@ final class InboxService
 
     /**
      * `InboxSummary`: requests waiting, conversations wanting a look — a line
-     * unread or a VS waiting for the player — and how many of those are VS.
+     * unread or a VS waiting for the player — and how many of those are VS;
+     * the player's friends, and the first few VS waiting for them, the one
+     * running out first first; the notifications they have not seen.
      *
-     * @return array{requests: int, threads: int, yourTurn: int}
+     * @return array{requests: int, threads: int, yourTurn: int, friends: int, waiting: list<array{id: string, opponent: array<string, mixed>, expiresAt: string|null}>, notifications: int, serverTime: string|null}
      */
     public function summary(User $user): array
     {
         $this->duels->settleFor($user);
         $unread = array_keys($this->unread($user));
-        $yourTurn = $this->yourTurn($user);
+        $waiting = $this->waitingFor($user);
+        /** @var list<string> $yourTurn */
+        $yourTurn = $waiting->pluck('challenger_id')->unique()->values()->all();
+
+        $shown = $waiting->take(self::WAITING_SHOWN)->values()->load('challenger');
+        $opponents = $this->players->summaries($user, new EloquentCollection($shown->map(fn (Duel $duel) => $duel->challenger)->all()));
 
         return [
             'requests' => $this->friends->requests($user)['incoming']->count(),
             'threads' => count(array_unique([...$unread, ...$yourTurn])),
             'yourTurn' => count($yourTurn),
+            'friends' => $this->friends->count($user),
+            'waiting' => $shown->map(fn (Duel $duel, int $i) => [
+                'id' => $duel->id,
+                'opponent' => $opponents[$i],
+                'expiresAt' => Timestamp::iso($duel->expires_at),
+            ])->all(),
+            'notifications' => $this->notifications->unseenCount($user),
+            'serverTime' => Timestamp::iso(now()),
         ];
     }
 
@@ -268,11 +288,13 @@ final class InboxService
     }
 
     /**
-     * Friends whose VS waits for `$user` to play it.
+     * The VS that wait for `$user` to play them — sent by a friend who is not
+     * banned, not started yet — the one running out first first. Each is its
+     * id, `challenger_id` and `expires_at`.
      *
-     * @return list<string>
+     * @return EloquentCollection<int, Duel>
      */
-    private function yourTurn(User $user): array
+    private function waitingFor(User $user): EloquentCollection
     {
         return Duel::query()
             ->join('users', 'users.id', '=', 'duels.challenger_id')
@@ -283,10 +305,9 @@ final class InboxService
             ->where('duels.status', DuelStatus::Waiting)
             ->whereNull('duels.opponent_run_id')
             ->whereNull('users.banned_at')
-            ->pluck('duels.challenger_id')
-            ->unique()
-            ->values()
-            ->all();
+            ->orderBy('duels.expires_at')
+            ->orderBy('duels.id')
+            ->get(['duels.id', 'duels.challenger_id', 'duels.expires_at']);
     }
 
     /** @return Builder<Message> Every line between the two. */

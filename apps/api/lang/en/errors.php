@@ -26,6 +26,7 @@ return [
     'friend_limit' => 'You can have up to :limit friends.',
     'request_limit' => 'You can have up to :limit requests waiting for an answer. Send a new one once someone answers.',
     'not_friends' => 'You can only do this with a friend.',
+    'friends_hidden' => 'Only their friends can see this list.',
     'message_limit' => 'You can send this friend up to :limit messages a day.',
     'duel_unavailable' => "This VS can't be played any more.",
     'duel_limit' => 'You can have up to :limit VS waiting for an answer.',

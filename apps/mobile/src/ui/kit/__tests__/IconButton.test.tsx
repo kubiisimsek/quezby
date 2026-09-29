@@ -83,6 +83,35 @@ describe('IconButton', () => {
     });
   });
 
+  it('answers yes in green and no in red, at a row\'s size', async () => {
+    const yes = jest.fn();
+    await render(
+      <>
+        <IconButton icon="check" label="Kabul et" tone="ok" size="sm" onPress={yes} />
+        <IconButton icon="close" label="Reddet" tone="danger" size="sm" onPress={jest.fn()} />
+      </>,
+    );
+
+    const accept = screen.getByRole('button', { name: 'Kabul et' });
+    expect(within(accept).getByTestId('slab-face')).toHaveStyle({ backgroundColor: arena.ok, height: 34, width: 34 });
+    const decline = screen.getByRole('button', { name: 'Reddet' });
+    expect(within(decline).getByTestId('slab-face')).toHaveStyle({ backgroundColor: arena.bad });
+
+    await fireEvent.press(accept);
+    expect(yes).toHaveBeenCalledTimes(1);
+  });
+
+  it('spins while its answer is on the way, and cannot be pressed twice', async () => {
+    const onPress = jest.fn();
+    await render(<IconButton icon="close" label="Reddet" tone="danger" loading onPress={onPress} />);
+
+    const button = screen.getByRole('button', { name: 'Reddet' });
+    expect(button).toBeBusy();
+    expect(button).toBeDisabled();
+    await fireEvent.press(button);
+    expect(onPress).not.toHaveBeenCalled();
+  });
+
   it('says its count the way the language counts', async () => {
     useLanguage.setState({ locale: 'fr' });
     await render(

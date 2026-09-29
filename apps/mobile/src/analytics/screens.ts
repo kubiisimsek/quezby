@@ -22,8 +22,12 @@ const SCREENS: Record<Route, AnalyticsScreen> = {
   Leaderboard: 'leaderboard',
   League: 'league',
   Home: 'home',
-  Friends: 'friends',
+  // The same dock slot as before 2026-09-29, when it was Arkadaşlar: its code stays.
+  Inbox: 'friends',
   Profile: 'profile',
+  Friends: 'friend_list',
+  Account: 'account',
+  Alerts: 'alerts',
 };
 
 export function screenOf(route: string | undefined): AnalyticsScreen | null {
