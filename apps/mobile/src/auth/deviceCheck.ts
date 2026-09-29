@@ -1,7 +1,7 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { sha256Hex } from '@quezby/config';
 import { ApiError } from '@quezby/sdk';
 import type { DeviceCheckResponse } from '@quezby/types';
-import * as Keychain from 'react-native-keychain';
 
 import { api } from '@/api/client';
 import { APP_PLATFORM, GOOGLE_CLOUD_PROJECT_NUMBER } from '@/config/env';
@@ -34,8 +34,11 @@ const DEFAULTS: DeviceCheckOptions = {
   cloudProjectNumber: GOOGLE_CLOUD_PROJECT_NUMBER,
 };
 
-/** Where the attested App Attest key id is kept; one key per install. */
-export const ATTEST_KEY_SERVICE = 'quezby.appattest';
+/**
+ * Where the attested App Attest key id is kept: one key per install, gone
+ * with it. The id names a key in this phone's Secure Enclave and is no secret.
+ */
+export const ATTEST_KEY = 'quezby.appattest.v1';
 
 let running: { userId: string; done: Promise<DeviceCheckOutcome> } | null = null;
 
@@ -147,8 +150,7 @@ async function attestNewKey(): Promise<DeviceCheckResponse> {
 
 async function storedKey(): Promise<string | null> {
   try {
-    const stored = await Keychain.getGenericPassword({ service: ATTEST_KEY_SERVICE });
-    return stored ? stored.password : null;
+    return await AsyncStorage.getItem(ATTEST_KEY);
   } catch {
     return null;
   }
@@ -156,16 +158,12 @@ async function storedKey(): Promise<string | null> {
 
 async function keepKey(keyId: string): Promise<void> {
   try {
-    await Keychain.setGenericPassword('appattest', keyId, {
-      service: ATTEST_KEY_SERVICE,
-      // The key lives in this phone's Secure Enclave; a backup restored elsewhere cannot use it.
-      accessible: Keychain.ACCESSIBLE.AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY,
-    });
+    await AsyncStorage.setItem(ATTEST_KEY, keyId);
   } catch {
     // Not kept: the next check attests a new key.
   }
 }
 
 async function forgetKey(): Promise<void> {
-  await Keychain.resetGenericPassword({ service: ATTEST_KEY_SERVICE }).catch(() => undefined);
+  await AsyncStorage.removeItem(ATTEST_KEY).catch(() => undefined);
 }

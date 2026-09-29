@@ -20,11 +20,11 @@ beforeEach(() => {
   jest.mocked(getApps).mockReturnValue([{ name: '[DEFAULT]' } as ReactNativeFirebase.FirebaseApp]);
   usePush.setState({ hydrated: true, permission: null, androidBlocked: false });
   useSession.setState({ token: 'token', user: buildMe({ id: 'u1', isGuest: true }), ranks: null, hydrated: true });
-  useOnboarding.setState({ userId: 'u1', step: 'notifications', remindedFor: null, hydrated: true });
+  useOnboarding.setState({ userId: 'u1', steps: ['notifications'], remindedFor: null, hydrated: true });
 });
 
 describe('NotificationsScreen', () => {
-  it('asks a new player whether the game may tell them, and asks the system on a yes', async () => {
+  it('asks a new account whether the game may tell them, and asks the system on a yes', async () => {
     jest.mocked(hasPermission).mockResolvedValue(-1);
     jest.mocked(requestPermission).mockResolvedValue(1);
     await renderWithProviders(<NotificationsScreen />);
@@ -37,8 +37,8 @@ describe('NotificationsScreen', () => {
 
     expect(requestPermission).toHaveBeenCalledTimes(1);
     expect(usePush.getState().permission).toBe('granted');
-    // A guest goes on to keeping the account.
-    expect(useOnboarding.getState().step).toBe('protect');
+    // The last first step: on to the game.
+    expect(useOnboarding.getState().steps).toEqual([]);
   });
 
   it('moves on, whatever the system is told', async () => {
@@ -51,20 +51,18 @@ describe('NotificationsScreen', () => {
     await settle();
 
     expect(usePush.getState().permission).toBe('denied');
-    expect(useOnboarding.getState().step).toBe('protect');
+    expect(useOnboarding.getState().steps).toEqual([]);
   });
 
   it('leaves the question for later on "Şimdi değil"', async () => {
     jest.mocked(hasPermission).mockResolvedValue(-1);
-    useSession.setState({ user: buildMe({ id: 'u1', isGuest: false, identities: ['apple'] }) });
     await renderWithProviders(<NotificationsScreen />);
     await settle();
 
     await fireEvent.press(screen.getByRole('button', { name: 'Şimdi değil' }));
 
     expect(requestPermission).not.toHaveBeenCalled();
-    // A kept account has no step after this one.
-    expect(useOnboarding.getState().step).toBeNull();
+    expect(useOnboarding.getState().steps).toEqual([]);
   });
 
   it('never shows to a phone whose notifications are on already, or to a build without push', async () => {
@@ -72,12 +70,12 @@ describe('NotificationsScreen', () => {
     await renderWithProviders(<NotificationsScreen />);
     await settle();
     expect(screen.queryByText('Haberin olsun mu?')).toBeNull();
-    expect(useOnboarding.getState().step).toBe('protect');
+    expect(useOnboarding.getState().steps).toEqual([]);
 
-    useOnboarding.setState({ step: 'notifications' });
+    useOnboarding.setState({ steps: ['notifications'] });
     jest.mocked(getApps).mockReturnValue([]);
     await renderWithProviders(<NotificationsScreen />);
     await settle();
-    expect(useOnboarding.getState().step).toBe('protect');
+    expect(useOnboarding.getState().steps).toEqual([]);
   });
 });

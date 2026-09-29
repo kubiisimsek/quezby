@@ -39,22 +39,30 @@ navigation/
                      stack screen `FindFriends`; Hesap bilgileri is `Account`
 screens/
   welcome/           the arena, the mark stamped in, "Quezby" in Rubik, the four moves as gems,
-                     one gold "Oyna" (a guest account, then the practice run) and "Hesabım var,
-                     giriş yap"; a small neutral slab at the top end names the language on
-                     screen and opens LanguageSheet
-  auth/              Login (TopBar "Tekrar hoş geldin") — Apple / Google, then "ya da e-postayla"
-  username/          after the practice run "Sana ne diyelim?" — the field in a tile, magenta
-                     "Kaydet", ghost "Şimdilik geç" (the account keeps `guest48128742`); for an
-                     old account with no name, the one question before the game, gold "Devam".
-                     The line under the title says the picked name never changes
-  onboarding/        Notifications — after the name: a bell, "Haberin olsun mu?", the three
-                     kinds of news (a friend's request, a VS and its end, a message), magenta
-                     "Bildirimleri aç" (the system's own question) and ghost "Şimdi değil";
-                     a phone already asked, one whose notifications are on and a build
-                     without push skip it. Protect — "Hesabını koru" after it, for a guest:
-                     Apple / Google, "E-postayla koru", ghost "Şimdi değil"; a kept account
-                     says so before "Devam et", and an Apple / Google account that is
-                     another player's can be switched to
+                     one gold "Oyna" (the practice run — no account yet); a small neutral
+                     slab at the top end names the language on screen and opens LanguageSheet
+  onboarding/        SignIn — after the practice run and after signing out: the mark, "Giriş
+                     yap", the email and password tiles, ghost "Şifremi unuttum" at the end
+                     of the line, magenta "Giriş yap", ghost "Hesabın yok mu? Kayıt ol", a
+                     "ya da" rule, Apple / Google (`SocialButton`), ghost "Misafir olarak
+                     devam et". Consent — the mark
+                     over `ConsentCard`. Notifications — the last step: a bell, "Haberin olsun
+                     mu?", the three kinds of news (a friend's request, a VS and its end, a
+                     message), magenta "Bildirimleri aç" (the system's own question) and
+                     ghost "Şimdi değil"; a phone already asked, one whose notifications are
+                     on and a build without push skip it
+  auth/              Register (TopBar "Kayıt ol") — email, password, "Şifreyi doğrula", magenta
+                     "Kayıt ol"; an email with an account gets a warn callout with "Giriş yap".
+                     VerifyEmail (TopBar "E-postanı doğrula") — a mail gem, where the code went,
+                     `CodeField`, magenta "Doğrula", ghost `ResendButton` counting the wait
+                     down (`components/EmailCode.tsx`). ForgotPassword (TopBar "Şifremi
+                     unuttum") — the email and "Kod gönder", then the code, the new password
+                     twice and "Şifreyi değiştir" on the same screen
+  username/          after a sign-in, while the name is automatic: "Sana ne diyelim?" — the
+                     field in a tile, magenta "Kaydet", ghost "Şimdilik geç" (the account keeps
+                     `guest48128742`); for an old account with no name, the one question before
+                     the game, gold "Devam". The line under the title says the picked name
+                     never changes
   home/              the lobby, drawn as a lock screen: a status strip (framed portrait — your
                      photo — with the league emblem; the bell, `IconButton` "bell" with a red
                      count of what you have not seen yet, → Alerts; Yardım); the clock — "SEZON REKORU", the

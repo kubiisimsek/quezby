@@ -1,28 +1,65 @@
 import type { Locale } from '@quezby/types';
 
 /**
- * Accounts: signing back in (`login`), an email and password to keep one
- * (`credentials`), the ways in attached to it (`ways`), Apple and Google
- * themselves (`social`), and a new guest's "Hesabını koru" step (`protect`).
- * Apple and Google are the companies' names in every language and come in as
- * `provider`; their buttons' own words are the kit's.
+ * Accounts: the ways in on a phone with no account (`join`), a new email
+ * account (`register`), the emailed code that proves an address (`verify`),
+ * a forgotten password (`forgot`), an email and password to keep a guest
+ * (`credentials`), the ways in attached to it (`ways`), and Apple and Google
+ * themselves (`social`). Apple and Google are the companies' names in every
+ * language and come in as `provider`; their buttons' own words are the kit's.
  */
 const tr = {
   /** The email field, and its tile among the ways in. */
   email: 'E-posta',
   password: 'Şifre',
-  /** Attach a way in to a guest account: the step, the sheet and the email form. */
+  /** A password typed twice, to be sure: a new account, a new password, an email attached. */
+  confirmPassword: 'Şifreyi doğrula',
+  /** Attach a way in to a guest account: the sheet and the email form. */
   keepAccount: 'Hesabını koru',
   keepWithEmail: 'E-postayla koru',
   /** Apple or Google, just attached. */
   linked: (provider: string) => `${provider} bağlandı`,
-  login: {
-    title: 'Tekrar hoş geldin',
-    intro:
-      'Hesabını Apple, Google ya da e-postayla koruduysan buradan dönebilirsin. Skorların ve kullanıcı adın seninle gelir.',
-    orEmail: 'ya da e-postayla',
-    missing: 'E-postanı ve şifreni yaz.',
+  /** The ways in on a phone with no account: signing in, then signing up, Apple, Google, a guest. */
+  join: {
+    title: 'Giriş yap',
     submit: 'Giriş yap',
+    missing: 'E-postanı ve şifreni yaz.',
+    forgot: 'Şifremi unuttum',
+    noAccount: 'Hesabın yok mu? Kayıt ol',
+    or: 'ya da',
+    guest: 'Misafir olarak devam et',
+  },
+  /** A new email account: the code comes before the account. */
+  register: {
+    title: 'Kayıt ol',
+    submit: 'Kayıt ol',
+    mismatch: 'Şifreler aynı değil.',
+    exists: 'Bu e-postayla bir hesabın var.',
+    toLogin: 'Giriş yap',
+    haveAccount: 'Hesabın var mı? Giriş yap',
+  },
+  /** The six-digit code emailed to prove an address: a sign-up, an email attached. */
+  verify: {
+    title: 'E-postanı doğrula',
+    body: (email: string) => `${email} adresine 6 haneli bir kod gönderdik.`,
+    code: 'Kod',
+    submit: 'Doğrula',
+    short: 'Kodun 6 hanesini yaz.',
+    resend: 'Kodu tekrar gönder',
+    /** The wait before a new code, as the clock shows it: "0:42". */
+    resendIn: (time: string) => `Kodu tekrar gönder (${time})`,
+    sent: 'Yeni kodu gönderdik.',
+    spam: 'Gelmediyse gereksiz klasörüne bak.',
+  },
+  /** A forgotten password: a code to the account's email, then the new password. */
+  forgot: {
+    title: 'Şifremi unuttum',
+    body: 'Hesabının e-postasını yaz, sana bir kod gönderelim.',
+    send: 'Kod gönder',
+    email: 'Geçerli bir e-posta yaz.',
+    codeBody: (email: string) => `${email} adresine bir kod gönderdik. Kodu ve yeni şifreni yaz.`,
+    newPassword: 'Yeni şifre',
+    submit: 'Şifreyi değiştir',
   },
   credentials: {
     title: 'E-posta bağla',
@@ -51,18 +88,6 @@ const tr = {
   social: {
     failed: (provider: string) => `${provider} ile giriş şu an yapılamadı. Biraz sonra tekrar dene.`,
   },
-  protect: {
-    body: 'Bu hesap şu an yalnızca bu telefonda. Bir giriş yolu bağla; telefonun değişse de adın, skorların ve ligin seninle gelsin.',
-    emailLinked: 'E-posta bağlandı',
-    wayLinked: 'Giriş yolu bağlandı',
-    keptBody: 'Hesabın artık korunuyor. Başka bir telefondan da girebilirsin.',
-    continue: 'Devam et',
-    /** After the API's own line: the Apple or Google account is another player's. */
-    identityTaken: (problem: string) =>
-      `${problem} O hesapla oynamak istersen ona geçebilirsin; bu yeni hesap burada kalır.`,
-    switchTo: (provider: string) => `${provider} hesabıma geç`,
-    notNow: 'Şimdi değil',
-  },
 };
 
 export type AuthMessages = typeof tr;
@@ -70,16 +95,46 @@ export type AuthMessages = typeof tr;
 const en: AuthMessages = {
   email: 'Email',
   password: 'Password',
+  confirmPassword: 'Confirm password',
   keepAccount: 'Protect your account',
   keepWithEmail: 'Protect with email',
   linked: (provider) => `${provider} linked`,
-  login: {
-    title: 'Welcome back',
-    intro:
-      'If you protected your account with Apple, Google or email, sign back in here. Your scores and username come with you.',
-    orEmail: 'or with email',
-    missing: 'Enter your email and password.',
+  join: {
+    title: 'Sign in',
     submit: 'Sign in',
+    missing: 'Enter your email and password.',
+    forgot: 'Forgot password?',
+    noAccount: 'No account yet? Sign up',
+    or: 'or',
+    guest: 'Continue as guest',
+  },
+  register: {
+    title: 'Sign up',
+    submit: 'Sign up',
+    mismatch: "Passwords don't match.",
+    exists: 'You already have an account with this email.',
+    toLogin: 'Sign in',
+    haveAccount: 'Have an account? Sign in',
+  },
+  verify: {
+    title: 'Verify your email',
+    body: (email) => `We sent a 6-digit code to ${email}.`,
+    code: 'Code',
+    submit: 'Verify',
+    short: 'Enter all 6 digits.',
+    resend: 'Send the code again',
+    resendIn: (time) => `Send the code again (${time})`,
+    sent: 'We sent a new code.',
+    spam: 'Not there? Check your spam folder.',
+  },
+  forgot: {
+    title: 'Forgot password',
+    body: "Enter your account's email and we'll send you a code.",
+    send: 'Send code',
+    email: 'Enter a valid email.',
+    codeBody: (email) => `We sent a code to ${email}. Enter it and your new password.`,
+    newPassword: 'New password',
+    submit: 'Change password',
   },
   credentials: {
     title: 'Link an email',
@@ -106,32 +161,51 @@ const en: AuthMessages = {
   social: {
     failed: (provider) => `Couldn't sign in with ${provider} right now. Try again in a bit.`,
   },
-  protect: {
-    body: 'This account only lives on this phone for now. Link a sign-in method so your name, scores and league come with you, even to a new phone.',
-    emailLinked: 'Email linked',
-    wayLinked: 'Sign-in method linked',
-    keptBody: 'Your account is protected now. You can sign in from another phone too.',
-    continue: 'Continue',
-    identityTaken: (problem) =>
-      `${problem} To play with that account, you can switch to it; this new one stays here.`,
-    switchTo: (provider) => `Switch to my ${provider} account`,
-    notNow: 'Not now',
-  },
 };
 
 const de: AuthMessages = {
   email: 'E-Mail',
   password: 'Passwort',
+  confirmPassword: 'Passwort bestätigen',
   keepAccount: 'Konto sichern',
   keepWithEmail: 'Mit E-Mail sichern',
   linked: (provider) => `${provider} verknüpft`,
-  login: {
-    title: 'Willkommen zurück',
-    intro:
-      'Hast du dein Konto mit Apple, Google oder E-Mail gesichert, meldest du dich hier wieder an. Deine Scores und dein Name kommen mit.',
-    orEmail: 'oder mit E-Mail',
-    missing: 'Gib deine E-Mail und dein Passwort ein.',
+  join: {
+    title: 'Anmelden',
     submit: 'Anmelden',
+    missing: 'Gib deine E-Mail und dein Passwort ein.',
+    forgot: 'Passwort vergessen?',
+    noAccount: 'Noch kein Konto? Registrieren',
+    or: 'oder',
+    guest: 'Als Gast weiterspielen',
+  },
+  register: {
+    title: 'Registrieren',
+    submit: 'Registrieren',
+    mismatch: 'Die Passwörter stimmen nicht überein.',
+    exists: 'Mit dieser E-Mail hast du schon ein Konto.',
+    toLogin: 'Anmelden',
+    haveAccount: 'Schon ein Konto? Anmelden',
+  },
+  verify: {
+    title: 'Bestätige deine E-Mail',
+    body: (email) => `Wir haben einen 6-stelligen Code an ${email} geschickt.`,
+    code: 'Code',
+    submit: 'Bestätigen',
+    short: 'Gib alle 6 Ziffern ein.',
+    resend: 'Code erneut senden',
+    resendIn: (time) => `Code erneut senden (${time})`,
+    sent: 'Wir haben einen neuen Code geschickt.',
+    spam: 'Nicht da? Schau in deinen Spam-Ordner.',
+  },
+  forgot: {
+    title: 'Passwort vergessen',
+    body: 'Gib die E-Mail deines Kontos ein, dann schicken wir dir einen Code.',
+    send: 'Code senden',
+    email: 'Gib eine gültige E-Mail ein.',
+    codeBody: (email) => `Wir haben einen Code an ${email} geschickt. Gib ihn und dein neues Passwort ein.`,
+    newPassword: 'Neues Passwort',
+    submit: 'Passwort ändern',
   },
   credentials: {
     title: 'E-Mail verknüpfen',
@@ -159,32 +233,51 @@ const de: AuthMessages = {
   social: {
     failed: (provider) => `Die Anmeldung mit ${provider} klappt gerade nicht. Versuch es gleich noch mal.`,
   },
-  protect: {
-    body: 'Dieses Konto gibt es gerade nur auf diesem Handy. Verknüpf einen Anmeldeweg, damit Name, Scores und Liga auch auf ein neues Handy mitkommen.',
-    emailLinked: 'E-Mail verknüpft',
-    wayLinked: 'Anmeldeweg verknüpft',
-    keptBody: 'Dein Konto ist jetzt gesichert. Du kannst dich auch auf einem anderen Handy anmelden.',
-    continue: 'Weiter',
-    identityTaken: (problem) =>
-      `${problem} Willst du mit diesem Konto spielen, kannst du dorthin wechseln; dieses neue Konto bleibt hier.`,
-    switchTo: (provider) => `Zu meinem ${provider}-Konto wechseln`,
-    notNow: 'Nicht jetzt',
-  },
 };
 
 const ar: AuthMessages = {
   email: 'البريد الإلكتروني',
   password: 'كلمة المرور',
+  confirmPassword: 'تأكيد كلمة المرور',
   keepAccount: 'احمِ حسابك',
   keepWithEmail: 'الحماية بالبريد الإلكتروني',
   linked: (provider) => `تم ربط ‎${provider}‎`,
-  login: {
-    title: 'مرحبًا بعودتك',
-    intro:
-      'إن كنت قد حميت حسابك باستخدام Apple أو Google أو البريد الإلكتروني فعُد إليه من هنا. ستنتقل معك نتائجك واسم المستخدم الخاص بك.',
-    orEmail: 'أو بالبريد الإلكتروني',
-    missing: 'اكتب بريدك الإلكتروني وكلمة المرور.',
+  join: {
+    title: 'تسجيل الدخول',
     submit: 'تسجيل الدخول',
+    missing: 'اكتب بريدك الإلكتروني وكلمة المرور.',
+    forgot: 'نسيت كلمة المرور؟',
+    noAccount: 'ليس لديك حساب؟ أنشئ حسابًا',
+    or: 'أو',
+    guest: 'المتابعة كضيف',
+  },
+  register: {
+    title: 'إنشاء حساب',
+    submit: 'إنشاء حساب',
+    mismatch: 'كلمتا المرور غير متطابقتين.',
+    exists: 'لديك حساب بهذا البريد الإلكتروني.',
+    toLogin: 'تسجيل الدخول',
+    haveAccount: 'لديك حساب؟ سجّل الدخول',
+  },
+  verify: {
+    title: 'أكّد بريدك الإلكتروني',
+    body: (email) => `أرسلنا رمزًا من 6 أرقام إلى ‎${email}‎.`,
+    code: 'الرمز',
+    submit: 'تأكيد',
+    short: 'اكتب الأرقام الستة كلها.',
+    resend: 'أعد إرسال الرمز',
+    resendIn: (time) => `أعد إرسال الرمز (‎${time}‎)`,
+    sent: 'أرسلنا رمزًا جديدًا.',
+    spam: 'لم يصل؟ تحقّق من مجلد الرسائل غير المرغوب فيها.',
+  },
+  forgot: {
+    title: 'نسيت كلمة المرور',
+    body: 'اكتب البريد الإلكتروني لحسابك وسنرسل إليك رمزًا.',
+    send: 'إرسال الرمز',
+    email: 'اكتب بريدًا إلكترونيًا صالحًا.',
+    codeBody: (email) => `أرسلنا رمزًا إلى ‎${email}‎. اكتبه مع كلمة المرور الجديدة.`,
+    newPassword: 'كلمة المرور الجديدة',
+    submit: 'تغيير كلمة المرور',
   },
   credentials: {
     title: 'ربط بريد إلكتروني',
@@ -213,32 +306,51 @@ const ar: AuthMessages = {
     failed: (provider) =>
       `تعذّر تسجيل الدخول باستخدام ‎${provider}‎ الآن. حاول مرة أخرى بعد قليل.`,
   },
-  protect: {
-    body: 'هذا الحساب موجود على هذا الهاتف فقط حاليًا. اربط طريقة لتسجيل الدخول لينتقل معك اسمك ونتائجك ودوريك حتى لو تغيّر هاتفك.',
-    emailLinked: 'تم ربط البريد الإلكتروني',
-    wayLinked: 'تم ربط طريقة تسجيل الدخول',
-    keptBody: 'حسابك محميّ الآن. يمكنك الدخول إليه من هاتف آخر أيضًا.',
-    continue: 'متابعة',
-    identityTaken: (problem) =>
-      `${problem} إن أردت اللعب بذلك الحساب فيمكنك الانتقال إليه، ويبقى هذا الحساب الجديد هنا.`,
-    switchTo: (provider) => `الانتقال إلى حسابي على ‎${provider}‎`,
-    notNow: 'ليس الآن',
-  },
 };
 
 const fr: AuthMessages = {
   email: 'E-mail',
   password: 'Mot de passe',
+  confirmPassword: 'Confirme le mot de passe',
   keepAccount: 'Protège ton compte',
   keepWithEmail: 'Protéger avec un e-mail',
   linked: (provider) => `${provider} lié`,
-  login: {
-    title: 'Content de te revoir',
-    intro:
-      'Si tu as protégé ton compte avec Apple, Google ou un e-mail, tu peux le retrouver ici. Tes scores et ton pseudo te suivent.',
-    orEmail: 'ou avec un e-mail',
-    missing: 'Saisis ton e-mail et ton mot de passe.',
+  join: {
+    title: 'Connexion',
     submit: 'Se connecter',
+    missing: 'Saisis ton e-mail et ton mot de passe.',
+    forgot: 'Mot de passe oublié ?',
+    noAccount: "Pas encore de compte ? S'inscrire",
+    or: 'ou',
+    guest: 'Continuer en invité',
+  },
+  register: {
+    title: "S'inscrire",
+    submit: "S'inscrire",
+    mismatch: 'Les mots de passe ne correspondent pas.',
+    exists: 'Tu as déjà un compte avec cet e-mail.',
+    toLogin: 'Se connecter',
+    haveAccount: 'Déjà un compte ? Se connecter',
+  },
+  verify: {
+    title: 'Confirme ton e-mail',
+    body: (email) => `On a envoyé un code à 6 chiffres à ${email}.`,
+    code: 'Code',
+    submit: 'Valider',
+    short: 'Saisis les 6 chiffres.',
+    resend: 'Renvoyer le code',
+    resendIn: (time) => `Renvoyer le code (${time})`,
+    sent: 'On a envoyé un nouveau code.',
+    spam: 'Rien reçu ? Regarde dans tes spams.',
+  },
+  forgot: {
+    title: 'Mot de passe oublié',
+    body: "Saisis l'e-mail de ton compte, on t'envoie un code.",
+    send: 'Envoyer le code',
+    email: 'Saisis un e-mail valide.',
+    codeBody: (email) => `On a envoyé un code à ${email}. Saisis-le avec ton nouveau mot de passe.`,
+    newPassword: 'Nouveau mot de passe',
+    submit: 'Changer le mot de passe',
   },
   credentials: {
     title: 'Lier un e-mail',
@@ -266,32 +378,51 @@ const fr: AuthMessages = {
   social: {
     failed: (provider) => `Connexion avec ${provider} impossible pour le moment. Réessaie un peu plus tard.`,
   },
-  protect: {
-    body: "Pour l'instant, ce compte n'existe que sur ce téléphone. Lie un moyen de connexion pour garder ton nom, tes scores et ta ligue, même sur un nouveau téléphone.",
-    emailLinked: 'E-mail lié',
-    wayLinked: 'Moyen de connexion lié',
-    keptBody: 'Ton compte est maintenant protégé. Tu peux aussi te connecter depuis un autre téléphone.',
-    continue: 'Continuer',
-    identityTaken: (problem) =>
-      `${problem} Pour jouer avec ce compte-là, tu peux passer dessus ; ce nouveau compte reste ici.`,
-    switchTo: (provider) => `Passer à mon compte ${provider}`,
-    notNow: 'Pas maintenant',
-  },
 };
 
 const es: AuthMessages = {
   email: 'Correo',
   password: 'Contraseña',
+  confirmPassword: 'Confirma la contraseña',
   keepAccount: 'Protege tu cuenta',
   keepWithEmail: 'Proteger con correo',
   linked: (provider) => `${provider} vinculado`,
-  login: {
-    title: 'Hola de nuevo',
-    intro:
-      'Si protegiste tu cuenta con Apple, Google o tu correo, puedes volver desde aquí. Tus puntuaciones y tu nombre de usuario vienen contigo.',
-    orEmail: 'o con tu correo',
-    missing: 'Escribe tu correo y tu contraseña.',
+  join: {
+    title: 'Iniciar sesión',
     submit: 'Iniciar sesión',
+    missing: 'Escribe tu correo y tu contraseña.',
+    forgot: '¿Olvidaste tu contraseña?',
+    noAccount: '¿No tienes cuenta? Regístrate',
+    or: 'o',
+    guest: 'Continuar como invitado',
+  },
+  register: {
+    title: 'Registrarse',
+    submit: 'Registrarse',
+    mismatch: 'Las contraseñas no coinciden.',
+    exists: 'Ya tienes una cuenta con este correo.',
+    toLogin: 'Iniciar sesión',
+    haveAccount: '¿Ya tienes cuenta? Inicia sesión',
+  },
+  verify: {
+    title: 'Verifica tu correo',
+    body: (email) => `Enviamos un código de 6 dígitos a ${email}.`,
+    code: 'Código',
+    submit: 'Verificar',
+    short: 'Escribe los 6 dígitos.',
+    resend: 'Reenviar el código',
+    resendIn: (time) => `Reenviar el código (${time})`,
+    sent: 'Te enviamos un código nuevo.',
+    spam: '¿No llegó? Mira en la carpeta de spam.',
+  },
+  forgot: {
+    title: 'Olvidé mi contraseña',
+    body: 'Escribe el correo de tu cuenta y te enviaremos un código.',
+    send: 'Enviar código',
+    email: 'Escribe un correo válido.',
+    codeBody: (email) => `Enviamos un código a ${email}. Escríbelo junto con tu nueva contraseña.`,
+    newPassword: 'Nueva contraseña',
+    submit: 'Cambiar contraseña',
   },
   credentials: {
     title: 'Vincular correo',
@@ -318,17 +449,6 @@ const es: AuthMessages = {
   },
   social: {
     failed: (provider) => `No se pudo iniciar sesión con ${provider} ahora. Inténtalo de nuevo en un rato.`,
-  },
-  protect: {
-    body: 'Por ahora, esta cuenta solo está en este teléfono. Vincula un método de acceso para que tu nombre, tus puntuaciones y tu liga te acompañen aunque cambies de teléfono.',
-    emailLinked: 'Correo vinculado',
-    wayLinked: 'Método de acceso vinculado',
-    keptBody: 'Tu cuenta ya está protegida. También puedes entrar desde otro teléfono.',
-    continue: 'Continuar',
-    identityTaken: (problem) =>
-      `${problem} Si quieres jugar con esa cuenta, puedes cambiarte a ella; esta cuenta nueva se queda aquí.`,
-    switchTo: (provider) => `Cambiar a mi cuenta de ${provider}`,
-    notNow: 'Ahora no',
   },
 };
 

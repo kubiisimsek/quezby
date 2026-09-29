@@ -9,11 +9,12 @@ kez seçilir, bir daha değişmez.
 
 ## Otomatik ad
 
-Hesap açılırken (misafir ya da Apple/Google ile yeni hesap) sunucu ona
+Hesap açılırken (misafir, e-posta ya da Apple/Google ile yeni hesap) sunucu ona
 `guest` + 8 rakam bir ad verir: `guest48128742` (`App\Services\Identity\GuestNames`,
 100 milyon ihtimal; alınmışsa yeniden çekilir, aynı anda çakışmayı unique index
-çözer). Oyuncu deneme turundan sonra "Sana ne diyelim?" adımında bir ad seçer
-ya da **Şimdilik geç** der ve bu adla oynar. Adlar küçük harfle saklandığı için
+çözer). Apple, Google ya da e-postayla giren oyuncuya, hesabın adı hâlâ
+otomatikse girişin hemen ardından "Sana ne diyelim?" sorulur; bir ad seçer ya da
+**Şimdilik geç** der ve bu adla oynar. Misafire sorulmaz; adını Profil'den seçer. Adlar küçük harfle saklandığı için
 `Guest48128742` değil `guest48128742` görünür.
 
 - `isAutoUsername` (TS) / `Username::isAutomatic` (PHP): ad hâlâ otomatik mi.

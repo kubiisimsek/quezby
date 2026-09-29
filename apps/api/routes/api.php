@@ -22,6 +22,7 @@ use App\Http\Controllers\MediaController;
 use App\Http\Controllers\ModerationController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OpsController;
+use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\PushTokenController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\ReportController;
@@ -52,6 +53,11 @@ Route::prefix('v1')->group(function () {
         Route::get('app/config', AppConfigController::class);
 
         Route::post('auth/guest', [AuthController::class, 'guest'])->middleware('throttle:guest-signup');
+        Route::post('auth/register', [AuthController::class, 'register'])->middleware('throttle:register');
+        Route::post('auth/register/resend', [AuthController::class, 'resendRegistration'])->middleware('throttle:email-send');
+        Route::post('auth/register/verify', [AuthController::class, 'verifyRegistration'])->middleware('throttle:email-verify');
+        Route::post('auth/password/forgot', [PasswordController::class, 'forgot'])->middleware('throttle:email-send');
+        Route::post('auth/password/reset', [PasswordController::class, 'reset'])->middleware('throttle:email-verify');
         Route::post('auth/login', [AuthController::class, 'login'])->middleware('throttle:login');
         Route::post('auth/nonce', [SocialAuthController::class, 'nonce'])->middleware('throttle:auth-nonce');
         Route::post('auth/apple', [SocialAuthController::class, 'apple'])->middleware('throttle:social-auth');
@@ -66,7 +72,9 @@ Route::prefix('v1')->group(function () {
             Route::put('me/username', [UsernameController::class, 'update'])->middleware('throttle:username-update');
             Route::put('me/settings', SettingsController::class);
             Route::put('me/locale', LocaleController::class);
-            Route::post('me/credentials', CredentialsController::class);
+            Route::post('me/credentials', [CredentialsController::class, 'store'])->middleware('throttle:email-send');
+            Route::post('me/credentials/resend', [CredentialsController::class, 'resend'])->middleware('throttle:email-send');
+            Route::post('me/credentials/verify', [CredentialsController::class, 'verify'])->middleware('throttle:email-verify');
             Route::post('me/identities/{provider}', [IdentityController::class, 'store'])->middleware('throttle:identities');
             Route::delete('me/identities/{provider}', [IdentityController::class, 'destroy'])->middleware('throttle:identities');
             Route::get('me/stats', StatsController::class)->middleware('throttle:reads');

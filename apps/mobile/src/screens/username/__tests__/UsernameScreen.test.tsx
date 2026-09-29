@@ -7,7 +7,7 @@ import { useSession } from '@/auth/session';
 import { iso } from '@/i18n';
 import { useLanguage } from '@/i18n/language';
 import { UsernameScreen } from '@/screens/username/UsernameScreen';
-import { useOnboarding } from '@/stores/onboarding';
+import { stepFor, useOnboarding } from '@/stores/onboarding';
 import { buildMe } from '@/test/factories';
 import { renderWithProviders } from '@/test/renderWithProviders';
 
@@ -22,10 +22,15 @@ const mocked = api as unknown as {
   usernames: { check: jest.Mock };
 };
 
-function signedIn(overrides: Parameters<typeof buildMe>[0] = {}, step: 'nickname' | null = 'nickname') {
+function signedIn(overrides: Parameters<typeof buildMe>[0] = {}, step: 'username' | null = 'username') {
   const user = buildMe({ id: 'u1', username: 'guest48128742', ...overrides });
   useSession.setState({ token: 'token', user, ranks: null, hydrated: true });
-  useOnboarding.setState({ userId: 'u1', step, remindedFor: null, hydrated: true });
+  useOnboarding.setState({
+    userId: 'u1',
+    steps: step ? [step, 'consent', 'notifications'] : [],
+    remindedFor: null,
+    hydrated: true,
+  });
   return user;
 }
 
@@ -40,7 +45,7 @@ describe('UsernameScreen', () => {
     jest.clearAllMocks();
   });
 
-  it('asks a new player for a name, and says what they are called until then', async () => {
+  it('asks a player who just signed in for a name, and says what they are called until then', async () => {
     signedIn();
     await renderWithProviders(<UsernameScreen />);
 
@@ -58,14 +63,14 @@ describe('UsernameScreen', () => {
     expect(screen.queryByText(/değiştir/)).toBeNull();
   });
 
-  it('lets a new player skip it, keeping the automatic name, and moves on to notifications', async () => {
+  it('lets a new player skip it, keeping the automatic name, and moves on to the usage question', async () => {
     signedIn();
     await renderWithProviders(<UsernameScreen />);
 
     await fireEvent.press(screen.getByText('Şimdilik geç'));
 
     expect(mocked.me.updateUsername).not.toHaveBeenCalled();
-    expect(useOnboarding.getState().step).toBe('notifications');
+    expect(stepFor(useOnboarding.getState(), 'u1')).toBe('consent');
     expect(track).toHaveBeenCalledWith('nickname_skip');
   });
 
@@ -80,16 +85,16 @@ describe('UsernameScreen', () => {
 
     expect(mocked.me.updateUsername).toHaveBeenCalledWith('ekin.su');
     expect(useSession.getState().user?.username).toBe('ekin.su');
-    expect(useOnboarding.getState().step).toBe('notifications');
+    expect(stepFor(useOnboarding.getState(), 'u1')).toBe('consent');
   });
 
-  it('moves an account that is already kept on to notifications too', async () => {
+  it('moves an account that is already kept on to the usage question too', async () => {
     signedIn({ isGuest: false, identities: ['apple'] });
     await renderWithProviders(<UsernameScreen />);
 
     await fireEvent.press(screen.getByText('Şimdilik geç'));
 
-    expect(useOnboarding.getState().step).toBe('notifications');
+    expect(stepFor(useOnboarding.getState(), 'u1')).toBe('consent');
   });
 
   it('cannot be skipped by an account with no name at all', async () => {
@@ -115,7 +120,7 @@ describe('UsernameScreen', () => {
     expect(await screen.findByText('Kullanıcı adını zaten seçtin; seçilen ad değişmez.')).toBeTruthy();
     expect(useSession.getState().user?.username).toBe('ekin');
     await fireEvent.press(screen.getByText('Şimdilik geç'));
-    expect(useOnboarding.getState().step).toBe('notifications');
+    expect(stepFor(useOnboarding.getState(), 'u1')).toBe('consent');
   });
 
   it('is the one question before the game for an account from before automatic names', async () => {
@@ -130,7 +135,7 @@ describe('UsernameScreen', () => {
     await fireEvent.press(screen.getByText('Devam'));
 
     expect(useSession.getState().user?.username).toBe('kubi');
-    expect(useOnboarding.getState().step).toBeNull();
+    expect(useOnboarding.getState().steps).toEqual([]);
   });
 
   it('asks a new player for a name in English, and says the pick is for good', async () => {
@@ -161,7 +166,7 @@ describe('UsernameScreen', () => {
 
     await fireEvent.press(screen.getByRole('button', { name: 'تخطَّ الآن' }));
 
-    expect(useOnboarding.getState().step).toBe('notifications');
+    expect(stepFor(useOnboarding.getState(), 'u1')).toBe('consent');
   });
 
   it('asks an account without a name in German, and reads a refusal in the language of the moment', async () => {

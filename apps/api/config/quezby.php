@@ -382,6 +382,25 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Email codes
+    |--------------------------------------------------------------------------
+    |
+    | The six-digit code that proves an email: a new email account, an email
+    | attached to an account, a password reset (`EmailCodes`). It goes out in
+    | the language the player signed up in, through the mailer of `MAIL_*`.
+    |
+    */
+
+    'email_codes' => [
+        'ttl_minutes' => 15,
+        // A new code no sooner than this after the last one.
+        'resend_seconds' => 60,
+        // Wrong tries before the code is gone and a new one must be asked for.
+        'max_attempts' => 5,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Leaderboards
     |--------------------------------------------------------------------------
     |

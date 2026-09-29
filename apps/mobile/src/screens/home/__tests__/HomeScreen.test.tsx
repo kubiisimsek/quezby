@@ -174,7 +174,7 @@ describe('HomeScreen', () => {
     useDeviceVerdict.setState({ userId: null, verdict: null, validUntil: null, hydrated: true });
     useSettings.setState({ hydrated: true, consent: 'synced', analytics: true });
     // Asked already — the reminder has tests of its own below.
-    useOnboarding.setState({ userId: null, step: null, remindedFor: 'player-1', hydrated: true });
+    useOnboarding.setState({ userId: null, steps: [], remindedFor: 'player-1', hydrated: true });
   });
 
   it('is a lobby, not a manual: the how-to section is gone', async () => {
@@ -552,7 +552,7 @@ describe('HomeScreen', () => {
     });
 
     it('keeps the league reminder for after the answer', async () => {
-      useOnboarding.setState({ userId: null, step: null, remindedFor: null, hydrated: true });
+      useOnboarding.setState({ userId: null, steps: [], remindedFor: null, hydrated: true });
       await renderLobby();
 
       expect(screen.queryByText(/^Ligdesin!/)).not.toBeOnTheScreen();
@@ -565,7 +565,7 @@ describe('HomeScreen', () => {
 
   describe('once a guest is placed in a league', () => {
     beforeEach(() => {
-      useOnboarding.setState({ userId: null, step: null, remindedFor: null, hydrated: true });
+      useOnboarding.setState({ userId: null, steps: [], remindedFor: null, hydrated: true });
     });
 
     it('does not ask while the placement games are still being played', async () => {

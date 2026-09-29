@@ -102,9 +102,61 @@ in the request's language (`Me.locale`). The digits are drawn at random; a taken
 on the unique index draws once more. Names like it are reserved: no player can
 pick one (`PUT /me/username` → `422 username_invalid`, `reserved`).
 
+### Email codes
+
+Every email address is proved before it counts: a six-digit code goes to it,
+in the language the player **signed up in** (a sign-up: the request's; an
+attached email or a reset: the account's `locale`). Only the code's HMAC is
+kept (`email_codes`). A code is good for 15 minutes; a new one no sooner than
+60 seconds after the last (asking again sooner keeps the live code and sends
+nothing); 5 wrong tries expire it, and a new one can still be asked for.
+Every call that sends one answers **`202 CodeSentResponse`**:
+`{ "email", "resendIn": 60, "expiresAt" }` — `resendIn` is the seconds before
+a new code may go out. A wrong code is `422 code_invalid`; an expired, used
+up or never sent one `422 code_expired`. Sending is throttled to 20 an hour
+per IP (`throttle:email-send`), checking to 20 a minute (`throttle:email-verify`).
+The mail goes through `MAIL_*` (SMTP on staging and production; `log` locally,
+where each code lands in `storage/logs/laravel.log`).
+
+### `POST /auth/register` — public
+
+`{ "email", "password", "platform", "installId" }` → `202 CodeSentResponse`.
+The first half of an email sign-up: **nothing is made yet** and no token is
+given. The password (≥ 8) waits, hashed, with the code. An email an account
+holds → `409 email_taken` (accounts are never merged). Calling again while the
+code is fresh keeps it and takes the new password. 10 an hour per IP
+(`throttle:register`).
+
+### `POST /auth/register/resend` — public
+
+`{ "email" }` → `202 CodeSentResponse`, or `422 code_expired` when no sign-up
+waits for that email.
+
+### `POST /auth/register/verify` — public
+
+`{ "email", "code" }` → `201 { "token", "user": Me }`: the account is made and
+signed in — an email account from the start (`isGuest: false`), named `guest`
++ 8 digits until its player picks a name, playing in the language it signed up
+in, on the platform and install id it signed up from. `409 email_taken` if an
+account took the email in between.
+
 ### `POST /auth/login` — public
 
 `{ "email", "password" }` → `{ "token", "user" }`, or `422 invalid_credentials`.
+An email sign-up never verified, with its own password, gets a new code (when
+the last is a minute old) and `409 email_unverified`: the app asks for the code.
+
+### `POST /auth/password/forgot` — public
+
+`{ "email" }` → `202 CodeSentResponse` — the same answer whether an account has
+that email or not; only an account's email gets a code, in the account's
+language. Calling again sends a new one once the last is a minute old.
+
+### `POST /auth/password/reset` — public
+
+`{ "email", "code", "password" }` (≥ 8) → `{ "token", "user" }`: the new
+password is set, **every other token is revoked**, and this phone is signed in.
+An account that had no password (Apple or Google only) gets one.
 
 ### `POST /auth/nonce` — public
 
@@ -203,11 +255,15 @@ One of the six (`UpdateLocaleRequest`), else `422 validation_failed` on
 `locale`. The app sends it when the player picks a language (**Dil**). The API
 answers in it whenever a request names none of the six.
 
-### `POST /me/credentials`
+### `POST /me/credentials` · `POST /me/credentials/resend` · `POST /me/credentials/verify`
 
-`{ "email", "password" }` (≥ 8) → `{ "user": Me }`. `409 email_taken`; `409
-already_linked` when the account already has an email (a player who signed in
-with Apple or Google may still add one).
+`{ "email", "password" }` (≥ 8) → `202 CodeSentResponse`: a code goes to the
+email in the account's language, and the password waits with it. `409
+email_taken`; `409 already_linked` when the account already has an email (a
+player who signed in with Apple or Google may still add one). `resend` (no
+body) → `202`, or `422 code_expired` with nothing waiting. `verify`
+`{ "code" }` → `{ "user": Me }`: the email and password are attached; `409
+email_taken` if another account took the email in between.
 
 ### `POST /me/identities/{apple|google}`
 
@@ -225,7 +281,7 @@ email and no other identity). Unlinking Apple revokes its grant.
 
 Deletes the account, its runs, board rows, league seats, friendships and
 their conversations, friend requests, blocks, VS, reports (made and received),
-push tokens, stats, device checks, App Attest keys and challenges, its phones
+push tokens, email codes waiting, stats, device checks, App Attest keys and challenges, its phones
 in the device registry, its usage analytics (visits, days, firsts), every
 token and its profile photo's file; revokes Apple's grant when there is one
 (never blocks). Anonymous daily totals stay. `204`.

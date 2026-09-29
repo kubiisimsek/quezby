@@ -10,8 +10,8 @@ import { SPACE } from '@/ui/theme';
 
 /**
  * The one question about usage analytics, asked before anything is
- * counted: on the welcome, and once in the lobby of a phone that never saw
- * it. Two slabs of the same size, so no is as easy as yes — and neither in
+ * counted: a new account's step once it is in, and once in the lobby of a
+ * phone that never saw it. Two slabs of the same size, so no is as easy as yes — and neither in
  * gold, which only ever starts a game.
  */
 export function ConsentCard({ onAnswer }: { onAnswer: (yes: boolean) => void }) {

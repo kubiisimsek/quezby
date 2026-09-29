@@ -6,6 +6,7 @@ import type {
   AppleLinkRequest,
   AppleSignInRequest,
   AuthResponse,
+  CodeSentResponse,
   BlocksResponse,
   CheckpointRequest,
   CheckpointResponse,
@@ -13,6 +14,7 @@ import type {
   DeviceChallengeResponse,
   DeviceCheckResponse,
   DuelResponse,
+  EmailRequest,
   FinishRunRequest,
   FinishRunResponse,
   FriendListResponse,
@@ -38,6 +40,8 @@ import type {
   PlayerResponse,
   RatingBoardResponse,
   RatingBoardScope,
+  RegisterRequest,
+  ResetPasswordRequest,
   RatingResponse,
   Phrase,
   Pulse,
@@ -59,6 +63,7 @@ import type {
   UsernameAvailability,
   UserSearchResponse,
   UserSettings,
+  VerifyEmailRequest,
 } from '@quezby/types';
 import { createRequest } from './http';
 
@@ -151,6 +156,41 @@ export function createApiClient({ device, ...options }: ApiClientOptions) {
           body: input,
           auth: false,
         }),
+      /** Emails a code; nothing is made until it comes back — `409 email_taken` when the email has an account. */
+      register: (input: RegisterRequest) =>
+        request<CodeSentResponse>('/auth/register', {
+          method: 'POST',
+          body: input,
+          auth: false,
+        }),
+      /** A new code for the sign-up waiting, no sooner than a minute after the last. */
+      resendRegistration: (input: EmailRequest) =>
+        request<CodeSentResponse>('/auth/register/resend', {
+          method: 'POST',
+          body: input,
+          auth: false,
+        }),
+      /** The sign-up's code: the account is made and signed in. */
+      verifyRegistration: (input: VerifyEmailRequest) =>
+        request<AuthResponse>('/auth/register/verify', {
+          method: 'POST',
+          body: input,
+          auth: false,
+        }),
+      /** A code to reset a forgotten password; the same answer whether the email has an account or not. */
+      forgotPassword: (input: EmailRequest) =>
+        request<CodeSentResponse>('/auth/password/forgot', {
+          method: 'POST',
+          body: input,
+          auth: false,
+        }),
+      /** The reset code and the new password: every other phone is signed out, this one in. */
+      resetPassword: (input: ResetPasswordRequest) =>
+        request<AuthResponse>('/auth/password/reset', {
+          method: 'POST',
+          body: input,
+          auth: false,
+        }),
       logout: () => request<void>('/auth/logout', { method: 'POST' }),
       /** A single-use nonce for Sign in with Apple. */
       nonce: () => request<NonceResponse>('/auth/nonce', { method: 'POST', auth: false }),
@@ -185,10 +225,17 @@ export function createApiClient({ device, ...options }: ApiClientOptions) {
           method: 'PUT',
           body: { locale } satisfies UpdateLocaleRequest,
         }),
+      /** Emails a code to the address; it is attached once the code comes back (`verifyCredentials`). */
       linkCredentials: (input: LinkCredentialsRequest) =>
-        request<{ user: Me }>('/me/credentials', {
+        request<CodeSentResponse>('/me/credentials', {
           method: 'POST',
           body: input,
+        }),
+      resendCredentials: () => request<CodeSentResponse>('/me/credentials/resend', { method: 'POST' }),
+      verifyCredentials: (code: string) =>
+        request<{ user: Me }>('/me/credentials/verify', {
+          method: 'POST',
+          body: { code },
         }),
       linkApple: (input: AppleLinkRequest) =>
         request<{ user: Me }>('/me/identities/apple', {

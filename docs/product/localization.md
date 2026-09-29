@@ -20,9 +20,8 @@ sesi: [ui-writing.md](../design/ui-writing.md).
    "uygulama dili" ayarı): bir sonraki açılışta oyun onu alır — en son söylenen
    istek kazanır.
 4. **Hesap:** oyuncunun dili hesabına da yazılır (`users.locale`). Bir hesap
-   ilk kez bir telefona geldiğinde — başka bir telefonda giriş, yeniden
-   kurulumdan sonra keychain'den dönen oturum — oyun **hesabın dilinde**
-   açılır. Ondan sonra telefon karar verir: telefonda seçilen dil hesaba
+   ilk kez bir telefona geldiğinde — başka bir telefonda ya da yeniden
+   kurulumdan sonra giriş — oyun **hesabın dilinde** açılır. Ondan sonra telefon karar verir: telefonda seçilen dil hesaba
    yazılır (`PUT /me/locale`), ağ yoksa bir sonraki açılışta.
 
 Misafir hesabın dili de kaydedilir; misafir Apple, Google ya da e-posta

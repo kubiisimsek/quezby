@@ -49,7 +49,14 @@
 - Network calls go through `@/api/client` (the `@quezby/sdk` instance), never
   a screen-level `fetch`. Server state is `@tanstack/react-query`; session and
   settings are Zustand stores.
-- The token lives in the keychain (`react-native-keychain`), not AsyncStorage.
+- The keychain (`react-native-keychain`) holds the token and nothing else,
+  filed under the install id and `AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY` (never
+  in a backup). Everything else — the install id, the App Attest key id,
+  settings, onboarding — lives in AsyncStorage, which goes with the app. iOS
+  keeps the keychain after the app is deleted: a new install (no install id
+  on disk) clears it before anything reads it, and a token filed under
+  another install is never used (`src/auth/session.ts`). A reinstall starts
+  signed out.
 - Device integrity is native: `QuezbyIntegrity` (Kotlin, Play Integrity standard
   API; Objective-C, App Attest) behind `src/lib/integrity.ts`, which degrades to
   "unavailable" when the module or support is missing. The app only carries the

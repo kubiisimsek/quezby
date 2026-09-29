@@ -10,6 +10,7 @@ use App\Game\Checkpoint;
 use App\Game\EngineError;
 use App\Game\Rules;
 use App\Game\Run as Engine;
+use App\Mail\EmailCodeMail;
 use App\Models\Admin;
 use App\Models\PlayerRating;
 use App\Models\Run;
@@ -19,6 +20,7 @@ use App\Services\RunClock;
 use App\Support\Timestamp;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Testing\TestResponse;
 use Laravel\Sanctum\Sanctum;
 
@@ -88,6 +90,15 @@ abstract class TestCase extends BaseTestCase
         $this->assertNotSame('', $response->json('error.message'));
 
         return $response;
+    }
+
+    /** The code in the last email sent to `$email` — under `Mail::fake()`. */
+    protected function codeSentTo(string $email): string
+    {
+        $mail = Mail::sent(EmailCodeMail::class, fn (EmailCodeMail $mail) => $mail->hasTo($email))->last();
+        $this->assertNotNull($mail, "No code was sent to {$email}.");
+
+        return $mail->code;
     }
 
     /**

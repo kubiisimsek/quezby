@@ -14,14 +14,21 @@ export type InboxSegment = 'messages' | 'friends';
 /** Every screen's name and params, one list per navigator. */
 export type RootStackParamList = {
   Welcome: undefined;
-  Login: undefined;
   /** A new player's practice run: the game, coached, counted nowhere. */
   Tutorial: undefined;
+  /** The ways in on a phone with no account: email and password, sign-up, Apple, Google, a guest. */
+  SignIn: { email?: string } | undefined;
+  /** A new email account: email, password twice. */
+  Register: { email?: string } | undefined;
+  /** The code emailed to a new account's address; `resendIn` is the API's wait before a new one. */
+  VerifyEmail: { email: string; resendIn?: number };
+  /** A forgotten password: a code to the email, then the new password. */
+  ForgotPassword: { email?: string } | undefined;
   Username: undefined;
-  /** A new player's question: may the game send notifications? */
+  /** A new account's question: may the game count how it is used? */
+  Consent: undefined;
+  /** A new account's question: may the game send notifications? */
   Notifications: undefined;
-  /** A new guest's offer to keep the account: Apple, Google or an email. */
-  Protect: undefined;
   Tabs: NavigatorScreenParams<TabParamList> | undefined;
   Game: GameParams;
   Help: undefined;

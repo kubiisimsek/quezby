@@ -17,7 +17,6 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { track } from '@/analytics/track';
-import { useSession } from '@/auth/session';
 import { FeedbackLayer } from '@/game/FeedbackLayer';
 import { Hud } from '@/game/Hud';
 import { REEL_ORDER, reelGuide } from '@/game/howTo';
@@ -61,8 +60,8 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Game' | 'Tutorial'>;
  *
  * As `Tutorial` it is a new player's practice run: played on the phone,
  * counted nowhere, with a coach card before the first post of each kind.
- * Nothing is behind it, so closing it always ends in its result, and its
- * result leads on to the player's name.
+ * No account is behind it yet: closing it always ends in its result, and
+ * its result leads on to the ways in.
  */
 export function GameScreen({ navigation, route }: Props) {
   const t = useT();
@@ -115,11 +114,7 @@ export function GameScreen({ navigation, route }: Props) {
           onClose={() => navigation.goBack()}
           onRetrySubmit={game.retrySubmit}
           onOpenDaily={() => navigation.replace('Daily')}
-          onContinue={
-            tutorial
-              ? () => useOnboarding.getState().advance(useSession.getState().user?.isGuest ?? true)
-              : undefined
-          }
+          onContinue={tutorial ? () => useOnboarding.getState().practiceDone() : undefined}
         />
       </>
     );

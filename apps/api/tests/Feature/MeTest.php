@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Services\LeaderboardService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 test('me shows the player and their ranks', function () {
     Carbon::setTestNow(Carbon::parse('2026-09-23 12:00', 'Europe/Istanbul'));
@@ -59,9 +60,11 @@ test('a setting must be a JSON boolean', function () {
 });
 
 test('a guest links an email and can then log in with it', function () {
+    Mail::fake();
     $this->signIn(User::factory()->create());
 
-    $this->postJson('/api/v1/me/credentials', ['email' => 'Kubi@Example.com', 'password' => 'long-enough'])
+    $this->postJson('/api/v1/me/credentials', ['email' => 'Kubi@Example.com', 'password' => 'long-enough'])->assertStatus(202);
+    $this->postJson('/api/v1/me/credentials/verify', ['code' => $this->codeSentTo('kubi@example.com')])
         ->assertOk()
         ->assertJsonPath('user.email', 'kubi@example.com')
         ->assertJsonPath('user.isGuest', false);

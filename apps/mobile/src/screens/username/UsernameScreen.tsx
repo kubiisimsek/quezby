@@ -21,9 +21,10 @@ import { SPACE } from '@/ui/theme';
  * the API is asked whether the name is free before the button is worth
  * pressing.
  *
- * Right after a new player's practice run it is a step they may skip: the
- * account already plays as `guest48128742`, and keeps that name until they
- * pick one — here or later on the profile. The name they pick is theirs for
+ * Right after signing in with Apple, Google or an email it is a step they
+ * may skip: the account already plays as `guest48128742`, and keeps that
+ * name until they pick one — here or later on the profile. A guest is not
+ * asked, and neither is an account that picked its name long ago. The name they pick is theirs for
  * good, and the screen says so. An account from before automatic names has
  * none, so for it this is the one question before the game.
  */
@@ -31,7 +32,7 @@ export function UsernameScreen() {
   const t = useT();
   const insets = useSafeAreaInsets();
   const user = useSession((state) => state.user);
-  const onboarding = useOnboarding((state) => stepFor(state, user?.id) === 'nickname');
+  const onboarding = useOnboarding((state) => stepFor(state, user?.id) === 'username');
   const current = user?.username ?? null;
   const [value, setValue] = useState('');
   const [pending, setPending] = useState(false);
@@ -45,7 +46,7 @@ export function UsernameScreen() {
   const canSkip = onboarding && current !== null;
   const autoName = canSkip && isAutoUsername(current) ? current : null;
 
-  const next = () => useOnboarding.getState().advance(useSession.getState().user?.isGuest ?? true);
+  const next = () => useOnboarding.getState().advance();
 
   const save = async () => {
     if (!ready) {

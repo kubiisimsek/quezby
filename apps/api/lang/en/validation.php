@@ -48,6 +48,7 @@ return [
         'checkpoints.*' => 'checkpoint receipt',
         'clientReels' => 'post count',
         'clientScore' => 'score',
+        'code' => 'code',
         'contentVersion' => 'catalog version',
         'cursor' => 'page cursor',
         'email' => 'email',

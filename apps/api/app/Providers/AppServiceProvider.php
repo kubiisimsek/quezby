@@ -62,6 +62,14 @@ class AppServiceProvider extends ServiceProvider
     {
         RateLimiter::for('guest-signup', fn (Request $request) => Limit::perHour(10)->by($request->ip()));
 
+        RateLimiter::for('register', fn (Request $request) => Limit::perHour(10)->by($request->ip()));
+
+        // Every email with a code in it; a new code waits a minute anyway (`quezby.email_codes`).
+        RateLimiter::for('email-send', fn (Request $request) => Limit::perHour(20)->by($request->ip()));
+
+        // A code has five tries of its own; this keeps one phone from walking many.
+        RateLimiter::for('email-verify', fn (Request $request) => Limit::perMinute(20)->by($request->ip()));
+
         RateLimiter::for('login', fn (Request $request) => Limit::perMinute(10)->by($request->ip()));
 
         RateLimiter::for('username-check', fn (Request $request) => Limit::perMinute(60)

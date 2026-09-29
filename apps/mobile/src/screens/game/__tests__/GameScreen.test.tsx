@@ -7,7 +7,7 @@ import { useGame, type GameController } from '@/game/useGame';
 import { useLanguage } from '@/i18n/language';
 import { GameScreen } from '@/screens/game/GameScreen';
 import { useOnboarding } from '@/stores/onboarding';
-import { buildDuel, buildMe, buildSummary } from '@/test/factories';
+import { buildDuel, buildSummary } from '@/test/factories';
 import { renderWithProviders } from '@/test/renderWithProviders';
 
 jest.mock('@/game/useGame', () => ({ useGame: jest.fn() }));
@@ -372,10 +372,17 @@ describe('GameScreen', () => {
       expect(navigation.goBack).not.toHaveBeenCalled();
     });
 
-    it('leads on to the player\'s name from its result', async () => {
+    it('leads on to the ways in from its result — no account is behind it yet', async () => {
       jest.mocked(useReducedMotion).mockReturnValue(true);
-      useSession.setState({ token: 'token', user: buildMe({ id: 'u1' }), hydrated: true });
-      useOnboarding.setState({ userId: 'u1', step: 'tutorial', remindedFor: null, hydrated: true });
+      useSession.setState({ token: null, user: null, hydrated: true });
+      useOnboarding.setState({
+        practiced: false,
+        playing: true,
+        userId: null,
+        steps: [],
+        remindedFor: null,
+        hydrated: true,
+      });
       const game = controller({
         phase: 'result',
         outcome: { mode: 'practice', summary: PRACTICE_SUMMARY, reason: 'tutorial', unseen: [] },
@@ -384,7 +391,7 @@ describe('GameScreen', () => {
       expect(track).toHaveBeenCalledWith('tutorial_done');
 
       await fireEvent.press(screen.getByText('Devam et'));
-      expect(useOnboarding.getState().step).toBe('nickname');
+      expect(useOnboarding.getState()).toMatchObject({ practiced: true, playing: false });
 
       await fireEvent.press(screen.getByText('Bir daha dene'));
       expect(game.start).toHaveBeenLastCalledWith('tutorial');

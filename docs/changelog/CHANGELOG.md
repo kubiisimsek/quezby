@@ -1,5 +1,80 @@
 # Changelog
 
+## 2026-09-29 — Email accounts: sign in first, proved by a code
+
+The owner: the ways-in screen had no sign-in, a sign-up asked for the
+password once, emails were never verified, and an email with an account
+was not told so. SMTP must be configurable in the API's env, and the code
+must go out in the language the player signed up in.
+
+- **Giriş yap** (the ways-in screen) now signs in on top: email, password,
+  **Şifremi unuttum**, then **Hesabın yok mu? Kayıt ol**, "ya da", Apple,
+  Google, **Misafir olarak devam et**. The line "Misafir hesap yalnızca bu
+  telefonda kalır." is gone.
+- **Kayıt ol:** email, password, **Şifreyi doğrula**. An email with an
+  account: "Bu e-postayla bir hesabın var." and a way back to Giriş yap.
+- **Verification is required:** `POST /auth/register` now answers `202
+  CodeSentResponse` and makes nothing; a six-digit code goes out in the
+  sign-up's language; `POST /auth/register/verify` makes the account and
+  signs it in; `POST /auth/register/resend`. 15 minutes, a new code after
+  60 s, 5 wrong tries expire it (a new one can still be asked for). Signing in
+  to a sign-up never verified answers `409 email_unverified` (with a new code
+  once the last is a minute old); the app opens the code screen.
+- **Forgotten password:** `POST /auth/password/forgot` (the same answer
+  whether the email has an account) and `POST /auth/password/reset` (every
+  other token revoked, this phone signed in).
+- **An email attached from the profile** is proved the same way:
+  `POST /me/credentials` → `202`, then `POST /me/credentials/verify`,
+  `POST /me/credentials/resend`; the sheet asks for the password twice.
+- **API:** `email_codes` table (HMAC of the code, the waiting password
+  hashed), `EmailCodes`, `EmailCodeMail` (HTML and text, right to left in
+  Arabic) with `lang/*/mail.php` in six languages, error codes
+  `email_unverified`, `code_invalid`, `code_expired`, throttles `email-send`
+  and `email-verify`. `MAIL_*` SMTP lines in every `.env*.example` (and
+  placeholders in the local `.env` and `.env.staging`);
+  `scripts/check-api-env.mjs` warns when SMTP is missing.
+- **App:** `SignInScreen` rewritten, `RegisterScreen`, `VerifyEmailScreen`,
+  `ForgotPasswordScreen`, `components/EmailCode.tsx` (`CodeField`,
+  `ResendButton`), a two-step `CredentialsSheet`; the `Email` screen is gone.
+- Tests: Pest (`EmailAuthTest`, `EmailCodeMailTest`, credentials in `MeTest`
+  and `IdentityLinkTest`), SDK, `check-api-env`, the app (SignIn, Register,
+  VerifyEmail, ForgotPassword, CredentialsSheet, the countdown).
+
+## 2026-09-29 — First launch in the owner's order; a reinstall signs out
+
+The owner: the first screens were wrong. A name was asked before the account
+was known — pick one, then sign in with Apple to an old account, and what
+then? And deleting and reinstalling the app kept the player signed in.
+
+- **First launch** is now: welcome (one gold **Oyna**, nothing asked) →
+  practice run (on the phone, no account) → **Giriş yap**: Apple, Google,
+  **E-postayla kayıt ol** or **Misafir olarak devam et** → the name, only
+  after a sign-in and only while the account's name is still the automatic
+  one → **Oyunu birlikte geliştirelim mi?** → notifications. A guest is never
+  asked for a name. Signing out lands on Giriş yap. The welcome's usage card,
+  "Hesabım var, giriş yap", the Login screen and the Protect step are gone;
+  "Hesabını koru" stays on the profile and in the lobby when a guest's league
+  opens.
+- **Session:** the keychain holds only the token, filed under the install id
+  and never in a backup (`AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY`). The install
+  id lives in AsyncStorage, which goes with the app; iOS keeps the keychain,
+  so a new install clears it before anything reads it, and a token filed
+  under another install is deleted, never used. A token saved before this is
+  re-filed on the same install. The App Attest key id moved from the keychain
+  to AsyncStorage.
+- **API:** `POST /auth/register` `{ email, password, platform, installId }` →
+  `201 { token, user }` — an email account from the start, named like a
+  guest, `409 email_taken`, `throttle:register` (10/h per IP). Types
+  `RegisterRequest`, SDK `auth.register`.
+- **App:** `SignInScreen`, `EmailScreen` (sign up, or back in), `ConsentScreen`;
+  the onboarding store keeps `practiced` for the install and the account's
+  `steps` (`username` · `consent` · `notifications`); the gate adds
+  `account`. Analytics: SignIn and Email are `login` in a journey, the
+  usage question itself is never recorded. Copy in six languages.
+- Tests: Pest (register), SDK, the app (session and reinstall, onboarding
+  store, gate, Welcome, SignIn, Email, Consent, Username, Notifications,
+  GameScreen's practice run, useSocialAuth, deviceCheck).
+
 ## 2026-09-29 — The league is the rating's, and it never resets
 
 The owner: with Elo there is no need for a league that ends every week, rank

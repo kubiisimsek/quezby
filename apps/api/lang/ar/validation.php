@@ -51,6 +51,7 @@ return [
         'checkpoints.*' => 'إيصال نقطة التحقق',
         'clientReels' => 'عدد المنشورات',
         'clientScore' => 'النتيجة',
+        'code' => 'الرمز',
         'contentVersion' => 'إصدار الكتالوج',
         'cursor' => 'مؤشر الصفحة',
         'email' => 'البريد الإلكتروني',

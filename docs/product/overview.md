@@ -15,37 +15,55 @@ anlamlı kılmak için var.
 ## İlk açılış
 
 İlk kez giren oyuncuyu önce oyun karşılar, form değil (Apple'ın _Onboarding
-for Games_ rehberi ve Unity'nin "önce anonim hesap, sonra bağla" yaklaşımı).
-Oyun **telefonun dilinde** açılır — Türkçe, İngilizce, Almanca, Arapça,
-Fransızca ya da İspanyolca; telefonun dili bunlardan biri değilse İngilizce.
-Karşılamadaki küçük dil düğmesi daha oynamadan başka dil seçtirir
-([localization.md](./localization.md)).
+for Games_ rehberi). Hesap, oyuncu oyunu gördükten sonra açılır; hesabı belli
+olmadan hiçbir şey sorulmaz. Oyun **telefonun dilinde** açılır — Türkçe,
+İngilizce, Almanca, Arapça, Fransızca ya da İspanyolca; telefonun dili
+bunlardan biri değilse İngilizce. Karşılamadaki küçük dil düğmesi daha
+oynamadan başka dil seçtirir ([localization.md](./localization.md)).
 
-1. **Karşılama:** marka, dört hareketin taşları, tek altın **Oyna** ve
-   **Hesabım var, giriş yap**. Oyna misafir hesabı açar; hesap açılırken
-   sunucu ona `guest48128742` gibi bir ad verir. Bu iki düğmeden önce bir kez
-   **"Oyunu birlikte geliştirelim mi?"** sorulur (**İzin ver / İzin verme**):
-   cevap gelmeden hiçbir kullanım verisi sayılmaz
-   ([analytics.md](./analytics.md)).
-2. **Deneme turu:** gerçek kurallarla bir tur, ama tamamen telefonda —
-   sunucuya hiç gitmez, **hiçbir yere sayılmaz** (tablo, lig, istatistik,
-   rekor). Her hareketin ilk postundan önce akış durur ve bir koç kartı onu
-   anlatır; postun süresi "Anladım"dan sonra başlar. Sonuç "DENEME TURU"
-   etiketlidir; turun bitmeden göremediği hareketler orada anlatılır.
-3. **Takma ad:** "Sana ne diyelim?" — seçilebilir ya da **Şimdilik geç**
-   denir; geçen oyuncu otomatik adla oynar, adını sonra Profil'den seçer.
-   Seçilen ad kalıcıdır, bir daha değişmez.
-4. **Bildirimler:** "Haberin olsun mu?" — biri seni eklediğinde, bir
+1. **Karşılama:** marka, dört hareketin taşları ve tek altın **Oyna**. Hesap
+   açılmaz, hiçbir şey sorulmaz.
+2. **Nasıl oynanır — deneme turu:** gerçek kurallarla bir tur, ama tamamen
+   telefonda ve hesapsız — sunucuya hiç gitmez, **hiçbir yere sayılmaz**
+   (tablo, lig, istatistik, rekor). Her hareketin ilk postundan önce akış
+   durur ve bir koç kartı onu anlatır; postun süresi "Anladım"dan sonra
+   başlar. Sonuç "DENEME TURU" etiketlidir; turun bitmeden göremediği
+   hareketler orada anlatılır. **Devam et** giriş ekranına, **Bir daha dene**
+   aynı tura götürür.
+3. **Giriş yap:** üstte e-posta ve şifreyle giriş (altında **Şifremi
+   unuttum**), sonra **Hesabın yok mu? Kayıt ol**, "ya da" ile **Apple ile
+   devam et** / **Google ile devam et**, en altta **Misafir olarak devam et**.
+   Apple ve Google, hesabı varsa onu bulur, yoksa açar.
+   - **Kayıt ol:** e-posta, şifre ve **Şifreyi doğrula**. E-postanın hesabı
+     varsa "Bu e-postayla bir hesabın var." der ve girişe götürür.
+   - **E-postanı doğrula:** e-postaya kayıt olunan dilde 6 haneli bir kod
+     gider; kod girilmeden hesap açılmaz. Kod 15 dakika geçerli, yenisi bir
+     dakika sonra istenir, 5 yanlış denemede kod biter (yenisi istenebilir).
+     Doğrulanmamış bir kayıtla giriş yapan oyuncuya yeni kod gider ve bu ekran
+     açılır.
+   - **Şifremi unuttum:** e-postaya kod gider; kod ve yeni şifre (iki kez)
+     girilince diğer telefonlardaki oturumlar kapanır, bu telefon girer.
+   Her yeni hesap sunucudan `guest48128742` gibi bir ad alır.
+4. **Takma ad — yalnızca giriş yapana:** "Sana ne diyelim?" Apple, Google ya
+   da e-postayla giren oyuncuya, hesabın adı hâlâ otomatikse sorulur;
+   **Şimdilik geç** denebilir. Ad hesap belli olduktan sonra sorulduğu için,
+   eski hesabına giren oyuncu adını zaten seçmişse soru hiç gelmez. Misafire
+   sorulmaz: otomatik adla oynar, adını sonra Profil'den seçer. Seçilen ad
+   kalıcıdır, bir daha değişmez.
+5. **Analitik izni:** **"Oyunu birlikte geliştirelim mi?"** (**İzin ver /
+   İzin verme**). Cevap gelmeden hiçbir kullanım verisi sayılmaz
+   ([analytics.md](./analytics.md)); bu yüzden önceki adımlar hiç sayılmaz.
+   Hesap başka bir telefonda evet dediyse sorulmaz.
+6. **Bildirimler:** "Haberin olsun mu?" — biri seni eklediğinde, bir
    arkadaşın VS attığında ya da mesaj gönderdiğinde. **Bildirimleri aç**
    telefonun kendi sorusunu getirir; **Şimdi değil** sonraya bırakır. Adım
    yalnızca soru hâlâ sorulabiliyorsa görünür: bildirimler zaten açıksa,
    telefon artık sormuyorsa ya da sürümde push yoksa atlanır.
-5. **Hesabını koru:** Apple, Google ya da e-posta — ya da **Şimdi değil**.
-   Apple/Google ile yeni açılan hesap bu adımı görmez.
 
-İlk adımlar hesaba bağlıdır ve telefonda saklanır: uygulamayı kapatan oyuncu
-kaldığı adıma döner, başka bir hesaba giren görmez. **Hesabım var** ile var olan
-hesabına giren doğrudan lobiye geçer.
+Adımlar telefonda saklanır ve uygulamayla silinir. Deneme turu bir kez
+oynanınca karşılama ve tur bir daha gösterilmez: hesaptan çıkan oyuncu
+doğrudan giriş ekranına döner. 4–6 hesaba bağlıdır: uygulamayı kapatan oyuncu
+kaldığı adıma döner, başka bir hesaba giren görmez.
 
 ## Döngü
 
@@ -192,16 +210,22 @@ friends*, *Inbox*, *VS*, *Push*).
 
 ## Hesap
 
-- Yeni oyuncu **Oyna** ile misafir başlar; var olan hesaba **Hesabım var, giriş
-  yap** (Apple, Google ya da e-posta) ile girilir. Misafir token'ı keychain'de
-  tutulur (iOS'ta uygulama silinse bile kalır). Her hesap açıldığı anda bir ad
-  alır — oyuncu seçene kadar `guest48128742`; seçtiği ad bir daha değişmez
-  ([usernames.md](./usernames.md)).
+- Hesap deneme turundan sonra açılır: Apple, Google, e-posta ya da misafir
+  (*İlk açılış*). Her hesap açıldığı anda bir ad alır — oyuncu seçene kadar
+  `guest48128742`; seçtiği ad bir daha değişmez ([usernames.md](./usernames.md)).
+- **Oturum:** telefonun güvenli deposunda (iOS keychain, Android Keystore)
+  yalnızca token durur, onu açan kurulumun kimliğiyle; yedeğe girmez. Kurulum
+  kimliği AsyncStorage'dadır ve uygulamayla silinir. iOS'ta keychain uygulama
+  silinince kalır, bu yüzden kimliği olmayan yeni bir kurulum ilk açılışta
+  keychain'i temizler ve başka bir kurulumun token'ını hiç kullanmaz: uygulamayı
+  silip yeniden kuran oyuncu çıkış yapmış olarak başlar. Misafir hesabın tek
+  anahtarı token'dır; misafir uygulamayı silerse hesabını da kaybeder.
 - Misafir kalan oyuncuya, ligi açıldığı ilk an lobide **bir kez** "Hesabını
   koru" sorulur: kaybedecek bir şeyi olduğu an. Sonrası yalnızca Profil'de ve
   **Hesap bilgileri**'ndedir.
 - **Hesabını koru:** misafir hesaba Apple, Google ya da e-posta + şifre
-  bağlanır; turlar hesapla kalır. Başka cihazdan girilebilir. Hesaplar e-postaya
+  (iki kez) bağlanır; e-posta, ona giden 6 haneli kod girilince bağlanır.
+  Turlar hesapla kalır. Başka cihazdan girilebilir. Hesaplar e-postaya
   göre asla birleştirilmez. Korunan hesapta aynı yer **Giriş yolları** olur:
   eksik yol eklenir, Apple ya da Google bağı kaldırılabilir — sunucu son giriş
   yolunun kaldırılmasına izin vermez.

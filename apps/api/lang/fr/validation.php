@@ -49,6 +49,7 @@ return [
         'checkpoints.*' => 'reçu de point de contrôle',
         'clientReels' => 'nombre de posts',
         'clientScore' => 'score',
+        'code' => 'code',
         'contentVersion' => 'version du catalogue',
         'cursor' => 'curseur de page',
         'email' => 'e-mail',

@@ -1,10 +1,10 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { sha256Hex } from '@quezby/config';
 import { ApiError } from '@quezby/sdk';
 import { NativeModules } from 'react-native';
-import * as Keychain from 'react-native-keychain';
 
 import { api } from '@/api/client';
-import { ATTEST_KEY_SERVICE, checkDevice } from '@/auth/deviceCheck';
+import { ATTEST_KEY, checkDevice } from '@/auth/deviceCheck';
 
 jest.mock('@/api/client', () => ({
   api: {
@@ -46,14 +46,13 @@ function nativeError(code: string): Error {
 }
 
 async function storedKey(): Promise<string | null> {
-  const stored = await Keychain.getGenericPassword({ service: ATTEST_KEY_SERVICE });
-  return stored ? stored.password : null;
+  return AsyncStorage.getItem(ATTEST_KEY);
 }
 
 describe('checkDevice', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
-    await Keychain.resetGenericPassword({ service: ATTEST_KEY_SERVICE });
+    await AsyncStorage.removeItem(ATTEST_KEY);
   });
 
   describe('on Android', () => {
@@ -162,7 +161,7 @@ describe('checkDevice', () => {
     });
 
     it('asserts with the kept key after that', async () => {
-      await Keychain.setGenericPassword('appattest', 'key-1', { service: ATTEST_KEY_SERVICE });
+      await AsyncStorage.setItem(ATTEST_KEY, 'key-1');
       challenges('challenge-2');
       device.iosAssert.mockResolvedValueOnce(PASS);
 
@@ -179,7 +178,7 @@ describe('checkDevice', () => {
     });
 
     it('drops a key the API does not know and attests a new one', async () => {
-      await Keychain.setGenericPassword('appattest', 'old-key', { service: ATTEST_KEY_SERVICE });
+      await AsyncStorage.setItem(ATTEST_KEY, 'old-key');
       challenges('challenge-1', 'challenge-2');
       device.iosAssert.mockRejectedValueOnce(new ApiError(409, 'attest_key_unknown', 'x'));
       nativeMock('generateKey').mockResolvedValueOnce('new-key');
@@ -194,7 +193,7 @@ describe('checkDevice', () => {
     });
 
     it('forgets a key the API does not know even when the new one cannot be attested yet', async () => {
-      await Keychain.setGenericPassword('appattest', 'old-key', { service: ATTEST_KEY_SERVICE });
+      await AsyncStorage.setItem(ATTEST_KEY, 'old-key');
       challenges('challenge-1');
       device.iosAssert.mockRejectedValueOnce(new ApiError(409, 'attest_key_unknown', 'x'));
       device.challenge.mockRejectedValueOnce(new ApiError(0, 'network', 'offline'));
@@ -204,7 +203,7 @@ describe('checkDevice', () => {
     });
 
     it('attests a new key when the kept one is gone from the phone (a reinstall)', async () => {
-      await Keychain.setGenericPassword('appattest', 'old-key', { service: ATTEST_KEY_SERVICE });
+      await AsyncStorage.setItem(ATTEST_KEY, 'old-key');
       challenges('challenge-1', 'challenge-2');
       nativeMock('generateAssertion').mockRejectedValueOnce(nativeError('invalid_key'));
       nativeMock('generateKey').mockResolvedValueOnce('new-key');
@@ -231,7 +230,7 @@ describe('checkDevice', () => {
     });
 
     it('fails silently when the API cannot be reached, keeping the key', async () => {
-      await Keychain.setGenericPassword('appattest', 'key-1', { service: ATTEST_KEY_SERVICE });
+      await AsyncStorage.setItem(ATTEST_KEY, 'key-1');
       device.challenge.mockRejectedValueOnce(new ApiError(0, 'network', 'offline'));
 
       await expect(checkDevice('player-1', IOS)).resolves.toEqual({ kind: 'failed' });
@@ -266,7 +265,7 @@ describe('checkDevice', () => {
     });
 
     it('lets a second caller for the same player share the running check', async () => {
-      await Keychain.setGenericPassword('appattest', 'key-1', { service: ATTEST_KEY_SERVICE });
+      await AsyncStorage.setItem(ATTEST_KEY, 'key-1');
       challenges('challenge-1');
       device.iosAssert.mockResolvedValueOnce(PASS);
 
@@ -281,7 +280,7 @@ describe('checkDevice', () => {
     });
 
     it('runs another player’s check only after the running one', async () => {
-      await Keychain.setGenericPassword('appattest', 'key-1', { service: ATTEST_KEY_SERVICE });
+      await AsyncStorage.setItem(ATTEST_KEY, 'key-1');
       challenges('challenge-1', 'challenge-2');
       device.iosAssert.mockResolvedValueOnce(PASS).mockResolvedValueOnce(FAIL);
 

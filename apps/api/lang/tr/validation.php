@@ -53,6 +53,7 @@ return [
         'checkpoints.*' => 'kontrol noktası makbuzu',
         'clientReels' => 'reel sayısı',
         'clientScore' => 'skor',
+        'code' => 'kod',
         'contentVersion' => 'katalog sürümü',
         'cursor' => 'sayfa imleci',
         'email' => 'e-posta',

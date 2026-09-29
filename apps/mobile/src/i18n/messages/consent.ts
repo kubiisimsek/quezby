@@ -1,8 +1,8 @@
 import type { Locale } from '@quezby/types';
 
 /**
- * The one question about usage analytics (`ConsentCard`): on the welcome,
- * and once in the lobby of a phone that predates it. It says what is counted
+ * The one question about usage analytics (`ConsentCard`): a new account's
+ * step once it is in, and once in the lobby of a phone that predates it. It says what is counted
  * and what never leaves the phone, and never says "tracking". The switch in
  * Ayarlar that changes the answer later has its own words.
  */

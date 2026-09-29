@@ -266,7 +266,7 @@ export function ResultView({
   onClose: () => void;
   onRetrySubmit: () => void;
   onOpenDaily: () => void;
-  /** After a new player's practice run: on to their name. */
+  /** After a new player's practice run: on to the ways in. */
   onContinue?: () => void;
 }) {
   const t = useT();
@@ -1445,7 +1445,7 @@ type DockAction = { label: string; tone: ButtonTone; onPress: () => void };
 /**
  * The way on, on a dark tray at the bottom: gold for the one that starts a
  * game, then sharing and the way home. It slides up last. After a new
- * player's practice run the way on is magenta — it leads to their name, not
+ * player's practice run the way on is magenta — it leads to the ways in, not
  * a game — and the second slab plays the practice run again.
  */
 function Dock({

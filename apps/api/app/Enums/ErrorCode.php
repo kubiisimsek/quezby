@@ -13,6 +13,11 @@ enum ErrorCode: string
     case UsernameLocked = 'username_locked';
     case InvalidCredentials = 'invalid_credentials';
     case EmailTaken = 'email_taken';
+    /** An email sign-up never verified: the code went to the email (a new one once the last is a minute old). */
+    case EmailUnverified = 'email_unverified';
+    case CodeInvalid = 'code_invalid';
+    /** Expired, used up by wrong tries, or never sent. */
+    case CodeExpired = 'code_expired';
     case AlreadyLinked = 'already_linked';
     case IdentityInvalid = 'identity_invalid';
     case IdentityTaken = 'identity_taken';
@@ -46,13 +51,13 @@ enum ErrorCode: string
             self::Unauthenticated => 401,
             self::Forbidden, self::FriendsHidden => 403,
             self::NotFound => 404,
-            self::UsernameTaken, self::UsernameLocked, self::EmailTaken, self::AlreadyLinked, self::IdentityTaken, self::LastSignInMethod,
+            self::UsernameTaken, self::UsernameLocked, self::EmailTaken, self::EmailUnverified, self::AlreadyLinked, self::IdentityTaken, self::LastSignInMethod,
             self::RunAlreadyFinished, self::DailyAlreadyPlayed, self::AttestKeyUnknown, self::DuelUnavailable, self::RatedLocked => 409,
             self::RunExpired => 410,
             self::ValidationFailed, self::UsernameInvalid, self::InvalidCredentials, self::IdentityInvalid,
             self::RunRejected, self::EngineOutdated, self::CannotBefriendSelf, self::FriendLimit, self::RequestLimit,
             self::NotFriends, self::MessageLimit, self::DuelLimit, self::PhotoInvalid,
-            self::ChallengeInvalid, self::IntegrityInvalid => 422,
+            self::ChallengeInvalid, self::IntegrityInvalid, self::CodeInvalid, self::CodeExpired => 422,
             self::TooManyRequests => 429,
             self::ServerError => 500,
         };

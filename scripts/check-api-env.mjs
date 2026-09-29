@@ -94,6 +94,21 @@ export function checkApiEnv(text, environment) {
     );
   }
 
+  // Email codes (sign-up, an attached email, a password reset) only reach anyone over SMTP.
+  const mailer = (values.get('MAIL_MAILER') ?? '').trim();
+  if (mailer !== 'smtp') {
+    warnings.push(
+      `MAIL_MAILER is "${mailer || 'unset'}", not smtp: no email code reaches anyone, so nobody can sign up with an email or reset a password.`,
+    );
+  } else {
+    const empty = ['MAIL_HOST', 'MAIL_PASSWORD', 'MAIL_FROM_ADDRESS'].filter(
+      (name) => (values.get(name) ?? '').trim() === '',
+    );
+    if (empty.length > 0) {
+      warnings.push(`${empty.join(', ')} ${empty.length === 1 ? 'is' : 'are'} empty: email codes cannot be sent.`);
+    }
+  }
+
   return { errors, warnings };
 }
 

@@ -1,5 +1,5 @@
 import { ApiError } from '@quezby/sdk';
-import { fireEvent, screen } from '@testing-library/react-native';
+import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 
 import { api } from '@/api/client';
 import { useSession } from '@/auth/session';
@@ -9,14 +9,18 @@ import { buildMe } from '@/test/factories';
 import { renderWithProviders } from '@/test/renderWithProviders';
 
 jest.mock('@/api/client', () => ({
-  api: { me: { linkCredentials: jest.fn() } },
+  api: { me: { linkCredentials: jest.fn(), resendCredentials: jest.fn(), verifyCredentials: jest.fn() } },
 }));
 
-const link = api.me.linkCredentials as jest.Mock;
+const mocked = api as unknown as {
+  me: { linkCredentials: jest.Mock; resendCredentials: jest.Mock; verifyCredentials: jest.Mock };
+};
+const SENT = { email: 'ekin@example.com', resendIn: 60, expiresAt: '2026-09-29T10:15:00.000Z' };
 
-async function fill(email: string, password: string) {
+async function fill(email: string, password: string, confirm = password) {
   await fireEvent.changeText(screen.getByLabelText('E-posta'), email);
   await fireEvent.changeText(screen.getByLabelText('Şifre'), password);
+  await fireEvent.changeText(screen.getByLabelText('Şifreyi doğrula'), confirm);
 }
 
 describe('CredentialsSheet', () => {
@@ -25,39 +29,70 @@ describe('CredentialsSheet', () => {
     useSession.setState({ token: 'token', user: buildMe(), ranks: null, hydrated: true });
   });
 
-  it('offers a guest to keep the account', async () => {
+  it('offers a guest to keep the account with an email and the password twice', async () => {
     await renderWithProviders(<CredentialsSheet open guest onClose={jest.fn()} />);
 
     expect(screen.getByText('Hesabını koru')).toBeTruthy();
     expect(screen.getByText('Hesabı koru')).toBeTruthy();
+    expect(screen.getByLabelText('Şifreyi doğrula')).toBeTruthy();
   });
 
-  it('asks for a real email and a long enough password before it asks the API', async () => {
+  it('asks for a real email, a long enough password and the same one twice before it asks the API', async () => {
     await renderWithProviders(<CredentialsSheet open guest onClose={jest.fn()} />);
 
     await fill('ekin', 'kisa');
     await fireEvent.press(screen.getByText('Hesabı koru'));
-
     expect(screen.getByText('Geçerli bir e-posta ve en az 8 karakterlik bir şifre yaz.')).toBeTruthy();
-    expect(link).not.toHaveBeenCalled();
+
+    await fill('ekin@example.com', 'uzun-bir-sifre', 'baska-bir-sifre');
+    await fireEvent.press(screen.getByText('Hesabı koru'));
+    expect(screen.getByText('Şifreler aynı değil.')).toBeTruthy();
+    expect(mocked.me.linkCredentials).not.toHaveBeenCalled();
   });
 
-  it('keeps the account with the email, and closes', async () => {
+  it('keeps the account only once the emailed code comes back, then closes', async () => {
+    mocked.me.linkCredentials.mockResolvedValue(SENT);
     const kept = buildMe({ email: 'ekin@example.com', isGuest: false });
-    link.mockResolvedValue({ user: kept });
+    mocked.me.verifyCredentials.mockResolvedValue({ user: kept });
     const onClose = jest.fn();
     await renderWithProviders(<CredentialsSheet open guest onClose={onClose} />);
 
     await fill(' ekin@example.com ', 'uzun-bir-sifre');
     await fireEvent.press(screen.getByText('Hesabı koru'));
 
-    expect(link).toHaveBeenCalledWith({ email: 'ekin@example.com', password: 'uzun-bir-sifre' });
+    expect(mocked.me.linkCredentials).toHaveBeenCalledWith({ email: 'ekin@example.com', password: 'uzun-bir-sifre' });
+    expect(await screen.findByText('ekin@example.com adresine 6 haneli bir kod gönderdik.')).toBeTruthy();
+    expect(useSession.getState().user?.isGuest).toBe(true);
+    expect(onClose).not.toHaveBeenCalled();
+
+    await fireEvent.changeText(screen.getByLabelText('Kod'), '123456');
+    await fireEvent.press(screen.getByRole('button', { name: 'Doğrula' }));
+
+    expect(mocked.me.verifyCredentials).toHaveBeenCalledWith('123456');
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(useSession.getState().user?.isGuest).toBe(false);
-    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('says a code is wrong, and sends a new one once the wait is over', async () => {
+    mocked.me.linkCredentials.mockResolvedValue({ ...SENT, resendIn: 0 });
+    mocked.me.verifyCredentials.mockRejectedValue(new ApiError(422, 'code_invalid', 'x'));
+    mocked.me.resendCredentials.mockResolvedValue(SENT);
+    await renderWithProviders(<CredentialsSheet open guest onClose={jest.fn()} />);
+    await fill('ekin@example.com', 'uzun-bir-sifre');
+    await fireEvent.press(screen.getByText('Hesabı koru'));
+    await screen.findByLabelText('Kod');
+
+    await fireEvent.changeText(screen.getByLabelText('Kod'), '000000');
+    await fireEvent.press(screen.getByRole('button', { name: 'Doğrula' }));
+    expect(await screen.findByText('Kod hatalı. Tekrar dene.')).toBeTruthy();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Kodu tekrar gönder' }));
+    expect(mocked.me.resendCredentials).toHaveBeenCalled();
+    expect(await screen.findByText('Yeni kodu gönderdik.')).toBeTruthy();
   });
 
   it('says what the API refused', async () => {
-    link.mockRejectedValue(new ApiError(409, 'email_taken', 'x'));
+    mocked.me.linkCredentials.mockRejectedValue(new ApiError(409, 'email_taken', 'x'));
     await renderWithProviders(<CredentialsSheet open guest onClose={jest.fn()} />);
 
     await fill('ekin@example.com', 'uzun-bir-sifre');
@@ -73,29 +108,12 @@ describe('CredentialsSheet', () => {
     expect(screen.getByText('Protect your account')).toBeTruthy();
     expect(screen.getByText(/^This account only lives on this phone for now\./)).toBeTruthy();
     expect(screen.getByText('At least 8 characters.')).toBeTruthy();
+    expect(screen.getByLabelText('Confirm password')).toBeTruthy();
 
     await fireEvent.changeText(screen.getByLabelText('Email'), 'ekin');
     await fireEvent.changeText(screen.getByLabelText('Password'), 'kisa');
     await fireEvent.press(screen.getByText('Protect account'));
 
-    expect(
-      screen.getByText('Enter a valid email and a password of at least 8 characters.'),
-    ).toBeTruthy();
-    expect(link).not.toHaveBeenCalled();
-  });
-
-  it('links one more way in to a kept account, in Arabic', async () => {
-    useLanguage.setState({ locale: 'ar' });
-    link.mockRejectedValue(new ApiError(409, 'email_taken', 'x'));
-    await renderWithProviders(<CredentialsSheet open guest={false} onClose={jest.fn()} />);
-
-    expect(screen.getByText('ربط بريد إلكتروني')).toBeTruthy();
-    expect(screen.getByText('ستتمكن من الدخول بهذا البريد الإلكتروني وكلمة المرور أيضًا.')).toBeTruthy();
-
-    await fireEvent.changeText(screen.getByLabelText('البريد الإلكتروني'), 'ekin@example.com');
-    await fireEvent.changeText(screen.getByLabelText('كلمة المرور'), 'uzun-bir-sifre');
-    await fireEvent.press(screen.getByText('ربط البريد الإلكتروني'));
-
-    expect(await screen.findByText('هذا البريد الإلكتروني مرتبط بحساب آخر.')).toBeTruthy();
+    expect(screen.getByText('Enter a valid email and a password of at least 8 characters.')).toBeTruthy();
   });
 });

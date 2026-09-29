@@ -22,7 +22,9 @@ import { gateFor } from '@/navigation/gate';
 import { tab, useNavTheme, useStackOptions } from '@/navigation/options';
 import { TabBar } from '@/navigation/TabBar';
 import type { RootStackParamList, TabParamList } from '@/navigation/types';
-import { LoginScreen } from '@/screens/auth/LoginScreen';
+import { ForgotPasswordScreen } from '@/screens/auth/ForgotPasswordScreen';
+import { RegisterScreen } from '@/screens/auth/RegisterScreen';
+import { VerifyEmailScreen } from '@/screens/auth/VerifyEmailScreen';
 import { DailyScreen } from '@/screens/daily/DailyScreen';
 import { FindFriendsScreen } from '@/screens/friends/FindFriendsScreen';
 import { FriendsScreen } from '@/screens/friends/FriendsScreen';
@@ -34,8 +36,9 @@ import { HistoryScreen } from '@/screens/history/HistoryScreen';
 import { HomeScreen } from '@/screens/home/HomeScreen';
 import { LeaderboardScreen } from '@/screens/leaderboard/LeaderboardScreen';
 import { LeagueScreen } from '@/screens/league/LeagueScreen';
+import { ConsentScreen } from '@/screens/onboarding/ConsentScreen';
 import { NotificationsScreen } from '@/screens/onboarding/NotificationsScreen';
-import { ProtectScreen } from '@/screens/onboarding/ProtectScreen';
+import { SignInScreen } from '@/screens/onboarding/SignInScreen';
 import { AlertsScreen } from '@/screens/alerts/AlertsScreen';
 import { AccountScreen } from '@/screens/profile/AccountScreen';
 import { AvatarEditorScreen } from '@/screens/profile/AvatarEditorScreen';
@@ -89,10 +92,10 @@ function TabsShell() {
 /**
  * What mounts is `gateFor`'s answer: a build the API no longer accepts → the
  * update screen; storage not read yet — or the app still turning to read its
- * language the right way — → the splash; no account → the
- * welcome; a new account's first steps — the practice run, the name,
- * notifications, keeping the account — one screen at a time; an account from
- * before automatic names → the name question; otherwise the game.
+ * language the right way — → the splash; no account → the welcome, the
+ * practice run, then the ways in; a new account's first steps — the name
+ * (signed in only), usage, notifications — one screen at a time; an account
+ * from before automatic names → the name question; otherwise the game.
  */
 export function RootNavigator() {
   const navTheme = useNavTheme();
@@ -101,8 +104,10 @@ export function RootNavigator() {
   const user = useSession((state) => state.user);
   const hydrated = useSession((state) => state.hydrated);
   const onboardingHydrated = useOnboarding((state) => state.hydrated);
+  const practiced = useOnboarding((state) => state.practiced);
+  const playing = useOnboarding((state) => state.playing);
   const onboardingUser = useOnboarding((state) => state.userId);
-  const onboardingStep = useOnboarding((state) => state.step);
+  const steps = useOnboarding((state) => state.steps);
   const languageReady = useLanguage((state) => state.phase === 'ready');
   const t = useT();
   const status = useAppStatus();
@@ -132,7 +137,7 @@ export function RootNavigator() {
     token,
     user,
     meFailed: me.isError,
-    onboarding: { userId: onboardingUser, step: onboardingStep },
+    onboarding: { practiced, playing, userId: onboardingUser, steps },
   });
   usePulse(gate === 'game');
 
@@ -198,22 +203,30 @@ export function RootNavigator() {
     >
       <Stack.Navigator screenOptions={stackOptions}>
         {gate === 'welcome' ? (
-          <>
-            <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="Login" component={LoginScreen} />
-          </>
+          <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
         ) : gate === 'tutorial' ? (
           <Stack.Screen
             name="Tutorial"
             component={GameScreen}
             options={{ headerShown: false, gestureEnabled: false, animation: 'fade' }}
           />
-        ) : gate === 'nickname' || gate === 'username' ? (
+        ) : gate === 'account' ? (
+          <>
+            <Stack.Screen
+              name="SignIn"
+              component={SignInScreen}
+              options={{ headerShown: false, animation: 'fade' }}
+            />
+            <Stack.Screen name="Register" component={RegisterScreen} />
+            <Stack.Screen name="VerifyEmail" component={VerifyEmailScreen} />
+            <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+          </>
+        ) : gate === 'username' ? (
           <Stack.Screen name="Username" component={UsernameScreen} options={{ headerShown: false }} />
+        ) : gate === 'consent' ? (
+          <Stack.Screen name="Consent" component={ConsentScreen} options={{ headerShown: false }} />
         ) : gate === 'notifications' ? (
           <Stack.Screen name="Notifications" component={NotificationsScreen} options={{ headerShown: false }} />
-        ) : gate === 'protect' ? (
-          <Stack.Screen name="Protect" component={ProtectScreen} options={{ headerShown: false }} />
         ) : (
           <>
             <Stack.Screen name="Tabs" component={TabsShell} options={{ headerShown: false }} />

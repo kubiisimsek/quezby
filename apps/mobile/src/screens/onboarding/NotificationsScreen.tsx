@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { ScrollView, StatusBar, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useSession } from '@/auth/session';
 import { allowPush, refreshPushPermission } from '@/hooks/usePush';
 import { useT } from '@/i18n';
 import { useOnboarding } from '@/stores/onboarding';
@@ -10,13 +9,13 @@ import type { IconName } from '@/ui/icons';
 import { Button, IconChip, Panel, Screen, Stamp, Txt } from '@/ui/kit';
 import { SPACE } from '@/ui/theme';
 
-/** On to the next first step: keeping the account, for a guest. */
+/** On to the game: this is the last first step. */
 function next() {
-  useOnboarding.getState().advance(useSession.getState().user?.isGuest ?? true);
+  useOnboarding.getState().advance();
 }
 
 /**
- * A new player's step after their name: may the game tell them when a friend
+ * A new account's last step, after the usage question: may the game tell them when a friend
  * adds them, sends a VS, plays one or says something? "Bildirimleri aç" brings
  * the system's own question; "Şimdi değil" leaves it for later — the inbox,
  * a conversation and a VS just sent offer it again. A phone that was already

@@ -88,6 +88,28 @@ openssl rand -hex 32                                # çıktıyı OPS_TOKEN= sat
   satırında **Açık** der; değilse hiçbir şey gönderilmez, başka hiçbir şey de
   bozulmaz.
 
+- **E-posta (SMTP)** — e-postayla kayıt, profilden e-posta bağlama ve
+  "Şifremi unuttum" 6 haneli bir kodla doğrulanır; kod oyuncunun kayıt olduğu
+  dilde gider. SMTP yoksa kimse e-postayla kayıt olamaz. cPanel → **Email
+  Accounts** → bir posta kutusu aç (ör. `no-reply@quezby.com`) → **Connect
+  Devices** sunucuyu, portu ve kullanıcıyı gösterir:
+
+  ```dotenv
+  MAIL_MAILER=smtp
+  MAIL_HOST=mail.quezby.com
+  MAIL_PORT=465
+  MAIL_SCHEME=smtps
+  MAIL_USERNAME=no-reply@quezby.com
+  MAIL_PASSWORD=posta-kutusunun-sifresi
+  MAIL_FROM_ADDRESS=no-reply@quezby.com
+  MAIL_FROM_NAME=Quezby
+  ```
+
+  587 portunda `MAIL_SCHEME` boş kalır (STARTTLS). Paketleme, `MAIL_MAILER`
+  `smtp` değilse ya da `MAIL_HOST`, `MAIL_PASSWORD`, `MAIL_FROM_ADDRESS`
+  boşsa uyarır. Kodların gereksiz klasörüne düşmemesi için alan adında
+  SPF/DKIM açık olsun (cPanel → **Email Deliverability**). `.env` değişince
+  `optimize`'ı çağır (6. adım).
 - `QUEZBY_LEAGUE_UNLOCK_RUNS=20`: Dereceli'nin (ve Elo ile ligin) kaç sayılan
   Normal ya da Günlük turdan sonra açıldığı. Her ortamda aynı kalır.
 - `MODERATION_TOKEN` yalnızca moderasyon yaparken dolu olsun (aşağıda 6b).

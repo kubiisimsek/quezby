@@ -43,13 +43,13 @@ Oyunun kendisi (turlar, skorlar, her post ve hareket) zaten `runs` ve
 ## İzin
 
 - **Nerede sorulur:**
-  - İlk açılışta, karşılama ekranında, oyuna girmeden tek bir soru sorulur: **"Oyunu birlikte geliştirelim mi?"**
+  - İlk açılışta, hesap açıldıktan ya da girildikten sonra (ve giriş yapanın adından sonra), bildirim sorusundan önce tek bir soru sorulur: **"Oyunu birlikte geliştirelim mi?"** Karşılama, deneme turu ve giriş ekranı bu sorudan önce gelir; onlar hiç sayılmaz (`tutorial_done` yeni oyuncuda kaydedilmez). Hesap başka bir telefonda evet dediyse sorulmaz.
   - Bu sorudan önce kurulmuş bir telefonda, lobinin en üstünde bir kez sorulur.
   - Lig hatırlatması ("Hesabını koru") bu cevaptan sonraya kalır.
 - **Butonlar:** **İzin ver** ve **İzin verme** aynı boyuttadır; hayır demek evet demek kadar kolaydır. İkisi de altın değildir: altın yalnızca oyunu başlatır.
 - **Cevaptan önce ve sonra:**
   - Cevaptan önce hiçbir şey sayılmaz.
-  - Cevap önce telefonda durur (`consent: pending`). Hesap açılınca ya da girilince API'ye gider (`useConsentSync`). API onu kabul edene kadar hiçbir ziyaret gönderilmez.
+  - Cevap önce telefonda durur (`consent: pending`), hemen ardından API'ye gider (`useConsentSync`; ağ yoksa bir sonraki dönüşte). API onu kabul edene kadar hiçbir ziyaret gönderilmez.
   - Hesapta cevap bir **zaman damgası** olarak tutulur: `users.analytics_at`, izin kanıtı.
 - **Değiştirmek:** Karar **Profil → Ayarlar → Kullanım verisi** ile değişir.
   - Kapatılınca telefon bekleyen ziyaretleri siler.

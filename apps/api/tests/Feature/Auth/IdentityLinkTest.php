@@ -3,6 +3,7 @@
 use App\Enums\SocialProvider;
 use App\Models\Run;
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
 use Tests\Support\FakeIdentityProvider;
 
 beforeEach(function () {
@@ -163,7 +164,9 @@ it('lets a player who signed in with Apple add an email and password', function 
     $player = $this->signIn();
     FakeIdentityProvider::attach($player, SocialProvider::Apple);
 
-    $this->postJson('/api/v1/me/credentials', ['email' => 'Kubi@Example.com', 'password' => 'long-enough'])
+    Mail::fake();
+    $this->postJson('/api/v1/me/credentials', ['email' => 'Kubi@Example.com', 'password' => 'long-enough'])->assertStatus(202);
+    $this->postJson('/api/v1/me/credentials/verify', ['code' => $this->codeSentTo('kubi@example.com')])
         ->assertOk()
         ->assertJsonPath('user.email', 'kubi@example.com')
         ->assertJsonPath('user.identities', ['apple']);

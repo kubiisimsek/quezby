@@ -76,20 +76,22 @@ not translated word for word: each language gets a joke that lands in it.
 | **Kombo x1,25** | Always two decimals, the language's decimal mark |
 | **Doğrulanıyor…** | While the API replays a run — no number before it answers |
 | **Skorun inceleniyor** | A held top score; never "şüpheli" or "hile" to the player |
-| **Oyna / Hesabım var, giriş yap** | The ways in, on the welcome: a new player plays first (a guest account and the practice run); **Apple ile devam et / Google ile devam et** and "ya da e-postayla" are on the login |
+| **Oyna** | The welcome's one slab: the practice run, before any account |
+| **Giriş yap** · **Şifremi unuttum** · **Hesabın yok mu? Kayıt ol** · **Misafir olarak devam et** | The ways in after the practice run (and after signing out), top to bottom: email and password with "Şifremi unuttum" under them, the way to a new account, "ya da", **Apple ile devam et / Google ile devam et**, a guest |
+| **Kayıt ol** · **Şifreyi doğrula** · **Bu e-postayla bir hesabın var.** | A new email account: the password twice ("Şifreler aynı değil." when they differ); an email that has an account leads back to **Giriş yap** |
+| **E-postanı doğrula** · **Doğrula** · **Kodu tekrar gönder (0:42)** | The six-digit code: "… adresine 6 haneli bir kod gönderdik.", "Gelmediyse gereksiz klasörüne bak.", the clock counting the wait down; "Kod hatalı. Tekrar dene." / "Kodun süresi doldu. Yeni kod iste." Never "OTP" or "doğrulama linki" to the player |
 | **Deneme turu** (DENEME TURU) | A new player's first run: coached, played on the phone, counted nowhere — "Bu tur hiçbir yere sayılmadı." Its score is the "deneme puanı". Never "tutorial" to the player |
 | **YENİ POST · 2/4** · **Anladım** | A coach card's ribbon, and the gold slab that starts the post it explained |
-| **Sana ne diyelim?** · **Şimdilik geç** | The name, right after the practice run, and the way past it; until then the account is `@guest48128742` ("Şimdilik adın @guest48128742") |
+| **Sana ne diyelim?** · **Şimdilik geç** | The name, right after signing in with Apple, Google or an email while the account's name is still the automatic one, and the way past it; until then the account is `@guest48128742` ("Şimdilik adın @guest48128742"). A guest is never asked |
 | **Adını seç** | The name door on Hesap bilgileri while the name is still the automatic one ("Şimdilik @guest48128742 · bir kez seçersin"). A picked name never changes, so after the pick Hesap bilgileri only shows it, locked: "Kullanıcı adın · @ekin · kalıcı" — never "değiştir" |
 | **Hesap bilgileri** | Ayarlar's account door, right above **Çıkış yap** ("@ekin · Apple bağlı", a guest's "Misafir hesap"), and its page: **Kullanıcı adı**, **Bağlı hesaplar**, and **Hesabı sil** last, in red |
 | **Rekor · Arkadaş · Tur** · **İSTATİSTİKLER** | The three numbers under a profile's name (Arkadaş opens the friend list and wears the requests waiting), and the tile with four more whose sheet has all of them: **Oyun**, **Hareketler**, **En iyiler** |
 | **Seçtiğin ad bir daha değişmez** | Said wherever a name is picked, before it is saved — there is no confirm step |
 | **Dereceli’ye 2 oyun kaldı** · **Dereceli açıldı!** | Dereceli before a new player's first 20 counted Normal or Günlük runs: "Dereceli, 20 Normal ya da Günlük oyundan sonra açılır."; the run that opens it: "Dereceli açıldı!" and "İlk 3 dereceli oyunun Elo’nu belirler." Before placement the league screen says "Lig sıralaması Dereceli oyuncularının" |
-| **Hesabını koru** | Attach Apple, Google or an email to a guest account — a step after the name ("Şimdi değil" skips it), and once, when a guest's league opens ("Ligdesin!…") |
-| **Oyunu birlikte geliştirelim mi?** · **İzin ver / İzin verme** | The one question about usage analytics (ribbon "SENİN SEÇİMİN"), on the welcome before anything else — and once in the lobby of a phone that predates it. Two slabs of one size, neither gold. It says what is counted ("hangi ekranlara girdiğini ve ne kadar oynadığını sayarız") and what never leaves the phone ("Adın, e-postan ya da konumun gönderilmez") |
+| **Hesabını koru** | Attach Apple, Google or an email to a guest account — on the profile, and once, when a guest's league opens ("Ligdesin!…"; "Şimdi değil" closes it) |
+| **Oyunu birlikte geliştirelim mi?** · **İzin ver / İzin verme** | The one question about usage analytics (ribbon "SENİN SEÇİMİN"), a new account's step before notifications — and once in the lobby of a phone that predates it. Two slabs of one size, neither gold. It says what is counted ("hangi ekranlara girdiğini ve ne kadar oynadığını sayarız") and what never leaves the phone ("Adın, e-postan ya da konumun gönderilmez") |
 | **Kullanım verisi** | The switch in Ayarlar for that answer: on — "Hangi ekranlara girdiğini ve ne kadar oynadığını sayarız."; off — "Yalnızca oyunun çalışması için gereken cihaz bilgisi gider." Never "izleme", "takip" or "tracking" to the player |
 | **Dil** | The language row in Ayarlar and the small button on the welcome: the six languages, each in its own words ("Türkçe", "English", "Deutsch", "العربية", "Français", "Español") |
-| **Apple hesabıma geç** | An Apple or Google account already belongs to another player: switch to it, leaving the fresh guest behind |
 | **Giriş yolları** | The same place once the account is kept: what is attached, **Bağı kaldır** to take Apple or Google off. On Hesap bilgileri the same tiles stand under **Bağlı hesaplar** |
 
 ## The same words in six languages
@@ -135,14 +137,16 @@ Use these and nothing else for them. A ribbon's capitals are in brackets.
 | Deneme turu (DENEME TURU) | Practice run (PRACTICE RUN) | Proberunde (PROBERUNDE) | Partie d'essai (PARTIE D'ESSAI) | Ronda de práctica (RONDA DE PRÁCTICA) | جولة تجريبية |
 | YENİ POST · Anladım | NEW POST · Got it | NEUER POST · Verstanden | NOUVEAU POST · Compris | POST NUEVO · Entendido | منشور جديد · فهمت |
 | E-posta · Şifre · Giriş yap | Email · Password · Sign in | E-Mail · Passwort · Anmelden | E-mail · Mot de passe · Se connecter | Correo · Contraseña · Iniciar sesión | البريد الإلكتروني · كلمة المرور · تسجيل الدخول |
-| Hesabım var, giriş yap | I have an account, sign in | Ich habe ein Konto – anmelden | J'ai un compte, me connecter | Ya tengo cuenta, iniciar sesión | لديّ حساب، سجّل الدخول |
+| Kayıt ol · Şifreyi doğrula | Sign up · Confirm password | Registrieren · Passwort bestätigen | S'inscrire · Confirme le mot de passe | Registrarse · Confirma la contraseña | إنشاء حساب · تأكيد كلمة المرور |
+| Şifremi unuttum | Forgot password? | Passwort vergessen? | Mot de passe oublié ? | ¿Olvidaste tu contraseña? | نسيت كلمة المرور؟ |
+| E-postanı doğrula · Kod · Kodu tekrar gönder | Verify your email · Code · Send the code again | Bestätige deine E-Mail · Code · Code erneut senden | Confirme ton e-mail · Code · Renvoyer le code | Verifica tu correo · Código · Reenviar el código | أكّد بريدك الإلكتروني · الرمز · أعد إرسال الرمز |
+| Misafir olarak devam et | Continue as guest | Als Gast weiterspielen | Continuer en invité | Continuar como invitado | المتابعة كضيف |
 | Apple ile devam et · Google ile devam et | Continue with Apple · Continue with Google | Mit Apple fortfahren · Weiter mit Google | Continuer avec Apple · Continuer avec Google | Continuar con Apple · Continuar con Google | المتابعة باستخدام Apple · المتابعة باستخدام Google |
 | Sana ne diyelim? · Şimdilik geç | What should we call you? · Skip for now | Wie sollen wir dich nennen? · Erst mal überspringen | On t'appelle comment ? · Passer pour l'instant | ¿Cómo te llamamos? · Saltar por ahora | بماذا نناديك؟ · تخطَّ الآن |
 | Adını seç | Pick your name | Wähle deinen Namen | Choisis ton nom | Elige tu nombre | اختر اسمك |
 | Seçtiğin ad bir daha değişmez | The name you pick never changes | Dein gewählter Name bleibt für immer | Le nom choisi ne change plus jamais | El nombre que elijas no cambia nunca | الاسم الذي تختاره لن يتغيّر أبدًا |
 | Dereceli’ye 2 oyun kaldı | 2 games to Ranked | Noch 2 Spiele bis Gewertet | Encore 2 parties avant le mode classé | Faltan 2 partidas para Competitivo | مباراتان للوصول إلى المصنَّف |
 | Hesabını koru · Şimdi değil · Ligdesin! | Protect your account · Not now · You're in the league! | Konto sichern · Nicht jetzt · Du bist in der Liga! | Protège ton compte · Pas maintenant · Tu es dans la ligue ! | Protege tu cuenta · Ahora no · ¡Estás en la liga! | احمِ حسابك · ليس الآن · أنت في الدوري! |
-| Apple hesabıma geç | Switch to my Apple account | Zu meinem Apple-Konto wechseln | Passer à mon compte Apple | Cambiar a mi cuenta de Apple | الانتقال إلى حسابي على Apple |
 | Giriş yolları · Bağı kaldır | Sign-in methods · Unlink | Anmeldewege · Verknüpfung lösen | Moyens de connexion · Dissocier | Métodos de acceso · Desvincular | طرق تسجيل الدخول · إلغاء الربط |
 | Oyunu birlikte geliştirelim mi? · İzin ver · İzin verme | Shall we improve the game together? · Allow · Don't allow | Wollen wir das Spiel gemeinsam verbessern? · Erlauben · Nicht erlauben | On améliore le jeu ensemble ? · Autoriser · Refuser | ¿Mejoramos el juego juntos? · Permitir · No permitir | هل نطوّر اللعبة معًا؟ · السماح · عدم السماح |
 | Kullanım verisi | Usage data | Nutzungsdaten | Données d'utilisation | Datos de uso | بيانات الاستخدام |

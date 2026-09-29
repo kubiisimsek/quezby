@@ -21,6 +21,10 @@ function env(overrides = {}) {
     APP_KEY: KEY,
     APP_DEBUG: 'false',
     QUEZBY_DAILY_SECRET: 'a-long-random-daily-secret',
+    MAIL_MAILER: 'smtp',
+    MAIL_HOST: 'mail.quezby.com',
+    MAIL_PASSWORD: 'a-mailbox-password',
+    MAIL_FROM_ADDRESS: 'no-reply@quezby.com',
     ...overrides,
   };
   return Object.entries(values)
@@ -105,6 +109,16 @@ describe('checkApiEnv', () => {
     assert.match(warnings[0], /^QUEZBY_DAILY_SECRET is empty/);
   });
 
+  it('only warns when email codes cannot go out: not smtp, or smtp half filled in', () => {
+    const logged = checkApiEnv(env({ MAIL_MAILER: 'log' }), 'staging');
+    assert.deepEqual(logged.errors, []);
+    assert.match(logged.warnings[0], /^MAIL_MAILER is "log", not smtp/);
+
+    const half = checkApiEnv(env({ MAIL_HOST: '', MAIL_PASSWORD: '' }), 'staging');
+    assert.deepEqual(half.errors, []);
+    assert.deepEqual(half.warnings, ['MAIL_HOST, MAIL_PASSWORD are empty: email codes cannot be sent.']);
+  });
+
   it('reads quotes, comments, CRLF and repeated lines the way dotenv does', () => {
     const text = [
       '# staging',
@@ -114,6 +128,10 @@ describe('checkApiEnv', () => {
       "APP_ENV='staging'",
       'APP_DEBUG=false # must stay false',
       'QUEZBY_DAILY_SECRET=secret',
+      'MAIL_MAILER=smtp',
+      'MAIL_HOST=mail.quezby.com',
+      'MAIL_PASSWORD="a # in a password"',
+      'MAIL_FROM_ADDRESS=no-reply@quezby.com',
     ].join('\r\n');
     assert.deepEqual(checkApiEnv(text, 'staging'), { errors: [], warnings: [] });
   });

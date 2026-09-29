@@ -16,10 +16,11 @@ import { useOnboarding } from '@/stores/onboarding';
 const NAMES: Record<SocialProvider, string> = { apple: 'Apple', google: 'Google' };
 
 /**
- * Apple and Google, for the login and "Hesabını koru": sign in (or up) with
+ * Apple and Google, for the ways in and "Hesabını koru": sign in (or up) with
  * one, attach one to the current account, or detach it. The API checks every
- * token; the phone only carries it there. A sign-in that made a new player
- * starts their first steps, practice run first. `error` says what went wrong
+ * token; the phone only carries it there. A sign-in starts the account's
+ * first steps on this phone — the name only while it is still the automatic
+ * one — before the session, so the lobby never flashes by. `error` says what went wrong
  * last, in the player's language; `errorCode` is the API's code for it —
  * `identity_taken` when the account belongs to another player.
  */
@@ -60,8 +61,7 @@ export function useSocialAuth() {
           provider === 'apple'
             ? await api.auth.apple({ ...(await appleCredential()), ...device })
             : await api.auth.google({ ...(await googleCredential()), ...device });
-        // A new player's first steps are set before the session, so the lobby never flashes by.
-        if (auth.created) useOnboarding.getState().begin(auth.user.id);
+        useOnboarding.getState().begin(auth.user, true);
         // A returning account brings its language; a new one was born in this phone's.
         await signInToAccount(auth.token, auth.user);
       }),

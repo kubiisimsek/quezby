@@ -4,13 +4,20 @@ import type { RootStackParamList, TabParamList } from '@/navigation/types';
 
 type Route = Exclude<keyof RootStackParamList, 'Tabs'> | keyof TabParamList;
 
-/** Every route the navigator can show, as a visit's journey names it — a new route must be named here. */
-const SCREENS: Record<Route, AnalyticsScreen> = {
+/**
+ * Every route the navigator can show, as a visit's journey names it — a new
+ * route must be named here. Null for the usage question itself: nothing is
+ * counted while it is asked.
+ */
+const SCREENS: Record<Route, AnalyticsScreen | null> = {
   Welcome: 'welcome',
-  Login: 'login',
   Tutorial: 'tutorial',
+  SignIn: 'login',
+  Register: 'login',
+  VerifyEmail: 'login',
+  ForgotPassword: 'login',
   Username: 'username',
-  Protect: 'protect',
+  Consent: null,
   Game: 'game',
   Help: 'help',
   Daily: 'daily',

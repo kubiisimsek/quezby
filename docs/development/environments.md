@@ -201,6 +201,24 @@ for review).
   at production never ranks either. App Attest does not run in the iOS
   Simulator — there a device simply stays unverified.
 
+## Email (codes)
+
+An email sign-up, an email attached to an account and a forgotten password
+are proved with a six-digit code (`docs/backend/api-contract.md` → *Email
+codes*), sent in the language the player signed up in (`lang/*/mail.php`,
+`App\Mail\EmailCodeMail`).
+
+- **Local** — `MAIL_MAILER=log`: each mail, code included, is written to
+  `apps/api/storage/logs/laravel.log`. Set `smtp` and fill in the `MAIL_*`
+  lines of `.env` to send for real.
+- **Staging and production** — `MAIL_MAILER=smtp` with `MAIL_HOST`,
+  `MAIL_PORT`, `MAIL_SCHEME` (`smtps` on 465, empty on 587), `MAIL_USERNAME`,
+  `MAIL_PASSWORD`, `MAIL_FROM_ADDRESS`, `MAIL_FROM_NAME`
+  (`docs/deployment/shared-hosting.md` → 2). `scripts/check-api-env.mjs` warns
+  when they are missing; without them nobody can sign up with an email.
+- **Tests** — `MAIL_MAILER=array` (`phpunit.xml`); feature tests fake the
+  mailer and read the code from the mail (`codeSentTo`).
+
 ## Push notifications (Firebase Cloud Messaging)
 
 Friends' news — a request, a request accepted, a VS sent or ended, a phrase —

@@ -90,6 +90,24 @@ export type GuestSignUpRequest = {
 
 export type LoginRequest = { email: string; password: string };
 
+/**
+ * The first half of an email sign-up: the account is made only once the
+ * code emailed in the request's language comes back (`VerifyEmailRequest`).
+ */
+export type RegisterRequest = LoginRequest & GuestSignUpRequest;
+
+/** `202` from every call that emails a code: where it went, when a new one may be asked for, when this one ends. */
+export type CodeSentResponse = { email: string; resendIn: number; expiresAt: string };
+
+/** The code of an email sign-up: the account is made and signed in. */
+export type VerifyEmailRequest = { email: string; code: string };
+
+/** A new code for a sign-up waiting, or a code to reset a forgotten password. */
+export type EmailRequest = { email: string };
+
+/** The code of a forgotten password and the new password: every other phone is signed out. */
+export type ResetPasswordRequest = { email: string; code: string; password: string };
+
 export type AuthResponse = { token: string; user: Me };
 
 /** A single-use nonce for Sign in with Apple; it must come back inside the identity token. */
@@ -962,6 +980,12 @@ export type ApiErrorCode =
   | 'username_locked'
   | 'invalid_credentials'
   | 'email_taken'
+  /** An email sign-up never verified: the code went to the email (a new one once the last is a minute old) — ask for it. */
+  | 'email_unverified'
+  /** A wrong emailed code. */
+  | 'code_invalid'
+  /** An emailed code that expired, was used up by wrong tries, or was never sent: ask for a new one. */
+  | 'code_expired'
   | 'already_linked'
   | 'identity_invalid'
   | 'identity_taken'
