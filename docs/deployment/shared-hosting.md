@@ -87,6 +87,7 @@ openssl rand -hex 32                                # çıktıyı OPS_TOKEN= sat
   okunabiliyorsa panelin **Sistem** sayfası "Push bildirimleri (Firebase)"
   satırında **Açık** der; değilse hiçbir şey gönderilmez, başka hiçbir şey de
   bozulmaz.
+
 - `QUEZBY_LEAGUE_UNLOCK_RUNS=20`: Dereceli'nin (ve Elo ile ligin) kaç sayılan
   Normal ya da Günlük turdan sonra açıldığı. Her ortamda aynı kalır.
 - `MODERATION_TOKEN` yalnızca moderasyon yaparken dolu olsun (aşağıda 6b).
@@ -157,8 +158,8 @@ php artisan optimize
 **SSH yoksa** (`.env` içinde `OPS_TOKEN` dolu olmalı):
 
 ```bash
-curl -X POST https://staging-api.quezby.com/api/v1/ops/migrate  -H "X-Ops-Token: <OPS_TOKEN>"
-curl -X POST https://staging-api.quezby.com/api/v1/ops/optimize -H "X-Ops-Token: <OPS_TOKEN>"
+curl -X POST https://quezby.kubisimsek.com/api/v1/ops/migrate  -H "X-Ops-Token: <OPS_TOKEN>"
+curl -X POST https://quezby.kubisimsek.com/api/v1/ops/optimize -H "X-Ops-Token: <OPS_TOKEN>"
 ```
 
 İkisi de `{"status":"ok","output":"…"}` döner; bir sorun olursa sebebi
@@ -234,6 +235,7 @@ kendi alt alan adında durur ve API'ye tarayıcıdan bağlanır. Staging için
    İkisi de **geçici şifreyi bir kez** gösterir; not al. Aynı e-postayla
    tekrar çağırırsan (komutta `--reset`) yeni bir geçici şifre verir — şifreni
    unutursan böyle dönersin. İşin bitince `OPS_TOKEN=` satırını boşalt (7. adım).
+
 3. **Paketle** (kendi bilgisayarında, depo kökünde):
 
    ```bash
@@ -245,12 +247,13 @@ kendi alt alan adında durur ve API'ye tarayıcıdan bağlanır. Staging için
    API'ye bağlanacağını da yazar), `robots.txt`, `favicon.svg`.
    `VITE_API_ORIGIN` dışında bir `VITE_*` değişkeni doluysa betik paketlemez:
    o değerler herkese açık pakete girerdi.
+
 4. **Alan adı.** cPanel → **Domains** → `admin.quezby.com` oluştur. Document
    Root için boş bir klasör seç (ör. `admin.quezby.com`); statik dosyalar
    olduğu için `public_html` altında olabilir. SSL: **SSL/TLS Status** →
    AutoSSL.
 5. **Yükle.** File Manager → o klasör → zip'i yükle → **Extract**. `.htaccess`
-   gizli bir dosyadır (File Manager → Settings → *Show Hidden Files*); orada
+   gizli bir dosyadır (File Manager → Settings → _Show Hidden Files_); orada
    olduğundan emin ol. Güncellemede önce eski `assets/` klasörünü sil, sonra
    yeni zip'i açıp üzerine yaz.
 6. **Gir.** `https://admin.quezby.com` → geçici şifreyle giriş → panel önce
@@ -268,7 +271,7 @@ işlemi — yasak, ad sıfırlama, fotoğraf kaldırma, bildirimleri kapatma, tu
 onay/ret, hesap silme, migration — **Denetim kaydı**nda kimin yaptığıyla
 durur; komut satırından ve ops uçlarından yapılanlar da. Oyuncuların
 birbirinin fotoğrafı ya da adı hakkındaki bildirimleri panelin
-**Bildirimler** sayfasına düşer (`docs/backend/admin-api.md` → *Reports*).
+**Bildirimler** sayfasına düşer (`docs/backend/admin-api.md` → _Reports_).
 
 ## Sorun giderme
 
@@ -294,7 +297,7 @@ birbirinin fotoğrafı ya da adı hakkındaki bildirimleri panelin
 - **Push gelmiyor**: önce Sistem'deki "Push bildirimleri (Firebase)" satırı.
   **Kapalı** ise üç `.env` değerinden biri eksik ya da JSON anahtarı o yolda
   yok veya okunamıyor — API o zaman sessizce hiçbir şey göndermez; düzelt,
-  `optimize`. **Açık** ise log'da *Google did not hand out a fcm access
-  token.* (anahtar geçersiz ya da `oauth2.googleapis.com`'a çıkış yok) ya da
-  *Firebase refused a push.* ara. Ayrıntı:
+  `optimize`. **Açık** ise log'da _Google did not hand out a fcm access
+  token._ (anahtar geçersiz ya da `oauth2.googleapis.com`'a çıkış yok) ya da
+  _Firebase refused a push._ ara. Ayrıntı:
   `docs/development/push-setup.md` → Sorun giderme.
