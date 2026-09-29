@@ -1,6 +1,7 @@
 <?php
 
 use App\Content\Catalog;
+use App\Game\Difficulty;
 use App\Game\Rules;
 
 return [
@@ -16,6 +17,10 @@ return [
     */
 
     'engine_version' => Rules::ENGINE_VERSION,
+
+    // Dereceli's difficulty table (`App\Game\Difficulty`), sealed apart from
+    // the rules. A rated run records the version it was played on.
+    'difficulty_version' => Difficulty::VERSION,
 
     /*
     |--------------------------------------------------------------------------
@@ -129,6 +134,9 @@ return [
         'score_jump_min_runs' => 5,
         'review_top_all' => 10,
         'review_top_weekly' => 3,
+        // A rated run never reaches the score boards: with a soft signal it
+        // waits for review when it would lift its player into the Elo board's top.
+        'review_top_rating' => 10,
 
         // Checkpoints: a few times in a run the app has the API stamp how far
         // it got; the finish brings the receipts back (`App\Game\Checkpoint`).
@@ -281,12 +289,29 @@ return [
             'min_runs' => 10,
             'shares' => ['bronze' => 20, 'silver' => 35, 'gold' => 25, 'platinum' => 13, 'diamond' => 6, 'master' => 1],
         ],
-        // Rating → the score a player of it typically makes, per engine
-        // version. Calibrated from real players with `quezby:rating:calibrate`.
+        // Rating → the score a player of it typically makes at difficulty 0,
+        // per engine version: what the placement runs are measured with, and
+        // rated runs from before the difficulty table.
         'targets' => [
             2 => [0 => 8000, 1000 => 34000, 2000 => 100000, 3000 => 240000, 4000 => 480000, 5000 => 800000, 6000 => 1100000],
             // Engine v3 (blind moves): v2's anchors 1 % lower, as the simulated medians moved.
             3 => [0 => 8000, 1000 => 33700, 2000 => 99000, 3000 => 238000, 4000 => 475000, 5000 => 792000, 6000 => 1090000],
+        ],
+        // Dereceli gets harder as the rating climbs (`App\Game\Difficulty`):
+        // difficulty 0 below `from`, then one more every `step` Elo, up to
+        // `Difficulty::MAX` (4750+). `docs/product/scoring.md` → "Dereceli zorluğu".
+        'difficulty' => [
+            'from' => 1000,
+            'step' => 250,
+            // Rating → the score a player of it typically makes at the
+            // difficulty that rating plays, per engine and difficulty version.
+            // From the simulated profiles' medians at their difficulties
+            // (`pnpm engine:simulate`); calibrate with `quezby:rating:calibrate`.
+            'targets' => [
+                3 => [
+                    1 => [0 => 8000, 1000 => 31600, 2000 => 74100, 3000 => 148300, 4000 => 265700, 5000 => 394000, 6000 => 542300],
+                ],
+            ],
         ],
     ],
 

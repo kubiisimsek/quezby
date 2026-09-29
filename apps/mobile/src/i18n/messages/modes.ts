@@ -24,6 +24,8 @@ const tr = {
     free: 'Skorun Zirve’ye yazılır',
     dailyPlayed: 'Bugünkü hakkını kullandın',
     rated: (target: string) => `Elo için oyna · Hedef ${target}`,
+    /** Once the rating has made Dereceli harder. */
+    ratedAt: (difficulty: string, target: string) => `Zorluk ${difficulty} · Hedef ${target}`,
   },
   /** The locked tile, read aloud. */
   lockedLabel: (remaining: number) => `Dereceli, kilitli: ${remaining} oyun kaldı`,
@@ -50,6 +52,7 @@ const en: ModeMessages = {
     free: 'Your score goes on the Summit',
     dailyPlayed: "You've used today's shot",
     rated: (target) => `Play for Elo · Target ${target}`,
+    ratedAt: (difficulty, target) => `Difficulty ${difficulty} · Target ${target}`,
   },
   lockedLabel: (remaining) =>
     plural('en', remaining, { one: 'Ranked, locked: 1 game to go', other: `Ranked, locked: ${remaining} games to go` }),
@@ -73,6 +76,7 @@ const de: ModeMessages = {
     free: 'Dein Score kommt auf den Gipfel',
     dailyPlayed: 'Dein Versuch für heute ist verbraucht',
     rated: (target) => `Spiel um Elo · Ziel ${target}`,
+    ratedAt: (difficulty, target) => `Schwierigkeit ${difficulty} · Ziel ${target}`,
   },
   lockedLabel: (remaining) =>
     plural('de', remaining, {
@@ -99,6 +103,7 @@ const ar: ModeMessages = {
     free: 'تُسجَّل نتيجتك في القمة',
     dailyPlayed: 'استخدمت محاولة اليوم',
     rated: (target) => `العب من أجل إيلو · الهدف ${iso(target)}`,
+    ratedAt: (difficulty, target) => `الصعوبة ${iso(difficulty)} · الهدف ${iso(target)}`,
   },
   lockedLabel: (remaining) =>
     plural('ar', remaining, {
@@ -141,6 +146,7 @@ const fr: ModeMessages = {
     free: 'Ton score va au Sommet',
     dailyPlayed: 'Tu as utilisé ton essai du jour',
     rated: (target) => `Joue pour l’Elo · Objectif ${target}`,
+    ratedAt: (difficulty, target) => `Difficulté ${difficulty} · Objectif ${target}`,
   },
   lockedLabel: (remaining) =>
     plural('fr', remaining, {
@@ -170,6 +176,7 @@ const es: ModeMessages = {
     free: 'Tu puntuación va a la Cumbre',
     dailyPlayed: 'Ya usaste tu intento de hoy',
     rated: (target) => `Juega por Elo · Objetivo ${target}`,
+    ratedAt: (difficulty, target) => `Dificultad ${difficulty} · Objetivo ${target}`,
   },
   lockedLabel: (remaining) =>
     plural('es', remaining, {

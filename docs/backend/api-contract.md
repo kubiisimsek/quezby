@@ -405,16 +405,24 @@ one (`counter`) — which then moves up.
 
 ### `POST /runs`
 
-`{ "mode": "free" | "daily" | "rated" | "vs", "engineVersion": 3, "contentVersion": 1 }` —
+`{ "mode": "free" | "daily" | "rated" | "vs", "engineVersion": 3, "contentVersion": 1, "difficultyVersion": 1 }` —
 a VS also names the friend it challenges (`"opponent": "ekin"`) or the VS it
 answers (`"duel": "01J…"`) — → `201`
 
 ```json
-{ "runId": "01J…", "seed": 3141592653, "engineVersion": 3, "contentVersion": 1, "mode": "daily", "dayKey": "2026-09-26", "duelId": null, "startedAt": "…" }
+{ "runId": "01J…", "seed": 3141592653, "engineVersion": 3, "contentVersion": 1, "difficulty": 0, "mode": "daily", "dayKey": "2026-09-26", "duelId": null, "startedAt": "…" }
 ```
 
 - An engine or catalog the API does not play (or no body — the v1 app) →
-  `422 engine_outdated` before any run exists.
+  `422 engine_outdated` before any run exists. So does a `rated` start
+  without the difficulty table the API plays (`difficultyVersion`, the
+  engine's `DIFFICULTY_VERSION`); the other modes do not need it.
+- `difficulty` is what the app plays the run at — `new Run(seed, difficulty)`
+  — and what the finish replays it at: the Dereceli difficulty of the
+  player's rating (0–16, one more every 250 Elo from 1000; 0 while placing),
+  set once the run left open has been charged, and 0 for every other mode.
+  The run keeps it (`runs.difficulty`, `runs.difficulty_version`).
+  [scoring.md → Dereceli zorluğu](../product/scoring.md#dereceli-zorluğu).
 - Needs a username (`422 validation_failed`) — every account has one since
   automatic names; only an older account with none is refused.
 - A player has **one open run**: starting another marks the previous one
@@ -517,10 +525,15 @@ The API:
    run; `off` — devices are neither checked nor recorded.
 4. Counts the run from the replay (stats, which posts were shown and liked).
 5. A `rated` run moves the player's **Elo** (`rating`, below) — and with it
-   their league and its ranking. No other mode touches it.
-6. A `ranked` run adds to the player's lifetime stats and, when it scored,
-   upserts this week's, this month's and the season's rows — whatever its
-   mode — and a daily run today's `challenge` row. No run writes a day row.
+   their league and its ranking. No other mode touches it. A rated run with a
+   soft signal is held for `review` when it would lift its player into the
+   top `plausibility.review_top_rating` (10) of the Elo board.
+6. A `ranked` run adds to the player's lifetime stats and, when a `free` or
+   `daily` run scored, upserts this week's, this month's and the season's rows
+   — and a daily run today's `challenge` row. **A rated run never reaches a
+   score board** (its `isNewBest` is false, its `passed` empty, its `ranks`
+   the player's as they stand, and its `shareText` names no week rank). No
+   run writes a day row.
 7. A `vs` run touches none of that: it settles its VS (*VS*).
 
 →
@@ -573,7 +586,9 @@ player's, one flagged only for its phone, one without a reel inside 30 s of
 its start); `pending` — held for review, counted if a moderator lets it
 through. `delta` is `after − before`, never beyond ±100; `tierBefore`/`tier`
 say whether the run moved the player between leagues; `nextTarget` is the next
-run's target; `shielded` — a fresh promotion held the player in their league.
+run's target; `shielded` — a fresh promotion held the player in their league;
+`difficulty` — the difficulty the run was played at; `nextDifficulty` — the
+next rated run's, from the rating now (null until placed).
 
 `leagueUnlock` (`LeagueUnlock`) is how far
 Dereceli still is after a free or daily run: `{ required, remaining, placement }`
@@ -662,7 +677,7 @@ jour`, `Feed del día` in the other five; each Arabic line opens with U+200F).
 ### `GET /rating`
 
 ```json
-{ "placed": true, "rating": 2340, "tier": "gold", "floor": 2000, "ceil": 3000, "progress": 340, "target": 150800, "peak": 2400,
+{ "placed": true, "rating": 2340, "tier": "gold", "floor": 2000, "ceil": 3000, "progress": 340, "target": 108600, "difficulty": 6, "peak": 2400,
   "placement": null, "provisional": false, "shield": { "tier": "gold", "runs": 2 },
   "history": [{ "kind": "run", "delta": 42, "before": 2298, "after": 2340, "score": 162000, "target": 150800, "tier": "gold", "runId": "01J…", "at": "…" }] }
 ```
@@ -673,7 +688,9 @@ and null once it is open. Before placement `placed` is false, `placement` is
 `{ "played": 2, "required": 3 }` and every other field is null or empty. `floor`/`ceil` bound the league (`ceil` null in
 `master` — MasterClass has no top), `progress` is how far into it, per-mille;
 `target` is the score the next run has to reach to win rating, rounded up to a
-hundred; `provisional` — moves are still twice as big (after placement, back
+hundred — the typical score of the rating at its own difficulty;
+`difficulty` is the Dereceli difficulty the next rated run is played at;
+`provisional` — moves are still twice as big (after placement, back
 after 30 idle days); `shield` — a fresh promotion's runs left. `history` is the
 last 20 changes that set or moved the rating, newest first — runs that did
 not count and the placement runs before the last are left out; `kind` is

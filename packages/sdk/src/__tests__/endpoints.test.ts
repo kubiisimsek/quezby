@@ -204,6 +204,14 @@ const CALLS: Call[] = [
     auth: true,
   },
   {
+    name: 'runs.start, rated, with the difficulty table the build plays',
+    call: (api) => api.runs.start({ mode: 'rated', engineVersion: 3, contentVersion: 1, difficultyVersion: 1 }),
+    method: 'POST',
+    url: '/runs',
+    body: { mode: 'rated', engineVersion: 3, contentVersion: 1, difficultyVersion: 1 },
+    auth: true,
+  },
+  {
     name: 'leaderboards.get with defaults',
     call: (api) => api.leaderboards.get('monthly'),
     method: 'GET',

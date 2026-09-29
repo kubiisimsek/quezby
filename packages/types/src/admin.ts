@@ -186,6 +186,8 @@ export type AdminPlayerRating = {
   peak: number | null;
   /** The next run's target. */
   target: number | null;
+  /** The difficulty the next rated run is played at; null until placed. */
+  difficulty: number | null;
   placement: RatingPlacement | null;
   provisionalLeft: number;
   shield: { tier: LeagueTier; runs: number } | null;
@@ -368,6 +370,10 @@ export type AdminRunDuel = {
 export type AdminRunDetail = AdminRunRow & {
   seed: number;
   contentVersion: number;
+  /** The Dereceli difficulty the run was played and replayed at; 0 for every run but a rated one. */
+  difficulty: number;
+  /** The difficulty table a rated run was played on; null for any other run, and rated runs from before it. */
+  difficultyVersion: number | null;
   hits: number | null;
   misses: number | null;
   perfects: number | null;
@@ -543,6 +549,8 @@ export type AdminRatingRow = {
   player: AdminPlayerRef;
   rating: number;
   tier: LeagueTier;
+  /** The Dereceli difficulty the rating plays at, 0–16. */
+  difficulty: number;
   peak: number | null;
   ratedAt: string | null;
 };
@@ -573,8 +581,16 @@ export type AdminRatingsResponse = {
     activeDays: number;
     /** Counted free and daily runs before Dereceli opens. */
     unlockRuns: number;
-    /** Rating → the score a player of it typically makes. */
+    /** Dereceli's difficulty table (`@quezby/engine`'s `DIFFICULTY_VERSION`). */
+    difficultyVersion: number;
+    /** Difficulty 0 below this rating, then one more every `difficultyStep` Elo, up to `maxDifficulty`. */
+    difficultyFrom: number;
+    difficultyStep: number;
+    maxDifficulty: number;
+    /** Rating → the score a player of it typically makes at the difficulty that rating plays. */
     targets: Array<{ rating: number; score: number }>;
+    /** Rating → the typical score at difficulty 0, what the placement runs are measured with. */
+    placementTargets: Array<{ rating: number; score: number }>;
   };
 };
 
@@ -587,6 +603,8 @@ export type AdminCalibrationQuery = { days?: number };
  */
 export type AdminCalibrationResponse = {
   engineVersion: number;
+  /** The difficulty table whose targets are calibrated, from the rated runs played on it. */
+  difficultyVersion: number;
   days: number;
   minRuns: number;
   /** Players with `minRuns` counted runs in the window. */

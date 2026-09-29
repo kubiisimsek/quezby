@@ -1,4 +1,4 @@
-import { ENGINE_VERSION, GESTURE } from '@quezby/engine';
+import { DIFFICULTY_VERSION, ENGINE_VERSION, GESTURE, drainAt } from '@quezby/engine';
 import { CHECKPOINTS, CONTENT_VERSION, PACE, exitDelayMs, prefixHash } from '@quezby/config';
 import { ApiError } from '@quezby/sdk';
 import type { CheckpointRequest, FinishRunRequest } from '@quezby/types';
@@ -26,6 +26,7 @@ const started = {
   seed: 42,
   engineVersion: ENGINE_VERSION,
   contentVersion: CONTENT_VERSION,
+  difficulty: 0,
   mode: 'free',
   dayKey: null,
   startedAt: '2026-09-26T10:00:00.000Z',
@@ -63,9 +64,29 @@ describe('useGame', () => {
       mode: 'daily',
       engineVersion: ENGINE_VERSION,
       contentVersion: CONTENT_VERSION,
+      difficultyVersion: DIFFICULTY_VERSION,
     });
     expect(hook.result.current.phase).toBe('playing');
     expect(hook.result.current.combo).toBe(1000);
+    expect(hook.result.current.difficulty).toBe(0);
+  });
+
+  it('plays a rated run at the difficulty the API handed it', async () => {
+    runs.start.mockResolvedValue({ ...started, mode: 'rated', difficulty: 12 });
+
+    const hook = await renderHook(() => useGame('rated'));
+    await act(async () => {
+      await hook.result.current.start();
+    });
+    await act(async () => {
+      jest.advanceTimersByTime(2000);
+    });
+
+    expect(runs.start).toHaveBeenCalledWith(expect.objectContaining({ mode: 'rated', difficultyVersion: DIFFICULTY_VERSION }));
+    expect(hook.result.current.difficulty).toBe(12);
+    // The meter drains as the API will replay it: at difficulty 12, not the Normal game's pace.
+    expect(hook.result.current.reel?.drain).toBe(drainAt(0, 12));
+    expect(hook.result.current.reel?.drain).toBeGreaterThan(drainAt(0, 0));
   });
 
   it('sends a VS to a friend: the start names them, and the run is played like any other', async () => {
@@ -83,6 +104,7 @@ describe('useGame', () => {
       mode: 'vs',
       engineVersion: ENGINE_VERSION,
       contentVersion: CONTENT_VERSION,
+      difficultyVersion: DIFFICULTY_VERSION,
       opponent: 'ekin',
     });
     expect(hook.result.current.phase).toBe('playing');
@@ -100,6 +122,7 @@ describe('useGame', () => {
       mode: 'vs',
       engineVersion: ENGINE_VERSION,
       contentVersion: CONTENT_VERSION,
+      difficultyVersion: DIFFICULTY_VERSION,
       duel: '01jduel0000000000000000001',
     });
   });

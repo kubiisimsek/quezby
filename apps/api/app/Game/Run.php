@@ -5,7 +5,9 @@ namespace App\Game;
 /**
  * One run, one reel at a time — the PHP twin of `packages/engine/src/run.ts`.
  * The API feeds it a finished run's actions and must land on the same summary
- * as the app, so every check below runs in the same order as there.
+ * as the app, so every check below runs in the same order as there. A rated
+ * run is replayed at the Dereceli difficulty it was handed (`Difficulty`);
+ * every other run at 0.
  */
 final class Run
 {
@@ -67,24 +69,24 @@ final class Run
     /** @var array{flawless: int, lightning: int, coolHead: int, comeback: int} */
     private array $bonusCounts = ['flawless' => 0, 'lightning' => 0, 'coolHead' => 0, 'comeback' => 0];
 
-    public function __construct(int $seed)
+    public function __construct(int $seed, public readonly int $difficulty = 0)
     {
         $this->seed = $seed & self::MASK;
-        $this->stream = new ReelStream($this->seed);
+        $this->stream = new ReelStream($this->seed, $difficulty);
         $this->reel = $this->stream->next();
     }
 
     /**
-     * Replays a finished run's log from its seed. A log that stops before the
-     * run ended is a run the player quit.
+     * Replays a finished run's log from its seed, at its Dereceli difficulty.
+     * A log that stops before the run ended is a run the player quit.
      *
      * @param  array<mixed>  $actions
      *
      * @throws EngineError on a log the app could not have produced
      */
-    public static function replay(int $seed, array $actions): Replay
+    public static function replay(int $seed, array $actions, int $difficulty = 0): Replay
     {
-        $run = new self($seed);
+        $run = new self($seed, $difficulty);
         $steps = [];
         foreach ($actions as $action) {
             $steps[] = $run->apply($action);
@@ -345,7 +347,7 @@ final class Run
         if ($blind > 0) {
             $this->blindRun = $blind;
         }
-        $this->meter -= Rules::penaltyFor($loss, $blind);
+        $this->meter -= Rules::penaltyFor(Difficulty::lossAt($loss, $this->difficulty), $blind);
         if ($this->meter <= 0) {
             $this->meter = 0;
             $this->ended = EndReason::Penalty;

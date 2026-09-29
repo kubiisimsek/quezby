@@ -196,6 +196,7 @@ export function playerRating(overrides: Partial<AdminPlayerRating> = {}): AdminP
     tier: 'gold',
     peak: 2610,
     target: 128000,
+    difficulty: 6,
     placement: null,
     provisionalLeft: 0,
     shield: null,
@@ -222,8 +223,8 @@ export function ratingsOverview(overrides: Partial<AdminRatingsResponse> = {}): 
     active: { bronze: 40, silver: 200, gold: 150, platinum: 50, diamond: 10, master: 2 },
     placing: 57,
     top: [
-      { player: { id: '01jplayer00000000000000000a', username: 'kerem.35', bannedAt: null }, rating: 5120, tier: 'master', peak: 5200, ratedAt: '2026-09-25T08:05:00.000Z' },
-      { player: { id: '01jplayer00000000000000000b', username: 'ekin', bannedAt: null }, rating: 4890, tier: 'diamond', peak: null, ratedAt: '2026-09-24T08:05:00.000Z' },
+      { player: { id: '01jplayer00000000000000000a', username: 'kerem.35', bannedAt: null }, rating: 5120, tier: 'master', difficulty: 16, peak: 5200, ratedAt: '2026-09-25T08:05:00.000Z' },
+      { player: { id: '01jplayer00000000000000000b', username: 'ekin', bannedAt: null }, rating: 4890, tier: 'diamond', difficulty: 16, peak: null, ratedAt: '2026-09-24T08:05:00.000Z' },
     ],
     rules: {
       engineVersion: 2,
@@ -238,7 +239,16 @@ export function ratingsOverview(overrides: Partial<AdminRatingsResponse> = {}): 
       bronzeLossPercent: 50,
       activeDays: 14,
       unlockRuns: 20,
+      difficultyVersion: 1,
+      difficultyFrom: 1000,
+      difficultyStep: 250,
+      maxDifficulty: 16,
       targets: [
+        { rating: 0, score: 8000 },
+        { rating: 1000, score: 31600 },
+        { rating: 2000, score: 74100 },
+      ],
+      placementTargets: [
         { rating: 0, score: 8000 },
         { rating: 1000, score: 34000 },
         { rating: 2000, score: 100000 },
@@ -251,6 +261,7 @@ export function ratingsOverview(overrides: Partial<AdminRatingsResponse> = {}): 
 export function calibration(overrides: Partial<AdminCalibrationResponse> = {}): AdminCalibrationResponse {
   return {
     engineVersion: 2,
+    difficultyVersion: 1,
     days: 30,
     minRuns: 10,
     players: 200,
@@ -312,6 +323,8 @@ export function runResponse(overrides: Partial<AdminRunResponse> = {}, run: Part
       ...runRow(),
       seed: 4242,
       contentVersion: 1,
+      difficulty: 0,
+      difficultyVersion: null,
       hits: 200,
       misses: 4,
       perfects: 12,

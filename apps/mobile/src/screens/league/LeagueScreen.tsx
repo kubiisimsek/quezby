@@ -347,6 +347,9 @@ function TierHero({
             icon="target"
           />
         ) : null}
+        {rating.difficulty ? (
+          <Tag label={t.rating.difficulty(t.fmt.score(rating.difficulty))} tone="secondary" icon="flame" />
+        ) : null}
         {rating.shield ? (
           <Tag label={t.rating.shield(rating.shield.runs)} tone="secondary" icon="shield" />
         ) : null}
@@ -357,6 +360,11 @@ function TierHero({
       {rating.target !== null ? (
         <Txt variant="micro" tone="onSolid" align="center">
           {t.rating.targetHint}
+        </Txt>
+      ) : null}
+      {rating.difficulty ? (
+        <Txt variant="micro" tone="onSolid" align="center">
+          {t.rating.difficultyHint}
         </Txt>
       ) : null}
     </Animated.View>

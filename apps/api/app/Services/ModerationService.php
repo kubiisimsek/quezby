@@ -47,7 +47,10 @@ final class ModerationService
             ->get();
     }
 
-    /** Lets a held run rank, on the boards of the days it was played. False when it was not held. */
+    /**
+     * Lets a held run rank: a Normal or Günlük one on the boards of the days
+     * it was played, a rated one on the rating. False when it was not held.
+     */
     public function approve(Run $run, Actor $actor): bool
     {
         return DB::transaction(function () use ($run, $actor) {
@@ -64,9 +67,11 @@ final class ModerationService
                 return true;
             }
 
-            $replay = Engine::replay($run->seed, $run->actions ?? []);
+            $replay = Engine::replay($run->seed, $run->actions ?? [], $run->difficulty);
             $this->playerStats->add($run->user, $replay->summary, $this->statsBuilder->build($replay, $run->seed, $run->content_version));
-            $this->leaderboards->record($run);
+            if ($run->mode->boards()) {
+                $this->leaderboards->record($run);
+            }
 
             return true;
         });

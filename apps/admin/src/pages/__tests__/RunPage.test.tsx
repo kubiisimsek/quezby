@@ -71,12 +71,36 @@ describe('RunPage', () => {
     expect(await screen.findByText('Bu tur incelemede')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Onayla' }));
     const dialog = await screen.findByRole('dialog');
-    expect(within(dialog).getByText(/Dereceli bir tursa reytingine de sayılır\./)).toBeInTheDocument();
+    expect(within(dialog).getByText(/haftanın, ayın ve sezonun tablolarına girer/)).toBeInTheDocument();
     expect(within(dialog).queryByText(/ligine/)).not.toBeInTheDocument();
     await user.click(within(dialog).getByRole('button', { name: 'Onayla' }));
 
     await waitFor(() => expect(api.runs.approve).toHaveBeenCalledWith(ID));
     expect(await screen.findByText('Tur onaylandı')).toBeInTheDocument();
+  });
+
+  it('says a held rated run waits for the Elo board, counts on the rating alone, and was played at its difficulty', async () => {
+    const api = fakeApi();
+    api.runs.get.mockResolvedValue(runResponse({}, { status: 'review', mode: 'rated', difficulty: 12, difficultyVersion: 1 }));
+    const { user } = renderApp({ path: `/runs/${ID}`, api, session: adminSession({ role: 'moderator' }) });
+
+    expect(await screen.findByText(/oyuncuyu Elo tablosunun zirvesine taşıyacak/)).toBeInTheDocument();
+    const difficulty = screen.getByText('Zorluk', { selector: 'dt' }).parentElement as HTMLElement;
+    expect(difficulty).toHaveTextContent('12');
+    expect(difficulty).toHaveTextContent('Zorluk tablosu 1; tur bu zorlukla tekrar oynatıldı');
+
+    await user.click(screen.getByRole('button', { name: 'Onayla' }));
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByText(/Hiçbir skor tablosuna yazılmaz\./)).toBeInTheDocument();
+  });
+
+  it('shows no difficulty for a run that is not rated', async () => {
+    const api = fakeApi();
+    api.runs.get.mockResolvedValue(runResponse({}, { status: 'ranked' }));
+    renderApp({ path: `/runs/${ID}`, api });
+
+    expect(await screen.findByText('Tohum')).toBeInTheDocument();
+    expect(screen.queryByText('Zorluk', { selector: 'dt' })).not.toBeInTheDocument();
   });
 
   it('rejects with a reason', async () => {

@@ -1,3 +1,14 @@
+export {
+  DIFFICULTIES,
+  DIFFICULTY_VERSION,
+  MAX_DIFFICULTY,
+  difficultyRules,
+  drainAt,
+  likeWeightAt,
+  lossAt,
+  specialShareAt,
+  type DifficultyRules,
+} from './difficulty';
 export { Rng } from './rng';
 export {
   BONUS_KINDS,

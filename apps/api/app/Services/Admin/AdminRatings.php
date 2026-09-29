@@ -4,6 +4,7 @@ namespace App\Services\Admin;
 
 use App\Enums\LeagueTier;
 use App\Enums\RatingKind;
+use App\Game\Difficulty;
 use App\Models\PlayerRating;
 use App\Models\RatingChange;
 use App\Models\Run;
@@ -28,7 +29,31 @@ final class AdminRatings
         private readonly array $config,
         #[Config('quezby.engine_version')]
         private readonly int $engineVersion,
+        #[Config('quezby.difficulty_version')]
+        private readonly int $difficultyVersion,
+        private readonly RatingService $ratings,
     ) {}
+
+    /** The targets a placed player's run is measured with: its difficulty table's. */
+    private function targets(): ?TargetTable
+    {
+        return TargetTable::forDifficulty($this->engineVersion, $this->difficultyVersion);
+    }
+
+    /**
+     * An anchor table as rows.
+     *
+     * @param  array<int, int>  $anchors
+     * @return list<array{rating: int, score: int}>
+     */
+    private static function rows(array $anchors): array
+    {
+        return array_map(
+            fn (int $rating, int $score) => ['rating' => $rating, 'score' => $score],
+            array_keys($anchors),
+            array_values($anchors),
+        );
+    }
 
     /**
      * `AdminRatingsResponse`: players per league (all, and those who played
@@ -73,6 +98,7 @@ final class AdminRatings
                     'player' => AdminRuns::ref($rating->user),
                     'rating' => $rating->rating,
                     'tier' => LeagueTier::fromRating((int) $rating->rating)->slug(),
+                    'difficulty' => $this->ratings->difficultyAt($rating->rating),
                     'peak' => $rating->peak,
                     'ratedAt' => Timestamp::iso($rating->rated_at),
                 ])
@@ -91,11 +117,12 @@ final class AdminRatings
                 'bronzeLossPercent' => (int) $this->config['bronze_loss_percent'],
                 'activeDays' => (int) $this->config['board_active_days'],
                 'unlockRuns' => (int) $this->config['unlock_runs'],
-                'targets' => array_map(
-                    fn (int $rating, int $score) => ['rating' => $rating, 'score' => $score],
-                    array_keys($this->config['targets'][$this->engineVersion] ?? []),
-                    array_values($this->config['targets'][$this->engineVersion] ?? []),
-                ),
+                'difficultyVersion' => $this->difficultyVersion,
+                'difficultyFrom' => (int) $this->config['difficulty']['from'],
+                'difficultyStep' => (int) $this->config['difficulty']['step'],
+                'maxDifficulty' => Difficulty::MAX,
+                'targets' => self::rows($this->config['difficulty']['targets'][$this->engineVersion][$this->difficultyVersion] ?? []),
+                'placementTargets' => self::rows($this->config['targets'][$this->engineVersion] ?? []),
             ],
         ];
     }
@@ -117,7 +144,8 @@ final class AdminRatings
             'rating' => $rating->rating,
             'tier' => $rating->rating === null ? null : LeagueTier::fromRating($rating->rating)->slug(),
             'peak' => $rating->peak,
-            'target' => $rating->rating === null ? null : TargetTable::forEngine($this->engineVersion)?->shown($rating->rating),
+            'target' => $rating->rating === null ? null : $this->targets()?->shown($rating->rating),
+            'difficulty' => $this->ratings->difficultyAt($rating->rating),
             'placement' => $rating->isPlaced() ? null : [
                 'played' => count($rating->placement_scores ?? []),
                 'required' => (int) $this->config['placement_runs'],

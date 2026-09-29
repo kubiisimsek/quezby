@@ -62,6 +62,21 @@ export const PROFILES: readonly SkillProfile[] = [
   },
 ];
 
+/**
+ * A thumb past `pro`, for the Dereceli difficulties (`difficulty.ts`) only:
+ * the rating's "elite" (~4540 Elo, Elmas) plays like this. Kept out of
+ * `PROFILES`, whose runs are the engine's replay fixtures.
+ */
+export const ELITE: SkillProfile = {
+  name: 'elite',
+  reaction: 330,
+  reactionSd: 55,
+  slip: 0.007,
+  reflex: 0.028,
+  holdSd: 22,
+  tapGap: 100,
+};
+
 export class Bot {
   private readonly rng: Rng;
 

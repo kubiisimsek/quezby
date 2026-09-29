@@ -47,12 +47,15 @@ export function PlayerSheet({
   username,
   onClose,
   inThread = false,
+  rating = true,
 }: {
   /** Null keeps the sheet closed. */
   username: string | null;
   onClose: () => void;
   /** Opened from the conversation itself: no way into it. */
   inThread?: boolean;
+  /** The player's league and Elo; Zirve, the score boards' screen, shows neither. */
+  rating?: boolean;
 }) {
   const t = useT();
   const words = t.friends.sheet;
@@ -116,7 +119,7 @@ export function PlayerSheet({
                 <Portrait name={card.username} src={card.avatarUrl} isMe={card.isMe} size="md" />
               </Stamp>
               <View style={styles.who}>
-                {card.league ? (
+                {rating && card.league ? (
                   <View style={styles.league}>
                     <TierBadge tier={card.league} size="md" showLabel />
                     {card.rating !== null ? (

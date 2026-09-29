@@ -35,6 +35,9 @@ const tr = {
   delta: (value: number) => signed('tr', value),
   target: (value: string) => `Hedef ${value}`,
   targetHint: 'Bu skoru geçersen Elo’n artar.',
+  /** Dereceli's difficulty (0–16), which climbs with the rating: "Zorluk 7". */
+  difficulty: (value: string) => `Zorluk ${value}`,
+  difficultyHint: 'Elo’n arttıkça engeller sıklaşır, dopamin daha hızlı biter.',
   /** How far the next league is: "Altın’a 158 Elo". */
   toNext: (tier: LeagueTier, points: string) => `${dativeOf(tiers.tr.names[tier])} ${points} Elo`,
   /** MasterClass: the one league with no top. */
@@ -58,6 +61,7 @@ const tr = {
     void: 'Bu tur Elo’ya sayılmadı',
     pending: 'Skorun incelenince Elo’ya yazılır',
     next: (target: string) => `Sıradaki hedef ${target}`,
+    nextDifficulty: (value: string) => `Sıradaki zorluk ${value}`,
   },
   history: {
     title: 'SON DEĞİŞİMLER',
@@ -70,13 +74,6 @@ const tr = {
     } satisfies Record<RatingChangeKind, string>,
     run: (score: string, target: string) => `${score} · hedef ${target}`,
   },
-  /** Zirve's Elo tab. */
-  board: {
-    tab: 'Elo',
-    hint: 'Son 14 günde oynayanlar',
-    empty: 'Henüz kimse yok',
-    emptyHint: 'Yerleşme turlarını bitiren oyuncular burada görünür.',
-  },
 };
 
 export type RatingMessages = typeof tr;
@@ -86,6 +83,8 @@ const en: RatingMessages = {
   delta: (value) => signed('en', value),
   target: (value) => `Target ${value}`,
   targetHint: 'Beat this score and your Elo goes up.',
+  difficulty: (value) => `Difficulty ${value}`,
+  difficultyHint: 'The higher your Elo, the more obstacles and the faster your dopamine drains.',
   toNext: (tier, points) => `${points} Elo to ${tiers.en.names[tier]}`,
   noCeiling: 'No ceiling',
   peak: (value) => `Best ${value}`,
@@ -106,6 +105,7 @@ const en: RatingMessages = {
     void: "This run didn't count for Elo",
     pending: 'Your Elo updates once your score is checked',
     next: (target) => `Next target ${target}`,
+    nextDifficulty: (value) => `Next difficulty ${value}`,
   },
   history: {
     title: 'LATEST CHANGES',
@@ -118,12 +118,6 @@ const en: RatingMessages = {
     },
     run: (score, target) => `${score} · target ${target}`,
   },
-  board: {
-    tab: 'Elo',
-    hint: 'Played in the last 14 days',
-    empty: 'Nobody here yet',
-    emptyHint: 'Players show up here once their placement runs are done.',
-  },
 };
 
 const de: RatingMessages = {
@@ -131,6 +125,8 @@ const de: RatingMessages = {
   delta: (value) => signed('de', value),
   target: (value) => `Ziel ${value}`,
   targetHint: 'Schlag diesen Score und dein Elo steigt.',
+  difficulty: (value) => `Schwierigkeit ${value}`,
+  difficultyHint: 'Je höher dein Elo, desto mehr Hindernisse und desto schneller sinkt dein Dopamin.',
   toNext: (tier, points) => `Noch ${points} Elo bis ${tiers.de.names[tier]}`,
   noCeiling: 'Nach oben offen',
   peak: (value) => `Bestwert ${value}`,
@@ -151,6 +147,7 @@ const de: RatingMessages = {
     void: 'Diese Runde zählt nicht fürs Elo',
     pending: 'Dein Elo zählt, sobald dein Score geprüft ist',
     next: (target) => `Nächstes Ziel ${target}`,
+    nextDifficulty: (value) => `Nächste Schwierigkeit ${value}`,
   },
   history: {
     title: 'LETZTE ÄNDERUNGEN',
@@ -163,12 +160,6 @@ const de: RatingMessages = {
     },
     run: (score, target) => `${score} · Ziel ${target}`,
   },
-  board: {
-    tab: 'Elo',
-    hint: 'Gespielt in den letzten 14 Tagen',
-    empty: 'Noch niemand da',
-    emptyHint: 'Hier stehen alle, die ihre Einstufung abgeschlossen haben.',
-  },
 };
 
 const ar: RatingMessages = {
@@ -176,6 +167,8 @@ const ar: RatingMessages = {
   delta: (value) => iso(signed('ar', value)),
   target: (value) => `الهدف ${iso(value)}`,
   targetHint: 'تجاوز هذه النتيجة ليرتفع تصنيفك.',
+  difficulty: (value) => `الصعوبة ${iso(value)}`,
+  difficultyHint: 'كلما ارتفع تصنيفك زادت العقبات ونفد الدوبامين أسرع.',
   toNext: (tier, points) => `${iso(points)} إيلو حتى ${tiers.ar.names[tier]}`,
   noCeiling: 'بلا سقف',
   peak: (value) => `الأعلى ${iso(value)}`,
@@ -210,6 +203,7 @@ const ar: RatingMessages = {
     void: 'لم تُحسب هذه الجولة في التصنيف',
     pending: 'يُحدَّث تصنيفك بعد مراجعة نتيجتك',
     next: (target) => `الهدف التالي ${iso(target)}`,
+    nextDifficulty: (value) => `الصعوبة التالية ${iso(value)}`,
   },
   history: {
     title: 'آخر التغييرات',
@@ -222,12 +216,6 @@ const ar: RatingMessages = {
     },
     run: (score, target) => `${iso(score)} · الهدف ${iso(target)}`,
   },
-  board: {
-    tab: 'إيلو',
-    hint: 'من لعبوا في آخر 14 يومًا',
-    empty: 'لا أحد هنا بعد',
-    emptyHint: 'يظهر اللاعبون هنا بعد إنهاء جولات التصنيف الأولي.',
-  },
 };
 
 const fr: RatingMessages = {
@@ -235,6 +223,8 @@ const fr: RatingMessages = {
   delta: (value) => signed('fr', value),
   target: (value) => `Objectif ${value}`,
   targetHint: 'Dépasse ce score et ton Elo monte.',
+  difficulty: (value) => `Difficulté ${value}`,
+  difficultyHint: 'Plus ton Elo monte, plus il y a d’obstacles et plus ta dopamine baisse vite.',
   toNext: (tier, points) => `Encore ${points}${NBSP}Elo jusqu’à ${tiers.fr.names[tier]}`,
   noCeiling: 'Pas de plafond',
   peak: (value) => `Meilleur ${value}`,
@@ -255,6 +245,7 @@ const fr: RatingMessages = {
     void: 'Cette partie ne compte pas pour l’Elo',
     pending: 'Ton Elo sera mis à jour une fois ton score vérifié',
     next: (target) => `Prochain objectif ${target}`,
+    nextDifficulty: (value) => `Difficulté suivante ${value}`,
   },
   history: {
     title: 'DERNIERS CHANGEMENTS',
@@ -267,12 +258,6 @@ const fr: RatingMessages = {
     },
     run: (score, target) => `${score} · objectif ${target}`,
   },
-  board: {
-    tab: 'Elo',
-    hint: 'Joueurs actifs ces 14 derniers jours',
-    empty: 'Personne pour l’instant',
-    emptyHint: 'Les joueurs apparaissent ici une fois leur placement terminé.',
-  },
 };
 
 const es: RatingMessages = {
@@ -280,6 +265,8 @@ const es: RatingMessages = {
   delta: (value) => signed('es', value),
   target: (value) => `Objetivo ${value}`,
   targetHint: 'Supera esta puntuación y tu Elo sube.',
+  difficulty: (value) => `Dificultad ${value}`,
+  difficultyHint: 'Cuanto más Elo, más obstáculos y más rápido baja tu dopamina.',
   toNext: (tier, points) => `${points} Elo para ${tiers.es.names[tier]}`,
   noCeiling: 'Sin techo',
   peak: (value) => `Mejor ${value}`,
@@ -300,6 +287,7 @@ const es: RatingMessages = {
     void: 'Esta partida no cuenta para el Elo',
     pending: 'Tu Elo se actualiza cuando se revise tu puntuación',
     next: (target) => `Siguiente objetivo ${target}`,
+    nextDifficulty: (value) => `Siguiente dificultad ${value}`,
   },
   history: {
     title: 'ÚLTIMOS CAMBIOS',
@@ -311,12 +299,6 @@ const es: RatingMessages = {
       reversal: 'Anulado',
     },
     run: (score, target) => `${score} · objetivo ${target}`,
-  },
-  board: {
-    tab: 'Elo',
-    hint: 'Jugaron en los últimos 14 días',
-    empty: 'Aún no hay nadie',
-    emptyHint: 'Los jugadores aparecen aquí al terminar su clasificación.',
   },
 };
 

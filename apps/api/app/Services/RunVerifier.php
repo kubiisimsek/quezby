@@ -44,7 +44,7 @@ final class RunVerifier
      */
     public function verify(Run $run, array $actions, int $clientScore, int $clientReels, CarbonInterface $now, bool $banned, array $checkpoints = []): Verification
     {
-        $replay = Engine::replay($run->seed, $actions);
+        $replay = Engine::replay($run->seed, $actions, $run->difficulty);
         $onTheWay = $this->checkpoints($run, $actions, $replay, $checkpoints);
         $device = $this->deviceIntegrity($run);
 

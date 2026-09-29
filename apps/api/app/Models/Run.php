@@ -27,6 +27,8 @@ use Illuminate\Support\Carbon;
  * @property int $seed
  * @property int $engine_version
  * @property int $content_version
+ * @property int $difficulty
+ * @property int|null $difficulty_version
  * @property string|null $app_version
  * @property DeviceVerdict|null $device_verdict
  * @property RunStatus $status
@@ -57,7 +59,7 @@ use Illuminate\Support\Carbon;
  * @property array<mixed>|null $actions
  */
 #[Fillable([
-    'seed', 'engine_version', 'content_version', 'app_version', 'device_verdict', 'status', 'mode', 'daily_key', 'duel_id', 'open_user_id',
+    'seed', 'engine_version', 'content_version', 'difficulty', 'difficulty_version', 'app_version', 'device_verdict', 'status', 'mode', 'daily_key', 'duel_id', 'open_user_id',
     'started_at', 'finished_at',
     'score', 'reels', 'hits', 'misses', 'perfects', 'max_streak', 'max_combo', 'bonus_points', 'level',
     'accuracy', 'avg_reaction_ms', 'active_ms', 'ended_by',
@@ -70,7 +72,7 @@ class Run extends Model
 
     /** Every column but the action log and the replay's stats: what a list of runs needs. */
     public const LIST_COLUMNS = [
-        'id', 'user_id', 'seed', 'engine_version', 'content_version', 'app_version', 'device_verdict',
+        'id', 'user_id', 'seed', 'engine_version', 'content_version', 'difficulty', 'difficulty_version', 'app_version', 'device_verdict',
         'status', 'mode', 'daily_key', 'duel_id', 'open_user_id', 'started_at', 'finished_at',
         'score', 'reels', 'hits', 'misses', 'perfects', 'max_streak', 'max_combo', 'bonus_points', 'level',
         'accuracy', 'avg_reaction_ms', 'active_ms', 'ended_by', 'client_score', 'client_reels',
@@ -88,6 +90,8 @@ class Run extends Model
             'seed' => 'integer',
             'engine_version' => 'integer',
             'content_version' => 'integer',
+            'difficulty' => 'integer',
+            'difficulty_version' => 'integer',
             'device_verdict' => DeviceVerdict::class,
             'status' => RunStatus::class,
             'mode' => RunMode::class,

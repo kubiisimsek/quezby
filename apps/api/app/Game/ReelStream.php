@@ -5,10 +5,14 @@ namespace App\Game;
 /**
  * The feed. Every reel costs exactly three draws — used or not — so reel `n`
  * always reads the same bits of the seed as `packages/engine/src/reels.ts`.
+ * A Dereceli difficulty (`Difficulty`) only moves the thresholds the draws
+ * are held against, and the drain; 0 is the feed of every other run.
  */
 final class ReelStream
 {
     private readonly Rng $rng;
+
+    private readonly int $likeWeight;
 
     private int $index = 0;
 
@@ -16,8 +20,9 @@ final class ReelStream
 
     private int $specialRun = 0;
 
-    public function __construct(int $seed)
+    public function __construct(int $seed, private readonly int $difficulty = 0)
     {
+        $this->likeWeight = Difficulty::likeWeightAt($difficulty);
         $this->rng = new Rng($seed);
     }
 
@@ -31,11 +36,11 @@ final class ReelStream
         $intro = Rules::INTRO[$n] ?? null;
         if ($intro !== null) {
             $kind = $intro;
-        } elseif ($special >= Rules::specialShareFor($n) || $this->specialRun >= Rules::MAX_SPECIAL_RUN) {
+        } elseif ($special >= Difficulty::specialShareAt($n, $this->difficulty) || $this->specialRun >= Rules::MAX_SPECIAL_RUN) {
             $kind = ReelKind::Skip;
-        } elseif ($pick < Rules::WEIGHT_LIKE) {
+        } elseif ($pick < $this->likeWeight) {
             $kind = ReelKind::Like;
-        } elseif ($pick < Rules::WEIGHT_LIKE + Rules::WEIGHT_HOLD) {
+        } elseif ($pick < $this->likeWeight + Rules::WEIGHT_HOLD) {
             $kind = ReelKind::Hold;
         } else {
             $kind = $this->previous === ReelKind::Freeze ? ReelKind::Like : ReelKind::Freeze;
@@ -54,7 +59,7 @@ final class ReelStream
             holdFill: $isHold ? Rules::holdFillFor($n) : 0,
             zoneCenter: $isHold ? Rules::ZONE_CENTER_MIN + $center : 0,
             zoneHalf: $isHold ? intdiv(Rules::zoneWidthFor($n), 2) : 0,
-            drain: Rules::drainFor($n),
+            drain: Difficulty::drainAt($n, $this->difficulty),
             level: Rules::levelFor($n),
         );
     }

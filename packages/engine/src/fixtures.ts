@@ -1,3 +1,12 @@
+import {
+  DIFFICULTIES,
+  DIFFICULTY_VERSION,
+  MAX_DIFFICULTY,
+  drainAt,
+  likeWeightAt,
+  lossAt,
+  specialShareAt,
+} from './difficulty';
 import { PROFILES, blindSwipe, playRun } from './bot';
 import { Rng } from './rng';
 import {
@@ -203,8 +212,13 @@ function cleanAction(run: Run, decideMs: number): Action {
   }
 }
 
-function recorded(name: string, seed: number, play: (run: Run) => Action | null): BonusFixture {
-  const run = new Run(seed);
+function recorded(
+  name: string,
+  seed: number,
+  play: (run: Run) => Action | null,
+  difficulty = 0,
+): BonusFixture {
+  const run = new Run(seed, difficulty);
   const actions: Action[] = [];
   const steps: StepFixture[] = [];
   while (!run.over) {
@@ -319,4 +333,86 @@ export function buildBonuses(): BonusFixture[] {
     if (!blinds.has(blind)) throw new Error(`no step log makes blind move ${blind}`);
   }
   return fixtures;
+}
+
+export type DifficultyReplayFixture = ReplayFixture & { difficulty: number };
+export type DifficultyStepFixture = BonusFixture & { difficulty: number };
+
+/** The difficulties the fixtures play: the first step, the middle, the top. */
+const PLAYED_DIFFICULTIES = [1, 8, MAX_DIFFICULTY];
+
+/**
+ * Dereceli's difficulties (`difficulty.ts`), for the PHP twin: the table,
+ * what it does to the curves and the losses, bot runs replayed at each
+ * difficulty, and step logs whose meter must match reel by reel. Difficulty
+ * 0 needs none of its own — it is every other fixture.
+ */
+export function buildDifficulty() {
+  const reels = [0, 7, 8, 20, 100, 300, 600, 2000];
+  const replays: DifficultyReplayFixture[] = [];
+  for (const difficulty of PLAYED_DIFFICULTIES) {
+    for (const profile of PROFILES) {
+      for (const seed of [42, 7919]) {
+        const run = new Run(seed, difficulty);
+        const actions = playRun(run, profile, seed + profile.name.length);
+        replays.push({
+          name: `${profile.name}-${seed}-d${difficulty}`,
+          seed,
+          difficulty,
+          actions,
+          summary: run.summary(),
+        });
+      }
+    }
+  }
+
+  const steps: DifficultyStepFixture[] = PLAYED_DIFFICULTIES.flatMap((difficulty) => [
+    {
+      difficulty,
+      ...recorded(
+        `clean-but-slow-d${difficulty}`,
+        42,
+        (run) =>
+          run.summary().reels < 60
+            ? cleanAction(run, Math.min(900, run.current.window - 1))
+            : null,
+        difficulty,
+      ),
+    },
+    {
+      difficulty,
+      ...recorded(
+        `misses-and-a-blind-move-d${difficulty}`,
+        99,
+        (run) => {
+          const reels = run.summary().reels;
+          if (reels >= 50) return null;
+          if (reels === 12 || reels === 30) return [GESTURE.none, 0, 0];
+          if (run.current.kind === 'like' && reels > 20) return [GESTURE.up, 200, 0];
+          return cleanAction(run, 450);
+        },
+        difficulty,
+      ),
+    },
+    { difficulty, ...recorded(`blind-swiper-d${difficulty}`, 42, (run) => blindSwipe(run, 200), difficulty) },
+  ]);
+
+  return {
+    version: DIFFICULTY_VERSION,
+    table: DIFFICULTIES,
+    curves: DIFFICULTIES.map((_, difficulty) => ({
+      difficulty,
+      likeWeight: likeWeightAt(difficulty),
+      reels: reels.map((n) => ({
+        n,
+        specialShare: specialShareAt(n, difficulty),
+        drain: drainAt(n, difficulty),
+      })),
+      losses: Object.fromEntries(
+        Object.entries(RULES.loss).map(([kind, loss]) => [kind, lossAt(loss, difficulty)]),
+      ),
+    })),
+    replays,
+    steps,
+  };
 }

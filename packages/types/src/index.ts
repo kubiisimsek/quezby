@@ -159,10 +159,11 @@ export type RunAction = [number, number, number];
 
 /**
  * `free` (Normal): any number a day. `daily` (Günlük): "Günün akışı" — one
- * attempt, the same seed for everyone. `rated` (Dereceli): any number a day,
- * and the only runs that play for Elo and the weekly group — open once
- * `RatingResponse.unlock` is null. `vs`: a friend's VS — one attempt each at
- * one seed; it never ranks anywhere.
+ * attempt, the same seed for everyone. Both climb the score boards (Zirve).
+ * `rated` (Dereceli): any number a day, at the difficulty of the player's
+ * Elo, and the only runs that play for Elo — never on a score board; open
+ * once `RatingResponse.unlock` is null. `vs`: a friend's VS — one attempt
+ * each at one seed; it never ranks anywhere.
  */
 export type RunMode = 'free' | 'daily' | 'rated' | 'vs';
 
@@ -172,6 +173,12 @@ export type StartRunRequest = {
   engineVersion: number;
   /** The content catalog this build draws reels from. */
   contentVersion: number;
+  /**
+   * Dereceli's difficulty table this build plays (`DIFFICULTY_VERSION` of
+   * `@quezby/engine`). A rated run from a build without it, or with
+   * another, is refused with `engine_outdated`.
+   */
+  difficultyVersion?: number;
   /** A VS against this friend, on a new seed — the challenger plays first. */
   opponent?: string;
   /** The VS a friend sent, answered on its seed. */
@@ -183,6 +190,11 @@ export type StartRunResponse = {
   seed: number;
   engineVersion: number;
   contentVersion: number;
+  /**
+   * The difficulty the run is played at — `new Run(seed, difficulty)`: the
+   * one the player's Elo gives a rated run (0–16), 0 for every other run.
+   */
+  difficulty: number;
   mode: RunMode;
   /** The Istanbul day of a daily run, `2026-09-24`; null otherwise. */
   dayKey: string | null;
@@ -351,6 +363,10 @@ export type RunRating = {
   placement: RatingPlacement | null;
   /** A fresh promotion held the player in their league. */
   shielded: boolean;
+  /** The difficulty the run was played at. */
+  difficulty: number;
+  /** The difficulty of the next rated run, from the rating now; null until placed. */
+  nextDifficulty: number | null;
 };
 
 /** Why the rating moved: a run, a placement, a forfeit, or a moderator's reversal. */
@@ -385,6 +401,11 @@ export type RatingResponse = {
   progress: number | null;
   /** The score the next run must reach to win rating. */
   target: number | null;
+  /**
+   * The difficulty the next rated run is played at, 0–16 (`MAX_DIFFICULTY`):
+   * one more every 250 Elo from 1000. Null until placed.
+   */
+  difficulty: number | null;
   peak: number | null;
   placement: RatingPlacement | null;
   /** Moves are still twice as big: right after placement, and back after a long break. */

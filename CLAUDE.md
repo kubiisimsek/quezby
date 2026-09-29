@@ -8,7 +8,8 @@ endless vertical feed; each reel asks for one gesture — swipe up, double-tap,
 press-and-hold, or *don't touch* — before its timer runs out, while a
 dopamine meter drains faster every reel. Players compete on weekly, monthly
 and all-time boards, a daily challenge everyone plays on one seed ("Günün
-akışı") and Elo leagues played in Dereceli — and with their friends: requests, an inbox of
+akışı") and Elo leagues played in Dereceli, which gets harder as the rating
+climbs and never touches the score boards — and with their friends: requests, an inbox of
 preset phrases, and VS (one seed, one attempt each, counted on no board).
 Start at `docs/product/overview.md`.
 
@@ -66,7 +67,11 @@ packages/sdk    the typed API client
   + `pnpm engine:lock` + `apps/api/app/Game/Rules.php` (`Rules::ENGINE_VERSION`;
   the config reads it) + the season's Elo targets
   (`config/quezby.php` › `rating.targets[ENGINE_VERSION]`). `php artisan test`
-  proves parity, the lock and the targets.
+  proves parity, the lock and the targets. Dereceli's difficulty table
+  (`packages/engine/src/difficulty.ts` + `apps/api/app/Game/Difficulty.php`,
+  difficulty 0 = the engine as it is) is sealed apart in
+  `difficulty.lock.json`: a change is a `DIFFICULTY_VERSION` bump + fixtures +
+  lock + `rating.difficulty.targets`, not a new season.
 - **The design language is not optional — and it is a game's.** Quezby must
   look like a mobile game, never an app ("Arena": the dark arena, outlined
   tiles, slab buttons with one gold play per screen, Rubik display type, no

@@ -1,5 +1,6 @@
 import { CHECKPOINTS, CONTENT_VERSION, PACE, exitDelayMs, prefixHash } from '@quezby/config';
 import {
+  DIFFICULTY_VERSION,
   ENGINE_VERSION,
   EngineError,
   GESTURE,
@@ -160,6 +161,8 @@ export function useGame(mode: RunMode = 'free', vs: VsTarget | null = null) {
   const [countdown, setCountdown] = useState(3);
   const [reel, setReel] = useState<Reel | null>(null);
   const [seed, setSeed] = useState(0);
+  /** The Dereceli difficulty the API handed the run; 0 for every other run. */
+  const [difficulty, setDifficulty] = useState(0);
   const [score, setScore] = useState(0);
   const [combo, setCombo] = useState(1000);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
@@ -692,8 +695,8 @@ export function useGame(mode: RunMode = 'free', vs: VsTarget | null = null) {
   }, [advanceReel, schedule]);
 
   const begin = useCallback(
-    (runSeed: number, runId: string | null) => {
-      runRef.current = new Run(runSeed);
+    (runSeed: number, runId: string | null, runDifficulty = 0) => {
+      runRef.current = new Run(runSeed, runDifficulty);
       runIdRef.current = runId;
       actionsRef.current = [];
       goAtRef.current = null;
@@ -705,6 +708,7 @@ export function useGame(mode: RunMode = 'free', vs: VsTarget | null = null) {
       coachedRef.current = new Set();
       setCoach(null);
       setSeed(runSeed);
+      setDifficulty(runDifficulty);
       setScore(0);
       setCombo(1000);
       setFeedback(null);
@@ -760,10 +764,12 @@ export function useGame(mode: RunMode = 'free', vs: VsTarget | null = null) {
           mode,
           engineVersion: ENGINE_VERSION,
           contentVersion: CONTENT_VERSION,
+          difficultyVersion: DIFFICULTY_VERSION,
           ...(mode === 'vs' && vs ? (vs.duelId ? { duel: vs.duelId } : { opponent: vs.opponent }) : {}),
         });
         if (!aliveRef.current) return;
-        begin(started.seed, started.runId);
+        // A rated run is played at the difficulty of the player's Elo, as the API will replay it.
+        begin(started.seed, started.runId, started.difficulty);
       } catch (error) {
         if (!aliveRef.current) return;
         // A VS and a rated run are played on the API's seed and verified, or not at all.
@@ -852,6 +858,7 @@ export function useGame(mode: RunMode = 'free', vs: VsTarget | null = null) {
     countdown,
     reel,
     seed,
+    difficulty,
     score,
     combo,
     feedback,

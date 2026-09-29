@@ -23,6 +23,7 @@ test('a free run hands out a random seed and opens the player\'s one run', funct
     expect($seed)->toBeInt()->toBeGreaterThanOrEqual(1)->toBeLessThanOrEqual(4294967295);
     $response->assertJsonPath('engineVersion', Rules::ENGINE_VERSION)
         ->assertJsonPath('contentVersion', Catalog::LATEST)
+        ->assertJsonPath('difficulty', 0)
         ->assertJsonPath('mode', 'free')
         ->assertJsonPath('dayKey', null);
     expect($response->json('startedAt'))->toMatch('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/');

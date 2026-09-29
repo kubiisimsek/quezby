@@ -12,11 +12,14 @@ export const TRANSITION_MS = 220;
 
 export type Played = { summary: RunSummary; seconds: number };
 
-/** `runs` runs of one profile on seeds `i · 7919`, bot seed `i`, as the simulator plays them. */
-export function playProfile(profile: SkillProfile, runs: number, firstSeed = 1): Played[] {
+/**
+ * `runs` runs of one profile on seeds `i · 7919`, bot seed `i`, as the
+ * simulator plays them — at a Dereceli `difficulty` when one is given.
+ */
+export function playProfile(profile: SkillProfile, runs: number, firstSeed = 1, difficulty = 0): Played[] {
   const played: Played[] = [];
   for (let i = firstSeed; i < firstSeed + runs; i += 1) {
-    const run = new Run(i * 7919);
+    const run = new Run(i * 7919, difficulty);
     playRun(run, profile, i);
     const summary = run.summary();
     played.push({ summary, seconds: (summary.activeMs + summary.reels * TRANSITION_MS) / 1000 });

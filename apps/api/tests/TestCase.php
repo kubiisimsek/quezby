@@ -7,6 +7,7 @@ use App\Enums\AdminRole;
 use App\Enums\LeagueTier;
 use App\Enums\RunMode;
 use App\Game\Checkpoint;
+use App\Game\Difficulty;
 use App\Game\EngineError;
 use App\Game\Rules;
 use App\Game\Run as Engine;
@@ -113,6 +114,7 @@ abstract class TestCase extends BaseTestCase
             'mode' => 'free',
             'engineVersion' => Rules::ENGINE_VERSION,
             'contentVersion' => Catalog::LATEST,
+            'difficultyVersion' => Difficulty::VERSION,
         ]);
     }
 
@@ -139,17 +141,18 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
-     * Plays a run of `$mode` cleanly for `$reels` reels, like a human thumb,
-     * and finishes it through the API as if it had just been played. `$body`
-     * adds to the start — a VS's `opponent` or `duel`.
+     * Plays a run of `$mode` cleanly for `$reels` reels, like a human thumb —
+     * at the difficulty the API handed it — and finishes it through the API
+     * as if it had just been played. `$body` adds to the start — a VS's
+     * `opponent` or `duel`. A `$jitterMs` of 0 is a metronome.
      *
      * @param  array<string, mixed>  $body
      */
-    protected function playFeed(string $mode = 'free', int $reels = 60, int $decisionMs = 430, array $body = []): TestResponse
+    protected function playFeed(string $mode = 'free', int $reels = 60, int $decisionMs = 430, array $body = [], int $jitterMs = 110): TestResponse
     {
         $start = $this->startRun(['mode' => $mode] + $body)->assertCreated();
-        $actions = playedLog($start->json('seed'), $reels, $decisionMs, 110);
-        $summary = Engine::replay($start->json('seed'), $actions)->summary;
+        $actions = playedLog($start->json('seed'), $reels, $decisionMs, $jitterMs, $start->json('difficulty'));
+        $summary = Engine::replay($start->json('seed'), $actions, $start->json('difficulty'))->summary;
         Run::query()->whereKey($start->json('runId'))->update(['started_at' => now()->subMinutes(10)]);
 
         return $this->finishRun($start->json('runId'), $actions, $summary->score, $summary->reels);
@@ -198,7 +201,7 @@ abstract class TestCase extends BaseTestCase
     {
         $run = Run::query()->find($runId);
         try {
-            $replay = $run === null ? null : Engine::replay($run->seed, $actions);
+            $replay = $run === null ? null : Engine::replay($run->seed, $actions, $run->difficulty);
         } catch (EngineError) {
             $replay = null;
         }

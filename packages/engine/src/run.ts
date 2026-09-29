@@ -1,3 +1,4 @@
+import { lossAt } from './difficulty';
 import { ReelStream, type Reel } from './reels';
 import {
   ENGINE_VERSION,
@@ -125,10 +126,13 @@ function allowedOn(kind: ReelKind, gesture: Gesture): boolean {
 
 /**
  * One run, one reel at a time. The app drives it live; the API feeds it a
- * finished run's actions and must land on the same summary.
+ * finished run's actions and must land on the same summary. A rated run is
+ * played at the Dereceli `difficulty` the API gave it (`difficulty.ts`);
+ * every other run at 0.
  */
 export class Run {
   readonly seed: number;
+  readonly difficulty: number;
   private readonly stream: ReelStream;
   private reel: Reel;
   private meterValue: number = RULES.meterMax;
@@ -163,9 +167,10 @@ export class Run {
     comeback: 0,
   };
 
-  constructor(seed: number) {
+  constructor(seed: number, difficulty = 0) {
     this.seed = seed >>> 0;
-    this.stream = new ReelStream(this.seed);
+    this.difficulty = difficulty;
+    this.stream = new ReelStream(this.seed, difficulty);
     this.reel = this.stream.next();
   }
 
@@ -397,7 +402,7 @@ export class Run {
         ? this.blindRun + 1
         : 0;
     if (blind > 0) this.blindRun = blind;
-    this.meterValue -= penaltyFor(loss, blind);
+    this.meterValue -= penaltyFor(lossAt(loss, this.difficulty), blind);
     if (this.meterValue <= 0) {
       this.meterValue = 0;
       this.ended = 'penalty';
@@ -467,12 +472,12 @@ function judge(reel: Reel, gesture: Gesture, d: number): Verdict {
 }
 
 /**
- * A finished run, replayed from its seed. Throws `EngineError` on a log the
- * app could not have produced. A log that stops before the run ended is a run
- * the player quit.
+ * A finished run, replayed from its seed at its Dereceli `difficulty`.
+ * Throws `EngineError` on a log the app could not have produced. A log that
+ * stops before the run ended is a run the player quit.
  */
-export function replay(seed: number, actions: readonly Action[]): RunSummary {
-  const run = new Run(seed);
+export function replay(seed: number, actions: readonly Action[], difficulty = 0): RunSummary {
+  const run = new Run(seed, difficulty);
   for (const action of actions) {
     run.apply(action);
   }

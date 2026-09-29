@@ -4,6 +4,7 @@ use App\Enums\LeagueTier;
 use App\Enums\RatingKind;
 use App\Enums\RunMode;
 use App\Enums\RunStatus;
+use App\Game\Difficulty;
 use App\Game\Rules;
 use App\Models\PlayerRating;
 use App\Models\RatingChange;
@@ -58,6 +59,8 @@ test('the first three rated runs place the player at the rating of their median,
             'nextTarget' => null,
             'placement' => ['played' => $i + 1, 'required' => 3],
             'shielded' => false,
+            'difficulty' => 0,
+            'nextDifficulty' => null,
         ]);
     }
 
@@ -73,6 +76,8 @@ test('the first three rated runs place the player at the rating of their median,
         'nextTarget' => 58400,
         'placement' => ['played' => 3, 'required' => 3],
         'shielded' => false,
+        'difficulty' => 0,
+        'nextDifficulty' => 3,
     ]);
     expect(ratingOf($player))
         ->rating->toBe(1500)
@@ -104,7 +109,7 @@ test('a placed run past its target rises, short of it falls, by tanh of the dist
     expect($up)->toMatchArray([
         'kind' => 'run', 'before' => 1500, 'after' => 1555, 'delta' => 55,
         'tierBefore' => 'silver', 'tier' => 'silver', 'target' => 58400, 'placement' => null, 'shielded' => false,
-    ])->and($up['nextTarget'])->toBe(TargetTable::forEngine(Rules::ENGINE_VERSION)?->shown(1555));
+    ])->and($up['nextTarget'])->toBe(TargetTable::forDifficulty(Rules::ENGINE_VERSION, Difficulty::VERSION)?->shown(1555));
 
     $down = ratedRun($player, 34000);
     expect($down['delta'])->toBe(TargetTable::delta(1555, 1000, 800, 100))
@@ -223,6 +228,8 @@ test('a run held for review waits, and moves nothing', function () {
         'nextTarget' => 240000,
         'placement' => null,
         'shielded' => false,
+        'difficulty' => 0,
+        'nextDifficulty' => 9,
     ])->and(RatingChange::query()->count())->toBe(0);
 });
 

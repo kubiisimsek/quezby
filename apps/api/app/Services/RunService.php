@@ -10,6 +10,7 @@ use App\Enums\RunMode;
 use App\Enums\RunStatus;
 use App\Exceptions\ApiException;
 use App\Game\Checkpoint;
+use App\Game\Difficulty;
 use App\Game\EngineError;
 use App\Models\Run;
 use App\Models\User;
@@ -54,10 +55,14 @@ final class RunService
      * Istanbul day. The run
      * records the player's device verdict standing now; the finish judges it.
      *
+     * A rated run is handed the difficulty of the player's rating once the
+     * run they leave has been charged; an app that does not play the
+     * difficulty table (`$difficultyVersion`) cannot open one.
+     *
      * A VS run either opens a VS against `$opponent`, on a fresh seed, or
      * answers the one `$duelId` names, on its seed.
      */
-    public function start(User $user, RunMode $mode, int $engineVersion, int $contentVersion, ?string $appVersion, ?User $opponent = null, ?string $duelId = null): Run
+    public function start(User $user, RunMode $mode, int $engineVersion, int $contentVersion, ?string $appVersion, ?User $opponent = null, ?string $duelId = null, ?int $difficultyVersion = null): Run
     {
         if ($user->username === null) {
             throw ValidationException::withMessages([
@@ -65,6 +70,9 @@ final class RunService
             ]);
         }
         if ($engineVersion !== (int) config('quezby.engine_version') || ! Catalog::has($contentVersion)) {
+            throw ApiException::of(ErrorCode::EngineOutdated);
+        }
+        if ($mode->rated() && $difficultyVersion !== Difficulty::VERSION) {
             throw ApiException::of(ErrorCode::EngineOutdated);
         }
 
@@ -103,6 +111,8 @@ final class RunService
                         'seed' => $duel?->seed ?? ($dayKey === null ? random_int(1, 4294967295) : $this->daily->seed($dayKey)),
                         'engine_version' => config('quezby.engine_version'),
                         'content_version' => $duel?->content_version ?? $contentVersion,
+                        'difficulty' => $mode->rated() ? $this->ratings->difficultyFor($user) : 0,
+                        'difficulty_version' => $mode->rated() ? Difficulty::VERSION : null,
                         'app_version' => $appVersion === null ? null : mb_substr($appVersion, 0, 32),
                         'device_verdict' => $deviceVerdict,
                         'status' => RunStatus::Started,
@@ -176,8 +186,8 @@ final class RunService
 
     /**
      * Replays the player's log and stores the server's result. Only a
-     * `ranked` run touches the boards and the lifetime numbers, a rated one
-     * the rating too;
+     * `ranked` run counts in the lifetime numbers; a Normal or Günlük one
+     * climbs the boards, a rated one moves the rating and nothing else;
      * a run quit before the first point is kept but places nobody. A VS run
      * is `played` (or `flagged`): it only settles its VS.
      *
@@ -233,7 +243,7 @@ final class RunService
         }
         $stats = $this->statsBuilder->build($verification->replay, $run->seed, $run->content_version);
         $status = $ranks
-            ? $this->statusOf($verification, $user, $summary->score, $now)
+            ? $this->statusOf($verification, $user, $run, $summary->score, $now)
             // A VS never ranks, so nothing needs holding for a moderator: a clean run is played, a hard flag loses it.
             : ($verification->hard === [] ? RunStatus::Played : RunStatus::Flagged);
 
@@ -264,7 +274,7 @@ final class RunService
             $outcome = null;
             if ($run->status === RunStatus::Ranked) {
                 $this->playerStats->add($user, $summary, $stats);
-                if ($run->score > 0) {
+                if ($run->score > 0 && $run->mode->boards()) {
                     $outcome = $this->leaderboards->record($run);
                 }
             }
@@ -293,9 +303,10 @@ final class RunService
     /**
      * Ranked, flagged, or held for review: a clean run ranks; a hard flag
      * never does; a soft signal holds back only a score that would reach the
-     * top of the season or the week.
+     * top of the season or the week — or, for a rated run, which never
+     * reaches a board, one that would lift its player into the Elo board's top.
      */
-    private function statusOf(Verification $verification, User $user, int $score, CarbonInterface $now): RunStatus
+    private function statusOf(Verification $verification, User $user, Run $run, int $score, CarbonInterface $now): RunStatus
     {
         if ($verification->hard !== []) {
             return RunStatus::Flagged;
@@ -304,8 +315,10 @@ final class RunService
             return RunStatus::Ranked;
         }
 
-        $reachesTop = $this->leaderboards->wouldPlace(LeaderboardPeriod::All, $now, $score, $this->plausibility['review_top_all'], $user)
-            || $this->leaderboards->wouldPlace(LeaderboardPeriod::Weekly, $now, $score, $this->plausibility['review_top_weekly'], $user);
+        $reachesTop = $run->mode->rated()
+            ? $this->ratings->wouldReachTop($user, $run, $score, $this->plausibility['review_top_rating'])
+            : $this->leaderboards->wouldPlace(LeaderboardPeriod::All, $now, $score, $this->plausibility['review_top_all'], $user)
+                || $this->leaderboards->wouldPlace(LeaderboardPeriod::Weekly, $now, $score, $this->plausibility['review_top_weekly'], $user);
 
         return $reachesTop ? RunStatus::Review : RunStatus::Ranked;
     }

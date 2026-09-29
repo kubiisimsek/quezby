@@ -26,6 +26,7 @@ function controller(overrides: Partial<GameController> = {}): GameController {
     countdown: 3,
     reel: null,
     seed: 1,
+    difficulty: 0,
     score: 0,
     combo: 1000,
     feedback: null,

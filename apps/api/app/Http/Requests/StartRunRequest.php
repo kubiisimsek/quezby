@@ -9,7 +9,8 @@ use Illuminate\Validation\Rule;
 /**
  * `StartRunRequest` in `packages/types`. An app that sends no versions is one
  * that predates them — it gets `engine_outdated`, not a validation error, so
- * it can tell the player to update. A VS names either the friend it
+ * it can tell the player to update; so does a rated run from an app without
+ * the difficulty table (`difficultyVersion`). A VS names either the friend it
  * challenges (`opponent`) or the VS it answers (`duel`) — one of the two.
  */
 class StartRunRequest extends FormRequest
@@ -23,6 +24,7 @@ class StartRunRequest extends FormRequest
             'mode' => ['sometimes', Rule::enum(RunMode::class)],
             'engineVersion' => ['sometimes', 'integer', 'min:0', 'max:65535'],
             'contentVersion' => ['sometimes', 'integer', 'min:0', 'max:65535'],
+            'difficultyVersion' => ['sometimes', 'integer', 'min:0', 'max:255'],
             'opponent' => [
                 'nullable', 'string', 'max:40', 'prohibits:duel',
                 Rule::requiredIf(fn () => $this->input('mode') === RunMode::Vs->value && ! $this->filled('duel')),
@@ -58,6 +60,14 @@ class StartRunRequest extends FormRequest
     public function contentVersion(): int
     {
         return (int) ($this->validated('contentVersion') ?? 0);
+    }
+
+    /** The Dereceli difficulty table the app plays; null from an app that predates it. */
+    public function difficultyVersion(): ?int
+    {
+        $version = $this->validated('difficultyVersion');
+
+        return $version === null ? null : (int) $version;
     }
 
     public function appVersion(): ?string

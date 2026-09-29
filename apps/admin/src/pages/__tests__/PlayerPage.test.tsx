@@ -316,6 +316,7 @@ describe('PlayerPage', () => {
     expect(within(fact(rating, 'Reyting')).getByText('Altın')).toBeInTheDocument();
     expect(fact(rating, 'En yüksek')).toHaveTextContent('2.610');
     expect(fact(rating, 'Sonraki hedef')).toHaveTextContent('128.000');
+    expect(fact(rating, 'Zorluk')).toHaveTextContent('6');
     expect(fact(rating, 'Sayılan tur')).toHaveTextContent('36');
     expect(within(rating).queryByText('Yerleşme', { selector: 'dt' })).not.toBeInTheDocument();
     expect(within(rating).queryByText('Geçici dönem', { selector: 'dt' })).not.toBeInTheDocument();

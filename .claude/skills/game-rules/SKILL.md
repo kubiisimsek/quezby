@@ -22,6 +22,20 @@ rule and the hash of the fixtures both engines replay. `lock.test.ts` and
 **A rules change is a new season**: every board starts fresh, because a board
 only ever ranks one engine version.
 
+## Dereceli's difficulty table is sealed apart
+
+`packages/engine/src/difficulty.ts` (PHP twin `apps/api/app/Game/Difficulty.php`)
+holds the 17 rows a rated run can be played at: `new Run(seed, difficulty)`,
+`replay(seed, actions, difficulty)`. Difficulty 0 must stay engine vN byte for
+byte — every other mode plays it and the rules lock and fixtures do not move.
+`difficulty.lock.json` seals the table and `fixtures/difficulty.json`; a change
+is a `DIFFICULTY_VERSION` bump (both engines), `pnpm engine:simulate` (the
+difficulty report and `balance.test.ts` → *difficulty balance*),
+`pnpm engine:fixtures`, `pnpm engine:lock`, new Elo targets in
+`config/quezby.php` › `rating.difficulty.targets[ENGINE_VERSION][DIFFICULTY_VERSION]`
+and `RatingBalanceTest`'s difficulty medians — never a new season.
+`docs/product/scoring.md` → *Dereceli zorluğu*.
+
 ## Changing a rule (only when the owner asked for a new season)
 
 1. Edit `packages/engine/src/rules.ts` (or `reels.ts` / `run.ts`) and bump `ENGINE_VERSION`.
@@ -42,7 +56,9 @@ only ever ranks one engine version.
    ones for late approvals.
 7. `cd apps/api && php artisan test` — `EngineParityTest` replays every fixture
    in PHP reel by reel; `RulesLockTest` checks the PHP rules hash to the lock.
-8. Add a `docs/changelog/CHANGELOG.md` entry; ship the app and raise
+8. A new engine replays the difficulty fixtures differently: bump
+   `DIFFICULTY_VERSION` too, re-seal, and give the new pair its Elo targets.
+9. Add a `docs/changelog/CHANGELOG.md` entry; ship the app and raise
    `QUEZBY_*_MIN_VERSION`.
 
 ## Invariants

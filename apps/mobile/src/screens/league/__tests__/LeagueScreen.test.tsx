@@ -52,7 +52,7 @@ function board(overrides: Partial<RatingBoardResponse> = {}): RatingBoardRespons
   return { scope: 'league', entries: ROWS, me: ROWS[2] ?? null, players: 4, ...overrides };
 }
 
-/** A Gold player, 2.340 Elo: 660 from Platin, 150.800 to beat. */
+/** A Gold player, 2.340 Elo: 660 from Platin, 150.800 to beat, at Zorluk 6. */
 const GOLD = buildRating({
   rating: 2_340,
   tier: 'gold',
@@ -60,6 +60,7 @@ const GOLD = buildRating({
   ceil: 3_000,
   progress: 340,
   target: 150_800,
+  difficulty: 6,
   peak: 2_400,
 });
 
@@ -92,6 +93,24 @@ describe('LeagueScreen — Lig', () => {
     expect(screen.getByText('Hedef 150.800')).toBeOnTheScreen();
     expect(screen.getByText('En yüksek 2.400')).toBeOnTheScreen();
     expect(screen.getByText('Bu skoru geçersen Elo’n artar.')).toBeOnTheScreen();
+  });
+
+  it('shows the difficulty the rating plays at, and what it does', async () => {
+    await renderLeague();
+
+    expect(await screen.findByText('Zorluk 6')).toBeOnTheScreen();
+    expect(screen.getByText('Elo’n arttıkça engeller sıklaşır, dopamin daha hızlı biter.')).toBeOnTheScreen();
+  });
+
+  it('says nothing of difficulty in Bronz, which plays the game as it is', async () => {
+    mocked.rating.current.mockResolvedValue(
+      buildRating({ rating: 820, tier: 'bronze', floor: 0, ceil: 1_000, progress: 820, target: 25_300, difficulty: 0 }),
+    );
+    await renderLeague();
+
+    expect(await screen.findByText('820 Elo')).toBeOnTheScreen();
+    expect(screen.queryByText(/^Zorluk/)).not.toBeOnTheScreen();
+    expect(screen.queryByText('Elo’n arttıkça engeller sıklaşır, dopamin daha hızlı biter.')).not.toBeOnTheScreen();
   });
 
   it('reads out only your own league; the ladder round it is its picture', async () => {

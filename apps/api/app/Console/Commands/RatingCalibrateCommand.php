@@ -21,8 +21,8 @@ final class RatingCalibrateCommand extends Command
         $report = $calibration->report(max(1, (int) $this->option('days')));
 
         $this->components->info(sprintf(
-            'Engine %d: %d players with %d+ counted runs in %d days.',
-            $report['engineVersion'], $report['players'], $report['minRuns'], $report['days'],
+            'Engine %d, difficulty table %d: %d players with %d+ counted runs in %d days.',
+            $report['engineVersion'], $report['difficultyVersion'], $report['players'], $report['minRuns'], $report['days'],
         ));
         $this->table(
             ['League', 'Wanted %', 'Settles now %'],

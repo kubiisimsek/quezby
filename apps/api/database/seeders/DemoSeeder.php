@@ -7,6 +7,7 @@ use App\Enums\Platform;
 use App\Enums\RunMode;
 use App\Enums\RunStatus;
 use App\Game\Checkpoint;
+use App\Game\Difficulty;
 use App\Game\Gesture;
 use App\Game\ReelKind;
 use App\Game\Replay;
@@ -269,10 +270,10 @@ final class DemoSeeder extends Seeder
         }
 
         Carbon::setTestNow($at);
-        $run = $runs->start($user, $mode, Rules::ENGINE_VERSION, Catalog::LATEST, '1.0.0');
+        $run = $runs->start($user, $mode, Rules::ENGINE_VERSION, Catalog::LATEST, '1.0.0', difficultyVersion: Difficulty::VERSION);
 
         $dice = self::dice($run->seed ^ crc32($user->id));
-        [$actions, $replay] = $this->play($run->seed, $thumb, $dice, $budgetMs, $clock);
+        [$actions, $replay] = $this->play($run->seed, $run->difficulty, $thumb, $dice, $budgetMs, $clock);
 
         $receipts = [];
         foreach ($clock->checkIns($replay, config('quezby.plausibility.checkpoints.marks_ms')) as ['reel' => $reel, 'atMs' => $atMs]) {
@@ -290,17 +291,18 @@ final class DemoSeeder extends Seeder
     }
 
     /**
-     * The bot: plays reel by reel on its own engine until the run is over, or
-     * until the next reel would not fit in `$budgetMs` — then it quits. The
+     * The bot: plays reel by reel on its own engine, at the run's difficulty,
+     * until the run is over, or until the next reel would not fit in
+     * `$budgetMs` — then it quits. The
      * replay it hands back is what the app's pace (`RunClock`) times.
      *
      * @param  array{reaction: int, reactionSd: int, slip: float, reflex: float, holdSd: int, tapGap: int}  $thumb
      * @return array{0: list<array{int, int, int}>, 1: Replay}
      */
-    private function play(int $seed, array $thumb, Randomizer $dice, int $budgetMs, RunClock $clock): array
+    private function play(int $seed, int $difficulty, array $thumb, Randomizer $dice, int $budgetMs, RunClock $clock): array
     {
         $pace = config('quezby.plausibility.pace');
-        $engine = new Engine($seed);
+        $engine = new Engine($seed, $difficulty);
         $actions = [];
         $steps = [];
 

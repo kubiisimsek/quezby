@@ -1,6 +1,8 @@
 <?php
 
+use App\Game\Difficulty;
 use App\Game\Rules;
+use App\Models\Run;
 use App\Services\Rating\TargetTable;
 
 /*
@@ -88,4 +90,35 @@ test('the median of placement is the middle score, the lower one of an even coun
     expect(TargetTable::median([50000, 10000, 30000, 20000, 40000]))->toBe(30000)
         ->and(TargetTable::median([4, 1, 3, 2]))->toBe(2)
         ->and(TargetTable::median([7]))->toBe(7);
+});
+
+test('this difficulty table has its targets, rising with the rating and below difficulty 0\'s from 1000 up', function () {
+    $anchors = config('quezby.rating.difficulty.targets.'.Rules::ENGINE_VERSION.'.'.Difficulty::VERSION);
+    $plain = targets();
+    $hard = TargetTable::forDifficulty(Rules::ENGINE_VERSION, Difficulty::VERSION);
+
+    expect($anchors)->toBeArray()->toHaveKey(0)->toHaveKey(5000)
+        ->and($hard)->not->toBeNull()
+        ->and($hard->target(0))->toEqualWithDelta($plain->target(0), 0.01);
+    $scores = array_values($anchors);
+    foreach (range(1, count($scores) - 1) as $i) {
+        expect($scores[$i])->toBeGreaterThan($scores[$i - 1]);
+    }
+    foreach ([1000, 2000, 3000, 4000, 5000] as $rating) {
+        expect($hard->target($rating))->toBeLessThan($plain->target($rating));
+    }
+});
+
+test('a difficulty table without targets has none', function () {
+    expect(TargetTable::forDifficulty(Rules::ENGINE_VERSION, Difficulty::VERSION + 1))->toBeNull()
+        ->and(TargetTable::forDifficulty(2, Difficulty::VERSION))->toBeNull();
+});
+
+test('a rated run is measured with its difficulty table, one from before it with its engine\'s', function () {
+    $played = new Run(['engine_version' => Rules::ENGINE_VERSION, 'difficulty_version' => Difficulty::VERSION]);
+    $before = new Run(['engine_version' => Rules::ENGINE_VERSION, 'difficulty_version' => null]);
+
+    expect(TargetTable::forRun($played)?->target(3000))
+        ->toEqualWithDelta(TargetTable::forDifficulty(Rules::ENGINE_VERSION, Difficulty::VERSION)->target(3000), 0.01)
+        ->and(TargetTable::forRun($before)?->target(3000))->toEqualWithDelta(targets()->target(3000), 0.01);
 });

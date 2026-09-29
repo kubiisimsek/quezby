@@ -24,7 +24,7 @@ beforeEach(function () {
     $this->signInAdmin(AdminRole::Moderator);
 });
 
-/** A score held for review, with the log an approval replays. */
+/** A score held for review, with the log an approval replays — from before the difficulty table. */
 function heldRun(User $player, int $seed = 4242, int $engineVersion = 2): Run
 {
     $actions = playedLog($seed, 100, 400);
@@ -33,6 +33,7 @@ function heldRun(User $player, int $seed = 4242, int $engineVersion = 2): Run
     return Run::factory()->for($player)->rated()->ranked($summary->score, $summary->reels)->create([
         'seed' => $seed,
         'engine_version' => $engineVersion,
+        'difficulty_version' => null,
         'status' => RunStatus::Review,
         'actions' => $actions,
         'flags' => [['code' => 'reaction_cv', 'cv' => 0, 'samples' => 60, 'severity' => 'soft']],

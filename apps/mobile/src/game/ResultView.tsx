@@ -282,7 +282,9 @@ export function ResultView({
   const score = run?.score ?? practice?.score ?? null;
   const endedBy = run?.endedBy ?? practice?.endedBy ?? null;
   const ranked = run?.status === 'ranked';
-  const record = Boolean(verified?.isNewBest) && ranked;
+  // Dereceli plays for Elo alone: its runs never climb the week, the month or the season.
+  const boards = ranked && run?.mode !== 'rated';
+  const record = Boolean(verified?.isNewBest) && boards;
   const note = noteFor(outcome, t);
 
   const duel = verified?.duel ?? null;
@@ -294,7 +296,7 @@ export function ResultView({
   if (verified) shown.push('breakdown');
   if (verified || practice) shown.push('stats');
   if (unseen.length > 0) shown.push('unseen');
-  if (verified && ranked) shown.push('ranks');
+  if (verified && boards) shown.push('ranks');
   if (verified && verified.passed.length > 0) shown.push('passed');
   if (verified?.leagueUnlock) shown.push('league');
   const rating = verified?.rating ?? null;
@@ -373,7 +375,7 @@ export function ResultView({
             score={score}
             practice={practice === null ? null : tutorial ? 'tutorial' : 'practice'}
             record={record}
-            best={verified?.best?.score ?? null}
+            best={run?.mode === 'rated' ? null : (verified?.best?.score ?? null)}
             crownAt={plan.crown}
             skipped={skipped}
           />
@@ -758,7 +760,7 @@ function Verified({
         <StatGrid columns={3} items={runStats(run, t)} />
       </Rise>
 
-      {run.status === 'ranked' ? (
+      {run.status === 'ranked' && run.mode !== 'rated' ? (
         <View style={styles.ranks}>
           {PERIODS.map((period, index) => (
             <RankTile
@@ -884,7 +886,8 @@ function VsSide({ label, side }: { label: string; side: DuelSide | null }) {
  * the rating counting up to where it stands, the move slammed in — green up,
  * red down — and the score against the target. A new league is said in gold
  * (the burst goes off with it), a fall in red with a shake. Placement counts
- * its runs; a held run and one that did not count say so.
+ * its runs; a held run and one that did not count say so. The tags close it:
+ * the difficulty the run was played at, and the next one when the rating moved it.
  */
 function RatingTile({
   rating,
@@ -991,6 +994,16 @@ function RatingTile({
           {rating.shielded ? <Tag label={words.shielded} tone="secondary" icon="shield" /> : null}
           {rating.nextTarget !== null ? (
             <Tag label={words.next(t.fmt.score(rating.nextTarget))} tone="neutral" icon="target" />
+          ) : null}
+          {rating.difficulty > 0 ? (
+            <Tag label={t.rating.difficulty(t.fmt.score(rating.difficulty))} tone="secondary" icon="flame" />
+          ) : null}
+          {rating.nextDifficulty !== null && rating.nextDifficulty !== rating.difficulty ? (
+            <Tag
+              label={words.nextDifficulty(t.fmt.score(rating.nextDifficulty))}
+              tone={rating.nextDifficulty > rating.difficulty ? 'warn' : 'neutral'}
+              icon={rating.nextDifficulty > rating.difficulty ? 'trendUp' : 'trendDown'}
+            />
           ) : null}
         </View>
       </Panel>

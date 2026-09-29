@@ -2,6 +2,8 @@
 
 namespace App\Services\Rating;
 
+use App\Models\Run;
+
 /**
  * The target a run plays against. `quezby.rating.targets` sets, every
  * thousand rating points, the score a player of that rating typically makes;
@@ -32,11 +34,34 @@ final readonly class TargetTable
         );
     }
 
-    /** The table of an engine version; null when it has none. */
+    /** The table of an engine version at difficulty 0; null when it has none. */
     public static function forEngine(int $engineVersion): ?self
     {
-        $anchors = config("quezby.rating.targets.{$engineVersion}");
+        return self::of(config("quezby.rating.targets.{$engineVersion}"));
+    }
 
+    /**
+     * The table of rated runs played on a difficulty table: each rating's
+     * typical score at the difficulty that rating plays. Null when it has none.
+     */
+    public static function forDifficulty(int $engineVersion, int $difficultyVersion): ?self
+    {
+        return self::of(config("quezby.rating.difficulty.targets.{$engineVersion}.{$difficultyVersion}"));
+    }
+
+    /**
+     * The table a placed player's rated run is measured with: its difficulty
+     * table's, or — for a run from before there was one — its engine's.
+     */
+    public static function forRun(Run $run): ?self
+    {
+        return $run->difficulty_version === null
+            ? self::forEngine($run->engine_version)
+            : self::forDifficulty($run->engine_version, $run->difficulty_version);
+    }
+
+    private static function of(mixed $anchors): ?self
+    {
         return is_array($anchors) && count($anchors) >= 2 ? new self($anchors) : null;
     }
 

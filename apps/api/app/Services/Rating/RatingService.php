@@ -7,6 +7,7 @@ use App\Enums\RatingKind;
 use App\Enums\RunFlag;
 use App\Enums\RunMode;
 use App\Enums\RunStatus;
+use App\Game\Difficulty;
 use App\Models\PlayerRating;
 use App\Models\RatingChange;
 use App\Models\Run;
@@ -25,7 +26,9 @@ use Illuminate\Support\Facades\DB;
  * Elo — played for in Dereceli (`RunMode::Rated`) alone, which opens once a
  * player has counted enough free and daily runs (`unlock`). Every rated run
  * is a match against the target of the player's rating (`TargetTable`); the
- * first few place them.
+ * first few place them. The game gets harder as the rating climbs
+ * (`difficultyFor`), and the targets of a rated run are the scores of its
+ * difficulty.
  * Every write goes through `write()`: one transaction, the player's rating
  * row locked, and at most one change per run, so a run moves a rating once.
  *
@@ -54,7 +57,63 @@ final class RatingService
         private readonly int $engineVersion,
         #[Config('quezby.rating.unlock_runs')]
         private readonly int $unlockRuns,
+        #[Config('quezby.difficulty_version')]
+        private readonly int $difficultyVersion,
     ) {}
+
+    /**
+     * The difficulty a rated run of `$user` is played at, from their rating
+     * now: 0 while they are being placed.
+     */
+    public function difficultyFor(User $user): int
+    {
+        return $this->difficultyAt(PlayerRating::query()->whereKey($user->id)->value('rating')) ?? 0;
+    }
+
+    /**
+     * The difficulty of a rating: 0 below `difficulty.from`, then one more
+     * every `difficulty.step`, up to `Difficulty::MAX`. Null before placement.
+     */
+    public function difficultyAt(?int $rating): ?int
+    {
+        if ($rating === null) {
+            return null;
+        }
+        $from = (int) $this->config['difficulty']['from'];
+
+        return $rating < $from ? 0 : min(Difficulty::MAX, intdiv($rating - $from, (int) $this->config['difficulty']['step']) + 1);
+    }
+
+    /**
+     * Whether a rated run scoring `$score` would lift its placed player into
+     * the Elo board's first `$places` — what a soft-signalled rated run waits
+     * for review for, as a score reaching the top of a board does.
+     */
+    public function wouldReachTop(User $user, Run $run, int $score, int $places): bool
+    {
+        $rating = PlayerRating::query()->find($user->id);
+        $table = TargetTable::forRun($run);
+        if ($rating === null || ! $rating->isPlaced() || $table === null) {
+            return false;
+        }
+        $before = (int) $rating->rating;
+        $width = (int) $this->config[$rating->provisional_left > 0 ? 'provisional_width' : 'width'];
+        $delta = TargetTable::delta($before, $table->performance($score), $width, (int) $this->config['max_delta']);
+        if ($delta <= 0) {
+            return false;
+        }
+
+        $ahead = PlayerRating::query()
+            ->join('users', 'users.id', '=', 'player_ratings.user_id')
+            ->whereNull('users.banned_at')
+            ->where('player_ratings.user_id', '!=', $user->id)
+            ->whereNotNull('player_ratings.rating')
+            ->where('player_ratings.rated_at', '>=', now()->subDays((int) $this->config['board_active_days']))
+            ->where('player_ratings.rating', '>=', $before + $delta)
+            ->count();
+
+        return $ahead < $places;
+    }
 
     /**
      * How far Dereceli still is — `LeagueUnlock` in `packages/types`: the
@@ -123,8 +182,9 @@ final class RatingService
 
     /**
      * What a run just finished did to its player's rating — `RunRating` in
-     * `packages/types`. Null for a VS. Called inside the finish's
-     * transaction, before the league seats the player.
+     * `packages/types` — with the difficulty it was played at and the one the
+     * next rated run gets. Null for any run but a rated one. Called inside
+     * the finish's transaction.
      *
      * @return array<string, mixed>|null
      */
@@ -133,11 +193,14 @@ final class RatingService
         if (! $run->mode->rated()) {
             return null;
         }
-        if ($run->status === RunStatus::Review) {
-            return $this->write($run->user, fn (PlayerRating $rating) => $this->pending($rating));
-        }
+        $view = $run->status === RunStatus::Review
+            ? $this->write($run->user, fn (PlayerRating $rating) => $this->pending($rating))
+            : $this->write($run->user, fn (PlayerRating $rating) => $this->settle($rating, $run, $this->kindOf($run)));
 
-        return $this->write($run->user, fn (PlayerRating $rating) => $this->settle($rating, $run, $this->kindOf($run)));
+        return $view + [
+            'difficulty' => (int) $run->difficulty,
+            'nextDifficulty' => $this->difficultyAt($view['after']),
+        ];
     }
 
     /**
@@ -401,7 +464,9 @@ final class RatingService
             return $this->viewOf($rating, $counted);
         }
 
-        $table = TargetTable::forEngine($run->engine_version);
+        // Placement is played at difficulty 0 and measured with the engine's own
+        // targets; a placed player's run with the targets of its difficulty.
+        $table = $rating->isPlaced() ? TargetTable::forRun($run) : TargetTable::forEngine($run->engine_version);
         if ($table === null || $kind === RatingKind::Void) {
             return $this->viewOf($rating, $this->record($rating, RatingKind::Void, $rating->rating, [
                 'run_id' => $run->id,
@@ -638,7 +703,9 @@ final class RatingService
 
     private function nextTarget(PlayerRating $rating): ?int
     {
-        return $rating->isPlaced() ? TargetTable::forEngine($this->engineVersion)?->shown((int) $rating->rating) : null;
+        return $rating->isPlaced()
+            ? TargetTable::forDifficulty($this->engineVersion, $this->difficultyVersion)?->shown((int) $rating->rating)
+            : null;
     }
 
     /**
@@ -660,6 +727,7 @@ final class RatingService
             'ceil' => $ceil,
             'progress' => $tier === null || $ceil === null ? null : intdiv(((int) $rating->rating - $tier->floor()) * 1000, $ceil - $tier->floor()),
             'target' => $this->nextTarget($rating),
+            'difficulty' => $this->difficultyAt($rating->rating),
             'peak' => $rating->peak,
             'placement' => $this->placementOf($rating),
             'provisional' => $rating->isPlaced() && $rating->provisional_left > 0,

@@ -45,7 +45,7 @@ export function Hud({
   reelIndex: number;
   /** A VS run's pill: "VS · @ekin". */
   versus?: string;
-  /** A rated run's pill: "Dereceli". */
+  /** A rated run's pill: "Dereceli", or its difficulty once the rating made it harder: "Zorluk 7". */
   rated?: string;
   onClose: () => void;
 }) {

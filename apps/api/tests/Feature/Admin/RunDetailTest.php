@@ -5,9 +5,10 @@ use App\Enums\AuditAction;
 use App\Enums\DuelStatus;
 use App\Enums\RunMode;
 use App\Enums\RunStatus;
+use App\Game\Difficulty;
 use App\Game\Rules;
-use App\Models\Duel;
 use App\Game\Run as Engine;
+use App\Models\Duel;
 use App\Models\Run;
 use App\Models\User;
 use App\Services\Admin\AuditLog;
@@ -56,6 +57,26 @@ test('replays a finished run post by post, and the posts add up to its score', f
         ->assertJsonPath('run.seed', 4242)
         ->assertJsonPath('run.clientScore', $run->score)
         ->assertJsonPath('run.stats', ['swipes' => 10]);
+});
+
+test('replays a rated run at the difficulty it was handed, and says which', function () {
+    $actions = playedLog(4242, 80, 420, 90, 12);
+    $summary = Engine::replay(4242, $actions, 12)->summary;
+    $run = Run::factory()->rated(12)->ranked($summary->score, $summary->reels)->create([
+        'seed' => 4242,
+        'actions' => $actions,
+        'client_score' => $summary->score,
+        'client_reels' => $summary->reels,
+    ]);
+
+    $response = adminRunDetail($run)->assertOk()
+        ->assertJsonPath('timelineUnavailable', null)
+        ->assertJsonPath('run.difficulty', 12)
+        ->assertJsonPath('run.difficultyVersion', Difficulty::VERSION);
+    $timeline = collect($response->json('timeline'));
+    expect($timeline->sum('points') + $timeline->sum('bonusPoints'))->toBe($run->score);
+
+    adminRunDetail(adminRunDetailPlayed())->assertJsonPath('run.difficulty', 0)->assertJsonPath('run.difficultyVersion', null);
 });
 
 test('says why there is no timeline', function (Closure $make, string $why) {

@@ -159,49 +159,33 @@ describe('LeaderboardScreen — Zirve', () => {
     expect(screen.getByRole('tab', { name: 'Tüm zamanlar' })).toBeSelected();
   });
 
-  it('shows the Elo board from its tab: the ratings, each player’s league, and no posts or countdown', async () => {
+  it('holds the score boards alone: no Elo tab, and nothing of Elo on the rows', async () => {
     answerEvery();
-    mocked.rating.board.mockImplementation(async (scope: LeaderboardScope) => ({
-      scope,
-      entries: [
-        { rank: 1, username: 'ekin', avatarUrl: null, rating: 5_210, tier: 'master', isMe: false, isFriend: false, gap: null },
-        { rank: 2, username: 'mert', avatarUrl: null, rating: 4_480, tier: 'diamond', isMe: false, isFriend: true, gap: 731 },
-        { rank: 3, username: 'oya', avatarUrl: null, rating: 3_900, tier: 'platinum', isMe: false, isFriend: false, gap: 581 },
-        { rank: 4, username: 'deniz', avatarUrl: null, rating: 2_640, tier: 'gold', isMe: false, isFriend: false, gap: 1_261 },
-      ],
-      me: { rank: 12, username: 'kubi', avatarUrl: null, rating: 1_640, tier: 'silver', isMe: true, isFriend: false, gap: 60 },
-      players: 312,
-    }));
     await renderZirve();
     await boardArrived();
 
-    await fireEvent.press(screen.getByRole('tab', { name: 'Elo' }));
-
-    expect(await screen.findByText('Son 14 günde oynayanlar')).toBeOnTheScreen();
-    expect(mocked.rating.board).toHaveBeenLastCalledWith('everyone');
-    expect(await screen.findByRole('button', { name: '1. sıra, @ekin, 5.210 Elo' })).toBeOnTheScreen();
-    expect(
-      await screen.findByRole('button', { name: '4. sıra, @deniz, 2.640 Elo, Altın lig, geçmek için 1.261 Elo' }),
-    ).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: /^12\. sıra, @kubi, sen, 1\.640 Elo, Gümüş lig/ })).toBeOnTheScreen();
-    expect(screen.queryByText(/post$/)).not.toBeOnTheScreen();
-    expect(screen.queryByText(/^Bitmesine/)).not.toBeOnTheScreen();
-    expect(screen.queryByText('SENİN KATIN')).not.toBeOnTheScreen();
-
-    await fireEvent.press(screen.getByRole('tab', { name: /^Arkadaşlar/ }));
-    await waitFor(() => expect(mocked.rating.board).toHaveBeenLastCalledWith('friends'));
+    expect(screen.queryByRole('tab', { name: 'Elo' })).not.toBeOnTheScreen();
+    ['Hafta', 'Ay', 'Tüm zamanlar'].forEach((name) =>
+      expect(screen.getByRole('tab', { name })).toBeOnTheScreen(),
+    );
+    expect(screen.queryByText(/Elo/)).not.toBeOnTheScreen();
+    expect(screen.queryByText(/ lig$/)).not.toBeOnTheScreen();
+    expect(mocked.rating.board).not.toHaveBeenCalled();
   });
 
-  it('says so when nobody has a rating yet', async () => {
-    answerEvery();
-    mocked.rating.board.mockResolvedValue({ scope: 'everyone', entries: [], me: null, players: 0 });
+  it('opens a player card without their league or Elo', async () => {
+    mocked.leaderboards.get.mockResolvedValue(board());
+    mocked.users.get.mockImplementation(async (username: string) =>
+      playerCard(username),
+    );
     await renderZirve();
     await boardArrived();
 
-    await fireEvent.press(screen.getByRole('tab', { name: 'Elo' }));
+    await fireEvent.press(screen.getByRole('button', { name: /^4\. sıra, @deniz/ }));
 
-    expect(await screen.findByText('Henüz kimse yok')).toBeOnTheScreen();
-    expect(screen.getByText('Yerleşme turlarını bitiren oyuncular burada görünür.')).toBeOnTheScreen();
+    expect(await screen.findByText('Sezon rekoru')).toBeOnTheScreen();
+    expect(screen.queryByText(/Elo$/)).not.toBeOnTheScreen();
+    expect(screen.queryByLabelText(/ lig$/)).not.toBeOnTheScreen();
   });
 
   it('asks for the friends board when "Arkadaşlar" is chosen', async () => {

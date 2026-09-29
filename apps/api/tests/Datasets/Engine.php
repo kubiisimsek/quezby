@@ -47,3 +47,26 @@ dataset('not whole numbers', [
     'too long' => [60001],
     'array' => [[400]],
 ]);
+
+/*
+| Dereceli's difficulties: runs and step logs the TypeScript engine played at
+| a difficulty (`packages/engine/fixtures/difficulty.json`).
+*/
+
+dataset('difficulty replays', function () {
+    foreach (engineFixture('difficulty.json')['replays'] as $fixture) {
+        yield $fixture['name'] => [$fixture];
+    }
+});
+
+dataset('difficulty steps', function () {
+    foreach (engineFixture('difficulty.json')['steps'] as $fixture) {
+        yield $fixture['name'] => [$fixture];
+    }
+});
+
+dataset('difficulty curves', function () {
+    foreach (engineFixture('difficulty.json')['curves'] as $curve) {
+        yield 'difficulty '.$curve['difficulty'] => [$curve];
+    }
+});

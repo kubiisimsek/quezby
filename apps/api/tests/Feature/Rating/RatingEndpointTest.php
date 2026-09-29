@@ -32,6 +32,7 @@ test('a player still placing sees how far placement has got, and nothing else', 
         'ceil' => null,
         'progress' => null,
         'target' => null,
+        'difficulty' => null,
         'peak' => null,
         'placement' => ['played' => 2, 'required' => 3],
         'provisional' => false,
@@ -54,6 +55,7 @@ test('a placed player sees their league, how far into it, the next target and th
         ->assertJsonPath('ceil', 3000)
         ->assertJsonPath('progress', intdiv(($counted['after'] - 2000) * 1000, 1000))
         ->assertJsonPath('target', $counted['nextTarget'])
+        ->assertJsonPath('difficulty', $counted['nextDifficulty'])
         ->assertJsonPath('peak', 2600)
         ->assertJsonPath('provisional', true)
         ->assertJsonPath('shield', null)

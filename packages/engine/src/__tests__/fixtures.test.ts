@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import {
   buildBonuses,
   buildCurves,
+  buildDifficulty,
   buildRejects,
   buildReplays,
   buildRules,
@@ -49,6 +50,21 @@ describe('fixtures', () => {
 
   it('rules.json is current', () => {
     expect(read('rules.json')).toEqual(JSON.parse(JSON.stringify(buildRules())));
+  });
+
+  it('difficulty.json is current', () => {
+    expect(read('difficulty.json')).toEqual(
+      JSON.parse(JSON.stringify(buildDifficulty())),
+    );
+  });
+
+  it('every difficulty replay replays to its summary at its difficulty', () => {
+    const { replays, steps } = buildDifficulty();
+    for (const fixture of replays) {
+      expect(replay(fixture.seed, fixture.actions, fixture.difficulty)).toEqual(fixture.summary);
+    }
+    const blinds = new Set(steps.flatMap((fixture) => fixture.steps.map((step) => step.blind)));
+    expect([...blinds]).toEqual(expect.arrayContaining([0, 1, 2]));
   });
 
   it('every replay fixture replays to its summary', () => {

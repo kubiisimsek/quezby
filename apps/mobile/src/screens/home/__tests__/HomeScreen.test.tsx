@@ -367,10 +367,19 @@ describe('HomeScreen', () => {
 
       expect(screen.getByRole('button', { name: 'Günlük' })).toBeOnTheScreen();
       expect(screen.getByText('Skorun Zirve’ye yazılır')).toBeOnTheScreen();
-      expect(screen.getByText('Elo için oyna · Hedef 72.400')).toBeOnTheScreen();
+      expect(screen.getByText('Zorluk 3 · Hedef 72.400')).toBeOnTheScreen();
 
       await pick('Normal');
       await waitFor(() => expect(navigate).toHaveBeenCalledWith('Game', { mode: 'free' }));
+    });
+
+    it('says Dereceli plays for Elo while the rating has not made it harder yet', async () => {
+      mocked.rating.current.mockResolvedValue(buildRating({ rating: 940, tier: 'bronze', target: 29_100, difficulty: 0 }));
+      await renderLobby();
+      await openModes();
+
+      expect(await screen.findByText('Elo için oyna · Hedef 29.100')).toBeOnTheScreen();
+      expect(screen.queryByText(/^Zorluk/)).not.toBeOnTheScreen();
     });
 
     it('plays the day’s feed from Günlük', async () => {
@@ -511,6 +520,7 @@ describe('HomeScreen', () => {
 
       expect(await screen.findByText('Gümüş lig · 1.640 Elo')).toBeOnTheScreen();
       expect(screen.getByText('Hedef 72.400')).toBeOnTheScreen();
+      expect(screen.getByText('Zorluk 3')).toBeOnTheScreen();
       expect(screen.getByText('LİG')).toBeOnTheScreen();
 
       await fireEvent.press(screen.getByText('Gümüş lig · 1.640 Elo'));
@@ -533,6 +543,14 @@ describe('HomeScreen', () => {
 
       expect(await screen.findByText('MasterClass lig · 5.210 Elo')).toBeOnTheScreen();
       expect(screen.getByText('Hedef 862.000')).toBeOnTheScreen();
+    });
+
+    it('shows the difficulty the rating has reached', async () => {
+      mocked.rating.current.mockResolvedValue(buildRating({ rating: 4_810, tier: 'diamond', target: 380_000, difficulty: 16 }));
+      await renderLobby();
+
+      expect(await screen.findByText('Zorluk 16')).toBeOnTheScreen();
+      expect(screen.getByText('Hedef 380.000')).toBeOnTheScreen();
     });
   });
 

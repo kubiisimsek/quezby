@@ -193,8 +193,10 @@ neither. Neither the row nor the detail says which VS a run played.
 ### `GET /runs/{id}` — viewer
 
 `AdminRunResponse`: the run with the server's result, the app's claim
-(`clientScore`, `clientReels`) and the stored stats; `timeline` — every post
-as the API's engine replays it (`index, kind, level, window, gesture, t, d,
+(`clientScore`, `clientReels`), the stored stats and the Dereceli
+`difficulty` it was played at (0 for any run but a rated one) with its
+`difficultyVersion` (null outside rated runs and before the table);
+`timeline` — every post as the API's engine replays it, at that difficulty (`index, kind, level, window, gesture, t, d,
 verdict, points, bonusPoints, combo, meter`; points and bonus points add up to
 the score) — or `timelineUnavailable`: `no_log` (never finished),
 `other_engine` (another season's rules) or `engine_error`; `rating`
@@ -350,18 +352,23 @@ ranked by Elo and never reset.
 `AdminRatingsResponse`: placed players per league (`tiers`, banned ones left
 out) and those of them with a counted run in the last `rules.activeDays`
 (`active`), `placing` (still in their placement runs), the highest fifty
-(`top`: player, rating, league, peak, last counted) and `rules` — the numbers
-the ratings run on, `unlockRuns` (the counted Normal or Günlük runs before
-Dereceli opens, 20 by default) and this season's target table.
+(`top`: player, rating, league, difficulty, peak, last counted) and `rules` —
+the numbers the ratings run on, `unlockRuns` (the counted Normal or Günlük
+runs before Dereceli opens, 20 by default), the difficulty ladder
+(`difficultyVersion`, `difficultyFrom`, `difficultyStep`, `maxDifficulty`),
+`targets` — the difficulty table's, what a placed player's run is measured
+with — and `placementTargets`, difficulty 0's, what placement is measured
+with. A player's `rating` also says the `difficulty` of their next rated run.
 
 ### `GET /ratings/calibration?days=` — viewer
 
 `AdminCalibrationResponse`, the same report as `php artisan
 quezby:rating:calibrate --days=`: the players with `minRuns` (10) counted runs
-in the last `days` (1–365, 30 by default), the share each league should hold,
-where those players' medians settle with today's table, and per anchor the
-target now and the one that would hold the shares. Nothing is written — a new
-table is a config change (`rating.targets`) with a changelog entry.
+in the last `days` (1–365, 30 by default) played on the current difficulty
+table (`difficultyVersion`), the share each league should hold, where those
+players' medians settle with today's table, and per anchor the target now and
+the one that would hold the shares. Nothing is written — a new table is a
+config change (`rating.difficulty.targets`) with a changelog entry.
 
 ## Content
 

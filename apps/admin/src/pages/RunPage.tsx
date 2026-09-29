@@ -147,7 +147,11 @@ export function RunPage() {
     >
       {me.status === 'review' ? (
         <Callout tone="warn" title="Bu tur incelemede">
-          <p>Yumuşak bir sinyali var ve skoru sezonun ya da haftanın zirvesine girecek. Onaylanana kadar hiçbir tabloda görünmez.</p>
+          <p>
+            {me.mode === 'rated'
+              ? 'Yumuşak bir sinyali var ve oyuncuyu Elo tablosunun zirvesine taşıyacak. Onaylanana kadar reytinge sayılmaz.'
+              : 'Yumuşak bir sinyali var ve skoru sezonun ya da haftanın zirvesine girecek. Onaylanana kadar hiçbir tabloda görünmez.'}
+          </p>
         </Callout>
       ) : null}
       {me.mode === 'vs' ? (
@@ -257,6 +261,15 @@ function RunFacts({ data }: { data: AdminRunResponse }) {
             { label: 'Oyun süresi', value: formatDuration(me.activeMs) },
             { label: 'Nasıl bitti', value: me.endedBy ? END_REASON[me.endedBy] : null },
             { label: 'Seviye', value: formatNumber(me.level) },
+            ...(me.mode === 'rated'
+              ? [
+                  {
+                    label: 'Zorluk',
+                    value: formatNumber(me.difficulty),
+                    hint: me.difficultyVersion === null ? 'Zorluk tablosundan önce oynandı' : `Zorluk tablosu ${formatNumber(me.difficultyVersion)}; tur bu zorlukla tekrar oynatıldı`,
+                  },
+                ]
+              : []),
             { label: 'İsabet · kaçan · mükemmel', value: `${formatNumber(me.hits)} · ${formatNumber(me.misses)} · ${formatNumber(me.perfects)}` },
             { label: 'En uzun seri', value: formatNumber(me.maxStreak) },
             { label: 'Bonus', value: formatNumber(me.bonusPoints) },

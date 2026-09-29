@@ -1,0 +1,15 @@
+{
+  "difficultyVersion": 1,
+  "engineVersion": 3,
+  "tableSha256": "698a9e685f3d3d70ca36ad1e8428e4652335a3ab37bc6c886e65ad564526d4d1",
+  "behaviourSha256": "6018b6ca1dafce8025076fc5eda98ac7b75574a6b1e05711d1d5c72753d70b01",
+  "history": [
+    {
+      "difficultyVersion": 1,
+      "engineVersion": 3,
+      "tableSha256": "698a9e685f3d3d70ca36ad1e8428e4652335a3ab37bc6c886e65ad564526d4d1",
+      "behaviourSha256": "6018b6ca1dafce8025076fc5eda98ac7b75574a6b1e05711d1d5c72753d70b01",
+      "lockedAt": "2026-09-29"
+    }
+  ]
+}

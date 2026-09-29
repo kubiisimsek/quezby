@@ -3,10 +3,12 @@
 use App\Content\Catalog;
 use App\Enums\RunMode;
 use App\Enums\RunStatus;
+use App\Game\Difficulty;
 use App\Game\Rules;
 use App\Game\Run as Engine;
 use App\Models\LeaderboardEntry;
 use App\Models\PlayerStat;
+use App\Models\RatingChange;
 use App\Models\Run;
 use App\Models\User;
 use App\Services\RunService;
@@ -24,9 +26,9 @@ beforeEach(function () {
 function moderationCommandsRun(User $player, int $reels = 100, RunMode $mode = RunMode::Free): Run
 {
     $runs = app(RunService::class);
-    $run = $runs->start($player, $mode, Rules::ENGINE_VERSION, Catalog::LATEST, null);
-    $actions = playedLog($run->seed, $reels, 400);
-    $summary = Engine::replay($run->seed, $actions)->summary;
+    $run = $runs->start($player, $mode, Rules::ENGINE_VERSION, Catalog::LATEST, null, difficultyVersion: Difficulty::VERSION);
+    $actions = playedLog($run->seed, $reels, 400, difficulty: $run->difficulty);
+    $summary = Engine::replay($run->seed, $actions, $run->difficulty)->summary;
     Carbon::setTestNow(now()->addMinutes(10));
 
     return $runs->finish($player, $run->id, $actions, $summary->score, $summary->reels)->run;
@@ -71,7 +73,7 @@ test('quezby:review with nothing held', function () {
     $this->artisan('quezby:review')->expectsOutputToContain('No runs are waiting for review.')->assertSuccessful();
 });
 
-test('approving a held rated run puts it on the boards of the day it was played, and in that week\'s group', function () {
+test('approving a held rated run counts it on the rating and in the stats, never on the boards', function () {
     $player = User::factory()->withUsername('kerem.35')->create();
     $this->rate($player, 1500);
     $run = moderationCommandsRun($player, mode: RunMode::Rated);
@@ -85,11 +87,8 @@ test('approving a held rated run puts it on the boards of the day it was played,
         ->assertSuccessful();
 
     expect($run->fresh()->status)->toBe(RunStatus::Ranked)
-        ->and(moderationCommandsRows($player))->toBe([
-            'all all' => $run->score,
-            'monthly 2026-09' => $run->score,
-            'weekly 2026-W39' => $run->score,
-        ])
+        ->and(moderationCommandsRows($player))->toBe([])
+        ->and(RatingChange::query()->where('run_id', $run->id)->exists())->toBeTrue()
         ->and(PlayerStat::query()->find($player->id)->runs)->toBe(1);
 });
 

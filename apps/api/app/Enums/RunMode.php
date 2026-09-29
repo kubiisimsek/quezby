@@ -14,16 +14,36 @@ enum RunMode: string
     case Vs = 'vs';
 
     /**
-     * "Dereceli": any number a day, on a fresh random seed — and the only
-     * runs that move a player's Elo and their weekly group. Open once the
-     * player has counted enough free and daily runs (`rating.unlock_runs`).
+     * "Dereceli": any number a day, on a fresh random seed, at the difficulty
+     * the player's Elo gives it — and the only runs that move a player's Elo.
+     * They never reach the score boards. Open once the player has counted
+     * enough free and daily runs (`rating.unlock_runs`).
      */
     case Rated = 'rated';
 
-    /** Whether the run can reach a board and the lifetime stats. */
+    /**
+     * Whether the run is judged for a standing — ranked, held for review or
+     * flagged — and counts in the lifetime stats: every run but a VS.
+     */
     public function ranks(): bool
     {
         return $this !== self::Vs;
+    }
+
+    /** Whether the run climbs the week, the month and the season (Zirve): Normal and Günlük only. */
+    public function boards(): bool
+    {
+        return $this === self::Free || $this === self::Daily;
+    }
+
+    /**
+     * The modes whose runs climb the score boards, as stored.
+     *
+     * @return list<string>
+     */
+    public static function onBoards(): array
+    {
+        return array_values(array_map(fn (self $mode) => $mode->value, array_filter(self::cases(), fn (self $mode) => $mode->boards())));
     }
 
     /** Whether the run plays for Elo. */

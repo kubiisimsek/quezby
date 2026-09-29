@@ -64,6 +64,8 @@ const tr = {
       'Dereceli oyundan çıkarsan oyun o anki skorunla sayılır. Yarım bırakılan dereceli oyun ise en düşük sonuç sayılır.',
       'Yeni bir lige çıkınca 3 oyun boyunca ondan düşmezsin. Bronz’da kayıplar yarıdır.',
       'Lig sıralaması hiç sıfırlanmaz: ligindeki, son 14 günde dereceli oynamış oyuncular Elo’ya göre sıralanır.',
+      'Elo’n arttıkça Dereceli zorlaşır: engeller sıklaşır, hatalar daha çok dopamin götürür ve dopamin daha hızlı biter. Zorluk 1.000 Elo’da başlar ve her 250 Elo’da bir artar.',
+      'Dereceli yalnızca Elo için oynanır. Skorun Bu hafta, Bu ay ve Tüm zamanlar sıralamalarına yazılmaz.',
     ],
   },
   boards: {
@@ -71,6 +73,7 @@ const tr = {
     lead: 'Üç sıralama var: Bu hafta, Bu ay ve Tüm zamanlar. Her birinde o dönemdeki en iyi turun tek satır olarak durur.',
     more: [
       'Gün gece yarısı, hafta pazartesi, ay ayın biriyle başlar; hepsi Europe/Istanbul saatiyle.',
+      'Sıralamalara Normal ve Günlük oyunların yazılır. Dereceli oyunlar yalnızca Elo’nu değiştirir.',
       'Skorlar eşitse o skora önce ulaşan önde.',
       'Oyunun kuralları değişince yeni bir sezon başlar; sıralamalar ve sezon rekorun sıfırdan başlar.',
     ],
@@ -194,6 +197,8 @@ const en: HelpMessages = {
       'If you quit a ranked game, it counts with your score so far. A ranked game left unfinished counts as the lowest result.',
       "When you move up a league, you can't drop out of it for 3 games. Losses in Bronze are halved.",
       'The league ranking never resets: the players of your league who played Ranked in the last 14 days, by Elo.',
+      'The higher your Elo, the harder Ranked gets: more obstacles, mistakes cost more dopamine and your dopamine drains faster. Difficulty starts at 1,000 Elo and goes up every 250 Elo.',
+      'Ranked is played for Elo only. Its scores never go on the This week, This month or All time rankings.',
     ],
   },
   boards: {
@@ -201,6 +206,7 @@ const en: HelpMessages = {
     lead: 'There are three rankings: This week, This month and All time. Each one holds your best run of that period as a single row.',
     more: [
       'The day starts at midnight, the week on Monday and the month on the 1st, all on Istanbul time.',
+      'Your Normal and Daily games go on the rankings. Ranked games only change your Elo.',
       'When scores tie, whoever reached that score first is ahead.',
       "When the game's rules change, a new season begins; the rankings and your season record start from zero.",
     ],
@@ -323,6 +329,8 @@ const de: HelpMessages = {
       'Brichst du ein gewertetes Spiel ab, zählt es mit deinem Score bis dahin. Ein liegen gelassenes gewertetes Spiel zählt als schlechtestes Ergebnis.',
       'Nach einem Aufstieg kannst du 3 Spiele lang nicht aus der neuen Liga fallen. In Bronze zählen Verluste nur zur Hälfte.',
       'Die Liga-Rangliste wird nie zurückgesetzt: die Spieler deiner Liga, die in den letzten 14 Tagen gewertet gespielt haben, nach Elo.',
+      'Je höher dein Elo, desto schwerer wird Gewertet: mehr Hindernisse, Fehler kosten mehr Dopamin und dein Dopamin sinkt schneller. Die Schwierigkeit beginnt bei 1.000 Elo und steigt alle 250 Elo.',
+      'Gewertet spielst du nur um Elo. Die Scores kommen nicht in die Ranglisten Diese Woche, Dieser Monat und Allzeit.',
     ],
   },
   boards: {
@@ -330,6 +338,7 @@ const de: HelpMessages = {
     lead: 'Es gibt drei Ranglisten: Diese Woche, Dieser Monat und Allzeit. In jeder steht deine beste Runde aus diesem Zeitraum als eine Zeile.',
     more: [
       'Der Tag beginnt um Mitternacht, die Woche am Montag, der Monat am Ersten – alles nach Istanbuler Zeit.',
+      'In die Ranglisten kommen deine normalen und täglichen Spiele. Gewertete Spiele ändern nur dein Elo.',
       'Bei gleichem Score liegt vorn, wer ihn zuerst erreicht hat.',
       'Ändern sich die Spielregeln, beginnt eine neue Saison; die Ranglisten und dein Saisonrekord fangen bei null an.',
     ],
@@ -456,6 +465,8 @@ const ar: HelpMessages = {
       'إن خرجت من مباراة مصنَّفة تُحسب بنتيجتك حتى تلك اللحظة. أما المباراة المصنَّفة المتروكة دون إنهاء فتُحسب أدنى نتيجة.',
       'عندما تصعد إلى دوري جديد لا تهبط منه طوال 3 مباريات. وفي البرونز تُحسب الخسارة بالنصف.',
       'ترتيب الدوري لا يُصفَّر أبدًا: لاعبو دوريك الذين لعبوا مصنَّفًا في آخر 14 يومًا، حسب الإيلو.',
+      'كلما ارتفع تصنيفك صار المصنَّف أصعب: عقبات أكثر، والأخطاء تكلّف دوبامين أكثر، والدوبامين ينفد أسرع. تبدأ الصعوبة عند 1.000 إيلو وتزداد كل 250 إيلو.',
+      'المصنَّف للإيلو فقط. نتائجه لا تُكتب في ترتيبات هذا الأسبوع وهذا الشهر وكل الأوقات.',
     ],
   },
   boards: {
@@ -463,6 +474,7 @@ const ar: HelpMessages = {
     lead: 'هناك ثلاثة ترتيبات: هذا الأسبوع، وهذا الشهر، وكل الأوقات. في كل منها تظهر أفضل جولة لك في تلك الفترة في سطر واحد.',
     more: [
       'يبدأ اليوم عند منتصف الليل، والأسبوع يوم الاثنين، والشهر في يومه الأول؛ وكلها بتوقيت إسطنبول.',
+      'تُكتب في الترتيبات مبارياتك العادية واليومية. المباريات المصنَّفة تغيّر تصنيفك فقط.',
       'عند تعادل النتائج يتقدّم من وصل إلى النتيجة أولًا.',
       'حين تتغيّر قواعد اللعبة يبدأ موسم جديد، وتبدأ الترتيبات ورقمك القياسي للموسم من الصفر.',
     ],
@@ -584,6 +596,8 @@ const fr: HelpMessages = {
       'Si tu quittes une partie classée, elle compte avec ton score du moment. Une partie classée laissée en plan compte comme le plus mauvais résultat.',
       'Quand tu montes de ligue, tu ne peux pas en redescendre pendant 3 parties. En Bronze, les pertes sont divisées par deux.',
       'Le classement de la ligue ne repart jamais de zéro : les joueurs de ta ligue qui ont joué en classé ces 14 derniers jours, par Elo.',
+      'Plus ton Elo monte, plus le mode classé devient dur : plus d’obstacles, les erreurs coûtent plus de dopamine et ta dopamine baisse plus vite. La difficulté commence à 1 000 Elo et augmente tous les 250 Elo.',
+      'Le mode classé se joue pour l’Elo uniquement. Ses scores ne vont pas dans les classements Cette semaine, Ce mois-ci et Depuis toujours.',
     ],
   },
   boards: {
@@ -591,6 +605,7 @@ const fr: HelpMessages = {
     lead: 'Il y a trois classements : Cette semaine, Ce mois-ci et Depuis toujours. Dans chacun, ta meilleure partie de la période tient sur une seule ligne.',
     more: [
       "Le jour commence à minuit, la semaine le lundi et le mois le 1er, tous à l'heure d'Istanbul.",
+      'Tes parties normales et quotidiennes vont dans les classements. Les parties classées ne changent que ton Elo.',
       "À score égal, celui qui l'a atteint en premier passe devant.",
       'Quand les règles du jeu changent, une nouvelle saison commence ; les classements et ton record de la saison repartent de zéro.',
     ],
@@ -713,6 +728,8 @@ const es: HelpMessages = {
       'Si sales de una partida competitiva, cuenta con la puntuación que llevabas. Una partida competitiva abandonada cuenta como el peor resultado.',
       'Al subir de liga, no puedes caer de ella durante 3 partidas. En Bronce, las pérdidas son la mitad.',
       'La tabla de la liga nunca se reinicia: los jugadores de tu liga que jugaron Competitivo en los últimos 14 días, por Elo.',
+      'Cuanto más Elo tienes, más difícil es Competitivo: más obstáculos, los errores cuestan más dopamina y tu dopamina baja más rápido. La dificultad empieza en 1.000 Elo y sube cada 250 Elo.',
+      'Competitivo se juega solo por Elo. Sus puntuaciones no entran en Esta semana, Este mes ni Histórico.',
     ],
   },
   boards: {
@@ -720,6 +737,7 @@ const es: HelpMessages = {
     lead: 'Hay tres clasificaciones: Esta semana, Este mes e Histórico. En cada una, tu mejor partida de ese periodo aparece en una sola fila.',
     more: [
       'El día empieza a medianoche, la semana el lunes y el mes el día 1; todo en hora de Estambul.',
+      'En las clasificaciones entran tus partidas normales y diarias. Las competitivas solo cambian tu Elo.',
       'Si hay empate, va delante quien llegó antes a esa puntuación.',
       'Cuando cambian las reglas del juego, empieza una nueva temporada; las clasificaciones y tu récord de la temporada empiezan de cero.',
     ],

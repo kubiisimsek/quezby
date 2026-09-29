@@ -170,6 +170,43 @@ describe('ResultView', () => {
     expect(screen.queryByText(/yükseldin|düştün/)).toBeNull();
   });
 
+  it('shows a rated run’s Elo and the difficulty it was played at, and nothing of the boards', async () => {
+    const run = response().run;
+    await view(
+      {
+        mode: 'verified',
+        response: response({
+          run: { ...run, mode: 'rated' },
+          isNewBest: false,
+          best: { score: 120_000, reels: 300, achievedAt: '2026-09-20T10:00:00.000Z' },
+          rankChanges: {
+            weekly: { before: 12, after: 12 },
+            monthly: { before: 80, after: 80 },
+            all: { before: 311, after: 311 },
+          },
+          passed: [],
+          rating: buildRunRating({ difficulty: 9, nextDifficulty: 10 }),
+        }),
+      },
+      'rated',
+    ).render();
+
+    expect(screen.getByText('ELO')).toBeTruthy();
+    expect(screen.getByText('Zorluk 9')).toBeTruthy();
+    expect(screen.getByText('Sıradaki zorluk 10')).toBeTruthy();
+    expect(screen.queryByLabelText(/^Hafta: /)).toBeNull();
+    expect(screen.queryByText('#12')).toBeNull();
+    expect(screen.queryByText('YENİ REKOR!')).toBeNull();
+    expect(screen.queryByText(/^Sezon rekorun/)).toBeNull();
+  });
+
+  it('says nothing of the next difficulty when the run left it where it was', async () => {
+    await view({ mode: 'verified', response: response({ rating: buildRunRating({ difficulty: 7, nextDifficulty: 7 }) }) }).render();
+
+    expect(screen.getByText('Zorluk 7')).toBeTruthy();
+    expect(screen.queryByText(/^Sıradaki zorluk/)).toBeNull();
+  });
+
   it('says a new league in gold', async () => {
     await view({
       mode: 'verified',

@@ -71,6 +71,8 @@ final class AdminRuns
             'run' => $this->present($run) + [
                 'seed' => $run->seed,
                 'contentVersion' => $run->content_version,
+                'difficulty' => $run->difficulty,
+                'difficultyVersion' => $run->difficulty_version,
                 'hits' => $run->hits,
                 'misses' => $run->misses,
                 'perfects' => $run->perfects,
@@ -133,7 +135,7 @@ final class AdminRuns
         }
 
         try {
-            $replay = Engine::replay($run->seed, $run->actions);
+            $replay = Engine::replay($run->seed, $run->actions, $run->difficulty);
         } catch (EngineError) {
             return [null, 'engine_error'];
         }

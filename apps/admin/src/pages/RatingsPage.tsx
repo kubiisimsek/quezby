@@ -31,6 +31,7 @@ const TOP_COLUMNS: Column<AdminRatingRow>[] = [
   { key: 'player', header: 'Oyuncu', cell: (row) => <PlayerCell player={row.player} link /> },
   { key: 'tier', header: 'Lig', cell: (row) => <TierTag tier={row.tier} />, hideBelow: 'md' },
   { key: 'rating', header: 'Reyting', cell: (row) => formatNumber(row.rating), align: 'end', tone: 'strong' },
+  { key: 'difficulty', header: 'Zorluk', cell: (row) => formatNumber(row.difficulty), align: 'end', tone: 'muted', hideBelow: 'lg' },
   { key: 'peak', header: 'En yüksek', cell: (row) => formatNumber(row.peak), align: 'end', tone: 'muted', hideBelow: 'lg' },
   { key: 'rated', header: 'Son sayılan', cell: (row) => <When at={row.ratedAt} />, tone: 'muted', hideBelow: 'xl' },
 ];
@@ -125,13 +126,13 @@ export function RatingsPage() {
           <Rules rules={data.rules} />
           <DataTable
             title="Hedef tablosu"
-            description="Bir reytingin tipik skoru: tur bunu geçerse reyting artar."
+            description="Bir reytingin kendi zorluğundaki tipik skoru: tur bunu geçerse reyting artar. Yerleşme turları zorluk 0'ın tablosuyla ölçülür."
             icon={<Target />}
             tone="secondary"
             columns={TARGET_COLUMNS}
             rows={data.rules.targets}
             rowKey={(row) => String(row.rating)}
-            empty={{ title: 'Bu sezonun hedef tablosu yok', hint: 'config’de rating.targets altında bu sezona bir tablo gerekir.', icon: <Target /> }}
+            empty={{ title: 'Bu zorluk tablosunun hedefleri yok', hint: 'config’de rating.difficulty.targets altında bu sezona ve zorluk tablosuna bir tablo gerekir.', icon: <Target /> }}
           />
         </div>
       </div>
@@ -162,6 +163,11 @@ function Rules({ rules }: { rules: AdminRatingsResponse['rules'] }) {
           { label: 'Terfi kalkanı', value: `${formatNumber(rules.shieldRuns)} tur`, hint: 'Yeni yükselen bu turlarda ligden düşmez' },
           { label: 'Bronz’da kayıp', value: formatPercent(rules.bronzeLossPercent), hint: 'Kaybın bu kadarı düşer' },
           { label: 'Dereceli kilidi', value: `${formatNumber(rules.unlockRuns)} oyun`, hint: 'Normal ya da Günlük oyun' },
+          {
+            label: 'Zorluk',
+            value: `0–${formatNumber(rules.maxDifficulty)}`,
+            hint: `${formatNumber(rules.difficultyFrom)} Elo’dan sonra her ${formatNumber(rules.difficultyStep)} Elo’da bir artar · tablo ${formatNumber(rules.difficultyVersion)}`,
+          },
         ]}
       />
     </Panel>
@@ -206,7 +212,7 @@ function Calibration() {
         ) : (
           <div className="space-y-5">
             <Callout tone="info" title="Hiçbir şey değişmez">
-              <p>Tablo config’de değişir (config/quezby.php › rating.targets); burası yalnızca bugünkü tablonun oyunculara ne kadar uyduğunu gösterir.</p>
+              <p>Tablo config’de değişir (config/quezby.php › rating.difficulty.targets); burası yalnızca bugünkü tablonun, zorluk tablosu {formatNumber(data.difficultyVersion)} ile oynanan dereceli turlara ne kadar uyduğunu gösterir.</p>
             </Callout>
             <Facts
               facts={[
@@ -246,7 +252,7 @@ function Calibration() {
         isFetching={calibration.isFetching}
         error={calibration.error}
         className="xl:self-start"
-        empty={{ title: 'Bu sezonun hedef tablosu yok', hint: 'config’de rating.targets altında bu sezona bir tablo gerekir.', icon: <Target /> }}
+        empty={{ title: 'Bu zorluk tablosunun hedefleri yok', hint: 'config’de rating.difficulty.targets altında bu sezona ve zorluk tablosuna bir tablo gerekir.', icon: <Target /> }}
       />
     </div>
   );

@@ -81,13 +81,15 @@ kaldığı adıma döner, başka bir hesaba giren görmez.
 4. Her 20 reelde seviye (puan çarpanı) artar, pencere daralır, bar hızlanır;
    hatasız seriler kombo çarpanını x1,50'ye taşır, isimli kombolar patlar.
 5. Tur bitince hareket kaydı sunucuya gider; sunucu tekrar oynatır, skoru
-   doğrular, tablolara ve istatistiklere, dereceliyse Elo'ya yazar
-   (`POST /runs/{id}/finish`).
+   doğrular ve istatistiklere yazar; Normal ve Günlük turu tablolara,
+   dereceli turu yalnızca Elo'ya (`POST /runs/{id}/finish`).
 6. Sonuç ekranı önce "Doğrulanıyor…" der, sonra **yalnızca sunucunun**
    sayılarını gösterir: skor, Elo (yeni reyting, ±değişim, hedef; yeni ligde
    konfeti), puanın nereden geldiği, sıra değişimi, bu hafta geçtiklerin,
    Dereceli'ye kalan oyun (açıldığı turda "Dereceli açıldı!" ve konfeti),
-   günlükse paylaşım kartı. Bir VS turunda sıra ve
+   günlükse paylaşım kartı. Dereceli turda sıra, rekor ve "geçtiklerin"
+   yoktur; Elo kutusu turun oynandığı zorluğu ("Zorluk 9") ve değiştiyse
+   sıradakini ("Sıradaki zorluk 10") gösterir. Bir VS turunda sıra ve
    paylaşım yoktur; VS'in kendisi vardır: gönderildi, ya da kazandın,
    kaybettin, berabere.
 
@@ -108,9 +110,14 @@ CS2'nin rekabetçi modu gibi: önce oyunu öğren, sonra dereceli oyna.
   Lig ekranı da ilerlemeyi gösterir.
   İlk **3 dereceli tur yerleşmedir**, sonra her dereceli tur Elo'yu değiştirir.
   Bir kez dereceli oynayan için hep açıktır.
+  **Elo arttıkça Dereceli zorlaşır:** 1000 Elo'dan itibaren her 250 Elo'da bir
+  zorluk (0–16): engeller sıklaşır, "Dokunma" reeli artar, hatalar daha çok
+  dopamin götürür ve bar daha hızlı erir. Bronz ve yerleşme turları oyunu
+  olduğu gibi oynar. Ayrıntılar: [scoring.md → Dereceli zorluğu](./scoring.md#dereceli-zorluğu).
 
-Üç modun skorları da Hafta / Ay / Tüm zamanlar tablolarına yazılır; Elo'yu ve
-lig sıralamasını yalnız Dereceli besler.
+Hafta / Ay / Tüm zamanlar tablolarına (Zirve) **yalnız Normal ve Günlük**
+turlar yazılır. Dereceli yalnızca Elo için oynanır: Elo'yu ve lig sıralamasını
+yalnız o besler, hiçbir skor tablosuna yazılmaz.
 
 ## Her gün
 
@@ -124,8 +131,9 @@ lig sıralamasını yalnız Dereceli besler.
   biri 1000 Elo (MasterClass 5000 ve üstü). Her dereceli turun bir **hedef
   skoru** var: geçen Elo kazanır, altında kalan kaybeder, bir tur en fazla ±100.
   İlk 3 dereceli tur yerleşmedir, herkes Gümüş'te başlar; "Mod seç"teki
-  Dereceli kutusu ve lobideki lig kartı bir sonraki turun hedefini gösterir
-  ("Elo için oyna · Hedef 88.400").
+  Dereceli kutusu ve lobideki lig kartı bir sonraki turun hedefini ve
+  zorluğunu gösterir ("Zorluk 7 · Hedef 88.400"; Bronz'da "Elo için oyna ·
+  Hedef 21.400"). Oyun sırasında HUD'daki rozet de zorluğu söyler.
   Yarım bırakılan dereceli tur hükmen kayıptır.
   Ayrıntılar: [scoring.md → Elo](./scoring.md#elo).
 - **Lig sıralaması hiç sıfırlanmaz:** satrançtaki gibi ligin Elo'nun
@@ -138,18 +146,17 @@ lig sıralamasını yalnız Dereceli besler.
 ## Rekabet
 
 - Sıralamalar: **Bu hafta**, **Bu ay**, **Tüm zamanlar** (Europe/Istanbul) ve
-  **Günün akışı**. Günlük tablo yoktur: günün en iyi dereceli skoru yalnızca
-  grup puanı için tutulur. Her oyuncunun o dönemdeki en iyi turu tek satır; eşitlikte
+  **Günün akışı**; hepsine yalnız Normal ve Günlük turlar yazılır. Günlük
+  tablo yoktur. Her oyuncunun o dönemdeki en iyi turu tek satır; eşitlikte
   önce yapan önde. Tüm zamanlar sezonun (kural sürümünün) tüm zamanlarıdır.
 - **Zirve** tasarımı: tepede podyum (taç, madalyalar), altında tırmanış —
   her satır bir üsttekini geçmek için gereken puanı gösterir — ve altta sabit
   **"Senin katın"**: sıran, bir üst sıraya ilerleme çubuğu, "@ekin'e 1.240 puan"
   ve **Geç onu**. Dönemin bitmesine geri sayım sunucu saatine göredir.
-- **Elo** sekmesi (Zirve'de dönemlerin yanında): son 14 günde dereceli turu olan
-  oyuncular reytinge göre, en yüksek önce; her satırda ligi. Yerleşmemiş ve
-  yasaklı oyuncular görünmez.
+- **Zirve'de Elo yoktur:** yalnız üç skor tablosu. Elo sıralaması Lig
+  ekranındadır; Zirve'den açılan oyuncu kartı da lig ve Elo göstermez.
 - Her tabloda "Herkes | Arkadaşlar" (arkadaşların + sen). Bir satıra dokununca
-  oyuncu kartı (lig ve Elo ile) açılır.
+  oyuncu kartı açılır.
 - Skor istemciden asla kabul edilmez; sunucu aynı motoru PHP'de çalıştırır.
   Şüpheli turlar tabloya girmez; zirveye yakın şüpheli skorlar incelemeye düşer.
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Game\Difficulty;
 use App\Game\Gesture;
 use App\Game\ReelKind;
 use App\Game\Rules;
@@ -77,13 +78,14 @@ function replayFixture(string $name): array
 
 /**
  * A log that plays every reel right, deciding skip and like reels after
- * `$decisionMs` (± `$jitterMs`), for `$reels` reels — then quits.
+ * `$decisionMs` (± `$jitterMs`), for `$reels` reels — then quits. A rated
+ * run's log is played at its `$difficulty`.
  *
  * @return list<array{int, int, int}>
  */
-function playedLog(int $seed, int $reels, int $decisionMs, int $jitterMs = 0): array
+function playedLog(int $seed, int $reels, int $decisionMs, int $jitterMs = 0, int $difficulty = 0): array
 {
-    $run = new Engine($seed);
+    $run = new Engine($seed, $difficulty);
     $actions = [];
     while (count($actions) < $reels && ! $run->isOver()) {
         $reel = $run->current();
@@ -129,16 +131,19 @@ function swipedLog(int $seed, int $reels, int $decisionMs, int $jitterMs = 0, bo
 }
 
 /**
- * Pins this season's Elo target table to engine v2's anchors — the ones the
- * rating tests were written against — so a new season's calibration never
- * moves their numbers. The season's own table is tested by
- * `Unit/Rating/TargetTableTest` and `Unit/Rating/RatingBalanceTest`.
+ * Pins this season's Elo target tables — difficulty 0's and the difficulty
+ * table's — to engine v2's anchors, the ones the rating tests were written
+ * against, so a new season's calibration never moves their numbers. The
+ * season's own tables are tested by `Unit/Rating/TargetTableTest` and
+ * `Unit/Rating/RatingBalanceTest`.
  */
 function pinRatingTargets(): void
 {
-    config(['quezby.rating.targets.'.Rules::ENGINE_VERSION => [
-        0 => 8000, 1000 => 34000, 2000 => 100000, 3000 => 240000, 4000 => 480000, 5000 => 800000, 6000 => 1100000,
-    ]]);
+    $anchors = [0 => 8000, 1000 => 34000, 2000 => 100000, 3000 => 240000, 4000 => 480000, 5000 => 800000, 6000 => 1100000];
+    config([
+        'quezby.rating.targets.'.Rules::ENGINE_VERSION => $anchors,
+        'quezby.rating.difficulty.targets.'.Rules::ENGINE_VERSION.'.'.Difficulty::VERSION => $anchors,
+    ]);
 }
 
 /**

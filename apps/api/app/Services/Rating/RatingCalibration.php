@@ -11,7 +11,9 @@ use Illuminate\Container\Attributes\Config;
 /**
  * How well the target table fits the players who actually play — for
  * `quezby:rating:calibrate` and the admin panel. Reads, never writes: a new
- * table is a config change, on record in the changelog.
+ * table is a config change, on record in the changelog. The table is the
+ * current difficulty table's (`rating.difficulty.targets`), read from the
+ * rated runs played on it: each at the difficulty its player's rating gave.
  *
  * Every player with enough rated runs in the window stands for the median
  * of their scores — where their rating settles. The anchors it proposes put
@@ -29,6 +31,8 @@ final class RatingCalibration
         private readonly array $calibration,
         #[Config('quezby.engine_version')]
         private readonly int $engineVersion,
+        #[Config('quezby.difficulty_version')]
+        private readonly int $difficultyVersion,
     ) {}
 
     /**
@@ -39,8 +43,8 @@ final class RatingCalibration
     public function report(int $days): array
     {
         $medians = $this->medians($days);
-        $table = TargetTable::forEngine($this->engineVersion);
-        $anchors = config("quezby.rating.targets.{$this->engineVersion}") ?? [];
+        $table = TargetTable::forDifficulty($this->engineVersion, $this->difficultyVersion);
+        $anchors = config("quezby.rating.difficulty.targets.{$this->engineVersion}.{$this->difficultyVersion}") ?? [];
         $proposed = $this->propose($medians);
 
         $settled = array_fill_keys(array_map(fn (LeagueTier $tier) => $tier->slug(), LeagueTier::cases()), 0);
@@ -50,6 +54,7 @@ final class RatingCalibration
 
         return [
             'engineVersion' => $this->engineVersion,
+            'difficultyVersion' => $this->difficultyVersion,
             'days' => $days,
             'minRuns' => $this->calibration['min_runs'],
             'players' => count($medians),
@@ -77,6 +82,7 @@ final class RatingCalibration
             ->where('runs.status', RunStatus::Ranked->value)
             ->where('runs.mode', RunMode::Rated->value)
             ->where('runs.engine_version', $this->engineVersion)
+            ->where('runs.difficulty_version', $this->difficultyVersion)
             ->where('runs.finished_at', '>=', now()->subDays($days))
             ->toBase()
             ->orderBy('runs.id')

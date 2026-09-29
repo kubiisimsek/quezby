@@ -1,5 +1,68 @@
 # Changelog
 
+## 2026-09-30 — Dereceli gets harder with Elo, and leaves the score boards
+
+The owner asked for ranked play to get harder as the rating climbs (Bronz as
+the game is, Elmas with far more obstacles and a meter that empties faster)
+without a new engine version, and for Dereceli to stop touching the normal
+rankings: rated players meet on Elo alone, and Zirve shows nothing of it.
+
+- **Dereceli difficulty, 0–16, engine v3 kept.** A rated run is handed a
+  difficulty with its seed: 0 below 1000 Elo and while placing, then one more
+  every 250 Elo, 16 from 4750 (`rating.difficulty.from/step`). Each step adds
+  15 ‰ to the special-reel share, moves like weight to freeze (40/30/30 →
+  30/30/40 at 16), multiplies the meter's losses by `1000 + 30·z` ‰ and its
+  drain by `1000 + ⌊3·z²/2⌋` ‰ (×1.38 at 16). `packages/engine/src/difficulty.ts`
+  and `apps/api/app/Game/Difficulty.php` hold the table; `new Run(seed,
+  difficulty)`, `replay(seed, actions, difficulty)`. Difficulty 0 is v3 to the
+  byte: `rules.lock.json`, every fixture and the golden scores are unchanged,
+  and Normal, Günlük, VS and practice never leave it. The table is sealed
+  apart (`difficulty.lock.json`, `DIFFICULTY_VERSION = 1`, new
+  `fixtures/difficulty.json` replayed by `DifficultyParityTest`); a change is
+  a difficulty version and new Elo targets, not a season.
+  Simulated at the difficulty each profile's rating reaches: Gümüş −18 %
+  (3:26 → 2:58), Altın −35 % (5:13 → 3:51), Platin −41 % (7:21 → 5:04),
+  Elmas at 16 −50 % (8:48 → 5:27, obstacles 40 → 56 %, freeze 11 → 18 %);
+  ±20 % holds at every difficulty. `pnpm engine:simulate` prints the table;
+  `balance.test.ts` locks it. Seed choice alone was measured first and moved
+  good and pro players only 2–4 %.
+- **Elo targets per difficulty table** (`rating.difficulty.targets.3.1`:
+  8 K, 31.6 K, 74.1 K, 148.3 K, 265.7 K, 394 K, 542.3 K every 1000): the
+  typical score of a rating at its own difficulty, so every profile still
+  settles in its league (`RatingBalanceTest`; with v3's targets the elite
+  would sink to Platin). Placement is played at difficulty 0 and measured
+  with `rating.targets.3`, as are rated runs from before the table
+  (`runs.difficulty_version` null). Calibration reads rated runs of the
+  current table and proposes `rating.difficulty.targets`.
+- **Dereceli off the score boards.** Only Normal and Günlük runs climb the
+  week, the month, the season and the day's board (`RunMode::boards()`,
+  also in `rebuildFor` and moderator approval); a rated run moves the rating
+  and the lifetime stats only, its result has no ranks, record or passed
+  players and its share text no week rank. Migration
+  `2026_10_01_000500_take_rated_runs_off_the_boards` rebuilds the rows a
+  rated run held. A soft-signalled rated run now waits for review when it
+  would lift its player into the Elo board's top 10
+  (`plausibility.review_top_rating`).
+- **API:** `POST /runs` takes `difficultyVersion` (a rated start without the
+  API's gets `engine_outdated`) and answers `difficulty`; `runs.difficulty`
+  and `runs.difficulty_version` (migration `…_000400`). `RatingResponse` and
+  `RunRating` carry `difficulty` (and `nextDifficulty`). Admin: run detail
+  `difficulty`/`difficultyVersion`, ratings `top.*.difficulty`, the ladder and
+  `placementTargets` in `rules`, `difficulty` on a player's rating,
+  calibration `difficultyVersion`.
+- **App:** the run is played at the API's difficulty; the HUD pill says
+  "Zorluk 9" in a harder rated run; "Mod seç" says "Zorluk 7 · Hedef
+  88.400"; the lobby's league card, the League screen (with a line on what it
+  does) and the rated result's Elo tile show it, the result with "Sıradaki
+  zorluk" when it moved. **Zirve has no Elo tab** any more, its player card
+  shows no league or Elo. Yardım explains both, in six languages.
+- **Admin panel:** Zorluk on a rated run's facts, the review note and the
+  approve dialog of a rated run speak of the Elo board and the rating, the
+  ratings page shows each top player's difficulty, the ladder and the
+  difficulty table's targets.
+- **Deploy:** `php artisan migrate` (the two migrations). Ship the API and
+  the app together: an app from before this cannot start a rated run.
+
 ## 2026-09-29 — Blind moves (engine v3), rounder edges, more phrases
 
 The owner scored 20 K by swiping with two fingers without looking and asked

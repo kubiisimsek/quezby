@@ -77,9 +77,22 @@ describe('RatingsPage', () => {
     expect(unlock).toHaveTextContent('Normal ya da Günlük oyun');
     expect(within(rules).queryByText('Lig bonusu')).not.toBeInTheDocument();
 
+    const difficulty = within(rules).getByText('Zorluk', { selector: 'dt' }).parentElement as HTMLElement;
+    expect(difficulty).toHaveTextContent('0–16');
+    expect(difficulty).toHaveTextContent('1.000 Elo’dan sonra her 250 Elo’da bir artar · tablo 1');
+
+    // The targets of the difficulty table: what a placed player's run is measured with.
     const targets = screen.getByRole('heading', { name: 'Hedef tablosu' }).closest('section') as HTMLElement;
     const row = within(targets).getByRole('row', { name: /1\.000/ });
-    expect(within(row).getByText('34.000')).toBeInTheDocument();
+    expect(within(row).getByText('31.600')).toBeInTheDocument();
+  });
+
+  it('lists the difficulty each of the highest plays at', async () => {
+    renderApp({ path: '/ratings', api: withRatings() });
+
+    const top = (await screen.findByRole('heading', { name: 'En yüksek 50' })).closest('section') as HTMLElement;
+    expect(within(top).getByRole('columnheader', { name: 'Zorluk' })).toBeInTheDocument();
+    expect(within(top).getAllByText('16')).toHaveLength(2);
   });
 
   it('fits the target table to the players of a window, and changes nothing', async () => {

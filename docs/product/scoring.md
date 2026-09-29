@@ -247,8 +247,10 @@ Oyunun üç modu var, lobide altın butonun üstündeki seçiciyle seçilir:
 | **Normal** | `free` | İstediğin kadar; skor Zirve'ye yazılır |
 | **Dereceli** | `rated` | Elo ve ligindeki sıra |
 
-Üçü de Hafta / Ay / Tüm zamanlar tablolarına yazılır; **Elo'yu yalnız
-Dereceli değiştirir** (CS2'nin rekabetçi modu gibi). Dereceli, oyuncunun
+Hafta / Ay / Tüm zamanlar tablolarına (Zirve) **yalnız Normal ve Günlük**
+yazılır; **Elo'yu yalnız Dereceli değiştirir** (CS2'nin rekabetçi modu gibi)
+ve dereceli tur hiçbir skor tablosuna yazılmaz. Dereceli, Elo arttıkça
+zorlaşır (*Dereceli zorluğu*). Dereceli, oyuncunun
 **20 sayılan Normal ya da Günlük** turundan sonra açılır (`ranked`, skor > 0;
 `rating.unlock_runs`). Açılmadan başlatılan dereceli tur `409 rated_locked`
 alır. Bir kez dereceli oynayan oyuncu için bir daha kilitlenmez. İlerleme
@@ -267,8 +269,14 @@ arası geometrik (motorun skorları bir beceri basamağında 2–3 katına çık
 
 | Reyting | 0 | 1000 | 2000 | 3000 | 4000 | 5000 | 6000 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Hedef (motor v3) | 8 B | 33,7 B | 99 B | 238 B | 475 B | 792 B | 1,09 M |
+| **Hedef (motor v3, zorluk tablosu 1)** | 8 B | 31,6 B | 74,1 B | 148,3 B | 265,7 B | 394 B | 542,3 B |
+| Hedef (motor v3, zorluk 0: yerleşme ve tablodan önceki turlar) | 8 B | 33,7 B | 99 B | 238 B | 475 B | 792 B | 1,09 M |
 | Hedef (motor v2, geç onaylar için) | 8 B | 34 B | 100 B | 240 B | 480 B | 800 B | 1,1 M |
+
+Yerleşmiş oyuncunun dereceli turu, oynadığı zorluk tablosunun hedefleriyle
+ölçülür (`rating.difficulty.targets[motor][zorluk tablosu]`): her reytingin
+**kendi zorluğundaki** tipik skoru. Yerleşme turları zorluk 0'da oynanır ve
+motorun kendi tablosuyla (`rating.targets[motor]`) ölçülür.
 
 - `P(skor)`: skorun, hangi reytingin tipik skoru olduğu (tablonun tersi).
 - **Değişim** `Δ = round(100 × tanh((P − R) / W))`: hedefi geçen artar,
@@ -326,7 +334,84 @@ değişince reytingler sıfırlanmaz, oyuncular birkaç turda yeni dengeye kayar
 motor profilleri (gerçek başparmak için −%15) kendi liglerinde durur — yeni
 başlayan ~1070 ve ortalama ~1910 Gümüş, iyi ~2825 Altın, profesyonel ~3830
 Platin, elit ~4540 Elmas; kusursuza yakın oyun MasterClass. Dengede sapma < 120,
-tipik değişim ±75 içinde.
+tipik değişim ±75 içinde. Her tur reytinginin zorluğunda oynandığında da
+zorluk tablosunun hedefleriyle aynı liglerde, zorluk 0'daki yerlerinin 150
+Elo yakınında dururlar (tipik değişim ±80); motorun kendi hedefleriyle elit
+Platin'e düşerdi.
+
+## Dereceli zorluğu
+
+Elo arttıkça Dereceli zorlaşır. Sunucu dereceli turu açarken oyuncunun o
+anki reytinginden bir **zorluk** (0–16) seçer, seed'le birlikte verir
+(`StartRunResponse.difficulty`) ve turu o zorlukla tekrar oynatır. Uygulama
+turu `new Run(seed, difficulty)` ile oynar; motorun sürümü değişmez.
+
+| Elo | Lig | Zorluk |
+| --- | --- | --- |
+| Yerleşme turları, 0–999 | — / Bronz | 0 (oyun olduğu gibi) |
+| 1000–1999 | Gümüş | 1–4 (her 250 Elo'da bir) |
+| 2000–2999 | Altın | 5–8 |
+| 3000–3999 | Platin | 9–12 |
+| 4000–4749 | Elmas | 13–15 |
+| 4750 ve üstü | Elmas, MasterClass | 16 (tavan) |
+
+Normal, Günlük, VS ve deneme turu hep zorluk 0'dadır. Zorluk, terk edilen
+açık tur hükmen sayıldıktan **sonra** hesaplanır (`rating.difficulty.from`,
+`step`).
+
+Her zorluk dört sayıyı biraz daha oynatır (`z` zorluk,
+`packages/engine/src/difficulty.ts` · `apps/api/app/Game/Difficulty.php`):
+
+| | Kural | z = 4 | z = 8 | z = 12 | z = 16 |
+| --- | --- | --: | --: | --: | --: |
+| Engel sıklığı | özel reel payına `+15·z` binde | +%6 | +%12 | +%18 | +%24 |
+| Dokunma payı | özel reellerde beğeni ağırlığı `−⌊5·z/8⌋`, dokunmaya | 40/30/30 → 38/30/32 | 35/30/35 | 33/30/37 | 30/30/40 |
+| Ceza | bar kayıpları × `(1000 + 30·z)` binde | ×1,12 | ×1,24 | ×1,36 | ×1,48 |
+| Dopamin erimesi | erime × `(1000 + ⌊3·z²/2⌋)` binde | ×1,02 | ×1,10 | ×1,22 | ×1,38 |
+
+Kör hamle katlaması büyümüş cezanın üstüne gelir (z = 16'da yanlış kaydırma
+−296, kör −592). Pencere, 600 ms taban, seed'in reel başına üç çekimi, giriş
+reelleri, "art arda en fazla 3 özel" ve "iki dokunma yan yana gelmez"
+değişmez. Zorluk 0 v3'ün ta kendisidir: `rules.lock.json`, bütün fixture'lar
+ve altın skorlar aynı kalır.
+
+**Denge** (600'er simüle tur, `pnpm engine:simulate`; her profil
+reytinginin ulaştığı zorlukta):
+
+| Profil (lig) | Zorluk | Skor p50 | Süre p50 | Engel · dokunma payı | Aynı süre ±%10 |
+| --- | --: | --- | --- | --- | --- |
+| Ortalama (Gümüş) | 4 | 101 B → 83 B (−%18) | 3:26 → 2:58 | %34 → %39 · %9 → %11 | 0,87 · 1,13 |
+| İyi (Altın) | 8 | 240 B → 155 B (−%35) | 5:13 → 3:51 | %37 → %45 · %10 → %14 | 0,90 · 1,12 |
+| Profesyonel (Platin) | 12 | 493 B → 290 B (−%41) | 7:21 → 5:04 | %38 → %51 · %10 → %16 | 0,89 · 1,10 |
+| Elit (Elmas) | 16 | 727 B → 362 B (−%50) | 8:48 → 5:27 | %40 → %56 · %11 → %18 | 0,89 · 1,11 |
+
+- ±%20 sözü her profilde, oynadığı zorluklarda tutar; hiçbir zorluk bir
+  alttakinden kolay değildir ve hiçbir profile daha çok puan ya da daha uzun
+  tur getirmez (`balance.test.ts` → *difficulty balance*).
+- Yalnız seed seçmek (motora dokunmadan "zor seed" vermek) önce ölçüldü:
+  en zor %2'lik seed bile iyi ve profesyonel oyuncuyu %2–4 zorlaştırıyordu.
+- Dereceli tur skor tablolarına yazılmadığı için zorluk hiçbir tabloyu
+  bozmaz; Elo'yu zorluk tablosunun hedefleri dengeler (*Elo*).
+
+### Zorluk tablosunu değiştirmek (yeni sezon değil)
+
+Zorluk tablosu kurallardan ayrı mühürlüdür: `packages/engine/difficulty.lock.json`
+(TS `lock.test.ts`, PHP `tests/Unit/DifficultyLockTest.php`), fixture'ı
+`packages/engine/fixtures/difficulty.json` (`DifficultyParityTest`).
+
+1. `difficulty.ts` içinde tabloyu değiştir, `DIFFICULTY_VERSION`'ı artır;
+   aynısını `Difficulty.php`'de yap, `Difficulty::VERSION`'ı eşitle.
+2. `pnpm engine:simulate` — zorluk raporu ve `balance.test.ts` tutmalı.
+3. `pnpm engine:fixtures`, `pnpm engine:lock`.
+4. Yeni Elo hedeflerini ekle: `config/quezby.php` ›
+   `rating.difficulty.targets[ENGINE_VERSION][DIFFICULTY_VERSION]`
+   (simülasyon medyanlarından ya da `quezby:rating:calibrate`), ve
+   `RatingBalanceTest`'in zorluk medyanlarını güncelle.
+5. Uygulamayla birlikte yayınla: eski tabloyu oynayan uygulama dereceli tur
+   açamaz (`engine_outdated`). Skor tabloları ve sezon aynen sürer.
+
+Motor sürümü artınca zorluk fixture'ları da değişir: yeni sezon, zorluk
+tablosunun da yeni sürümüdür.
 
 ## Hile koruması
 
@@ -358,7 +443,9 @@ görünen her sayı sunucudan gelir.
    altınların ≥%90'ı mükemmel, oyuncunun sezon rekorunun ≥3 katı, aynı telefondan
    ikinci hesabın aynı günlük akışı. Sinyalli bir skor sezonun ilk 10'una ya da
    haftanın ilk 3'üne girecekse `review` olur ve bir moderatör bakana kadar
-   tabloya çıkmaz. VS turunda yumuşak sinyale bakılmaz: sıralamaya girmediği
+   tabloya çıkmaz. Skor tablosuna hiç yazılmayan dereceli tur ise, oyuncuyu
+   Elo tabelasının ilk 10'una taşıyacaksa (`review_top_rating`) `review` olur
+   ve onaylanana kadar Elo'ya sayılmaz. VS turunda yumuşak sinyale bakılmaz: sıralamaya girmediği
    için bekletilecek bir skoru yoktur; yalnızca sert bayraklar sayılır.
 6. Eşikler 8.000 simüle tura karşı kalibre edildi; hiçbir dürüst profil
    yakalanmaz (`tests/Unit/RunVerifierTest.php`).

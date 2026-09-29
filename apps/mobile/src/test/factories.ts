@@ -231,7 +231,7 @@ export function buildRunSummary(overrides: Partial<RunSummary> = {}): RunSummary
   };
 }
 
-/** A placed player's rating: Gümüş, 1.640, a run from Altın. */
+/** A placed player's rating: Gümüş, 1.640 (Zorluk 3), a run from Altın. */
 export function buildRating(overrides: Partial<RatingResponse> = {}): RatingResponse {
   return {
     unlock: null,
@@ -242,6 +242,7 @@ export function buildRating(overrides: Partial<RatingResponse> = {}): RatingResp
     ceil: 2_000,
     progress: 640,
     target: 72_400,
+    difficulty: 3,
     peak: 1_702,
     placement: null,
     provisional: false,
@@ -273,6 +274,7 @@ export function buildPlacing(played = 2): RatingResponse {
     ceil: null,
     progress: null,
     target: null,
+    difficulty: null,
     peak: null,
     placement: { played, required: 3 },
     history: [],
@@ -288,7 +290,7 @@ export function buildLocked(remaining = 12): RatingResponse {
   };
 }
 
-/** What a counted run did to the rating: +42 in Gümüş. */
+/** What a counted run did to the rating: +42 in Gümüş, at Zorluk 3. */
 export function buildRunRating(overrides: Partial<RunRating> = {}): RunRating {
   return {
     kind: 'run',
@@ -301,6 +303,8 @@ export function buildRunRating(overrides: Partial<RunRating> = {}): RunRating {
     nextTarget: 72_400,
     placement: null,
     shielded: false,
+    difficulty: 3,
+    nextDifficulty: 3,
     ...overrides,
   };
 }

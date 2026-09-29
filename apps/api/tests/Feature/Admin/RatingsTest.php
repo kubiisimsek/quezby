@@ -3,6 +3,8 @@
 use App\Enums\AdminRole;
 use App\Enums\LeagueTier;
 use App\Enums\RunStatus;
+use App\Game\Difficulty;
+use App\Game\Rules;
 use App\Models\PlayerRating;
 use App\Models\RatingChange;
 use App\Models\Run;
@@ -39,10 +41,28 @@ test('counts players per league, those who played lately apart, and lists the hi
         ->assertJsonPath('top.*.rating', [5300, 2900, 2100, 800])
         ->assertJsonPath('top.0.player.username', $players[0]->username)
         ->assertJsonPath('top.0.tier', 'master')
+        ->assertJsonPath('top.*.difficulty', [16, 8, 5, 0])
         ->assertJsonPath('rules.maxDelta', 100)
         ->assertJsonPath('rules.activeDays', 14)
         ->assertJsonPath('rules.unlockRuns', 20)
-        ->assertJsonPath('rules.targets.1', ['rating' => 1000, 'score' => 34000]);
+        ->assertJsonPath('rules.difficultyVersion', Difficulty::VERSION)
+        ->assertJsonPath('rules.difficultyFrom', 1000)
+        ->assertJsonPath('rules.difficultyStep', 250)
+        ->assertJsonPath('rules.maxDifficulty', 16)
+        ->assertJsonPath('rules.targets.1', ['rating' => 1000, 'score' => 34000])
+        ->assertJsonPath('rules.placementTargets.1', ['rating' => 1000, 'score' => 34000]);
+});
+
+test('the rules show the difficulty table\'s targets, and placement\'s apart', function () {
+    config(['quezby.rating.difficulty.targets.'.Rules::ENGINE_VERSION.'.'.Difficulty::VERSION => [0 => 8000, 1000 => 30000, 2000 => 70000]]);
+
+    $this->getJson('/api/v1/admin/ratings')->assertOk()
+        ->assertJsonPath('rules.targets', [
+            ['rating' => 0, 'score' => 8000],
+            ['rating' => 1000, 'score' => 30000],
+            ['rating' => 2000, 'score' => 70000],
+        ])
+        ->assertJsonPath('rules.placementTargets.1', ['rating' => 1000, 'score' => 34000]);
 });
 
 test('a player\'s page shows their rating and every change, the runs that did not count too', function () {
@@ -57,6 +77,7 @@ test('a player\'s page shows their rating and every change, the runs that did no
 
     $this->getJson("/api/v1/admin/players/{$player->id}")->assertOk()
         ->assertJsonPath('rating.tier', 'gold')
+        ->assertJsonPath('rating.difficulty', 5)
         ->assertJsonPath('rating.peak', 2200)
         ->assertJsonPath('rating.shield', ['tier' => 'gold', 'runs' => 3])
         ->assertJsonPath('rating.placement', null)
@@ -100,11 +121,14 @@ test('the calibration report places the players who played enough, and proposes 
     Run::factory()->for(User::factory()->withUsername()->create(['banned_at' => now()]))->rated()->ranked(999999)->count(10)->create(['finished_at' => now()->subDay()]);
     // Free runs are not what a rating settles on.
     Run::factory()->for(User::factory()->withUsername()->create())->ranked(999999)->count(10)->create(['finished_at' => now()->subDay()]);
+    // Nor rated runs played before the difficulty table.
+    Run::factory()->for(User::factory()->withUsername()->create())->rated()->ranked(999999)->count(10)->create(['finished_at' => now()->subDay(), 'difficulty_version' => null]);
     $ratingsBefore = PlayerRating::query()->count() + RatingChange::query()->count();
 
     $report = $this->getJson('/api/v1/admin/ratings/calibration?days=30')->assertOk();
 
     $report->assertJsonPath('players', 20)
+        ->assertJsonPath('difficultyVersion', Difficulty::VERSION)
         ->assertJsonPath('days', 30)
         ->assertJsonPath('minRuns', 10)
         ->assertJsonPath('shares.bronze', 20)
@@ -133,7 +157,7 @@ test('the calibrate command prints the same report and writes nothing', function
     }
 
     $this->artisan('quezby:rating:calibrate', ['--days' => 7])
-        ->expectsOutputToContain('6 players with 10+ counted runs in 7 days')
+        ->expectsOutputToContain('difficulty table '.Difficulty::VERSION.': 6 players with 10+ counted runs in 7 days')
         ->assertSuccessful();
 
     expect(PlayerRating::query()->count())->toBe(0)

@@ -179,7 +179,13 @@ export function GameScreen({ navigation, route }: Props) {
         combo={game.combo}
         reelIndex={game.reel?.index ?? 0}
         versus={opponent ? t.vs.hud(handle(opponent)) : undefined}
-        rated={mode === 'rated' && !game.practice ? t.modes.hud : undefined}
+        rated={
+          mode === 'rated' && !game.practice
+            ? game.difficulty > 0
+              ? t.rating.difficulty(t.fmt.score(game.difficulty))
+              : t.modes.hud
+            : undefined
+        }
         onClose={close}
       />
 

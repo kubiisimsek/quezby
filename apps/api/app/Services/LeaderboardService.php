@@ -59,10 +59,11 @@ final class LeaderboardService
     }
 
     /**
-     * Puts a ranked run on this week's, this month's and the season's board —
-     * and on today's challenge board when it was the daily run — and, for a
-     * rated run, keeps the day's best for the weekly group. A row only ever moves to a strictly higher
-     * score, so an equal score keeps the earlier `achieved_at`.
+     * Puts a ranked Normal or Günlük run on this week's, this month's and the
+     * season's board — and on today's challenge board when it was the daily
+     * run. A rated run plays for Elo alone and never comes here. A row only
+     * ever moves to a strictly higher score, so an equal score keeps the
+     * earlier `achieved_at`.
      */
     public function record(Run $run): RecordOutcome
     {
@@ -358,8 +359,8 @@ final class LeaderboardService
     }
 
     /**
-     * Rebuilds a player's rows this season from the ranked runs they have
-     * left — after a moderator rejected one of them.
+     * Rebuilds a player's rows this season from the ranked Normal and Günlük
+     * runs they have left — after a moderator rejected one of them.
      */
     public function rebuildFor(User $user): void
     {
@@ -368,6 +369,7 @@ final class LeaderboardService
 
             $user->runs()
                 ->where('status', RunStatus::Ranked)
+                ->whereIn('mode', RunMode::onBoards())
                 ->where('engine_version', $this->season)
                 ->where('score', '>', 0)
                 ->orderBy('finished_at')

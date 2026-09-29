@@ -81,14 +81,11 @@ export function SummitPodium({
   board,
   podium,
   onPressEntry,
-  unit = 'points',
 }: {
   /** Undefined while the first answer is on its way. */
   board: Pick<LeaderboardResponse, 'board' | 'periodKey' | 'scope'> | undefined;
   podium: LeaderboardEntry[];
   onPressEntry?: (entry: LeaderboardEntry) => void;
-  /** What the numbers are, read aloud: points, or Elo on the Elo board. */
-  unit?: 'points' | 'elo';
 }) {
   const theme = useTheme();
 
@@ -115,29 +112,20 @@ export function SummitPodium({
       key={`${board.board}:${board.periodKey}:${board.scope}`}
       entries={podium}
       onPressEntry={onPressEntry}
-      unit={unit}
     />
   );
 }
 
-/**
- * A player on the climb, or the break before your own rows. A board that is
- * not of scores — the Elo board — leaves the posts out, says its own fact
- * under the name (`detail`) and reads its numbers aloud as Elo.
- */
+/** A player on the climb, or the break before your own rows. */
 export function ClimbItemView({
   item,
   index,
   onPressEntry,
-  detail,
-  showReels = true,
 }: {
   item: ClimbItem;
   /** Position in the list — drives the entrance stagger. */
   index: number;
   onPressEntry?: (entry: LeaderboardEntry) => void;
-  detail?: (entry: LeaderboardEntry) => string | undefined;
-  showReels?: boolean;
 }) {
   if (item.kind === 'gap') {
     return <ClimbBreak />;
@@ -147,9 +135,6 @@ export function ClimbItemView({
   return (
     <ClimbRow
       {...entry}
-      reels={showReels ? entry.reels : undefined}
-      detail={detail?.(entry)}
-      unit={showReels ? 'points' : 'elo'}
       index={index}
       onPress={onPressEntry ? () => onPressEntry(entry) : undefined}
     />

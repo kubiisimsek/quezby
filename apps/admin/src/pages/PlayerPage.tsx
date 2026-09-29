@@ -622,6 +622,7 @@ function RatingPanel({ rating }: { rating: AdminPlayerRating | null }) {
               ]
             : []),
           { label: 'En yüksek', value: formatNumber(rating.peak) },
+          { label: 'Zorluk', value: formatNumber(rating.difficulty), hint: 'Sıradaki dereceli turun oynandığı zorluk' },
           {
             label: 'Sonraki hedef',
             value: formatNumber(rating.target),

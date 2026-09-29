@@ -11,7 +11,8 @@ import { errorMessage, fieldErrors } from '@/lib/errors';
 import { formatNumber, playerName, shortId } from '@/lib/format';
 
 type DialogProps = {
-  run: Pick<AdminRunRow, 'id' | 'player' | 'score'>;
+  /** A board's row knows no mode: it is a Normal or a Günlük run. */
+  run: Pick<AdminRunRow, 'id' | 'player' | 'score'> & Partial<Pick<AdminRunRow, 'mode'>>;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onDone?: () => void;
@@ -27,7 +28,11 @@ export function ApproveRunDialog({ run, open, onOpenChange, onDone }: DialogProp
       tone="primary"
       icon={<CircleCheck />}
       title={`${playerName(run.player?.username)} · ${formatNumber(run.score)} sıralamaya girsin mi?`}
-      description="Tur, oynandığı haftanın, ayın ve sezonun tablolarına girer ve oyuncunun istatistiklerine sayılır. Dereceli bir tursa reytingine de sayılır."
+      description={
+        run.mode === 'rated'
+          ? 'Dereceli tur, onay anındaki reytinge sayılır ve oyuncunun istatistiklerine girer. Hiçbir skor tablosuna yazılmaz.'
+          : 'Tur, oynandığı haftanın, ayın ve sezonun tablolarına girer ve oyuncunun istatistiklerine sayılır.'
+      }
       confirmLabel="Onayla"
       loading={approve.isPending}
       onConfirm={() =>

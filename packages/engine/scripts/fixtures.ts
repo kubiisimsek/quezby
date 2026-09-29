@@ -6,10 +6,13 @@
  *   fixtures/curves.json   the rules' curves, combo steps and named combos at sample reels
  *   fixtures/bonuses.json  logs checked reel by reel — points, combo, named combos, meter
  *   fixtures/rules.json    the rules as data, for a readable diff from PHP
+ *   fixtures/difficulty.json  Dereceli's difficulty table, its curves and runs
+ *                          replayed at it (sealed in `difficulty.lock.json`)
  *
  * The TypeScript suite checks these files are current; the Laravel suite
  * (`tests/Unit/EngineParityTest.php`) replays them in PHP. The rules are
- * locked: regenerate only after bumping `ENGINE_VERSION`, then `pnpm engine:lock`.
+ * locked: regenerate only after bumping `ENGINE_VERSION` (or, for
+ * `difficulty.json` alone, `DIFFICULTY_VERSION`), then `pnpm engine:lock`.
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -17,6 +20,7 @@ import { join } from 'node:path';
 import {
   buildBonuses,
   buildCurves,
+  buildDifficulty,
   buildRejects,
   buildReplays,
   buildRules,
@@ -35,3 +39,4 @@ write('rejects.json', buildRejects());
 write('curves.json', buildCurves());
 write('bonuses.json', buildBonuses());
 write('rules.json', buildRules());
+write('difficulty.json', buildDifficulty());

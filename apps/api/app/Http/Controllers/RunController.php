@@ -38,6 +38,7 @@ class RunController extends Controller
             $request->appVersion(),
             $opponent === null ? null : ($players->find($opponent, $user) ?? throw ApiException::of(ErrorCode::NotFound)),
             $request->duel(),
+            $request->difficultyVersion(),
         );
 
         return response()->json([
@@ -45,6 +46,7 @@ class RunController extends Controller
             'seed' => $run->seed,
             'engineVersion' => $run->engine_version,
             'contentVersion' => $run->content_version,
+            'difficulty' => $run->difficulty,
             'mode' => $run->mode->value,
             'dayKey' => $run->daily_key,
             'duelId' => $run->duel_id,
@@ -99,10 +101,15 @@ class RunController extends Controller
             'daily' => $finished->daily,
             'rating' => $finished->rating,
             'leagueUnlock' => $finished->leagueUnlock,
-            // A VS is between two friends: nothing of it is for sharing.
+            // A VS is between two friends: nothing of it is for sharing. A rated
+            // run never climbs the week, so it shares no week rank.
             'shareText' => $finished->run->mode === RunMode::Vs
                 ? null
-                : $finished->daily['shareText'] ?? $this->shareText($finished->run->score ?? 0, $finished->run->reels ?? 0, $ranks['weekly']),
+                : $finished->daily['shareText'] ?? $this->shareText(
+                    $finished->run->score ?? 0,
+                    $finished->run->reels ?? 0,
+                    $finished->run->mode->boards() ? $ranks['weekly'] : null,
+                ),
             'duel' => $duel === null ? null : $duels->view($user, $duel, $players->summary($user, User::query()->findOrFail($duel->otherOf($user)))),
         ]);
     }

@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Content\Catalog;
 use App\Enums\RunMode;
 use App\Enums\RunStatus;
+use App\Game\Difficulty;
 use App\Game\EndReason;
 use App\Game\Rules;
 use App\Models\Run;
@@ -28,6 +29,7 @@ class RunFactory extends Factory
             'seed' => fake()->numberBetween(1, 4294967295),
             'engine_version' => Rules::ENGINE_VERSION,
             'content_version' => Catalog::LATEST,
+            'difficulty' => 0,
             'status' => RunStatus::Started,
             'mode' => RunMode::Free,
             'started_at' => now(),
@@ -43,10 +45,17 @@ class RunFactory extends Factory
         ]);
     }
 
-    /** A Dereceli run: the only kind that plays for Elo and the weekly group. */
-    public function rated(): static
+    /**
+     * A Dereceli run: the only kind that plays for Elo, on this difficulty
+     * table — at `$difficulty` (0 unless given).
+     */
+    public function rated(int $difficulty = 0): static
     {
-        return $this->state(fn (array $attributes) => ['mode' => RunMode::Rated]);
+        return $this->state(fn (array $attributes) => [
+            'mode' => RunMode::Rated,
+            'difficulty' => $difficulty,
+            'difficulty_version' => Difficulty::VERSION,
+        ]);
     }
 
     /** A finished, ranked run with the given result. */

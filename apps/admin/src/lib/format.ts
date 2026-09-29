@@ -204,7 +204,7 @@ type Label = { tone: TagTone; label: string };
 /** Where a run stands, and what that means for the boards. A clean VS run is good news too, so `ok`. */
 export const RUN_STATUS: Record<AdminRunStatus, Label & { hint: string }> = {
   started: { tone: 'neutral', label: 'Açık', hint: 'Tohum verildi, tur henüz bitmedi.' },
-  ranked: { tone: 'ok', label: 'Sıralamada', hint: 'Tekrarda temiz çıktı: tablolara, lige ve istatistiklere sayılır.' },
+  ranked: { tone: 'ok', label: 'Sıralamada', hint: 'Tekrarda temiz çıktı: Normal ve Günlük tur tablolara, Dereceli tur reytinge; ikisi de istatistiklere sayılır.' },
   flagged: { tone: 'bad', label: 'Bayraklı', hint: 'Bir inandırıcılık kontrolüne takıldı: saklanır, hiçbir yere sayılmaz.' },
   review: { tone: 'warn', label: 'İncelemede', hint: 'Yumuşak sinyalli bir zirve skor: bir moderatör bakana kadar tablolarda görünmez.' },
   played: { tone: 'ok', label: 'Oynandı', hint: 'Temiz bir VS turu: yalnızca VS’ini belirler, hiçbir tabloya, lige ya da istatistiğe sayılmaz.' },

@@ -56,6 +56,8 @@ export function ModeSheet({
   let ratedLine: string;
   if (unlock) ratedLine = words.lockedTitle(unlock.remaining);
   else if (placement) ratedLine = t.rating.placement.title(placement.played, placement.required);
+  else if (rating?.difficulty)
+    ratedLine = words.lines.ratedAt(t.fmt.score(rating.difficulty), t.fmt.score(rating.target ?? 0));
   else ratedLine = words.lines.rated(t.fmt.score(rating?.target ?? 0));
 
   return (

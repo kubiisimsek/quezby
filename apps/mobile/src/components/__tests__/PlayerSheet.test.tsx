@@ -94,6 +94,16 @@ describe('PlayerSheet', () => {
     expect(screen.queryByText(/Elo$/)).toBeNull();
   });
 
+  it('leaves the league and the Elo out when the screen asks it to, as Zirve does', async () => {
+    mocked.users.get.mockResolvedValue(card());
+
+    await renderWithProviders(<PlayerSheet username="ekin" onClose={jest.fn()} rating={false} />);
+
+    expect(await screen.findByLabelText('Sezon rekoru: 41.200')).toBeTruthy();
+    expect(screen.queryByLabelText('Altın lig')).toBeNull();
+    expect(screen.queryByText('2.450 Elo')).toBeNull();
+  });
+
   it('shows a stranger’s friend count, and no way into the list', async () => {
     mocked.users.get.mockResolvedValue(card({ relation: 'none' }));
 
