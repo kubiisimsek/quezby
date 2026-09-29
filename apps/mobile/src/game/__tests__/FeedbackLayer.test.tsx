@@ -14,6 +14,7 @@ function feedback(overrides: Partial<Feedback> = {}): Feedback {
     points: 1_250,
     combo: 1_250,
     bonuses: [],
+    blind: 0,
     ...overrides,
   };
 }
@@ -49,6 +50,25 @@ describe('FeedbackLayer', () => {
     expect(screen.getByText(words)).toBeOnTheScreen();
   });
 
+  it.each([
+    [1, 'Ceza x2'],
+    [2, 'Ceza x4'],
+    [3, 'Ceza x8'],
+  ])('calls a blind move %i in a row what it is, and says what it cost', async (blind, penalty) => {
+    await render(<FeedbackLayer feedback={feedback({ verdict: 'wrong', kind: 'like', blind })} />);
+
+    expect(screen.getByText('Bakmadan!')).toBeOnTheScreen();
+    expect(screen.getByText(penalty)).toBeOnTheScreen();
+    expect(screen.queryByText('Yanlış hareket')).toBeNull();
+  });
+
+  it('says nothing of a penalty on a wrong move made after a look', async () => {
+    await render(<FeedbackLayer feedback={feedback({ verdict: 'wrong', kind: 'like' })} />);
+
+    expect(screen.getByText('Yanlış hareket')).toBeOnTheScreen();
+    expect(screen.queryByText(/Ceza/)).toBeNull();
+  });
+
   it('speaks English', async () => {
     useLanguage.setState({ locale: 'en' });
     await render(
@@ -62,6 +82,12 @@ describe('FeedbackLayer', () => {
 
     await screen.rerender(<FeedbackLayer feedback={feedback({ id: 2, verdict: 'timeout' })} />);
     expect(screen.getByText('Too slow!')).toBeOnTheScreen();
+
+    await screen.rerender(
+      <FeedbackLayer feedback={feedback({ id: 3, verdict: 'wrong', kind: 'hold', blind: 1 })} />,
+    );
+    expect(screen.getByText('Didn’t look!')).toBeOnTheScreen();
+    expect(screen.getByText('Penalty x2')).toBeOnTheScreen();
   });
 
   it('speaks Arabic, keeping the Latin pieces whole', async () => {
@@ -75,5 +101,10 @@ describe('FeedbackLayer', () => {
       <FeedbackLayer feedback={feedback({ id: 2, verdict: 'drained', kind: 'freeze' })} />,
     );
     expect(screen.getByText('نفد الدوبامين')).toBeOnTheScreen();
+
+    await screen.rerender(
+      <FeedbackLayer feedback={feedback({ id: 3, verdict: 'wrong', kind: 'like', blind: 2 })} />,
+    );
+    expect(screen.getByText('العقوبة \u200Ex4\u200E')).toBeOnTheScreen();
   });
 });

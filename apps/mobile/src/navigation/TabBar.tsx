@@ -15,6 +15,7 @@ import { Icon } from '@/ui/icons';
 import { buttonColors } from '@/ui/kit/buttons';
 import { Slab } from '@/ui/kit/slab';
 import { Count } from '@/ui/kit/social';
+import { Shine } from '@/ui/kit/surfaces';
 import { SPRING, SPRING_POP } from '@/ui/motion';
 import { DEPTH, FONT, RADIUS, SPACE, embossed, lh, useTheme, withAlpha } from '@/ui/theme';
 
@@ -185,7 +186,7 @@ function Slot({
             tileStyle,
           ]}
         >
-          <View style={[styles.tileHi, { backgroundColor: theme.primaryHi }]} />
+          <Shine color={theme.primaryHi} radius={14} height="50%" />
         </Animated.View>
         {icon?.({ focused, color, size: 23 })}
         {badge > 0 ? (
@@ -244,7 +245,6 @@ const styles = StyleSheet.create({
     top: 0,
     width: TILE,
   },
-  tileHi: { height: '50%', left: 0, position: 'absolute', right: 0, top: 0 },
   badge: { end: -2, position: 'absolute', top: -4 },
   orb: { marginTop: -34 },
   orbFace: { height: 58, width: 64 },

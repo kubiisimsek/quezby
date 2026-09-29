@@ -2,6 +2,7 @@
 
 use App\Game\Gesture;
 use App\Game\ReelKind;
+use App\Game\Rules;
 use App\Game\Run as Engine;
 use App\Support\Timestamp;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -125,6 +126,19 @@ function swipedLog(int $seed, int $reels, int $decisionMs, int $jitterMs = 0, bo
     }
 
     return $actions;
+}
+
+/**
+ * Pins this season's Elo target table to engine v2's anchors — the ones the
+ * rating tests were written against — so a new season's calibration never
+ * moves their numbers. The season's own table is tested by
+ * `Unit/Rating/TargetTableTest` and `Unit/Rating/RatingBalanceTest`.
+ */
+function pinRatingTargets(): void
+{
+    config(['quezby.rating.targets.'.Rules::ENGINE_VERSION => [
+        0 => 8000, 1000 => 34000, 2000 => 100000, 3000 => 240000, 4000 => 480000, 5000 => 800000, 6000 => 1100000,
+    ]]);
 }
 
 /**

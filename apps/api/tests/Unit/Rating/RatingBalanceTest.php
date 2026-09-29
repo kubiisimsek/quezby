@@ -67,16 +67,16 @@ test('each simulated player settles in their league, and stays there', function 
         ->and($settled['p90'])->toBeLessThanOrEqual(75);
 })->with([
     // median score, log spread (p90/p10 of the profile), league
-    'casual' => [40000, 0.52, LeagueTier::Silver],
-    'average' => [104000, 0.35, LeagueTier::Silver],
-    'good' => [240000, 0.23, LeagueTier::Gold],
-    'pro' => [499000, 0.14, LeagueTier::Platinum],
-    'elite' => [744000, 0.12, LeagueTier::Diamond],
+    'casual' => [39900, 0.52, LeagueTier::Silver],
+    'average' => [102700, 0.35, LeagueTier::Silver],
+    'good' => [238100, 0.24, LeagueTier::Gold],
+    'pro' => [494400, 0.16, LeagueTier::Platinum],
+    'elite' => [737000, 0.12, LeagueTier::Diamond],
 ]);
 
 test('only near-flawless play holds MasterClass', function () {
     expect(LeagueTier::fromRating((int) round(settle(1000000, 0.08, players: 40)['mean'])))->toBe(LeagueTier::Master)
-        ->and(LeagueTier::fromRating((int) round(settle(744000, 0.12, players: 40)['mean'])))->not->toBe(LeagueTier::Master);
+        ->and(LeagueTier::fromRating((int) round(settle(737000, 0.12, players: 40)['mean'])))->not->toBe(LeagueTier::Master);
 });
 
 test('a better player always settles higher', function () {

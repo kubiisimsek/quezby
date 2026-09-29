@@ -83,7 +83,7 @@ profile photos served 600/min/IP.
 ### `GET /app/config?platform=ios&version=1.0.0` — public
 
 ```json
-{ "status": "ok", "engineVersion": 2, "contentVersion": 1, "latestVersion": "1.0.0", "minVersion": "1.0.0", "storeUrl": null }
+{ "status": "ok", "engineVersion": 3, "contentVersion": 1, "latestVersion": "1.0.0", "minVersion": "1.0.0", "storeUrl": null }
 ```
 
 `status` is `update_required` when `version < minVersion` (per platform),
@@ -405,12 +405,12 @@ one (`counter`) — which then moves up.
 
 ### `POST /runs`
 
-`{ "mode": "free" | "daily" | "rated" | "vs", "engineVersion": 2, "contentVersion": 1 }` —
+`{ "mode": "free" | "daily" | "rated" | "vs", "engineVersion": 3, "contentVersion": 1 }` —
 a VS also names the friend it challenges (`"opponent": "ekin"`) or the VS it
 answers (`"duel": "01J…"`) — → `201`
 
 ```json
-{ "runId": "01J…", "seed": 3141592653, "engineVersion": 2, "contentVersion": 1, "mode": "daily", "dayKey": "2026-09-26", "duelId": null, "startedAt": "…" }
+{ "runId": "01J…", "seed": 3141592653, "engineVersion": 3, "contentVersion": 1, "mode": "daily", "dayKey": "2026-09-26", "duelId": null, "startedAt": "…" }
 ```
 
 - An engine or catalog the API does not play (or no body — the v1 app) →
@@ -922,10 +922,12 @@ Marks the conversation read up to its newest line. `204`.
 
 ### `POST /me/threads/{username}/messages`
 
-`{ "phrase": "gg" }` → `201 { "message": InboxMessage }`. One of the ten codes
+`{ "phrase": "gg" }` → `201 { "message": InboxMessage }`. One of the 24 codes
 of `PHRASES` in `@quezby/config` (`App\Enums\Phrase`, tested against
-`packages/config/fixtures/social.json`): `gg`, `rematch`, `beat_that`, `wow`,
-`close_one`, `your_turn`, `daily`, `hi`, `thanks`, `next_time`. Each phone
+`packages/config/fixtures/social.json`): `hi`, `whats_up`, `gg`, `gg_wp`,
+`rematch`, `your_turn`, `beat_that`, `ready`, `wow`, `close_one`, `clutch`,
+`ez`, `bot`, `nerf`, `lucky`, `lag`, `warming_up`, `rage_quit`, `respect`,
+`afk`, `daily`, `thanks`, `next_time`, `bye`. Each phone
 says a phrase in its own language, a push in the receiver's
 (`lang/{locale}/phrases.php`). Anything else → `422 validation_failed`; not a
 friend → `422 not_friends`; `inbox.phrases_per_day` (20) to one friend in an

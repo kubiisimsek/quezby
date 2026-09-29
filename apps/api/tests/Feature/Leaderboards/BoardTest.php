@@ -2,6 +2,7 @@
 
 use App\Enums\LeaderboardPeriod;
 use App\Enums\RunMode;
+use App\Game\Rules;
 use App\Models\LeaderboardEntry;
 use App\Models\User;
 use App\Services\LeaderboardService;
@@ -46,7 +47,7 @@ test('runs either side of Istanbul midnight share the week, and each keeps its d
         ->assertExactJson([
             'board' => 'weekly',
             'periodKey' => '2026-W39',
-            'season' => 2,
+            'season' => Rules::ENGINE_VERSION,
             'scope' => 'everyone',
             'startsAt' => '2026-09-20T21:00:00.000Z',
             'endsAt' => '2026-09-27T21:00:00.000Z',
@@ -161,7 +162,7 @@ test('a board only ranks this season', function () {
     $this->signIn($now);
 
     $this->getJson('/api/v1/leaderboards/all')
-        ->assertJsonPath('season', 2)
+        ->assertJsonPath('season', Rules::ENGINE_VERSION)
         ->assertJsonPath('entries.*.username', ['yeni'])
         ->assertJsonPath('players', 1);
     $this->getJson('/api/v1/me')->assertJsonPath('user.best.score', 1000)->assertJsonPath('ranks.all', 1);
@@ -179,7 +180,7 @@ test('a row keeps the higher score and the earlier tie', function () {
     $row = LeaderboardEntry::query()->where('period', 'weekly')->sole();
     expect($row->score)->toBe(5000)
         ->and($row->run_id)->toBe($best->id)
-        ->and($row->season)->toBe(2)
+        ->and($row->season)->toBe(Rules::ENGINE_VERSION)
         ->and($row->achieved_at->format('Y-m-d H:i:s.v'))->toBe('2026-09-24 10:00:00.000');
 
     $higher = $this->recordRanked($player, 6000, RunMode::Rated);

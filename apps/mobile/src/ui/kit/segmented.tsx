@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { SHRINK_TO_FIT } from '@/i18n/native';
 import { Icon, type IconName } from '@/ui/icons';
+import { Shine } from '@/ui/kit/surfaces';
 import { DEPTH, FONT, RADIUS, SPACE, embossed, lh, useTheme } from '@/ui/theme';
 
 /**
@@ -51,10 +52,7 @@ export function Segmented<T extends string>({
             ]}
           >
             {on ? (
-              <View
-                pointerEvents="none"
-                style={[segmented.hi, { backgroundColor: theme.primaryHi }]}
-              />
+              <Shine color={theme.primaryHi} radius={RADIUS.control - 2} height="48%" />
             ) : null}
             {option.icon ? (
               <Icon name={option.icon} size={15} color={ink} strokeWidth={2.6} />
@@ -106,7 +104,6 @@ const segmented = StyleSheet.create({
     overflow: 'hidden',
     paddingHorizontal: SPACE.xs,
   },
-  hi: { height: '48%', left: 0, position: 'absolute', right: 0, top: 0 },
   label: { fontFamily: FONT.display, fontSize: 14, lineHeight: lh(18) },
   count: {
     borderRadius: RADIUS.pill,

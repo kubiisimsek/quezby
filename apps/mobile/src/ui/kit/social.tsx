@@ -8,6 +8,7 @@ import { Avatar, IconChip, gemColors } from '@/ui/kit/identity';
 import { AnimatedPressable, common } from '@/ui/kit/shared';
 import { Slab } from '@/ui/kit/slab';
 import { Tag } from '@/ui/kit/status';
+import { Shine } from '@/ui/kit/surfaces';
 import { Txt } from '@/ui/kit/text';
 import { type TagTone } from '@/ui/kit/tones';
 import { usePressScale } from '@/ui/motion';
@@ -198,10 +199,7 @@ export function Bubble({
           { borderColor: theme.outline },
         ]}
       >
-        <View
-          pointerEvents="none"
-          style={[styles.bubbleShine, { backgroundColor: withAlpha(theme.onBrand, mine ? 0.16 : 0.08) }]}
-        />
+        <Shine color={withAlpha(theme.onBrand, mine ? 0.16 : 0.08)} radius={BUBBLE_RADIUS} height="45%" />
         <Text style={[styles.bubbleText, { color: mine ? theme.onBrand : theme.ink }]}>{text}</Text>
       </View>
       <Txt variant="micro" tone="faint">
@@ -303,6 +301,9 @@ export function PhraseChip({
   );
 }
 
+/** A phrase bubble's corners — but the one its tail sits at. */
+const BUBBLE_RADIUS = 20;
+
 const styles = StyleSheet.create({
   faceOff: {
     alignItems: 'center',
@@ -343,7 +344,7 @@ const styles = StyleSheet.create({
   end: { alignItems: 'flex-end', alignSelf: 'flex-end' },
   bubble: {
     borderBottomWidth: DEPTH.outline + 3,
-    borderRadius: 20,
+    borderRadius: BUBBLE_RADIUS,
     borderWidth: DEPTH.outline,
     overflow: 'hidden',
     paddingHorizontal: SPACE.lg,
@@ -351,7 +352,6 @@ const styles = StyleSheet.create({
   },
   bubbleMine: { borderBottomEndRadius: 6 },
   bubbleTheirs: { borderBottomStartRadius: 6 },
-  bubbleShine: { height: '45%', left: 0, position: 'absolute', right: 0, top: 0 },
   bubbleText: { fontFamily: FONT.semibold, fontSize: 17, lineHeight: lh(23) },
   event: { alignItems: 'center', alignSelf: 'center', gap: 3, maxWidth: '92%' },
   eventStrip: {

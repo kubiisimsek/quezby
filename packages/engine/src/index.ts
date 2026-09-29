@@ -12,6 +12,7 @@ export {
   holdFillFor,
   levelBoostFor,
   levelFor,
+  penaltyFor,
   specialShareFor,
   windowFor,
   zoneWidthFor,

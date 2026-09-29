@@ -1,13 +1,13 @@
-import { PHRASES } from '@quezby/config';
 import { ApiError } from '@quezby/sdk';
 import type { DuelView, HeadToHead, InboxMessage, PlayerSummary } from '@quezby/types';
 import { useIsFocused } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useEffect, useState } from 'react';
-import { FlatList, ScrollView, StyleSheet, View } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useSession } from '@/auth/session';
+import { PhraseSheet } from '@/components/PhraseSheet';
 import { PlayerSheet } from '@/components/PlayerSheet';
 import { PushNudge } from '@/components/PushNudge';
 import { VsSheet, type VsOpponent } from '@/components/VsSheet';
@@ -27,7 +27,6 @@ import {
   FaceOff,
   IconButton,
   Panel,
-  PhraseChip,
   Screen,
   SkeletonList,
   TopBar,
@@ -40,10 +39,10 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Thread'>;
 /**
  * The conversation with a friend. Under the name, how the two of you stand
  * over every VS; then the lines, newest at the bottom — the phrases each of
- * you sent and what happened between you, VS by VS. Above the phrase tray,
- * the VS open between you: send one, answer theirs with the screen's one
- * gold "Oyna", or wait for them. Opening it reads it; while it is open it
- * asks for new lines now and then.
+ * you sent and what happened between you, VS by VS. At the bottom, the VS
+ * open between you — send one, answer theirs with the screen's one gold
+ * "Oyna", or wait for them — and the door to the phrases (`PhraseSheet`).
+ * Opening it reads it; while it is open it asks for new lines now and then.
  */
 export function ThreadScreen({ navigation, route }: Props) {
   const { username } = route.params;
@@ -59,6 +58,7 @@ export function ThreadScreen({ navigation, route }: Props) {
   const decline = useDeclineDuel(username);
   const [card, setCard] = useState(false);
   const [vs, setVs] = useState<VsOpponent | null>(null);
+  const [phrases, setPhrases] = useState(false);
 
   const pages = thread.data?.pages ?? [];
   const newest = pages[0];
@@ -143,30 +143,25 @@ export function ThreadScreen({ navigation, route }: Props) {
             {send.isError || decline.isError ? (
               <Callout tone="bad">{messageFor(send.error ?? decline.error, t)}</Callout>
             ) : null}
-            <Eyebrow icon="message">{words.tray}</Eyebrow>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.tray}
-              keyboardShouldPersistTaps="handled"
-            >
-              {PHRASES.map((phrase) => {
-                const text = t.inbox.phrases[phrase];
-                return (
-                  <PhraseChip
-                    key={phrase}
-                    text={text}
-                    label={words.send(text)}
-                    disabled={send.isPending}
-                    onPress={() => send.mutate(phrase)}
-                  />
-                );
-              })}
-            </ScrollView>
+            <Button
+              label={words.trayOpen}
+              icon="message"
+              tone="secondary"
+              onPress={() => setPhrases(true)}
+            />
           </View>
         </>
       )}
 
+      <PhraseSheet
+        open={phrases}
+        onClose={() => setPhrases(false)}
+        busy={send.isPending}
+        onSend={(phrase) => {
+          send.mutate(phrase);
+          setPhrases(false);
+        }}
+      />
       <PlayerSheet username={card ? username : null} onClose={() => setCard(false)} inThread />
       <VsSheet
         opponent={vs}
@@ -364,7 +359,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACE.lg,
     paddingTop: SPACE.md,
   },
-  tray: { gap: SPACE.sm, paddingBottom: SPACE.xs, paddingEnd: SPACE.lg },
   vsRow: { alignItems: 'center', flexDirection: 'row', gap: SPACE.md },
   vs: { gap: SPACE.sm, paddingVertical: SPACE.md },
   vsActions: { alignItems: 'center', flexDirection: 'row', gap: SPACE.sm },

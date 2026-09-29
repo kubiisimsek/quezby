@@ -17,6 +17,7 @@ import Animated, {
 import { useT } from '@/i18n';
 import { Icon, type IconName } from '@/ui/icons';
 import { AnimatedPressable } from '@/ui/kit/shared';
+import { Shine } from '@/ui/kit/surfaces';
 import { SPRING, usePressScale } from '@/ui/motion';
 import { DEPTH, FONT, RADIUS, SPACE, embossed, lh, useTheme, withAlpha } from '@/ui/theme';
 
@@ -83,7 +84,7 @@ export function ScopeSwitch({
             slab,
           ]}
         >
-          <View style={[styles.slabHi, { backgroundColor: theme.primaryHi }]} />
+          <Shine color={theme.primaryHi} radius={RADIUS.control - INSET} height="48%" />
           <View
             style={[
               styles.slabGloss,
@@ -171,7 +172,6 @@ const styles = StyleSheet.create({
     top: 0,
     width: '50%',
   },
-  slabHi: { height: '48%', left: 0, position: 'absolute', right: 0, top: 0 },
   slabGloss: {
     borderRadius: RADIUS.pill,
     height: 4,

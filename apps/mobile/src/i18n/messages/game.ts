@@ -28,6 +28,10 @@ const tr = {
     combo: (combo: string) => `${combo} kombo`,
     /** The combo's toast, then what it paid (`t.fmt.score`): "Kusursuz seviye! +480". */
     bonus: (toast: string, points: string) => `${toast} +${points}`,
+    /** A blind move (`RULES.blindMs`): the wrong post, swiped or double-tapped too soon to have looked. */
+    blind: 'Bakmadan!',
+    /** Under it, what the penalty was multiplied by: 2, 4, 8. */
+    penalty: (times: number) => `Ceza x${times}`,
   },
   /** The head-up display over the post (Hud). */
   hud: {
@@ -104,6 +108,8 @@ const en: GameMessages = {
   feedback: {
     combo: (combo) => `${combo} combo`,
     bonus: (toast, points) => `${toast} +${points}`,
+    blind: 'Didn’t look!',
+    penalty: (times) => `Penalty x${times}`,
   },
   hud: {
     meter: 'Dopamine',
@@ -160,6 +166,8 @@ const de: GameMessages = {
   feedback: {
     combo: (combo) => `${combo} Kombo`,
     bonus: (toast, points) => `${toast} +${points}`,
+    blind: 'Blind gewischt!',
+    penalty: (times) => `Strafe x${times}`,
   },
   hud: {
     meter: 'Dopamin',
@@ -216,6 +224,8 @@ const ar: GameMessages = {
   feedback: {
     combo: (combo) => `كومبو ${iso(combo)}`,
     bonus: (toast, points) => `${toast} ${iso(`+${points}`)}`,
+    blind: 'دون أن تنظر!',
+    penalty: (times) => `العقوبة ${iso(`x${times}`)}`,
   },
   hud: {
     meter: 'الدوبامين',
@@ -282,6 +292,8 @@ const fr: GameMessages = {
   feedback: {
     combo: (combo) => `combo ${combo}`,
     bonus: (toast, points) => `${toast} +${points}`,
+    blind: 'Sans regarder !',
+    penalty: (times) => `Pénalité x${times}`,
   },
   hud: {
     meter: 'Dopamine',
@@ -343,6 +355,8 @@ const es: GameMessages = {
   feedback: {
     combo: (combo) => `combo ${combo}`,
     bonus: (toast, points) => `${toast} +${points}`,
+    blind: '¡Sin mirar!',
+    penalty: (times) => `Penalización x${times}`,
   },
   hud: {
     meter: 'Dopamina',

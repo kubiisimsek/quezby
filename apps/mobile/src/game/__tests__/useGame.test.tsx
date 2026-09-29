@@ -1152,6 +1152,23 @@ describe('useGame timing', () => {
     expect(await logOf(game)).toEqual([[GESTURE.up, 330, 0]]);
   });
 
+  it('tells a blind swipe on a friend’s post from a looked-at one, by its doubled penalty', async () => {
+    const { game } = await afterCountdown();
+    await answerRight(game);
+    await answerRight(game);
+    expect(game.result.current.reel?.kind).toBe('like');
+
+    await advance(150);
+    await swipe(game);
+
+    expect(game.result.current.feedback).toMatchObject({ kind: 'like', verdict: 'wrong', blind: 1 });
+    expect(await logOf(game)).toEqual([
+      [GESTURE.up, REACTION_MS, 0],
+      [GESTURE.up, REACTION_MS, 0],
+      [GESTURE.up, 150, 0],
+    ]);
+  });
+
   it('judges a still finger on a post that is not gold as a hold, when the window ends', async () => {
     const { game } = await afterCountdown();
     const window = game.result.current.reel?.window ?? 0;

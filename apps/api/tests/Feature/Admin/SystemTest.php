@@ -3,6 +3,7 @@
 use App\Enums\AdminRole;
 use App\Enums\AuditAction;
 use App\Enums\RunStatus;
+use App\Game\Rules;
 use App\Models\AuditEntry;
 use App\Models\Run;
 use App\Models\User;
@@ -24,8 +25,8 @@ test('says what the API runs with, and only whether each secret is set', functio
         ->assertOk()
         ->assertJsonPath('environment', 'testing')
         ->assertJsonPath('database', 'sqlite')
-        ->assertJsonPath('season', 2)
-        ->assertJsonPath('engineVersion', 2)
+        ->assertJsonPath('season', Rules::ENGINE_VERSION)
+        ->assertJsonPath('engineVersion', Rules::ENGINE_VERSION)
         ->assertJsonPath('timezone', 'Europe/Istanbul')
         ->assertJsonPath('tokens', ['ops' => true, 'moderation' => false])
         ->assertJsonPath('appKey', true)

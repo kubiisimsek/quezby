@@ -1,9 +1,11 @@
+import { PHRASES } from '@quezby/config';
 import { ApiError } from '@quezby/sdk';
 import type { ThreadResponse } from '@quezby/types';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 
 import { api } from '@/api/client';
 import { useSession } from '@/auth/session';
+import { inbox } from '@/i18n/messages/inbox';
 import { ThreadScreen } from '@/screens/friends/ThreadScreen';
 import { usePush } from '@/stores/push';
 import { buildBrief, buildDuel, buildMe, buildMessage, buildSummary } from '@/test/factories';
@@ -76,10 +78,32 @@ describe('ThreadScreen', () => {
     mocked.me.sendPhrase.mockResolvedValue({ message: buildMessage({ id: 4, phrase: 'rematch', mine: true }) });
     await renderThread();
 
+    await fireEvent.press(await screen.findByRole('button', { name: 'Hazır mesaj gönder' }));
     await fireEvent.press(await screen.findByRole('button', { name: 'Gönder: Rövanş? 🔥' }));
 
     expect(mocked.me.sendPhrase).toHaveBeenCalledWith('ekin', 'rematch');
     expect(await screen.findByLabelText(/^Sen: Rövanş\? 🔥\./)).toBeOnTheScreen();
+  });
+
+  it('keeps the phrases in a sheet: every one, greetings and the game’s banter first', async () => {
+    mocked.me.sendPhrase.mockResolvedValue({ message: buildMessage({ id: 4, phrase: 'gg_wp', mine: true }) });
+    await renderThread();
+    expect(screen.queryByRole('button', { name: 'Gönder: Selam! 👋' })).toBeNull();
+
+    await fireEvent.press(await screen.findByRole('button', { name: 'Hazır mesaj gönder' }));
+    expect(screen.getByText('Birine dokun, hemen gider.')).toBeOnTheScreen();
+    for (const phrase of PHRASES) {
+      expect(
+        await screen.findByRole('button', { name: `Gönder: ${inbox.tr.phrases[phrase]}` }),
+      ).toBeOnTheScreen();
+    }
+    for (const words of ['Selam! 👋', 'Naber? 😄', 'GG WP 🤝', 'EZ 😎', 'Rage quit attım! 😡', 'AFK, çay koyuyorum ☕']) {
+      expect(screen.getByRole('button', { name: `Gönder: ${words}` })).toBeOnTheScreen();
+    }
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Gönder: GG WP 🤝' }));
+    expect(mocked.me.sendPhrase).toHaveBeenCalledWith('ekin', 'gg_wp');
+    expect(await screen.findByLabelText(/^Sen: GG WP 🤝\./)).toBeOnTheScreen();
   });
 
   it('sends a VS from its sheet: the challenger plays first', async () => {

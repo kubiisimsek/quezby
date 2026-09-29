@@ -94,7 +94,11 @@ The owner judges every screen as a game. These are the rules that keep it one
   look and does not follow the phone's light/dark setting.
 - **Tiles and slabs.** Surfaces are `Panel` / `Card` / `LobbyCard` tiles
   (outline + lip); anything pressable that is not a row is a slab (`Button`,
-  `IconButton`, `Slab`). **One gold `play` button per screen** — the action
+  `IconButton`, `Slab`). A box with a lip has its outline drawn *under* what
+  it holds, clipped only by the outer curve: whatever lies flush against its
+  inside follows the inner curve — a lit edge is `LitEdge`, a shine is
+  `Shine`, a banner or wash rounds by `innerRadius` — never a straight bar or
+  a square corner against a rounded outline. **One gold `play` button per screen** — the action
   that starts a game. Magenta and violet do everything else; red takes
   something away.
 - **Type.** Titles, numbers and button labels are Rubik through `Txt`

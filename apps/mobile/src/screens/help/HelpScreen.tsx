@@ -17,6 +17,7 @@ import {
   Panel,
   Row,
   Screen,
+  Shine,
   TierBadge,
   TopBar,
   Txt,
@@ -118,7 +119,7 @@ export function HelpScreen({ navigation }: Props) {
               </View>
             ))}
           </View>
-          <More lines={words.dopamine.more} />
+          <More lines={[...words.dopamine.more, words.dopamine.blind(`${RULES.blindMs}`)]} />
         </Section>
 
         <Section icon="sparkle" title={words.scoring.title}>
@@ -256,13 +257,7 @@ function ReelGem({ kind, icon }: { kind: ReelKind; icon: IconName }) {
         { backgroundColor: look.face, borderColor: theme.outline },
       ]}
     >
-      <View
-        pointerEvents="none"
-        style={[
-          styles.reelShine,
-          { backgroundColor: withAlpha(theme.onBrand, 0.2) },
-        ]}
-      />
+      <Shine color={withAlpha(theme.onBrand, 0.2)} radius={13} height="38%" />
       <Icon name={icon} size={24} color={look.ink} strokeWidth={2.6} />
     </View>
   );
@@ -341,7 +336,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     width: 44,
   },
-  reelShine: { height: '38%', left: 0, position: 'absolute', right: 0, top: 0 },
   meters: { gap: SPACE.sm, paddingVertical: SPACE.xs },
   meterRow: { alignItems: 'center', flexDirection: 'row', gap: SPACE.md },
   meterLabel: { width: 84 },

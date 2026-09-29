@@ -20,7 +20,7 @@ import { Stamp } from '@/ui/kit/juice';
 import { Panel } from '@/ui/kit/surfaces';
 import { Ribbon, Txt } from '@/ui/kit/text';
 import { type TagTone } from '@/ui/kit/tones';
-import { DEPTH, RADIUS, SPACE, useTheme, withAlpha } from '@/ui/theme';
+import { DEPTH, SPACE, useTheme, withAlpha } from '@/ui/theme';
 
 /** The move a coach card acts out: swipe up, double-tap, press and let go, or keep still. */
 export type CoachGesture = 'swipe' | 'doubleTap' | 'hold' | 'still';
@@ -200,8 +200,9 @@ const styles = StyleSheet.create({
   trail: { position: 'absolute', top: 0 },
   pop: { position: 'absolute', right: 10, top: 4 },
   holdStage: { alignItems: 'center', gap: SPACE.sm },
+  /** Square-cornered, as the gold post's own bar is. */
   track: {
-    borderRadius: RADIUS.pill,
+    borderRadius: 4,
     borderWidth: DEPTH.outline,
     height: 14,
     overflow: 'hidden',

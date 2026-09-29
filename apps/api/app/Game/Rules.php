@@ -12,7 +12,7 @@ namespace App\Game;
  */
 final class Rules
 {
-    public const ENGINE_VERSION = 2;
+    public const ENGINE_VERSION = 3;
 
     public const WINDOW_MAX = 2200;
 
@@ -82,6 +82,14 @@ final class Rules
     public const LOSS_HOLD_MISS = 120;
 
     public const LOSS_CAUGHT = 250;
+
+    /**
+     * A blind move: a swipe or a double tap on the wrong post, made sooner
+     * than this — too soon to have looked. Its penalty doubles, and doubles
+     * again for each blind move after it (x2, x4, x8…) until a considered hit,
+     * so the third in a row always empties the meter.
+     */
+    public const BLIND_MS = 300;
 
     /** Points before multipliers, keyed by `ReelKind` value. */
     public const BASE = ['skip' => 100, 'like' => 120, 'hold' => 150, 'freeze' => 120];
@@ -184,6 +192,15 @@ final class Rules
         return self::COMBO_START + intdiv($combo - self::COMBO_START, 2);
     }
 
+    /**
+     * What a miss costs the meter: `$loss`, doubled once for each blind move
+     * in a row — `$blind` is 0 for a miss that was not blind.
+     */
+    public static function penaltyFor(int $loss, int $blind): int
+    {
+        return $loss * 2 ** $blind;
+    }
+
     /** A named combo's points on reel `$n`. */
     public static function bonusFor(BonusKind $kind, int $n): int
     {
@@ -230,6 +247,7 @@ final class Rules
                 'holdMiss' => self::LOSS_HOLD_MISS,
                 'caught' => self::LOSS_CAUGHT,
             ],
+            'blindMs' => self::BLIND_MS,
             'base' => self::BASE,
             'speedFloor' => self::SPEED_FLOOR,
             'precisionBonus' => self::PRECISION_BONUS,

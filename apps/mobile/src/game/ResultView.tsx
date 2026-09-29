@@ -60,6 +60,7 @@ import {
   Eyebrow,
   FaceOff,
   IconChip,
+  LitEdge,
   Meter,
   Panel,
   Ribbon,
@@ -70,6 +71,7 @@ import {
   Tag,
   TierBadge,
   Txt,
+  Shine,
   gemColors,
   useShake,
   type ButtonTone,
@@ -683,10 +685,7 @@ function RecordBanner() {
           { backgroundColor: theme.gold, borderColor: theme.outline },
         ]}
       >
-        <View
-          pointerEvents="none"
-          style={[styles.bannerHi, { backgroundColor: theme.goldHi }]}
-        />
+        <Shine color={theme.goldHi} radius={12} height="50%" />
         <Icon name="crown" size={22} color={theme.goldInk} strokeWidth={2.8} />
         <Text style={[styles.bannerText, { color: theme.goldInk }]}>
           {t.result.stage.record}
@@ -1310,10 +1309,7 @@ function RankTile({
         motion,
       ]}
     >
-      <View
-        pointerEvents="none"
-        style={[styles.edge, { backgroundColor: theme.tileHi }]}
-      />
+      <LitEdge color={theme.tileHi} radius={RADIUS.control} />
       <Text
         numberOfLines={1}
         adjustsFontSizeToFit={SHRINK_TO_FIT}
@@ -1580,7 +1576,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACE.xl,
     paddingTop: 7,
   },
-  bannerHi: { height: '50%', left: 0, position: 'absolute', right: 0, top: 0 },
   bannerText: {
     fontFamily: FONT.display,
     fontSize: 23,
@@ -1628,7 +1623,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACE.xs,
     paddingVertical: SPACE.ms,
   },
-  edge: { height: 3, left: 0, position: 'absolute', right: 0, top: 0 },
   rankValue: { fontFamily: FONT.display, fontSize: 22, lineHeight: lh(27) },
   move: {
     alignItems: 'center',

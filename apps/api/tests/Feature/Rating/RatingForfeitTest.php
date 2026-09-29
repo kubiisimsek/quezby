@@ -19,6 +19,7 @@ use Illuminate\Support\Carbon;
 
 beforeEach(function () {
     Carbon::setTestNow(Carbon::parse('2026-10-01 12:00', 'Europe/Istanbul'));
+    pinRatingTargets();
 });
 
 function forfeitOf(Run $run): ?RatingChange

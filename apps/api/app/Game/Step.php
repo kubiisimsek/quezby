@@ -20,6 +20,11 @@ final readonly class Step
         /** The combo the points were earned at, per-mille. 0 on a miss. */
         public int $combo,
         public array $bonuses,
+        /**
+         * How many blind moves in a row this miss made: its penalty was
+         * doubled this many times. 0 on a hit, and on a miss that was not blind.
+         */
+        public int $blind,
         public int $meter,
         public bool $over,
         public Gesture $gesture,

@@ -3,6 +3,7 @@
 use App\Enums\AdminRole;
 use App\Enums\AuditAction;
 use App\Enums\RunStatus;
+use App\Game\Rules;
 use App\Models\AuditEntry;
 use App\Models\Run;
 use App\Models\User;
@@ -49,7 +50,7 @@ test('shows everything about a player on one page', function () {
         ->assertJsonPath('player.installId', 'install-1')
         ->assertJsonPath('player.sessions', 1)
         ->assertJsonPath('player.isGuest', false)
-        ->assertJsonPath('season', 2)
+        ->assertJsonPath('season', Rules::ENGINE_VERSION)
         ->assertJsonPath('best.score', 9000)
         ->assertJsonPath('best.runId', $best->id)
         ->assertJsonPath('ranks.all', 1)

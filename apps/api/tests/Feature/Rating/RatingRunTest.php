@@ -4,6 +4,7 @@ use App\Enums\LeagueTier;
 use App\Enums\RatingKind;
 use App\Enums\RunMode;
 use App\Enums\RunStatus;
+use App\Game\Rules;
 use App\Models\PlayerRating;
 use App\Models\RatingChange;
 use App\Models\Run;
@@ -21,6 +22,7 @@ use Illuminate\Support\Carbon;
 
 beforeEach(function () {
     Carbon::setTestNow(Carbon::parse('2026-10-01 12:00', 'Europe/Istanbul'));
+    pinRatingTargets();
 });
 
 /**
@@ -102,7 +104,7 @@ test('a placed run past its target rises, short of it falls, by tanh of the dist
     expect($up)->toMatchArray([
         'kind' => 'run', 'before' => 1500, 'after' => 1555, 'delta' => 55,
         'tierBefore' => 'silver', 'tier' => 'silver', 'target' => 58400, 'placement' => null, 'shielded' => false,
-    ])->and($up['nextTarget'])->toBe(TargetTable::forEngine(2)?->shown(1555));
+    ])->and($up['nextTarget'])->toBe(TargetTable::forEngine(Rules::ENGINE_VERSION)?->shown(1555));
 
     $down = ratedRun($player, 34000);
     expect($down['delta'])->toBe(TargetTable::delta(1555, 1000, 800, 100))
@@ -114,7 +116,7 @@ test('a placed run past its target rises, short of it falls, by tanh of the dist
         ->performance->toBe(2000)
         ->target->toBe(58310)
         ->width->toBe(800)
-        ->engine_version->toBe(2);
+        ->engine_version->toBe(Rules::ENGINE_VERSION);
 });
 
 test('a run that scored nothing is the full loss', function () {

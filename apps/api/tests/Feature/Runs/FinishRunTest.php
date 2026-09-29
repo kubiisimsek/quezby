@@ -3,6 +3,7 @@
 use App\Content\ContentPicker;
 use App\Enums\RunStatus;
 use App\Game\ReelKind;
+use App\Game\Rules;
 use App\Game\Run as Engine;
 use App\Models\LeaderboardEntry;
 use App\Models\PlayerStat;
@@ -76,7 +77,7 @@ test('a finished run is replayed, ranked and recorded on every board', function 
         ->and($run->open_user_id)->toBeNull()
         ->and($run->stats['swipes'])->toBe($stats['swipes']);
     // A free run keeps no day row: only a rated run adds to a weekly group.
-    expect(LeaderboardEntry::query()->where('user_id', $user->id)->where('season', 2)->pluck('period')->map->value->all())
+    expect(LeaderboardEntry::query()->where('user_id', $user->id)->where('season', Rules::ENGINE_VERSION)->pluck('period')->map->value->all())
         ->toEqualCanonicalizing(['weekly', 'monthly', 'all']);
 });
 

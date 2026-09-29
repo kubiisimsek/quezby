@@ -2,6 +2,7 @@
 
 use App\Enums\AdminRole;
 use App\Enums\RunStatus;
+use App\Game\Rules;
 use App\Models\LeaderboardEntry;
 use App\Models\Run;
 use App\Models\User;
@@ -23,7 +24,7 @@ function adminBoard(array $query): TestResponse
 }
 
 /** A row of `$board` for a new player, without a run. */
-function adminBoardRow(string $board, string $key, int $score, string $achievedAt = '2026-09-25 08:00:00.000', int $season = 2): LeaderboardEntry
+function adminBoardRow(string $board, string $key, int $score, string $achievedAt = '2026-09-25 08:00:00.000', int $season = Rules::ENGINE_VERSION): LeaderboardEntry
 {
     return LeaderboardEntry::query()->create([
         'season' => $season,
@@ -45,7 +46,7 @@ test('ranks a board the way the game does, ties shared', function () {
     adminBoard(['board' => 'challenge'])
         ->assertOk()
         ->assertJsonPath('key', '2026-09-25')
-        ->assertJsonPath('season', 2)
+        ->assertJsonPath('season', Rules::ENGINE_VERSION)
         ->assertJsonPath('startsAt', '2026-09-24T21:00:00.000Z')
         ->assertJsonPath('endsAt', '2026-09-25T21:00:00.000Z')
         ->assertJsonPath('items.*.rank', [1, 2, 2, 4])
@@ -84,7 +85,7 @@ test('opens another period and another season', function () {
     adminBoardRow('all', 'all', 666);
 
     adminBoard(['board' => 'monthly', 'key' => '2026-08'])->assertJsonPath('items.0.score', 777)->assertJsonPath('startsAt', '2026-07-31T21:00:00.000Z');
-    adminBoard(['board' => 'all', 'season' => 1])->assertJsonPath('items.*.score', [555])->assertJsonPath('seasons', [2, 1])->assertJsonPath('startsAt', null);
+    adminBoard(['board' => 'all', 'season' => 1])->assertJsonPath('items.*.score', [555])->assertJsonPath('seasons', [Rules::ENGINE_VERSION, 1])->assertJsonPath('startsAt', null);
 });
 
 test('numbers a day of Günün akışı', function () {

@@ -3,6 +3,7 @@ import {
   Pressable,
   StyleSheet,
   View,
+  type DimensionValue,
   type LayoutChangeEvent,
   type StyleProp,
   type ViewStyle,
@@ -46,6 +47,50 @@ function useMeasured(): [Size, (event: LayoutChangeEvent) => void] {
     );
   };
   return [size, onLayout];
+}
+
+type Corners = Required<
+  Pick<
+    ViewStyle,
+    | 'borderTopLeftRadius'
+    | 'borderTopRightRadius'
+    | 'borderBottomLeftRadius'
+    | 'borderBottomRightRadius'
+  >
+>;
+
+/**
+ * Where a wash may paint inside a bordered box, read from the box's style:
+ * each corner's radius less the thinner of the two borders that meet there —
+ * by the outer curve alone it would paint over the outline, which a box with
+ * a lip draws beneath what it holds. `outline` is the border's colour, or
+ * null for a box without one.
+ */
+function washFrame(style: StyleProp<ViewStyle>): {
+  corners: Corners;
+  outline: ViewStyle['borderColor'] | null;
+} {
+  const flat = StyleSheet.flatten(style) ?? {};
+  const size = (value: unknown, fallback: number) =>
+    typeof value === 'number' ? value : fallback;
+  const all = size(flat.borderRadius, 0);
+  const width = size(flat.borderWidth, 0);
+  const top = size(flat.borderTopWidth, width);
+  const bottom = size(flat.borderBottomWidth, width);
+  const left = size(flat.borderLeftWidth, width);
+  const right = size(flat.borderRightWidth, width);
+  const corner = (radius: unknown, a: number, b: number) =>
+    Math.max(0, size(radius, all) - Math.min(a, b));
+  const bordered = Math.max(top, bottom, left, right) > 0;
+  return {
+    corners: {
+      borderTopLeftRadius: corner(flat.borderTopLeftRadius, top, left),
+      borderTopRightRadius: corner(flat.borderTopRightRadius, top, right),
+      borderBottomLeftRadius: corner(flat.borderBottomLeftRadius, bottom, left),
+      borderBottomRightRadius: corner(flat.borderBottomRightRadius, bottom, right),
+    },
+    outline: bordered ? (flat.borderBottomColor ?? flat.borderColor ?? null) : null,
+  };
 }
 
 /**
@@ -165,41 +210,45 @@ export function Gradient({
 }) {
   const id = `grad-${useId().replace(/:/g, '')}`;
   const [size, onLayout] = useMeasured();
+  const box: StyleProp<ViewStyle> = [
+    {
+      borderRadius: radius,
+      overflow: 'hidden',
+      backgroundColor:
+        fromOpacity === 1 && toOpacity === 1 ? from : 'transparent',
+    },
+    style,
+  ];
 
   return (
-    <View
-      style={[
-        {
-          borderRadius: radius,
-          overflow: 'hidden',
-          backgroundColor:
-            fromOpacity === 1 && toOpacity === 1 ? from : 'transparent',
-        },
-        style,
-      ]}
-      onLayout={onLayout}
-    >
-      {size.width > 0 && size.height > 0 ? (
-        <Svg
-          style={StyleSheet.absoluteFill}
-          width={size.width}
-          height={size.height}
-        >
-          <Defs>
-            <LinearGradient
-              id={id}
-              x1="0"
-              y1="0"
-              x2={vertical ? '0' : '1'}
-              y2="1"
-            >
-              <Stop offset="0" stopColor={from} stopOpacity={fromOpacity} />
-              <Stop offset="1" stopColor={to} stopOpacity={toOpacity} />
-            </LinearGradient>
-          </Defs>
-          <Rect width={size.width} height={size.height} fill={`url(#${id})`} />
-        </Svg>
-      ) : null}
+    <View style={box}>
+      <View
+        pointerEvents="none"
+        style={[StyleSheet.absoluteFill, styles.clip, washFrame(box).corners]}
+        onLayout={onLayout}
+      >
+        {size.width > 0 && size.height > 0 ? (
+          <Svg width={size.width} height={size.height}>
+            <Defs>
+              <LinearGradient
+                id={id}
+                x1="0"
+                y1="0"
+                x2={vertical ? '0' : '1'}
+                y2="1"
+              >
+                <Stop offset="0" stopColor={from} stopOpacity={fromOpacity} />
+                <Stop offset="1" stopColor={to} stopOpacity={toOpacity} />
+              </LinearGradient>
+            </Defs>
+            <Rect
+              width={size.width}
+              height={size.height}
+              fill={`url(#${id})`}
+            />
+          </Svg>
+        ) : null}
+      </View>
       {children}
     </View>
   );
@@ -224,65 +273,157 @@ export function BrandBand({
   const id = `band-${useId().replace(/:/g, '')}`;
   const [size, onLayout] = useMeasured();
   const { width, height } = size;
+  const box: StyleProp<ViewStyle> = [
+    {
+      backgroundColor: theme.brandFrom,
+      borderRadius: radius,
+      overflow: 'hidden',
+    },
+    style,
+  ];
+  const frame = washFrame(box);
 
+  // Between the wash's curve and a lip's thicker edge a sliver of the box
+  // shows: in the outline's colour, it reads as the outline.
+  return (
+    <View style={[box, frame.outline ? { backgroundColor: frame.outline } : null]}>
+      <View
+        pointerEvents="none"
+        style={[
+          StyleSheet.absoluteFill,
+          styles.clip,
+          frame.corners,
+          { backgroundColor: theme.brandFrom },
+        ]}
+        onLayout={onLayout}
+      >
+        {width > 0 && height > 0 ? (
+          <Svg width={width} height={height}>
+            <Defs>
+              <RadialGradient
+                id={`${id}-violet`}
+                cx={width * 1.08}
+                cy={height * 1.12}
+                rx={width * 1.05}
+                ry={height * 1.8}
+                gradientUnits="userSpaceOnUse"
+              >
+                <Stop offset="0" stopColor={theme.brandTo} stopOpacity={1} />
+                <Stop offset="0.75" stopColor={theme.brandTo} stopOpacity={0} />
+              </RadialGradient>
+              <RadialGradient
+                id={`${id}-light`}
+                cx={width * 0.2}
+                cy={0}
+                rx={width * 0.7}
+                ry={height * 1.1}
+                gradientUnits="userSpaceOnUse"
+              >
+                <Stop offset="0" stopColor={theme.onBrand} stopOpacity={0.16} />
+                <Stop offset="0.7" stopColor={theme.onBrand} stopOpacity={0} />
+              </RadialGradient>
+              <Pattern
+                id={`${id}-lanes`}
+                patternUnits="userSpaceOnUse"
+                width={24}
+                height={24}
+                patternTransform="rotate(40)"
+              >
+                <Rect width={4} height={24} fill={theme.onBrand} />
+              </Pattern>
+            </Defs>
+            <Rect width={width} height={height} fill={`url(#${id}-violet)`} />
+            <Rect width={width} height={height} fill={`url(#${id}-light)`} />
+            <Rect
+              width={width}
+              height={height}
+              fill={`url(#${id}-lanes)`}
+              opacity={0.07}
+            />
+          </Svg>
+        ) : null}
+      </View>
+      {children}
+    </View>
+  );
+}
+
+/**
+ * The inside of a tile's corner: its radius less its outline. Whatever lies
+ * flush against the inside of a tile's top — its lit edge, a shine, a banner
+ * — rounds by this, or it crosses the outline's curve: a tile with a lip has
+ * its outline drawn under what it holds, and clipped only by the outer curve.
+ */
+export function innerRadius(
+  radius: number,
+  outline: number = DEPTH.outline,
+): number {
+  return Math.max(0, radius - outline);
+}
+
+/** How thick a tile's lit edge is at its middle. */
+const EDGE_WIDTH = 3;
+
+/**
+ * A tile's lit top edge: a band of light along the inside of the outline that
+ * follows the corners and thins out down their curve — never a straight bar
+ * cut across them. `radius` and `outline` are the tile's own.
+ */
+export function LitEdge({
+  color,
+  radius = RADIUS.panel,
+  outline = DEPTH.outline,
+}: {
+  color: string;
+  radius?: number;
+  outline?: number;
+}) {
+  const inner = innerRadius(radius, outline);
   return (
     <View
+      pointerEvents="none"
       style={[
+        styles.edge,
         {
-          backgroundColor: theme.brandFrom,
-          borderRadius: radius,
-          overflow: 'hidden',
+          borderTopColor: color,
+          borderTopLeftRadius: inner,
+          borderTopRightRadius: inner,
+          height: Math.max(inner, EDGE_WIDTH * 2),
         },
-        style,
       ]}
-      onLayout={onLayout}
+    />
+  );
+}
+
+/**
+ * The lit upper part of a small slab with a lip — a chat bubble, a ribbon, a
+ * tab's tile: a lighter band across its top. The band is cut out of a box as
+ * tall as the slab, rounded like its inside corners: a band rounded on its
+ * own gets its corners flattened to its height, and they poke over the
+ * outline. `radius` and `outline` are the slab's own.
+ */
+export function Shine({
+  color,
+  radius,
+  outline = DEPTH.outline,
+  height,
+}: {
+  color: string;
+  radius: number;
+  outline?: number;
+  height: DimensionValue;
+}) {
+  const inner = innerRadius(radius, outline);
+  return (
+    <View
+      pointerEvents="none"
+      style={[
+        StyleSheet.absoluteFill,
+        styles.clip,
+        { borderTopLeftRadius: inner, borderTopRightRadius: inner },
+      ]}
     >
-      {width > 0 && height > 0 ? (
-        <Svg style={StyleSheet.absoluteFill} width={width} height={height}>
-          <Defs>
-            <RadialGradient
-              id={`${id}-violet`}
-              cx={width * 1.08}
-              cy={height * 1.12}
-              rx={width * 1.05}
-              ry={height * 1.8}
-              gradientUnits="userSpaceOnUse"
-            >
-              <Stop offset="0" stopColor={theme.brandTo} stopOpacity={1} />
-              <Stop offset="0.75" stopColor={theme.brandTo} stopOpacity={0} />
-            </RadialGradient>
-            <RadialGradient
-              id={`${id}-light`}
-              cx={width * 0.2}
-              cy={0}
-              rx={width * 0.7}
-              ry={height * 1.1}
-              gradientUnits="userSpaceOnUse"
-            >
-              <Stop offset="0" stopColor={theme.onBrand} stopOpacity={0.16} />
-              <Stop offset="0.7" stopColor={theme.onBrand} stopOpacity={0} />
-            </RadialGradient>
-            <Pattern
-              id={`${id}-lanes`}
-              patternUnits="userSpaceOnUse"
-              width={24}
-              height={24}
-              patternTransform="rotate(40)"
-            >
-              <Rect width={4} height={24} fill={theme.onBrand} />
-            </Pattern>
-          </Defs>
-          <Rect width={width} height={height} fill={`url(#${id}-violet)`} />
-          <Rect width={width} height={height} fill={`url(#${id}-light)`} />
-          <Rect
-            width={width}
-            height={height}
-            fill={`url(#${id}-lanes)`}
-            opacity={0.07}
-          />
-        </Svg>
-      ) : null}
-      {children}
+      <View style={{ backgroundColor: color, height }} />
     </View>
   );
 }
@@ -333,7 +474,7 @@ export function Panel({
         style,
       ]}
     >
-      {flat ? null : <View pointerEvents="none" style={[styles.edge, { backgroundColor: colors.hi }]} />}
+      {flat ? null : <LitEdge color={colors.hi} />}
       {children}
     </View>
   );
@@ -383,7 +524,7 @@ export function Card({
         style,
       ]}
     >
-      <View pointerEvents="none" style={[styles.edge, { backgroundColor: colors.hi }]} />
+      <LitEdge color={colors.hi} />
       {children}
     </Animated.View>
   );
@@ -421,12 +562,12 @@ export function Divider({ style }: { style?: StyleProp<ViewStyle> }) {
 }
 
 const styles = StyleSheet.create({
+  /** A wash's frame: the inside of its box, so it never paints over the outline. */
+  clip: { overflow: 'hidden' },
   divider: { borderRadius: RADIUS.pill, height: 2, width: '100%' },
-  /** The lit top edge of a tile. */
+  /** The lit top edge of a tile (`LitEdge`): the top border of a box rounded like the tile's inside. */
   edge: {
-    borderTopLeftRadius: RADIUS.panel - DEPTH.outline,
-    borderTopRightRadius: RADIUS.panel - DEPTH.outline,
-    height: 3,
+    borderTopWidth: EDGE_WIDTH,
     left: 0,
     opacity: 0.9,
     position: 'absolute',

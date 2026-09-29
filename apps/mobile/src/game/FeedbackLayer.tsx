@@ -17,7 +17,7 @@ import { bonusGuide } from '@/game/howTo';
 import type { Feedback } from '@/game/useGame';
 import { ltr, useT } from '@/i18n';
 import { Icon } from '@/ui/icons';
-import { useShake } from '@/ui/kit';
+import { Shine, useShake } from '@/ui/kit';
 import { SPRING_POP } from '@/ui/motion';
 import { DEPTH, FONT, SPACE, embossed, lh, withAlpha } from '@/ui/theme';
 import { reel as REEL } from '@/ui/tokens';
@@ -139,11 +139,25 @@ function Burst({ feedback }: { feedback: Feedback }) {
             ) : null}
           </>
         ) : (
-          <Animated.View style={shakeStyle}>
+          <Animated.View style={[styles.missBlock, shakeStyle]}>
             <Animated.View style={[styles.miss, missStyle]}>
-              <View style={styles.missHi} />
-              <Text style={styles.missText}>{label}</Text>
+              <Shine
+                color={withAlpha(REEL.ink, 0.16)}
+                radius={18}
+                outline={DEPTH.outline + 0.5}
+                height="50%"
+              />
+              <Text style={styles.missText}>
+                {feedback.blind > 0 ? t.game.feedback.blind : label}
+              </Text>
             </Animated.View>
+            {feedback.blind > 0 ? (
+              <Animated.View style={[styles.penalty, missStyle]}>
+                <Text style={styles.penaltyText}>
+                  {t.game.feedback.penalty(2 ** feedback.blind)}
+                </Text>
+              </Animated.View>
+            ) : null}
           </Animated.View>
         )}
       </View>
@@ -181,7 +195,7 @@ function ComboRibbon({
 
   return (
     <Animated.View style={[styles.ribbon, style]}>
-      <View style={styles.ribbonHi} />
+      <Shine color={withAlpha(REEL.ink, 0.28)} radius={12} height="50%" />
       <Text style={styles.ribbonText}>
         {t.game.feedback.bonus(bonusGuide(t)[bonus.kind].toast, t.fmt.score(bonus.points))}
       </Text>
@@ -234,14 +248,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACE.lg,
     paddingVertical: SPACE.xs,
   },
-  ribbonHi: {
-    backgroundColor: withAlpha(REEL.ink, 0.28),
-    height: '50%',
-    left: 0,
-    position: 'absolute',
-    right: 0,
-    top: 0,
-  },
   ribbonText: {
     color: REEL.goldInk,
     fontFamily: FONT.display,
@@ -258,13 +264,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACE.xxl,
     paddingVertical: SPACE.sm,
   },
-  missHi: {
-    backgroundColor: withAlpha(REEL.ink, 0.16),
-    height: '50%',
-    left: 0,
-    position: 'absolute',
-    right: 0,
-    top: 0,
+  missBlock: { alignItems: 'center', gap: SPACE.sm },
+  /** A blind move's doubled penalty, stamped under the miss: "Ceza x2". */
+  penalty: {
+    backgroundColor: REEL.outline,
+    borderColor: REEL.miss,
+    borderRadius: 12,
+    borderWidth: DEPTH.outline,
+    paddingHorizontal: SPACE.lg,
+    paddingVertical: SPACE.xxs,
+    transform: [{ rotate: '-3deg' }],
+  },
+  penaltyText: {
+    color: REEL.ink,
+    fontFamily: FONT.display,
+    fontSize: 22,
+    lineHeight: lh(28),
   },
   missText: {
     color: REEL.ink,

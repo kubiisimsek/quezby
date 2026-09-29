@@ -7,7 +7,7 @@
  * the point. The rules are locked (`rules.lock.json`): changing any value is
  * an `ENGINE_VERSION` bump, `pnpm engine:lock`, and a new leaderboard season.
  */
-export const ENGINE_VERSION = 2;
+export const ENGINE_VERSION = 3;
 
 export const REEL_KINDS = ['skip', 'like', 'hold', 'freeze'] as const;
 export type ReelKind = (typeof REEL_KINDS)[number];
@@ -66,6 +66,13 @@ export const RULES = {
   >,
   perfectGain: 60,
   loss: { timeout: 200, wrong: 200, holdMiss: 120, caught: 250 },
+  /**
+   * A blind move: a swipe or a double tap on the wrong post, made sooner than
+   * this — too soon to have looked. Its penalty doubles, and doubles again
+   * for each blind move after it (x2, x4, x8…) until a considered hit, so the
+   * third in a row always empties the meter.
+   */
+  blindMs: 300,
 
   /** Points before multipliers. */
   base: { skip: 100, like: 120, hold: 150, freeze: 120 } as Record<
@@ -161,6 +168,14 @@ export function comboAfterHit(combo: number): number {
 /** The combo after a miss: whatever was above x1 is halved. */
 export function comboAfterMiss(combo: number): number {
   return RULES.comboStart + Math.floor((combo - RULES.comboStart) / 2);
+}
+
+/**
+ * What a miss costs the meter: `loss`, doubled once for each blind move in a
+ * row — `blind` is 0 for a miss that was not blind.
+ */
+export function penaltyFor(loss: number, blind: number): number {
+  return loss * 2 ** blind;
 }
 
 /** A named combo's points on reel `n`. */

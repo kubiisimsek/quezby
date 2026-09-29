@@ -1,4 +1,4 @@
-import { PROFILES, playRun } from './bot';
+import { PROFILES, blindSwipe, playRun } from './bot';
 import { Rng } from './rng';
 import {
   BONUS_KINDS,
@@ -176,6 +176,7 @@ export type StepFixture = {
   points: number;
   combo: number;
   bonuses: BonusHit[];
+  blind: number;
   meter: number;
 };
 
@@ -218,6 +219,7 @@ function recorded(name: string, seed: number, play: (run: Run) => Action | null)
       points: step.points,
       combo: step.combo,
       bonuses: [...step.bonuses],
+      blind: step.blind,
       meter: step.meter,
     });
   }
@@ -243,9 +245,36 @@ function comeback(): BonusFixture {
 }
 
 /**
- * Step-by-step logs for the named combos and the combo's halving, so the PHP
- * twin is checked on every reel's points, not only on the total. Between
- * them, every named combo goes off at least once.
+ * Plays clean until the intro is over, then makes a blind move — a quick
+ * double tap on a skip reel — and fills the meter back with fast hits that
+ * never forgive it, so the next blind move doubles again: x2, x4, then the
+ * third, which always ends the run.
+ */
+function thirdBlindMove(): BonusFixture {
+  const quick: Record<ReelKind, Action | null> = {
+    skip: [GESTURE.up, 200, 0],
+    like: [GESTURE.like, 250, 0],
+    hold: null,
+    freeze: null,
+  };
+  let blinds = 0;
+  return recorded('third-blind-move', 3, (run) => {
+    const reel = run.current;
+    if (reel.index < RULES.intro.length) return cleanAction(run, 450);
+    if (blinds === 0 || run.meter >= 850 || blinds === 2) {
+      if (reel.kind !== 'skip') return quick[reel.kind] ?? cleanAction(run, 450);
+      blinds += 1;
+      return [GESTURE.like, 250, 0];
+    }
+    return quick[reel.kind] ?? cleanAction(run, 450);
+  });
+}
+
+/**
+ * Step-by-step logs for the named combos, the combo's halving and the blind
+ * moves, so the PHP twin is checked on every reel's points and meter, not
+ * only on the total. Between them, every named combo goes off at least once,
+ * and a blind move is doubled up to the third.
  */
 export function buildBonuses(): BonusFixture[] {
   const fixtures = [
@@ -266,6 +295,16 @@ export function buildBonuses(): BonusFixture[] {
       return cleanAction(run, 400);
     }),
     comeback(),
+    recorded('blind-swiper', 42, (run) => blindSwipe(run, 200)),
+    recorded('blind-then-looks-again', 99, (run) => {
+      if (run.summary().reels >= 60) return null;
+      return run.current.kind === 'like' ? [GESTURE.up, 200, 0] : cleanAction(run, 450);
+    }),
+    recorded('slow-wrong-is-not-blind', 7919, (run) => {
+      if (run.summary().reels >= 40) return null;
+      return run.current.kind === 'like' ? [GESTURE.up, 450, 0] : cleanAction(run, 450);
+    }),
+    thirdBlindMove(),
   ];
 
   const seen = new Set<BonusKind>();
@@ -274,6 +313,10 @@ export function buildBonuses(): BonusFixture[] {
   }
   for (const kind of BONUS_KINDS) {
     if (!seen.has(kind)) throw new Error(`no bonus fixture sets off ${kind}`);
+  }
+  const blinds = new Set(fixtures.flatMap((fixture) => fixture.steps.map((step) => step.blind)));
+  for (const blind of [0, 1, 2, 3]) {
+    if (!blinds.has(blind)) throw new Error(`no step log makes blind move ${blind}`);
   }
   return fixtures;
 }

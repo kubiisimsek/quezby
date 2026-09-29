@@ -4,7 +4,7 @@ import { turnOnPush } from '@/hooks/usePush';
 import { useT } from '@/i18n';
 import { usePush } from '@/stores/push';
 import { Icon } from '@/ui/icons';
-import { Button, IconChip, Txt } from '@/ui/kit';
+import { Button, IconChip, LitEdge, Txt } from '@/ui/kit';
 import { DEPTH, RADIUS, SPACE, useTheme } from '@/ui/theme';
 
 /**
@@ -37,7 +37,7 @@ export function PushNudge({
     <View
       style={[styles.card, { backgroundColor: theme.warnSoft, borderColor: theme.outline }]}
     >
-      <View pointerEvents="none" style={[styles.edge, { backgroundColor: theme.warnLine }]} />
+      <LitEdge color={theme.warnLine} />
       <IconChip icon="bell" tone="warn" size="md" />
       <View style={styles.text}>
         <Txt variant="heading">{words.title}</Txt>
@@ -79,7 +79,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     padding: SPACE.lg,
   },
-  edge: { height: 3, left: RADIUS.panel, position: 'absolute', right: RADIUS.panel, top: 2 },
   text: { flex: 1, gap: SPACE.xxs },
   action: { alignSelf: 'flex-start', marginTop: SPACE.sm },
   hide: { padding: SPACE.xxs },

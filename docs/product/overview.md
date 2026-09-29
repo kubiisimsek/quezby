@@ -175,8 +175,11 @@ friends*, *Inbox*, *VS*, *Push*).
   alınır, arkadaşlık bitirilir. En fazla 500 arkadaş ve cevap bekleyen en fazla
   100 istek. Takip sisteminden gelen karşılıklı takipler arkadaşlığa, tek
   yönlüler bekleyen isteğe dönüştü.
-- **Sohbet yazıyla değil, hazır mesajlarla olur:** on sabit söz ("İyi oyundu!
-  👏", "Rövanş? 🔥"…); telefon kendi dilinde gösterir. Oyuncudan oyuncuya
+- **Sohbet yazıyla değil, hazır mesajlarla olur:** 24 sabit söz — önce
+  selamlar ("Selam! 👋", "Naber? 😄"), sonra oyun dünyasının şakaları ("GG WP
+  🤝", "EZ 😎", "Lag vardı! 📶", "Rage quit attım! 😡"…); sohbetin altındaki
+  **Hazır mesaj gönder** hepsini bir sheet'te açar, birine dokununca gider.
+  Telefon kendi dilinde gösterir. Oyuncudan oyuncuya
   yazılmış hiçbir söz gitmez; bu yüzden denetlenecek metin de yoktur. Bir
   arkadaşa günde en fazla 20. Sohbete oyunun kendi satırları da düşer:
   "artık arkadaşsınız", VS daveti, sonucu, reddi, süresinin dolması. Satırlar

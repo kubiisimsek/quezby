@@ -14,6 +14,7 @@ import {
   Divider,
   Eyebrow,
   Panel,
+  Shine,
   SkeletonList,
   StatGrid,
   Tag,
@@ -170,10 +171,7 @@ function LikedPost({
   return (
     <View style={styles.post}>
       <View style={[styles.thumb, { backgroundColor: REEL.like, borderColor: theme.outline }]}>
-        <View
-          pointerEvents="none"
-          style={[styles.thumbShine, { backgroundColor: withAlpha(theme.onBrand, 0.16) }]}
-        />
+        <Shine color={withAlpha(theme.onBrand, 0.16)} radius={12} height="40%" />
         <Text style={styles.emoji}>{emoji}</Text>
       </View>
       <View style={styles.flex}>
@@ -205,6 +203,5 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     width: 48,
   },
-  thumbShine: { height: '40%', left: 0, position: 'absolute', right: 0, top: 0 },
   emoji: { fontSize: 28, lineHeight: 34 },
 });

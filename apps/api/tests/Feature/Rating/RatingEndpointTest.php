@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Schema;
 
 beforeEach(function () {
     Carbon::setTestNow(Carbon::parse('2026-10-01 12:00', 'Europe/Istanbul'));
+    pinRatingTargets();
 });
 
 test('a player still placing sees how far placement has got, and nothing else', function () {

@@ -16,6 +16,7 @@ use Illuminate\Support\Carbon;
 
 beforeEach(function () {
     Carbon::setTestNow(Carbon::parse('2026-10-01 12:00', 'Europe/Istanbul'));
+    pinRatingTargets();
 });
 
 test('Dereceli opens after twenty counted free and daily runs, and says so on the run that opens it', function () {

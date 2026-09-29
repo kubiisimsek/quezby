@@ -6,6 +6,7 @@ import {
   comboAfterHit,
   comboAfterMiss,
   levelBoostFor,
+  penaltyFor,
   type BonusKind,
   type ReelKind,
 } from './rules';
@@ -54,6 +55,11 @@ export type Step = {
   /** The combo the points were earned at, per-mille. 0 on a miss. */
   combo: number;
   bonuses: readonly BonusHit[];
+  /**
+   * How many blind moves in a row this miss made: its penalty was doubled
+   * this many times. 0 on a hit, and on a miss that was not blind.
+   */
+  blind: number;
   meter: number;
   over: boolean;
 };
@@ -147,6 +153,8 @@ export class Run {
   private previousHit: ReelKind | null = null;
   /** The meter ended a reel below `comebackLow` and has not climbed back yet. */
   private lowMeter = false;
+  /** Blind moves since the last considered hit. */
+  private blindRun = 0;
   private bonusPoints = 0;
   private readonly bonusCounts: BonusCounts = {
     flawless: 0,
@@ -246,7 +254,7 @@ export class Run {
     if (verdict === 'hit' || verdict === 'perfect') {
       return this.hit(reel, verdict, gesture, t, d);
     }
-    return this.miss(reel, verdict);
+    return this.miss(reel, verdict, gesture, t);
   }
 
   /** The player left: whatever was on screen is not judged. */
@@ -295,6 +303,12 @@ export class Run {
     this.maxStreak = Math.max(this.maxStreak, this.streak);
     this.hits += 1;
     if (verdict === 'perfect') this.perfects += 1;
+
+    // A hold, a freeze reel left alone, or a swipe or like made in time to
+    // have looked: the player is looking again, and blind moves start over.
+    if (gesture === GESTURE.hold || gesture === GESTURE.none || t >= RULES.blindMs) {
+      this.blindRun = 0;
+    }
 
     this.combo = comboAfterHit(this.combo);
     this.maxCombo = Math.max(this.maxCombo, this.combo);
@@ -361,7 +375,7 @@ export class Run {
     return bonuses.length === 0 ? NO_BONUSES : bonuses;
   }
 
-  private miss(reel: Reel, verdict: Verdict): Step {
+  private miss(reel: Reel, verdict: Verdict, gesture: Gesture, t: number): Step {
     this.streak = 0;
     this.misses += 1;
     this.combo = comboAfterMiss(this.combo);
@@ -376,13 +390,20 @@ export class Run {
           : verdict === 'holdEarly' || verdict === 'holdLate'
             ? RULES.loss.holdMiss
             : RULES.loss.wrong;
-    this.meterValue -= loss;
+    const blind =
+      verdict === 'wrong' &&
+      (gesture === GESTURE.up || gesture === GESTURE.like) &&
+      t < RULES.blindMs
+        ? this.blindRun + 1
+        : 0;
+    if (blind > 0) this.blindRun = blind;
+    this.meterValue -= penaltyFor(loss, blind);
     if (this.meterValue <= 0) {
       this.meterValue = 0;
       this.ended = 'penalty';
     }
     if (this.meterValue < RULES.comebackLow) this.lowMeter = true;
-    return this.advance(reel, verdict, 0, 0, NO_BONUSES);
+    return this.advance(reel, verdict, 0, 0, NO_BONUSES, blind);
   }
 
   private advance(
@@ -391,13 +412,14 @@ export class Run {
     points: number,
     combo: number,
     bonuses: readonly BonusHit[],
+    blind = 0,
   ): Step {
     this.reels += 1;
     if (!this.ended) {
       this.reel = this.stream.next();
       if (this.reel.index % RULES.levelEvery === 0) this.levelClean = true;
     }
-    return this.step(reel, verdict, points, combo, bonuses);
+    return this.step(reel, verdict, points, combo, bonuses, blind);
   }
 
   private step(
@@ -406,6 +428,7 @@ export class Run {
     points: number,
     combo: number,
     bonuses: readonly BonusHit[],
+    blind = 0,
   ): Step {
     return {
       reel,
@@ -413,6 +436,7 @@ export class Run {
       points,
       combo,
       bonuses,
+      blind,
       meter: this.meterValue,
       over: this.ended !== null,
     };

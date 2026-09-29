@@ -26,8 +26,10 @@ return new class extends Migration
             $table->string('locale', 2);
             $table->string('platform', 8)->nullable();
             $table->string('install_id', 100)->nullable();
-            $table->timestamp('sent_at', 3);
-            $table->timestamp('expires_at', 3)->index();
+            // dateTime, never a NOT NULL timestamp: MySQL without explicit_defaults_for_timestamp
+            // gives the second one a zero default, which strict mode refuses (1067).
+            $table->dateTime('sent_at', 3);
+            $table->dateTime('expires_at', 3)->index();
             $table->timestamps(3);
 
             $table->index(['purpose', 'email']);

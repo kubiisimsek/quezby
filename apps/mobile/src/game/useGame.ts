@@ -60,6 +60,8 @@ export type Feedback = {
   points: number;
   combo: number;
   bonuses: readonly BonusHit[];
+  /** Blind moves in a row on a miss: its penalty was doubled this many times. */
+  blind: number;
 };
 
 /**
@@ -517,6 +519,7 @@ export function useGame(mode: RunMode = 'free', vs: VsTarget | null = null) {
         points: step.points,
         combo: step.combo,
         bonuses: step.bonuses,
+        blind: step.blind,
       });
       if (step.bonuses.length > 0) feel('perfect');
       setScore(run.points);

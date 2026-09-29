@@ -22,6 +22,7 @@ import { Button } from '@/ui/kit/buttons';
 import { Avatar } from '@/ui/kit/identity';
 import { Meter } from '@/ui/kit/meter';
 import { AnimatedPressable } from '@/ui/kit/shared';
+import { LitEdge } from '@/ui/kit/surfaces';
 import { Txt } from '@/ui/kit/text';
 import { FADE, SPRING_PRESS, stagger } from '@/ui/motion';
 import {
@@ -115,10 +116,7 @@ export function ClimbRow({
 
   const body = (
     <>
-      <View
-        pointerEvents="none"
-        style={[styles.edge, { backgroundColor: face.hi }]}
-      />
+      <LitEdge color={face.hi} radius={ROW_RADIUS} />
       {isMe ? (
         <View
           pointerEvents="none"
@@ -345,10 +343,7 @@ export function FloorCard({
         style,
       ]}
     >
-      <View
-        pointerEvents="none"
-        style={[styles.floorEdge, { backgroundColor: theme.primaryLine }]}
-      />
+      <LitEdge color={theme.primaryLine} />
       <View
         style={[
           styles.floorTab,
@@ -429,8 +424,6 @@ const styles = StyleSheet.create({
     paddingRight: SPACE.md,
     paddingVertical: SPACE.sm + 1,
   },
-  /** The lit top edge of the tile. */
-  edge: { height: 3, left: 0, position: 'absolute', right: 0, top: 0 },
   /** Your tile's magenta frame, inside the outline. */
   ring: {
     borderRadius: ROW_RADIUS - DEPTH.outline,
@@ -491,16 +484,6 @@ const styles = StyleSheet.create({
     paddingBottom: SPACE.ms,
     paddingHorizontal: SPACE.md,
     paddingTop: SPACE.md + 2,
-  },
-  floorEdge: {
-    borderTopLeftRadius: RADIUS.panel - DEPTH.outline,
-    borderTopRightRadius: RADIUS.panel - DEPTH.outline,
-    height: 3,
-    left: 0,
-    opacity: 0.9,
-    position: 'absolute',
-    right: 0,
-    top: 0,
   },
   /** The card's name on a dark tab over its top edge, the way a game labels a slab. */
   floorTab: {

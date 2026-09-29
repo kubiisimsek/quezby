@@ -183,7 +183,11 @@ function SideAction({ icon, label }: { icon: IconName; label: string }) {
   );
 }
 
-/** The gold reel's bar: it fills while pressed; let go inside the green. */
+/**
+ * The gold reel's bar: it fills while pressed; let go inside the green. The
+ * fill is square-ended with a dark edge, so where it stands against the zone
+ * reads at a glance — a rounded tip hid it.
+ */
 function HoldMeter({ reel, values }: { reel: Reel; values: ReelValues }) {
   const t = useT();
   const zoneLeft = (reel.zoneCenter - reel.zoneHalf) / 10;
@@ -198,9 +202,11 @@ function HoldMeter({ reel, values }: { reel: Reel; values: ReelValues }) {
 
   return (
     <View style={styles.holdBlock}>
-      <Animated.View style={[styles.holdTrack, trackStyle]}>
+      <Animated.View testID="hold-track" style={[styles.holdTrack, trackStyle]}>
         <View style={[styles.holdZone, { left: `${zoneLeft}%`, width: `${zoneWidth}%` }]} />
-        <Animated.View style={[styles.holdFill, fillStyle]} />
+        <Animated.View testID="hold-fill" style={[styles.holdFill, fillStyle]}>
+          <View testID="hold-tip" style={styles.holdTip} />
+        </Animated.View>
       </Animated.View>
       <Text style={styles.holdLabel}>{t.game.post.holdMeter}</Text>
     </View>
@@ -279,7 +285,7 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
     backgroundColor: REEL.shade,
     borderColor: REEL.holdBar,
-    borderRadius: RADIUS.pill,
+    borderRadius: 4,
     borderWidth: 2,
     height: 26,
     overflow: 'hidden',
@@ -292,9 +298,18 @@ const styles = StyleSheet.create({
   },
   holdFill: {
     backgroundColor: REEL.holdBar,
-    borderRadius: RADIUS.pill,
     height: '100%',
     opacity: 0.85,
+    overflow: 'hidden',
+  },
+  /** The fill's leading edge; clipped away while the fill is empty. */
+  holdTip: {
+    backgroundColor: REEL.outline,
+    bottom: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    width: 3,
   },
   holdLabel: { ...TYPE.heading, color: REEL.ink, fontFamily: FONT.bold },
 });

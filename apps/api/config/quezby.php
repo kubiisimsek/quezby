@@ -285,6 +285,8 @@ return [
         // version. Calibrated from real players with `quezby:rating:calibrate`.
         'targets' => [
             2 => [0 => 8000, 1000 => 34000, 2000 => 100000, 3000 => 240000, 4000 => 480000, 5000 => 800000, 6000 => 1100000],
+            // Engine v3 (blind moves): v2's anchors 1 % lower, as the simulated medians moved.
+            3 => [0 => 8000, 1000 => 33700, 2000 => 99000, 3000 => 238000, 4000 => 475000, 5000 => 792000, 6000 => 1090000],
         ],
     ],
 

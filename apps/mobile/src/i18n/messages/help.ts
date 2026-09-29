@@ -27,6 +27,9 @@ const tr = {
       'Doğru hareket barı doldurur, mükemmel bir altın post biraz daha fazla. Hata yaparsan ya da süreyi kaçırırsan boşalır.',
       'Bar azaldıkça yeşilden sarıya, sonra kırmızıya döner. Biterse tur da biter.',
     ],
+    /** A blind move (`RULES.blindMs`, in ms). */
+    blind: (ms: string) =>
+      `Bir postun ilk ${ms} ms’sinde, bakmadan yanlış kaydırır ya da çift dokunursan ceza iki katı olur. Üst üste yaparsan dört, sonra sekiz katı.`,
   },
   scoring: {
     title: 'Puan ve kombolar',
@@ -153,6 +156,8 @@ const en: HelpMessages = {
       'The right move fills the bar, a perfect gold post a little more. Make a mistake or run out of time and it drains.',
       "As it drains, the bar turns from green to yellow, then red. When it's empty, the run is over.",
     ],
+    blind: (ms) =>
+      `Swipe or double-tap the wrong post in its first ${ms} ms, before you could look, and the penalty doubles. Do it again in a row and it’s four times, then eight.`,
   },
   scoring: {
     title: 'Points and combos',
@@ -280,6 +285,8 @@ const de: HelpMessages = {
       'Die richtige Bewegung füllt den Balken, ein perfekter Gold-Post noch etwas mehr. Machst du einen Fehler oder verpasst die Zeit, leert er sich.',
       'Wird er leerer, wechselt der Balken von Grün zu Gelb, dann zu Rot. Ist er leer, ist die Runde vorbei.',
     ],
+    blind: (ms) =>
+      `Wischst du den falschen Post in seinen ersten ${ms} ms blind weg oder tippst doppelt darauf, zählt die Strafe doppelt. Gleich noch einmal: vierfach, dann achtfach.`,
   },
   scoring: {
     title: 'Punkte und Kombos',
@@ -406,6 +413,8 @@ const ar: HelpMessages = {
       'الحركة الصحيحة تملأ الشريط، والمنشور الذهبي المثالي يملؤه أكثر قليلًا. وإن أخطأت أو فاتك الوقت نقص.',
       'كلما نقص الشريط تحوّل من الأخضر إلى الأصفر ثم إلى الأحمر. وإن نفد انتهت الجولة.',
     ],
+    blind: (ms) =>
+      `إذا سحبت المنشور الخاطئ أو نقرت عليه مرتين في أول ${iso(`${ms} ms`)} دون أن تنظر، تتضاعف العقوبة. وإن كررتها متتاليةً تصبح أربعة أضعاف ثم ثمانية.`,
   },
   scoring: {
     title: 'النقاط والكومبو',
@@ -537,6 +546,8 @@ const fr: HelpMessages = {
       'Le bon geste remplit la barre, un post doré parfait un peu plus. Si tu te trompes ou laisses filer le temps, elle se vide.',
       'En baissant, la barre passe du vert au jaune, puis au rouge. Si elle se vide, la partie est finie.',
     ],
+    blind: (ms) =>
+      `Balaie ou tape deux fois le mauvais post dans ses ${ms} premières ms, sans regarder, et la pénalité double. Recommence aussitôt : quatre fois, puis huit.`,
   },
   scoring: {
     title: 'Points et combos',
@@ -664,6 +675,8 @@ const es: HelpMessages = {
       'El gesto correcto llena la barra; un post dorado perfecto, un poco más. Si te equivocas o se te acaba el tiempo, se vacía.',
       'A medida que baja, la barra pasa de verde a amarillo y luego a rojo. Si se vacía, la partida termina.',
     ],
+    blind: (ms) =>
+      `Si deslizas o tocas dos veces el post equivocado en sus primeros ${ms} ms, sin mirar, la penalización se duplica. Si lo repites seguido, se multiplica por cuatro y luego por ocho.`,
   },
   scoring: {
     title: 'Puntos y combos',

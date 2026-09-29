@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { PROFILES, playRun } from '../bot';
-import { RULES, levelBoostFor } from '../rules';
+import { PROFILES, blindSwipe, playRun } from '../bot';
+import { RULES, levelBoostFor, penaltyFor } from '../rules';
 import { EngineError, GESTURE, Run, replay, type Action } from '../run';
 
 /** Plays the intro perfectly and fast, returning the run at reel 8. */
@@ -87,6 +87,110 @@ describe('Run', () => {
     run.apply([GESTURE.up, 300, 0]);
     expect(run.current.kind).toBe('like');
     expect(run.apply([GESTURE.up, 300, 0]).verdict).toBe('wrong');
+  });
+
+  describe('blind moves', () => {
+    /** Seed 1 opens skip, skip, like: the run standing on its first friend's post. */
+    function atTheLike(): Run {
+      const run = new Run(1);
+      run.apply([GESTURE.up, 400, 0]);
+      run.apply([GESTURE.up, 400, 0]);
+      expect(run.current.kind).toBe('like');
+      return run;
+    }
+
+    it('doubles the penalty of a swipe on the wrong post made too soon to have looked', () => {
+      const run = atTheLike();
+      const before = run.meter;
+      const drain = Math.floor((run.current.drain * 299) / 1000);
+      const step = run.apply([GESTURE.up, RULES.blindMs - 1, 0]);
+      expect(step.verdict).toBe('wrong');
+      expect(step.blind).toBe(1);
+      expect(step.meter).toBe(before - drain - RULES.loss.wrong * 2);
+    });
+
+    it('counts a quick double tap on the wrong post as blind too', () => {
+      const run = new Run(1);
+      const step = run.apply([GESTURE.like, 250, 0]);
+      expect(step.verdict).toBe('wrong');
+      expect(step.blind).toBe(1);
+    });
+
+    it('keeps the plain penalty for a wrong move made after a look', () => {
+      const run = atTheLike();
+      const step = run.apply([GESTURE.up, RULES.blindMs, 0]);
+      expect(step.verdict).toBe('wrong');
+      expect(step.blind).toBe(0);
+    });
+
+    it('never calls a timeout, a missed hold or a touched freeze reel blind', () => {
+      const timeout = new Run(1).apply([GESTURE.none, 0, 0]);
+      expect([timeout.verdict, timeout.blind]).toEqual(['timeout', 0]);
+
+      const hold = new Run(3);
+      for (let i = 0; i < 4; i += 1) hold.apply(perfectAction(hold));
+      const early = hold.apply([GESTURE.hold, 100, 10]);
+      expect([early.verdict, early.blind]).toEqual(['holdEarly', 0]);
+
+      const freeze = new Run(9);
+      for (let i = 0; i < 6; i += 1) freeze.apply(perfectAction(freeze));
+      const caught = freeze.apply([GESTURE.touch, 100, 0]);
+      expect([caught.verdict, caught.blind]).toEqual(['caught', 0]);
+
+      // A press held on a skip reel is the wrong move, but not a blind one.
+      const pressed = new Run(1).apply([GESTURE.hold, 100, 400]);
+      expect([pressed.verdict, pressed.blind]).toEqual(['wrong', 0]);
+    });
+
+    it('doubles again for each blind move in a row, while fast hits never forgive', () => {
+      const run = new Run(1);
+      expect(run.apply([GESTURE.like, 250, 0]).blind).toBe(1);
+      run.apply([GESTURE.up, 200, 0]);
+      const second = run.apply([GESTURE.up, 200, 0]);
+      expect(second.reel.kind).toBe('like');
+      expect(second.blind).toBe(2);
+      expect(second.over).toBe(true);
+      expect(run.summary().endedBy).toBe('penalty');
+    });
+
+    it('starts over after a considered hit', () => {
+      const run = new Run(1);
+      expect(run.apply([GESTURE.like, 250, 0]).blind).toBe(1);
+      expect(run.apply([GESTURE.up, RULES.blindMs, 0]).verdict).toBe('hit');
+      expect(run.apply([GESTURE.up, 200, 0]).blind).toBe(1);
+    });
+
+    it('lets a hold or a freeze reel left alone count as a look', () => {
+      const run = new Run(3);
+      run.apply([GESTURE.up, 200, 0]);
+      run.apply([GESTURE.up, 200, 0]);
+      expect(run.apply([GESTURE.up, 200, 0]).blind).toBe(1);
+      run.apply([GESTURE.up, 200, 0]);
+      expect(run.current.kind).toBe('hold');
+      expect(['hit', 'perfect']).toContain(run.apply(perfectAction(run)).verdict);
+      expect(run.apply([GESTURE.like, 250, 0]).blind).toBe(1);
+      expect(run.current.kind).toBe('freeze');
+      expect(run.apply([GESTURE.none, 0, 0]).verdict).toBe('hit');
+      expect(run.apply([GESTURE.like, 250, 0]).blind).toBe(1);
+    });
+
+    it('costs a loss doubled once per blind move', () => {
+      expect([0, 1, 2, 3].map((blind) => penaltyFor(RULES.loss.wrong, blind))).toEqual([
+        200, 400, 800, 1600,
+      ]);
+    });
+
+    it('ends a player who swipes everything within the intro, on every seed', () => {
+      for (const seed of [1, 42, 7919, 123456789]) {
+        for (const ms of [150, 200, RULES.blindMs - 1]) {
+          const run = new Run(seed);
+          while (!run.over) run.apply(blindSwipe(run, ms));
+          const summary = run.summary();
+          expect(summary.endedBy).toBe('penalty');
+          expect(summary.reels).toBeLessThanOrEqual(RULES.intro.length);
+        }
+      }
+    });
   });
 
   it('judges a hold by where the bar stopped', () => {

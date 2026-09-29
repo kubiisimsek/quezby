@@ -14,8 +14,9 @@ import {
   sameLengthSpread,
   type Played,
 } from '../src/balance';
-import { PROFILES } from '../src/bot';
+import { PROFILES, blindSwipe } from '../src/bot';
 import { BONUS_KINDS } from '../src/rules';
+import { Run } from '../src/run';
 
 const runs = Number(process.argv[2] ?? 2000);
 
@@ -68,4 +69,17 @@ for (const profile of PROFILES) {
   console.log(
     `  ended by  drained ${ends.drained} · penalty ${ends.penalty} · quit ${ends.quit}\n`,
   );
+}
+
+// The blind swiper: every reel swiped as it arrives, a touch on the freeze
+// reels — what the blind-move penalty (`RULES.blindMs`) is for.
+for (const ms of [150, 200, 250]) {
+  const summaries = Array.from({ length: runs }, (_, i) => {
+    const run = new Run((i + 1) * 7919);
+    while (!run.over) run.apply(blindSwipe(run, ms));
+    return run.summary();
+  });
+  console.log(`blind swiper, ${ms} ms`);
+  console.log(`  reels     ${row(summaries.map((summary) => summary.reels)).map(fmt).join(' / ')}`);
+  console.log(`  score     ${row(summaries.map((summary) => summary.score)).map(fmt).join(' / ')}\n`);
 }

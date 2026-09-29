@@ -2,6 +2,7 @@
 
 use App\Enums\AdminRole;
 use App\Enums\RunStatus;
+use App\Game\Rules;
 use App\Models\LeaderboardEntry;
 use App\Models\Run;
 use App\Models\User;
@@ -21,12 +22,12 @@ test('says how the game is doing today and over thirty days', function () {
     Run::factory()->for($new)->ranked(100)->create(['status' => RunStatus::Flagged, 'flags' => [['code' => 'wall_clock', 'severity' => 'hard']]]);
     Run::factory()->for($old)->ranked(99000)->create(['status' => RunStatus::Review, 'flags' => [['code' => 'reaction_cv', 'severity' => 'soft'], ['code' => 'wall_clock', 'severity' => 'hard']]]);
     Run::factory()->for($old)->ranked(10)->create(['finished_at' => now()->subDays(2)]);
-    LeaderboardEntry::query()->create(['season' => 2, 'period' => 'challenge', 'period_key' => '2026-09-25', 'user_id' => $new->id, 'score' => 10, 'reels' => 5, 'achieved_at' => now()]);
+    LeaderboardEntry::query()->create(['season' => Rules::ENGINE_VERSION, 'period' => 'challenge', 'period_key' => '2026-09-25', 'user_id' => $new->id, 'score' => 10, 'reels' => 5, 'achieved_at' => now()]);
 
     $response = $this->getJson('/api/v1/admin/overview')->assertOk()
         ->assertJsonPath('today', '2026-09-25')
         ->assertJsonPath('dailyNumber', 2)
-        ->assertJsonPath('season', 2)
+        ->assertJsonPath('season', Rules::ENGINE_VERSION)
         ->assertJsonPath('kpis', [
             'players' => 3,
             'newToday' => 1,

@@ -1,4 +1,4 @@
-# Puanlama ve zorluk — Engine v2 (kilitli)
+# Puanlama ve zorluk — Engine v3 (kilitli)
 
 **Kod:** `packages/engine/src/rules.ts` (TS) · `apps/api/app/Game/Rules.php` (PHP ikizi)
 **Kilit:** `packages/engine/rules.lock.json` · **Denge raporu:** `pnpm engine:simulate`
@@ -119,6 +119,26 @@ Bar 1000'den (%100) başlar, reel ekrandayken saniyede `erime(n)` kadar düşer.
 Bar bir reelin ortasında biterse tur o anda biter (`drained`); bir ceza onu
 sıfıra indirirse de biter (`penalty`).
 
+### Kör hamle (motor v3)
+
+Reel canlandıktan sonraki **ilk 300 ms içinde** (`blindMs`) yanlış posta
+kaydırmak ya da çift dokunmak **kör hamledir**: o sürede postun ne olduğuna
+bakılamaz. Kör hamlenin cezası **ikiye katlanır**, arkasından gelen her kör
+hamlede yeniden katlanır: −400, −800, −1600. Üçüncüsü turu her zaman bitirir.
+
+- Sayaç **düşünülmüş bir isabetle** sıfırlanır: 300 ms ya da daha geç bir
+  kaydırma/beğeni isabeti, bir altın isabeti ya da dokunulmadan geçilen bir
+  dokunma reeli. Hızlı (300 ms altı) kaydırma isabetleri sayacı sıfırlamaz.
+- Kör sayılmayanlar: süreyi kaçırmak, altında erken/geç bırakmak, bir postu
+  basılı tutmak ve dokunma reeline dokunmak (onun zaten kendi, en ağır cezası
+  var). Dokunma reelinde parmak ilk temasta yakalanır; o da kör sayılsaydı
+  hızlı ama dürüst oyuncular gereğinden sert cezalanırdı.
+- Amaç, bakmadan (iki parmakla, art arda) kaydırarak puan toplamayı bitirmek:
+  motor v2'de her şeyi kaydıran bir oyuncu medyanda 7–8 B, en iyi %10'da
+  20–38 B yapıyordu; v3'te her tohumda 5. reelde, 650 puanla düşer.
+- Oyunda kör hamle "Bakmadan!" ve altında "Ceza x2" (x4, x8) olarak görünür
+  (`Step.blind`).
+
 ## Puan
 
 ```
@@ -164,10 +184,15 @@ kadar geçen süredir.
 
 | Profil | Reel p50 | Süre p10 / p50 / p90 | Skor p10 / p50 / p90 | Aynı süre (±%10) p10/p50 · p90/p50 | İsimli kombo payı |
 | --- | --: | --- | --- | --- | --: |
-| Yeni başlayan | 127 | 1:05 / **2:03** / 2:58 | 17 B / **40 B** / 65 B | **0,87 · 1,14** | %7 |
-| Ortalama | 245 | 2:20 / **3:29** / 4:35 | 61 B / **104 B** / 148 B | **0,88 · 1,11** | %11 |
-| İyi | 405 | 3:57 / **5:13** / 6:17 | 169 B / **240 B** / 306 B | **0,89 · 1,11** | %23 |
-| Profesyonel | 631 | 6:13 / **7:26** / 8:16 | 402 B / **499 B** / 577 B | **0,89 · 1,10** | %31 |
+| Yeni başlayan | 126 | 1:05 / **2:02** / 2:57 | 17 B / **40 B** / 65 B | **0,88 · 1,15** | %7 |
+| Ortalama | 243 | 2:17 / **3:27** / 4:33 | 60 B / **103 B** / 147 B | **0,88 · 1,12** | %11 |
+| İyi | 401 | 3:51 / **5:10** / 6:15 | 164 B / **238 B** / 304 B | **0,89 · 1,11** | %23 |
+| Profesyonel | 626 | 6:00 / **7:21** / 8:15 | 384 B / **494 B** / 573 B | **0,89 · 1,09** | %31 |
+| Kör kaydıran (150–250 ms, her reel) | 5 | — | **650** (her tohumda) | — | — |
+
+Kör hamle cezası dürüst profilleri medyanda ~%1 kısaltır (v2'de 40 / 104 /
+240 / 499 B); en çok, dokunma reeline refleksle hızlı dokunan
+profesyonellerin kötü turlarında hissedilir (p10 402 → 384 B).
 
 - **±%20 sözü dört profilde de tutuyor.** Engine v1'de aynı ölçüm
   0,74–0,77 / 1,26–1,41 idi: sıfırlanan x1→x5 kombo gürültü, sınırsız seviye
@@ -242,7 +267,8 @@ arası geometrik (motorun skorları bir beceri basamağında 2–3 katına çık
 
 | Reyting | 0 | 1000 | 2000 | 3000 | 4000 | 5000 | 6000 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Hedef (motor v2) | 8 B | 34 B | 100 B | 240 B | 480 B | 800 B | 1,1 M |
+| Hedef (motor v3) | 8 B | 33,7 B | 99 B | 238 B | 475 B | 792 B | 1,09 M |
+| Hedef (motor v2, geç onaylar için) | 8 B | 34 B | 100 B | 240 B | 480 B | 800 B | 1,1 M |
 
 - `P(skor)`: skorun, hangi reytingin tipik skoru olduğu (tablonun tersi).
 - **Değişim** `Δ = round(100 × tanh((P − R) / W))`: hedefi geçen artar,
@@ -321,7 +347,9 @@ görünen her sayı sunucudan gelir.
    - `fast_decisions`: ≥30 kaydırma/beğeni isabetinin %20'den fazlası 250 ms altında
      — ama 250 ms altındaki tüm hareketlerin %10'dan fazlası yanlışsa bayrak
      kalkar (`fast_wrong_share`): her şeyi kaydıran oyuncu tahmin ediyordur,
-     bot değildir; yanlış hareketlerde de aynı hızdadır.
+     bot değildir; yanlış hareketlerde de aynı hızdadır. Motor v3'ten beri
+     her şeyi kör kaydıran, 30 isabete varmadan kör hamle cezasıyla düşer;
+     bu istisna, kimini bakarak kimini körlemesine kaydıranı korur.
    - `hold_bounds`: uygulamanın çoktan bitireceği uzunlukta bir basılı tutma.
    - `client_mismatch`: uygulamanın gösterdiği skor sunucununkiyle aynı değil.
    - `banned`: oyuncu (sessizce) yasaklı.

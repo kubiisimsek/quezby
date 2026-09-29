@@ -134,6 +134,17 @@ export class Bot {
   }
 }
 
+/**
+ * A thumb that swipes every reel `ms` after it goes live, without looking —
+ * the player the blind-move penalty is for. On a freeze reel the swipe is a
+ * touch.
+ */
+export function blindSwipe(run: Run, ms: number): Action {
+  const reel = run.current;
+  if (ms >= reel.window) return [GESTURE.none, 0, 0];
+  return [reel.kind === 'freeze' ? GESTURE.touch : GESTURE.up, ms, 0];
+}
+
 /** Plays a whole run with one profile. Stops at `maxReels` as a quit. */
 export function playRun(
   run: Run,

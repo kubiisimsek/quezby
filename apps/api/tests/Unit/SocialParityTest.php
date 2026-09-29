@@ -22,6 +22,12 @@ it('keeps a photo to the size and weight the app squeezes it to', function () {
         ->and(config('quezby.avatars.min_side'))->toBe($fixture['avatar']['minSide']);
 });
 
+it('opens the tray with greetings, then the game\'s banter', function () {
+    expect(array_slice(array_map(fn (Phrase $phrase) => $phrase->value, Phrase::cases()), 0, 4))
+        ->toBe(['hi', 'whats_up', 'gg', 'gg_wp'])
+        ->and(Phrase::cases())->toHaveCount(24);
+});
+
 it('says every phrase in every language', function (string $locale) {
     app()->setLocale($locale);
 

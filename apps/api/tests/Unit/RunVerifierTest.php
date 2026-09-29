@@ -59,17 +59,27 @@ it('counts decisions under the speed floor only among swipe and like hits', func
         ->and(verifier()->decisionSpeed($short))->toBeNull('too few samples to judge');
 });
 
-it('lets a guesser through who is as fast on the reels it gets wrong', function (int $seed, bool $spareFreeze) {
-    $steps = Engine::replay($seed, swipedLog($seed, 200, 190, 40, $spareFreeze))->steps;
+it('lets a guesser through who is as fast on the reels it gets wrong', function (int $seed, int $decisionMs, int $jitterMs) {
+    $steps = Engine::replay($seed, swipedLog($seed, 200, $decisionMs, $jitterMs, spareFreeze: true))->steps;
     $skipHits = collect($steps)->filter(fn ($step) => $step->reel->kind->value === 'skip' && $step->verdict->isHit())->count();
 
     expect($skipHits)->toBeGreaterThanOrEqual(config('quezby.plausibility.fast_min_samples'), 'enough swipe hits that speed alone would flag it')
         ->and(verifier()->decisionSpeed($steps))->toBeNull();
 })->with([
+    // Swipes some reels too soon to have looked and some after a look, so the
+    // blind moves (engine v3) leave it alive long enough to be judged.
+    'one feed' => [31337, 300, 150],
+    'another feed' => [7919, 280, 130],
+]);
+
+it('never has to judge a guesser who swipes everything: the engine ends it first', function (int $seed, bool $spareFreeze) {
+    $summary = Engine::replay($seed, swipedLog($seed, 200, 190, 40, $spareFreeze))->summary;
+
+    expect($summary->endedBy->value)->toBe('penalty')
+        ->and($summary->reels)->toBeLessThan(config('quezby.plausibility.fast_min_samples'));
+})->with([
     'swipes everything' => [7919, false],
     'spares freeze reels' => [4242, true],
-    'spares freeze reels, another feed' => [7919, true],
-    'spares freeze reels, a third feed' => [31337, true],
 ]);
 
 it('still catches a fast player who is right almost every time', function () {

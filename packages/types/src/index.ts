@@ -765,16 +765,30 @@ export type FriendListResponse = {
  * the API's push says them in the receiver's.
  */
 export type Phrase =
+  | 'hi'
+  | 'whats_up'
   | 'gg'
+  | 'gg_wp'
   | 'rematch'
+  | 'your_turn'
   | 'beat_that'
+  | 'ready'
   | 'wow'
   | 'close_one'
-  | 'your_turn'
+  | 'clutch'
+  | 'ez'
+  | 'bot'
+  | 'nerf'
+  | 'lucky'
+  | 'lag'
+  | 'warming_up'
+  | 'rage_quit'
+  | 'respect'
+  | 'afk'
   | 'daily'
-  | 'hi'
   | 'thanks'
-  | 'next_time';
+  | 'next_time'
+  | 'bye';
 
 export type BlockedPlayer = { username: string; avatarUrl: string | null; blockedAt: string };
 

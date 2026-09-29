@@ -1,5 +1,6 @@
 import type { Reel, ReelKind } from '@quezby/engine';
 import { render, screen } from '@testing-library/react-native';
+import { StyleSheet } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
 import { lookOf } from '@/game/content';
@@ -46,6 +47,15 @@ describe('ReelCard', () => {
 
     expect(screen.getByText('Altın post')).toBeOnTheScreen();
     expect(screen.getByText('Basılı tut · yeşilde bırak')).toBeOnTheScreen();
+  });
+
+  it('fills the gold bar square-ended, with a dark edge where it stands', async () => {
+    await render(<ReelCard reel={reel('hold')} seed={42} values={VALUES} hint={false} />);
+
+    const fill = StyleSheet.flatten(screen.getByTestId('hold-fill').props.style);
+    expect(fill.borderRadius).toBeUndefined();
+    expect(screen.getByTestId('hold-tip')).toHaveStyle({ position: 'absolute', right: 0, width: 3 });
+    expect(screen.getByTestId('hold-track')).toHaveStyle({ borderRadius: 4 });
   });
 
   it('draws each post in the format the catalog gave it, on its kind’s backdrop', async () => {

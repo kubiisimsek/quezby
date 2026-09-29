@@ -12,6 +12,7 @@ import {
   Callout,
   Eyebrow,
   IconChip,
+  LitEdge,
   SocialButton,
   Tag,
   Txt,
@@ -179,10 +180,7 @@ function WayTile({
         { backgroundColor: theme.raised, borderColor: theme.outline },
       ]}
     >
-      <View
-        pointerEvents="none"
-        style={[styles.tileEdge, { backgroundColor: theme.tileHi }]}
-      />
+      <LitEdge color={theme.tileHi} />
       {gem}
       <View style={styles.tileText}>
         <Txt variant="heading">{title}</Txt>
@@ -232,7 +230,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACE.lg,
     paddingVertical: SPACE.md,
   },
-  tileEdge: { height: 3, left: 0, position: 'absolute', right: 0, top: 0 },
   tileText: { alignItems: 'flex-start', flex: 1, gap: SPACE.xs },
   gem: {
     alignItems: 'center',

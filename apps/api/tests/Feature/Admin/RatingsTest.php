@@ -18,6 +18,7 @@ use Illuminate\Support\Carbon;
 
 beforeEach(function () {
     Carbon::setTestNow(Carbon::parse('2026-10-01 12:00', 'Europe/Istanbul'));
+    pinRatingTargets();
     $this->signInAdmin(AdminRole::Viewer);
 });
 

@@ -67,7 +67,7 @@ test('combo steps match', function () {
     }
 });
 
-it('scores every reel of the bonus logs like the TypeScript engine', function (array $fixture) {
+it('scores every reel of the step logs like the TypeScript engine', function (array $fixture) {
     $run = new Run($fixture['seed']);
     foreach ($fixture['actions'] as $index => $action) {
         $step = $run->apply($action);
@@ -78,6 +78,7 @@ it('scores every reel of the bonus logs like the TypeScript engine', function (a
             'points' => $step->points,
             'combo' => $step->combo,
             'bonuses' => array_map(fn (BonusHit $bonus) => $bonus->toArray(), $step->bonuses),
+            'blind' => $step->blind,
             'meter' => $step->meter,
         ], "{$fixture['name']} reel {$index}");
     }

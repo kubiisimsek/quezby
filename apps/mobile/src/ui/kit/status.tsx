@@ -9,6 +9,7 @@ import Animated, {
 import { SHRINK_TO_FIT } from '@/i18n/native';
 import { IconChip } from '@/ui/kit/identity';
 import { common } from '@/ui/kit/shared';
+import { LitEdge } from '@/ui/kit/surfaces';
 import { tagPalette, toneColor, type TagTone, type Tone } from '@/ui/kit/tones';
 import { Icon, type IconName } from '@/ui/icons';
 import { DEPTH, FONT, RADIUS, SPACE, TYPE, embossed, lh, useTheme } from '@/ui/theme';
@@ -149,7 +150,7 @@ export function Stat({
         { backgroundColor: theme.tile, borderColor: theme.outline },
       ]}
     >
-      <View pointerEvents="none" style={[styles.statEdge, { backgroundColor: theme.tileHi }]} />
+      <LitEdge color={theme.tileHi} radius={RADIUS.control} />
       {icon ? <IconChip icon={icon} tone={STAT_GEM[tone]} size="sm" /> : null}
       <Animated.Text
         numberOfLines={1}
@@ -282,7 +283,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACE.sm,
     paddingVertical: SPACE.ms,
   },
-  statEdge: { height: 3, left: 0, position: 'absolute', right: 0, top: 0 },
   statLabel: { alignSelf: 'stretch', textAlign: 'center' },
   statValue: { alignSelf: 'stretch', fontFamily: FONT.display, textAlign: 'center' },
   statRow: { flexDirection: 'row', gap: SPACE.ms },

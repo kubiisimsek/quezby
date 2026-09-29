@@ -59,6 +59,9 @@ final class Run
     /** The meter ended a reel below `COMEBACK_LOW` and has not climbed back yet. */
     private bool $lowMeter = false;
 
+    /** Blind moves since the last considered hit. */
+    private int $blindRun = 0;
+
     private int $bonusPoints = 0;
 
     /** @var array{flawless: int, lightning: int, coolHead: int, comeback: int} */
@@ -244,6 +247,12 @@ final class Run
             $this->perfects++;
         }
 
+        // A hold, a freeze reel left alone, or a swipe or like made in time to
+        // have looked: the player is looking again, and blind moves start over.
+        if ($gesture === Gesture::Hold || $gesture === Gesture::None || $t >= Rules::BLIND_MS) {
+            $this->blindRun = 0;
+        }
+
         $this->combo = Rules::comboAfterHit($this->combo);
         $this->maxCombo = max($this->maxCombo, $this->combo);
         $base = Rules::BASE[$reel->kind->value];
@@ -322,12 +331,21 @@ final class Run
         $this->levelClean = false;
         $this->lightningRun = 0;
         $this->previousHit = null;
-        $this->meter -= match ($verdict) {
+        $loss = match ($verdict) {
             Verdict::Timeout => Rules::LOSS_TIMEOUT,
             Verdict::Caught => Rules::LOSS_CAUGHT,
             Verdict::HoldEarly, Verdict::HoldLate => Rules::LOSS_HOLD_MISS,
             default => Rules::LOSS_WRONG,
         };
+        $blind = $verdict === Verdict::Wrong
+            && ($gesture === Gesture::Up || $gesture === Gesture::Like)
+            && $t < Rules::BLIND_MS
+            ? $this->blindRun + 1
+            : 0;
+        if ($blind > 0) {
+            $this->blindRun = $blind;
+        }
+        $this->meter -= Rules::penaltyFor($loss, $blind);
         if ($this->meter <= 0) {
             $this->meter = 0;
             $this->ended = EndReason::Penalty;
@@ -336,13 +354,13 @@ final class Run
             $this->lowMeter = true;
         }
 
-        return $this->advance($reel, $verdict, 0, 0, [], $gesture, $t, $d);
+        return $this->advance($reel, $verdict, 0, 0, [], $gesture, $t, $d, $blind);
     }
 
     /**
      * @param  list<BonusHit>  $bonuses
      */
-    private function advance(Reel $reel, Verdict $verdict, int $points, int $combo, array $bonuses, Gesture $gesture, int $t, int $d): Step
+    private function advance(Reel $reel, Verdict $verdict, int $points, int $combo, array $bonuses, Gesture $gesture, int $t, int $d, int $blind = 0): Step
     {
         $this->reels++;
         if ($this->ended === null) {
@@ -352,13 +370,13 @@ final class Run
             }
         }
 
-        return $this->step($reel, $verdict, $points, $combo, $bonuses, $gesture, $t, $d);
+        return $this->step($reel, $verdict, $points, $combo, $bonuses, $gesture, $t, $d, $blind);
     }
 
     /**
      * @param  list<BonusHit>  $bonuses
      */
-    private function step(Reel $reel, Verdict $verdict, int $points, int $combo, array $bonuses, Gesture $gesture, int $t, int $d): Step
+    private function step(Reel $reel, Verdict $verdict, int $points, int $combo, array $bonuses, Gesture $gesture, int $t, int $d, int $blind = 0): Step
     {
         return new Step(
             reel: $reel,
@@ -366,6 +384,7 @@ final class Run
             points: $points,
             combo: $combo,
             bonuses: $bonuses,
+            blind: $blind,
             meter: $this->meter,
             over: $this->ended !== null,
             gesture: $gesture,

@@ -9,19 +9,33 @@ import type { Phrase } from '@quezby/types';
  * against `fixtures/social.json`. Codes are only ever added, never renamed.
  */
 const PHRASE_CODES: Record<Phrase, true> = {
+  hi: true,
+  whats_up: true,
   gg: true,
+  gg_wp: true,
   rematch: true,
+  your_turn: true,
   beat_that: true,
+  ready: true,
   wow: true,
   close_one: true,
-  your_turn: true,
+  clutch: true,
+  ez: true,
+  bot: true,
+  nerf: true,
+  lucky: true,
+  lag: true,
+  warming_up: true,
+  rage_quit: true,
+  respect: true,
+  afk: true,
   daily: true,
-  hi: true,
   thanks: true,
   next_time: true,
+  bye: true,
 };
 
-/** In the order the phrase tray shows them. */
+/** In the order the phrase sheet shows them: greetings first, then the game's banter. */
 export const PHRASES = Object.keys(PHRASE_CODES) as Phrase[];
 
 export function isPhrase(value: string): value is Phrase {

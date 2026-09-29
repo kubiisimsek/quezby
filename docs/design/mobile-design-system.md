@@ -147,7 +147,8 @@ screens/
                      under it ("3 galibiyet · 1 yenilgi · 0 beraberlik") and a slab to the
                      friend's PlayerSheet; a `FaceOff` panel at the top of the lines; the
                      lines newest at the bottom (`Bubble`s and `EventLine`s), a `PushNudge`
-                     under them; a dock with the VS card over the phrase tray (`PhraseChip`s):
+                     under them; a dock with the VS card over a violet "Hazır mesaj gönder" slab
+                     that opens the `PhraseSheet`:
                      no VS — magenta "VS at" → VsSheet; your turn — the screen's one gold
                      "Oyna", a ghost "Reddet" and a `CountdownChip`; their turn — your score
                      and the countdown. Read on sight; asked again when the pulse moves
@@ -305,7 +306,10 @@ A new shape goes into the family it belongs to and into that list.
 | `Screen` / `Arena` | The night arena every screen stands on / the arena alone, for a screen that lays out its own scroll |
 | `TopBar` | A screen's head on the arena: title in Rubik, `subtitle`, a back slab (`onBack`), one action (`right`) |
 | `Panel` / `Card` | A tile (outline, lip, lit edge) / a pressable tile that sinks and staggers in; `tone` `primary` (yours) / `sunken` (a well) |
-| `BrandBand` | The stage — magenta into violet with lanes, for a hero |
+| `LitEdge` | A tile's lit top edge: the top border of a box rounded like the tile's inside (`innerRadius`), so it follows the corners and thins down their curve — never a straight bar across them. Every tile with a lit edge draws it (Panel, Card, LobbyCard, NoticeCard, ClimbRow, FloorCard, StatGrid, result rank tiles, sign-in tiles, the nudges) |
+| `Shine` | The lighter upper band of a small slab with a lip (a bubble, a ribbon, a tab's tile, a segment): cut from a slab-tall box rounded like the slab's inside — a short band rounded on its own gets its corners flattened to its height and they poke over the outline |
+| `innerRadius` | A corner's radius less its outline: the radius of anything flush against a tile's inside (a banner at a tile's top, a shine) |
+| `BrandBand` | The stage — magenta into violet with lanes, for a hero. The wash is clipped to the box's inside corners and sized to its inside, and a bordered band fills the rest in its outline's colour: the lip and the outline stay whole round every corner |
 | `Gradient` | A two-colour SVG wash |
 | `Slab` | Anything pressable that is not a row: face on a lip in the outline, gloss on top; sinks under the thumb |
 | `Button` | A slab with a Rubik label. `play` (gold — starts a game, one per screen) / `primary` (magenta) / `secondary` (violet) / `neutral` (tile) / `ghost` (text) / `danger` (red) / `onBrand` (gold on a stage) / `onBrandSoft` (violet on a stage); `sm/md/lg/xl`; `icon`; `loading`; `accessibilityLabel` when a short label needs its context read aloud ("Oyna" → "Günün akışını oyna"); the label shrinks to fit. Never green: green is only the ✓ `IconButton` |
@@ -339,7 +343,7 @@ A new shape goes into the family it belongs to and into that list.
 | `Count` | How many wait: a red pill, `9+` past nine — on a `ThreadRow`, and on a dock slot (`TabBar` draws it from `tabBarBadge`) |
 | `Bubble` | A phrase in a conversation: yours on the end side as a magenta slab, your friend's on the start side as a tile, each with its time under it |
 | `EventLine` | What happened between two friends rather than what was said — friends now, a VS sent, won, lost or drawn, turned down, run out — as a strip in the middle of the conversation with its gem; a result (`strong`) sets its word in Rubik in the colour of how it went, the two scores under it |
-| `PhraseChip` | A phrase in the tray: a small neutral slab that sends it; dimmed while one is on its way |
+| `PhraseChip` | A phrase in the `PhraseSheet`: a small neutral slab that sends it; dimmed while one is on its way |
 | `RunTile` | A past game: its mode's gem (free play, the daily, a VS), its title over posts · time · hour, the score in Rubik on the end side — gold, with "REKOR" under it, when it is the season's best — and what became of it as a tag; ends in an arrow slab |
 | `Toast` | A push that arrives while the game is open: a tile with a bell that drops in from the top with the push's own words, opens what it is about when tapped, and slides back up by itself |
 | `CoachCard` | A new kind of post, before it starts: "YENİ POST · 2/4", its gem, a hand acting the move out (swipe, double-tap, hold into the green zone, keep still — twice, then still), its name and line, the gold "Anladım" that starts the post |
@@ -382,6 +386,7 @@ which takes a tint.
 | `PlayerSheet` | A player's card from any row: portrait, tier, what you are to each other as a tag (Arkadaşın, İstek gönderildi, Seni eklemek istiyor, Engelledin), their friends count — a neutral slab that opens the list (once the card has left the screen) on your own card and a friend's, plain words on anyone else's, season best in gold, weekly and all-time place, a few lifetime counts — then the one main action the relation allows: "Arkadaş ekle"; "Kabul et" / "Reddet"; "Geri al"; "VS at" and "Sohbet" for a friend (no "Sohbet" when opened from the conversation); "Engeli kaldır". "Diğer" opens an `ActionList` in place: "Arkadaşlıktan çıkar" (a friend), "Engelle", "Fotoğrafı bildir" (when there is a photo), "Kullanıcı adını bildir". The VS sheet or the conversation opens once the card has left the screen |
 | `PlayerCard` | `Portrait` (the 72/92pt framed portrait of a profile — the photo, or the initials; `onEdit` pins a camera `IconButton` slab to its corner) and `SeasonBest` (the gold record well) |
 | `FriendButton` | The small slab beside a player in FindFriends, by what they are to you: "Ekle"; "Geri al" while your request waits; "Kabul et" and a close glyph slab (read aloud "Reddet") while theirs waits, so the name keeps its room; "Sohbet" once you are friends; nothing for a player you blocked. Only the pressed row shows a spinner, and the API's answer shows at once |
+| `PhraseSheet` | Hazır mesajlar: all 24 phrases wrapped in reading order (greetings first, then the game's banter), "Birine dokun, hemen gider."; one tap sends it and closes the sheet |
 | `VsSheet` | Sending a VS: `FaceOff`, the four rules (one feed, a try each; you play first and your score stays hidden; your friend has a while, then it counts for nobody; a VS counts on no board, league or stat) and the sheet's one gold "Oyna" — the game opens once the sheet is gone |
 | `RunSheet` | A past game from Geçmiş oyunlar: the score (gold and "REKOR" when it is the season's best), when it ended, what became of it, the stat tiles and bonus chips of the replay, and a VS's two scores; `runTitle`, `runLook` and `runTag` name, gem and tag a run for its `RunTile` too |
 | `PushNudge` | Notifications are off, in a warn card with a bell: never asked → "Bildirimleri aç" (the system's question); turned down → "Ayarları aç" (the phone's settings). In the Mesajlar tab and a conversation, where "Gizle" puts it away for a week, and on a VS just sent; nothing while they are on or in a build without push |

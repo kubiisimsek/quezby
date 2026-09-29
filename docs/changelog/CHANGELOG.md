@@ -1,5 +1,50 @@
 # Changelog
 
+## 2026-09-29 — Blind moves (engine v3), rounder edges, more phrases
+
+The owner scored 20 K by swiping with two fingers without looking and asked
+for the penalty to compound, so fast skipping ends the run at once; asked
+for the cards' top edges and corners to be looked at, the profile first; for
+more preset messages (a hello, GG WP and the gaming world's jokes), shown in
+a sheet; and for the gold post's bar to fill square-ended.
+
+- **Engine v3 — a new season.** A *blind move* is a swipe or a double tap on
+  the wrong post within `RULES.blindMs` (300 ms) of it going live. Its
+  penalty doubles, and doubles again for each blind move after it (−400,
+  −800, −1600: the third always ends the run) until a considered hit — a
+  swipe or like at 300 ms or later, a gold hit, a freeze reel left alone.
+  Timeouts, hold misses, presses and freeze touches are never blind.
+  `Step.blind` carries it; the TS and PHP engines, fixtures (three new step
+  logs), `rules.lock.json`, `Rules::ENGINE_VERSION` moved together.
+  Simulated: a player who swipes everything blind is out on the fifth reel
+  with 650 on every seed (v2: 7–8 K median, up to 38 K); honest profiles
+  lose ~1 % (40 / 103 / 238 / 494 K). New Elo targets for v3
+  (`rating.targets.3`, v2's 1 % lower); rating tests pin v2's table so their
+  numbers stay put; season-2 literals in tests now read `Rules::ENGINE_VERSION`.
+  In the game a blind move says **Bakmadan!** with **Ceza x2** (x4, x8) under
+  it; Yardım → Dopamin barı explains it, in six languages.
+  **Deploy:** the API and the app go together — a v2 app gets
+  `engine_outdated`; boards start a new season.
+- **Edges and corners.** The lit top edge of every tile was a straight 3 pt
+  bar that crossed the rounded outline at both corners (Panel, Card,
+  LobbyCard, NoticeCard, ClimbRow, FloorCard, StatGrid, result ranks, sign-in
+  tiles, the guest and push nudges): now `LitEdge`, following the inner
+  curve. The profile card's magenta banner painted over its top corners; it
+  now rounds by `innerRadius`. `BrandBand` (Zirve's stage, the result stage,
+  the profile banner) drew its wash over its own bottom lip and corners; the
+  wash is now clipped to the inside. Shines on bubbles, ribbons, the miss
+  slab, tab tiles, segments, the stats sheet's thumbs and Yardım's gems are
+  `Shine`, so their corners no longer poke over the outline.
+- **Phrases:** 24 instead of 10 (`hi`, `whats_up`, `gg`, `gg_wp`,
+  `rematch`, `your_turn`, `beat_that`, `ready`, `wow`, `close_one`,
+  `clutch`, `ez`, `bot`, `nerf`, `lucky`, `lag`, `warming_up`, `rage_quit`,
+  `respect`, `afk`, `daily`, `thanks`, `next_time`, `bye`), in six languages
+  in the app and the API's push. The conversation's dock keeps the VS card and
+  a **Hazır mesaj gönder** slab that opens `PhraseSheet`.
+- **Gold post bar:** square corners and a square fill with a dark leading
+  edge, so where it stands against the green reads at a glance; the coach
+  card's little bar matches.
+
 ## 2026-09-29 — Email accounts: sign in first, proved by a code
 
 The owner: the ways-in screen had no sign-in, a sign-up asked for the
@@ -36,6 +81,10 @@ must go out in the language the player signed up in.
 - **App:** `SignInScreen` rewritten, `RegisterScreen`, `VerifyEmailScreen`,
   `ForgotPasswordScreen`, `components/EmailCode.tsx` (`CodeField`,
   `ResendButton`), a two-step `CredentialsSheet`; the `Email` screen is gone.
+- `email_codes.sent_at` / `expires_at` are `dateTime(3)`: as NOT NULL
+  timestamps the staging MySQL refused the table (1067, "Invalid default
+  value", no `explicit_defaults_for_timestamp`). `MigrationTimestampsTest`
+  now refuses a NOT NULL timestamp without a default in any migration.
 - Tests: Pest (`EmailAuthTest`, `EmailCodeMailTest`, credentials in `MeTest`
   and `IdentityLinkTest`), SDK, `check-api-env`, the app (SignIn, Register,
   VerifyEmail, ForgotPassword, CredentialsSheet, the countdown).

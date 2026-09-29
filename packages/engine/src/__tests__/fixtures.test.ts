@@ -57,7 +57,7 @@ describe('fixtures', () => {
     }
   });
 
-  it('every bonus fixture replays reel by reel', () => {
+  it('every step log replays reel by reel', () => {
     for (const fixture of buildBonuses()) {
       const run = new Run(fixture.seed);
       fixture.actions.forEach((action, i) => {
@@ -69,6 +69,7 @@ describe('fixtures', () => {
           points: step.points,
           combo: step.combo,
           bonuses: [...step.bonuses],
+          blind: step.blind,
           meter: step.meter,
         }).toEqual(fixture.steps[i]);
       });

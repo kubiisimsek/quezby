@@ -74,6 +74,15 @@ test('a phrase goes to a friend, and reading the conversation clears it', functi
     $this->getJson('/api/v1/me/friends')->assertJsonPath('friends.0.unread', 0);
 });
 
+test('the game\'s banter goes too: greetings and GG WP, EZ and rage quits', function (string $phrase) {
+    $me = $this->signIn();
+    $this->befriend($me, User::factory()->withUsername('kanka')->create());
+
+    $this->postJson('/api/v1/me/threads/kanka/messages', ['phrase' => $phrase])
+        ->assertCreated()
+        ->assertJsonPath('message.phrase', $phrase);
+})->with(['whats_up', 'gg_wp', 'ready', 'clutch', 'ez', 'bot', 'nerf', 'lucky', 'lag', 'warming_up', 'rage_quit', 'respect', 'afk', 'bye']);
+
 test('a phrase is one of the list, never typed words', function (mixed $phrase) {
     $me = $this->signIn();
     $this->befriend($me, User::factory()->withUsername('kanka')->create());

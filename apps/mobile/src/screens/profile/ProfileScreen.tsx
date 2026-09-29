@@ -37,6 +37,7 @@ import {
   Counters,
   IconButton,
   IconChip,
+  LitEdge,
   LobbyCard,
   Panel,
   RankChips,
@@ -47,6 +48,7 @@ import {
   Tag,
   TierBadge,
   Txt,
+  innerRadius,
 } from '@/ui/kit';
 import { ActionSheet } from '@/ui/sheet';
 import { DEPTH, RADIUS, SPACE, TYPE, embossed, useTheme } from '@/ui/theme';
@@ -398,10 +400,7 @@ function KeepNudge({ onPress }: { onPress: () => void }) {
         pressed ? styles.sunk : null,
       ]}
     >
-      <View
-        pointerEvents="none"
-        style={[styles.nudgeEdge, { backgroundColor: theme.warnLine }]}
-      />
+      <LitEdge color={theme.warnLine} />
       <IconChip icon="shield" tone="warn" size="md" />
       <View style={styles.flex}>
         <Txt variant="heading">{t.auth.keepAccount}</Txt>
@@ -422,9 +421,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACE.lg,
   },
   hero: { gap: 0, padding: 0 },
+  /** Flush with the card's top: rounded like the inside of its corners, or it paints over the outline. */
   banner: {
     alignItems: 'center',
     borderBottomWidth: DEPTH.outline,
+    borderTopLeftRadius: innerRadius(RADIUS.panel),
+    borderTopRightRadius: innerRadius(RADIUS.panel),
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingBottom: PORTRAIT_RISE - SPACE.md,
@@ -458,6 +460,5 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     padding: SPACE.lg,
   },
-  nudgeEdge: { height: 3, left: 0, position: 'absolute', right: 0, top: 0 },
   sunk: { transform: [{ translateY: 3 }] },
 });

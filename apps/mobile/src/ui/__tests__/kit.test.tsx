@@ -59,6 +59,9 @@ const ADDED = [
   'PhraseChip',
   'RunTile',
   'Toast',
+  'LitEdge',
+  'Shine',
+  'innerRadius',
 ] as const;
 
 describe('@/ui/kit', () => {

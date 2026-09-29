@@ -29,6 +29,7 @@ import { buttonColors } from '@/ui/kit/buttons';
 import { IconChip } from '@/ui/kit/identity';
 import { AnimatedPressable, common } from '@/ui/kit/shared';
 import { Slab } from '@/ui/kit/slab';
+import { LitEdge } from '@/ui/kit/surfaces';
 import { Count } from '@/ui/kit/social';
 import { Txt } from '@/ui/kit/text';
 import { type TagTone } from '@/ui/kit/tones';
@@ -78,7 +79,7 @@ export function LobbyCard({
 
   const content = (
     <>
-      <View pointerEvents="none" style={[styles.edge, { backgroundColor: theme.tileHi }]} />
+      <LitEdge color={theme.tileHi} />
       <View style={styles.head}>
         {icon ? <IconChip icon={icon} tone={tone} size="lg" /> : null}
         <View style={styles.titles}>
@@ -213,10 +214,7 @@ export function NoticeCard({
         style,
       ]}
     >
-      <View
-        pointerEvents="none"
-        style={[styles.edge, { backgroundColor: fresh ? theme.primary : theme.tileHi }]}
-      />
+      <LitEdge color={fresh ? theme.primary : theme.tileHi} />
       {onPress ? (
         <AnimatedPressable
           accessibilityRole="button"
@@ -621,7 +619,6 @@ export function RankChips({
 
 const styles = StyleSheet.create({
   card: { gap: SPACE.md },
-  edge: { height: 3, left: 0, position: 'absolute', right: 0, top: 0 },
   head: { alignItems: 'center', flexDirection: 'row', gap: SPACE.md },
   titles: { flex: 1, gap: 1 },
   arrow: {

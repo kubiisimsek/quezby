@@ -11,8 +11,11 @@ export {
   Card,
   Divider,
   Gradient,
+  LitEdge,
   Panel,
   Screen,
+  Shine,
+  innerRadius,
   type PanelTone,
 } from '@/ui/kit/surfaces';
 export { Slab, type SlabColors } from '@/ui/kit/slab';
