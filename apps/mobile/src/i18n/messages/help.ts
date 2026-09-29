@@ -49,16 +49,18 @@ const tr = {
     more: [
       'Tek hakkın var; akışı başlattığın an hakkını kullanmış olursun. Yeni akış her gece yarısı gelir, Europe/Istanbul saatiyle.',
       'Sonucunu paylaşabilirsin. Tablodaki her kare bir seviye: 🟩 hatasız, 🟨 bir iki hata, 🟥 daha fazlası, ⬛ turun bittiği yer.',
-      'Günün akışındaki skorun öteki sıralamalara ve ligine de yazılır. Serbest oyunda ise istediğin kadar oynarsın.',
+      'Günün akışındaki skorun öteki sıralamalara da yazılır ve Dereceli’yi açmaya sayılır. Normal oyunda ise istediğin kadar oynarsın.',
     ],
   },
   leagues: {
     title: 'Ligler',
-    lead: 'Beş lig var, Bronz’dan Elmas’a. Lig, ilk 20 sayılan oyunundan sonra açılır; deneme turu ve VS sayılmaz. Sonra haftanın ilk sıralı turunla ligindeki 30 kişilik bir gruba katılırsın.',
+    lead: 'Üç mod var: Günlük, Normal ve Dereceli. Elo’nu yalnız Dereceli değiştirir. Dereceli, 20 Normal ya da Günlük oyundan sonra açılır; ilk 3 dereceli oyunun Elo’nu belirler ve herkes Gümüş’te başlar.',
     more: [
-      'Lig puanın, haftanın her gününde yaptığın en iyi skorların toplamı. Her gün oynamak kazandırır.',
-      'Hafta bitince ilk beş bir üst lige çıkar, son beş bir alt lige iner, gerisi yerinde kalır. Grup küçükse bu sayılar da küçülür. Elmas’tan yukarı, Bronz’dan aşağı yol yok.',
-      'Hafta pazartesi başlar, Europe/Istanbul saatiyle.',
+      'Altı lig var: Bronz, Gümüş, Altın, Platin, Elmas ve MasterClass. Her lig 1.000 Elo, MasterClass 5.000 ve üstü.',
+      'Her dereceli oyunun bir hedef skoru var. Geçersen Elo’n artar, altında kalırsan düşer; ne kadar farkla, o kadar çok. Bir oyun en fazla 100 Elo değiştirir.',
+      'Dereceli oyundan çıkarsan oyun o anki skorunla sayılır. Yarım bırakılan dereceli oyun ise en düşük sonuç sayılır.',
+      'Yeni bir lige çıkınca 3 oyun boyunca ondan düşmezsin. Bronz’da kayıplar yarıdır.',
+      'Lig sıralaması hiç sıfırlanmaz: ligindeki, son 14 günde dereceli oynamış oyuncular Elo’ya göre sıralanır.',
     ],
   },
   boards: {
@@ -99,12 +101,12 @@ const tr = {
       {
         question: 'Günün akışını tekrar oynayabilir miyim?',
         answer:
-          'Hayır, her gün tek hakkın var. Serbest oyunda ise istediğin kadar oynarsın; en iyi turun sıralamalara yazılır.',
+          'Hayır, her gün tek hakkın var. Normal oyunda ise istediğin kadar oynarsın; en iyi turun sıralamalara yazılır.',
       },
       {
         question: 'Ligde nasıl yükselirim?',
         answer:
-          'Haftanın her günü oyna: her günün en iyi skoru lig puanına eklenir. Hafta bitince terfi bölgesindeysen bir üst lige çıkarsın.',
+          'Dereceli oyna ve hedef skorunu geç: hedefin üstüne çıktıkça Elo’n artar ve 1.000 Elo’da bir üst lige geçersin.',
       },
       {
         question: 'Arkadaşlarımla nasıl yarışırım?',
@@ -175,16 +177,18 @@ const en: HelpMessages = {
     more: [
       "You get one try, and it's used the moment you start the feed. A new feed arrives every midnight, Istanbul time.",
       'You can share your result. Each square in the grid is a level: 🟩 no mistakes, 🟨 a mistake or two, 🟥 more than that, ⬛ where the run ended.',
-      'Your Daily Feed score also counts on the other rankings and in your league. In free play, you can play as much as you like.',
+      'Your Daily Feed score also counts on the other rankings and toward opening Ranked. In Normal, you can play as much as you like.',
     ],
   },
   leagues: {
     title: 'Leagues',
-    lead: "There are five leagues, from Bronze to Diamond. The league opens after your first 20 counted games; the practice run and VS games don't count. Then your first ranked run of the week puts you in a group of 30 in your league.",
+    lead: 'There are three modes: Daily, Normal and Ranked. Only Ranked changes your Elo. Ranked opens after 20 Normal or Daily games; your first 3 ranked games set your Elo, and everyone starts in Silver.',
     more: [
-      'Your league points are the sum of your best score on each day of the week. Playing every day pays off.',
-      "When the week ends, the top five move up a league, the bottom five move down and the rest stay put. In a smaller group, these numbers shrink too. There's no way up from Diamond and no way down from Bronze.",
-      'The week starts on Monday, Istanbul time.',
+      'There are six leagues: Bronze, Silver, Gold, Platinum, Diamond and MasterClass. Each league is 1,000 Elo; MasterClass is 5,000 and up.',
+      'Every ranked game has a target score. Beat it and your Elo goes up, fall short and it goes down; the bigger the gap, the bigger the move. One game changes it by 100 Elo at most.',
+      'If you quit a ranked game, it counts with your score so far. A ranked game left unfinished counts as the lowest result.',
+      "When you move up a league, you can't drop out of it for 3 games. Losses in Bronze are halved.",
+      'The league ranking never resets: the players of your league who played Ranked in the last 14 days, by Elo.',
     ],
   },
   boards: {
@@ -224,12 +228,12 @@ const en: HelpMessages = {
       {
         question: 'Can I play the Daily Feed again?',
         answer:
-          'No, you get one try a day. In free play you can play as much as you like; your best run goes on the rankings.',
+          'No, you get one try a day. In Normal you can play as much as you like; your best run goes on the rankings.',
       },
       {
         question: 'How do I move up in the league?',
         answer:
-          "Play every day of the week: each day's best score is added to your league points. If you're in the promotion zone when the week ends, you move up a league.",
+          'Play Ranked and beat your target score: every game above it raises your Elo, and every 1,000 Elo is a league up.',
       },
       {
         question: 'How do I compete with my friends?',
@@ -300,16 +304,18 @@ const de: HelpMessages = {
     more: [
       'Du hast einen Versuch; er ist verbraucht, sobald du den Feed startest. Jeden Tag um Mitternacht kommt ein neuer Feed, nach Istanbuler Zeit.',
       'Du kannst dein Ergebnis teilen. Jedes Feld im Raster ist ein Level: 🟩 fehlerfrei, 🟨 ein, zwei Fehler, 🟥 mehr, ⬛ wo die Runde endete.',
-      'Dein Score im Tages-Feed zählt auch in den anderen Ranglisten und in deiner Liga. Im freien Spiel spielst du, so oft du willst.',
+      'Dein Score im Tages-Feed zählt auch in den anderen Ranglisten und hilft, Gewertet freizuschalten. Im normalen Spiel spielst du, so oft du willst.',
     ],
   },
   leagues: {
     title: 'Ligen',
-    lead: 'Es gibt fünf Ligen, von Bronze bis Diamant. Die Liga öffnet sich nach deinen ersten 20 gewerteten Spielen; die Proberunde und VS-Spiele zählen nicht. Mit deiner ersten gewerteten Runde der Woche kommst du dann in eine 30er-Gruppe deiner Liga.',
+    lead: 'Es gibt drei Modi: Täglich, Normal und Gewertet. Nur Gewertet ändert dein Elo. Gewertet öffnet sich nach 20 normalen oder täglichen Spielen; deine ersten 3 gewerteten Spiele bestimmen dein Elo, und alle starten in Silber.',
     more: [
-      'Deine Ligapunkte sind die Summe deiner besten Scores an jedem Tag der Woche. Jeden Tag zu spielen lohnt sich.',
-      'Am Ende der Woche steigen die ersten fünf eine Liga auf, die letzten fünf eine ab, der Rest bleibt. In einer kleineren Gruppe werden diese Zahlen auch kleiner. Über Diamant geht es nicht hinaus, unter Bronze nicht hinab.',
-      'Die Woche beginnt am Montag, nach Istanbuler Zeit.',
+      'Es gibt sechs Ligen: Bronze, Silber, Gold, Platin, Diamant und MasterClass. Jede Liga umfasst 1.000 Elo, MasterClass beginnt bei 5.000.',
+      'Jedes gewertete Spiel hat einen Ziel-Score. Schlägst du ihn, steigt dein Elo, bleibst du darunter, sinkt es; je größer der Abstand, desto mehr. Ein Spiel ändert es um höchstens 100 Elo.',
+      'Brichst du ein gewertetes Spiel ab, zählt es mit deinem Score bis dahin. Ein liegen gelassenes gewertetes Spiel zählt als schlechtestes Ergebnis.',
+      'Nach einem Aufstieg kannst du 3 Spiele lang nicht aus der neuen Liga fallen. In Bronze zählen Verluste nur zur Hälfte.',
+      'Die Liga-Rangliste wird nie zurückgesetzt: die Spieler deiner Liga, die in den letzten 14 Tagen gewertet gespielt haben, nach Elo.',
     ],
   },
   boards: {
@@ -349,12 +355,12 @@ const de: HelpMessages = {
       {
         question: 'Kann ich den Tages-Feed noch mal spielen?',
         answer:
-          'Nein, du hast einen Versuch pro Tag. Im freien Spiel spielst du, so oft du willst; deine beste Runde kommt in die Ranglisten.',
+          'Nein, du hast einen Versuch pro Tag. Im normalen Spiel spielst du, so oft du willst; deine beste Runde kommt in die Ranglisten.',
       },
       {
         question: 'Wie steige ich in der Liga auf?',
         answer:
-          'Spiel an jedem Tag der Woche: Der beste Score jedes Tages kommt zu deinen Ligapunkten dazu. Bist du am Ende der Woche in der Aufstiegszone, steigst du eine Liga auf.',
+          'Spiel Gewertet und schlag deinen Ziel-Score: Jedes Spiel darüber hebt dein Elo, und alle 1.000 Elo geht es eine Liga hoch.',
       },
       {
         question: 'Wie trete ich gegen meine Freunde an?',
@@ -429,16 +435,18 @@ const ar: HelpMessages = {
     more: [
       'لديك محاولة واحدة، وتُحتسب لحظة بدء الخلاصة. تصل خلاصة جديدة كل منتصف ليل بتوقيت إسطنبول.',
       'يمكنك مشاركة نتيجتك. كل مربع في الشبكة مستوى: 🟩 بلا أخطاء، 🟨 خطأ أو خطآن، 🟥 أكثر من ذلك، ⬛ حيث انتهت الجولة.',
-      'نتيجتك في خلاصة اليوم تُسجَّل أيضًا في الترتيبات الأخرى وفي دوريك. أما في اللعب الحر فالعب قدر ما تشاء.',
+      'نتيجتك في خلاصة اليوم تُسجَّل أيضًا في الترتيبات الأخرى وتُحتسب لفتح اللعب المصنَّف. أما في اللعب العادي فالعب قدر ما تشاء.',
     ],
   },
   leagues: {
     title: 'الدوريات',
-    lead: 'هناك خمسة دوريات، من البرونز إلى الماس. يُفتح الدوري بعد أول 20 مباراة تُحتسب لك، ولا تُحتسب الجولة التجريبية ولا مباريات التحدي. بعدها تنضم بأول جولة مصنّفة في الأسبوع إلى مجموعة من 30 لاعبًا في دوريك.',
+    lead: 'هناك ثلاثة أنماط: يومي وعادي ومصنَّف. وحده المصنَّف يغيّر تصنيفك (إيلو). يُفتح المصنَّف بعد 20 مباراة عادية أو يومية، وأول 3 مباريات مصنَّفة لك تحدد تصنيفك، والجميع يبدأ في الفضة.',
     more: [
-      'نقاط دوريك هي مجموع أفضل نتائجك في كل يوم من أيام الأسبوع. اللعب كل يوم يؤتي ثماره.',
-      'عند نهاية الأسبوع يصعد أول خمسة إلى الدوري الأعلى، وينزل آخر خمسة إلى الأدنى، ويبقى الباقون في أماكنهم. وإن كانت المجموعة أصغر صغرت هذه الأعداد أيضًا. لا صعود بعد الماس ولا هبوط بعد البرونز.',
-      'يبدأ الأسبوع يوم الاثنين بتوقيت إسطنبول.',
+      'هناك ستة دوريات: البرونز والفضة والذهب والبلاتين والماس وماستر كلاس. كل دوري ‎1000‎ إيلو، وماستر كلاس من ‎5000‎ فما فوق.',
+      'لكل مباراة مصنَّفة نتيجة هدف. إن تجاوزتها ارتفع تصنيفك، وإن بقيت دونها انخفض، وكلما كبر الفارق كبر التغيير. لا تغيّر المباراة الواحدة أكثر من 100 إيلو.',
+      'إن خرجت من مباراة مصنَّفة تُحسب بنتيجتك حتى تلك اللحظة. أما المباراة المصنَّفة المتروكة دون إنهاء فتُحسب أدنى نتيجة.',
+      'عندما تصعد إلى دوري جديد لا تهبط منه طوال 3 مباريات. وفي البرونز تُحسب الخسارة بالنصف.',
+      'ترتيب الدوري لا يُصفَّر أبدًا: لاعبو دوريك الذين لعبوا مصنَّفًا في آخر 14 يومًا، حسب الإيلو.',
     ],
   },
   boards: {
@@ -478,12 +486,12 @@ const ar: HelpMessages = {
       {
         question: 'هل يمكنني لعب خلاصة اليوم مرة أخرى؟',
         answer:
-          'لا، لديك محاولة واحدة كل يوم. أما في اللعب الحر فالعب قدر ما تشاء، وتُسجَّل أفضل جولاتك في الترتيبات.',
+          'لا، لديك محاولة واحدة كل يوم. أما في اللعب العادي فالعب قدر ما تشاء، وتُسجَّل أفضل جولاتك في الترتيبات.',
       },
       {
         question: 'كيف أصعد في الدوري؟',
         answer:
-          'العب كل يوم من أيام الأسبوع: تُضاف أفضل نتيجة لكل يوم إلى نقاط دوريك. وإن كنت في منطقة الصعود عند نهاية الأسبوع صعدت إلى الدوري الأعلى.',
+          'العب مصنَّفًا وتجاوز نتيجة هدفك: كل مباراة فوقه ترفع تصنيفك، وكل ‎1000‎ إيلو تعني دوريًا أعلى.',
       },
       {
         question: 'كيف أنافس أصدقائي؟',
@@ -553,16 +561,18 @@ const fr: HelpMessages = {
     more: [
       "Tu n'as qu'un essai ; il est utilisé dès que tu lances le fil. Un nouveau fil arrive chaque jour à minuit, heure d'Istanbul.",
       "Tu peux partager ton résultat. Chaque case de la grille est un niveau : 🟩 sans faute, 🟨 une ou deux fautes, 🟥 davantage, ⬛ là où la partie s'est arrêtée.",
-      'Ton score au Fil du jour compte aussi dans les autres classements et dans ta ligue. En partie libre, tu joues autant que tu veux.',
+      'Ton score au Fil du jour compte aussi dans les autres classements et pour ouvrir le mode classé. En normal, tu joues autant que tu veux.',
     ],
   },
   leagues: {
     title: 'Ligues',
-    lead: "Il y a cinq ligues, de Bronze à Diamant. La ligue s'ouvre après tes 20 premières parties comptées ; la partie d'essai et les VS ne comptent pas. Ensuite, ta première partie classée de la semaine te place dans un groupe de 30 joueurs de ta ligue.",
+    lead: "Il y a trois modes : Quotidien, Normal et Classé. Seul le mode classé change ton Elo. Il s'ouvre après 20 parties normales ou quotidiennes ; tes 3 premières parties classées fixent ton Elo, et tout le monde commence en Argent.",
     more: [
-      'Tes points de ligue sont la somme de tes meilleurs scores de chaque jour de la semaine. Jouer tous les jours paie.',
-      "À la fin de la semaine, les cinq premiers montent d'une ligue, les cinq derniers descendent, les autres restent. Dans un groupe plus petit, ces nombres baissent aussi. Rien au-dessus de Diamant, rien en dessous de Bronze.",
-      "La semaine commence le lundi, heure d'Istanbul.",
+      'Il y a six ligues : Bronze, Argent, Or, Platine, Diamant et MasterClass. Chaque ligue fait 1 000 Elo, MasterClass commence à 5 000.',
+      "Chaque partie classée a un score objectif. Dépasse-le et ton Elo monte, reste en dessous et il baisse ; plus l'écart est grand, plus il bouge. Une partie le change de 100 Elo au plus.",
+      'Si tu quittes une partie classée, elle compte avec ton score du moment. Une partie classée laissée en plan compte comme le plus mauvais résultat.',
+      'Quand tu montes de ligue, tu ne peux pas en redescendre pendant 3 parties. En Bronze, les pertes sont divisées par deux.',
+      'Le classement de la ligue ne repart jamais de zéro : les joueurs de ta ligue qui ont joué en classé ces 14 derniers jours, par Elo.',
     ],
   },
   boards: {
@@ -602,12 +612,12 @@ const fr: HelpMessages = {
       {
         question: 'Puis-je rejouer le Fil du jour ?',
         answer:
-          'Non, tu as un seul essai par jour. En partie libre, tu joues autant que tu veux ; ta meilleure partie compte pour les classements.',
+          'Non, tu as un seul essai par jour. En normal, tu joues autant que tu veux ; ta meilleure partie compte pour les classements.',
       },
       {
         question: 'Comment monter en ligue ?',
         answer:
-          "Joue chaque jour de la semaine : le meilleur score de chaque jour s'ajoute à tes points de ligue. Si tu es dans la zone de promotion à la fin de la semaine, tu montes d'une ligue.",
+          "Joue en classé et dépasse ton score objectif : chaque partie au-dessus fait monter ton Elo, et tous les 1 000 Elo tu montes d'une ligue.",
       },
       {
         question: 'Comment affronter mes amis ?',
@@ -678,16 +688,18 @@ const es: HelpMessages = {
     more: [
       'Tienes un solo intento; lo gastas en cuanto empiezas el feed. Cada medianoche llega un feed nuevo, hora de Estambul.',
       'Puedes compartir tu resultado. Cada casilla de la cuadrícula es un nivel: 🟩 sin errores, 🟨 uno o dos errores, 🟥 más, ⬛ donde terminó la partida.',
-      'Tu puntuación del Feed del día también cuenta en las otras clasificaciones y en tu liga. En el juego libre, juegas todo lo que quieras.',
+      'Tu puntuación del Feed del día también cuenta en las otras clasificaciones y para abrir Competitivo. En Normal, juegas todo lo que quieras.',
     ],
   },
   leagues: {
     title: 'Ligas',
-    lead: 'Hay cinco ligas, de Bronce a Diamante. La liga se abre después de tus primeras 20 partidas contadas; la ronda de práctica y los VS no cuentan. Luego, tu primera partida clasificada de la semana te une a un grupo de 30 jugadores de tu liga.',
+    lead: 'Hay tres modos: Diario, Normal y Competitivo. Solo Competitivo cambia tu Elo. Se abre después de 20 partidas normales o diarias; tus primeras 3 partidas competitivas fijan tu Elo y todos empiezan en Plata.',
     more: [
-      'Tus puntos de liga son la suma de tus mejores puntuaciones de cada día de la semana. Jugar todos los días tiene premio.',
-      'Al terminar la semana, los cinco primeros suben de liga, los cinco últimos bajan y el resto se queda. Si el grupo es más pequeño, estos números también bajan. No hay nada por encima de Diamante ni por debajo de Bronce.',
-      'La semana empieza el lunes, hora de Estambul.',
+      'Hay seis ligas: Bronce, Plata, Oro, Platino, Diamante y MasterClass. Cada liga son 1.000 Elo y MasterClass empieza en 5.000.',
+      'Cada partida competitiva tiene una puntuación objetivo. Si la superas, tu Elo sube; si te quedas por debajo, baja; cuanto mayor la diferencia, mayor el cambio. Una partida lo cambia 100 Elo como mucho.',
+      'Si sales de una partida competitiva, cuenta con la puntuación que llevabas. Una partida competitiva abandonada cuenta como el peor resultado.',
+      'Al subir de liga, no puedes caer de ella durante 3 partidas. En Bronce, las pérdidas son la mitad.',
+      'La tabla de la liga nunca se reinicia: los jugadores de tu liga que jugaron Competitivo en los últimos 14 días, por Elo.',
     ],
   },
   boards: {
@@ -727,12 +739,12 @@ const es: HelpMessages = {
       {
         question: '¿Puedo volver a jugar el Feed del día?',
         answer:
-          'No, tienes un solo intento al día. En el juego libre juegas todo lo que quieras; tu mejor partida va a las clasificaciones.',
+          'No, tienes un solo intento al día. En Normal juegas todo lo que quieras; tu mejor partida va a las clasificaciones.',
       },
       {
         question: '¿Cómo subo en la liga?',
         answer:
-          'Juega todos los días de la semana: la mejor puntuación de cada día se suma a tus puntos de liga. Si al terminar la semana estás en la zona de ascenso, subes de liga.',
+          'Juega Competitivo y supera tu puntuación objetivo: cada partida por encima sube tu Elo, y cada 1.000 Elo es una liga más.',
       },
       {
         question: '¿Cómo compito con mis amigos?',

@@ -6,7 +6,6 @@ use App\Enums\RunStatus;
 use App\Game\Rules;
 use App\Game\Run as Engine;
 use App\Models\LeaderboardEntry;
-use App\Models\LeagueMember;
 use App\Models\PlayerStat;
 use App\Models\Run;
 use App\Models\User;
@@ -22,10 +21,10 @@ beforeEach(function () {
  * metronome thumb — every decision at 400 ms. On an open board that is a top
  * score with a soft warning: held for review.
  */
-function moderationCommandsRun(User $player, int $reels = 100): Run
+function moderationCommandsRun(User $player, int $reels = 100, RunMode $mode = RunMode::Free): Run
 {
     $runs = app(RunService::class);
-    $run = $runs->start($player, RunMode::Free, Rules::ENGINE_VERSION, Catalog::LATEST, null);
+    $run = $runs->start($player, $mode, Rules::ENGINE_VERSION, Catalog::LATEST, null);
     $actions = playedLog($run->seed, $reels, 400);
     $summary = Engine::replay($run->seed, $actions)->summary;
     Carbon::setTestNow(now()->addMinutes(10));
@@ -72,14 +71,13 @@ test('quezby:review with nothing held', function () {
     $this->artisan('quezby:review')->expectsOutputToContain('No runs are waiting for review.')->assertSuccessful();
 });
 
-test('approving a held run puts it on the boards of the day it was played', function () {
+test('approving a held rated run puts it on the boards of the day it was played, and in that week\'s group', function () {
     $player = User::factory()->withUsername('kerem.35')->create();
-    $run = moderationCommandsRun($player);
+    $this->rate($player, 1500);
+    $run = moderationCommandsRun($player, mode: RunMode::Rated);
     expect($run->status)->toBe(RunStatus::Review)
         ->and(LeaderboardEntry::query()->count())->toBe(0)
         ->and(PlayerStat::query()->find($player->id))->toBeNull();
-    // One counted run short of the league before it, so the approved one opens it.
-    Run::factory()->for($player)->ranked(100)->count(config('quezby.leagues.unlock_runs') - 1)->create();
     Carbon::setTestNow(Carbon::parse('2026-09-26 12:00', 'Europe/Istanbul'));
 
     $this->artisan('quezby:run:approve', ['run' => strtoupper($run->id)])
@@ -89,11 +87,9 @@ test('approving a held run puts it on the boards of the day it was played', func
     expect($run->fresh()->status)->toBe(RunStatus::Ranked)
         ->and(moderationCommandsRows($player))->toBe([
             'all all' => $run->score,
-            'daily 2026-09-24' => $run->score,
             'monthly 2026-09' => $run->score,
             'weekly 2026-W39' => $run->score,
         ])
-        ->and(LeagueMember::query()->where('user_id', $player->id)->value('week_key'))->toBe('2026-W39')
         ->and(PlayerStat::query()->find($player->id)->runs)->toBe(1);
 });
 
@@ -124,7 +120,6 @@ test("rejecting a run rebuilds its player's boards from the runs they have left"
         ->and($cheated->flags)->toBe([['code' => 'moderator', 'reason' => 'Bot gibi oynuyor', 'severity' => 'hard']])
         ->and(moderationCommandsRows($player))->toBe([
             'all all' => 3000,
-            'daily 2026-09-23' => 3000,
             'monthly 2026-09' => 3000,
             'weekly 2026-W39' => 3000,
         ]);
@@ -217,7 +212,6 @@ test("unbanning puts the player's ranked runs back on the boards", function () {
         ->and($player->ban_reason)->toBeNull()
         ->and(moderationCommandsRows($player))->toBe([
             'all all' => 5000,
-            'daily 2026-09-24' => 5000,
             'monthly 2026-09' => 5000,
             'weekly 2026-W39' => 5000,
         ]);

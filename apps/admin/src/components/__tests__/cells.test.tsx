@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { FlagTags, PlayerCell, When } from '@/lib/columns';
+import { EloDelta, FlagTags, PlayerCell, TierTag, When } from '@/lib/columns';
 import { renderWithProviders } from '@/test/render';
 
 describe('When', () => {
@@ -91,3 +91,36 @@ describe('PlayerCell', () => {
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 });
+
+describe('TierTag', () => {
+  it('names the league', () => {
+    renderWithProviders(
+      <>
+        <TierTag tier="gold" />
+        <TierTag tier="master" />
+      </>,
+    );
+
+    expect(screen.getByText('Altın')).toBeInTheDocument();
+    expect(screen.getByText('MasterClass')).toBeInTheDocument();
+  });
+});
+
+describe('EloDelta', () => {
+  it('signs a move and colours it by its news: green up, red down, grey for none', () => {
+    renderWithProviders(
+      <>
+        <EloDelta value={42} />
+        <EloDelta value={-18} />
+        <EloDelta value={0} />
+        <EloDelta value={50} unit />
+      </>,
+    );
+
+    expect(screen.getByText('+42')).toHaveClass('text-ok-text');
+    expect(screen.getByText('−18')).toHaveClass('text-bad-text');
+    expect(screen.getByText('0')).toHaveClass('text-ink-muted');
+    expect(screen.getByText('+50 Elo')).toHaveClass('text-ok-text');
+  });
+});
+

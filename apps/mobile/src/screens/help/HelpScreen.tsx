@@ -33,6 +33,7 @@ const TIERS: readonly LeagueTier[] = [
   'gold',
   'platinum',
   'diamond',
+  'master',
 ];
 
 /** Each reel in the feed's own colours, so the guide teaches what the eye will see. */

@@ -39,6 +39,14 @@ describe('Hud', () => {
     expect(screen.queryByText('VS · @ekin')).toBeNull();
   });
 
+  it('marks a rated run with its pill', async () => {
+    await render(
+      <Hud meter={shared(1000)} score={0} combo={1_000} reelIndex={0} rated="Dereceli" onClose={jest.fn()} />,
+    );
+
+    expect(screen.getByText('Dereceli')).toBeOnTheScreen();
+  });
+
   it('speaks English', async () => {
     useLanguage.setState({ locale: 'en' });
     await render(hud());

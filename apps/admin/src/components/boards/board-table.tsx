@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils';
 import { useSession } from '@/stores/session';
 
 /** The rank as the game shows it: the podium wears a crown. */
-function Rank({ rank }: { rank: number }) {
+export function Rank({ rank }: { rank: number }) {
   return (
     <span
       className={cn(

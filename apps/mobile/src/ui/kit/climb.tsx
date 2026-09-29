@@ -56,6 +56,7 @@ export function ClimbRow({
   isMe,
   onPress,
   index = 0,
+  unit = 'points',
 }: {
   rank: number;
   username: string;
@@ -74,6 +75,8 @@ export function ClimbRow({
   onPress?: () => void;
   /** Position in the list — drives the entrance stagger. */
   index?: number;
+  /** What the numbers are, read aloud: points, or Elo on the Elo board. */
+  unit?: 'points' | 'elo';
 }) {
   const theme = useTheme();
   const t = useT();
@@ -97,7 +100,7 @@ export function ClimbRow({
     transform: [{ translateY: (1 - enter.value) * 12 + down.value * 3 }],
   }));
 
-  const label = t.board.row({ rank, name: username, isMe, score, detail, gap });
+  const label = t.board.row({ rank, name: username, isMe, score, detail, gap, unit });
 
   const facts = [
     reels === undefined ? null : t.board.posts(reels),
@@ -294,6 +297,7 @@ export function FloorCard({
   gapToNext,
   progress,
   onPlay,
+  unit = 'points',
   style,
 }: {
   /** Null when you have no ranked run in this period. */
@@ -307,11 +311,14 @@ export function FloorCard({
   progress?: number | null;
   /** `chasing`: the slab said "Geç onu" — there was someone right above to pass. */
   onPlay: (chasing: boolean) => void;
+  /** `elo`: an Elo board — the score is a rating, the gap Elo. */
+  unit?: 'points' | 'elo';
   style?: StyleProp<ViewStyle>;
 }) {
   const theme = useTheme();
   const t = useT();
   const words = t.board.floor;
+  const elo = unit === 'elo';
   const top = rank === 1;
   const chasing = rank !== null && !top && gapToNext != null;
 
@@ -319,9 +326,11 @@ export function FloorCard({
   if (rank === null) line = words.unranked;
   else if (top) line = words.top;
   else if (gapToNext != null) {
-    line = targetUsername
-      ? words.toPass(targetUsername, gapToNext)
-      : words.toNext(gapToNext);
+    if (elo) line = targetUsername ? words.toPassElo(targetUsername, gapToNext) : null;
+    else
+      line = targetUsername
+        ? words.toPass(targetUsername, gapToNext)
+        : words.toNext(gapToNext);
   }
 
   const permille =
@@ -368,7 +377,7 @@ export function FloorCard({
         </Text>
         <View style={styles.floorText}>
           <Txt variant="heading" numberOfLines={1}>
-            {score === null ? words.you : words.youScored(score)}
+            {score === null ? words.you : elo ? words.youRated(score) : words.youScored(score)}
           </Txt>
           {line ? (
             <Txt variant="meta" tone="muted" numberOfLines={2}>

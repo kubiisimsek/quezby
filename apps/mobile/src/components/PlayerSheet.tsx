@@ -37,7 +37,7 @@ type Then =
 
 /**
  * A player's card, over whatever board or list it was opened from: their
- * portrait and league, their best this season in gold, their places and a
+ * portrait, league and Elo, their best this season in gold, their places and a
  * few lifetime numbers — then what the two of you can do, by what you are to
  * each other: ask to be friends, answer their request, send a VS or open the
  * conversation, lift a block. The rarer actions — ending the friendship,
@@ -116,7 +116,14 @@ export function PlayerSheet({
                 <Portrait name={card.username} src={card.avatarUrl} isMe={card.isMe} size="md" />
               </Stamp>
               <View style={styles.who}>
-                {card.league ? <TierBadge tier={card.league} size="md" showLabel /> : null}
+                {card.league ? (
+                  <View style={styles.league}>
+                    <TierBadge tier={card.league} size="md" showLabel />
+                    {card.rating !== null ? (
+                      <Tag label={t.rating.elo(t.fmt.score(card.rating))} tone="warn" icon="trophy" />
+                    ) : null}
+                  </View>
+                ) : null}
                 <RelationTag card={card} />
                 {card.isMe || card.relation === 'friend' ? (
                   // Your list, or a friend's: theirs to show you.
@@ -284,6 +291,7 @@ function moreActions(
 }
 
 const styles = StyleSheet.create({
+  league: { alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap', gap: SPACE.sm },
   body: { gap: SPACE.lg },
   identity: { alignItems: 'center', flexDirection: 'row', gap: SPACE.lg },
   who: { alignItems: 'flex-start', flex: 1, gap: SPACE.sm },

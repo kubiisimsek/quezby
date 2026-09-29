@@ -111,8 +111,10 @@ function tierColors(
       return { solid: theme.tierGold, soft: theme.tierGoldSoft };
     case 'platinum':
       return { solid: theme.tierPlatinum, soft: theme.tierPlatinumSoft };
-    default:
+    case 'diamond':
       return { solid: theme.tierDiamond, soft: theme.tierDiamondSoft };
+    default:
+      return { solid: theme.tierMaster, soft: theme.tierMasterSoft };
   }
 }
 
@@ -122,7 +124,7 @@ const EMBLEM_INNER = 'M12 3.9 19 7.9v3.6H5V7.9L12 3.9Z';
 
 /**
  * What sits inside each emblem. Colour is never the only signal: the climb
- * reads in the shape too — one chevron, two, a star, a spark, a gem.
+ * reads in the shape too — one chevron, two, a star, a spark, a gem, a crown.
  */
 function TierMark({ tier, color }: { tier: LeagueTier; color: string }) {
   const stroke = {
@@ -159,12 +161,22 @@ function TierMark({ tier, color }: { tier: LeagueTier; color: string }) {
           fill={color}
         />
       );
-    default:
+    case 'diamond':
       return (
         <Path
           d="M8.3 10.6 10.1 8h3.8l1.8 2.6L12 16.4l-3.7-5.8ZM8.3 10.6h7.4M10.9 10.6 12 16.4l1.1-5.8"
           strokeWidth={1.8}
           {...stroke}
+        />
+      );
+    default:
+      return (
+        <Path
+          d="M7.7 15.6h8.6l.9-6.3-3.2 2.5L12 7.8l-2 4-3.2-2.5.9 6.3Z"
+          fill={color}
+          stroke={color}
+          strokeWidth={1.2}
+          strokeLinejoin="round"
         />
       );
   }

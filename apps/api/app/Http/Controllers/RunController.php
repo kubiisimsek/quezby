@@ -19,6 +19,7 @@ use App\Services\Social\DuelService;
 use App\Support\Timestamp;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 
 class RunController extends Controller
 {
@@ -59,6 +60,14 @@ class RunController extends Controller
         ]);
     }
 
+    /** A run given up in its countdown. */
+    public function cancel(string $runId, #[CurrentUser] User $user): Response
+    {
+        $this->runs->cancel($user, $runId);
+
+        return response()->noContent();
+    }
+
     public function finish(
         FinishRunRequest $request,
         string $runId,
@@ -88,7 +97,7 @@ class RunController extends Controller
             'rankChanges' => $outcome?->changes() ?? array_map(fn (?int $rank) => ['before' => $rank, 'after' => $rank], $ranks),
             'passed' => $outcome?->passed ?? [],
             'daily' => $finished->daily,
-            'league' => $finished->league,
+            'rating' => $finished->rating,
             'leagueUnlock' => $finished->leagueUnlock,
             // A VS is between two friends: nothing of it is for sharing.
             'shareText' => $finished->run->mode === RunMode::Vs

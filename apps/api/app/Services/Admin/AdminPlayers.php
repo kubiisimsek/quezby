@@ -6,14 +6,12 @@ use App\Enums\LeaderboardPeriod;
 use App\Enums\RunFlag;
 use App\Models\DeviceCheck;
 use App\Models\LeaderboardEntry;
-use App\Models\LeagueMember;
 use App\Models\Run;
 use App\Models\SocialIdentity;
 use App\Models\User;
 use App\Services\Avatars\AvatarService;
 use App\Services\Devices\DeviceRegistry;
 use App\Services\LeaderboardService;
-use App\Services\LeagueService;
 use App\Services\PlayerStatsService;
 use App\Services\Social\FriendService;
 use App\Services\Social\ReportService;
@@ -31,13 +29,13 @@ final class AdminPlayers
 {
     public function __construct(
         private readonly LeaderboardService $leaderboards,
-        private readonly LeagueService $leagues,
         private readonly PlayerStatsService $playerStats,
         private readonly FriendService $friends,
         private readonly ReportService $reports,
         private readonly AdminRuns $runs,
         private readonly AuditLog $audit,
         private readonly DeviceRegistry $devices,
+        private readonly AdminRatings $ratings,
     ) {}
 
     /**
@@ -112,7 +110,7 @@ final class AdminPlayers
             ],
             'ranks' => $this->leaderboards->ranksFor($player),
             'stats' => $this->playerStats->of($player)['stats'],
-            'league' => $this->leagueSeat($player),
+            'rating' => $this->ratings->of($player),
             'runs' => $player->runs()->toBase()->selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status')
                 ->map(fn ($total) => (int) $total)->all(),
             'recentRuns' => $player->runs()
@@ -254,39 +252,6 @@ final class AdminPlayers
             ->where('period', LeaderboardPeriod::All->value)
             ->where('period_key', 'all')
             ->limit(1);
-    }
-
-    /**
-     * This week's seat, where the player stands in it. None for a banned
-     * player: they are off the standings.
-     *
-     * @return array<string, mixed>|null
-     */
-    private function leagueSeat(User $player): ?array
-    {
-        if ($player->isBanned()) {
-            return null;
-        }
-        $member = LeagueMember::query()
-            ->with('group')
-            ->where('user_id', $player->id)
-            ->where('season', $this->leaderboards->season())
-            ->where('week_key', $this->leagues->weekKey(now()))
-            ->first();
-        if ($member === null) {
-            return null;
-        }
-        $standing = $this->leagues->standingOf($member);
-
-        return [
-            'weekKey' => $member->week_key,
-            'groupId' => $member->group_id,
-            'tier' => $standing['tier'],
-            'rank' => $standing['rank'],
-            'members' => $standing['members'],
-            'points' => $standing['points'],
-            'zone' => $standing['zone'],
-        ];
     }
 
     /**

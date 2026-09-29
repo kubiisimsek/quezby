@@ -8,16 +8,24 @@ import {
   formatChallenge,
   formatChallengeDay,
   formatDayKey,
+  formatDelta,
   formatDuration,
   formatMonthKey,
   formatMs,
   formatNumber,
+  formatPercent,
   formatPerMille,
   formatPeriodKey,
+  formatRatingMove,
   formatRelative,
   formatTime,
   formatWeekKey,
+  FUNNEL_STEP,
+  LEAGUE_TIER,
+  LEAGUE_TIERS,
+  MILESTONE,
   playerName,
+  RATING_KIND,
   REPORT_REASON,
   REPORT_STATUS,
   RUN_FLAG,
@@ -38,6 +46,27 @@ describe('numbers', () => {
     expect(formatPerMille(942)).toBe('%94,2');
     expect(formatPerMille(1000)).toBe('%100');
     expect(formatPerMille(undefined)).toBe('—');
+  });
+
+  it('signs a move with a real minus sign, and leaves none on nothing', () => {
+    expect(formatDelta(42)).toBe('+42');
+    expect(formatDelta(-18)).toBe('\u221218');
+    expect(formatDelta(-1018)).toBe('−1.018');
+    expect(formatDelta(0)).toBe('0');
+    expect(formatDelta(null)).toBe('—');
+    expect(formatDelta(-18)).not.toContain('-');
+  });
+
+  it('reads a per cent value the Turkish way', () => {
+    expect(formatPercent(20)).toBe('%20');
+    expect(formatPercent(12.5)).toBe('%12,5');
+    expect(formatPercent(null)).toBe('—');
+  });
+
+  it('writes a rating before and after, a side not yet set as a dash', () => {
+    expect(formatRatingMove(2408, 2450)).toBe('2.408 → 2.450');
+    expect(formatRatingMove(null, 1500)).toBe('— → 1.500');
+    expect(formatRatingMove(null, null)).toBe('—');
   });
 
   it('writes milliseconds and durations', () => {
@@ -147,5 +176,34 @@ describe('verdicts', () => {
     const failures = Object.entries(VERDICT).filter(([verdict]) => verdict !== 'hit' && verdict !== 'perfect');
     expect(failures).toHaveLength(6);
     for (const [, { tone }] of failures) expect(tone).not.toBe(VERDICT.perfect.tone);
+  });
+});
+
+describe('ratings', () => {
+  it('names six leagues, MasterClass on top', () => {
+    expect(LEAGUE_TIERS).toEqual(['master', 'diamond', 'platinum', 'gold', 'silver', 'bronze']);
+    expect(LEAGUE_TIER.master).toBe('MasterClass');
+    expect(LEAGUE_TIERS.map((tier) => LEAGUE_TIER[tier])).toEqual(['MasterClass', 'Elmas', 'Platin', 'Altın', 'Gümüş', 'Bronz']);
+  });
+
+  it('says a player is in a league once their placement games are played, in the funnel and in their firsts', () => {
+    expect(FUNNEL_STEP.league).toEqual({ label: 'Yerleşti', hint: 'Yerleşme oyunlarını bitirip bir lige girdi' });
+    expect(MILESTONE.league).toBe('Yerleşti');
+  });
+
+  it('says why a rating moved, never in the action magenta', () => {
+    expect(Object.fromEntries(Object.entries(RATING_KIND).map(([kind, { label }]) => [kind, label]))).toEqual({
+      placement: 'Yerleşme',
+      run: 'Tur',
+      forfeit: 'Hükmen',
+      void: 'Sayılmadı',
+      reversal: 'Geri alındı',
+    });
+    for (const kind of Object.values(RATING_KIND)) {
+      expect(kind.hint).not.toBe('');
+      expect(kind.tone).not.toBe('primary');
+    }
+    expect(RATING_KIND.forfeit.tone).toBe('bad');
+    expect(RATING_KIND.reversal.tone).toBe('warn');
   });
 });

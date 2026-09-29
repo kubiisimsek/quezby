@@ -54,6 +54,7 @@ function card(overrides: Partial<PlayerCard> = {}) {
       username: 'ekin',
       best: { score: 41_200, reels: 210, achievedAt: '2026-09-24T09:30:00.000Z' },
       league: 'gold',
+      rating: 2_450,
       ranks: { weekly: 12, all: 311 },
       stats: { runs: 40, reels: 5_200, likes: 610, perfects: 90 },
       friends: 8,
@@ -74,6 +75,7 @@ describe('PlayerSheet', () => {
     expect(screen.getByLabelText('Sezon rekoru: 41.200')).toBeTruthy();
     expect(screen.getByText('210 post')).toBeTruthy();
     expect(screen.getByLabelText('Altın lig')).toBeTruthy();
+    expect(screen.getByText('2.450 Elo')).toBeTruthy();
     expect(screen.getByText('#12')).toBeTruthy();
     expect(screen.getByText('#311')).toBeTruthy();
     expect(screen.getByText('5.200')).toBeTruthy();
@@ -83,12 +85,13 @@ describe('PlayerSheet', () => {
   });
 
   it('shows "—" before a season best and no emblem without a league', async () => {
-    mocked.users.get.mockResolvedValue(card({ best: null, league: null }));
+    mocked.users.get.mockResolvedValue(card({ best: null, league: null, rating: null }));
 
     await renderWithProviders(<PlayerSheet username="ekin" onClose={jest.fn()} />);
 
     expect(await screen.findByLabelText('Sezon rekoru: —')).toBeTruthy();
     expect(screen.queryByLabelText(/ lig$/)).toBeNull();
+    expect(screen.queryByText(/Elo$/)).toBeNull();
   });
 
   it('shows a stranger’s friend count, and no way into the list', async () => {

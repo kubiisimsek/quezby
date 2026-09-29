@@ -258,7 +258,7 @@ const GLINT = { ms: 900, rest: 2600 } as const;
 const ALONG = IS_RTL ? -1 : 1;
 
 /**
- * The lobby's play button — today's game. A big gold slab that breathes,
+ * The lobby's play button. A gold slab that breathes,
  * 1 → 1.04 and back, with a glint crossing its face every few seconds: the
  * one thing on the lobby that moves on its own, because the game is waiting.
  *
@@ -363,7 +363,7 @@ export function PlayButton({
           />
         </View>
         {loading ? null : (
-          <Icon name={icon} size={30} color={colors.ink} strokeWidth={2.6} fill={colors.ink} />
+          <Icon name={icon} size={24} color={colors.ink} strokeWidth={2.6} fill={colors.ink} />
         )}
         <Text
           numberOfLines={1}
@@ -445,7 +445,7 @@ export function SwipePlay({
   const liftStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: -lift.value }],
   }));
-  const chevrons = [0, 1, 2];
+  const chevrons = [0, 1];
 
   return (
     <View style={[styles.swipe, style]}>
@@ -650,11 +650,11 @@ const styles = StyleSheet.create({
   counterBadge: { position: 'absolute', right: -DEPTH.outline, top: -DEPTH.outline },
   playFace: {
     flexDirection: 'row',
-    gap: SPACE.md,
-    minHeight: 76,
+    gap: SPACE.sm,
+    minHeight: 60,
     paddingHorizontal: SPACE.xl,
   },
-  playLabel: { flexShrink: 1, fontFamily: FONT.display, fontSize: 30, lineHeight: lh(36) },
+  playLabel: { flexShrink: 1, fontFamily: FONT.display, fontSize: 24, lineHeight: lh(30) },
   glint: {
     height: '220%',
     left: 0,

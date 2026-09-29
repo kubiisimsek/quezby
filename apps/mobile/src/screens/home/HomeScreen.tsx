@@ -9,8 +9,7 @@ import type {
   DailyResponse,
   InboxSummary,
   LeaderboardResponse,
-  LeagueMember,
-  LeagueResponse,
+  RatingResponse,
   WaitingDuel,
 } from '@quezby/types';
 import type { UseQueryResult } from '@tanstack/react-query';
@@ -30,13 +29,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { track } from '@/analytics/track';
 import { useSession } from '@/auth/session';
 import { CredentialsSheet } from '@/components/CredentialsSheet';
+import { ModeSheet } from '@/components/ModeSheet';
 import { SignInWaysSheet } from '@/components/SignInWaysSheet';
 import { APP_PLATFORM } from '@/config/env';
 import { deviceFailed as deviceFailedWords } from '@/game/howTo';
-import { useDaily, useLeaderboard, useLeague } from '@/hooks/useBoards';
+import { useDaily, useLeaderboard, useRating } from '@/hooks/useBoards';
 import { useMe } from '@/hooks/useMe';
 import { useDeclineDuel, useInboxSummary } from '@/hooks/useSocial';
 import { handle, useT } from '@/i18n';
+import type { PlayMode } from '@/i18n/messages/modes';
 import { messageFor } from '@/lib/errors';
 import type { RootStackParamList, TabParamList } from '@/navigation/types';
 import { deviceFailed, useDeviceVerdict } from '@/stores/deviceVerdict';
@@ -94,7 +95,7 @@ export function HomeScreen({ navigation }: Props) {
   const unranked = useDeviceVerdict((state) => deviceFailed(state, userId));
   const me = useMe();
   const daily = useDaily();
-  const league = useLeague();
+  const rating = useRating();
   const weekly = useLeaderboard('weekly', 'everyone', 3);
   const inbox = useInboxSummary();
   const remindersRead = useOnboarding((state) => state.hydrated);
@@ -105,18 +106,18 @@ export function HomeScreen({ navigation }: Props) {
   const asking = useSettings((state) => state.hydrated && state.consent === 'unasked');
   /** The email form waits for the ways sheet to leave the screen. */
   const toEmail = useRef(false);
-  const joined = league.data?.joined === true;
+  const placed = rating.data?.placed === true;
 
-  // A guest who has just been seated in a league has something to lose: ask
+  // A guest who has just been placed in a league has something to lose: ask
   // once to keep the account. Never over the game's result — only here.
   // After the usage question, never on top of it.
   useEffect(() => {
-    if (!focused || !remindersRead || !settingsRead || asking || !joined || !user?.isGuest) return;
+    if (!focused || !remindersRead || !settingsRead || asking || !placed || !user?.isGuest) return;
     if (remindedFor === user.id) return;
     useOnboarding.getState().markReminded(user.id);
     track('protect_reminder');
     setKeep('ways');
-  }, [asking, focused, joined, remindedFor, remindersRead, settingsRead, user?.id, user?.isGuest]);
+  }, [asking, focused, placed, remindedFor, remindersRead, settingsRead, user?.id, user?.isGuest]);
 
   const strip = useEntrance(0, 10);
   const clock = useEntrance(1, 16);
@@ -138,7 +139,7 @@ export function HomeScreen({ navigation }: Props) {
       await Promise.all([
         me.refetch(),
         daily.refetch(),
-        league.refetch(),
+        rating.refetch(),
         weekly.refetch(),
         inbox.refetch(),
       ]);
@@ -147,9 +148,17 @@ export function HomeScreen({ navigation }: Props) {
     }
   };
 
-  const tier = league.data && !league.data.unlock ? league.data.tier : null;
+  const tier = rating.data?.tier ?? null;
   const best = user?.best ?? null;
   const playFree = () => navigation.navigate('Game', { mode: 'free' });
+
+  // The gold slab opens the modes; a used daily opens the day's board instead.
+  const [choosing, setChoosing] = useState(false);
+  const dailyPlayed = Boolean(daily.data?.attempt);
+  const playMode = (mode: PlayMode) => {
+    if (mode === 'daily' && dailyPlayed) navigation.navigate('Daily');
+    else navigation.navigate('Game', { mode });
+  };
 
   return (
     <View style={[styles.fill, { backgroundColor: theme.canvas }]}>
@@ -251,7 +260,7 @@ export function HomeScreen({ navigation }: Props) {
         </Animated.View>
 
         <Animated.View style={leagueIn}>
-          <LeagueNotice league={league} onPress={() => navigation.navigate('League')} />
+          <LeagueNotice rating={rating} onPress={() => navigation.navigate('League')} />
         </Animated.View>
 
         <Animated.View style={rivalIn}>
@@ -265,12 +274,21 @@ export function HomeScreen({ navigation }: Props) {
         </Animated.View>
       </ScrollView>
 
-      <SwipePlay
-        label={t.nav.tabs.play}
-        hint={t.home.swipe}
-        breathing={focused}
-        onPlay={playFree}
-        style={styles.unlock}
+      <View style={styles.unlock}>
+        <SwipePlay
+          label={t.nav.tabs.play}
+          hint={t.home.swipe}
+          breathing={focused && !choosing}
+          onPlay={() => setChoosing(true)}
+        />
+      </View>
+
+      <ModeSheet
+        open={choosing}
+        onClose={() => setChoosing(false)}
+        rating={rating.data}
+        dailyPlayed={dailyPlayed}
+        onPick={playMode}
       />
 
       <SignInWaysSheet
@@ -525,29 +543,29 @@ function DailyNotice({
 }
 
 /**
- * This week's league: your tier, place and zone — or, before your first
- * ranked run, the invitation to take a seat. Before a new player's first few
- * counted runs it is locked, and says how many runs are left.
+ * Your league: its emblem, your Elo and the score your next run has to beat
+ * — or, while the first rated runs place you, how many are played; or, while
+ * Dereceli is shut, how many Normal and Günlük games still open it.
  */
 function LeagueNotice({
-  league,
+  rating,
   onPress,
 }: {
-  league: UseQueryResult<LeagueResponse>;
+  rating: UseQueryResult<RatingResponse>;
   onPress: () => void;
 }) {
   const t = useT();
-  const data = league.data;
+  const data = rating.data;
   const eyebrow = t.home.notice.league;
 
   if (!data) {
     return (
       <NoticeCard
         eyebrow={eyebrow}
-        title={league.isError ? messageFor(league.error, t) : t.home.league.title}
+        title={rating.isError ? messageFor(rating.error, t) : t.home.league.title}
         icon="shield"
         tone="secondary"
-        meta={league.isError ? undefined : <Skeleton height={14} width={120} />}
+        meta={rating.isError ? undefined : <Skeleton height={14} width={120} />}
         onPress={onPress}
       />
     );
@@ -557,8 +575,8 @@ function LeagueNotice({
     const { required, remaining } = data.unlock;
     return (
       <NoticeCard
-        eyebrow={t.home.league.locked}
-        title={t.home.league.remaining(remaining)}
+        eyebrow={t.modes.ribbon}
+        title={t.modes.lockedTitle(remaining)}
         icon="lock"
         tone="secondary"
         meta={
@@ -571,56 +589,37 @@ function LeagueNotice({
     );
   }
 
-  const me = data.joined ? data.me : null;
+  if (!data.placed || data.rating === null || data.tier === null) {
+    const placement = data.placement ?? { played: 0, required: 1 };
+    return (
+      <NoticeCard
+        eyebrow={t.rating.placement.ribbon}
+        title={t.rating.placement.title(placement.played, placement.required)}
+        icon="flag"
+        tone="secondary"
+        meta={
+          <View style={styles.meter}>
+            <Meter value={placement.played / placement.required} tone="secondary" notches={placement.required} />
+          </View>
+        }
+        onPress={onPress}
+      />
+    );
+  }
+
   return (
     <NoticeCard
       eyebrow={eyebrow}
-      title={
-        me
-          ? t.home.league.standing(
-              t.fmt.rank(me.rank),
-              t.fmt.score(data.members.length),
-              me.points,
-              t.fmt.score(me.points),
-            )
-          : t.home.notice.join
-      }
+      title={t.home.league.rated(t.tiers.league(data.tier), t.rating.elo(t.fmt.score(data.rating)))}
       icon="shield"
       tone="secondary"
       meta={
-        me ? (
-          <ZoneTag league={data} me={me} />
-        ) : (
-          <CountdownChip
-            endsAt={data.endsAt}
-            serverTime={data.serverTime}
-            prefix={t.home.countdown.endsIn}
-            onElapsed={() => void league.refetch()}
-          />
+        data.target === null ? undefined : (
+          <Tag label={t.rating.target(t.fmt.score(data.target))} tone="secondary" icon="target" />
         )
       }
       right={<TierBadge tier={data.tier} size="md" />}
       onPress={onPress}
-    />
-  );
-}
-
-function ZoneTag({ league, me }: { league: LeagueResponse; me: LeagueMember }) {
-  const t = useT();
-  if (me.zone === 'promote') {
-    return <Tag label={t.home.league.promote} tone="ok" icon="trendUp" />;
-  }
-  if (me.zone === 'demote') {
-    return <Tag label={t.home.league.demote} tone="bad" icon="trendDown" />;
-  }
-  const gap = league.promotionGap;
-  return gap === null ? (
-    <Tag label={t.home.league.safe} tone="neutral" icon="check" />
-  ) : (
-    <Tag
-      label={t.home.league.toPromotion(gap, t.fmt.gap(gap))}
-      tone="secondary"
-      icon="arrowUp"
     />
   );
 }
@@ -664,6 +663,7 @@ const styles = StyleSheet.create({
   score: { fontFamily: FONT.display, fontSize: 22, lineHeight: lh(26) },
   meter: { alignSelf: 'stretch', paddingTop: SPACE.xs },
   unlock: {
+    gap: SPACE.sm,
     paddingBottom: ORB_RISE + SPACE.xs,
     paddingHorizontal: SPACE.lg,
     paddingTop: SPACE.sm,

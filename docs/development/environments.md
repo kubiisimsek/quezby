@@ -106,8 +106,9 @@ installs on a phone, Google Play refuses it. Making the key:
 
 Usage analytics and the device registry (`QUEZBY_ANALYTICS_*`,
 `QUEZBY_DEVICE_DAYS`) have the same defaults in every environment — what they
-do and when to turn them: `docs/product/analytics.md`. So do the league's
-threshold (`QUEZBY_LEAGUE_UNLOCK_RUNS`, 20 counted runs), how long a VS waits
+do and when to turn them: `docs/product/analytics.md`. So do Dereceli's
+threshold (`QUEZBY_LEAGUE_UNLOCK_RUNS`, 20 counted Normal or Günlük runs;
+`rating.unlock_runs`), how long a VS waits
 for its answer (`QUEZBY_DUEL_EXPIRE_HOURS`, 48) and how long conversation
 lines stay (`QUEZBY_INBOX_KEEP_DAYS`, 90). Push has three variables of its
 own — *Push notifications* below.

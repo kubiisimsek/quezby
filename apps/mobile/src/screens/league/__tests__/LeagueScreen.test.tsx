@@ -1,128 +1,67 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import type {
-  LeagueMember,
-  LeagueOutcome,
-  LeagueResponse,
-  LeagueTier,
-} from '@quezby/types';
+import type { RatingBoardResponse, RatingEntry } from '@quezby/types';
 import { fireEvent, screen } from '@testing-library/react-native';
 import type { ComponentProps } from 'react';
 
+import { track } from '@/analytics/track';
 import { api } from '@/api/client';
 import { iso } from '@/i18n';
 import { useLanguage } from '@/i18n/language';
 import { LeagueScreen } from '@/screens/league/LeagueScreen';
+import { buildLocked, buildPlacing, buildRating } from '@/test/factories';
 import { renderWithProviders } from '@/test/renderWithProviders';
+
+jest.mock('@/analytics/track', () => ({ track: jest.fn() }));
 
 jest.mock('@/api/client', () => ({
   api: {
-    leagues: { current: jest.fn() },
+    rating: { current: jest.fn(), board: jest.fn() },
     users: { get: jest.fn(), follow: jest.fn(), unfollow: jest.fn() },
   },
 }));
 
 const mocked = api as unknown as {
-  leagues: { current: jest.Mock };
+  rating: { current: jest.Mock; board: jest.Mock };
   users: { get: jest.Mock };
 };
 
 type Props = ComponentProps<typeof LeagueScreen>;
 
-const NOW = '2026-09-24T10:00:00.000Z';
-const SEEN_KEY = 'quezby.league.seen.v1';
-
-function member(overrides: Partial<LeagueMember> = {}): LeagueMember {
+function entry(overrides: Partial<RatingEntry> = {}): RatingEntry {
   return {
     rank: 1,
-    username: 'ekin',
-    points: 30_000,
-    daysPlayed: 4,
-    isMe: false,
+    username: 'ust',
     avatarUrl: null,
+    rating: 2_900,
+    tier: 'gold',
+    isMe: false,
     isFriend: false,
-    zone: 'stay',
     gap: null,
     ...overrides,
   };
 }
 
-/** Six players: two promote, two stay (one of them you), two go down. */
-const GROUP: LeagueMember[] = [
-  member({
-    rank: 1,
-    username: 'ekin',
-    points: 41_200,
-    daysPlayed: 5,
-    zone: 'promote',
-  }),
-  member({
-    rank: 2,
-    username: 'mert',
-    points: 38_000,
-    daysPlayed: 4,
-    zone: 'promote',
-    gap: 3_201,
-  }),
-  member({
-    rank: 3,
-    username: 'kubi',
-    points: 30_500,
-    daysPlayed: 3,
-    isMe: true,
-    gap: 7_501,
-  }),
-  member({
-    rank: 4,
-    username: 'oya',
-    points: 22_000,
-    daysPlayed: 2,
-    gap: 8_501,
-  }),
-  member({
-    rank: 5,
-    username: 'deniz',
-    points: 9_000,
-    daysPlayed: 1,
-    zone: 'demote',
-    gap: 13_001,
-  }),
-  member({
-    rank: 6,
-    username: 'burak',
-    points: 1_200,
-    daysPlayed: 1,
-    zone: 'demote',
-    gap: 7_801,
-  }),
+/** Four players of Altın by Elo, you third. */
+const ROWS: RatingEntry[] = [
+  entry({ rank: 1, username: 'ust', rating: 2_900 }),
+  entry({ rank: 2, username: 'es', rating: 2_500, gap: 401 }),
+  entry({ rank: 3, username: 'kubi', rating: 2_340, gap: 161, isMe: true }),
+  entry({ rank: 4, username: 'alt', rating: 2_100, gap: 241 }),
 ];
 
-function league(overrides: Partial<LeagueResponse> = {}): LeagueResponse {
-  return {
-    season: 1,
-    weekKey: '2026-W39',
-    tier: 'gold',
-    endsAt: '2026-09-27T21:00:00.000Z',
-    serverTime: NOW,
-    joined: true,
-    unlock: null,
-    members: GROUP,
-    me: GROUP[2] ?? null,
-    promoteCount: 2,
-    demoteCount: 2,
-    promotionGap: null,
-    nextRankProgress: null,
-    lastWeek: null,
-    ...overrides,
-  };
+function board(overrides: Partial<RatingBoardResponse> = {}): RatingBoardResponse {
+  return { scope: 'league', entries: ROWS, me: ROWS[2] ?? null, players: 4, ...overrides };
 }
 
-function lastWeek(
-  outcome: LeagueOutcome,
-  tier: LeagueTier,
-  newTier: LeagueTier,
-): LeagueResponse['lastWeek'] {
-  return { weekKey: '2026-W38', tier, rank: 3, members: 30, outcome, newTier };
-}
+/** A Gold player, 2.340 Elo: 660 from Platin, 150.800 to beat. */
+const GOLD = buildRating({
+  rating: 2_340,
+  tier: 'gold',
+  floor: 2_000,
+  ceil: 3_000,
+  progress: 340,
+  target: 150_800,
+  peak: 2_400,
+});
 
 async function renderLeague() {
   const navigation = { navigate: jest.fn(), setOptions: jest.fn() };
@@ -136,290 +75,241 @@ async function renderLeague() {
 }
 
 describe('LeagueScreen — Lig', () => {
-  beforeEach(async () => {
+  beforeEach(() => {
     jest.clearAllMocks();
-    await AsyncStorage.clear();
+    mocked.rating.current.mockResolvedValue(GOLD);
+    mocked.rating.board.mockResolvedValue(board());
   });
 
-  it('puts the tier, the time left and the rule on the stage', async () => {
-    mocked.leagues.current.mockResolvedValue(league());
-
+  it('puts your league, your Elo, how far into it and the next target on the stage', async () => {
     await renderLeague();
 
     expect(await screen.findByText('Altın lig')).toBeOnTheScreen();
     expect(screen.getByRole('image', { name: 'Altın lig' })).toBeOnTheScreen();
-    expect(screen.getByText('Bitmesine 3 g 11 sa')).toBeOnTheScreen();
-    expect(
-      screen.getByText('Puanın: her günün en iyi skorunun toplamı'),
-    ).toBeOnTheScreen();
+    expect(screen.getByText('2.340 Elo')).toBeOnTheScreen();
+    expect(screen.getByText("Platin'e 660 Elo")).toBeOnTheScreen();
+    expect(screen.getAllByTestId('meter-notch')).toHaveLength(3);
+    expect(screen.getByText('Hedef 150.800')).toBeOnTheScreen();
+    expect(screen.getByText('En yüksek 2.400')).toBeOnTheScreen();
+    expect(screen.getByText('Bu skoru geçersen Elo’n artar.')).toBeOnTheScreen();
   });
 
-  it('reads out only your own tier; the ladder round it is its picture', async () => {
-    mocked.leagues.current.mockResolvedValue(league({ tier: 'silver' }));
+  it('reads out only your own league; the ladder round it is its picture', async () => {
+    mocked.rating.current.mockResolvedValue(buildRating());
 
     await renderLeague();
 
     expect(await screen.findByText('Gümüş lig')).toBeOnTheScreen();
-    expect(
-      screen.getAllByRole('image').map((node) => node.props.accessibilityLabel),
-    ).toEqual(['Gümüş lig']);
+    expect(screen.getAllByRole('image').map((node) => node.props.accessibilityLabel)).toEqual(['Gümüş lig']);
   });
 
-  it('keeps its head while the league is on its way', async () => {
-    mocked.leagues.current.mockReturnValue(new Promise(() => {}));
+  it('gives MasterClass no ceiling, and shows a fresh shield', async () => {
+    mocked.rating.current.mockResolvedValue(
+      buildRating({
+        rating: 5_060,
+        tier: 'master',
+        floor: 5_000,
+        ceil: null,
+        progress: null,
+        target: 826_100,
+        shield: { tier: 'master', runs: 2 },
+      }),
+    );
 
     await renderLeague();
 
-    expect(screen.getByText('HAFTALIK LİG')).toBeOnTheScreen();
+    expect(await screen.findByText('MasterClass lig')).toBeOnTheScreen();
+    expect(screen.getByText('Tavanı yok')).toBeOnTheScreen();
+    expect(screen.getByText('Kalkan · 2 tur')).toBeOnTheScreen();
+    expect(screen.queryByTestId('meter-notch')).not.toBeOnTheScreen();
+  });
+
+  it('counts the placement games before there is a rating, and plays the next one rated', async () => {
+    mocked.rating.current.mockResolvedValue(buildPlacing(2));
+
+    const navigation = await renderLeague();
+
+    expect(await screen.findByText('Yerleşme 2/3')).toBeOnTheScreen();
+    expect(screen.getByText('İlk 3 dereceli oyunun hangi ligde başlayacağını belirler.')).toBeOnTheScreen();
+    expect(screen.getAllByTestId('meter-notch')).toHaveLength(2);
+    expect(screen.queryByText(/^Hedef/)).not.toBeOnTheScreen();
+    expect(screen.getByText('Lig sıralaması Dereceli oyuncularının')).toBeOnTheScreen();
+    expect(mocked.rating.board).not.toHaveBeenCalled();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Dereceli oyna' }));
+    expect(navigation.navigate).toHaveBeenCalledWith('Game', { mode: 'rated' });
+  });
+
+  it('keeps Dereceli shut until enough Normal and Günlük games are played, and sends the player to Normal', async () => {
+    mocked.rating.current.mockResolvedValue(buildLocked(12));
+
+    const navigation = await renderLeague();
+
+    expect(await screen.findByText('Dereceli’ye 12 oyun kaldı')).toBeOnTheScreen();
+    expect(screen.getByText('Dereceli, 20 Normal ya da Günlük oyundan sonra açılır.')).toBeOnTheScreen();
+    expect(screen.queryByText(/^Yerleşme \d/)).not.toBeOnTheScreen();
+    expect(screen.getByText('Lig sıralaması Dereceli oyuncularının')).toBeOnTheScreen();
+    expect(screen.getByText('Yerleşme oyunlarını bitirince ligindeki sıralamaya girersin.')).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Dereceli oyna' })).not.toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Normal oyna' }));
+    expect(navigation.navigate).toHaveBeenCalledWith('Game', { mode: 'free' });
+  });
+
+  it('lists the latest changes of the rating, newest first', async () => {
+    mocked.rating.current.mockResolvedValue(
+      buildRating({
+        history: [
+          { kind: 'reversal', delta: -30, before: 1_670, after: 1_640, score: null, target: null, tier: 'silver', runId: 'r3', at: '2026-09-29T09:00:00.000Z' },
+          { kind: 'run', delta: -18, before: 1_628, after: 1_610, score: 41_000, target: 66_100, tier: 'silver', runId: 'r2', at: '2026-09-28T09:00:00.000Z' },
+        ],
+      }),
+    );
+
+    await renderLeague();
+
+    expect(await screen.findByText('SON DEĞİŞİMLER')).toBeOnTheScreen();
+    expect(screen.getByText('Geri alındı')).toBeOnTheScreen();
+    expect(screen.getByText('−30')).toBeOnTheScreen();
+    expect(screen.getByText('Tur')).toBeOnTheScreen();
+    expect(screen.getByText('−18')).toBeOnTheScreen();
+    expect(screen.getByText('41.000 · hedef 66.100')).toBeOnTheScreen();
+  });
+
+  it('shows the rating a placement set, not a move', async () => {
+    mocked.rating.current.mockResolvedValue(
+      buildRating({
+        rating: 1_500,
+        history: [
+          { kind: 'placement', delta: 0, before: null, after: 1_500, score: 58_310, target: null, tier: 'silver', runId: 'r5', at: '2026-09-29T09:00:00.000Z' },
+        ],
+      }),
+    );
+
+    await renderLeague();
+
+    expect(await screen.findByText('Yerleşme')).toBeOnTheScreen();
+    expect(screen.getAllByText('1.500').length).toBeGreaterThan(0);
+    expect(screen.queryByText('±0')).not.toBeOnTheScreen();
+  });
+
+  it('keeps its head while the rating is on its way', async () => {
+    mocked.rating.current.mockReturnValue(new Promise(() => {}));
+
+    await renderLeague();
+
+    expect(screen.getByText('LİG')).toBeOnTheScreen();
     expect(screen.queryByText(/ lig$/)).not.toBeOnTheScreen();
   });
 
-  it('invites a player who has not played this week to join', async () => {
-    mocked.leagues.current.mockResolvedValue(
-      league({ joined: false, members: [], me: null }),
-    );
-    const navigation = await renderLeague();
-
-    expect(
-      await screen.findByText('Bu hafta henüz oynamadın'),
-    ).toBeOnTheScreen();
-    expect(
-      screen.queryByRole('header', { name: 'Terfi bölgesi' }),
-    ).not.toBeOnTheScreen();
-    expect(screen.queryByText('SENİN KATIN')).not.toBeOnTheScreen();
-
-    await fireEvent.press(
-      screen.getByRole('button', { name: 'Oyna, ligine katıl' }),
-    );
-    expect(navigation.navigate).toHaveBeenCalledWith('Game', { mode: 'free' });
-  });
-
-  it('says how many counted runs a new player has left before the league opens', async () => {
-    mocked.leagues.current.mockResolvedValue(
-      league({ joined: false, members: [], me: null, unlock: { required: 3, remaining: 1 } }),
-    );
-    const navigation = await renderLeague();
-
-    expect(await screen.findByText('Lige 1 oyun kaldı')).toBeOnTheScreen();
-    expect(screen.getByText(/Lig, ilk 3 oyunundan sonra açılır; deneme turu sayılmaz\./)).toBeOnTheScreen();
-    expect(screen.queryByText('Bu hafta henüz oynamadın')).not.toBeOnTheScreen();
-
-    await fireEvent.press(screen.getByRole('button', { name: 'Oyna' }));
-    expect(navigation.navigate).toHaveBeenCalledWith('Game', { mode: 'free' });
-  });
-
-  it('bands the group into its zones, with points, days played and gaps', async () => {
-    mocked.leagues.current.mockResolvedValue(league());
-
+  it('ranks your league by Elo, never by the week, with the Elo to pass the player above', async () => {
     await renderLeague();
 
+    expect(await screen.findByRole('button', { name: /^1\. sıra, @ust/ })).toBeOnTheScreen();
+    expect(screen.getByText('LİG SIRALAMASI')).toBeOnTheScreen();
+    expect(screen.getByText('Son 14 günde dereceli oynayanlar, Elo sırasıyla')).toBeOnTheScreen();
+    expect(mocked.rating.board).toHaveBeenCalledWith('league');
     expect(
-      await screen.findByRole('header', { name: 'Terfi bölgesi' }),
-    ).toBeOnTheScreen();
-    expect(screen.getByText('TERFİ BÖLGESİ')).toBeOnTheScreen();
-    expect(
-      screen.getByRole('header', { name: 'Düşme bölgesi' }),
-    ).toBeOnTheScreen();
-    expect(screen.getByText('DÜŞME BÖLGESİ')).toBeOnTheScreen();
-    expect(
-      screen
-        .getAllByRole('button', { name: /\. sıra, @/ })
-        .map((row) => row.props.accessibilityLabel),
+      screen.getAllByRole('button', { name: /\. sıra, @/ }).map((row) => row.props.accessibilityLabel),
     ).toEqual([
-      '1. sıra, @ekin, 41.200 puan, 5 gün',
-      '2. sıra, @mert, 38.000 puan, 4 gün, geçmek için 3.201 puan',
-      '3. sıra, @kubi, sen, 30.500 puan, 3 gün, geçmek için 7.501 puan',
-      '4. sıra, @oya, 22.000 puan, 2 gün, geçmek için 8.501 puan',
-      '5. sıra, @deniz, 9.000 puan, 1 gün, geçmek için 13.001 puan',
-      '6. sıra, @burak, 1.200 puan, 1 gün, geçmek için 7.801 puan',
+      '1. sıra, @ust, 2.900 Elo',
+      '2. sıra, @es, 2.500 Elo, geçmek için 401 Elo',
+      '3. sıra, @kubi, sen, 2.340 Elo, geçmek için 161 Elo',
+      '4. sıra, @alt, 2.100 Elo, geçmek için 241 Elo',
     ]);
-    expect(screen.getByText('3 gün')).toBeOnTheScreen();
-    expect(screen.getByText('▲ 7.501')).toBeOnTheScreen();
+    expect(screen.queryByText(/HAFTALIK|Bitmesine|bonus/i)).not.toBeOnTheScreen();
   });
 
-  it('pins your floor with the player to pass', async () => {
-    mocked.leagues.current.mockResolvedValue(league());
+  it('pins your floor with the Elo to the player above, and plays rated to pass them', async () => {
     const navigation = await renderLeague();
 
-    expect(await screen.findByText("@mert'e 7.501 puan")).toBeOnTheScreen();
+    expect(await screen.findByText("@es'e 161 Elo")).toBeOnTheScreen();
     expect(screen.getByText('SENİN KATIN')).toBeOnTheScreen();
     expect(screen.getByText('#3')).toBeOnTheScreen();
-    expect(screen.getByText('Sen · 30.500')).toBeOnTheScreen();
+    expect(screen.getByText('Sen · 2.340 Elo')).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole('button', { name: 'Geç onu' }));
-    expect(navigation.navigate).toHaveBeenCalledWith('Game', { mode: 'free' });
+    expect(navigation.navigate).toHaveBeenCalledWith('Game', { mode: 'rated' });
+    expect(track).toHaveBeenCalledWith('rival');
+  });
+
+  it('asks a placed player who has not played rated lately back in', async () => {
+    mocked.rating.board.mockResolvedValue(board({ entries: ROWS.filter((row) => !row.isMe), me: null, players: 3 }));
+    const navigation = await renderLeague();
+
+    expect(await screen.findByText('Son 14 günde dereceli oynamadın')).toBeOnTheScreen();
+    expect(screen.getByText('Bir dereceli oyun seni ligindeki sıralamaya geri koyar.')).toBeOnTheScreen();
+    expect(screen.queryByText('SENİN KATIN')).not.toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: /^1\. sıra, @ust/ })).toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Dereceli oyna' }));
+    expect(navigation.navigate).toHaveBeenCalledWith('Game', { mode: 'rated' });
   });
 
   it('opens a player card from a row', async () => {
-    mocked.leagues.current.mockResolvedValue(league());
     mocked.users.get.mockReturnValue(new Promise(() => {}));
     await renderLeague();
 
-    await fireEvent.press(
-      await screen.findByRole('button', { name: /^4\. sıra, @oya/ }),
-    );
+    await fireEvent.press(await screen.findByRole('button', { name: /^4\. sıra, @alt/ }));
 
-    expect(mocked.users.get).toHaveBeenCalledWith('oya');
-  });
-
-  it.each([
-    ['promoted', 'silver', 'gold', "Altın'a yükseldin!"],
-    ['stayed', 'silver', 'silver', 'Gümüş ligde kaldın.'],
-    ['demoted', 'gold', 'silver', "Gümüş'e düştün."],
-  ] as const)(
-    'tells a %s player how last week ended',
-    async (outcome, tier, newTier, headline) => {
-      mocked.leagues.current.mockResolvedValue(
-        league({ lastWeek: lastWeek(outcome, tier, newTier) }),
-      );
-
-      await renderLeague();
-
-      expect(await screen.findByText(headline)).toBeOnTheScreen();
-      expect(
-        screen.getByText(
-          `Geçen hafta ${tier === 'gold' ? 'Altın' : 'Gümüş'} ligde #3 oldun.`,
-        ),
-      ).toBeOnTheScreen();
-    },
-  );
-
-  it("shows last week's card once, and not again after it is put away", async () => {
-    mocked.leagues.current.mockResolvedValue(
-      league({ lastWeek: lastWeek('promoted', 'silver', 'gold') }),
-    );
-
-    await renderLeague();
-    expect(await screen.findByText("Altın'a yükseldin!")).toBeOnTheScreen();
-
-    await fireEvent.press(screen.getByRole('button', { name: 'Kapat' }));
-
-    expect(screen.queryByText("Altın'a yükseldin!")).not.toBeOnTheScreen();
-    expect(await AsyncStorage.getItem(SEEN_KEY)).toBe('2026-W38');
-
-    await screen.unmount();
-    await renderLeague();
-
-    expect(
-      await screen.findByRole('header', { name: 'Terfi bölgesi' }),
-    ).toBeOnTheScreen();
-    expect(screen.queryByText("Altın'a yükseldin!")).not.toBeOnTheScreen();
-  });
-
-  it('greets a new week even after an older card was put away', async () => {
-    await AsyncStorage.setItem(SEEN_KEY, '2026-W37');
-    mocked.leagues.current.mockResolvedValue(
-      league({ lastWeek: lastWeek('stayed', 'gold', 'gold') }),
-    );
-
-    await renderLeague();
-
-    expect(await screen.findByText('Altın ligde kaldın.')).toBeOnTheScreen();
+    expect(mocked.users.get).toHaveBeenCalledWith('alt');
   });
 
   it('explains a failed load and tries again', async () => {
-    mocked.leagues.current
-      .mockRejectedValueOnce(new Error('offline'))
-      .mockResolvedValue(league());
+    mocked.rating.board.mockRejectedValueOnce(new Error('offline')).mockResolvedValue(board());
     await renderLeague();
 
-    expect(await screen.findByText('Lig yüklenemedi')).toBeOnTheScreen();
+    expect(await screen.findByText('Lig sıralaması yüklenemedi')).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'Tekrar dene' }));
 
-    expect(
-      await screen.findByRole('header', { name: 'Terfi bölgesi' }),
-    ).toBeOnTheScreen();
+    expect(await screen.findByRole('button', { name: /^1\. sıra, @ust/ })).toBeOnTheScreen();
   });
 });
 
 describe('LeagueScreen — in other languages', () => {
-  beforeEach(async () => {
+  beforeEach(() => {
     jest.clearAllMocks();
-    await AsyncStorage.clear();
+    mocked.rating.current.mockResolvedValue(GOLD);
+    mocked.rating.board.mockResolvedValue(board());
   });
 
-  it('speaks English: the stage, last week, the zones and your floor', async () => {
+  it('speaks English: the stage, the league ranking and your floor', async () => {
     useLanguage.setState({ locale: 'en' });
-    mocked.leagues.current.mockResolvedValue(
-      league({ lastWeek: lastWeek('promoted', 'silver', 'gold') }),
-    );
 
     await renderLeague();
 
-    expect(
-      await screen.findByText('You moved up to Gold league!'),
-    ).toBeOnTheScreen();
-    expect(
-      screen.getByText('Last week you finished #3 in Silver league.'),
-    ).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: 'Close' })).toBeOnTheScreen();
-    expect(screen.getByText('WEEKLY LEAGUE')).toBeOnTheScreen();
-    expect(screen.getByText('Gold league')).toBeOnTheScreen();
-    expect(
-      screen.getByText("Your points: the sum of each day's best score"),
-    ).toBeOnTheScreen();
-    expect(
-      screen.getByRole('header', { name: 'Promotion zone' }),
-    ).toBeOnTheScreen();
-    expect(screen.getByText('PROMOTION ZONE')).toBeOnTheScreen();
-    expect(screen.getByText('RELEGATION ZONE')).toBeOnTheScreen();
-    expect(
-      screen.getByRole('button', {
-        name: '3rd place, @kubi, you, 30,500 points, 3 days, 7,501 points to pass',
-      }),
-    ).toBeOnTheScreen();
-    expect(screen.getAllByText('1 day')).toHaveLength(2);
-    expect(screen.getByText('7,501 pts to @mert')).toBeOnTheScreen();
+    expect(await screen.findByText('Gold league')).toBeOnTheScreen();
+    expect(await screen.findByText('You · 2,340 Elo')).toBeOnTheScreen();
+    expect(screen.getByText('LEAGUE RANKING')).toBeOnTheScreen();
+    expect(screen.getByText('LEAGUE')).toBeOnTheScreen();
+    expect(screen.getByText('2,340 Elo')).toBeOnTheScreen();
+    expect(screen.getByText('660 Elo to Platinum')).toBeOnTheScreen();
+    expect(screen.getByText('Target 150,800')).toBeOnTheScreen();
+    expect(screen.getByText('Ranked players of the last 14 days, by Elo')).toBeOnTheScreen();
+    expect(screen.getByText('161 Elo to @es')).toBeOnTheScreen();
   });
 
-  it('tells a new player in English how many games stand before the league', async () => {
+  it('tells a new player in English how many games stand before Ranked', async () => {
     useLanguage.setState({ locale: 'en' });
-    mocked.leagues.current.mockResolvedValue(
-      league({
-        joined: false,
-        members: [],
-        me: null,
-        unlock: { required: 3, remaining: 1 },
-      }),
-    );
+    mocked.rating.current.mockResolvedValue(buildLocked(1));
 
     await renderLeague();
 
-    expect(await screen.findByText('1 game to the league')).toBeOnTheScreen();
-    expect(
-      screen.getByText(
-        "The league opens after your first 3 games; the practice run doesn't count. Then your first run of each week puts you in a group.",
-      ),
-    ).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: 'Play' })).toBeOnTheScreen();
+    expect(await screen.findByText('1 game to Ranked')).toBeOnTheScreen();
+    expect(screen.getByText('Ranked opens after 20 Normal or Daily games.')).toBeOnTheScreen();
+    expect(screen.getByText('The league ranking is for Ranked players')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Play Normal' })).toBeOnTheScreen();
   });
 
-  it('speaks Arabic: the tier, the zones and how last week ended', async () => {
+  it('speaks Arabic: the league, the Elo and the ranking', async () => {
     useLanguage.setState({ locale: 'ar' });
-    mocked.leagues.current.mockResolvedValue(
-      league({ lastWeek: lastWeek('demoted', 'platinum', 'gold') }),
-    );
 
     await renderLeague();
 
-    expect(await screen.findByText('هبطت إلى دوري الذهب.')).toBeOnTheScreen();
-    expect(
-      screen.getByText(
-        `في الأسبوع الماضي حللت في المركز ${iso('#3')} في دوري البلاتين.`,
-      ),
-    ).toBeOnTheScreen();
-    expect(screen.getByText('الدوري الأسبوعي')).toBeOnTheScreen();
-    expect(screen.getByText('دوري الذهب')).toBeOnTheScreen();
-    expect(
-      screen.getByRole('header', { name: 'منطقة الصعود' }),
-    ).toBeOnTheScreen();
-    expect(
-      screen.getByRole('header', { name: 'منطقة الهبوط' }),
-    ).toBeOnTheScreen();
-    expect(
-      screen.getByRole('button', {
-        name: `المركز 1، ${iso('@ekin')}، 41,200 نقطة، 5 أيام`,
-      }),
-    ).toBeOnTheScreen();
+    expect(await screen.findByText('دوري الذهب')).toBeOnTheScreen();
+    expect(await screen.findByText(`تفصلك 161 إيلو عن ${iso('@es')}`)).toBeOnTheScreen();
+    expect(screen.getByText('ترتيب الدوري')).toBeOnTheScreen();
+    expect(screen.getByText('الدوري')).toBeOnTheScreen();
+    expect(screen.getByText(`${iso('2,340')} إيلو`)).toBeOnTheScreen();
   });
 });

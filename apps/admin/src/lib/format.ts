@@ -15,11 +15,10 @@ import type {
   AnalyticsEvent,
   AnalyticsScreen,
   LeaderboardBoard,
-  LeagueOutcome,
   LeagueTier,
-  LeagueZone,
   Locale,
   Platform,
+  RatingChangeKind,
   ReportReason,
   RunFlagCode,
   RunFlagSeverity,
@@ -49,6 +48,23 @@ const monthFormat = new Intl.DateTimeFormat('tr-TR', { timeZone: TIMEZONE, month
 /** `12.345`; a missing number is a dash. */
 export function formatNumber(value: number | null | undefined): string {
   return value === null || value === undefined ? '—' : integer.format(value);
+}
+
+/** A move up or down, signed with a real minus: `+42`, `−1.018`, `0`. */
+export function formatDelta(value: number | null | undefined): string {
+  if (value === null || value === undefined) return '—';
+  if (value === 0) return '0';
+  return `${value > 0 ? '+' : '−'}${integer.format(Math.abs(value))}`;
+}
+
+/** A value the API sends per cent (`20`) the Turkish way: `%20`. */
+export function formatPercent(value: number | null | undefined): string {
+  return value === null || value === undefined ? '—' : percent.format(value / 100);
+}
+
+/** A rating before and after a change: `1.234 → 1.276`; a side not yet set is a dash. */
+export function formatRatingMove(before: number | null, after: number | null): string {
+  return before === null && after === null ? '—' : `${formatNumber(before)} → ${formatNumber(after)}`;
 }
 
 /** A per-mille value as the API sends it (`942`) as a percentage: `%94,2`. */
@@ -259,26 +275,29 @@ export const AUDIT_VIA: Record<AdminAuditVia, string> = {
   system: 'Sistem',
 };
 
+/** The six leagues, a thousand rating points each; MasterClass is 5000 and up. */
 export const LEAGUE_TIER: Record<LeagueTier, string> = {
   bronze: 'Bronz',
   silver: 'Gümüş',
   gold: 'Altın',
   platinum: 'Platin',
   diamond: 'Elmas',
+  master: 'MasterClass',
 };
 
-export const LEAGUE_TIERS: LeagueTier[] = ['diamond', 'platinum', 'gold', 'silver', 'bronze'];
+/** The leagues, the highest first. */
+export const LEAGUE_TIERS: LeagueTier[] = ['master', 'diamond', 'platinum', 'gold', 'silver', 'bronze'];
 
-export const LEAGUE_ZONE: Record<LeagueZone, Label> = {
-  promote: { tone: 'ok', label: 'Yükseliyor' },
-  stay: { tone: 'neutral', label: 'Kalıyor' },
-  demote: { tone: 'bad', label: 'Düşüyor' },
-};
-
-export const LEAGUE_OUTCOME: Record<LeagueOutcome, Label> = {
-  promoted: { tone: 'ok', label: 'Yükseldi' },
-  stayed: { tone: 'neutral', label: 'Kaldı' },
-  demoted: { tone: 'bad', label: 'Düştü' },
+/**
+ * Why a rating moved. Only a forfeit is bad news; a moderator's reversal is
+ * worth a look.
+ */
+export const RATING_KIND: Record<RatingChangeKind, Label & { hint: string }> = {
+  placement: { tone: 'secondary', label: 'Yerleşme', hint: 'İlk turlardan biri: sonuncusu oyuncuyu medyan skoruyla yerleştirir.' },
+  run: { tone: 'neutral', label: 'Tur', hint: 'Hedefe karşı oynanan tur: geçtiyse reyting arttı, kaldıysa düştü.' },
+  forfeit: { tone: 'bad', label: 'Hükmen', hint: 'Bayrak alan bir oyunla bitti: tam kayıp sayıldı.' },
+  void: { tone: 'neutral', label: 'Sayılmadı', hint: 'Yasaklıyken, güvenilmeyen bir telefonda ya da geri sayımda bırakılan tur: reytinge dokunmadı.' },
+  reversal: { tone: 'warn', label: 'Geri alındı', hint: 'Bir moderatör turu reddetti; tur ne getirdiyse geri alındı.' },
 };
 
 /** The four kinds of post, as the game calls them, and the move each one asks for. */
@@ -328,8 +347,9 @@ export const GESTURE: Record<AdminGesture, string> = {
 };
 
 export const RUN_MODE: Record<RunMode, string> = {
-  free: 'Serbest',
+  free: 'Normal',
   daily: 'Günün akışı',
+  rated: 'Dereceli',
   vs: 'VS',
 };
 
@@ -440,7 +460,7 @@ export const FUNNEL_STEP: Record<AdminFunnelStep, { label: string; hint: string 
   named: { label: 'Adını seçti', hint: 'Otomatik adda kalmadı' },
   protected: { label: 'Hesabını korudu', hint: 'Apple, Google ya da e-posta' },
   first_run: { label: 'İlk sayılan tur', hint: 'Sıralamaya giren, puan alan' },
-  league: { label: 'Lige girdi', hint: 'Bir gruba oturdu' },
+  league: { label: 'Yerleşti', hint: 'Yerleşme oyunlarını bitirip bir lige girdi' },
   returned: { label: 'Ertesi gün döndü', hint: 'Dünden önce katılanlardan' },
 };
 
@@ -453,7 +473,7 @@ export const MILESTONE: Record<AdminMilestone, string> = {
   protect_reminder: 'Koruma hatırlatmasını gördü',
   protected: 'Hesabını korudu',
   first_run: 'İlk sayılan tur',
-  league: 'Lige girdi',
+  league: 'Yerleşti',
 };
 
 /** Whether a player's activity is kept, and why not. */

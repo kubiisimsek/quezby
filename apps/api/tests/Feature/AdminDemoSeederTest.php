@@ -2,9 +2,12 @@
 
 use App\Enums\AdminRole;
 use App\Enums\AuditAction;
+use App\Enums\RatingKind;
 use App\Enums\RunStatus;
 use App\Models\Admin;
 use App\Models\AuditEntry;
+use App\Models\PlayerRating;
+use App\Models\RatingChange;
 use App\Models\Run;
 use App\Models\User;
 use Illuminate\Support\Carbon;
@@ -38,6 +41,14 @@ test('locally it makes an admin of each role and something for each of them to l
         ->and(User::query()->where('username', 'yasakli.hesap')->sole()->isBanned())->toBeTrue()
         ->and(User::query()->where('username', 'root.telefon')->sole()->deviceChecks()->where('verdict', 'fail')->count())->toBe(3)
         ->and(AuditEntry::query()->pluck('action')->all())->toEqualCanonicalizing([AuditAction::RunReject, AuditAction::PlayerBan]);
+
+    // The suspects' runs were counted as a finish counts them: the bot's flagged rated runs are
+    // forfeits — three zeros place it at the floor of Gümüş, two more take a hundred each.
+    $speedy = User::query()->where('username', 'bot.hizli')->sole();
+    expect(PlayerRating::query()->findOrFail($speedy->id))
+        ->placement_scores->toBe([0, 0, 0])
+        ->rating->toBe(1000)
+        ->and(RatingChange::query()->where('user_id', $speedy->id)->where('kind', RatingKind::Forfeit->value)->count())->toBe(5);
 
     $this->signInAdmin(AdminRole::Viewer);
     $this->getJson('/api/v1/admin/suspects')->assertOk()->assertJsonPath('items.0.player.username', 'bot.hizli');

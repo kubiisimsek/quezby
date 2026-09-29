@@ -1,9 +1,7 @@
 <?php
 
-use App\Enums\LeagueTier;
 use App\Models\LeaderboardEntry;
-use App\Models\LeagueGroup;
-use App\Models\LeagueMember;
+use App\Models\PlayerRating;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -66,14 +64,9 @@ test("each result carries the season's best, this week's league and what they ar
         'season' => config('quezby.season') - 1, 'period' => 'all', 'period_key' => 'all', 'user_id' => $newcomer->id,
         'score' => 99000, 'reels' => 300, 'achieved_at' => now(),
     ]);
-    $thisWeek = LeagueGroup::query()->create(['season' => config('quezby.season'), 'week_key' => '2026-W39', 'tier' => LeagueTier::Gold, 'members' => 1]);
-    $lastWeek = LeagueGroup::query()->create(['season' => config('quezby.season'), 'week_key' => '2026-W38', 'tier' => LeagueTier::Silver, 'members' => 1]);
-    foreach ([[$thisWeek, $ranked], [$lastWeek, $newcomer]] as [$group, $player]) {
-        LeagueMember::query()->create([
-            'group_id' => $group->id, 'user_id' => $player->id, 'season' => $group->season,
-            'week_key' => $group->week_key, 'tier' => $group->tier, 'joined_at' => now(),
-        ]);
-    }
+    // The league is the rating's: a player still placing has none.
+    $this->rate($ranked, 2210);
+    PlayerRating::query()->create(['user_id' => $newcomer->id, 'placement_scores' => [30000]]);
     $this->befriend($me, $ranked);
     $this->requestFriend($newcomer, $me);
 

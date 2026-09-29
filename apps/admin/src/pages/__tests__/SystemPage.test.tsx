@@ -20,6 +20,18 @@ describe('SystemPage', () => {
     expect(screen.getByText('Tanımlı')).toBeInTheDocument();
   });
 
+  it('shows the limits, Dereceli\'s unlock among them, and no weekly league group', async () => {
+    const api = fakeApi();
+    api.system.get.mockResolvedValue(system());
+    renderApp({ path: '/system', api });
+
+    const limits = (await screen.findByRole('heading', { name: 'Sınırlar' })).closest('section') as HTMLElement;
+    const unlock = within(limits).getByText('Dereceli kilidi', { selector: 'dt' }).parentElement as HTMLElement;
+    expect(unlock).toHaveTextContent('20 oyun');
+    expect(unlock).toHaveTextContent('Normal ya da Günlük oyun');
+    expect(within(limits).queryByText('Lig grubu')).not.toBeInTheDocument();
+  });
+
   it('says APP_KEY is missing and rebuilds the cache once .env has it', async () => {
     const api = fakeApi();
     api.system.get.mockResolvedValue(system({ appKey: false }));

@@ -2,11 +2,20 @@ import { ApiError } from '@quezby/sdk/admin';
 import { screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { adminSession, AVATAR_URL, playerActivity, playerResponse, playersPage } from '@/test/factories';
+import { adminSession, AVATAR_URL, playerActivity, playerRating, playerResponse, playersPage, ratingChange } from '@/test/factories';
 import { fakeApi } from '@/test/fake-api';
 import { renderApp } from '@/test/render';
 
 const ID = '01jplayer00000000000000000a';
+
+/** A card of the player's page by its heading. */
+async function card(name: string): Promise<HTMLElement> {
+  return (await screen.findByRole('heading', { name })).closest('section') as HTMLElement;
+}
+
+function fact(scope: HTMLElement, label: string): HTMLElement {
+  return within(scope).getByText(label, { selector: 'dt' }).parentElement as HTMLElement;
+}
 
 function withPlayer(response = playerResponse()) {
   const api = fakeApi();
@@ -21,7 +30,7 @@ describe('PlayerPage', () => {
     expect(await screen.findByRole('heading', { name: '@kerem.35' })).toBeInTheDocument();
     expect(screen.getByText('Sezon 2 rekoru')).toBeInTheDocument();
     expect(screen.getAllByText('250.311').length).toBeGreaterThan(0);
-    expect(screen.getByText('Altın · 4/28')).toBeInTheDocument();
+    expect(within(await card('Oyun · sezon 2')).queryByText('Lig', { selector: 'dt' })).not.toBeInTheDocument();
     expect(screen.getByText('×2,5')).toBeInTheDocument();
     expect(screen.getByText('Makine gibi ritim')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Tüm turları' })).toHaveAttribute('href', `/runs?player=${ID}`);
@@ -82,7 +91,7 @@ describe('PlayerPage', () => {
   });
 
   it('offers to lift a ban instead, and shows why the player was banned', async () => {
-    const api = withPlayer(playerResponse({ best: null, league: null }, { bannedAt: '2026-09-24T10:00:00.000Z', banReason: 'Bot gibi oynuyor' }));
+    const api = withPlayer(playerResponse({ best: null }, { bannedAt: '2026-09-24T10:00:00.000Z', banReason: 'Bot gibi oynuyor' }));
     api.players.unban.mockResolvedValue({ changed: true });
     const { user } = renderApp({ path: `/players/${ID}`, api });
 
@@ -298,5 +307,102 @@ describe('PlayerPage', () => {
     expect(screen.queryByRole('button', { name: 'Bildirimleri kapat' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'İşlemler' })).not.toBeInTheDocument();
   });
-});
 
+  it('shows a placed player\'s rating, league, peak and next target', async () => {
+    renderApp({ path: `/players/${ID}`, api: withPlayer() });
+
+    const rating = await card('Reyting');
+    expect(fact(rating, 'Reyting')).toHaveTextContent('2.450');
+    expect(within(fact(rating, 'Reyting')).getByText('Altın')).toBeInTheDocument();
+    expect(fact(rating, 'En yüksek')).toHaveTextContent('2.610');
+    expect(fact(rating, 'Sonraki hedef')).toHaveTextContent('128.000');
+    expect(fact(rating, 'Sayılan tur')).toHaveTextContent('36');
+    expect(within(rating).queryByText('Yerleşme', { selector: 'dt' })).not.toBeInTheDocument();
+    expect(within(rating).queryByText('Geçici dönem', { selector: 'dt' })).not.toBeInTheDocument();
+    expect(within(rating).queryByText('Terfi kalkanı', { selector: 'dt' })).not.toBeInTheDocument();
+  });
+
+  it('lists every change of the rating, the runs that did not count stepping back', async () => {
+    renderApp({ path: `/players/${ID}`, api: withPlayer() });
+
+    const history = await card('Reyting geçmişi');
+    const rows = within(history).getAllByRole('row').slice(1);
+    expect(rows).toHaveLength(4);
+
+    const [won, reversed, voided, lost] = rows as [HTMLElement, HTMLElement, HTMLElement, HTMLElement];
+    expect(within(won).getByText('Tur')).toBeInTheDocument();
+    expect(within(won).getByText('+42')).toHaveClass('text-ok-text');
+    expect(within(won).getByText('2.408 → 2.450')).toBeInTheDocument();
+    expect(within(won).getByText('140.000')).toBeInTheDocument();
+    expect(within(won).getByText('hedef 120.000')).toBeInTheDocument();
+    expect(within(won).getByRole('link', { name: 'Tur 000000AB aç' })).toHaveAttribute('href', '/runs/01jrun000000000000000000ab');
+
+    expect(within(reversed).getByText('Geri alındı')).toBeInTheDocument();
+    expect(within(reversed).getByText('−30')).toHaveClass('text-bad-text');
+    expect(within(reversed).getByRole('link', { name: 'Tur 000000AE aç' })).toHaveAttribute('href', '/runs/01jrun000000000000000000ae');
+
+    expect(within(voided).getByText('Sayılmadı')).toBeInTheDocument();
+    expect(voided).toHaveClass('[&>td]:opacity-60');
+    expect(won).not.toHaveClass('[&>td]:opacity-60');
+
+    expect(within(lost).getByText('−18')).toHaveClass('text-bad-text');
+    expect(within(lost).getByText('2.456 → 2.438')).toBeInTheDocument();
+  });
+
+  it('shows a player still in their placement runs', async () => {
+    renderApp({
+      path: `/players/${ID}`,
+      api: withPlayer(
+        playerResponse({
+          rating: playerRating({
+            rating: null,
+            tier: null,
+            peak: null,
+            target: null,
+            placement: { played: 3, required: 5 },
+            ratedRuns: 3,
+            history: [ratingChange({ kind: 'placement', delta: 0, before: null, after: null, target: null, performance: null })],
+          }),
+        }),
+      ),
+    });
+
+    const rating = await card('Reyting');
+    expect(within(fact(rating, 'Reyting')).getByText('Yerleşmede')).toBeInTheDocument();
+    expect(fact(rating, 'Yerleşme')).toHaveTextContent('3 / 5 tur');
+    expect(fact(rating, 'Sonraki hedef')).toHaveTextContent('—');
+    const history = await card('Reyting geçmişi');
+    const row = within(history).getAllByRole('row')[1] as HTMLElement;
+    expect(within(row).getByText('Yerleşme')).toBeInTheDocument();
+    expect(within(row).getByText('—')).toBeInTheDocument();
+  });
+
+  it('says what still speeds or shields a fresh rating', async () => {
+    renderApp({
+      path: `/players/${ID}`,
+      api: withPlayer(
+        playerResponse({
+          rating: playerRating({
+            provisionalLeft: 7,
+            shield: { tier: 'platinum', runs: 2 },
+            history: [ratingChange({ shielded: true, delta: -30 })],
+          }),
+        }),
+      ),
+    });
+
+    const rating = await card('Reyting');
+    expect(fact(rating, 'Geçici dönem')).toHaveTextContent('7 tur daha');
+    expect(fact(rating, 'Terfi kalkanı')).toHaveTextContent('Platin · 2 tur');
+    const history = await card('Reyting geçmişi');
+    expect(within(history).getByText('Kalkan')).toBeInTheDocument();
+  });
+
+  it('says a player has no rating yet, with no history to show', async () => {
+    renderApp({ path: `/players/${ID}`, api: withPlayer(playerResponse({ rating: null })) });
+
+    const rating = await card('Reyting');
+    expect(within(rating).getByText('Henüz reyting yok')).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Reyting geçmişi' })).not.toBeInTheDocument();
+  });
+});

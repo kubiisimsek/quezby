@@ -1,14 +1,15 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { CompositeScreenProps } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type {
-  LeagueMember,
-  LeagueResponse,
   LeagueTier,
-  LeagueZone,
+  LeagueUnlock,
+  RatingChange,
+  RatingEntry,
+  RatingResponse,
 } from '@quezby/types';
-import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import type { UseQueryResult } from '@tanstack/react-query';
+import { useCallback, useState, type ReactNode } from 'react';
 import {
   ActivityIndicator,
   RefreshControl,
@@ -25,34 +26,37 @@ import { track } from '@/analytics/track';
 import { BoardStage, useArrival } from '@/components/BoardStage';
 import { FloorDock } from '@/components/FloorDock';
 import { PlayerSheet } from '@/components/PlayerSheet';
-import { useLeague } from '@/hooks/useBoards';
+import { useRating, useRatingBoard } from '@/hooks/useBoards';
 import { useT } from '@/i18n';
 import { messageFor } from '@/lib/errors';
+import { TIERS } from '@/lib/tiers';
 import type { RootStackParamList, TabParamList } from '@/navigation/types';
 import { Icon } from '@/ui/icons';
 import {
   Button,
   Callout,
   ClimbRow,
-  Confetti,
-  CountdownChip,
   EmptyState,
+  Eyebrow,
   FloorCard,
-  IconButton,
+  IconChip,
+  Meter,
   Panel,
   Ribbon,
   Screen,
   SkeletonList,
   Spotlight,
   Stamp,
+  Tag,
   TierBadge,
   Txt,
 } from '@/ui/kit';
 import {
-  DEPTH,
-  RADIUS,
+  FONT,
   SPACE,
   TYPE,
+  embossed,
+  lh,
   useTheme,
   withAlpha,
   type Theme,
@@ -63,34 +67,30 @@ type Props = CompositeScreenProps<
   NativeStackScreenProps<RootStackParamList>
 >;
 
-/** The week whose result card was last put away. */
-const SEEN_KEY = 'quezby.league.seen.v1';
-
-/** The tiers, bottom to top. */
-const TIERS: LeagueTier[] = ['bronze', 'silver', 'gold', 'platinum', 'diamond'];
+/** How many of the latest rating changes the screen lists. */
+const HISTORY_ROWS = 6;
 
 /**
- * The week's league. On the stage: your tier's emblem glowing between the
- * tiers under and over it, its name, the time left and how points are
- * counted. Under it, the group you were seated in, best first — the
- * promotion places under a green "TERFİ BÖLGESİ" banner at the top and the
- * demotion places under a red "DÜŞME BÖLGESİ" at the foot, so where you
- * stand needs no counting — and your floor pinned over the dock. Last week's
- * outcome greets you once, until you put it away; a promotion gets confetti.
+ * The league — the one your Elo puts you in. On the stage: its emblem
+ * glowing between the leagues under and over it, your Elo in gold, how far
+ * into the league you are and how far the next one is, and the score your
+ * next run has to beat. Before it: how far Dereceli is, then the placement
+ * games. Under it, your latest changes, then the league's players by Elo —
+ * a ranking that never resets — with your floor pinned over the dock: the
+ * Elo to pass the player right above you.
  */
 export function LeagueScreen({ navigation }: Props) {
-  const league = useLeague();
+  const rating = useRating();
+  const placed = rating.data?.placed === true;
+  const board = useRatingBoard('league', placed);
   const theme = useTheme();
   const t = useT();
-  const { refetch } = league;
-  const data = league.data;
   const [selected, setSelected] = useState<string | null>(null);
   const [floorHeight, setFloorHeight] = useState(0);
   const [pulling, setPulling] = useState(false);
-  const { seen, dismiss } = useSeenWeek();
 
   const play = useCallback(
-    () => navigation.navigate('Game', { mode: 'free' }),
+    (mode: 'free' | 'rated' = 'rated') => navigation.navigate('Game', { mode }),
     [navigation],
   );
   const chase = useCallback(
@@ -100,88 +100,82 @@ export function LeagueScreen({ navigation }: Props) {
     },
     [play],
   );
-  const open = useCallback(
-    (member: LeagueMember) => setSelected(member.username),
-    [],
-  );
+  const open = useCallback((entry: RatingEntry) => setSelected(entry.username), []);
   const refresh = useCallback(async () => {
     setPulling(true);
     try {
-      await refetch();
+      await Promise.all([rating.refetch(), ...(placed ? [board.refetch()] : [])]);
     } finally {
       setPulling(false);
     }
-  }, [refetch]);
+  }, [board, placed, rating]);
 
-  const me = data?.joined ? data.me : null;
-  const lastWeek = data?.lastWeek ?? null;
-  const greet =
-    lastWeek !== null && seen !== undefined && seen !== lastWeek.weekKey;
+  const data = placed ? board.data : undefined;
+  const me = data?.me ?? null;
+  const above = me ? (data?.entries.find((entry) => entry.rank === me.rank - 1) ?? null) : null;
+  const history = rating.data?.history.slice(0, HISTORY_ROWS) ?? [];
 
-  let body: ReactNode;
-  if (!data) {
-    body = league.isError ? (
+  let ranking: ReactNode;
+  if (!rating.data) {
+    ranking = rating.isError ? null : <SkeletonList rows={4} />;
+  } else if (!placed) {
+    // The ranking is Dereceli's: the stage above holds the way there.
+    ranking = <EmptyState icon="lock" title={t.league.closed.title} hint={t.league.closed.hint} />;
+  } else if (!data) {
+    ranking = board.isError ? (
       <View style={styles.stack}>
         <Callout tone="bad" title={t.league.failed}>
-          {messageFor(league.error, t)}
+          {messageFor(board.error, t)}
         </Callout>
         <Button
           label={t.league.retry}
           tone="neutral"
           icon="refresh"
-          onPress={() => void refetch()}
+          onPress={() => void board.refetch()}
         />
       </View>
     ) : (
       <SkeletonList rows={4} />
     );
   } else {
-    body = (
+    ranking = (
       <View style={styles.stack}>
-        {greet && lastWeek ? (
-          <LastWeekCard
-            lastWeek={lastWeek}
-            onDismiss={() => dismiss(lastWeek.weekKey)}
-          />
-        ) : null}
-        {data.joined ? (
-          <Group members={data.members} onPress={open} />
-        ) : data.unlock ? (
-          <EmptyState
-            icon="lock"
-            title={t.league.locked.title(data.unlock.remaining)}
-            hint={t.league.locked.hint(data.unlock.required)}
-            action={
-              <Button
-                label={t.league.play}
-                icon="play"
-                tone="play"
-                onPress={play}
-              />
-            }
-          />
-        ) : (
+        {me ? null : (
           <EmptyState
             icon="shield"
-            title={t.league.join.title}
-            hint={t.league.join.hint}
+            title={t.league.idle.title}
+            hint={t.league.idle.hint}
             action={
               <Button
-                label={t.league.join.action}
-                icon="play"
+                label={t.league.idle.action}
+                icon="shield"
                 tone="play"
-                onPress={play}
+                onPress={() => play('rated')}
               />
             }
           />
         )}
+        {data.entries.length > 0 ? (
+          <View style={styles.rows}>
+            {data.entries.map((entry, index) => (
+              <ClimbRow
+                key={entry.username}
+                rank={entry.rank}
+                username={entry.username}
+                avatarUrl={entry.avatarUrl}
+                score={entry.rating}
+                gap={entry.gap}
+                isMe={entry.isMe}
+                index={index}
+                unit="elo"
+                onPress={() => open(entry)}
+              />
+            ))}
+          </View>
+        ) : null}
       </View>
     );
   }
-
-  const above = me
-    ? (data?.members[data.members.findIndex((m) => m.isMe) - 1] ?? null)
-    : null;
 
   return (
     <Screen>
@@ -202,74 +196,40 @@ export function LeagueScreen({ navigation }: Props) {
         }
         showsVerticalScrollIndicator={false}
       >
-        <LeagueStage
-          league={data}
-          failed={league.isError}
-          onElapsed={() => void refetch()}
-        />
-        <View style={styles.body}>{body}</View>
+        <LeagueStage rating={rating} onPlay={play} />
+        <View style={[styles.body, styles.stack]}>
+          {history.length > 0 ? <History changes={history} /> : null}
+          <View style={styles.stack}>
+            <Eyebrow icon="podium">{t.league.board}</Eyebrow>
+            {placed ? (
+              <Txt variant="meta" tone="muted">
+                {t.league.rule}
+              </Txt>
+            ) : null}
+            {ranking}
+          </View>
+        </View>
       </ScrollView>
 
       {me ? (
         <FloorDock onHeight={setFloorHeight}>
           <FloorCard
             rank={me.rank}
-            score={me.points}
+            score={me.rating}
             targetUsername={above?.username ?? null}
             gapToNext={me.gap}
-            progress={data?.nextRankProgress ?? null}
+            unit="elo"
             onPlay={chase}
           />
         </FloorDock>
       ) : null}
 
-      <Confetti
-        fire={
-          greet && lastWeek?.outcome === 'promoted' ? lastWeek.weekKey : null
-        }
-      />
       <PlayerSheet username={selected} onClose={() => setSelected(null)} />
     </Screen>
   );
 }
 
-/** The last week put away, read once from the phone; undefined until read. */
-function useSeenWeek() {
-  const [seen, setSeen] = useState<string | null | undefined>(undefined);
-
-  useEffect(() => {
-    let alive = true;
-    const read = async () => {
-      let value: string | null = null;
-      try {
-        value = await AsyncStorage.getItem(SEEN_KEY);
-      } catch {
-        value = null;
-      }
-      if (alive) setSeen(value);
-    };
-    void read();
-    return () => {
-      alive = false;
-    };
-  }, []);
-
-  const dismiss = useCallback((weekKey: string) => {
-    setSeen(weekKey);
-    const write = async () => {
-      try {
-        await AsyncStorage.setItem(SEEN_KEY, weekKey);
-      } catch {
-        // Unsaved, the card only comes back once more.
-      }
-    };
-    void write();
-  }, []);
-
-  return { seen, dismiss };
-}
-
-/** A tier's own colour — the emblem's metal, and the light behind it. */
+/** A league's own colour — the emblem's metal, and the light behind it. */
 function tierColor(theme: Theme, tier: LeagueTier): string {
   switch (tier) {
     case 'bronze':
@@ -280,32 +240,40 @@ function tierColor(theme: Theme, tier: LeagueTier): string {
       return theme.tierGold;
     case 'platinum':
       return theme.tierPlatinum;
-    default:
+    case 'diamond':
       return theme.tierDiamond;
+    default:
+      return theme.tierMaster;
   }
 }
 
 /**
- * The stage: the league's name, and — once it is in — your tier on its
- * ladder. While it loads a spinner holds the room; when it could not be
- * loaded, an empty emblem does, and the error is said under the stage.
+ * The stage: the league your Elo puts you in, on its ladder. Before it, the
+ * way there: while Dereceli is shut, how many Normal or Günlük games open it;
+ * then the placement games that set the Elo, each with its gold way in. A
+ * spinner holds the room while it loads; an empty emblem when it could not
+ * be loaded.
  */
 function LeagueStage({
-  league,
-  failed,
-  onElapsed,
+  rating,
+  onPlay,
 }: {
-  league: LeagueResponse | undefined;
-  failed: boolean;
-  onElapsed: () => void;
+  rating: UseQueryResult<RatingResponse>;
+  onPlay: (mode: 'free' | 'rated') => void;
 }) {
   const theme = useTheme();
   const t = useT();
   const insets = useSafeAreaInsets();
+  const data = rating.data;
 
   let hero: ReactNode;
-  if (league) hero = <TierHero league={league} onElapsed={onElapsed} />;
-  else if (failed) {
+  if (data?.placed && data.tier !== null && data.rating !== null) {
+    hero = <TierHero rating={data} tier={data.tier} value={data.rating} />;
+  } else if (data?.unlock) {
+    hero = <LockedHero unlock={data.unlock} onPlay={() => onPlay('free')} />;
+  } else if (data) {
+    hero = <PlacementHero placement={data.placement} onPlay={() => onPlay('rated')} />;
+  } else if (rating.isError) {
     hero = (
       <View style={styles.waiting}>
         <Icon
@@ -314,6 +282,9 @@ function LeagueStage({
           color={withAlpha(theme.onBrand, 0.35)}
           strokeWidth={2}
         />
+        <Txt variant="meta" tone="onSolid" align="center">
+          {messageFor(rating.error, t)}
+        </Txt>
       </View>
     );
   } else {
@@ -333,41 +304,126 @@ function LeagueStage({
 }
 
 function TierHero({
-  league,
-  onElapsed,
+  rating,
+  tier,
+  value,
 }: {
-  league: LeagueResponse;
-  onElapsed: () => void;
+  rating: RatingResponse;
+  tier: LeagueTier;
+  value: number;
 }) {
   const theme = useTheme();
   const t = useT();
   const intro = useArrival(0, 12);
+  const next = TIERS[TIERS.indexOf(tier) + 1] ?? null;
 
   return (
     <Animated.View style={[styles.hero, intro]}>
-      <TierLadder tier={league.tier} />
+      <TierLadder tier={tier} />
       <Txt variant="hero" align="center">
-        {t.tiers.league(league.tier)}
+        {t.tiers.league(tier)}
       </Txt>
-      <View style={styles.centred}>
-        <CountdownChip
-          endsAt={league.endsAt}
-          serverTime={league.serverTime}
-          prefix={t.home.countdown.endsIn}
-          tone="onBrand"
-          onElapsed={onElapsed}
-        />
-      </View>
-      <View style={styles.rule}>
-        <Icon
-          name="calendar"
-          size={14}
-          color={theme.onBrand}
-          strokeWidth={2.4}
-        />
-        <Txt variant="meta" tone="onSolid">
-          {t.league.rule}
+      <Text
+        accessibilityLabel={t.rating.elo(t.fmt.score(value))}
+        style={[styles.elo, { color: theme.gold }, embossed(3)]}
+      >
+        {t.rating.elo(t.fmt.score(value))}
+      </Text>
+      <View style={styles.bar}>
+        {rating.progress !== null ? (
+          <Meter value={rating.progress / 1000} tone="warn" notches={4} />
+        ) : null}
+        <Txt variant="meta" tone="onSolid" align="center">
+          {next !== null && rating.ceil !== null
+            ? t.rating.toNext(next, t.fmt.score(rating.ceil - value))
+            : t.rating.noCeiling}
         </Txt>
+      </View>
+      <View style={styles.tags}>
+        {rating.target !== null ? (
+          <Tag
+            label={t.rating.target(t.fmt.score(rating.target))}
+            tone="warn"
+            icon="target"
+          />
+        ) : null}
+        {rating.shield ? (
+          <Tag label={t.rating.shield(rating.shield.runs)} tone="secondary" icon="shield" />
+        ) : null}
+        {rating.peak !== null ? (
+          <Tag label={t.rating.peak(t.fmt.score(rating.peak))} tone="neutral" icon="trophy" />
+        ) : null}
+      </View>
+      {rating.target !== null ? (
+        <Txt variant="micro" tone="onSolid" align="center">
+          {t.rating.targetHint}
+        </Txt>
+      ) : null}
+    </Animated.View>
+  );
+}
+
+/** Dereceli still shut: the Normal and Günlük games that open it, counted. */
+function LockedHero({
+  unlock,
+  onPlay,
+}: {
+  unlock: LeagueUnlock;
+  onPlay: () => void;
+}) {
+  const t = useT();
+  const intro = useArrival(0, 12);
+  const { remaining, required } = unlock;
+
+  return (
+    <Animated.View style={[styles.hero, intro]}>
+      <Stamp from={1.6} delay={160}>
+        <IconChip icon="lock" tone="neutral" size="lg" />
+      </Stamp>
+      <Txt variant="hero" align="center">
+        {t.modes.lockedTitle(remaining)}
+      </Txt>
+      <View style={styles.bar}>
+        <Meter value={(required - remaining) / required} tone="warn" />
+      </View>
+      <Txt variant="meta" tone="onSolid" align="center">
+        {t.modes.lockedBody(required)}
+      </Txt>
+      <View style={styles.heroPlay}>
+        <Button label={t.modes.playNormal} icon="play" tone="play" onPress={onPlay} />
+      </View>
+    </Animated.View>
+  );
+}
+
+/** Dereceli open, the Elo not set yet: the placement games, counted, and what they decide. */
+function PlacementHero({
+  placement,
+  onPlay,
+}: {
+  placement: RatingResponse['placement'];
+  onPlay: () => void;
+}) {
+  const t = useT();
+  const intro = useArrival(0, 12);
+  const { played, required } = placement ?? { played: 0, required: 1 };
+
+  return (
+    <Animated.View style={[styles.hero, intro]}>
+      <Stamp from={1.6} delay={160}>
+        <IconChip icon="flag" tone="secondary" size="lg" />
+      </Stamp>
+      <Txt variant="hero" align="center">
+        {t.rating.placement.title(played, required)}
+      </Txt>
+      <View style={styles.bar}>
+        <Meter value={played / required} tone="secondary" notches={required} />
+      </View>
+      <Txt variant="meta" tone="onSolid" align="center">
+        {t.rating.placement.hint(required)}
+      </Txt>
+      <View style={styles.heroPlay}>
+        <Button label={t.modes.play} icon="shield" tone="play" onPress={onPlay} />
       </View>
     </Animated.View>
   );
@@ -378,7 +434,7 @@ const EMBLEM = 92;
 const EMBLEM_GLOW = 168;
 
 /**
- * Your tier's emblem, big and lit, between the two tiers under it and the two
+ * Your league's emblem, big and lit, between the two under it and the two
  * over it — the ones above dimmed until they are reached. Only your own
  * emblem is read aloud; the ladder is the title's picture.
  */
@@ -417,7 +473,7 @@ function TierLadder({ tier }: { tier: LeagueTier }) {
   );
 }
 
-/** One tier on the ladder, or the empty room past either end of it. */
+/** One league on the ladder, or the empty room past either end of it. */
 function Rung({
   tier,
   far = false,
@@ -437,204 +493,54 @@ function Rung({
   );
 }
 
-function LastWeekCard({
-  lastWeek,
-  onDismiss,
-}: {
-  lastWeek: NonNullable<LeagueResponse['lastWeek']>;
-  onDismiss: () => void;
-}) {
+/** A change that set the rating rather than moved it: it shows the rating it set. */
+function placing(change: RatingChange): boolean {
+  return change.before === null && (change.kind === 'placement' || change.kind === 'forfeit');
+}
+
+/** The latest moves of the rating, newest first: why, and by how much — or, for a placement, where it set it. */
+function History({ changes }: { changes: RatingChange[] }) {
   const theme = useTheme();
   const t = useT();
-  const words = t.league.lastWeek;
-  const intro = useArrival(1);
-  const up = lastWeek.outcome === 'promoted';
-  const down = lastWeek.outcome === 'demoted';
-  const headline = up
-    ? words.promoted(lastWeek.newTier)
-    : down
-      ? words.demoted(lastWeek.newTier)
-      : words.stayed(lastWeek.newTier);
-  const ring = up
-    ? withAlpha(theme.gold, 0.8)
-    : down
-      ? withAlpha(theme.bad, 0.55)
-      : null;
+  const words = t.rating.history;
 
   return (
-    <Animated.View style={intro}>
-      <Panel style={styles.lastWeek}>
-        {ring ? (
-          <View
-            pointerEvents="none"
-            style={[styles.lastWeekRing, { borderColor: ring }]}
-          />
-        ) : null}
-        <View style={styles.lastWeekEmblem}>
-          {up ? (
-            <View pointerEvents="none" style={styles.lastWeekGlow}>
-              <Spotlight size={LAST_WEEK_GLOW} color={theme.gold} />
-            </View>
-          ) : null}
-          <Stamp from={1.8} delay={220}>
-            <TierBadge tier={lastWeek.newTier} size="lg" />
-          </Stamp>
-        </View>
-        <View style={styles.lastWeekText}>
-          <Txt
-            variant="title"
-            style={
-              up
-                ? { color: theme.gold }
-                : down
-                  ? { color: theme.badText }
-                  : null
-            }
-          >
-            {headline}
-          </Txt>
-          <Txt variant="meta" tone="muted">
-            {words.finished(lastWeek.tier, lastWeek.rank)}
-          </Txt>
-        </View>
-        <IconButton icon="close" label={words.close} onPress={onDismiss} />
-      </Panel>
-    </Animated.View>
-  );
-}
-
-const LAST_WEEK_GLOW = 120;
-
-type Run = { zone: LeagueZone; members: LeagueMember[] };
-
-/** Members in order, cut wherever the zone changes. */
-function runsOf(members: LeagueMember[]): Run[] {
-  const runs: Run[] = [];
-  for (const member of members) {
-    const last = runs[runs.length - 1];
-    if (last && last.zone === member.zone) last.members.push(member);
-    else runs.push({ zone: member.zone, members: [member] });
-  }
-  return runs;
-}
-
-function Group({
-  members,
-  onPress,
-}: {
-  members: LeagueMember[];
-  onPress: (member: LeagueMember) => void;
-}) {
-  const t = useT();
-  return (
-    <View style={styles.group}>
-      {runsOf(members).map((run) => {
-        const rows = run.members.map((member) => (
-          <ClimbRow
-            key={`${member.rank}-${member.username}`}
-            rank={member.rank}
-            username={member.username}
-            avatarUrl={member.avatarUrl}
-            score={member.points}
-            detail={t.league.days(member.daysPlayed)}
-            gap={member.gap}
-            isMe={member.isMe}
-            index={members.indexOf(member)}
-            onPress={() => onPress(member)}
-          />
-        ));
-        const key = `${run.zone}-${run.members[0]?.rank ?? 0}`;
-        return run.zone === 'stay' ? (
-          <View key={key} style={styles.rows}>
-            {rows}
+    <Panel style={styles.history}>
+      <Text style={[TYPE.label, { color: theme.inkMuted }]}>{words.title}</Text>
+      {changes.map((change, index) => (
+        <View key={`${change.at}-${index}`} style={styles.change}>
+          <View style={styles.changeText}>
+            <Txt variant="heading" numberOfLines={1}>
+              {words.kinds[change.kind]}
+            </Txt>
+            {change.score !== null && change.target !== null ? (
+              <Txt variant="micro" tone="muted" numberOfLines={1}>
+                {words.run(t.fmt.score(change.score), t.fmt.score(change.target))}
+              </Txt>
+            ) : null}
           </View>
-        ) : (
-          <ZoneBand key={key} zone={run.zone}>
-            {rows}
-          </ZoneBand>
-        );
-      })}
-    </View>
-  );
-}
-
-/** How tall a zone's banner is; it straddles the top edge of the zone's well. */
-const BANNER = 30;
-
-/**
- * The places that move you: a green well under a "TERFİ BÖLGESİ" banner at
- * the top of the group, a red one under "DÜŞME BÖLGESİ" at its foot, arrows
- * on the banner pointing the way the week will take them.
- */
-function ZoneBand({
-  zone,
-  children,
-}: {
-  zone: Exclude<LeagueZone, 'stay'>;
-  children: ReactNode;
-}) {
-  const theme = useTheme();
-  const t = useT();
-  const words = t.league.zones[zone];
-  const up = zone === 'promote';
-  const look = up
-    ? {
-        face: theme.ok,
-        hi: theme.okHi,
-        lip: theme.okLip,
-        ink: theme.outline,
-        tint: theme.ok,
-      }
-    : {
-        face: theme.bad,
-        hi: theme.badHi,
-        lip: theme.badLip,
-        ink: theme.onBrand,
-        tint: theme.bad,
-      };
-  const arrow = (
-    <View style={up ? null : styles.pointDown}>
-      <Icon name="arrowUp" size={14} color={look.ink} strokeWidth={3.2} />
-    </View>
-  );
-
-  return (
-    <View style={styles.zone}>
-      <View style={styles.bannerRow} pointerEvents="box-none">
-        <View
-          accessible
-          accessibilityRole="header"
-          accessibilityLabel={words.name}
-          style={[
-            styles.banner,
-            {
-              backgroundColor: look.face,
-              borderBottomColor: look.lip,
-              borderColor: theme.outline,
-            },
-          ]}
-        >
-          <View
-            pointerEvents="none"
-            style={[styles.bannerHi, { backgroundColor: look.hi }]}
-          />
-          {arrow}
-          <Text style={[TYPE.label, { color: look.ink }]}>{words.ribbon}</Text>
-          {arrow}
+          <Text
+            style={[
+              styles.changeDelta,
+              {
+                color: placing(change)
+                  ? theme.ink
+                  : change.delta > 0
+                    ? theme.ok
+                    : change.delta < 0
+                      ? theme.bad
+                      : theme.inkMuted,
+              },
+              embossed(1.5),
+            ]}
+          >
+            {placing(change) && change.after !== null
+              ? t.fmt.score(change.after)
+              : t.rating.delta(change.delta)}
+          </Text>
         </View>
-      </View>
-      <View
-        style={[
-          styles.zoneWell,
-          {
-            backgroundColor: withAlpha(look.tint, 0.1),
-            borderColor: withAlpha(look.tint, 0.5),
-          },
-        ]}
-      >
-        {children}
-      </View>
-    </View>
+      ))}
+    </Panel>
   );
 }
 
@@ -643,15 +549,19 @@ const styles = StyleSheet.create({
   stage: { gap: SPACE.md, paddingBottom: SPACE.xl },
   waiting: {
     alignItems: 'center',
+    gap: SPACE.md,
     justifyContent: 'center',
     minHeight: 200,
+    paddingHorizontal: SPACE.xl,
   },
   hero: { alignItems: 'center', gap: SPACE.sm, paddingHorizontal: SPACE.xl },
-  centred: { alignItems: 'center' },
-  rule: {
-    alignItems: 'center',
+  heroPlay: { alignSelf: 'stretch', marginTop: SPACE.sm, paddingHorizontal: SPACE.xl },
+  elo: { fontFamily: FONT.display, fontSize: 34, lineHeight: lh(40), textAlign: 'center' },
+  bar: { alignSelf: 'stretch', gap: SPACE.xs, paddingHorizontal: SPACE.xl },
+  tags: {
     flexDirection: 'row',
-    gap: SPACE.sm,
+    flexWrap: 'wrap',
+    gap: SPACE.xs,
     justifyContent: 'center',
     marginTop: SPACE.xxs,
   },
@@ -684,59 +594,9 @@ const styles = StyleSheet.create({
   },
   body: { padding: SPACE.xl },
   stack: { gap: SPACE.lg },
-  lastWeek: { alignItems: 'center', flexDirection: 'row', gap: SPACE.md },
-  lastWeekRing: {
-    borderRadius: RADIUS.panel - DEPTH.outline,
-    borderWidth: 2,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-    right: 0,
-    top: 0,
-  },
-  lastWeekEmblem: {
-    alignItems: 'center',
-    height: 52,
-    justifyContent: 'center',
-    width: 52,
-  },
-  lastWeekGlow: {
-    height: LAST_WEEK_GLOW,
-    left: (52 - LAST_WEEK_GLOW) / 2,
-    position: 'absolute',
-    top: (52 - LAST_WEEK_GLOW) / 2,
-    width: LAST_WEEK_GLOW,
-  },
-  lastWeekText: { flex: 1, gap: SPACE.xxs },
-  group: { gap: SPACE.md },
+  history: { gap: SPACE.sm },
+  change: { alignItems: 'center', flexDirection: 'row', gap: SPACE.md },
+  changeText: { flex: 1, gap: SPACE.xxs },
+  changeDelta: { fontFamily: FONT.display, fontSize: 18, lineHeight: lh(22) },
   rows: { gap: SPACE.sm },
-  zone: { paddingTop: BANNER / 2 },
-  bannerRow: {
-    alignItems: 'center',
-    left: 0,
-    position: 'absolute',
-    right: 0,
-    top: 0,
-    zIndex: 1,
-  },
-  banner: {
-    alignItems: 'center',
-    borderBottomWidth: DEPTH.outline + 2,
-    borderRadius: 10,
-    borderWidth: DEPTH.outline,
-    flexDirection: 'row',
-    gap: SPACE.sm,
-    height: BANNER,
-    overflow: 'hidden',
-    paddingHorizontal: SPACE.md,
-  },
-  bannerHi: { height: '46%', left: 0, position: 'absolute', right: 0, top: 0 },
-  pointDown: { transform: [{ rotate: '180deg' }] },
-  zoneWell: {
-    borderRadius: RADIUS.panel + SPACE.xs,
-    borderWidth: 2,
-    gap: SPACE.sm,
-    padding: SPACE.sm,
-    paddingTop: BANNER / 2 + SPACE.sm,
-  },
 });

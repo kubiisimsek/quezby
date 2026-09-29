@@ -22,6 +22,8 @@ enum ErrorCode: string
     case RunRejected = 'run_rejected';
     case EngineOutdated = 'engine_outdated';
     case DailyAlreadyPlayed = 'daily_already_played';
+    /** Dereceli is not open to the player yet: too few free and daily runs. */
+    case RatedLocked = 'rated_locked';
     case CannotBefriendSelf = 'cannot_befriend_self';
     case FriendLimit = 'friend_limit';
     case RequestLimit = 'request_limit';
@@ -45,7 +47,7 @@ enum ErrorCode: string
             self::Forbidden, self::FriendsHidden => 403,
             self::NotFound => 404,
             self::UsernameTaken, self::UsernameLocked, self::EmailTaken, self::AlreadyLinked, self::IdentityTaken, self::LastSignInMethod,
-            self::RunAlreadyFinished, self::DailyAlreadyPlayed, self::AttestKeyUnknown, self::DuelUnavailable => 409,
+            self::RunAlreadyFinished, self::DailyAlreadyPlayed, self::AttestKeyUnknown, self::DuelUnavailable, self::RatedLocked => 409,
             self::RunExpired => 410,
             self::ValidationFailed, self::UsernameInvalid, self::InvalidCredentials, self::IdentityInvalid,
             self::RunRejected, self::EngineOutdated, self::CannotBefriendSelf, self::FriendLimit, self::RequestLimit,

@@ -1,4 +1,13 @@
-import type { AdminDeviceCheck, AdminPlayerDevice, AdminPlayerResponse, AdminRunRow, AdminVisit, ReportReason } from '@quezby/types';
+import type {
+  AdminDeviceCheck,
+  AdminPlayerDevice,
+  AdminPlayerRating,
+  AdminPlayerResponse,
+  AdminRatingChange,
+  AdminRunRow,
+  AdminVisit,
+  ReportReason,
+} from '@quezby/types';
 import {
   Activity,
   Ban,
@@ -8,6 +17,8 @@ import {
   Flag,
   FlagOff,
   Gamepad2,
+  Gauge,
+  History,
   Image as ImageIcon,
   ImageOff,
   LogOut,
@@ -17,6 +28,7 @@ import {
   RotateCcw,
   Route,
   ScrollText,
+  Shield,
   ShieldAlert,
   ShieldCheck,
   Smartphone,
@@ -55,7 +67,7 @@ import { Page } from '@/components/patterns/page';
 import { ShareList } from '@/components/patterns/share-list';
 import { usePlayerActivity } from '@/hooks/api/analytics';
 import { usePlayer } from '@/hooks/api/players';
-import { auditColumns, FlagTags, RunStatusTag, When } from '@/lib/columns';
+import { auditColumns, EloDelta, FlagTags, RunStatusTag, TierTag, When } from '@/lib/columns';
 import { errorMessage, isApiError } from '@/lib/errors';
 import {
   ACTIVITY_STATUS,
@@ -65,14 +77,15 @@ import {
   formatDateTime,
   formatDuration,
   formatNumber,
+  formatRatingMove,
   formatRelative,
   LEAGUE_TIER,
-  LEAGUE_ZONE,
   LOCALE_LABEL,
   MILESTONE,
   PLATFORM,
   playerName,
   PROVIDER,
+  RATING_KIND,
   REPORT_REASON,
   RUN_FLAG,
   RUN_MODE,
@@ -93,6 +106,40 @@ const RUN_COLUMNS: Column<AdminRunRow>[] = [
   { key: 'score', header: 'Skor', cell: (run) => formatNumber(run.score), align: 'end', tone: 'strong' },
   { key: 'flags', header: 'Sinyaller', cell: (run) => <FlagTags flags={run.flags} max={2} />, hideBelow: 'lg' },
   { key: 'when', header: 'Ne zaman', cell: (run) => <When at={run.finishedAt ?? run.startedAt} />, tone: 'muted' },
+];
+
+/** A run's score over the target it played against; a change with neither is a dash. */
+function ScoreVsTarget({ score, target }: { score: number | null; target: number | null }) {
+  if (score === null && target === null) return <span className="text-ink-faint">—</span>;
+  return (
+    <span className="whitespace-nowrap">
+      <span className="block font-semibold text-ink">{formatNumber(score)}</span>
+      {target !== null ? <span className="block text-micro font-medium text-ink-faint">hedef {formatNumber(target)}</span> : null}
+    </span>
+  );
+}
+
+const RATING_COLUMNS: Column<AdminRatingChange>[] = [
+  {
+    key: 'kind',
+    header: 'Ne',
+    cell: (change) => (
+      <span className="flex flex-wrap items-center gap-1">
+        <Tag tone={RATING_KIND[change.kind].tone} label={RATING_KIND[change.kind].label} title={RATING_KIND[change.kind].hint} />
+        {change.shielded ? <Tag tone="neutral" icon={<Shield />} label="Kalkan" title="Yeni yükselişin kalkanı onu liginde tuttu." /> : null}
+      </span>
+    ),
+  },
+  {
+    key: 'delta',
+    header: 'Değişim',
+    cell: (change) => (change.counted ? <EloDelta value={change.delta} /> : <span className="text-ink-faint">—</span>),
+    align: 'end',
+  },
+  { key: 'rating', header: 'Reyting', cell: (change) => <span className="whitespace-nowrap">{formatRatingMove(change.before, change.after)}</span>, tone: 'muted', hideBelow: 'md' },
+  { key: 'score', header: 'Skor', cell: (change) => <ScoreVsTarget score={change.score} target={change.target} />, align: 'end', hideBelow: 'lg' },
+  { key: 'run', header: 'Tur', cell: (change) => (change.runId ? shortId(change.runId) : '—'), tone: 'mono', hideBelow: 'xl' },
+  { key: 'when', header: 'Ne zaman', cell: (change) => <When at={change.at} />, tone: 'muted' },
 ];
 
 const INSTALL_COLUMNS: Column<AdminPlayerDevice>[] = [
@@ -381,6 +428,21 @@ function Summary({
             </Button>
           }
         />
+        {data.rating ? (
+          <DataTable
+            title="Reyting geçmişi"
+            description="Son otuz değişim, en yeni önce; sayılmayan turlar da."
+            icon={<History />}
+            tone="secondary"
+            columns={RATING_COLUMNS}
+            rows={data.rating.history}
+            rowKey={(change) => String(change.id)}
+            rowTo={(change) => (change.runId ? `/runs/${change.runId}` : null)}
+            rowLabel={(change) => `Tur ${shortId(change.runId ?? '')} aç`}
+            rowMuted={(change) => !change.counted}
+            empty={{ title: 'Henüz değişim yok', hint: 'Sayılan her tur reytingi burada oynatır.', icon: <History /> }}
+          />
+        ) : null}
         <Panel title="Son 30 günün sinyalleri" description="Turlarına konan hile bayrakları, en sık olan önce." icon={<ShieldAlert />} tone="warn">
           {data.flags.length > 0 ? (
             <ShareList
@@ -476,6 +538,8 @@ function Summary({
           />
         </Panel>
 
+        <RatingPanel rating={data.rating} />
+
         <Panel title={`Oyun · sezon ${data.season}`} icon={<Trophy />}>
           <Facts
             facts={[
@@ -491,15 +555,6 @@ function Summary({
               { label: 'Bu hafta', value: data.ranks.weekly ? `#${formatNumber(data.ranks.weekly)}` : null },
               { label: 'Bu ay', value: data.ranks.monthly ? `#${formatNumber(data.ranks.monthly)}` : null },
               { label: 'Tüm zamanlar', value: data.ranks.all ? `#${formatNumber(data.ranks.all)}` : null },
-              {
-                label: 'Lig',
-                value: data.league ? (
-                  <Link to={`/leagues/${data.league.groupId}`} className="hover:text-primary-text hover:underline">
-                    {LEAGUE_TIER[data.league.tier]} · {formatNumber(data.league.rank)}/{formatNumber(data.league.members)}
-                  </Link>
-                ) : null,
-                hint: data.league ? `${formatNumber(data.league.points)} puan · ${LEAGUE_ZONE[data.league.zone].label}` : undefined,
-              },
               { label: 'Tur', value: formatNumber(data.stats.runs) },
               { label: 'Post', value: formatNumber(data.stats.reels) },
               { label: 'Mükemmel', value: formatNumber(data.stats.perfects) },
@@ -525,6 +580,76 @@ function Summary({
         ) : null}
       </div>
     </div>
+  );
+}
+
+/**
+ * Where the player's rating stands: their league and next target once
+ * placed, the placement runs until then, and what still speeds or shields it.
+ */
+function RatingPanel({ rating }: { rating: AdminPlayerRating | null }) {
+  if (!rating) {
+    return (
+      <Panel title="Reyting" icon={<Gauge />} tone="secondary" flush>
+        <EmptyState icon={<Gauge />} title="Henüz reyting yok" hint="İlk sayılan turuyla yerleşmeye başlar." />
+      </Panel>
+    );
+  }
+
+  return (
+    <Panel title="Reyting" icon={<Gauge />} tone="secondary">
+      <Facts
+        facts={[
+          {
+            label: 'Reyting',
+            value:
+              rating.rating === null ? (
+                <Tag label="Yerleşmede" />
+              ) : (
+                <span className="inline-flex flex-wrap items-center justify-end gap-2">
+                  <span className="tabular">{formatNumber(rating.rating)}</span>
+                  {rating.tier ? <TierTag tier={rating.tier} /> : null}
+                </span>
+              ),
+          },
+          ...(rating.placement
+            ? [
+                {
+                  label: 'Yerleşme',
+                  value: `${formatNumber(rating.placement.played)} / ${formatNumber(rating.placement.required)} tur`,
+                  hint: 'Sonuncusu oyuncuyu medyan skoruyla yerleştirir.',
+                },
+              ]
+            : []),
+          { label: 'En yüksek', value: formatNumber(rating.peak) },
+          {
+            label: 'Sonraki hedef',
+            value: formatNumber(rating.target),
+            hint: rating.target === null ? undefined : 'Reyting kazanmak için geçmesi gereken skor',
+          },
+          ...(rating.provisionalLeft > 0
+            ? [
+                {
+                  label: 'Geçici dönem',
+                  value: `${formatNumber(rating.provisionalLeft)} tur daha`,
+                  hint: 'Değişimler daha büyük: yeni yerleşti ya da uzun aradan döndü.',
+                },
+              ]
+            : []),
+          ...(rating.shield
+            ? [
+                {
+                  label: 'Terfi kalkanı',
+                  value: `${LEAGUE_TIER[rating.shield.tier]} · ${formatNumber(rating.shield.runs)} tur`,
+                  hint: 'Yeni yükseldi: bu turlarda liginden düşmez.',
+                },
+              ]
+            : []),
+          { label: 'Sayılan tur', value: formatNumber(rating.ratedRuns) },
+          { label: 'Son sayılan', value: formatRelative(rating.ratedAt) },
+        ]}
+      />
+    </Panel>
   );
 }
 

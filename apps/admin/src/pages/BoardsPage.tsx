@@ -19,8 +19,7 @@ const BOARDS: { value: LeaderboardPeriod; icon: React.ReactNode }[] = [
 /**
  * The high-score boards — this week, this month, all time — for any past
  * period and season. Every number comes from the API, ranked as the game
- * ranks it. There is no day board: the API keeps each day's best only to add
- * up league points.
+ * ranks it. There is no day board: no board serves a day.
  */
 export function BoardsPage() {
   const { params, page, set, setPage } = useListParams({ board: 'weekly', key: '', season: '' });

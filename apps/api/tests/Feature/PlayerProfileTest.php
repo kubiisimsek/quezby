@@ -1,8 +1,6 @@
 <?php
 
-use App\Enums\LeagueTier;
-use App\Models\LeagueGroup;
-use App\Models\LeagueMember;
+use App\Models\PlayerRating;
 use App\Models\PlayerStat;
 use App\Models\User;
 use Illuminate\Support\Carbon;
@@ -25,11 +23,7 @@ test("a player's card", function () {
     $this->recordRanked($player, 5000);
 
     PlayerStat::query()->create(['user_id' => $player->id, 'runs' => 12, 'reels' => 2400, 'likes' => 310, 'perfects' => 42, 'swipes' => 1500]);
-    $group = LeagueGroup::query()->create(['season' => config('quezby.season'), 'week_key' => '2026-W39', 'tier' => LeagueTier::Gold, 'members' => 1]);
-    LeagueMember::query()->create([
-        'group_id' => $group->id, 'user_id' => $player->id, 'season' => $group->season,
-        'week_key' => '2026-W39', 'tier' => LeagueTier::Gold, 'joined_at' => now(),
-    ]);
+    $this->rate($player, 2450);
     $banned = User::factory()->withUsername('banned')->create(['banned_at' => now()]);
     foreach ([$me, $rival, $banned] as $friend) {
         $this->befriend($player, $friend);
@@ -43,6 +37,7 @@ test("a player's card", function () {
             'createdAt' => '2026-09-01T07:00:00.000Z',
             'best' => ['score' => 8000, 'reels' => 100, 'achievedAt' => '2026-09-17T17:00:00.000Z'],
             'league' => 'gold',
+            'rating' => 2450,
             'ranks' => ['weekly' => 2, 'all' => 1],
             'stats' => ['runs' => 12, 'reels' => 2400, 'likes' => 310, 'perfects' => 42],
             'friends' => 2,
@@ -66,16 +61,24 @@ test('a player who never ranked', function () {
         ->assertJsonPath('player.isMe', false);
 });
 
-test('last week in a league is not this week', function () {
+test('a player still in their placement runs has no league yet', function () {
     $this->signIn();
-    $player = User::factory()->withUsername('gecen.hafta')->create();
-    $group = LeagueGroup::query()->create(['season' => config('quezby.season'), 'week_key' => '2026-W38', 'tier' => LeagueTier::Silver, 'members' => 1]);
-    LeagueMember::query()->create([
-        'group_id' => $group->id, 'user_id' => $player->id, 'season' => $group->season,
-        'week_key' => '2026-W38', 'tier' => LeagueTier::Silver, 'joined_at' => now()->subWeek(),
-    ]);
+    $player = User::factory()->withUsername('yerlesiyor')->create();
+    PlayerRating::query()->create(['user_id' => $player->id, 'placement_scores' => [40000, 52000]]);
 
-    $this->getJson('/api/v1/users/gecen.hafta')->assertOk()->assertJsonPath('player.league', null);
+    $this->getJson('/api/v1/users/yerlesiyor')->assertOk()
+        ->assertJsonPath('player.league', null)
+        ->assertJsonPath('player.rating', null);
+});
+
+test("a MasterClass player's card says so", function () {
+    $this->signIn();
+    $player = User::factory()->withUsername('usta')->create();
+    $this->rate($player, 5320);
+
+    $this->getJson('/api/v1/users/usta')->assertOk()
+        ->assertJsonPath('player.league', 'master')
+        ->assertJsonPath('player.rating', 5320);
 });
 
 test('a request shows which way it waits', function () {

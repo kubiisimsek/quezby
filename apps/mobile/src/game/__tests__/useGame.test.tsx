@@ -14,11 +14,11 @@ import { usePendingRun } from '@/stores/pendingRun';
 jest.mock('@/analytics/track', () => ({ track: jest.fn() }));
 
 jest.mock('@/api/client', () => ({
-  api: { runs: { start: jest.fn(), finish: jest.fn(), checkpoint: jest.fn() } },
+  api: { runs: { start: jest.fn(), finish: jest.fn(), checkpoint: jest.fn(), cancel: jest.fn() } },
 }));
 
 const runs = (api as unknown as {
-  runs: { start: jest.Mock; finish: jest.Mock; checkpoint: jest.Mock };
+  runs: { start: jest.Mock; finish: jest.Mock; checkpoint: jest.Mock; cancel: jest.Mock };
 }).runs;
 
 const started = {
@@ -117,6 +117,32 @@ describe('useGame', () => {
     expect(hook.result.current.startError?.code).toBe('engine_outdated');
   });
 
+  it('never plays a rated run on the phone alone: an outdated app cannot start one', async () => {
+    runs.start.mockRejectedValue(new ApiError(422, 'engine_outdated', 'Güncelle.'));
+
+    const hook = await renderHook(() => useGame('rated'));
+    await act(async () => {
+      await hook.result.current.start();
+    });
+
+    expect(runs.start).toHaveBeenCalledWith(expect.objectContaining({ mode: 'rated' }));
+    expect(hook.result.current.phase).toBe('error');
+    expect(hook.result.current.practice).toBeNull();
+    expect(hook.result.current.startError?.code).toBe('engine_outdated');
+  });
+
+  it('says so when Dereceli is not open to the player yet', async () => {
+    runs.start.mockRejectedValue(new ApiError(409, 'rated_locked', 'Dereceli henüz açılmadı.'));
+
+    const hook = await renderHook(() => useGame('rated'));
+    await act(async () => {
+      await hook.result.current.start();
+    });
+
+    expect(hook.result.current.phase).toBe('error');
+    expect(hook.result.current.startError?.code).toBe('rated_locked');
+  });
+
   it('says why a VS cannot start', async () => {
     runs.start.mockRejectedValue(new ApiError(409, 'duel_unavailable', 'Bu VS artık oynanamaz.'));
 
@@ -171,6 +197,77 @@ describe('useGame', () => {
       code: 'network',
       message: "Couldn't reach the server. Check your internet connection.",
     });
+  });
+
+  it('walks away from a countdown and tells the API, which lets it go for nothing', async () => {
+    runs.start.mockResolvedValue(started);
+    runs.cancel.mockResolvedValue(undefined);
+    const hook = await renderHook(() => useGame('free'));
+    await act(async () => {
+      await hook.result.current.start();
+    });
+    expect(hook.result.current.phase).toBe('countdown');
+
+    await act(async () => {
+      hook.result.current.quit();
+    });
+
+    expect(runs.cancel).toHaveBeenCalledWith('run-1');
+    expect(runs.finish).not.toHaveBeenCalled();
+    expect(hook.result.current.phase).toBe('countdown');
+  });
+
+  it('never cancels a run that is under way: closing it sends its score', async () => {
+    runs.start.mockResolvedValue(started);
+    runs.finish.mockResolvedValue({ run: { score: 0 }, best: null, ranks: {}, isNewBest: false });
+    const hook = await playing();
+
+    await act(async () => {
+      hook.result.current.quit();
+    });
+
+    expect(runs.cancel).not.toHaveBeenCalled();
+    expect(runs.finish).toHaveBeenCalled();
+  });
+
+  it('sends a finish kept on the phone before it starts another run', async () => {
+    usePendingRun.setState({
+      run: { runId: 'run-0', actions: [[1, 400, 0]], clientScore: 120, clientReels: 1, savedAt: Date.now() },
+      hydrated: true,
+    });
+    const order: string[] = [];
+    runs.finish.mockImplementation(async (runId: string) => {
+      order.push(`finish ${runId}`);
+      return { run: { score: 120 } };
+    });
+    runs.start.mockImplementation(async () => {
+      order.push('start');
+      return started;
+    });
+
+    const hook = await renderHook(() => useGame('free'));
+    await act(async () => {
+      await hook.result.current.start();
+    });
+
+    expect(order).toEqual(['finish run-0', 'start']);
+    expect(usePendingRun.getState().run).toBeNull();
+    expect(hook.result.current.phase).toBe('countdown');
+  });
+
+  it('starts anyway when a finish kept on the phone still cannot be sent', async () => {
+    const kept = { runId: 'run-0', actions: [], clientScore: 0, clientReels: 0, savedAt: Date.now() };
+    usePendingRun.setState({ run: kept, hydrated: true });
+    runs.finish.mockRejectedValue(new ApiError(0, 'network', 'offline'));
+    runs.start.mockResolvedValue(started);
+
+    const hook = await renderHook(() => useGame('free'));
+    await act(async () => {
+      await hook.result.current.start();
+    });
+
+    expect(runs.start).toHaveBeenCalled();
+    expect(usePendingRun.getState().run).toEqual(kept);
   });
 
   it('shows only what the API answered at the end', async () => {

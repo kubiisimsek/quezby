@@ -59,7 +59,7 @@ A contract change is one commit: `packages/types` → Laravel request/resource �
 | 401 | `unauthenticated` — missing or revoked token |
 | 403 | `forbidden` — the admin panel only: the admin's role may not do this (`docs/backend/admin-api.md`) · `friends_hidden` — another player's friend list, to someone who is not their friend |
 | 404 | `not_found` — also another player's run, an unknown board (`daily` included), a banned player, a player who blocked you, a VS that is not yours to see |
-| 409 | `username_taken`, `username_locked`, `email_taken`, `already_linked`, `identity_taken`, `last_sign_in_method`, `run_already_finished`, `daily_already_played`, `attest_key_unknown`, `duel_unavailable` |
+| 409 | `username_taken`, `username_locked`, `email_taken`, `already_linked`, `identity_taken`, `last_sign_in_method`, `run_already_finished`, `daily_already_played`, `rated_locked`, `attest_key_unknown`, `duel_unavailable` |
 | 410 | `run_expired` |
 | 422 | `validation_failed`, `username_invalid`, `invalid_credentials`, `identity_invalid`, `run_rejected`, `engine_outdated`, `cannot_befriend_self`, `friend_limit`, `request_limit`, `not_friends`, `message_limit`, `duel_limit`, `photo_invalid`, `challenge_invalid`, `integrity_invalid` |
 | 429 | `too_many_requests` |
@@ -349,7 +349,7 @@ one (`counter`) — which then moves up.
 
 ### `POST /runs`
 
-`{ "mode": "free" | "daily" | "vs", "engineVersion": 2, "contentVersion": 1 }` —
+`{ "mode": "free" | "daily" | "rated" | "vs", "engineVersion": 2, "contentVersion": 1 }` —
 a VS also names the friend it challenges (`"opponent": "ekin"`) or the VS it
 answers (`"duel": "01J…"`) — → `201`
 
@@ -363,8 +363,16 @@ answers (`"duel": "01J…"`) — → `201`
   automatic names; only an older account with none is refused.
 - A player has **one open run**: starting another marks the previous one
   `abandoned`. Runs older than `QUEZBY_RUN_TTL_MINUTES` (120) become `expired`.
+  Either is a **forfeit** on the player's Elo — the full loss (*Elo* in
+  [scoring.md](../product/scoring.md#elo)) — unless the run belongs to a past
+  season or a banned player. The app sends a finish kept on the phone before
+  it starts another run.
 - The run records the player's device verdict standing now (`pass`, `fail`, or
   none) in `runs.device_verdict` — nothing with `QUEZBY_INTEGRITY_MODE=off`.
+- `rated` (Dereceli, the only mode that plays for Elo): a fresh seed, as
+  `free`; before the player has **20 counted free or daily runs** — ranked and
+  scoring, `rating.unlock_runs` — `409 rated_locked` and no run. Once a
+  player has a rating row (their first rated run), it never locks again.
 - `free`: seed `random_int(1, 4294967295)`. `daily`: the day's seed —
   `hash_hmac('sha256', "quezby-daily|{day}|{engine}", QUEZBY_DAILY_SECRET)` —
   the same for everyone; one attempt per Istanbul day, taken when started
@@ -400,6 +408,15 @@ throttle. Another player's or an unknown run → 404; a run no longer
 `started` → `409 run_already_finished`; one past its time → `410 run_expired`
 (left for the finish to close).
 
+### `POST /runs/{runId}/cancel` → `204`
+
+A run given up in its countdown (3, 2, 1): closed as `abandoned`, and — within
+`runs.cancel_seconds` (5) of its start — for nothing on the rating. Later it is
+a forfeit, as leaving it would be: a run already under way ends with its
+score, never with a cancel. A run no longer `started` is left as it is (still
+`204`); another player's or an unknown run → 404. A daily run's attempt stays
+used; a VS left this way is lost, as an unfinished one always is.
+
 ### `POST /runs/{runId}/finish`
 
 `{ "actions": [[1, 412, 0], [2, 530, 0], [3, 380, 690], [0, 0, 0]], "clientScore": 1234, "clientReels": 4, "checkpoints": ["…", "…"] }`
@@ -410,9 +427,10 @@ throttle. Another player's or an unknown run → 404; a run no longer
 The API:
 
 1. Loads the run — the caller's, `started`, not expired (else 404 / 409 / 410,
-   an expired run becomes `expired`), on the current engine (`422 engine_outdated`).
+   an expired run becomes `expired` and is a forfeit), on the current engine
+   (`422 engine_outdated`).
 2. Replays `actions` from the run's seed. A log the engine refuses →
-   `422 run_rejected`, the run stored as `rejected`.
+   `422 run_rejected`, the run stored as `rejected` — a forfeit too.
 3. Checks plausibility (see [scoring.md](../product/scoring.md), *Hile koruması*):
    hard flags (`wall_clock`, `fast_decisions`, `hold_bounds`, `client_mismatch`,
    `banned`, and from the receipts and the device below) make the run
@@ -442,12 +460,12 @@ The API:
    `log` (local, staging, and the default) — the verdict is only recorded on the
    run; `off` — devices are neither checked nor recorded.
 4. Counts the run from the replay (stats, which posts were shown and liked).
-5. A `ranked` run adds to the player's lifetime stats and, when it scored,
-   upserts this week's, this month's and the season's rows, the day's row
-   (kept only to add up league points — no route serves it) and, for a daily
-   run, today's `challenge` row — and, once the league is open to them, seats
-   the player in this week's league group.
-6. A `vs` run touches none of that: it settles its VS (*VS*).
+5. A `rated` run moves the player's **Elo** (`rating`, below) — and with it
+   their league and its ranking. No other mode touches it.
+6. A `ranked` run adds to the player's lifetime stats and, when it scored,
+   upserts this week's, this month's and the season's rows — whatever its
+   mode — and a daily run today's `challenge` row. No run writes a day row.
+7. A `vs` run touches none of that: it settles its VS (*VS*).
 
 →
 
@@ -460,7 +478,7 @@ The API:
   "rankChanges": { "weekly": { "before": 51, "after": 44 }, "monthly": { "before": null, "after": 80 }, … },
   "passed": [{ "username": "ayse", "avatarUrl": null, "score": 239000, "isFriend": true }],
   "daily": { "dayKey": "2026-09-26", "number": 3, "rank": 37, "players": 1204, "grid": "🟩🟩🟨🟥⬛", "shareText": "…" },
-  "league": { "tier": "gold", "rank": 4, "members": 30, "zone": "promote", "points": 812000 },
+  "rating": { "kind": "run", "before": 2298, "after": 2340, "delta": 42, "tierBefore": "gold", "tier": "gold", "target": 150800, "nextTarget": 155000, "placement": null, "shielded": false },
   "leagueUnlock": null,
   "shareText": "Quezby · Günün akışı #3\n🟩🟩🟨🟥⬛\n240.310 puan · #37/1.204",
   "duel": null
@@ -488,10 +506,25 @@ phone failed its integrity check, so its runs never rank, and the app says so
 ("Bu cihazda skorlar sıralamaya girmiyor"). It is null for every other flag:
 the other checks are not explained to the player.
 `passed` lists up to three players the run overtook on this week's board,
-closest first. `daily` is null outside a daily run; `league` is null when the
-run did not rank, or the league is not open to the player yet. `leagueUnlock`
-is `{ required, remaining }` until it opens — `{ "required": 20, "remaining": 19 }`
-after a new player's first counted run — and null once it has, and after a VS.
+closest first. `daily` is null outside a daily run.
+
+`rating` (`RunRating`) is null after any run but a rated one. `kind`: `run` — against its
+`target` (the score to beat, as the player saw it); `placement` — one of the
+first three rated runs (`placement: { played, required }`; `before`/`after` null
+until the last one places the player, when `after` is set); `forfeit` — a run
+flagged for how it was played, the full loss; `void` — did not count (a banned
+player's, one flagged only for its phone, one without a reel inside 30 s of
+its start); `pending` — held for review, counted if a moderator lets it
+through. `delta` is `after − before`, never beyond ±100; `tierBefore`/`tier`
+say whether the run moved the player between leagues; `nextTarget` is the next
+run's target; `shielded` — a fresh promotion held the player in their league.
+
+`leagueUnlock` (`LeagueUnlock`) is how far
+Dereceli still is after a free or daily run: `{ required, remaining, placement }`
+— `{ "required": 20, "remaining": 19, "placement": 3 }` after a new player's
+first counted run, `remaining: 0` on the very run that opens it (the app
+celebrates), `placement` the rated runs that will place them — and null after
+any later run, a rated run and a VS.
 `duel` is the VS a `vs` run played (`DuelView`, *VS*) as it stands after the
 run; null otherwise. A VS run's `ranks` are the player's ranks as they stand,
 its `rankChanges` show no move and its `passed` is empty.
@@ -570,30 +603,43 @@ request's language: `Quezby · Günün akışı #3`, the grid and `52.340 puan �
 #37/1.204` on three lines (`Daily Feed`, `Tages-Feed`, `خلاصة اليوم`, `Fil du
 jour`, `Feed del día` in the other five; each Arabic line opens with U+200F).
 
-### `GET /leagues/current`
+### `GET /rating`
 
 ```json
-{ "season": 2, "weekKey": "2026-W39", "tier": "gold", "endsAt": "…", "serverTime": "…", "joined": true, "unlock": null,
-  "members": [{ "rank": 1, "username": "…", "avatarUrl": null, "points": 912000, "daysPlayed": 5, "isMe": false, "isFriend": false, "zone": "promote", "gap": null }],
-  "me": LeagueMember, "promoteCount": 5, "demoteCount": 5, "promotionGap": 42000, "nextRankProgress": 870,
-  "lastWeek": { "weekKey": "2026-W38", "tier": "silver", "rank": 3, "members": 28, "outcome": "promoted", "newTier": "gold" } }
+{ "placed": true, "rating": 2340, "tier": "gold", "floor": 2000, "ceil": 3000, "progress": 340, "target": 150800, "peak": 2400,
+  "placement": null, "provisional": false, "shield": { "tier": "gold", "runs": 2 },
+  "history": [{ "kind": "run", "delta": 42, "before": 2298, "after": 2340, "score": 162000, "target": 150800, "tier": "gold", "runId": "01J…", "at": "…" }] }
 ```
 
-Points are the sum of each day's best score this week — the day rows the
-boards keep for this alone. `promotionGap` is what would take you into the
-promotion zone (null when you are in it, or there is none); `nextRankProgress`
-is your points towards the member above, per-mille. **The league opens to a
-player after their first 20 counted runs** — ranked and scoring
-(`QUEZBY_LEAGUE_UNLOCK_RUNS`, `config/quezby.php` › `leagues.unlock_runs`);
-zero-score, flagged, held and VS runs do not count, and a new player's
-practice run never reaches the API.
-Until then `unlock` is `{ "required": 20, "remaining": n }` and nobody is seated;
-anyone who has ever sat in a league is never locked again. A player is seated
-on their first ranked run of the week once it is open (`joined: false` until
-then, with the tier they will play); a player who opens it mid-week brings the
-week's earlier daily bests along. Zones: ⌊members × 5 / 30⌋ up and down; none above `diamond`
-or below `bronze`. Last week is settled lazily, the first time any of its
-players needs it — no cron.
+The player's Elo and league (`RatingResponse`). `unlock` (`LeagueUnlock`) is
+how far Dereceli still is — `{ "required": 20, "remaining": 12, "placement": 3 }` —
+and null once it is open. Before placement `placed` is false, `placement` is
+`{ "played": 2, "required": 3 }` and every other field is null or empty. `floor`/`ceil` bound the league (`ceil` null in
+`master` — MasterClass has no top), `progress` is how far into it, per-mille;
+`target` is the score the next run has to reach to win rating, rounded up to a
+hundred; `provisional` — moves are still twice as big (after placement, back
+after 30 idle days); `shield` — a fresh promotion's runs left. `history` is the
+last 20 changes that set or moved the rating, newest first — runs that did
+not count and the placement runs before the last are left out; `kind` is
+`placement`, `run`, `forfeit` or `reversal` (a moderator took a gain back).
+Only rated runs place a player. See [scoring.md → Elo](../product/scoring.md#elo).
+
+### `GET /ratings?scope=everyone|friends|league`
+
+```json
+{ "scope": "everyone", "players": 312,
+  "entries": [{ "rank": 1, "username": "ekin", "avatarUrl": null, "rating": 5210, "tier": "master", "isMe": false, "isFriend": false, "gap": null }],
+  "me": RatingEntry }
+```
+
+The Elo board (`RatingBoardResponse`): placed players with a counted rated run in
+the last 14 days (`rating.board_active_days`), banned ones left out, highest
+first — of two equal ratings, the one reached first. `friends` is your friends
+and you; `league` is the players of your own league (your rating's tier) —
+the league screen's ranking, which never resets: there are no weekly groups.
+Before placement `league` answers no rows (`players: 0`, `me` null). The top
+50; `me` is your row wherever it is (null when you are not on the board);
+`gap` is the rating to pass the row above.
 
 ## Analytics
 
@@ -654,11 +700,13 @@ follower where only one did (`FollowsToFriends`, in the migration).
 by username — yourself, banned players and anyone on either side of a block
 with you left out — 20 at most → `{ "users": [PlayerSummary] }`.
 `PlayerSummary` = `{ username, avatarUrl, best, league, relation }`: `best` is
-this season's best score, `league` this week's tier (null when not seated).
+this season's best score, `league` their rating's league (null before
+placement).
 
 ### `GET /users/{username}`
 
-`{ "player": { username, avatarUrl, createdAt, best, league, ranks: { weekly, all }, stats: { runs, reels, likes, perfects }, friends, relation, isMe } }`.
+`{ "player": { username, avatarUrl, createdAt, best, league, rating, ranks: { weekly, all }, stats: { runs, reels, likes, perfects }, friends, relation, isMe } }`.
+`league` and `rating` are their Elo's league and number (null before placement).
 `friends` counts their friends who are not banned. Unknown, banned, or a
 player who blocked you → 404.
 
@@ -1031,3 +1079,15 @@ The season is the engine version; a rules change starts every board fresh.
 `period` is `weekly`, `monthly`, `all` or `challenge` — and `daily`: every
 ranked run also keeps its Istanbul day's best, which no route serves as a
 board; the league adds those rows up (`LeaderboardPeriod::calendar()`).
+
+## Rating
+
+`player_ratings` holds one row per player: `rating` (null until placed),
+`tier`, `peak`, `placement_scores`, `provisional_left`, `shield_tier` /
+`shield_left`, `rated_at`, `changed_at`. `rating_changes` holds every move and
+every run that did not count (`kind`, `score`, `target`, `performance`,
+`before`/`after`/`delta`, `width`, `shielded`, `engine_version`) — `run_id`,
+`reversal_of` and `league_member_id` are unique, so a run, a reversal and a
+week's bonus each move a rating once. Every write locks the player's row. The
+rating is not reset by a new season; the target table is per engine version
+(`config/quezby.php` › `rating`).

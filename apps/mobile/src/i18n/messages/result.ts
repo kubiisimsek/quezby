@@ -115,8 +115,6 @@ const tr = {
     /** After the gold rank (`t.fmt.rank`), the count in `board`'s words: "#37 / 1.204 oyuncu". */
     ofPlayers: (players: number) => ` / ${board.tr.players(players)}`,
   },
-  /** Under the league's countdown (`t.league.locked.title`), before a new player's first counted runs. */
-  unlockBody: (required: number) => `Lig, ilk ${required} oyunundan sonra açılır.`,
   /** Over the kinds a practice run ended before. */
   unseen: 'Henüz görmediklerin',
   /** The players this run overtook this week; `name` is `handle(username)`. */
@@ -125,12 +123,6 @@ const tr = {
     name: (name: string, friend: boolean) => (friend ? `${name} · arkadaşın` : name),
     label: (name: string, friend: boolean, _score: number, shown: string) =>
       `${name}${friend ? ', arkadaşın' : ''}, ${shown} puan, geçtin`,
-  },
-  /** The player's league this week; the zone's line is the lobby's (`t.home.league`). */
-  league: {
-    /** `league` is `t.tiers.league(tier)`, `rank` `t.fmt.rank(rank)`: "Altın lig · #4/30". */
-    title: (league: string, rank: string, members: number) => `${league} · ${rank}/${members}`,
-    weekly: (_points: number, shown: string) => `Haftalık ${shown} puan`,
   },
   /** The ways on, at the bottom. */
   dock: {
@@ -228,21 +220,12 @@ const en: ResultMessages = {
     unplaced: "Didn't make today's board",
     ofPlayers: (players) => ` / ${board.en.players(players)}`,
   },
-  unlockBody: (required) =>
-    plural('en', required, {
-      one: 'The league opens after your first game.',
-      other: `The league opens after your first ${required} games.`,
-    }),
   unseen: "You haven't seen these yet",
   passed: {
     title: 'Passed this week',
     name: (name, friend) => (friend ? `${name} · your friend` : name),
     label: (name, friend, score, shown) =>
       `${name}${friend ? ', your friend' : ''}, ${enPoints(score, shown)}, you passed them`,
-  },
-  league: {
-    title: (league, rank, members) => `${league} · ${rank}/${members}`,
-    weekly: (points, shown) => `${enPoints(points, shown)} this week`,
   },
   dock: {
     continue: 'Continue',
@@ -337,21 +320,12 @@ const de: ResultMessages = {
     unplaced: 'Nicht in der heutigen Rangliste',
     ofPlayers: (players) => ` / ${board.de.players(players)}`,
   },
-  unlockBody: (required) =>
-    plural('de', required, {
-      one: 'Die Liga öffnet nach deinem ersten Spiel.',
-      other: `Die Liga öffnet nach deinen ersten ${required} Spielen.`,
-    }),
   unseen: 'Noch nicht gesehen',
   passed: {
     title: 'Diese Woche überholt',
     name: (name, friend) => (friend ? `${name} · dein Freund` : name),
     label: (name, friend, score, shown) =>
       `${name}${friend ? ', dein Freund' : ''}, ${dePoints(score, shown)}, von dir überholt`,
-  },
-  league: {
-    title: (league, rank, members) => `${league} · ${rank}/${members}`,
-    weekly: (points, shown) => `${dePoints(points, shown)} diese Woche`,
   },
   dock: {
     continue: 'Weiter',
@@ -467,23 +441,12 @@ const ar: ResultMessages = {
     unplaced: 'لم تدخل ترتيب اليوم',
     ofPlayers: (players) => ` / ${board.ar.players(players)}`,
   },
-  unlockBody: (required) =>
-    plural('ar', required, {
-      one: 'يُفتح الدوري بعد مباراتك الأولى.',
-      two: 'يُفتح الدوري بعد أول مباراتين لك.',
-      few: `يُفتح الدوري بعد أول ${required} مباريات لك.`,
-      other: `يُفتح الدوري بعد أول ${required} مباراة لك.`,
-    }),
   unseen: 'لم ترها بعد',
   passed: {
     title: 'تجاوزتهم هذا الأسبوع',
     name: (name, friend) => (friend ? `${iso(name)} · صديقك` : name),
     label: (name, friend, score, shown) =>
       `${iso(name)}${friend ? '، صديقك' : ''}، ${arPoints(score, shown)}، تجاوزته`,
-  },
-  league: {
-    title: (league, rank, members) => `${league} · ${iso(`${rank}/${members}`)}`,
-    weekly: (points, shown) => `${arPoints(points, shown)} هذا الأسبوع`,
   },
   dock: {
     continue: 'متابعة',
@@ -595,21 +558,12 @@ const fr: ResultMessages = {
     unplaced: 'Pas dans le classement du jour',
     ofPlayers: (players) => ` / ${board.fr.players(players)}`,
   },
-  unlockBody: (required) =>
-    plural('fr', required, {
-      one: "La ligue s'ouvre après ta première partie.",
-      other: `La ligue s'ouvre après tes ${required} premières parties.`,
-    }),
   unseen: 'Pas encore vus',
   passed: {
     title: 'Dépassés cette semaine',
     name: (name, friend) => (friend ? `${name} · ton ami` : name),
     label: (name, friend, score, shown) =>
       `${name}${friend ? ', ton ami' : ''}, ${frPoints(score, shown)}, désormais derrière toi`,
-  },
-  league: {
-    title: (league, rank, members) => `${league} · ${rank}/${members}`,
-    weekly: (points, shown) => `${frPoints(points, shown)} cette semaine`,
   },
   dock: {
     continue: 'Continuer',
@@ -710,21 +664,12 @@ const es: ResultMessages = {
     unplaced: 'No entró en la clasificación de hoy',
     ofPlayers: (players) => ` / ${board.es.players(players)}`,
   },
-  unlockBody: (required) =>
-    plural('es', required, {
-      one: 'La liga se abre después de tu primera partida.',
-      other: `La liga se abre después de tus primeras ${required} partidas.`,
-    }),
   unseen: 'Aún no los viste',
   passed: {
     title: 'Superados esta semana',
     name: (name, friend) => (friend ? `${name} · tu amigo` : name),
     label: (name, friend, score, shown) =>
       `${name}${friend ? ', tu amigo' : ''}, ${esPoints(score, shown)}, ahora detrás de ti`,
-  },
-  league: {
-    title: (league, rank, members) => `${league} · ${rank}/${members}`,
-    weekly: (points, shown) => `${esPoints(points, shown)} esta semana`,
   },
   dock: {
     continue: 'Continuar',

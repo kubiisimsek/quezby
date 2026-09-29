@@ -4,7 +4,11 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type {
   LeaderboardEntry,
   LeaderboardPeriod,
+  LeaderboardResponse,
   LeaderboardScope,
+  LeagueTier,
+  RatingBoardResponse,
+  RatingEntry,
 } from '@quezby/types';
 import { useCallback, useState, type ReactNode } from 'react';
 import {
@@ -28,7 +32,7 @@ import {
   climbKey,
   layoutBoard,
 } from '@/components/SummitBoard';
-import { useLeaderboard } from '@/hooks/useBoards';
+import { useLeaderboard, useRatingBoard } from '@/hooks/useBoards';
 import { useT } from '@/i18n';
 import { messageFor } from '@/lib/errors';
 import type { RootStackParamList, TabParamList } from '@/navigation/types';
@@ -54,6 +58,44 @@ type Props = CompositeScreenProps<
 /** The periods, in the switch's order; their words are `t.board.summit.periods`. */
 const PERIODS: LeaderboardPeriod[] = ['weekly', 'monthly', 'all'];
 
+/** The switch: the three score boards, then the Elo board. */
+type Tab = LeaderboardPeriod | 'elo';
+
+/**
+ * The Elo board drawn the way a score board is: the rating where the score
+ * stands, the podium and the climb as they are. Every number is still the
+ * API's.
+ */
+function asBoard(ratings: RatingBoardResponse): LeaderboardResponse {
+  const entry = (row: RatingEntry): LeaderboardEntry => ({
+    rank: row.rank,
+    username: row.username,
+    avatarUrl: row.avatarUrl,
+    score: row.rating,
+    reels: 0,
+    isMe: row.isMe,
+    isFriend: row.isFriend,
+    gap: row.gap,
+  });
+  const me = ratings.me ? entry(ratings.me) : null;
+  const listed = ratings.entries.some((row) => row.isMe);
+  return {
+    board: 'all',
+    periodKey: 'elo',
+    season: 0,
+    scope: ratings.scope === 'friends' ? 'friends' : 'everyone',
+    startsAt: null,
+    endsAt: null,
+    serverTime: '',
+    entries: ratings.entries.map(entry),
+    me,
+    neighbors: me && !listed ? [me] : [],
+    rival: null,
+    nextRankProgress: null,
+    players: ratings.players,
+  };
+}
+
 /** What sits under the period switch. */
 type Body = 'loading' | 'error' | 'alone' | 'empty' | 'board';
 
@@ -72,17 +114,29 @@ type Body = 'loading' | 'error' | 'alone' | 'empty' | 'board';
 export function LeaderboardScreen({ navigation }: Props) {
   const theme = useTheme();
   const t = useT();
-  const [period, setPeriod] = useState<LeaderboardPeriod>('weekly');
+  const [tab, setTab] = useState<Tab>('weekly');
   const [scope, setScope] = useState<LeaderboardScope>('everyone');
   const [selected, setSelected] = useState<string | null>(null);
   const [floorHeight, setFloorHeight] = useState(0);
   const [pulling, setPulling] = useState(false);
   const intro = useArrival(0, 10);
 
-  const board = useLeaderboard(period, scope);
+  const elo = tab === 'elo';
+  const scores = useLeaderboard(elo ? 'weekly' : tab, scope);
+  const ratings = useRatingBoard(scope, elo);
+  const board = elo ? ratings : scores;
   const { refetch } = board;
-  const data = board.data;
+  const data = elo ? (ratings.data ? asBoard(ratings.data) : undefined) : scores.data;
   const layout = data ? layoutBoard(data) : null;
+  const tiers = new Map<string, LeagueTier>(
+    [...(ratings.data?.entries ?? []), ...(ratings.data?.me ? [ratings.data.me] : [])].map(
+      (row) => [row.username, row.tier],
+    ),
+  );
+  const leagueOf = (entry: LeaderboardEntry) => {
+    const tier = tiers.get(entry.username);
+    return tier ? t.tiers.league(tier) : undefined;
+  };
 
   let body: Body = 'board';
   if (!data || !layout) body = board.isError ? 'error' : 'loading';
@@ -126,7 +180,7 @@ export function LeaderboardScreen({ navigation }: Props) {
       >
         <TopBar
           title={t.board.summit.title}
-          subtitle={data ? t.board.players(data.players) : undefined}
+          subtitle={elo ? t.rating.board.hint : data ? t.board.players(data.players) : undefined}
           right={
             <View style={styles.headRight}>
               {data?.endsAt ? (
@@ -157,6 +211,7 @@ export function LeaderboardScreen({ navigation }: Props) {
               board={data}
               podium={layout?.podium ?? []}
               onPressEntry={open}
+              unit={elo ? 'elo' : 'points'}
             />
           </View>
         ) : null}
@@ -164,12 +219,15 @@ export function LeaderboardScreen({ navigation }: Props) {
 
       <View style={styles.periods}>
         <Segmented
-          value={period}
-          onChange={setPeriod}
-          options={PERIODS.map((value) => ({
-            value,
-            label: t.board.summit.periods[value],
-          }))}
+          value={tab}
+          onChange={setTab}
+          options={[
+            ...PERIODS.map((value) => ({
+              value: value as Tab,
+              label: t.board.summit.periods[value],
+            })),
+            { value: 'elo' as Tab, label: t.rating.board.tab },
+          ]}
         />
       </View>
     </View>
@@ -206,8 +264,8 @@ export function LeaderboardScreen({ navigation }: Props) {
       empty = (
         <EmptyState
           icon="mountain"
-          title={t.board.summit.emptyTitle}
-          hint={t.board.summit.emptyHint}
+          title={elo ? t.rating.board.empty : t.board.summit.emptyTitle}
+          hint={elo ? t.rating.board.emptyHint : t.board.summit.emptyHint}
           action={
             <Button
               label={t.board.summit.play}
@@ -231,7 +289,13 @@ export function LeaderboardScreen({ navigation }: Props) {
         keyExtractor={climbKey}
         renderItem={({ item, index }) => (
           <View style={[styles.item, stale ? styles.stale : null]}>
-            <ClimbItemView item={item} index={index} onPressEntry={open} />
+            <ClimbItemView
+              item={item}
+              index={index}
+              onPressEntry={open}
+              detail={elo ? leagueOf : undefined}
+              showReels={!elo}
+            />
           </View>
         )}
         ListHeaderComponent={header}
@@ -240,7 +304,7 @@ export function LeaderboardScreen({ navigation }: Props) {
           styles.content,
           {
             paddingBottom:
-              body === 'board' ? floorHeight + SPACE.lg : SPACE.xxl,
+              body === 'board' && !elo ? floorHeight + SPACE.lg : SPACE.xxl,
           },
         ]}
         refreshControl={
@@ -255,7 +319,7 @@ export function LeaderboardScreen({ navigation }: Props) {
         showsVerticalScrollIndicator={false}
       />
 
-      {body === 'board' && data ? (
+      {body === 'board' && data && !elo ? (
         <FloorDock onHeight={setFloorHeight}>
           <FloorCard
             rank={data.me?.rank ?? null}

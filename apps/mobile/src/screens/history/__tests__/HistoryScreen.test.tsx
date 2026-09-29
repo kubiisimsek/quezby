@@ -90,7 +90,7 @@ describe('HistoryScreen', () => {
     await renderHistory();
 
     expect(await screen.findByText('Bugün')).toBeOnTheScreen();
-    expect(screen.getByText('Serbest oyun')).toBeOnTheScreen();
+    expect(screen.getByText('Normal oyun')).toBeOnTheScreen();
     expect(screen.getByText('REKOR')).toBeOnTheScreen();
     expect(screen.getByText('Günün akışı #17')).toBeOnTheScreen();
     expect(screen.getByText('İncelemede')).toBeOnTheScreen();
@@ -109,13 +109,26 @@ describe('HistoryScreen', () => {
     expect(mocked.me.runs).toHaveBeenCalledWith({ cursor: undefined });
   });
 
+  it('names a rated run, and narrows the list to Dereceli', async () => {
+    mocked.me.runs.mockResolvedValue({
+      runs: [buildRunSummary({ runId: 'r4', mode: 'rated', finishedAt: new Date().toISOString() })],
+      nextCursor: null,
+    });
+    await renderHistory();
+
+    expect(await screen.findByText('Dereceli oyun')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('tab', { name: 'Dereceli' }));
+
+    await waitFor(() => expect(mocked.me.runs).toHaveBeenLastCalledWith({ cursor: undefined, mode: 'rated' }));
+  });
+
   it('opens a run’s card with everything its replay counted', async () => {
     const summary = buildRunSummary({ runId: 'r1' });
     mocked.me.runs.mockResolvedValue({ runs: [summary], nextCursor: null });
     mocked.me.run.mockResolvedValue({ summary, run: result() });
     await renderHistory();
 
-    await fireEvent.press(await screen.findByLabelText(/^Serbest oyun, 12\.345 puan/));
+    await fireEvent.press(await screen.findByLabelText(/^Normal oyun, 12\.345 puan/));
 
     expect(await screen.findByText('Kusursuz seviye')).toBeOnTheScreen();
     expect(mocked.me.run).toHaveBeenCalledWith('r1');

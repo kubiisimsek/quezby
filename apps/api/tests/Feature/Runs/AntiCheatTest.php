@@ -46,6 +46,18 @@ test('inhumanly fast decisions are flagged', function () {
         ->and(LeaderboardEntry::query()->count())->toBe(0);
 });
 
+test('a player who swipes everything is a guesser, not a bot, and ranks', function () {
+    $this->signIn();
+    $actions = swipedLog(seed: 7919, reels: 200, decisionMs: 190, jitterMs: 40);
+    $summary = Engine::replay(7919, $actions)->summary;
+    $runId = $this->startRunFor(['seed' => 7919, 'summary' => ['activeMs' => $summary->activeMs, 'reels' => $summary->reels]]);
+
+    $this->finishRun($runId, $actions, $summary->score, $summary->reels)
+        ->assertOk()
+        ->assertJsonPath('run.status', 'ranked');
+    expect(collect(Run::query()->findOrFail($runId)->flags)->firstWhere('code', 'fast_decisions'))->toBeNull();
+});
+
 test('quick but human decisions rank', function () {
     $this->signIn();
     $actions = playedLog(seed: 4242, reels: 80, decisionMs: 420, jitterMs: 120);

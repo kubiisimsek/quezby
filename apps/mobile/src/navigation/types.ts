@@ -1,11 +1,11 @@
 import type { NavigatorScreenParams } from '@react-navigation/native';
 
 /**
- * A run to play: free play or today's challenge — or a VS with a friend,
- * sent (`opponent` alone) or answered (`duelId`, the one they sent).
+ * A run to play: Normal, today's challenge or Dereceli — or a VS with a
+ * friend, sent (`opponent` alone) or answered (`duelId`, the one they sent).
  */
 export type GameParams =
-  | { mode: 'free' | 'daily' }
+  | { mode: 'free' | 'daily' | 'rated' }
   | { mode: 'vs'; opponent: string; duelId?: string };
 
 /** The two sides of the Mesajlar tab. */

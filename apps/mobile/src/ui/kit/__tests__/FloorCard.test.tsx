@@ -38,6 +38,16 @@ describe('FloorCard', () => {
     expect(onPlay).toHaveBeenCalledWith(true);
   });
 
+  it('speaks Elo on an Elo board: your rating, and the Elo to pass the player above', async () => {
+    await renderWithProviders(
+      <FloorCard rank={3} score={2_340} targetUsername="es" gapToNext={161} unit="elo" onPlay={jest.fn()} />,
+    );
+
+    expect(screen.getByText('Sen · 2.340 Elo')).toBeOnTheScreen();
+    expect(screen.getByText("@es'e 161 Elo")).toBeOnTheScreen();
+    expect(screen.queryByText(/puan/)).not.toBeOnTheScreen();
+  });
+
   it('bends the suffix to the name', async () => {
     await renderWithProviders(
       <FloorCard

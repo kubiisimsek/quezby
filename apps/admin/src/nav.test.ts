@@ -29,4 +29,13 @@ describe('the menu', () => {
     expect(activeNavHref(items, '/playersomething')).toBeNull();
     expect(activeNavHref(items, '/account')).toBeNull();
   });
+
+  it('puts the ratings in the game section after the boards and the daily, with no weekly leagues, for every role', () => {
+    for (const role of ['owner', 'moderator', 'viewer'] as const) {
+      const hrefs = navFor(role).map((item) => item.href);
+      expect(hrefs.slice(hrefs.indexOf('/boards'), hrefs.indexOf('/boards') + 3)).toEqual(['/boards', '/daily', '/ratings']);
+      expect(hrefs).not.toContain('/leagues');
+    }
+    expect(NAV.find((item) => item.href === '/ratings')).toMatchObject({ label: 'Reytingler', section: 'Oyun' });
+  });
 });

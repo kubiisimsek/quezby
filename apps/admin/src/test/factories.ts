@@ -5,18 +5,21 @@ import type {
   AdminBoardKeysResponse,
   AdminBoardResponse,
   AdminBoardRow,
+  AdminCalibrationResponse,
   AdminContentResponse,
-  AdminLeagueGroupResponse,
-  AdminLeaguesResponse,
   AdminOverview,
   AdminMe,
   AdminPage,
   AdminPlayerActivity,
+  AdminPlayerRating,
   AdminPlayerResponse,
   AdminPlayerRow,
   AdminPlayersResponse,
+  AdminRatingChange,
+  AdminRatingsResponse,
   AdminReportRow,
   AdminReportsResponse,
+  AdminRunRating,
   AdminRunResponse,
   AdminRunRow,
   AdminRunsResponse,
@@ -138,7 +141,7 @@ export function playerResponse(overrides: Partial<AdminPlayerResponse> = {}, pla
       maxCombo: 2500,
       bonuses: { flawless: 3, lightning: 2, coolHead: 1, comeback: 0 },
     },
-    league: { weekKey: '2026-W39', groupId: 7, tier: 'gold', rank: 4, members: 28, points: 912000, zone: 'promote' },
+    rating: playerRating(),
     runs: { ranked: 40, flagged: 2 },
     recentRuns: [runRow()],
     flags: [{ code: 'reaction_cv', severity: 'soft', count: 2 }],
@@ -160,6 +163,104 @@ export function playerResponse(overrides: Partial<AdminPlayerResponse> = {}, pla
     social: { friends: 4, blockedBy: 0 },
     openReports: { photo: 0, name: 0 },
     audit: [],
+    ...overrides,
+  };
+}
+
+/** A change of a rating: by default a run that beat its target. */
+export function ratingChange(overrides: Partial<AdminRatingChange> = {}): AdminRatingChange {
+  return {
+    id: 40,
+    kind: 'run',
+    delta: 42,
+    before: 2408,
+    after: 2450,
+    score: 140000,
+    target: 120000,
+    tier: 'gold',
+    runId: '01jrun000000000000000000ab',
+    at: '2026-09-25T08:05:00.000Z',
+    performance: 2560,
+    width: 800,
+    shielded: false,
+    engineVersion: 2,
+    counted: true,
+    ...overrides,
+  };
+}
+
+/** A placed player in Altın, with a run, a gain a moderator took back, a run that did not count and a loss behind them. */
+export function playerRating(overrides: Partial<AdminPlayerRating> = {}): AdminPlayerRating {
+  return {
+    rating: 2450,
+    tier: 'gold',
+    peak: 2610,
+    target: 128000,
+    placement: null,
+    provisionalLeft: 0,
+    shield: null,
+    ratedRuns: 36,
+    ratedAt: '2026-09-25T08:05:00.000Z',
+    history: [
+      ratingChange(),
+      ratingChange({ id: 39, kind: 'reversal', delta: -30, before: 2438, after: 2408, score: null, target: null, runId: '01jrun000000000000000000ae', performance: null, width: null }),
+      ratingChange({ id: 38, kind: 'void', delta: 0, before: 2438, after: 2438, score: 0, target: null, runId: '01jrun000000000000000000ac', performance: null, width: null, counted: false }),
+      ratingChange({ id: 37, kind: 'run', delta: -18, before: 2456, after: 2438, score: 90000, target: 118000, runId: '01jrun000000000000000000ad', performance: 2180 }),
+    ],
+    ...overrides,
+  };
+}
+
+/** What a run did to the rating: by default the run that beat its target, never reversed. */
+export function runRating(overrides: Partial<AdminRunRating> = {}): AdminRunRating {
+  return { ...ratingChange(), reversedBy: null, ...overrides };
+}
+
+export function ratingsOverview(overrides: Partial<AdminRatingsResponse> = {}): AdminRatingsResponse {
+  return {
+    tiers: { bronze: 120, silver: 340, gold: 210, platinum: 64, diamond: 12, master: 2 },
+    active: { bronze: 40, silver: 200, gold: 150, platinum: 50, diamond: 10, master: 2 },
+    placing: 57,
+    top: [
+      { player: { id: '01jplayer00000000000000000a', username: 'kerem.35', bannedAt: null }, rating: 5120, tier: 'master', peak: 5200, ratedAt: '2026-09-25T08:05:00.000Z' },
+      { player: { id: '01jplayer00000000000000000b', username: 'ekin', bannedAt: null }, rating: 4890, tier: 'diamond', peak: null, ratedAt: '2026-09-24T08:05:00.000Z' },
+    ],
+    rules: {
+      engineVersion: 2,
+      maxDelta: 100,
+      width: 800,
+      provisionalWidth: 400,
+      provisionalRuns: 15,
+      placementRuns: 5,
+      placementMin: 1200,
+      placementMax: 1800,
+      shieldRuns: 3,
+      bronzeLossPercent: 50,
+      activeDays: 14,
+      unlockRuns: 20,
+      targets: [
+        { rating: 0, score: 8000 },
+        { rating: 1000, score: 34000 },
+        { rating: 2000, score: 100000 },
+      ],
+    },
+    ...overrides,
+  };
+}
+
+export function calibration(overrides: Partial<AdminCalibrationResponse> = {}): AdminCalibrationResponse {
+  return {
+    engineVersion: 2,
+    days: 30,
+    minRuns: 10,
+    players: 200,
+    shares: { bronze: 20, silver: 35, gold: 25, platinum: 13, diamond: 6, master: 1 },
+    settled: { bronze: 60, silver: 70, gold: 40, platinum: 20, diamond: 8, master: 2 },
+    anchors: [
+      { rating: 0, current: 8000, proposed: 9500 },
+      { rating: 1000, current: 34000, proposed: 31000 },
+      { rating: 2000, current: 100000, proposed: null },
+    ],
     ...overrides,
   };
 }
@@ -224,6 +325,7 @@ export function runResponse(overrides: Partial<AdminRunResponse> = {}, run: Part
       clientReels: 204,
       stats: null,
       duel: null,
+      rating: null,
       ...run,
     },
     timeline: [
@@ -331,45 +433,6 @@ export function boardKeys(overrides: Partial<AdminBoardKeysResponse> = {}): Admi
   };
 }
 
-export function leaguesWeek(overrides: Partial<AdminLeaguesResponse> = {}): AdminLeaguesResponse {
-  return {
-    ...page([
-      { id: 7, tier: 'gold', members: 28, settled: false, createdAt: '2026-09-21T08:00:00.000Z' },
-      { id: 3, tier: 'bronze', members: 30, settled: true, createdAt: '2026-09-21T07:00:00.000Z' },
-    ]),
-    season: 2,
-    weekKey: '2026-W39',
-    weeks: ['2026-W39', '2026-W38'],
-    tiers: { bronze: 30, silver: 0, gold: 28, platinum: 0, diamond: 0 },
-    ...overrides,
-  };
-}
-
-export function leagueGroup(overrides: Partial<AdminLeagueGroupResponse> = {}): AdminLeagueGroupResponse {
-  return {
-    group: {
-      id: 7,
-      tier: 'gold',
-      members: 3,
-      settled: false,
-      createdAt: '2026-09-21T08:00:00.000Z',
-      season: 2,
-      weekKey: '2026-W39',
-      startsAt: '2026-09-20T21:00:00.000Z',
-      endsAt: '2026-09-27T21:00:00.000Z',
-    },
-    promoteCount: 1,
-    demoteCount: 1,
-    standings: [
-      { rank: 1, player: { id: '01jplayer00000000000000000a', username: 'kerem.35', bannedAt: null }, points: 912000, daysPlayed: 5, zone: 'promote', finalRank: null, outcome: null },
-      { rank: 2, player: { id: '01jplayer00000000000000000b', username: 'ekin', bannedAt: null }, points: 500000, daysPlayed: 3, zone: 'stay', finalRank: null, outcome: null },
-      { rank: 3, player: { id: '01jplayer00000000000000000c', username: 'deniz', bannedAt: null }, points: 1000, daysPlayed: 1, zone: 'demote', finalRank: null, outcome: null },
-    ],
-    banned: [],
-    ...overrides,
-  };
-}
-
 /** The first page of a long catalog: three posts on it, the top fives ranked by the API over all of them. */
 export function contentResponse(overrides: Partial<AdminContentResponse> = {}): AdminContentResponse {
   const coffee = { contentId: 'skip-003', kind: 'skip', shows: 1000, likes: 0, misses: 400, likeRate: 0, missRate: 400 } as const;
@@ -410,7 +473,7 @@ export function system(overrides: Partial<AdminSystem> = {}): AdminSystem {
     cached: { config: true, routes: true },
     pendingMigrations: [],
     runs: { open: 4, stale: 1 },
-    limits: { reviewTopAll: 10, reviewTopWeekly: 3, leagueGroupSize: 30, leagueUnlockRuns: 20, runTtlMinutes: 120, adminTokenHours: 12 },
+    limits: { reviewTopAll: 10, reviewTopWeekly: 3, leagueUnlockRuns: 20, runTtlMinutes: 120, adminTokenHours: 12 },
     ...overrides,
   };
 }

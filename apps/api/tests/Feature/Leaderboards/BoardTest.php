@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\LeaderboardPeriod;
+use App\Enums\RunMode;
 use App\Models\LeaderboardEntry;
 use App\Models\User;
 use App\Services\LeaderboardService;
@@ -28,14 +29,14 @@ test('every period says when it began and when it turns over, in UTC', function 
         ->and($leaderboards->boundsAt(LeaderboardPeriod::All, $at))->toBeNull();
 });
 
-test('runs either side of Istanbul midnight share the week, and each keeps its day for the league', function () {
+test('runs either side of Istanbul midnight share the week, and each keeps its day for the weekly group', function () {
     $evening = User::factory()->withUsername('evening')->create();
     $night = User::factory()->withUsername('night')->create();
 
     Carbon::setTestNow(Carbon::parse('2026-09-24 23:30', 'Europe/Istanbul'));
-    $this->recordRanked($evening, 3000);
+    $this->recordRanked($evening, 3000, RunMode::Rated);
     Carbon::setTestNow(Carbon::parse('2026-09-25 00:30', 'Europe/Istanbul'));
-    $this->recordRanked($night, 2000);
+    $this->recordRanked($night, 2000, RunMode::Rated);
     $this->signIn($night);
 
     $evenRow = ['rank' => 1, 'username' => 'evening', 'avatarUrl' => null, 'score' => 3000, 'reels' => 100, 'isMe' => false, 'isFriend' => false, 'gap' => null];
@@ -64,9 +65,8 @@ test('runs either side of Istanbul midnight share the week, and each keeps its d
         ->assertJsonPath('endsAt', null)
         ->assertJsonPath('players', 2);
 
-    // No player sees a day board, but each day's best stays: league points add them up.
-    expect(LeaderboardEntry::query()->where('period', 'daily')->pluck('period_key', 'user_id')->all())
-        ->toBe([$evening->id => '2026-09-24', $night->id => '2026-09-25']);
+    // There is no day board, and no day rows either.
+    expect(LeaderboardEntry::query()->where('period', 'daily')->count())->toBe(0);
 });
 
 test('there is no day board', function () {
@@ -171,20 +171,31 @@ test('a row keeps the higher score and the earlier tie', function () {
     $player = User::factory()->withUsername()->create();
 
     Carbon::setTestNow(Carbon::parse('2026-09-24 10:00:00'));
-    $best = $this->recordRanked($player, 5000);
+    $best = $this->recordRanked($player, 5000, RunMode::Rated);
     Carbon::setTestNow(Carbon::parse('2026-09-24 11:00:00'));
-    $this->recordRanked($player, 4000);
-    $this->recordRanked($player, 5000);
+    $this->recordRanked($player, 4000, RunMode::Rated);
+    $this->recordRanked($player, 5000, RunMode::Rated);
 
-    $row = LeaderboardEntry::query()->where('period', 'daily')->sole();
+    $row = LeaderboardEntry::query()->where('period', 'weekly')->sole();
     expect($row->score)->toBe(5000)
         ->and($row->run_id)->toBe($best->id)
         ->and($row->season)->toBe(2)
         ->and($row->achieved_at->format('Y-m-d H:i:s.v'))->toBe('2026-09-24 10:00:00.000');
 
-    $higher = $this->recordRanked($player, 6000);
+    $higher = $this->recordRanked($player, 6000, RunMode::Rated);
     expect(LeaderboardEntry::query()->pluck('score')->unique()->values()->all())->toBe([6000])
         ->and(LeaderboardEntry::query()->where('period', 'all')->sole()->run_id)->toBe($higher->id);
+});
+
+test('every mode counts on the week, the month and the season, and no run keeps a day row', function () {
+    $player = User::factory()->withUsername()->create();
+
+    $this->recordRanked($player, 5000);
+    $this->recordRanked($player, 6000, RunMode::Daily);
+    $this->recordRanked($player, 7000, RunMode::Rated);
+
+    expect(LeaderboardEntry::query()->where('period', 'daily')->count())->toBe(0)
+        ->and(LeaderboardEntry::query()->whereIn('period', ['weekly', 'monthly', 'all'])->pluck('score')->unique()->values()->all())->toBe([7000]);
 });
 
 test('the challenge board holds only daily runs', function () {

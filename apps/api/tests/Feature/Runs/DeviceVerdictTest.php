@@ -187,7 +187,7 @@ describe('logged', function () {
         $run = Run::query()->sole();
         expect($run->device_verdict)->toBe(DeviceVerdict::Fail)
             ->and($run->flags)->toBeNull()
-            ->and(LeaderboardEntry::query()->count())->toBe(4);
+            ->and(LeaderboardEntry::query()->count())->toBe(3);
     });
 
     it('holds nothing back for a missing verdict', function () {

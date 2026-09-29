@@ -34,7 +34,7 @@ describe('HelpScreen', () => {
   it('opens an answer when its question is tapped, and closes it again', async () => {
     await renderWithProviders(<HelpScreen {...props} />);
     const answer =
-      'Hayır, her gün tek hakkın var. Serbest oyunda ise istediğin kadar oynarsın; en iyi turun sıralamalara yazılır.';
+      'Hayır, her gün tek hakkın var. Normal oyunda ise istediğin kadar oynarsın; en iyi turun sıralamalara yazılır.';
 
     const question = screen.getByRole('button', {
       name: 'Günün akışını tekrar oynayabilir miyim?',
@@ -154,22 +154,23 @@ describe('HelpScreen', () => {
     }
   });
 
-  it('lays out the league rules', async () => {
+  it('lays out the modes and the league rules: Dereceli, six leagues from Elo, the target, a ranking that never resets', async () => {
     await renderWithProviders(<HelpScreen {...props} />);
 
-    for (const tier of ['Bronz', 'Gümüş', 'Altın', 'Platin', 'Elmas']) {
+    for (const tier of ['Bronz', 'Gümüş', 'Altın', 'Platin', 'Elmas', 'MasterClass']) {
       expect(screen.getByText(tier)).toBeOnTheScreen();
     }
-    expect(screen.getByText(/30 kişilik bir gruba/)).toBeOnTheScreen();
-    expect(screen.getByText(/Lig, ilk 20 sayılan oyunundan sonra\s+açılır; deneme turu ve VS sayılmaz/)).toBeOnTheScreen();
-    expect(
-      screen.getByText(/her gününde yaptığın en iyi skorların\s+toplamı/),
-    ).toBeOnTheScreen();
-    expect(
-      screen.getByText(
-        /ilk beş bir üst lige çıkar, son beş bir alt lige\s+iner/,
-      ),
-    ).toBeOnTheScreen();
+    expect(screen.getByText(/Üç mod var: Günlük, Normal ve Dereceli/)).toBeOnTheScreen();
+    expect(screen.getByText(/Elo’nu yalnız Dereceli değiştirir/)).toBeOnTheScreen();
+    expect(screen.getByText(/Dereceli, 20 Normal ya da Günlük oyundan sonra açılır/)).toBeOnTheScreen();
+    expect(screen.getByText(/ilk 3 dereceli oyunun Elo’nu belirler/)).toBeOnTheScreen();
+    expect(screen.getByText(/Altı lig var/)).toBeOnTheScreen();
+    expect(screen.getByText(/Her dereceli oyunun bir hedef skoru var/)).toBeOnTheScreen();
+    expect(screen.getByText(/en fazla 100 Elo/)).toBeOnTheScreen();
+    expect(screen.getByText(/Yarım bırakılan dereceli oyun ise en düşük sonuç sayılır/)).toBeOnTheScreen();
+    expect(screen.getByText(/Lig sıralaması hiç sıfırlanmaz/)).toBeOnTheScreen();
+    expect(screen.queryByText(/Haftalık grup|\+50, \+30 ve \+15/)).not.toBeOnTheScreen();
+    expect(screen.queryByText(/bir alt lige\s+iner/)).not.toBeOnTheScreen();
   });
 
   it('says how the boards and fair play work', async () => {

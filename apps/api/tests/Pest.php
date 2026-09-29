@@ -102,6 +102,32 @@ function playedLog(int $seed, int $reels, int $decisionMs, int $jitterMs = 0): a
 }
 
 /**
+ * A log that swipes up on every reel without looking, after `$decisionMs`
+ * (± `$jitterMs`): right on swipe reels, wrong on like and gold ones, caught
+ * on freeze reels unless `$spareFreeze` — the guesser `fast_decisions` must
+ * tell from a bot.
+ *
+ * @return list<array{int, int, int}>
+ */
+function swipedLog(int $seed, int $reels, int $decisionMs, int $jitterMs = 0, bool $spareFreeze = false): array
+{
+    $run = new Engine($seed);
+    $actions = [];
+    while (count($actions) < $reels && ! $run->isOver()) {
+        $reel = $run->current();
+        $t = $decisionMs + ($jitterMs === 0 ? 0 : (($reel->index * 7919) % (2 * $jitterMs + 1)) - $jitterMs);
+        $action = match ($reel->kind) {
+            ReelKind::Freeze => $spareFreeze ? [Gesture::None->value, 0, 0] : [Gesture::Touch->value, $t, 0],
+            default => [Gesture::Up->value, $t, 0],
+        };
+        $run->apply($action);
+        $actions[] = $action;
+    }
+
+    return $actions;
+}
+
+/**
  * A `GuestNames` digit source that draws `$values` in turn, then keeps
  * drawing the last one.
  *

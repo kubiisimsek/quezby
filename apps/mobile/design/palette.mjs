@@ -120,6 +120,9 @@ export const roles = {
   tierPlatinumSoft: 'oklch(0.36 0.05 200)',
   tierDiamond: 'oklch(0.78 0.15 240)',
   tierDiamondSoft: 'oklch(0.36 0.1 250)',
+  // MasterClass: an orchid of its own, past the diamond's blue.
+  tierMaster: 'oklch(0.8 0.15 318)',
+  tierMasterSoft: 'oklch(0.36 0.11 318)',
 
   // Sign-in buttons as Apple and Google draw them on a dark screen.
   appleBg: 'oklch(1 0 0)',

@@ -28,7 +28,7 @@ const tr = {
     body: (why: string) => `${why} Oynayabilirsin ama skorların sıralamaya girmez.`,
   },
   today: {
-    free: 'Serbest oyna',
+    free: 'Normal oyna',
     placed: (rank: string, _players: number, players: string) => `${rank} / ${players} oyuncu`,
     tags: {
       review: 'Skorun inceleniyor',
@@ -40,17 +40,8 @@ const tr = {
   },
   league: {
     title: 'Lig',
-    locked: 'KİLİTLİ',
-    remaining: (games: number) => `Lige ${games} oyun kaldı`,
-    opensAfter: (games: number) =>
-      `Lig, ilk ${games} oyunundan sonra açılır. Deneme turu sayılmaz.`,
-    standing: (rank: string, size: string, _points: number, points: string) =>
-      `${rank}/${size} · ${points} puan`,
-    join: 'Bu hafta ilk turunu oyna, ligine katıl.',
-    promote: 'Terfi bölgesindesin',
-    demote: 'Düşme bölgesindesin',
-    safe: 'Güvendesin',
-    toPromotion: (_points: number, points: string) => `Terfiye ${points} puan`,
+    /** Your league and rating: "Altın lig · 2.340 Elo". */
+    rated: (league: string, elo: string) => `${league} · ${elo}`,
   },
   rival: {
     title: 'Hedefin',
@@ -70,7 +61,6 @@ const tr = {
     /** The daily's small Oyna, as a screen reader says it. */
     playLabel: 'Günün akışını oyna',
     league: 'LİG',
-    join: 'Ligine katıl',
     rival: 'HEDEFİN · BU HAFTA',
   },
   records: {
@@ -101,7 +91,7 @@ const en: HomeMessages = {
     body: (why) => `${why} You can still play, but your scores won't rank.`,
   },
   today: {
-    free: 'Free play',
+    free: 'Play Normal',
     placed: (rank, count, players) =>
       plural('en', count, {
         one: `${rank} / ${players} player`,
@@ -117,31 +107,7 @@ const en: HomeMessages = {
   },
   league: {
     title: 'League',
-    locked: 'LOCKED',
-    remaining: (games) =>
-      plural('en', games, {
-        one: `${games} game to the league`,
-        other: `${games} games to the league`,
-      }),
-    opensAfter: (games) =>
-      plural('en', games, {
-        one: "The league opens after your first game. The practice run doesn't count.",
-        other: `The league opens after your first ${games} games. The practice run doesn't count.`,
-      }),
-    standing: (rank, size, count, points) =>
-      plural('en', count, {
-        one: `${rank}/${size} · ${points} point`,
-        other: `${rank}/${size} · ${points} points`,
-      }),
-    join: 'Play your first run this week to join your league.',
-    promote: 'In the promotion zone',
-    demote: 'In the relegation zone',
-    safe: "You're safe",
-    toPromotion: (count, points) =>
-      plural('en', count, {
-        one: `${points} point to promotion`,
-        other: `${points} points to promotion`,
-      }),
+    rated: (league, elo) => `${league} · ${elo}`,
   },
   rival: {
     title: 'Your target',
@@ -160,7 +126,6 @@ const en: HomeMessages = {
     play: 'Play',
     playLabel: 'Play the Daily Feed',
     league: 'LEAGUE',
-    join: 'Join your league',
     rival: 'YOUR TARGET · THIS WEEK',
   },
   records: {
@@ -189,7 +154,7 @@ const de: HomeMessages = {
       `${why} Du kannst spielen, aber deine Scores kommen nicht in die Rangliste.`,
   },
   today: {
-    free: 'Frei spielen',
+    free: 'Normal spielen',
     placed: (rank, _count, players) => `${rank} / ${players} Spieler`,
     tags: {
       review: 'Dein Score wird geprüft',
@@ -201,31 +166,7 @@ const de: HomeMessages = {
   },
   league: {
     title: 'Liga',
-    locked: 'GESPERRT',
-    remaining: (games) =>
-      plural('de', games, {
-        one: `Noch ${games} Spiel bis zur Liga`,
-        other: `Noch ${games} Spiele bis zur Liga`,
-      }),
-    opensAfter: (games) =>
-      plural('de', games, {
-        one: 'Die Liga öffnet nach deinem ersten Spiel. Die Proberunde zählt nicht.',
-        other: `Die Liga öffnet nach deinen ersten ${games} Spielen. Die Proberunde zählt nicht.`,
-      }),
-    standing: (rank, size, count, points) =>
-      plural('de', count, {
-        one: `${rank}/${size} · ${points} Punkt`,
-        other: `${rank}/${size} · ${points} Punkte`,
-      }),
-    join: 'Spiel diese Woche deine erste Runde und steig in deine Liga ein.',
-    promote: 'In der Aufstiegszone',
-    demote: 'In der Abstiegszone',
-    safe: 'Du bist sicher',
-    toPromotion: (count, points) =>
-      plural('de', count, {
-        one: `${points} Punkt bis zum Aufstieg`,
-        other: `${points} Punkte bis zum Aufstieg`,
-      }),
+    rated: (league, elo) => `${league} · ${elo}`,
   },
   rival: {
     title: 'Dein Ziel',
@@ -244,7 +185,6 @@ const de: HomeMessages = {
     play: 'Spielen',
     playLabel: 'Tages-Feed spielen',
     league: 'LIGA',
-    join: 'Tritt deiner Liga bei',
     rival: 'DEIN ZIEL · DIESE WOCHE',
   },
   records: {
@@ -272,7 +212,7 @@ const ar: HomeMessages = {
     body: (why) => `${why} يمكنك اللعب، لكن نتائجك لن تدخل الترتيب.`,
   },
   today: {
-    free: 'العب بحرية',
+    free: 'العب عاديًا',
     placed: (rank, count, players) =>
       plural('ar', count, {
         one: `${iso(rank)} / لاعب واحد`,
@@ -291,39 +231,7 @@ const ar: HomeMessages = {
   },
   league: {
     title: 'الدوري',
-    locked: 'مقفل',
-    remaining: (games) =>
-      plural('ar', games, {
-        one: 'مباراة واحدة للوصول إلى الدوري',
-        two: 'مباراتان للوصول إلى الدوري',
-        few: `${games} مباريات للوصول إلى الدوري`,
-        other: `${games} مباراة للوصول إلى الدوري`,
-      }),
-    opensAfter: (games) =>
-      plural('ar', games, {
-        one: 'يُفتح الدوري بعد مباراتك الأولى. الجولة التجريبية لا تُحتسب.',
-        two: 'يُفتح الدوري بعد أول مباراتين لك. الجولة التجريبية لا تُحتسب.',
-        few: `يُفتح الدوري بعد أول ${games} مباريات لك. الجولة التجريبية لا تُحتسب.`,
-        other: `يُفتح الدوري بعد أول ${games} مباراة لك. الجولة التجريبية لا تُحتسب.`,
-      }),
-    standing: (rank, size, count, points) =>
-      plural('ar', count, {
-        one: `${iso(rank)}/${size} · نقطة واحدة`,
-        two: `${iso(rank)}/${size} · نقطتان`,
-        few: `${iso(rank)}/${size} · ${points} نقاط`,
-        other: `${iso(rank)}/${size} · ${points} نقطة`,
-      }),
-    join: 'العب أول جولة لك هذا الأسبوع لتنضم إلى دوريك.',
-    promote: 'في منطقة الصعود',
-    demote: 'في منطقة الهبوط',
-    safe: 'أنت في أمان',
-    toPromotion: (count, points) =>
-      plural('ar', count, {
-        one: 'نقطة واحدة للصعود',
-        two: 'نقطتان للصعود',
-        few: `${points} نقاط للصعود`,
-        other: `${points} نقطة للصعود`,
-      }),
+    rated: (league, elo) => `${league} · ${elo}`,
   },
   rival: {
     title: 'هدفك',
@@ -344,7 +252,6 @@ const ar: HomeMessages = {
     play: 'العب',
     playLabel: 'العب خلاصة اليوم',
     league: 'الدوري',
-    join: 'انضم إلى دوريك',
     rival: 'هدفك · هذا الأسبوع',
   },
   records: {
@@ -371,7 +278,7 @@ const fr: HomeMessages = {
     body: (why) => `${why} Tu peux jouer, mais tes scores ne seront pas classés.`,
   },
   today: {
-    free: 'Jouer librement',
+    free: 'Jouer en normal',
     placed: (rank, count, players) =>
       plural('fr', count, {
         one: `${rank} / ${players} joueur`,
@@ -387,31 +294,7 @@ const fr: HomeMessages = {
   },
   league: {
     title: 'Ligue',
-    locked: 'VERROUILLÉ',
-    remaining: (games) =>
-      plural('fr', games, {
-        one: `Encore ${games} partie avant la ligue`,
-        other: `Encore ${games} parties avant la ligue`,
-      }),
-    opensAfter: (games) =>
-      plural('fr', games, {
-        one: "La ligue s'ouvre après ta première partie. La partie d'essai ne compte pas.",
-        other: `La ligue s'ouvre après tes ${games} premières parties. La partie d'essai ne compte pas.`,
-      }),
-    standing: (rank, size, count, points) =>
-      plural('fr', count, {
-        one: `${rank}/${size} · ${points} point`,
-        other: `${rank}/${size} · ${points} points`,
-      }),
-    join: 'Joue ta première partie cette semaine pour rejoindre ta ligue.',
-    promote: 'En zone de promotion',
-    demote: 'En zone de relégation',
-    safe: "Tu es à l'abri",
-    toPromotion: (count, points) =>
-      plural('fr', count, {
-        one: `${points} point avant la promotion`,
-        other: `${points} points avant la promotion`,
-      }),
+    rated: (league, elo) => `${league} · ${elo}`,
   },
   rival: {
     title: 'Ta cible',
@@ -430,7 +313,6 @@ const fr: HomeMessages = {
     play: 'Jouer',
     playLabel: 'Jouer le Fil du jour',
     league: 'LIGUE',
-    join: 'Rejoins ta ligue',
     rival: 'TA CIBLE · CETTE SEMAINE',
   },
   records: {
@@ -459,7 +341,7 @@ const es: HomeMessages = {
       `${why} Puedes jugar, pero tus puntuaciones no entrarán en la clasificación.`,
   },
   today: {
-    free: 'Jugar libre',
+    free: 'Jugar Normal',
     placed: (rank, count, players) =>
       plural('es', count, {
         one: `${rank} / ${players} jugador`,
@@ -475,31 +357,7 @@ const es: HomeMessages = {
   },
   league: {
     title: 'Liga',
-    locked: 'BLOQUEADA',
-    remaining: (games) =>
-      plural('es', games, {
-        one: `Falta ${games} partida para la liga`,
-        other: `Faltan ${games} partidas para la liga`,
-      }),
-    opensAfter: (games) =>
-      plural('es', games, {
-        one: 'La liga se abre después de tu primera partida. La ronda de práctica no cuenta.',
-        other: `La liga se abre después de tus primeras ${games} partidas. La ronda de práctica no cuenta.`,
-      }),
-    standing: (rank, size, count, points) =>
-      plural('es', count, {
-        one: `${rank}/${size} · ${points} punto`,
-        other: `${rank}/${size} · ${points} puntos`,
-      }),
-    join: 'Juega tu primera partida esta semana para unirte a tu liga.',
-    promote: 'En zona de ascenso',
-    demote: 'En zona de descenso',
-    safe: 'Estás a salvo',
-    toPromotion: (count, points) =>
-      plural('es', count, {
-        one: `${points} punto para el ascenso`,
-        other: `${points} puntos para el ascenso`,
-      }),
+    rated: (league, elo) => `${league} · ${elo}`,
   },
   rival: {
     title: 'Tu objetivo',
@@ -518,7 +376,6 @@ const es: HomeMessages = {
     play: 'Jugar',
     playLabel: 'Jugar el Feed del día',
     league: 'LIGA',
-    join: 'Únete a tu liga',
     rival: 'TU OBJETIVO · ESTA SEMANA',
   },
   records: {

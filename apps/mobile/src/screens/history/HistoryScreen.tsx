@@ -23,7 +23,7 @@ import { SPACE } from '@/ui/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'History'>;
 
-type Filter = 'all' | 'daily' | 'vs';
+type Filter = 'all' | 'daily' | 'rated' | 'vs';
 
 type Day = { key: string; title: string; data: RunSummary[] };
 
@@ -52,6 +52,7 @@ export function HistoryScreen({ navigation }: Props) {
           options={[
             { value: 'all', label: words.filters.all, icon: 'history' },
             { value: 'daily', label: words.filters.daily, icon: 'calendar' },
+            { value: 'rated', label: words.filters.rated, icon: 'shield' },
             { value: 'vs', label: words.filters.vs, icon: 'swords' },
           ]}
         />

@@ -10,6 +10,8 @@ import type {
   PlayerCard,
   PlayerSummary,
   Ranks,
+  RatingResponse,
+  RunRating,
   RunSummary,
   WaitingDuel,
 } from '@quezby/types';
@@ -113,6 +115,7 @@ export function buildCard(overrides: Partial<PlayerCard> = {}): PlayerCard {
     createdAt: '2026-09-01T12:00:00.000Z',
     best: { score: 9_870, reels: 64, achievedAt: '2026-09-20T18:00:00.000Z' },
     league: 'silver',
+    rating: 1_640,
     ranks: { weekly: 12, all: 340 },
     stats: { runs: 42, reels: 2_310, likes: 510, perfects: 88 },
     friends: 7,
@@ -224,6 +227,80 @@ export function buildRunSummary(overrides: Partial<RunSummary> = {}): RunSummary
     isBest: false,
     dailyNumber: null,
     duel: null,
+    ...overrides,
+  };
+}
+
+/** A placed player's rating: Gümüş, 1.640, a run from Altın. */
+export function buildRating(overrides: Partial<RatingResponse> = {}): RatingResponse {
+  return {
+    unlock: null,
+    placed: true,
+    rating: 1_640,
+    tier: 'silver',
+    floor: 1_000,
+    ceil: 2_000,
+    progress: 640,
+    target: 72_400,
+    peak: 1_702,
+    placement: null,
+    provisional: false,
+    shield: null,
+    history: [
+      {
+        kind: 'run',
+        delta: 42,
+        before: 1_598,
+        after: 1_640,
+        score: 98_120,
+        target: 66_100,
+        tier: 'silver',
+        runId: 'run-1',
+        at: '2026-10-01T09:00:00.000Z',
+      },
+    ],
+    ...overrides,
+  };
+}
+
+/** A rating still placing: `played` of five runs in. */
+export function buildPlacing(played = 2): RatingResponse {
+  return buildRating({
+    placed: false,
+    rating: null,
+    tier: null,
+    floor: null,
+    ceil: null,
+    progress: null,
+    target: null,
+    peak: null,
+    placement: { played, required: 3 },
+    history: [],
+  });
+}
+
+/** Dereceli still shut: `remaining` of twenty Normal and Günlük games to go. */
+export function buildLocked(remaining = 12): RatingResponse {
+  return {
+    ...buildPlacing(0),
+    unlock: { required: 20, remaining, placement: 3 },
+    placement: { played: 0, required: 3 },
+  };
+}
+
+/** What a counted run did to the rating: +42 in Gümüş. */
+export function buildRunRating(overrides: Partial<RunRating> = {}): RunRating {
+  return {
+    kind: 'run',
+    before: 1_598,
+    after: 1_640,
+    delta: 42,
+    tierBefore: 'silver',
+    tier: 'silver',
+    target: 66_100,
+    nextTarget: 72_400,
+    placement: null,
+    shielded: false,
     ...overrides,
   };
 }

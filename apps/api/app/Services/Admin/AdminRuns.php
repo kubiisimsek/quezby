@@ -25,6 +25,7 @@ final class AdminRuns
 {
     public function __construct(
         private readonly AuditLog $audit,
+        private readonly AdminRatings $ratings,
     ) {}
 
     /**
@@ -83,6 +84,7 @@ final class AdminRuns
                 'clientReels' => $run->client_reels,
                 'stats' => $run->stats,
                 'duel' => $this->duel($run),
+                'rating' => $this->ratings->ofRun($run),
             ],
             'timeline' => $timeline,
             'timelineUnavailable' => $unavailable,

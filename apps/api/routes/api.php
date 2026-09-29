@@ -16,7 +16,6 @@ use App\Http\Controllers\HealthController;
 use App\Http\Controllers\IdentityController;
 use App\Http\Controllers\InboxController;
 use App\Http\Controllers\LeaderboardController;
-use App\Http\Controllers\LeagueController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MeController;
 use App\Http\Controllers\MediaController;
@@ -24,6 +23,7 @@ use App\Http\Controllers\ModerationController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OpsController;
 use App\Http\Controllers\PushTokenController;
+use App\Http\Controllers\RatingController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RunController;
 use App\Http\Controllers\RunHistoryController;
@@ -97,10 +97,12 @@ Route::prefix('v1')->group(function () {
             Route::post('runs', [RunController::class, 'store'])->middleware('throttle:run-start');
             Route::post('runs/{runId}/checkpoint', [RunController::class, 'checkpoint'])->middleware('throttle:run-checkpoint');
             Route::post('runs/{runId}/finish', [RunController::class, 'finish'])->middleware('throttle:run-finish');
+            Route::post('runs/{runId}/cancel', [RunController::class, 'cancel'])->middleware('throttle:run-finish');
 
             Route::get('leaderboards/{board}', LeaderboardController::class)->whereIn('board', LeaderboardPeriod::boardValues())->middleware('throttle:reads');
             Route::get('daily', DailyController::class)->middleware('throttle:reads');
-            Route::get('leagues/current', LeagueController::class)->middleware('throttle:reads');
+            Route::get('rating', [RatingController::class, 'show'])->middleware('throttle:reads');
+            Route::get('ratings', [RatingController::class, 'board'])->middleware('throttle:reads');
 
             Route::post('analytics/visits', AnalyticsController::class)->middleware('throttle:analytics');
 
@@ -153,8 +155,8 @@ Route::prefix('v1')->group(function () {
                 Route::get('analytics', Admin\AnalyticsController::class)->name('analytics');
                 Route::get('boards', [Admin\BoardController::class, 'index'])->name('boards.index');
                 Route::get('boards/keys', [Admin\BoardController::class, 'keys'])->name('boards.keys');
-                Route::get('leagues', [Admin\LeagueController::class, 'index'])->name('leagues.index');
-                Route::get('leagues/groups/{group}', [Admin\LeagueController::class, 'show'])->whereNumber('group')->name('leagues.show');
+                Route::get('ratings', [Admin\RatingController::class, 'index'])->name('ratings.index');
+                Route::get('ratings/calibration', [Admin\RatingController::class, 'calibration'])->name('ratings.calibration');
                 Route::get('content', Admin\ContentController::class)->name('content');
                 Route::get('reports', [Admin\ReportController::class, 'index'])->name('reports.index');
             });

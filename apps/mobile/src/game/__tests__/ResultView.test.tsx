@@ -7,7 +7,7 @@ import { track } from '@/analytics/track';
 import { ResultView } from '@/game/ResultView';
 import type { Outcome } from '@/game/useGame';
 import { useLanguage } from '@/i18n/language';
-import { buildDuel } from '@/test/factories';
+import { buildDuel, buildRunRating } from '@/test/factories';
 import { renderWithProviders } from '@/test/renderWithProviders';
 
 jest.mock('@/analytics/track', () => ({ track: jest.fn() }));
@@ -70,13 +70,7 @@ function response(
     },
     passed: [{ username: 'ayse', avatarUrl: null, score: 101_000, isFriend: true }],
     daily: null,
-    league: {
-      tier: 'gold',
-      rank: 4,
-      members: 30,
-      zone: 'promote',
-      points: 250_000,
-    },
+    rating: null,
     leagueUnlock: null,
     shareText:
       "Quezby'de 104.560 puan yaptım! 245 post · bu hafta #12. Sen kaç yaparsın?",
@@ -92,7 +86,6 @@ function vsResponse(duel: FinishRunResponse['duel']): FinishRunResponse {
     run: { ...base.run, mode: 'vs', status: 'played' },
     isNewBest: false,
     passed: [],
-    league: null,
     shareText: null,
     duel,
   });
@@ -162,8 +155,105 @@ describe('ResultView', () => {
     expect(screen.getByText('▼11')).toBeTruthy();
     expect(screen.getByText('x1,50')).toBeTruthy();
     expect(screen.getByText('@ayse · arkadaşın')).toBeTruthy();
-    expect(screen.getByText('Altın lig · #4/30')).toBeTruthy();
-    expect(screen.getByText('Terfi bölgesindesin')).toBeTruthy();
+    // There is no weekly group: nothing about one after a run.
+    expect(screen.queryByText(/lig · #/)).toBeNull();
+  });
+
+  it('shows what the run did to the Elo: where it stands, the move, the target and the next one', async () => {
+    await view({ mode: 'verified', response: response({ rating: buildRunRating() }) }).render();
+
+    expect(screen.getByText('ELO')).toBeTruthy();
+    expect(screen.getByText('1.640')).toBeTruthy();
+    expect(screen.getByTestId('rating-delta')).toHaveTextContent('+42');
+    expect(screen.getByText('Skor 104.560 · Hedef 66.100')).toBeTruthy();
+    expect(screen.getByText('Sıradaki hedef 72.400')).toBeTruthy();
+    expect(screen.queryByText(/yükseldin|düştün/)).toBeNull();
+  });
+
+  it('says a new league in gold', async () => {
+    await view({
+      mode: 'verified',
+      response: response({
+        rating: buildRunRating({ before: 1_990, after: 2_030, delta: 40, tierBefore: 'silver', tier: 'gold' }),
+      }),
+    }).render();
+
+    expect(screen.getByText("Altın'a yükseldin!")).toBeTruthy();
+  });
+
+  it('says a fall with the league it fell to, and the loss with a real minus', async () => {
+    await view({
+      mode: 'verified',
+      response: response({
+        rating: buildRunRating({ before: 2_010, after: 1_992, delta: -18, tierBefore: 'gold', tier: 'silver' }),
+      }),
+    }).render();
+
+    expect(screen.getByText("Gümüş'e düştün.")).toBeTruthy();
+    expect(screen.getByTestId('rating-delta')).toHaveTextContent('\u221218');
+  });
+
+  it('says when a fresh promotion’s shield held', async () => {
+    await view({
+      mode: 'verified',
+      response: response({
+        rating: buildRunRating({ delta: 0, after: 2_000, before: 2_000, tier: 'gold', tierBefore: 'gold', shielded: true }),
+      }),
+    }).render();
+
+    expect(screen.getByText('Kalkan seni ligde tuttu')).toBeTruthy();
+  });
+
+  it('says when a run was a forfeit', async () => {
+    await view({
+      mode: 'verified',
+      response: response({ rating: buildRunRating({ kind: 'forfeit', delta: -100, before: 1_640, after: 1_540 }) }),
+    }).render();
+
+    expect(screen.getByText('Hükmen yenilgi')).toBeTruthy();
+  });
+
+  it('counts the placement runs', async () => {
+    await view({
+      mode: 'verified',
+      response: response({
+        rating: buildRunRating({
+          kind: 'placement', before: null, after: null, delta: 0, tierBefore: null, tier: null,
+          target: null, nextTarget: null, placement: { played: 2, required: 3 },
+        }),
+      }),
+    }).render();
+
+    expect(screen.getByText('Yerleşme 2/3')).toBeTruthy();
+    expect(screen.getByText('İlk 3 dereceli oyunun hangi ligde başlayacağını belirler.')).toBeTruthy();
+  });
+
+  it('says where the last placement run placed the player', async () => {
+    await view({
+      mode: 'verified',
+      response: response({
+        rating: buildRunRating({
+          kind: 'placement', before: null, after: 1_500, delta: 0, tierBefore: null, tier: 'silver',
+          target: null, nextTarget: 58_400, placement: { played: 5, required: 5 },
+        }),
+      }),
+    }).render();
+
+    expect(screen.getByText('Yerleştin: Gümüş lig!')).toBeTruthy();
+    expect(screen.getByText('1.500')).toBeTruthy();
+    expect(screen.queryByTestId('rating-delta')).toBeNull();
+  });
+
+  it('says a held run counts once it is checked', async () => {
+    await view({ mode: 'verified', response: response({ rating: buildRunRating({ kind: 'pending' }) }) }).render();
+
+    expect(screen.getByText('Skorun incelenince Elo’ya yazılır')).toBeTruthy();
+  });
+
+  it('says a run that did not count', async () => {
+    await view({ mode: 'verified', response: response({ rating: buildRunRating({ kind: 'void' }) }) }).render();
+
+    expect(screen.getByText('Bu tur Elo’ya sayılmadı')).toBeTruthy();
   });
 
   it('reads each board’s place and its move aloud in words', async () => {
@@ -315,7 +405,7 @@ describe('ResultView', () => {
 
     expect(screen.getByText('Günün akışı #3')).toBeTruthy();
     expect(screen.getByText('#37 / 1.204 oyuncu')).toBeTruthy();
-    await fireEvent.press(screen.getByText('Serbest oyna'));
+    await fireEvent.press(screen.getByText('Normal oyna'));
     expect(handlers.onPlayFree).toHaveBeenCalled();
     await fireEvent.press(screen.getByText('Günün tablosu'));
     expect(handlers.onOpenDaily).toHaveBeenCalled();
@@ -384,14 +474,26 @@ describe('ResultView', () => {
     expect(screen.queryByText('Sıradan post')).toBeNull();
   });
 
-  it('says how many counted runs the league still waits for', async () => {
+  it('says how many Normal or Günlük games Dereceli still waits for', async () => {
     await view({
       mode: 'verified',
-      response: response({ league: null, leagueUnlock: { required: 3, remaining: 2 } }),
+      response: response({ leagueUnlock: { required: 20, remaining: 2, placement: 3 } }),
     }).render();
 
-    expect(screen.getByText('Lige 2 oyun kaldı')).toBeTruthy();
-    expect(screen.getByText('Lig, ilk 3 oyunundan sonra açılır.')).toBeTruthy();
+    expect(screen.getByText('Dereceli’ye 2 oyun kaldı')).toBeTruthy();
+    expect(screen.getByText('Dereceli, 20 Normal ya da Günlük oyundan sonra açılır.')).toBeTruthy();
+    expect(screen.queryByText('Dereceli açıldı!')).toBeNull();
+  });
+
+  it('celebrates the run that opens Dereceli, with the placement games ahead', async () => {
+    await view({
+      mode: 'verified',
+      response: response({ leagueUnlock: { required: 20, remaining: 0, placement: 3 } }),
+    }).render();
+
+    expect(screen.getByText('Dereceli açıldı!')).toBeTruthy();
+    expect(screen.getByText('İlk 3 dereceli oyunun Elo’nu belirler.')).toBeTruthy();
+    expect(screen.queryByText(/oyun kaldı/)).toBeNull();
   });
 
   it('sends a VS: the friend is told, the score kept from them, and the way back is the conversation', async () => {
@@ -498,9 +600,6 @@ describe('ResultView', () => {
       expect(
         screen.getByLabelText('@ayse, your friend, 101,000 points, you passed them'),
       ).toBeTruthy();
-      expect(screen.getByText('Gold league · #4/30')).toBeTruthy();
-      expect(screen.getByText('In the promotion zone')).toBeTruthy();
-      expect(screen.getByText('250,000 points this week')).toBeTruthy();
       expect(screen.getByText('Play again')).toBeTruthy();
       expect(screen.getByText('Share')).toBeTruthy();
       expect(screen.getByText('Back to home')).toBeTruthy();
@@ -520,9 +619,6 @@ describe('ResultView', () => {
       expect(screen.getByLabelText('الشهر: المركز 80')).toBeTruthy();
       expect(screen.getByLabelText('الكل: المركز 311، تراجع 11 مركزًا')).toBeTruthy();
       expect(screen.getByText('\u200E@ayse\u200E · صديقك')).toBeTruthy();
-      expect(screen.getByText('دوري الذهب · \u200E#4/30\u200E')).toBeTruthy();
-      expect(screen.getByText('في منطقة الصعود')).toBeTruthy();
-      expect(screen.getByText('250,000 نقطة هذا الأسبوع')).toBeTruthy();
       expect(screen.getByText('العب مجددًا')).toBeTruthy();
       expect(screen.getByText('العودة إلى الرئيسية')).toBeTruthy();
     });
@@ -573,7 +669,7 @@ describe('ResultView', () => {
       expect(screen.getByText('Daily Feed #3')).toBeTruthy();
       expect(screen.getByText('#37 / 1,204 players')).toBeTruthy();
       expect(screen.getByText("Today's board")).toBeTruthy();
-      expect(screen.getByText('Free play')).toBeTruthy();
+      expect(screen.getByText('Play Normal')).toBeTruthy();
       expect(screen.getByRole('image', { name: 'Result grid: 🟩🟨🟥⬛' })).toBeTruthy();
     });
 
@@ -588,15 +684,15 @@ describe('ResultView', () => {
       expect(screen.getByText(/security check didn't approve this device: .*You can keep playing\.$/)).toBeTruthy();
     });
 
-    it('counts the games left before the league in Arabic', async () => {
+    it('counts the games left before Ranked in Arabic', async () => {
       useLanguage.setState({ locale: 'ar' });
       await view({
         mode: 'verified',
-        response: response({ league: null, leagueUnlock: { required: 3, remaining: 2 } }),
+        response: response({ leagueUnlock: { required: 20, remaining: 2, placement: 3 } }),
       }).render();
 
-      expect(screen.getByText('مباراتان للوصول إلى الدوري')).toBeTruthy();
-      expect(screen.getByText('يُفتح الدوري بعد أول 3 مباريات لك.')).toBeTruthy();
+      expect(screen.getByText('مباراتان للوصول إلى المصنَّف')).toBeTruthy();
+      expect(screen.getByText('يُفتح اللعب المصنَّف بعد 20 مباراة عادية أو يومية.')).toBeTruthy();
     });
 
     it('marks an offline run as training in Arabic, with the unit its score takes', async () => {
@@ -655,6 +751,25 @@ describe('ResultView', () => {
         jest.advanceTimersByTime(2_500);
       });
       expect(screen.queryByTestId('confetti')).toBeNull();
+    });
+
+    it('fires confetti for a new league as its tile lands, without a record', async () => {
+      await view({
+        mode: 'verified',
+        response: response({
+          isNewBest: false,
+          rating: buildRunRating({ before: 1_990, after: 2_030, delta: 40, tierBefore: 'silver', tier: 'gold' }),
+        }),
+      }).render();
+
+      await act(async () => {
+        jest.advanceTimersByTime(1_300);
+      });
+      expect(screen.queryByTestId('confetti')).toBeNull();
+      await act(async () => {
+        jest.advanceTimersByTime(400);
+      });
+      expect(screen.getByTestId('confetti')).toBeTruthy();
     });
 
     it('never fires confetti for a run that is not a record', async () => {

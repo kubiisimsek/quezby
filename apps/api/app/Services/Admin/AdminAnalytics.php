@@ -255,8 +255,9 @@ final class AdminAnalytics
             ->where('runs.score', '>', 0))->count();
 
         $league = $cohort()->whereExists(fn (QueryBuilder $query) => $query->selectRaw('1')
-            ->from('league_members')
-            ->whereColumn('league_members.user_id', 'users.id'))->count();
+            ->from('player_ratings')
+            ->whereColumn('player_ratings.user_id', 'users.id')
+            ->whereNotNull('player_ratings.rating'))->count();
 
         $before = $this->analytics->todayStart()->format($format);
         $couldReturn = $cohort()->where('users.created_at', '<', $before)->count();

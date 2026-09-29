@@ -4,9 +4,9 @@ namespace App\Services;
 
 use App\Enums\LeaderboardPeriod;
 use App\Enums\PlayerRelation;
-use App\Models\LeagueMember;
 use App\Models\User;
 use App\Services\Avatars\AvatarService;
+use App\Services\Rating\RatingService;
 use App\Services\Social\FriendService;
 use App\Support\Timestamp;
 use App\Support\Username;
@@ -16,7 +16,7 @@ use Illuminate\Support\Collection;
 /**
  * Players as other players see them. Search, the profile card and the friend
  * lists all shape a player here, with the same handful of queries whatever
- * the page size: every best, league seat and relation is fetched at once. A
+ * the page size: every best, rating and relation is fetched at once. A
  * banned player is shown to nobody but themselves, and a player who blocked
  * the viewer is not there for them.
  */
@@ -26,7 +26,7 @@ final class PlayerDirectory
 
     public function __construct(
         private readonly LeaderboardService $leaderboards,
-        private readonly LeagueService $leagues,
+        private readonly RatingService $ratings,
         private readonly FriendService $friends,
     ) {}
 
@@ -87,7 +87,7 @@ final class PlayerDirectory
             ->toBase()
             ->pluck('score', 'user_id')
             ->all();
-        $tiers = $this->tiersOf($ids);
+        $tiers = $this->ratings->tiersOf($ids);
         $relations = $this->friends->relations($viewer, $ids);
 
         return $players->map(fn (User $player) => [
@@ -110,9 +110,9 @@ final class PlayerDirectory
     }
 
     /**
-     * `PlayerCard` in `packages/types`: the season's best and ranks, this
-     * week's league, lifetime numbers, friends and what the two are to each
-     * other.
+     * `PlayerCard` in `packages/types`: the season's best and ranks, the
+     * rating and its league, lifetime numbers, friends and what the two are
+     * to each other.
      *
      * @return array<string, mixed>
      */
@@ -131,7 +131,8 @@ final class PlayerDirectory
                 'reels' => $best->reels,
                 'achievedAt' => Timestamp::iso($best->achieved_at),
             ],
-            'league' => $this->tiersOf([$player->id])[$player->id] ?? null,
+            'league' => $this->ratings->tiersOf([$player->id])[$player->id] ?? null,
+            'rating' => $this->ratings->ratingsOf([$player->id])[$player->id] ?? null,
             'ranks' => [
                 'weekly' => $weekly === null ? null : $this->leaderboards->rankOf($weekly),
                 'all' => $best === null ? null : $this->leaderboards->rankOf($best),
@@ -146,26 +147,5 @@ final class PlayerDirectory
             'relation' => ($player->is($viewer) ? PlayerRelation::None : $this->friends->relation($viewer, $player))->value,
             'isMe' => $player->is($viewer),
         ];
-    }
-
-    /**
-     * This week's league of each player seated in one, as its slug.
-     *
-     * @param  list<string>  $ids
-     * @return array<string, string>
-     */
-    private function tiersOf(array $ids): array
-    {
-        if ($ids === []) {
-            return [];
-        }
-
-        return LeagueMember::query()
-            ->where('season', $this->leaderboards->season())
-            ->where('week_key', $this->leagues->weekKey(now()))
-            ->whereIn('user_id', $ids)
-            ->get(['user_id', 'tier'])
-            ->mapWithKeys(fn (LeagueMember $member) => [$member->user_id => $member->tier->slug()])
-            ->all();
     }
 }

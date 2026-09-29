@@ -109,7 +109,7 @@ test('refuses a period that does not fit the board', function (array $query, str
 })->with([
     [['board' => 'weekly', 'key' => '2026-09-25'], 'key'],
     [['board' => 'challenge', 'key' => '2026-W39'], 'key'],
-    // The day's rows only add up league points; no board shows them.
+    // A day names no board.
     [['board' => 'daily'], 'board'],
     [['board' => 'all', 'key' => '2026'], 'key'],
     [['board' => 'yearly'], 'board'],

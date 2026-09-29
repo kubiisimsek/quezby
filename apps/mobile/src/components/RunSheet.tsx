@@ -20,7 +20,7 @@ import {
 import { Sheet } from '@/ui/sheet';
 import { FONT, SPACE, TYPE, embossed, lh, useTheme } from '@/ui/theme';
 
-/** A past game's name: free play, the day's challenge by its number, or a VS by who it was against. */
+/** A past game's name: Normal, the day's challenge by its number, Dereceli, or a VS by who it was against. */
 export function runTitle(summary: RunSummary, t: Messages): string {
   const words = t.history.kinds;
   switch (summary.mode) {
@@ -28,6 +28,8 @@ export function runTitle(summary: RunSummary, t: Messages): string {
       return t.daily.numbered(t.fmt.score(summary.dailyNumber ?? 0));
     case 'vs':
       return summary.duel?.opponent ? words.vs(handle(summary.duel.opponent)) : words.vsGone;
+    case 'rated':
+      return words.rated;
     default:
       return words.free;
   }
@@ -40,6 +42,8 @@ export function runLook(summary: RunSummary): { icon: IconName; tone: TagTone } 
       return { icon: 'calendar', tone: 'warn' };
     case 'vs':
       return { icon: 'swords', tone: 'secondary' };
+    case 'rated':
+      return { icon: 'shield', tone: 'ok' };
     default:
       return { icon: 'play', tone: 'primary' };
   }

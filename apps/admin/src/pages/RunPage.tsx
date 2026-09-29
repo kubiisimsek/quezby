@@ -1,10 +1,11 @@
-import type { AdminRunResponse } from '@quezby/types';
+import type { AdminRunRating, AdminRunResponse } from '@quezby/types';
 import {
   CircleCheck,
   CircleX,
   Clock,
   Crosshair,
   Gamepad2,
+  Gauge,
   Hash,
   ScrollText,
   ShieldAlert,
@@ -29,7 +30,7 @@ import { Facts } from '@/components/patterns/facts';
 import { Page } from '@/components/patterns/page';
 import { RunTimeline } from '@/components/patterns/run-timeline';
 import { useRun } from '@/hooks/api/runs';
-import { auditColumns } from '@/lib/columns';
+import { auditColumns, EloDelta, TierTag } from '@/lib/columns';
 import { errorMessage, isApiError } from '@/lib/errors';
 import {
   DEVICE_VERDICT,
@@ -37,11 +38,14 @@ import {
   END_REASON,
   formatDateTime,
   formatDayKey,
+  formatDelta,
   formatDuration,
   formatMs,
   formatNumber,
   formatPerMille,
+  formatRatingMove,
   playerName,
+  RATING_KIND,
   RUN_FLAG,
   RUN_MODE,
   RUN_STATUS,
@@ -213,6 +217,7 @@ export function RunPage() {
 
         <div className="space-y-6">
           <RunFacts data={data} />
+          <RatingCard rating={me.rating} />
           <DataTable
             title="Kayıt"
             icon={<ScrollText />}
@@ -279,5 +284,52 @@ function RunFacts({ data }: { data: AdminRunResponse }) {
         />
       </Panel>
     </>
+  );
+}
+
+/**
+ * What the run did to its player's rating: why, by how much, against which
+ * target — and what a moderator's reject took back.
+ */
+function RatingCard({ rating }: { rating: AdminRunRating | null }) {
+  if (!rating) {
+    return (
+      <Panel title="Reyting" icon={<Gauge />} tone="secondary">
+        <div className="space-y-1">
+          <p className="text-body font-semibold text-ink">Bu tur reytinge dokunmadı</p>
+          <p className="text-meta text-ink-muted">VS, hâlâ açık ya da incelemede bekleyen bir tur reytinge sayılmaz.</p>
+        </div>
+      </Panel>
+    );
+  }
+
+  const kind = RATING_KIND[rating.kind];
+
+  return (
+    <Panel title="Reyting" icon={<Gauge />} tone="secondary">
+      <div className="space-y-4">
+        {rating.reversedBy !== null ? (
+          <Callout tone="warn" title={`Moderatör geri aldı: ${formatDelta(rating.reversedBy)}`}>
+            <p>Tur reddedildi; getirdiği değişim oyuncunun reytinginden geri alındı.</p>
+          </Callout>
+        ) : null}
+        <Facts
+          facts={[
+            { label: 'Ne oldu', value: <Tag tone={kind.tone} label={kind.label} />, hint: kind.hint },
+            { label: 'Değişim', value: rating.counted ? <EloDelta value={rating.delta} unit /> : 'Sayılmadı' },
+            { label: 'Reyting', value: formatRatingMove(rating.before, rating.after) },
+            { label: 'Lig', value: rating.tier ? <TierTag tier={rating.tier} /> : null },
+            { label: 'Skor', value: formatNumber(rating.score), hint: rating.target === null ? undefined : `hedef ${formatNumber(rating.target)}` },
+            { label: 'Performans', value: formatNumber(rating.performance), hint: 'Bu skoru tipik yapan reyting' },
+            { label: 'Genişlik', value: formatNumber(rating.width), hint: 'Geçici dönemde daha dar: değişim daha büyük' },
+            {
+              label: 'Terfi kalkanı',
+              value: rating.shielded ? 'Tuttu' : 'Yok',
+              hint: rating.shielded ? 'Yeni yükselişin kalkanı oyuncuyu liginde tuttu.' : undefined,
+            },
+          ]}
+        />
+      </div>
+    </Panel>
   );
 }

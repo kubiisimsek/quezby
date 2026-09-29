@@ -133,7 +133,7 @@ exceptions). Numbers are tabular in tables and tiles.
 | `patterns/secret-reveal` | a temporary password, shown once |
 | `layout/shell`, `sidebar`, `login-layout`, `gate` | the frame and the doors |
 | `moderation/*`, `boards/board-table` | the moderation dialogs and the board table every page shares |
-| `lib/columns` | the cells many tables draw: `PlayerCell` (the photo, where the row carries it), `When` (a moment on one line, the exact time on hover), `RunStatusTag` (what the status means for the boards, on hover), `FlagTags`, the audit columns |
+| `lib/columns` | the cells many tables draw: `PlayerCell` (the photo, where the row carries it), `When` (a moment on one line, the exact time on hover), `RunStatusTag` (what the status means for the boards, on hover), `FlagTags`, `TierTag` (a league's name with its medal, a crown for MasterClass), `EloDelta` (a rating move with its sign, green up, red down, grey none), the audit columns |
 
 A third copy of the same markup is a missing component.
 

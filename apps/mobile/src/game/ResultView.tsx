@@ -5,12 +5,11 @@ import type {
   DuelView,
   FinishRunResponse,
   LeaderboardPeriod,
-  LeagueStanding,
   LeagueUnlock,
-  LeagueZone,
   PassedPlayer,
   RankChange,
   RunMode,
+  RunRating,
   RunResult,
 } from '@quezby/types';
 import { useEffect, useState, type ReactNode } from 'react';
@@ -47,6 +46,7 @@ import { BONUS_ORDER, deviceFailed, reelGuide } from '@/game/howTo';
 import type { Outcome } from '@/game/useGame';
 import { handle, ltr, useT, type Messages } from '@/i18n';
 import { IS_RTL, SHRINK_TO_FIT } from '@/i18n/native';
+import { tierMove } from '@/lib/tiers';
 import { Icon, type IconName } from '@/ui/icons';
 import {
   Avatar,
@@ -71,9 +71,9 @@ import {
   TierBadge,
   Txt,
   gemColors,
+  useShake,
   type ButtonTone,
   type StatItem,
-  type TagTone,
 } from '@/ui/kit';
 import { SPRING_POP } from '@/ui/motion';
 import {
@@ -90,16 +90,6 @@ import {
 } from '@/ui/theme';
 
 const PERIODS: readonly LeaderboardPeriod[] = ['weekly', 'monthly', 'all'];
-
-/** How a league zone looks, and which of the lobby's lines names it (`t.home.league`). */
-const ZONE: Record<
-  LeagueZone,
-  { tone: TagTone; icon: IconName; line: 'promote' | 'safe' | 'demote' }
-> = {
-  promote: { tone: 'ok', icon: 'trendUp', line: 'promote' },
-  stay: { tone: 'secondary', icon: 'shield', line: 'safe' },
-  demote: { tone: 'bad', icon: 'trendDown', line: 'demote' },
-};
 
 /**
  * The result's sequence, in ms from the moment it opens: the score slams in
@@ -143,7 +133,16 @@ const SLIDE: WithTimingConfig = {
 };
 
 type Section =
-  'status' | 'vs' | 'daily' | 'breakdown' | 'stats' | 'unseen' | 'ranks' | 'passed' | 'league';
+  | 'status'
+  | 'vs'
+  | 'daily'
+  | 'rating'
+  | 'breakdown'
+  | 'stats'
+  | 'unseen'
+  | 'ranks'
+  | 'passed'
+  | 'league';
 
 type Plan = {
   crown: number;
@@ -153,17 +152,23 @@ type Plan = {
   end: number;
 };
 
-/** When each part of this result arrives. Only what is shown takes a beat. */
+/**
+ * When each part of this result arrives. Only what is shown takes a beat.
+ * The burst goes off for a record as it lands, or — without one — as the
+ * tile of a party lands: a new league, or Dereceli opening.
+ */
 function choreograph(
   shown: readonly Section[],
   counting: boolean,
   record: boolean,
+  party: 'rating' | 'league' | null = null,
 ): Plan {
   const crown = BEAT.score + (counting ? BEAT.count : 0) + BEAT.crown;
   const at: Record<Section, number> = {
     status: 0,
     vs: 0,
     daily: 0,
+    rating: 0,
     breakdown: 0,
     stats: 0,
     unseen: 0,
@@ -179,7 +184,7 @@ function choreograph(
   const dock = clock + BEAT.dock;
   return {
     crown,
-    burst: record ? crown + BEAT.burst : null,
+    burst: record ? crown + BEAT.burst : party ? at[party] + BEAT.hop : null,
     at,
     dock,
     end: dock + BEAT.settle,
@@ -283,13 +288,25 @@ export function ResultView({
   if (note) shown.push('status');
   if (duel) shown.push('vs');
   if (verified?.daily) shown.push('daily');
+  if (verified?.rating) shown.push('rating');
   if (verified) shown.push('breakdown');
   if (verified || practice) shown.push('stats');
   if (unseen.length > 0) shown.push('unseen');
   if (verified && ranked) shown.push('ranks');
   if (verified && verified.passed.length > 0) shown.push('passed');
-  if (verified?.league || verified?.leagueUnlock) shown.push('league');
-  const plan = choreograph(shown, score !== null, record);
+  if (verified?.leagueUnlock) shown.push('league');
+  const rating = verified?.rating ?? null;
+  const promotion =
+    rating !== null &&
+    rating.after !== null &&
+    (rating.kind === 'placement' || tierMove(rating.tierBefore, rating.tier) === 'up');
+  const opened = verified?.leagueUnlock?.remaining === 0;
+  const plan = choreograph(
+    shown,
+    score !== null,
+    record,
+    promotion ? 'rating' : opened ? 'league' : null,
+  );
 
   const [skipped, setSkipped] = useState(reduced);
   const [playing, setPlaying] = useState(!reduced);
@@ -728,6 +745,12 @@ function Verified({
         </Rise>
       ) : null}
 
+      {response.rating ? (
+        <Rise at={plan.at.rating} skipped={skipped}>
+          <RatingTile rating={response.rating} score={run.score} at={plan.at.rating} skipped={skipped} />
+        </Rise>
+      ) : null}
+
       <Rise at={plan.at.breakdown} skipped={skipped}>
         <Breakdown run={run} at={plan.at.breakdown} skipped={skipped} />
       </Rise>
@@ -761,11 +784,7 @@ function Verified({
         </Rise>
       ) : null}
 
-      {response.league ? (
-        <Rise at={plan.at.league} skipped={skipped}>
-          <LeagueTile league={response.league} />
-        </Rise>
-      ) : response.leagueUnlock ? (
+      {response.leagueUnlock ? (
         <Rise at={plan.at.league} skipped={skipped}>
           <LeagueUnlockTile unlock={response.leagueUnlock} />
         </Rise>
@@ -861,18 +880,162 @@ function VsSide({ label, side }: { label: string; side: DuelSide | null }) {
   );
 }
 
-/** The league before it opens: how many counted runs it still waits for. */
+/**
+ * What the run did to the Elo, on the result's clock: the league's emblem,
+ * the rating counting up to where it stands, the move slammed in — green up,
+ * red down — and the score against the target. A new league is said in gold
+ * (the burst goes off with it), a fall in red with a shake. Placement counts
+ * its runs; a held run and one that did not count say so.
+ */
+function RatingTile({
+  rating,
+  score,
+  at,
+  skipped,
+}: {
+  rating: RunRating;
+  score: number;
+  at: number;
+  skipped: boolean;
+}) {
+  const theme = useTheme();
+  const t = useT();
+  const words = t.rating.result;
+  const move = tierMove(rating.tierBefore, rating.tier);
+  const { style: shaken, shake } = useShake();
+
+  useEffect(() => {
+    if (move !== 'down') return;
+    const timer = setTimeout(shake, skipped ? 0 : at + BEAT.hop);
+    return () => clearTimeout(timer);
+    // Not on `shake`: it is a fresh function each render, and a fall shakes once.
+  }, [at, move, skipped]);
+
+  if (rating.kind === 'pending' || rating.kind === 'void') {
+    return (
+      <Panel style={styles.league}>
+        <IconChip icon={rating.kind === 'pending' ? 'hourglass' : 'info'} tone="secondary" />
+        <Txt variant="meta" tone="muted" style={styles.leagueText}>
+          {rating.kind === 'pending' ? words.pending : words.void}
+        </Txt>
+      </Panel>
+    );
+  }
+
+  if (rating.after === null || rating.tier === null) {
+    const placement = rating.placement ?? { played: 0, required: 1 };
+    return (
+      <Panel style={styles.unlock}>
+        <View style={styles.league}>
+          <IconChip icon="flag" tone="secondary" size="lg" />
+          <View style={styles.leagueText}>
+            <Txt variant="title">{t.rating.placement.title(placement.played, placement.required)}</Txt>
+            <Txt variant="meta" tone="muted">
+              {t.rating.placement.hint(placement.required)}
+            </Txt>
+          </View>
+        </View>
+        <Meter value={placement.played / placement.required} tone="secondary" notches={placement.required} />
+      </Panel>
+    );
+  }
+
+  const placed = rating.kind === 'placement';
+  const headline = placed
+    ? words.placed(rating.tier)
+    : move === 'up'
+      ? words.promoted(rating.tier)
+      : move === 'down'
+        ? words.demoted(rating.tier)
+        : null;
+  const deltaColor = rating.delta > 0 ? theme.ok : rating.delta < 0 ? theme.bad : theme.inkMuted;
+
+  return (
+    <Animated.View style={shaken}>
+      <Panel style={styles.rating}>
+        <View style={styles.league}>
+          <Slam at={at + BEAT.inner} skipped={skipped} from={placed || move === 'up' ? 1.8 : 1.2}>
+            <TierBadge tier={rating.tier} size="lg" />
+          </Slam>
+          <View style={styles.leagueText}>
+            <Text style={[TYPE.label, { color: theme.inkMuted }]}>{words.ribbon}</Text>
+            <View style={styles.ratingRow}>
+              <CountUp
+                value={rating.after}
+                format={(value) => t.fmt.score(Math.round(value))}
+                delay={skipped ? 0 : at}
+                duration={skipped ? 0 : 700}
+                style={[styles.ratingValue, { color: theme.ink }, embossed(2)]}
+              />
+              {placed ? null : (
+                <Slam at={at + BEAT.inner * 3} skipped={skipped}>
+                  <Text testID="rating-delta" style={[styles.ratingDelta, { color: deltaColor }, embossed(2)]}>
+                    {t.rating.delta(rating.delta)}
+                  </Text>
+                </Slam>
+              )}
+            </View>
+          </View>
+        </View>
+        {headline ? (
+          <Txt variant="title" style={{ color: move === 'down' ? theme.badText : theme.gold }}>
+            {headline}
+          </Txt>
+        ) : null}
+        {rating.target !== null ? (
+          <Txt variant="meta" tone="muted">
+            {words.line(t.fmt.score(score), t.fmt.score(rating.target))}
+          </Txt>
+        ) : null}
+        <View style={styles.ratingTags}>
+          {rating.kind === 'forfeit' ? <Tag label={words.forfeit} tone="bad" icon="close" /> : null}
+          {rating.shielded ? <Tag label={words.shielded} tone="secondary" icon="shield" /> : null}
+          {rating.nextTarget !== null ? (
+            <Tag label={words.next(t.fmt.score(rating.nextTarget))} tone="neutral" icon="target" />
+          ) : null}
+        </View>
+      </Panel>
+    </Animated.View>
+  );
+}
+
+/**
+ * Dereceli before it opens: how many Normal or Günlük games it still waits
+ * for. The run that opens it says so, in gold, with the burst.
+ */
 function LeagueUnlockTile({ unlock }: { unlock: LeagueUnlock }) {
+  const theme = useTheme();
   const t = useT();
   const played = unlock.required - unlock.remaining;
+
+  if (unlock.remaining === 0) {
+    return (
+      <Panel style={styles.unlock}>
+        <View style={styles.league}>
+          <Stamp from={1.8} delay={120}>
+            <IconChip icon="shield" tone="warn" size="lg" />
+          </Stamp>
+          <View style={styles.leagueText}>
+            <Txt variant="title" style={{ color: theme.gold }}>
+              {t.modes.opened.title}
+            </Txt>
+            <Txt variant="meta" tone="muted">
+              {t.modes.opened.body(unlock.placement)}
+            </Txt>
+          </View>
+        </View>
+      </Panel>
+    );
+  }
+
   return (
     <Panel style={styles.unlock}>
       <View style={styles.league}>
         <IconChip icon="lock" tone="secondary" size="lg" />
         <View style={styles.leagueText}>
-          <Txt variant="title">{t.league.locked.title(unlock.remaining)}</Txt>
+          <Txt variant="title">{t.modes.lockedTitle(unlock.remaining)}</Txt>
           <Txt variant="meta" tone="muted">
-            {t.result.unlockBody(unlock.required)}
+            {t.modes.lockedBody(unlock.required)}
           </Txt>
         </View>
       </View>
@@ -1277,29 +1440,6 @@ function PassedRow({
   );
 }
 
-function LeagueTile({ league }: { league: LeagueStanding }) {
-  const t = useT();
-  const zone = ZONE[league.zone];
-  return (
-    <Panel style={styles.league}>
-      <TierBadge tier={league.tier} size="lg" />
-      <View style={styles.leagueText}>
-        <Txt variant="title" numberOfLines={1}>
-          {t.result.league.title(
-            t.tiers.league(league.tier),
-            t.fmt.rank(league.rank),
-            league.members,
-          )}
-        </Txt>
-        <Tag label={t.home.league[zone.line]} tone={zone.tone} icon={zone.icon} />
-        <Txt variant="meta" tone="muted">
-          {t.result.league.weekly(league.points, t.fmt.score(league.points))}
-        </Txt>
-      </View>
-    </Panel>
-  );
-}
-
 type DockAction = { label: string; tone: ButtonTone; onPress: () => void };
 
 /**
@@ -1524,6 +1664,11 @@ const styles = StyleSheet.create({
   league: { alignItems: 'center', flexDirection: 'row', gap: SPACE.md },
   leagueText: { flex: 1, gap: SPACE.xs },
   unlock: { gap: SPACE.md },
+  rating: { gap: SPACE.sm },
+  ratingRow: { alignItems: 'baseline', flexDirection: 'row', flexWrap: 'wrap', gap: SPACE.sm },
+  ratingValue: { fontFamily: FONT.display, fontSize: 30, lineHeight: lh(36) },
+  ratingDelta: { fontFamily: FONT.display, fontSize: 22, lineHeight: lh(27) },
+  ratingTags: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACE.xs },
   unseen: { gap: SPACE.md },
   unseenRow: { alignItems: 'center', flexDirection: 'row', gap: SPACE.md },
   dock: {

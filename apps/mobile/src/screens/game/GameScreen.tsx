@@ -86,7 +86,7 @@ export function GameScreen({ navigation, route }: Props) {
 
   useEffect(() => {
     if (game.phase !== 'result' || tutorial) return;
-    for (const key of ['leaderboard', 'me', 'daily', 'league', 'stats', 'history', 'inbox', 'friends', 'thread']) {
+    for (const key of ['leaderboard', 'me', 'daily', 'rating', 'ratings', 'stats', 'history', 'inbox', 'friends', 'thread']) {
       void queryClient.invalidateQueries({ queryKey: [key] });
     }
   }, [game.phase, queryClient, tutorial]);
@@ -184,6 +184,7 @@ export function GameScreen({ navigation, route }: Props) {
         combo={game.combo}
         reelIndex={game.reel?.index ?? 0}
         versus={opponent ? t.vs.hud(handle(opponent)) : undefined}
+        rated={mode === 'rated' && !game.practice ? t.modes.hud : undefined}
         onClose={close}
       />
 

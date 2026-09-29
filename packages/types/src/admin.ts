@@ -16,12 +16,12 @@ import type {
   AnalyticsScreen,
   DuelStatus,
   LeaderboardBoard,
-  LeagueOutcome,
   LeagueTier,
-  LeagueZone,
   Locale,
   Platform,
   PlayerStats,
+  RatingChange,
+  RatingPlacement,
   Ranks,
   ReportReason,
   RunMode,
@@ -166,15 +166,37 @@ export type AdminPlayerDevice = {
   others: AdminPlayerRef[];
 };
 
-export type AdminLeagueSeat = {
-  weekKey: string;
-  groupId: number;
-  tier: LeagueTier;
-  rank: number;
-  members: number;
-  points: number;
-  zone: LeagueZone;
+/** One change of a rating as the panel shows it: why, by how much, and the runs that did not count too. */
+export type AdminRatingChange = RatingChange & {
+  id: number;
+  /** The rating whose typical score the run's was. */
+  performance: number | null;
+  /** The width the run was measured with: smaller while provisional. */
+  width: number | null;
+  shielded: boolean;
+  engineVersion: number | null;
+  /** False for a run that did not count (`void`). */
+  counted: boolean;
 };
+
+/** A player's rating — null in `AdminPlayerResponse` for a player never rated. */
+export type AdminPlayerRating = {
+  rating: number | null;
+  tier: LeagueTier | null;
+  peak: number | null;
+  /** The next run's target. */
+  target: number | null;
+  placement: RatingPlacement | null;
+  provisionalLeft: number;
+  shield: { tier: LeagueTier; runs: number } | null;
+  ratedRuns: number;
+  ratedAt: string | null;
+  /** The last thirty changes, newest first. */
+  history: AdminRatingChange[];
+};
+
+/** What a run did to its player's rating, and what a moderator's reject took back. */
+export type AdminRunRating = AdminRatingChange & { reversedBy: number | null };
 
 export type AdminPlayerResponse = {
   player: AdminPlayerDetail;
@@ -182,7 +204,7 @@ export type AdminPlayerResponse = {
   best: { score: number; reels: number; achievedAt: string; runId: string | null } | null;
   ranks: Ranks;
   stats: PlayerStats;
-  league: AdminLeagueSeat | null;
+  rating: AdminPlayerRating | null;
   /** Every run the player ever started, by status. */
   runs: Partial<Record<AdminRunStatus, number>>;
   recentRuns: AdminRunRow[];
@@ -362,6 +384,8 @@ export type AdminRunDetail = AdminRunRow & {
   stats: RunStats | null;
   /** Set for a `vs` run; null for any other. */
   duel: AdminRunDuel | null;
+  /** Null for a run that never reached the rating: a VS, one still open or held for review. */
+  rating: AdminRunRating | null;
 };
 
 export type AdminRunResponse = {
@@ -513,48 +537,65 @@ export type AdminBoardKeysResponse = {
   keys: AdminBoardKey[];
 };
 
-/* ------------------------------------------------------------- leagues -- */
+/* ------------------------------------------------------------- ratings -- */
 
-export type AdminLeaguesQuery = AdminPageQuery & {
-  /** `2026-W39`; this week when left out. */
-  week?: string;
-  tier?: LeagueTier;
-};
-
-export type AdminLeagueGroupRow = {
-  id: number;
-  tier: LeagueTier;
-  members: number;
-  settled: boolean;
-  createdAt: string;
-};
-
-export type AdminLeaguesResponse = AdminPage<AdminLeagueGroupRow> & {
-  season: number;
-  weekKey: string;
-  /** Weeks with groups this season, newest first. */
-  weeks: string[];
-  /** Seated players this week, per tier. */
-  tiers: Record<LeagueTier, number>;
-};
-
-export type AdminLeagueStanding = {
-  rank: number;
+export type AdminRatingRow = {
   player: AdminPlayerRef;
-  points: number;
-  daysPlayed: number;
-  zone: LeagueZone;
-  finalRank: number | null;
-  outcome: LeagueOutcome | null;
+  rating: number;
+  tier: LeagueTier;
+  peak: number | null;
+  ratedAt: string | null;
 };
 
-export type AdminLeagueGroupResponse = {
-  group: AdminLeagueGroupRow & { season: number; weekKey: string; startsAt: string; endsAt: string };
-  promoteCount: number;
-  demoteCount: number;
-  standings: AdminLeagueStanding[];
-  /** Seated, but banned: off the standings. */
-  banned: AdminPlayerRef[];
+/** `GET /admin/ratings`. */
+export type AdminRatingsResponse = {
+  /** Placed players per league, banned ones left out… */
+  tiers: Record<LeagueTier, number>;
+  /** …and those of them with a counted run in the last two weeks. */
+  active: Record<LeagueTier, number>;
+  /** Players still in their placement runs. */
+  placing: number;
+  /** The highest fifty. */
+  top: AdminRatingRow[];
+  /** The rules the ratings run on (`config/quezby.php` › `rating`). */
+  rules: {
+    engineVersion: number;
+    maxDelta: number;
+    width: number;
+    provisionalWidth: number;
+    provisionalRuns: number;
+    placementRuns: number;
+    placementMin: number;
+    placementMax: number;
+    shieldRuns: number;
+    bronzeLossPercent: number;
+    /** A player counts as active — on the Elo board, in `active` — with a counted run in this many days. */
+    activeDays: number;
+    /** Counted free and daily runs before Dereceli opens. */
+    unlockRuns: number;
+    /** Rating → the score a player of it typically makes. */
+    targets: Array<{ rating: number; score: number }>;
+  };
+};
+
+export type AdminCalibrationQuery = { days?: number };
+
+/**
+ * `GET /admin/ratings/calibration`: how the target table fits the players
+ * who played enough in the window, and the anchors that would hold the
+ * leagues' shares. Nothing is changed: a new table is a config change.
+ */
+export type AdminCalibrationResponse = {
+  engineVersion: number;
+  days: number;
+  minRuns: number;
+  /** Players with `minRuns` counted runs in the window. */
+  players: number;
+  /** The share each league should hold, per cent. */
+  shares: Record<LeagueTier, number>;
+  /** Where those players' medians settle with today's table. */
+  settled: Record<LeagueTier, number>;
+  anchors: Array<{ rating: number; current: number | null; proposed: number | null }>;
 };
 
 /* ------------------------------------------------------------- content -- */
@@ -673,7 +714,6 @@ export type AdminSystem = {
   limits: {
     reviewTopAll: number;
     reviewTopWeekly: number;
-    leagueGroupSize: number;
     leagueUnlockRuns: number;
     runTtlMinutes: number;
     adminTokenHours: number;

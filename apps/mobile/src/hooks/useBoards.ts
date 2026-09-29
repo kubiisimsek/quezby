@@ -3,8 +3,10 @@ import type {
   LeaderboardBoard,
   LeaderboardResponse,
   LeaderboardScope,
-  LeagueResponse,
   PlayerResponse,
+  RatingBoardResponse,
+  RatingBoardScope,
+  RatingResponse,
   StatsResponse,
   UserSearchResponse,
 } from '@quezby/types';
@@ -15,8 +17,8 @@ import { api } from '@/api/client';
 
 /**
  * Server state for the competitive screens. Every number on them — ranks,
- * gaps, points, zones, countdowns — comes from these answers; the app only
- * draws them.
+ * gaps, points, ratings, targets, countdowns — comes from these answers; the
+ * app only draws them.
  */
 export const boardKey = (board: LeaderboardBoard, scope: LeaderboardScope, limit: number) =>
   ['leaderboard', board, scope, limit] as const;
@@ -33,8 +35,19 @@ export function useDaily() {
   return useQuery<DailyResponse>({ queryKey: ['daily'], queryFn: () => api.daily.get() });
 }
 
-export function useLeague() {
-  return useQuery<LeagueResponse>({ queryKey: ['league'], queryFn: () => api.leagues.current() });
+/** The player's Elo, league and next target (`GET /rating`). */
+export function useRating() {
+  return useQuery<RatingResponse>({ queryKey: ['rating'], queryFn: () => api.rating.current() });
+}
+
+/** The highest ratings of the players who played lately — everyone's, friends', or the player's league's (`GET /ratings`). */
+export function useRatingBoard(scope: RatingBoardScope = 'everyone', enabled = true) {
+  return useQuery<RatingBoardResponse>({
+    queryKey: ['ratings', scope],
+    queryFn: () => api.rating.board(scope),
+    placeholderData: keepPreviousData,
+    enabled,
+  });
 }
 
 export function useStats() {

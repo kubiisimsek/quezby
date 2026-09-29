@@ -22,6 +22,7 @@ return [
     'run_rejected' => 'No se pudo verificar esta partida, así que no entra en la clasificación.',
     'engine_outdated' => 'Tu versión del juego no está actualizada. Actualiza la app para entrar en la clasificación.',
     'daily_already_played' => 'Ya jugaste el Feed del día. Mañana te espera uno nuevo.',
+    'rated_locked' => 'El modo Competitivo aún no está abierto. Juega primero partidas normales o diarias.',
     'cannot_befriend_self' => 'No puedes enviarte una solicitud de amistad.',
     'friend_limit' => 'Puedes tener :limit amigos como máximo.',
     'request_limit' => 'Puedes tener :limit solicitudes esperando respuesta como máximo. Envía otra cuando alguien responda.',

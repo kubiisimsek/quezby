@@ -36,7 +36,10 @@ only ever ranks one engine version.
 5. `pnpm --filter @quezby/engine test` — rules, scoring, balance, fixtures, lock.
 6. Mirror the change in `apps/api/app/Game/*.php` (`Rules::ENGINE_VERSION`;
    `config/quezby.php` reads it, and the season follows it) and
-   `Rules::toArray()`.
+   `Rules::toArray()`. Add the new version's Elo targets
+   (`config/quezby.php` › `rating.targets[ENGINE_VERSION]`, from the
+   simulation's medians — `docs/product/scoring.md` → *Elo*); keep the old
+   ones for late approvals.
 7. `cd apps/api && php artisan test` — `EngineParityTest` replays every fixture
    in PHP reel by reel; `RulesLockTest` checks the PHP rules hash to the lock.
 8. Add a `docs/changelog/CHANGELOG.md` entry; ship the app and raise

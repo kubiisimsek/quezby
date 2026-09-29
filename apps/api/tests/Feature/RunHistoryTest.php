@@ -45,9 +45,12 @@ test('the history keeps to one mode when asked', function () {
     $me = $this->signIn();
     Run::factory()->for($me)->ranked(3000)->create(['finished_at' => now()->subHour()]);
     Run::factory()->for($me)->daily('2026-09-26')->ranked(5000)->create(['finished_at' => now()]);
+    Run::factory()->for($me)->rated()->ranked(7000)->create(['finished_at' => now()->subMinutes(30)]);
 
     $this->getJson('/api/v1/me/runs?mode=daily')->assertJsonPath('runs.*.score', [5000]);
     $this->getJson('/api/v1/me/runs?mode=free')->assertJsonPath('runs.*.score', [3000]);
+    $this->getJson('/api/v1/me/runs?mode=rated')->assertJsonPath('runs.*.score', [7000])
+        ->assertJsonPath('runs.0.mode', 'rated');
     $this->assertApiError($this->getJson('/api/v1/me/runs?mode=duel'), 422, 'validation_failed');
 });
 

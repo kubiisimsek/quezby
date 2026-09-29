@@ -60,8 +60,8 @@ final class LeaderboardService
 
     /**
      * Puts a ranked run on this week's, this month's and the season's board —
-     * and on today's challenge board when it was the daily run — and keeps the
-     * day's best for the league. A row only ever moves to a strictly higher
+     * and on today's challenge board when it was the daily run — and, for a
+     * rated run, keeps the day's best for the weekly group. A row only ever moves to a strictly higher
      * score, so an equal score keeps the earlier `achieved_at`.
      */
     public function record(Run $run): RecordOutcome
@@ -92,7 +92,7 @@ final class LeaderboardService
      */
     private function boardsFor(Run $run): array
     {
-        $boards = LeaderboardPeriod::calendar();
+        $boards = LeaderboardPeriod::periods();
         if ($run->mode === RunMode::Daily) {
             $boards[] = LeaderboardPeriod::Challenge;
         }

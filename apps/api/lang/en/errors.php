@@ -22,6 +22,7 @@ return [
     'run_rejected' => "This game couldn't be verified, so it can't rank.",
     'engine_outdated' => 'Your version of the game is out of date. Update the app to rank.',
     'daily_already_played' => "You've played today's Daily Feed. A new one is waiting tomorrow.",
+    'rated_locked' => "Ranked isn't open yet. Play Normal or Daily games first.",
     'cannot_befriend_self' => "You can't send yourself a friend request.",
     'friend_limit' => 'You can have up to :limit friends.',
     'request_limit' => 'You can have up to :limit requests waiting for an answer. Send a new one once someone answers.',

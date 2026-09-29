@@ -2,9 +2,6 @@ import type {
   DailyAttempt,
   DailyResponse,
   LeaderboardResponse,
-  LeagueMember,
-  LeagueResponse,
-  LeagueZone,
   Locale,
 } from '@quezby/types';
 import type { QueryClient } from '@tanstack/react-query';
@@ -26,7 +23,17 @@ import { HomeScreen } from '@/screens/home/HomeScreen';
 import { useDeviceVerdict } from '@/stores/deviceVerdict';
 import { useOnboarding } from '@/stores/onboarding';
 import { useSettings } from '@/stores/settings';
-import { buildEntry, buildInbox, buildMe, buildRanks, buildSummary, buildWaiting } from '@/test/factories';
+import {
+  buildEntry,
+  buildInbox,
+  buildLocked,
+  buildMe,
+  buildPlacing,
+  buildRanks,
+  buildRating,
+  buildSummary,
+  buildWaiting,
+} from '@/test/factories';
 import { renderWithProviders } from '@/test/renderWithProviders';
 
 /** The official mock has no `useReducedMotion`; the breath is spied on. */
@@ -46,7 +53,7 @@ jest.mock('@/api/client', () => ({
   api: {
     me: { get: jest.fn(), inbox: jest.fn() },
     daily: { get: jest.fn() },
-    leagues: { current: jest.fn() },
+    rating: { current: jest.fn() },
     leaderboards: { get: jest.fn() },
     duels: { decline: jest.fn() },
   },
@@ -55,7 +62,7 @@ jest.mock('@/api/client', () => ({
 const mocked = api as unknown as {
   me: { get: jest.Mock; inbox: jest.Mock };
   daily: { get: jest.Mock };
-  leagues: { current: jest.Mock };
+  rating: { current: jest.Mock };
   leaderboards: { get: jest.Mock };
   duels: { decline: jest.Mock };
 };
@@ -81,65 +88,6 @@ function daily(attempt: DailyAttempt | null = null): DailyResponse {
     me: null,
     players: 1_204,
   };
-}
-
-/** A group of thirty, 500 points between neighbours, you at `me`. */
-function group(me: number, zone: LeagueZone): LeagueMember[] {
-  return Array.from({ length: 30 }, (_, index) => {
-    const rank = index + 1;
-    return {
-      rank,
-      username: rank === me ? 'ekin' : `oyuncu${rank}`,
-      points: 20_000 - index * 500,
-      daysPlayed: 3,
-      isMe: rank === me,
-      avatarUrl: null,
-      isFriend: false,
-      zone:
-        rank === me
-          ? zone
-          : rank <= 5
-            ? 'promote'
-            : rank > 25
-              ? 'demote'
-              : 'stay',
-      gap: rank === 1 ? null : 501,
-    };
-  });
-}
-
-function league(overrides: Partial<LeagueResponse> = {}): LeagueResponse {
-  return {
-    season: 2,
-    weekKey: '2026-W39',
-    tier: 'gold',
-    endsAt: '2026-09-27T21:00:00.000Z',
-    serverTime: NOW,
-    joined: false,
-    unlock: null,
-    members: [],
-    me: null,
-    promoteCount: 0,
-    demoteCount: 0,
-    promotionGap: null,
-    nextRankProgress: null,
-    lastWeek: null,
-    ...overrides,
-  };
-}
-
-function joined(rank: number, zone: LeagueZone): LeagueResponse {
-  const members = group(rank, zone);
-  return league({
-    joined: true,
-    members,
-    me: members[rank - 1] ?? null,
-    promoteCount: 5,
-    demoteCount: 5,
-    // What the API sends: fifth place's points − yours + 1, null once you are in.
-    promotionGap: rank > 5 ? (members[4]?.points ?? 0) - (members[rank - 1]?.points ?? 0) + 1 : null,
-    nextRankProgress: null,
-  });
 }
 
 function weekly(
@@ -189,6 +137,17 @@ async function renderLobby() {
   return result;
 }
 
+/** The gold slab's sheet of modes, open. */
+async function openModes() {
+  await fireEvent.press(screen.getByRole('button', { name: 'Oyna' }));
+  expect(await screen.findByText('Mod seç')).toBeOnTheScreen();
+}
+
+/** A mode picked from the sheet: the game opens once the sheet has left. */
+async function pick(name: string) {
+  await fireEvent.press(screen.getByRole('button', { name }));
+}
+
 /**
  * The game speaks `locale` on a phone that already knows this account — an
  * account seen for the first time would bring its own language (`useMe`).
@@ -210,7 +169,7 @@ describe('HomeScreen', () => {
     mocked.me.get.mockResolvedValue({ user: buildMe(), ranks: buildRanks() });
     mocked.me.inbox.mockResolvedValue(buildInbox({ serverTime: NOW }));
     mocked.daily.get.mockResolvedValue(daily());
-    mocked.leagues.current.mockResolvedValue(league());
+    mocked.rating.current.mockResolvedValue(buildRating());
     mocked.leaderboards.get.mockResolvedValue(weekly());
     useDeviceVerdict.setState({ userId: null, verdict: null, validUntil: null, hydrated: true });
     useSettings.setState({ hydrated: true, consent: 'synced', analytics: true });
@@ -228,7 +187,7 @@ describe('HomeScreen', () => {
   });
 
   it('shows who is playing, in which league, and opens help — and no mailbox: Mesajlar is on the dock', async () => {
-    mocked.leagues.current.mockResolvedValue(league({ tier: 'platinum' }));
+    mocked.rating.current.mockResolvedValue(buildRating({ rating: 3_420, tier: 'platinum' }));
     await renderLobby();
 
     expect(screen.getByText('@ekin')).toBeOnTheScreen();
@@ -282,24 +241,25 @@ describe('HomeScreen', () => {
   });
 
   describe('the gold slab', () => {
-    it('is the one way to free play: a tap', async () => {
+    it('opens the modes on a tap, and plays none by itself', async () => {
       await renderLobby();
 
       expect(screen.getByText('Yukarı kaydır, oyna')).toBeOnTheScreen();
-      await fireEvent.press(screen.getByRole('button', { name: 'Oyna' }));
+      expect(screen.queryByText('Mod seç')).not.toBeOnTheScreen();
+      await openModes();
 
-      expect(navigate).toHaveBeenCalledWith('Game', { mode: 'free' });
+      expect(navigate).not.toHaveBeenCalled();
     });
 
-    it('plays on a swipe up, far or fast enough', async () => {
+    it('opens the modes on a swipe up, far or fast enough', async () => {
       await renderLobby();
-
       await act(async () => swipe()({ translationY: -80, velocityY: -200, canceled: false }));
-      expect(navigate).toHaveBeenCalledWith('Game', { mode: 'free' });
+      expect(await screen.findByText('Mod seç')).toBeOnTheScreen();
 
-      navigate.mockClear();
+      await screen.unmount();
+      await renderLobby();
       await act(async () => swipe()({ translationY: -20, velocityY: -1_200, canceled: false }));
-      expect(navigate).toHaveBeenCalledWith('Game', { mode: 'free' });
+      expect(await screen.findByText('Mod seç')).toBeOnTheScreen();
     });
 
     it('stays put for a short swipe, or one the system took over', async () => {
@@ -308,6 +268,7 @@ describe('HomeScreen', () => {
       await act(async () => swipe()({ translationY: -20, velocityY: -200, canceled: false }));
       await act(async () => swipe()({ translationY: -200, velocityY: -2_000, canceled: true }));
 
+      expect(screen.queryByText('Mod seç')).not.toBeOnTheScreen();
       expect(navigate).not.toHaveBeenCalled();
     });
 
@@ -399,6 +360,97 @@ describe('HomeScreen', () => {
     });
   });
 
+  describe('the mode sheet', () => {
+    it('offers the three modes, and plays Normal', async () => {
+      await renderLobby();
+      await openModes();
+
+      expect(screen.getByRole('button', { name: 'Günlük' })).toBeOnTheScreen();
+      expect(screen.getByText('Skorun Zirve’ye yazılır')).toBeOnTheScreen();
+      expect(screen.getByText('Elo için oyna · Hedef 72.400')).toBeOnTheScreen();
+
+      await pick('Normal');
+      await waitFor(() => expect(navigate).toHaveBeenCalledWith('Game', { mode: 'free' }));
+    });
+
+    it('plays the day’s feed from Günlük', async () => {
+      await renderLobby();
+      await openModes();
+
+      expect(screen.getAllByText('Herkes aynı akışı oynar · tek hak').length).toBe(2);
+      await pick('Günlük');
+
+      await waitFor(() => expect(navigate).toHaveBeenCalledWith('Game', { mode: 'daily' }));
+    });
+
+    it('opens the day instead once today’s shot is used', async () => {
+      mocked.daily.get.mockResolvedValue(
+        daily({ status: 'ranked', score: 18_420, rank: 12, grid: '🟩🟩🟨⬛', shareText: 'Quezby' }),
+      );
+      await renderLobby();
+      await openModes();
+
+      expect(screen.getByText('Bugünkü hakkını kullandın')).toBeOnTheScreen();
+      await pick('Günlük');
+
+      await waitFor(() => expect(navigate).toHaveBeenCalledWith('Daily'));
+      expect(navigate).not.toHaveBeenCalledWith('Game', { mode: 'daily' });
+    });
+
+    it('plays Dereceli for Elo, with the score to beat', async () => {
+      await renderLobby();
+      await openModes();
+
+      await pick('Dereceli');
+
+      await waitFor(() => expect(navigate).toHaveBeenCalledWith('Game', { mode: 'rated' }));
+    });
+
+    it('counts the placement games on Dereceli before there is an Elo', async () => {
+      mocked.rating.current.mockResolvedValue(buildPlacing(1));
+      await renderLobby();
+      await openModes();
+
+      expect(screen.getAllByText('Yerleşme 1/3').length).toBe(2);
+      await pick('Dereceli');
+
+      await waitFor(() => expect(navigate).toHaveBeenCalledWith('Game', { mode: 'rated' }));
+    });
+
+    it('keeps Dereceli shut until it opens: a lock and how far it is, and no way in', async () => {
+      mocked.rating.current.mockResolvedValue(buildLocked(12));
+      await renderLobby();
+      await openModes();
+
+      const locked = screen.getByRole('button', { name: 'Dereceli, kilitli: 12 oyun kaldı' });
+      expect(locked).toBeDisabled();
+      expect(screen.getAllByText('Dereceli’ye 12 oyun kaldı')).toHaveLength(2);
+
+      await fireEvent.press(locked);
+      await act(async () => {
+        await new Promise<void>((resolve) => {
+          setTimeout(() => resolve(), 700);
+        });
+      });
+      expect(navigate).not.toHaveBeenCalled();
+      expect(screen.getByText('Mod seç')).toBeOnTheScreen();
+
+      await pick('Normal');
+      await waitFor(() => expect(navigate).toHaveBeenCalledWith('Game', { mode: 'free' }));
+    });
+
+    it('shows the lock as the league while Dereceli is shut', async () => {
+      mocked.rating.current.mockResolvedValue(buildLocked(12));
+      await renderLobby();
+
+      expect(await screen.findByText('DERECELİ')).toBeOnTheScreen();
+      expect(screen.queryByText(/Elo$/)).not.toBeOnTheScreen();
+
+      await fireEvent.press(screen.getByText('Dereceli’ye 12 oyun kaldı'));
+      expect(navigate).toHaveBeenCalledWith('League');
+    });
+  });
+
   describe('today’s feed', () => {
     it('is one notice while it is open, with a small Oyna for the daily', async () => {
       await renderLobby();
@@ -444,8 +496,9 @@ describe('HomeScreen', () => {
       await renderLobby();
 
       expect(screen.getByText('Bir şeyler ters gitti. Tekrar dene.')).toBeOnTheScreen();
-      await fireEvent.press(screen.getByRole('button', { name: 'Oyna' }));
-      expect(navigate).toHaveBeenCalledWith('Game', { mode: 'free' });
+      await openModes();
+      await pick('Normal');
+      await waitFor(() => expect(navigate).toHaveBeenCalledWith('Game', { mode: 'free' }));
 
       await fireEvent.press(screen.getByRole('button', { name: 'Tekrar dene' }));
       expect(await screen.findByText('GÜNÜN AKIŞI #17')).toBeOnTheScreen();
@@ -453,45 +506,33 @@ describe('HomeScreen', () => {
   });
 
   describe('the league', () => {
-    it('shows your place and what promotion takes', async () => {
-      mocked.leagues.current.mockResolvedValue(joined(7, 'stay'));
+    it('shows your league, your Elo and the score your next run has to beat', async () => {
       await renderLobby();
 
-      expect(await screen.findByText('#7/30 · 17.000 puan')).toBeOnTheScreen();
-      // Fifth place holds 18.000; a tie goes to whoever got there first.
-      expect(screen.getByText('Terfiye 1.001 puan')).toBeOnTheScreen();
+      expect(await screen.findByText('Gümüş lig · 1.640 Elo')).toBeOnTheScreen();
+      expect(screen.getByText('Hedef 72.400')).toBeOnTheScreen();
       expect(screen.getByText('LİG')).toBeOnTheScreen();
 
-      await fireEvent.press(screen.getByText('#7/30 · 17.000 puan'));
+      await fireEvent.press(screen.getByText('Gümüş lig · 1.640 Elo'));
       expect(navigate).toHaveBeenCalledWith('League');
     });
 
-    it.each<[LeagueZone, number, string]>([
-      ['promote', 2, 'Terfi bölgesindesin'],
-      ['demote', 28, 'Düşme bölgesindesin'],
-    ])('names the %s zone', async (zone, rank, line) => {
-      mocked.leagues.current.mockResolvedValue(joined(rank, zone));
+    it('counts the placement runs until the rating is there, with no league yet', async () => {
+      mocked.rating.current.mockResolvedValue(buildPlacing(2));
       await renderLobby();
 
-      expect(await screen.findByText(line)).toBeOnTheScreen();
+      expect(await screen.findByText('Yerleşme 2/3')).toBeOnTheScreen();
+      expect(screen.getByText('YERLEŞME')).toBeOnTheScreen();
+      expect(screen.queryByText(/Gümüş lig/)).not.toBeOnTheScreen();
+      expect(screen.queryByText(/^Hedef/)).not.toBeOnTheScreen();
     });
 
-    it('invites you in before your first ranked run', async () => {
+    it('shows a MasterClass player their league', async () => {
+      mocked.rating.current.mockResolvedValue(buildRating({ rating: 5_210, tier: 'master', ceil: null, progress: null, target: 862_000 }));
       await renderLobby();
 
-      expect(await screen.findByText('Ligine katıl')).toBeOnTheScreen();
-      expect(screen.getByText(/^Bitmesine 3 g/)).toBeOnTheScreen();
-      expect(screen.queryByText(/Terfi/)).not.toBeOnTheScreen();
-    });
-
-    it('shows a locked league with the runs it waits for, and no tier yet', async () => {
-      mocked.leagues.current.mockResolvedValue(league({ unlock: { required: 3, remaining: 2 } }));
-      await renderLobby();
-
-      expect(await screen.findByText('Lige 2 oyun kaldı')).toBeOnTheScreen();
-      expect(screen.getByText('KİLİTLİ')).toBeOnTheScreen();
-      expect(screen.queryByText('Altın lig')).not.toBeOnTheScreen();
-      expect(screen.queryByText('Ligine katıl')).not.toBeOnTheScreen();
+      expect(await screen.findByText('MasterClass lig · 5.210 Elo')).toBeOnTheScreen();
+      expect(screen.getByText('Hedef 862.000')).toBeOnTheScreen();
     });
   });
 
@@ -512,7 +553,6 @@ describe('HomeScreen', () => {
 
     it('keeps the league reminder for after the answer', async () => {
       useOnboarding.setState({ userId: null, step: null, remindedFor: null, hydrated: true });
-      mocked.leagues.current.mockResolvedValue(joined(7, 'stay'));
       await renderLobby();
 
       expect(screen.queryByText(/^Ligdesin!/)).not.toBeOnTheScreen();
@@ -523,10 +563,18 @@ describe('HomeScreen', () => {
     });
   });
 
-  describe('once a guest\'s league opens', () => {
+  describe('once a guest is placed in a league', () => {
     beforeEach(() => {
       useOnboarding.setState({ userId: null, step: null, remindedFor: null, hydrated: true });
-      mocked.leagues.current.mockResolvedValue(joined(7, 'stay'));
+    });
+
+    it('does not ask while the placement games are still being played', async () => {
+      mocked.rating.current.mockResolvedValue(buildPlacing(2));
+      await renderLobby();
+
+      expect(await screen.findByText('Yerleşme 2/3')).toBeOnTheScreen();
+      expect(screen.queryByText(/^Ligdesin!/)).not.toBeOnTheScreen();
+      expect(useOnboarding.getState().remindedFor).toBeNull();
     });
 
     it('asks, once, to keep the account', async () => {
@@ -613,12 +661,12 @@ describe('HomeScreen', () => {
     expect(screen.queryByText('Bu cihazda kapalı')).not.toBeOnTheScreen();
   });
 
-  it('pulls to refresh you, the daily, the league, the week and the inbox', async () => {
+  it('pulls to refresh you, the daily, the rating, the week and the inbox', async () => {
     const { queryClient } = await renderLobby();
     const before = {
       me: mocked.me.get.mock.calls.length,
       daily: mocked.daily.get.mock.calls.length,
-      league: mocked.leagues.current.mock.calls.length,
+      rating: mocked.rating.current.mock.calls.length,
       board: mocked.leaderboards.get.mock.calls.length,
       inbox: mocked.me.inbox.mock.calls.length,
     };
@@ -630,7 +678,7 @@ describe('HomeScreen', () => {
 
     expect(mocked.me.get).toHaveBeenCalledTimes(before.me + 1);
     expect(mocked.daily.get).toHaveBeenCalledTimes(before.daily + 1);
-    expect(mocked.leagues.current).toHaveBeenCalledTimes(before.league + 1);
+    expect(mocked.rating.current).toHaveBeenCalledTimes(before.rating + 1);
     expect(mocked.leaderboards.get).toHaveBeenCalledTimes(before.board + 1);
     expect(mocked.me.inbox).toHaveBeenCalledTimes(before.inbox + 1);
   });
@@ -659,7 +707,6 @@ describe('HomeScreen', () => {
     it('speaks English: the clock, today\'s feed, a VS, the league and the rival', async () => {
       speak('en');
       mocked.me.inbox.mockResolvedValue(buildInbox({ serverTime: NOW, yourTurn: 1, waiting: [buildWaiting()] }));
-      mocked.leagues.current.mockResolvedValue(joined(7, 'stay'));
       mocked.leaderboards.get.mockResolvedValue(
         weekly({
           entry: buildEntry({ username: 'deniz', rank: 11 }),
@@ -686,9 +733,9 @@ describe('HomeScreen', () => {
       expect(screen.getByRole('button', { name: 'Play the Daily Feed' })).toBeOnTheScreen();
 
       expect(screen.getByText('LEAGUE')).toBeOnTheScreen();
-      expect(await screen.findByText('#7/30 · 17,000 points')).toBeOnTheScreen();
-      expect(screen.getByText('Gold league')).toBeOnTheScreen();
-      expect(screen.getByText('1,001 points to promotion')).toBeOnTheScreen();
+      expect(await screen.findByText('Silver league · 1,640 Elo')).toBeOnTheScreen();
+      expect(screen.getByText('Silver league')).toBeOnTheScreen();
+      expect(screen.getByText('Target 72,400')).toBeOnTheScreen();
 
       expect(screen.getByText('YOUR TARGET · THIS WEEK')).toBeOnTheScreen();
       expect(screen.getByText('1,001 points to pass @deniz')).toBeOnTheScreen();
@@ -700,16 +747,30 @@ describe('HomeScreen', () => {
       expect(screen.getByRole('button', { name: 'Help' })).toBeOnTheScreen();
     });
 
-    it('counts one game to the league in English, and a played day', async () => {
+    it('names the modes in English', async () => {
+      speak('en');
+      mocked.rating.current.mockResolvedValue(buildLocked(3));
+      await renderLobby();
+
+      await fireEvent.press(screen.getByRole('button', { name: 'Play' }));
+
+      expect(await screen.findByText('Pick a mode')).toBeOnTheScreen();
+      expect(screen.getByRole('button', { name: 'Daily' })).toBeOnTheScreen();
+      expect(screen.getByRole('button', { name: 'Normal' })).toBeOnTheScreen();
+      expect(screen.getByRole('button', { name: 'Ranked, locked: 3 games to go' })).toBeDisabled();
+      expect(screen.getByText('Your score goes on the Summit')).toBeOnTheScreen();
+    });
+
+    it('counts the placement runs in English, and a played day', async () => {
       speak('en');
       mocked.daily.get.mockResolvedValue(
         daily({ status: 'review', score: 250_000, rank: null, grid: null, shareText: null }),
       );
-      mocked.leagues.current.mockResolvedValue(league({ unlock: { required: 3, remaining: 1 } }));
+      mocked.rating.current.mockResolvedValue(buildPlacing(2));
       await renderLobby();
 
-      expect(await screen.findByText('1 game to the league')).toBeOnTheScreen();
-      expect(screen.getByText('LOCKED')).toBeOnTheScreen();
+      expect(await screen.findByText('Placement 2/3')).toBeOnTheScreen();
+      expect(screen.getByText('PLACEMENT')).toBeOnTheScreen();
       expect(screen.getByText('250,000')).toBeOnTheScreen();
       expect(screen.getByText('Your score is being reviewed')).toBeOnTheScreen();
       expect(screen.getByText('Next feed in 11h 0m')).toBeOnTheScreen();
@@ -738,7 +799,7 @@ describe('HomeScreen', () => {
       mocked.daily.get.mockResolvedValue(
         daily({ status: 'ranked', score: 18_420, rank: 12, grid: '🟩🟩🟨⬛', shareText: 'Quezby' }),
       );
-      mocked.leagues.current.mockResolvedValue(league({ unlock: { required: 3, remaining: 2 } }));
+      mocked.rating.current.mockResolvedValue(buildRating({ rating: 2_340, tier: 'gold', target: 150_800 }));
       mocked.leaderboards.get.mockResolvedValue(
         weekly({
           entry: buildEntry({ username: 'deniz', rank: 11 }),
@@ -755,8 +816,8 @@ describe('HomeScreen', () => {
       expect(screen.getByText(`${iso('#12')} / 1,204 لاعبين`)).toBeOnTheScreen();
       expect(screen.getByText('الخلاصة التالية بعد 11 س 0 د')).toBeOnTheScreen();
 
-      expect(await screen.findByText('مباراتان للوصول إلى الدوري')).toBeOnTheScreen();
-      expect(screen.getByText('مقفل')).toBeOnTheScreen();
+      expect(await screen.findByText(`دوري الذهب · ${iso('2,340')} إيلو`)).toBeOnTheScreen();
+      expect(screen.getByText(`الهدف ${iso('150,800')}`)).toBeOnTheScreen();
 
       expect(screen.getByText(`1,001 نقطة لتجاوز ${iso('@deniz')}`)).toBeOnTheScreen();
       expect(screen.getByText(`يسبقك ${iso('@deniz')} مباشرةً في ترتيب الأسبوع.`)).toBeOnTheScreen();

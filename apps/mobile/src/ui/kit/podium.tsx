@@ -83,9 +83,12 @@ const CROWN_AT = 720;
 export function Podium<T extends PodiumEntry>({
   entries,
   onPressEntry,
+  unit = 'points',
 }: {
   entries: T[];
   onPressEntry?: (entry: T) => void;
+  /** What the numbers are, read aloud: points, or Elo on the Elo board. */
+  unit?: 'points' | 'elo';
 }) {
   const theme = useTheme();
   const reduced = useReducedMotion();
@@ -124,6 +127,7 @@ export function Podium<T extends PodiumEntry>({
             joined={index > 0}
             entry={places.get(place) ?? null}
             onPress={onPressEntry}
+            unit={unit}
           />
         ))}
       </View>
@@ -136,12 +140,14 @@ function Place<T extends PodiumEntry>({
   joined,
   entry,
   onPress,
+  unit,
 }: {
   place: MedalRank;
   /** Shares its left outline with the block before it. */
   joined: boolean;
   entry: T | null;
   onPress?: (entry: T) => void;
+  unit: 'points' | 'elo';
 }) {
   const theme = useTheme();
   const t = useT();
@@ -189,6 +195,7 @@ function Place<T extends PodiumEntry>({
         name: entry.username,
         isMe: entry.isMe,
         score: entry.score,
+        unit,
       })
     : t.board.vacant(place);
 

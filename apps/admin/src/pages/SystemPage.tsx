@@ -194,8 +194,7 @@ export function SystemPage() {
             facts={[
               { label: 'İncelemeye düşen zirve · sezon', value: `İlk ${formatNumber(data.limits.reviewTopAll)}` },
               { label: 'İncelemeye düşen zirve · hafta', value: `İlk ${formatNumber(data.limits.reviewTopWeekly)}` },
-              { label: 'Lig grubu', value: `${formatNumber(data.limits.leagueGroupSize)} oyuncu` },
-              { label: 'Lig açılışı', value: `${formatNumber(data.limits.leagueUnlockRuns)} sayılan tur` },
+              { label: 'Dereceli kilidi', value: `${formatNumber(data.limits.leagueUnlockRuns)} oyun`, hint: 'Normal ya da Günlük oyun' },
               { label: 'Tur süresi', value: `${formatNumber(data.limits.runTtlMinutes)} dk` },
               { label: 'Panel oturumu', value: `${formatNumber(data.limits.adminTokenHours)} saat` },
             ]}

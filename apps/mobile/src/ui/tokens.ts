@@ -93,6 +93,8 @@ export type Palette = {
   tierPlatinumSoft: string;
   tierDiamond: string;
   tierDiamondSoft: string;
+  tierMaster: string;
+  tierMasterSoft: string;
   appleBg: string;
   appleInk: string;
   googleBg: string;
@@ -189,6 +191,8 @@ export const arena: Palette = {
   tierPlatinumSoft: '#164547',
   tierDiamond: '#49c3ff',
   tierDiamondSoft: '#023f6f',
+  tierMaster: '#e69dfc',
+  tierMasterSoft: '#542662',
   appleBg: '#ffffff',
   appleInk: '#000000',
   googleBg: '#131314',

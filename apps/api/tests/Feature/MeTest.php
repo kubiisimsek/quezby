@@ -118,7 +118,7 @@ test('deleting the account removes its runs, rows and tokens', function () {
     $this->assertDatabaseMissing('personal_access_tokens', ['tokenable_id' => $user->id]);
 
     $this->assertSame(1, Run::query()->where('user_id', $other->id)->count());
-    $this->assertSame(4, LeaderboardEntry::query()->where('user_id', $other->id)->count());
+    $this->assertSame(3, LeaderboardEntry::query()->where('user_id', $other->id)->count());
     $this->assertDatabaseHas('personal_access_tokens', ['tokenable_id' => $other->id]);
 
     $this->app['auth']->forgetGuards();

@@ -179,7 +179,10 @@ final class RunVerifier
 
     /**
      * Among swipe and like hits — once there are enough — too large a share
-     * decided faster than the speed bonus pays for.
+     * decided faster than the speed bonus pays for. A player who swipes
+     * everything hits every swipe reel as fast, and is just as fast on the
+     * reels it gets wrong: when more than `fast_wrong_share` of all the fast
+     * gestures were wrong, that is guessing, not deciding.
      *
      * @param  list<Step>  $steps
      * @return array<string, mixed>|null
@@ -190,6 +193,18 @@ final class RunVerifier
         $fast = count(array_filter($times, fn (int $t) => $t < $this->limits['fast_decision_ms']));
 
         if (count($times) < $this->limits['fast_min_samples'] || $fast <= count($times) * $this->limits['fast_share_limit']) {
+            return null;
+        }
+
+        $gestures = 0;
+        $wrong = 0;
+        foreach ($steps as $step) {
+            if ($step->gesture !== Gesture::None && $step->t < $this->limits['fast_decision_ms']) {
+                $gestures++;
+                $wrong += in_array($step->verdict, [Verdict::Wrong, Verdict::Caught], true) ? 1 : 0;
+            }
+        }
+        if ($wrong > $gestures * $this->limits['fast_wrong_share']) {
             return null;
         }
 

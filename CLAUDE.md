@@ -8,7 +8,7 @@ endless vertical feed; each reel asks for one gesture — swipe up, double-tap,
 press-and-hold, or *don't touch* — before its timer runs out, while a
 dopamine meter drains faster every reel. Players compete on weekly, monthly
 and all-time boards, a daily challenge everyone plays on one seed ("Günün
-akışı") and weekly leagues — and with their friends: requests, an inbox of
+akışı") and Elo leagues played in Dereceli — and with their friends: requests, an inbox of
 preset phrases, and VS (one seed, one attempt each, counted on no board).
 Start at `docs/product/overview.md`.
 
@@ -22,6 +22,7 @@ Start at `docs/product/overview.md`.
 | The admin panel (`apps/admin`) | `docs/design/admin-design-system.md`, then `docs/rules/admin-rules.md` |
 | Anything user-visible | `docs/design/ui-writing.md` (six languages — every word of the app lives in `apps/mobile/src/i18n/messages`, a push's in `apps/api/lang`), then `docs/product/localization.md` |
 | Game rules, scoring, difficulty | `docs/product/scoring.md` |
+| Elo, Dereceli, leagues | `docs/product/scoring.md` → "Elo" |
 | Anti-cheat, device integrity, checkpoints | `docs/product/scoring.md` → "Hile koruması" |
 | Usernames | `docs/product/usernames.md` |
 | Friends, the inbox, VS, profile photos, reports, push | `docs/product/overview.md` → "Arkadaşlar", then `docs/backend/api-contract.md`; setting push up: `docs/development/environments.md` → "Push notifications" |
@@ -37,10 +38,11 @@ Start at `docs/product/overview.md`.
 ```
 apps/mobile     Bare React Native 0.86 — ios/ and android/ are committed source
 apps/admin      Vite + React admin panel, static files for shared hosting —
-                players, bans, suspects, reports, runs, boards, leagues, admins,
+                players, bans, suspects, reports, runs, boards, ratings, admins,
                 audit log
 apps/api        Laravel + Sanctum — identity (guest, email, Apple, Google), run
-                verification, boards, daily challenge, leagues, friends, inbox,
+                verification, boards, daily challenge, Elo (Dereceli) and its
+                leagues, friends, inbox,
                 VS, profile photos, reports, push, run history, stats
 packages/engine the game rules: deterministic, integer-only, replayed by the API,
                 locked by rules.lock.json
@@ -62,7 +64,9 @@ packages/sdk    the typed API client
   commit on both sides: `packages/engine/src/rules.ts` + `ENGINE_VERSION` bump +
   `pnpm engine:simulate` (the ±20 % promise must hold) + `pnpm engine:fixtures`
   + `pnpm engine:lock` + `apps/api/app/Game/Rules.php` (`Rules::ENGINE_VERSION`;
-  the config reads it). `php artisan test` proves parity and the lock.
+  the config reads it) + the season's Elo targets
+  (`config/quezby.php` › `rating.targets[ENGINE_VERSION]`). `php artisan test`
+  proves parity, the lock and the targets.
 - **The design language is not optional — and it is a game's.** Quezby must
   look like a mobile game, never an app ("Arena": the dark arena, outlined
   tiles, slab buttons with one gold play per screen, Rubik display type, no

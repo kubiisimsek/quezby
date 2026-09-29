@@ -59,6 +59,27 @@ it('counts decisions under the speed floor only among swipe and like hits', func
         ->and(verifier()->decisionSpeed($short))->toBeNull('too few samples to judge');
 });
 
+it('lets a guesser through who is as fast on the reels it gets wrong', function (int $seed, bool $spareFreeze) {
+    $steps = Engine::replay($seed, swipedLog($seed, 200, 190, 40, $spareFreeze))->steps;
+    $skipHits = collect($steps)->filter(fn ($step) => $step->reel->kind->value === 'skip' && $step->verdict->isHit())->count();
+
+    expect($skipHits)->toBeGreaterThanOrEqual(config('quezby.plausibility.fast_min_samples'), 'enough swipe hits that speed alone would flag it')
+        ->and(verifier()->decisionSpeed($steps))->toBeNull();
+})->with([
+    'swipes everything' => [7919, false],
+    'spares freeze reels' => [4242, true],
+    'spares freeze reels, another feed' => [7919, true],
+    'spares freeze reels, a third feed' => [31337, true],
+]);
+
+it('still catches a fast player who is right almost every time', function () {
+    $fast = Engine::replay(4242, playedLog(4242, 80, 200, 30))->steps;
+    $wrongs = collect($fast)->filter(fn ($step) => in_array($step->verdict->value, ['wrong', 'caught'], true))->count();
+
+    expect($wrongs)->toBe(0)
+        ->and(verifier()->decisionSpeed($fast))->toMatchArray(['code' => 'fast_decisions']);
+});
+
 it('hears a metronome, not a thumb', function () {
     $metronome = Engine::replay(4242, playedLog(4242, 90, 450))->steps;
     $thumb = Engine::replay(4242, playedLog(4242, 90, 450, 100))->steps;

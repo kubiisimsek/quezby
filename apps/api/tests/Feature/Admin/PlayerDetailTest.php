@@ -101,7 +101,7 @@ test('a player who has not said yes shows no consent', function () {
     adminPlayerDetail($player)->assertOk()->assertJsonPath('player.analyticsAt', null)->assertJsonPath('installs', []);
 });
 
-test('a banned player shows why, and sits in no league', function () {
+test('a banned player shows why', function () {
     $this->signInAdmin(AdminRole::Viewer);
     $player = User::factory()->withUsername('hileci')->create(['banned_at' => now(), 'ban_reason' => 'Hız hilesi']);
 
@@ -109,7 +109,7 @@ test('a banned player shows why, and sits in no league', function () {
         ->assertOk()
         ->assertJsonPath('player.banReason', 'Hız hilesi')
         ->assertJsonPath('player.bannedAt', '2026-09-25T09:00:00.000Z')
-        ->assertJsonPath('league', null);
+        ->assertJsonMissingPath('league');
 });
 
 test('only an owner sees where an action on the player came from', function (AdminRole $role, ?string $ip) {

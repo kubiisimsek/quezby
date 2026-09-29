@@ -71,9 +71,10 @@ With no photo, the portrait shows their initials in Rubik.
 ### Medals, tiers, sign-in
 
 `medalGold/Silver/Bronze` each with `Soft`, `Ink` and `Lip` make the podium's
-coins and pedestals. `tierBronze … tierDiamond` (+ `Soft`) draw the league
-emblems, whose mark climbs with the tier (one chevron, two, a star, a spark, a
-gem). `appleBg/Ink` and `googleBg/Ink/Line` are the two companies' dark-screen
+coins and pedestals. `tierBronze … tierDiamond`, `tierMaster` (+ `Soft`) draw
+the league emblems, whose mark climbs with the tier (one chevron, two, a star,
+a spark, a gem, a crown). MasterClass is an orchid of its own, past the
+diamond's blue — neither the brand's magenta nor the quiet violet. `appleBg/Ink` and `googleBg/Ink/Line` are the two companies' dark-screen
 buttons; the Google "G" keeps its colours in `marks`.
 
 ### The feed — `reel`

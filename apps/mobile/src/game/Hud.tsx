@@ -35,6 +35,7 @@ export function Hud({
   combo,
   reelIndex,
   versus,
+  rated,
   onClose,
 }: {
   meter: SharedValue<number>;
@@ -44,6 +45,8 @@ export function Hud({
   reelIndex: number;
   /** A VS run's pill: "VS · @ekin". */
   versus?: string;
+  /** A rated run's pill: "Dereceli". */
+  rated?: string;
   onClose: () => void;
 }) {
   const t = useT();
@@ -133,6 +136,14 @@ export function Hud({
             <Icon name="swords" size={13} color={REEL.ink} strokeWidth={2.8} />
             <Text style={styles.levelText} numberOfLines={1}>
               {versus}
+            </Text>
+          </View>
+        ) : null}
+        {rated ? (
+          <View style={styles.level}>
+            <Icon name="shield" size={13} color={REEL.ink} strokeWidth={2.8} />
+            <Text style={styles.levelText} numberOfLines={1}>
+              {rated}
             </Text>
           </View>
         ) : null}

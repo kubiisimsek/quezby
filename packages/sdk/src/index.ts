@@ -27,7 +27,6 @@ import type {
   LeaderboardBoard,
   LeaderboardResponse,
   LeaderboardScope,
-  LeagueResponse,
   LinkCredentialsRequest,
   Locale,
   LoginRequest,
@@ -37,6 +36,9 @@ import type {
   NotificationsResponse,
   Platform,
   PlayerResponse,
+  RatingBoardResponse,
+  RatingBoardScope,
+  RatingResponse,
   Phrase,
   Pulse,
   PushTokenRequest,
@@ -276,6 +278,9 @@ export function createApiClient({ device, ...options }: ApiClientOptions) {
           method: 'POST',
           body: input,
         }),
+      /** Gives up a run in its countdown — for nothing within seconds of its start, a forfeit after. */
+      cancel: (runId: string) =>
+        request<void>(`/runs/${encodeURIComponent(runId)}/cancel`, { method: 'POST' }),
     },
     /** VS between two friends: started through `runs.start({ mode: 'vs', … })`. */
     duels: {
@@ -296,8 +301,11 @@ export function createApiClient({ device, ...options }: ApiClientOptions) {
       /** Today's "Günün akışı": the one attempt and the top of the board. */
       get: () => request<DailyResponse>('/daily'),
     },
-    leagues: {
-      current: () => request<LeagueResponse>('/leagues/current'),
+    /** Elo: the player's rating and league, and the highest ratings — everyone's, friends', or their league's. */
+    rating: {
+      current: () => request<RatingResponse>('/rating'),
+      board: (scope: RatingBoardScope = 'everyone') =>
+        request<RatingBoardResponse>('/ratings', { query: { scope } }),
     },
     analytics: {
       /**

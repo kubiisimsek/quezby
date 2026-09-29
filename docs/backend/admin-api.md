@@ -4,7 +4,7 @@
 **Server:** `apps/api/app/Http/Controllers/Admin`, `app/Services/Admin` · **Tests:** Pest, `apps/api/tests/Feature/Admin`
 **Panel:** `apps/admin` — `docs/design/admin-design-system.md`, `docs/rules/admin-rules.md`
 
-The admin panel's API: players, runs, suspects, reports, boards, leagues,
+The admin panel's API: players, runs, suspects, reports, boards, ratings,
 content, the audit log, the panel's own accounts and the system. It shares
 the player API's conventions (`docs/backend/api-contract.md`): JSON with
 camelCase keys, ISO-8601 UTC timestamps with milliseconds, one error shape.
@@ -100,8 +100,12 @@ CSP names the API's origin in `img-src` (`apps/admin/deploy/htaccess.mjs`).
 
 `AdminPlayerResponse`: the player (identities without their Apple tokens,
 sessions, last seen, `analyticsAt` — when they said yes to usage analytics),
-this season's best and ranks, lifetime stats, this week's league seat (none
-while banned), runs by status, the ten latest runs, the flag codes of the last
+this season's best and ranks, lifetime stats, `rating`
+(`AdminPlayerRating`: rating, league (the rating's tier), peak, next target,
+placement or provisional runs left, shield, counted runs, when the last one
+counted, and the last 30 changes (`placement`, `run`, `forfeit`, `void`,
+`reversal`), the runs that did not count too, `counted: false`; null for a
+player never rated), runs by status, the ten latest runs, the flag codes of the last
 30 days, device checks (20 latest), other accounts on the same install,
 `installs` — the phones the player used, from the device registry, each with
 the other accounts seen on it — `social` (`friends`: their friends who are
@@ -117,7 +121,8 @@ Istanbul days (active days, visits, time, one entry a day), the 20 latest
 visits with their journeys (`{ code, at }`), and their firsts — from the app
 with consent (`tutorial_done`, `nickname_skip`, `protect_skip`,
 `protect_reminder`) and from what the API keeps anyway (`joined`, `protected`,
-`first_run`, `league`). The panel asks only when its Etkinlik tab opens.
+`first_run`, `league` — placed in a league by Elo, the placement games
+played). The panel asks only when its Etkinlik tab opens.
 
 ### `POST /players/{id}/ban` — moderator
 
@@ -169,7 +174,7 @@ DELETE's body.
 
 ### `GET /runs` — viewer
 
-Filters: `status` (every `AdminRunStatus`), `mode` (`free | daily | vs`),
+Filters: `status` (every `AdminRunStatus`), `mode` (`free | daily | rated | vs`),
 `flag` (a `RunFlagCode`, matched exactly), `player` (id), `from` / `to`
 (Istanbul days `Y-m-d`, both inclusive, by start), `sort` (`newest | score`).
 Rows are `AdminRunRow` — never the action log. `counts` is per status under
@@ -177,7 +182,7 @@ the other filters.
 
 **VS runs** (`mode: vs`) are the runs of a VS between two friends, one attempt
 each at one seed. The API replays one like any other run, but it never ranks:
-a clean one is `played` — it settles its VS and counts on no board, league,
+a clean one is `played` — it settles its VS and counts on no board, rating,
 stat or record — and one with a hard flag is `flagged` (it loses its VS; the
 challenger's voids it). Its soft signals are kept but hold nothing, and the
 checks against the player's history are not run for it, so a VS run is never
@@ -192,19 +197,27 @@ neither. Neither the row nor the detail says which VS a run played.
 as the API's engine replays it (`index, kind, level, window, gesture, t, d,
 verdict, points, bonusPoints, combo, meter`; points and bonus points add up to
 the score) — or `timelineUnavailable`: `no_log` (never finished),
-`other_engine` (another season's rules) or `engine_error`; and the audit
-entries about it.
+`other_engine` (another season's rules) or `engine_error`; `rating`
+(`AdminRunRating`) — what the run did to the rating (kind, delta, before and
+after, the target it played against, its performance and width, whether a
+shield held) and `reversedBy` when a moderator's reject took the gain back;
+null for a run that never reached the rating (a VS, one still open or held);
+and the audit entries about it.
 
 ### `POST /runs/{id}/approve` — moderator
 
-A run held for `review` ranks: on the boards of the days it was played, into
-the player's stats and league. Any other status: `changed: false`.
+A run held for `review` ranks: on its boards (the week, month and season it
+was played in; a daily run's challenge too) and into the player's stats — and
+a Dereceli run counts on their Elo now, from the rating they have now (the
+audit entry's `ratingDelta`). Any other status: `changed: false`.
 
 ### `POST /runs/{id}/reject` — moderator
 
 `{ "reason" }`. A `ranked`, `review` or `flagged` run becomes `rejected` with a
 hard `moderator` flag carrying the reason; the player's boards are rebuilt
-from the runs left. A VS run, and any other status: `changed: false`.
+from the runs left, and what the run **won** on the Elo is taken back, once
+(`ratingDelta` on the audit entry) — what it lost stays. A VS run, and any
+other status: `changed: false`.
 
 ### Finding runs by a flag
 
@@ -294,7 +307,8 @@ and `devices` counts only the players who said yes to usage analytics:
   per-mille, `null` until the day is over for someone in the week;
 - `funnel` — the window's newcomers who were active on their first day,
   through `joined → tutorial → named → protected → first_run → league →
-  returned`; `returned` is of those who joined before today;
+  returned`; `league` — placed in a league by Elo (the placement games
+  played); `returned` is of those who joined before today;
 - `screens`, `events` — the window's totals, most first;
 - `devices` — every player's phones seen in the last 7 days: app versions,
   systems (by major version) and models, each with its share per-mille;
@@ -311,8 +325,7 @@ The API keeps the answer for a minute under one cache key per window. A
 Any board (`weekly | monthly | all | challenge`) for any period key
 (`2026-W39`, `2026-09`, `all`, or a challenge day `2026-09-24`; the current
 one when left out) and season (this one when left out). There is no day
-board: the API keeps each day's best only to add up league points, and
-`daily` is `422` on `board`. Rows are ranked as the game ranks them —
+board: no run writes a day's row, and `daily` is `422` on `board`. Rows are ranked as the game ranks them —
 score, then who got there first; ties share a rank, across pages too — with
 the run behind each row and its signals. Adds `seasons` (every season with
 rows), `number` ("Günün akışı #N" on the challenge board; `null` for a day
@@ -326,20 +339,29 @@ number of players, leader and top score — and for the challenge board its
 number (`null` before the first day) and `attempts` (daily runs started that
 day, whatever became of them), with today first even before anyone played it.
 
-## Leagues
+## Ratings
 
-### `GET /leagues?week=&tier=` — viewer
+The panel shows ratings; it never changes one (a rating moves only through
+Dereceli runs and moderation). A player's league is their rating's tier,
+ranked by Elo and never reset.
 
-A week's groups (this week when left out), the highest tier first:
-`id, tier, members, settled, createdAt`; plus `weeks` (this season's, newest
-first) and `tiers` (seated players per tier).
+### `GET /ratings` — viewer
 
-### `GET /leagues/groups/{id}` — viewer
+`AdminRatingsResponse`: placed players per league (`tiers`, banned ones left
+out) and those of them with a counted run in the last `rules.activeDays`
+(`active`), `placing` (still in their placement runs), the highest fifty
+(`top`: player, rating, league, peak, last counted) and `rules` — the numbers
+the ratings run on, `unlockRuns` (the counted Normal or Günlük runs before
+Dereceli opens, 20 by default) and this season's target table.
 
-The group's table as its players see it — rank, points (each day's best,
-summed), days played, zone — its final ranks and outcomes once settled, and
-its banned members, who sit out of the table. Looking at a finished week
-settles it, as a player's visit would.
+### `GET /ratings/calibration?days=` — viewer
+
+`AdminCalibrationResponse`, the same report as `php artisan
+quezby:rating:calibrate --days=`: the players with `minRuns` (10) counted runs
+in the last `days` (1–365, 30 by default), the share each league should hold,
+where those players' medians settle with today's table, and per anchor the
+target now and the one that would hold the shares. Nothing is written — a new
+table is a config change (`rating.targets`) with a changelog entry.
 
 ## Content
 
@@ -399,7 +421,8 @@ subject { type, id, label }, reason, details, ip` — `ip` only for an owner.
   (`QUEZBY_PUSH_ENABLED`) with the Firebase project (`FIREBASE_PROJECT_ID`)
   and a readable service-account key (`FIREBASE_CREDENTIALS`) — whether config
   and routes are cached, the migrations uploaded but not run, open and stale
-  runs, and the limits the game runs with. The panel says in red when
+  runs, and the limits the game runs with (`leagueUnlockRuns`: the counted
+  runs that open Dereceli). The panel says in red when
   `appKey` is false: without the key the API answers every player 500
   (`RequireAppKey`), while `/admin/*` and `/ops/*` stay open so the key can be
   put right and the cache rebuilt. It says in red too when `gd` is false, and

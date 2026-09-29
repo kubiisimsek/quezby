@@ -24,6 +24,8 @@ type Row = {
   detail?: string;
   /** Points to pass the row above; none when there is nobody to pass. */
   gap?: number | null;
+  /** What the numbers are: points, or — on the Elo board — Elo. */
+  unit?: 'points' | 'elo';
 };
 
 /** A row's facts in order, as a screen reader says them; a fact left out is skipped. */
@@ -110,13 +112,13 @@ const tr = {
   /** Beside your own name on the podium and the climb: "@ekin · sen". */
   you: 'sen',
   /** A row read aloud: "4. sıra, @deniz, 9.870 puan, geçmek için 1.240 puan". */
-  row: ({ rank, name, isMe, score, detail, gap }: Row) =>
+  row: ({ rank, name, isMe, score, detail, gap, unit = 'points' }: Row) =>
     listed([
       `${rank}. sıra`,
       `${handle(name)}${isMe ? ', sen' : ''}`,
-      `${fmt.tr.score(score)} puan`,
+      `${fmt.tr.score(score)} ${unit === 'elo' ? 'Elo' : 'puan'}`,
       detail,
-      gap == null ? null : `geçmek için ${fmt.tr.gap(gap)} puan`,
+      gap == null ? null : `geçmek için ${fmt.tr.gap(gap)} ${unit === 'elo' ? 'Elo' : 'puan'}`,
     ]),
   /** How many posts a run lasted — under a name on the climb, under a season best. */
   posts: (count: number) => `${fmt.tr.score(count)} post`,
@@ -134,6 +136,9 @@ const tr = {
     toPass: (name: string, gap: number) => `${handle(dativeOf(name))} ${fmt.tr.gap(gap)} puan`,
     /** The same, when their name is not known. */
     toNext: (gap: number) => `Bir üst sıraya ${fmt.tr.gap(gap)} puan`,
+    /** On an Elo board: your rating, and the Elo to pass the player above. */
+    youRated: (rating: number) => `Sen · ${fmt.tr.score(rating)} Elo`,
+    toPassElo: (name: string, gap: number) => `${handle(dativeOf(name))} ${fmt.tr.gap(gap)} Elo`,
     progress: 'Bir üst sıraya ilerleme',
     pass: 'Geç onu',
     play: 'Oyna',
@@ -158,13 +163,13 @@ const en: BoardMessages = {
   place: (rank) => `${ordinal(rank)} place`,
   vacant: (rank) => `${ordinal(rank)} place, empty`,
   you: 'you',
-  row: ({ rank, name, isMe, score, detail, gap }) =>
+  row: ({ rank, name, isMe, score, detail, gap, unit = 'points' }) =>
     listed([
       `${ordinal(rank)} place`,
       `${handle(name)}${isMe ? ', you' : ''}`,
-      points.en(score),
+      unit === 'elo' ? `${fmt.en.score(score)} Elo` : points.en(score),
       detail,
-      gap == null ? null : `${points.en(gap)} to pass`,
+      gap == null ? null : `${unit === 'elo' ? `${fmt.en.gap(gap)} Elo` : points.en(gap)} to pass`,
     ]),
   posts: (count) => plural('en', count, { one: '1 post', other: `${fmt.en.score(count)} posts` }),
   between: 'More players in between',
@@ -185,6 +190,8 @@ const en: BoardMessages = {
         one: '1 pt to the next rank',
         other: `${fmt.en.gap(gap)} pts to the next rank`,
       }),
+    youRated: (rating) => `You · ${fmt.en.score(rating)} Elo`,
+    toPassElo: (name, gap) => `${fmt.en.gap(gap)} Elo to ${handle(name)}`,
     progress: 'Progress to the next rank',
     pass: 'Pass them',
     play: 'Play',
@@ -207,13 +214,13 @@ const de: BoardMessages = {
   place: (rank) => `Platz ${fmt.de.score(rank)}`,
   vacant: (rank) => `Platz ${fmt.de.score(rank)}, frei`,
   you: 'du',
-  row: ({ rank, name, isMe, score, detail, gap }) =>
+  row: ({ rank, name, isMe, score, detail, gap, unit = 'points' }) =>
     listed([
       `Platz ${fmt.de.score(rank)}`,
       `${handle(name)}${isMe ? ', du' : ''}`,
-      points.de(score),
+      unit === 'elo' ? `${fmt.de.score(score)} Elo` : points.de(score),
       detail,
-      gap == null ? null : `${points.de(gap)} zum Überholen`,
+      gap == null ? null : `${unit === 'elo' ? `${fmt.de.gap(gap)} Elo` : points.de(gap)} zum Überholen`,
     ]),
   posts: (count) => plural('de', count, { one: '1 Post', other: `${fmt.de.score(count)} Posts` }),
   between: 'Dazwischen sind weitere Spieler',
@@ -226,6 +233,8 @@ const de: BoardMessages = {
     top: 'Du stehst auf dem Gipfel! Verteidige deinen Platz.',
     toPass: (name, gap) => `Noch ${points.de(gap)} bis ${handle(name)}`,
     toNext: (gap) => `Noch ${points.de(gap)} bis zum nächsten Platz`,
+    youRated: (rating) => `Du · ${fmt.de.score(rating)} Elo`,
+    toPassElo: (name, gap) => `Noch ${fmt.de.gap(gap)} Elo bis ${handle(name)}`,
     progress: 'Fortschritt bis zum nächsten Platz',
     pass: 'Überholen',
     play: 'Spielen',
@@ -254,14 +263,14 @@ const ar: BoardMessages = {
   place: (rank) => `المركز ${fmt.ar.score(rank)}`,
   vacant: (rank) => `المركز ${fmt.ar.score(rank)} شاغر`,
   you: 'أنت',
-  row: ({ rank, name, isMe, score, detail, gap }) =>
+  row: ({ rank, name, isMe, score, detail, gap, unit = 'points' }) =>
     listed(
       [
         `المركز ${fmt.ar.score(rank)}`,
         `${iso(handle(name))}${isMe ? '، أنت' : ''}`,
-        points.ar(score),
+        unit === 'elo' ? `${fmt.ar.score(score)} إيلو` : points.ar(score),
         detail,
-        gap == null ? null : `${points.ar(gap)} للتجاوز`,
+        gap == null ? null : `${unit === 'elo' ? `${fmt.ar.gap(gap)} إيلو` : points.ar(gap)} للتجاوز`,
       ],
       '، ',
     ),
@@ -283,6 +292,8 @@ const ar: BoardMessages = {
     top: 'أنت في القمة! حافظ على مكانك.',
     toPass: (name, gap) => `تفصلك ${points.ar(gap)} عن ${iso(handle(name))}`,
     toNext: (gap) => `تفصلك ${points.ar(gap)} عن المركز التالي`,
+    youRated: (rating) => `أنت · ${fmt.ar.score(rating)} إيلو`,
+    toPassElo: (name, gap) => `تفصلك ${fmt.ar.gap(gap)} إيلو عن ${iso(handle(name))}`,
     progress: 'التقدّم نحو المركز التالي',
     pass: 'تجاوزه',
     play: 'العب',
@@ -310,13 +321,13 @@ const fr: BoardMessages = {
   place: rang,
   vacant: (rank) => `${rang(rank)}, libre`,
   you: 'toi',
-  row: ({ rank, name, isMe, score, detail, gap }) =>
+  row: ({ rank, name, isMe, score, detail, gap, unit = 'points' }) =>
     listed([
       rang(rank),
       `${handle(name)}${isMe ? ', toi' : ''}`,
-      points.fr(score),
+      unit === 'elo' ? `${fmt.fr.score(score)}\u00A0Elo` : points.fr(score),
       detail,
-      gap == null ? null : `${points.fr(gap)} pour dépasser`,
+      gap == null ? null : `${unit === 'elo' ? `${fmt.fr.gap(gap)}\u00A0Elo` : points.fr(gap)} pour dépasser`,
     ]),
   posts: (count) =>
     plural('fr', count, {
@@ -341,6 +352,8 @@ const fr: BoardMessages = {
         one: `À ${fmt.fr.gap(gap)} pt du rang suivant`,
         other: `À ${fmt.fr.gap(gap)} pts du rang suivant`,
       }),
+    youRated: (rating) => `Toi · ${fmt.fr.score(rating)} Elo`,
+    toPassElo: (name, gap) => `À ${fmt.fr.gap(gap)} Elo de ${handle(name)}`,
     progress: 'Progression vers le rang suivant',
     pass: 'Dépasser',
     play: 'Jouer',
@@ -367,13 +380,13 @@ const es: BoardMessages = {
   place: (rank) => `Puesto ${fmt.es.score(rank)}`,
   vacant: (rank) => `Puesto ${fmt.es.score(rank)}, libre`,
   you: 'tú',
-  row: ({ rank, name, isMe, score, detail, gap }) =>
+  row: ({ rank, name, isMe, score, detail, gap, unit = 'points' }) =>
     listed([
       `Puesto ${fmt.es.score(rank)}`,
       `${handle(name)}${isMe ? ', tú' : ''}`,
-      points.es(score),
+      unit === 'elo' ? `${fmt.es.score(score)} Elo` : points.es(score),
       detail,
-      gap == null ? null : `${points.es(gap)} para superar`,
+      gap == null ? null : `${unit === 'elo' ? `${fmt.es.gap(gap)} Elo` : points.es(gap)} para superar`,
     ]),
   posts: (count) => plural('es', count, { one: '1 post', other: `${fmt.es.score(count)} posts` }),
   between: 'Hay más jugadores en medio',
@@ -386,6 +399,8 @@ const es: BoardMessages = {
     top: '¡Estás en la cumbre! Defiende tu puesto.',
     toPass: (name, gap) => `A ${points.es(gap)} de ${handle(name)}`,
     toNext: (gap) => `A ${points.es(gap)} del siguiente puesto`,
+    youRated: (rating) => `Tú · ${fmt.es.score(rating)} Elo`,
+    toPassElo: (name, gap) => `A ${fmt.es.gap(gap)} Elo de ${handle(name)}`,
     progress: 'Progreso hacia el siguiente puesto',
     pass: 'Superar',
     play: 'Jugar',

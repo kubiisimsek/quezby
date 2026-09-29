@@ -2,11 +2,19 @@ import { ApiError } from '@quezby/sdk/admin';
 import { screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { adminSession, runResponse } from '@/test/factories';
+import { adminSession, runRating, runResponse } from '@/test/factories';
 import { fakeApi } from '@/test/fake-api';
 import { renderApp } from '@/test/render';
 
 const ID = '01jrun000000000000000000ab';
+
+async function ratingCard(): Promise<HTMLElement> {
+  return (await screen.findByRole('heading', { name: 'Reyting' })).closest('section') as HTMLElement;
+}
+
+function fact(scope: HTMLElement, label: string): HTMLElement {
+  return within(scope).getByText(label, { selector: 'dt' }).parentElement as HTMLElement;
+}
 
 describe('RunPage', () => {
   it('shows the run, its replay and whether the app told the truth', async () => {
@@ -63,6 +71,8 @@ describe('RunPage', () => {
     expect(await screen.findByText('Bu tur incelemede')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Onayla' }));
     const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByText(/Dereceli bir tursa reytingine de sayılır\./)).toBeInTheDocument();
+    expect(within(dialog).queryByText(/ligine/)).not.toBeInTheDocument();
     await user.click(within(dialog).getByRole('button', { name: 'Onayla' }));
 
     await waitFor(() => expect(api.runs.approve).toHaveBeenCalledWith(ID));
@@ -154,5 +164,59 @@ describe('RunPage', () => {
     renderApp({ path: `/runs/${ID}`, api });
 
     expect(await screen.findByText('Böyle bir tur yok')).toBeInTheDocument();
+  });
+
+  it('shows what the run did to the rating, against which target', async () => {
+    const api = fakeApi();
+    api.runs.get.mockResolvedValue(runResponse({}, { rating: runRating() }));
+    renderApp({ path: `/runs/${ID}`, api });
+
+    const card = await ratingCard();
+    expect(within(fact(card, 'Ne oldu')).getByText('Tur')).toBeInTheDocument();
+    expect(within(fact(card, 'Değişim')).getByText('+42 Elo')).toHaveClass('text-ok-text');
+    expect(fact(card, 'Reyting')).toHaveTextContent('2.408 → 2.450');
+    expect(within(fact(card, 'Lig')).getByText('Altın')).toBeInTheDocument();
+    expect(fact(card, 'Skor')).toHaveTextContent('140.000');
+    expect(fact(card, 'Skor')).toHaveTextContent('hedef 120.000');
+    expect(fact(card, 'Performans')).toHaveTextContent('2.560');
+    expect(fact(card, 'Genişlik')).toHaveTextContent('800');
+    expect(fact(card, 'Terfi kalkanı')).toHaveTextContent('Yok');
+    expect(within(card).queryByText(/Moderatör geri aldı/)).not.toBeInTheDocument();
+  });
+
+  it('says what a moderator\'s reject took back', async () => {
+    const api = fakeApi();
+    api.runs.get.mockResolvedValue(
+      runResponse({}, { status: 'rejected', rating: runRating({ delta: 55, before: 2400, after: 2455, reversedBy: -55, shielded: true }) }),
+    );
+    renderApp({ path: `/runs/${ID}`, api });
+
+    const card = await ratingCard();
+    expect(within(card).getByText('Moderatör geri aldı: −55')).toBeInTheDocument();
+    expect(within(fact(card, 'Değişim')).getByText('+55 Elo')).toBeInTheDocument();
+    expect(fact(card, 'Terfi kalkanı')).toHaveTextContent('Tuttu');
+  });
+
+  it('shows a run that did not count as such', async () => {
+    const api = fakeApi();
+    api.runs.get.mockResolvedValue(
+      runResponse({}, { rating: runRating({ kind: 'void', delta: 0, before: 2378, after: 2378, target: null, performance: null, width: null, counted: false }) }),
+    );
+    renderApp({ path: `/runs/${ID}`, api });
+
+    const card = await ratingCard();
+    expect(within(fact(card, 'Ne oldu')).getByText('Sayılmadı')).toBeInTheDocument();
+    expect(fact(card, 'Değişim')).toHaveTextContent('Sayılmadı');
+    expect(fact(card, 'Performans')).toHaveTextContent('—');
+  });
+
+  it('says when a run never touched the rating', async () => {
+    const api = fakeApi();
+    api.runs.get.mockResolvedValue(runResponse({}, { mode: 'vs', status: 'played', rating: null }));
+    renderApp({ path: `/runs/${ID}`, api });
+
+    const card = await ratingCard();
+    expect(within(card).getByText('Bu tur reytinge dokunmadı')).toBeInTheDocument();
+    expect(within(card).queryByText('Değişim', { selector: 'dt' })).not.toBeInTheDocument();
   });
 });

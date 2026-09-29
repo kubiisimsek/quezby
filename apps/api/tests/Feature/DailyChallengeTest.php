@@ -54,7 +54,7 @@ test('the daily run ranks on the challenge board and on the calendar boards', fu
     $response = $this->playFeed('daily')->assertOk()->assertJsonPath('run.mode', 'daily')->assertJsonPath('run.status', 'ranked');
 
     expect(LeaderboardEntry::query()->where('user_id', $user->id)->pluck('period')->map->value->all())
-        ->toEqualCanonicalizing(['daily', 'weekly', 'monthly', 'all', 'challenge']);
+        ->toEqualCanonicalizing(['weekly', 'monthly', 'all', 'challenge']);
     $response->assertJsonPath('daily.dayKey', '2026-09-26')
         ->assertJsonPath('daily.number', 3)
         ->assertJsonPath('daily.rank', 1)

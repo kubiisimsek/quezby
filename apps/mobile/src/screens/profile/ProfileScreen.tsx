@@ -15,7 +15,7 @@ import { LanguageSheet } from '@/components/LanguageSheet';
 import { NotificationsSheet } from '@/components/NotificationsSheet';
 import { SignInWaysSheet } from '@/components/SignInWaysSheet';
 import { useRemoveAvatar } from '@/hooks/useAvatar';
-import { useLeague, useStats } from '@/hooks/useBoards';
+import { useRating, useStats } from '@/hooks/useBoards';
 import { forgetPush } from '@/hooks/usePush';
 import { useInboxSummary } from '@/hooks/useSocial';
 import { handle, useT } from '@/i18n';
@@ -89,7 +89,7 @@ export function ProfileScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const user = useSession((state) => state.user);
   const ranks = useSession((state) => state.ranks);
-  const league = useLeague();
+  const rating = useRating();
   const inbox = useInboxSummary();
   const stats = useStats();
   const removePhoto = useRemoveAvatar();
@@ -151,7 +151,8 @@ export function ProfileScreen({ navigation }: Props) {
         <PlayerHero
           user={user}
           ranks={ranks}
-          tier={league.data && !league.data.unlock ? league.data.tier : null}
+          tier={rating.data?.tier ?? null}
+          elo={rating.data?.rating ?? null}
           onSettings={() => setSheet('settings')}
           onPhoto={() => setSheet('photo')}
           counters={
@@ -277,13 +278,14 @@ export function ProfileScreen({ navigation }: Props) {
 
 /**
  * Your card: a banner in the brand's stage with the gear on it, your
- * portrait rising out of it, your name and league, your three numbers and
- * your place on each board — all of it the API's.
+ * portrait rising out of it, your name, league and Elo, your three numbers
+ * and your place on each board — all of it the API's.
  */
 function PlayerHero({
   user,
   ranks,
   tier,
+  elo,
   counters,
   onSettings,
   onPhoto,
@@ -291,6 +293,7 @@ function PlayerHero({
   user: Me;
   ranks: Ranks | null;
   tier: LeagueTier | null;
+  elo: number | null;
   counters: ReactNode;
   onSettings: () => void;
   /** The camera slab on the portrait: pick a photo, or take it away. */
@@ -334,6 +337,9 @@ function PlayerHero({
         {tier || user.isGuest ? (
           <View style={styles.badges}>
             {tier ? <TierBadge tier={tier} size="md" showLabel /> : null}
+            {elo !== null ? (
+              <Tag label={t.rating.elo(t.fmt.score(elo))} tone="warn" icon="trophy" />
+            ) : null}
             {user.isGuest ? <Tag label={words.guest} tone="warn" icon="alert" /> : null}
           </View>
         ) : null}

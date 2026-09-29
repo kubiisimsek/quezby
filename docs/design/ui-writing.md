@@ -49,7 +49,7 @@ not translated word for word: each language gets a joke that lands in it.
 | --- | --- |
 | **Post** | What comes down the feed, as the player sees it: "Sıradan post", "Altın post", "Kırmızı postta elini çek", "64 post". Never "reel" in the app, the share text or the store — the code and the product docs keep *reel* as the domain term |
 | **Günün akışı** (#17) | The daily challenge: "Herkes aynı akışı oynar · tek hak" |
-| **Serbest oyun** | Any number of runs; the button is just "Oyna" |
+| **Mod seç** · **Günlük · Normal · Dereceli** | The sheet the gold slab opens, and its three modes. Normal is any number of runs ("Normal oyun" in the history, "Normal oyna" on a button); Dereceli is the only one that plays for Elo, shut until "Dereceli’ye 12 oyun kaldı", then "Dereceli açıldı!". Never "Serbest oyun", "rekabetçi" or "ranked" in Turkish; the slab itself still just says "Oyna" |
 | **Zirve** | The leaderboard screen and its dock slot; **Senin katın** is the player's own row card |
 | **Oyna · Zirve · Lig · Mesajlar · Profil** | The dock's five slots, the lobby (Oyna) in the middle |
 | **SEZON REKORU** · **Yukarı kaydır, oyna** | The lobby is a lock screen: the season best stands where the time would ("SEZON REKORU"), and the line under the gold slab says what a lock screen says, as the game's own move. Tapping plays too |
@@ -67,8 +67,11 @@ not translated word for word: each language gets a joke that lands in it.
 | **Geçmiş oyunlar** (GEÇMİŞ OYUNLAR) | Every run played to its end, "Oynadığın her tur, sunucunun saydığı haliyle": Hepsi / Günün akışı / VS, the days as Bugün, Dün, then the date; the season's best is tagged **REKOR** |
 | **Bildirimler** · **Haberin olsun mu?** · **Bildirimleri aç** | Push notifications: the new player's step after the name ("Şimdi değil" leaves them off), the card wherever they are off ("Bildirimler kapalı" — **Ayarları aç** once only the phone's settings can turn them on, **Gizle** for a week) and Ayarlar → Bildirimler (Arkadaşlık, VS, Hazır mesajlar) |
 | **Geç onu** | The one action on a rival: play to pass them. "@ekin'e 1.240 puan" |
-| **Bronz, Gümüş, Altın, Platin, Elmas** | League tiers, capitalised as names: "Altın lig" |
-| **Terfi bölgesi / Düşme bölgesi** | League zones; "Terfiye 1.240 puan" |
+| **Bronz, Gümüş, Altın, Platin, Elmas, MasterClass** | Leagues, capitalised as names: "Altın lig"; MasterClass is written the same in every Latin language (ماستر كلاس in Arabic) |
+| **Elo** · **Hedef 88.400** · **+42 / −18** | The rating a league comes from, "2.340 Elo"; the score the next run has to beat, "Hedef …" — never "eşik" or "minimum"; a move with its sign and a real minus (−), ±0 for none. "Altın'a 158 Elo" to the next league, "Tavanı yok" in MasterClass |
+| **Yerleşme 2/3** (YERLEŞME) | The first three rated runs, which place a player: "İlk 3 dereceli oyunun hangi ligde başlayacağını belirler." Never "kalibrasyon" |
+| **Yükseldin! · düştün · Kalkan · Hükmen yenilgi** | The Elo tile: "Altın'a yükseldin!", "Gümüş'e düştün.", "Kalkan seni ligde tuttu", a run flagged for how it was played is "Hükmen yenilgi" — never "hile" |
+| **Lig sıralaması** (LİG SIRALAMASI) · **@deniz'e 40 Elo** | A league's players by Elo, never reset: "Son 14 günde dereceli oynayanlar, Elo sırasıyla"; your floor says the Elo to pass the player above. There are no weekly groups, zones or Elo bonuses any more |
 | **Kusursuz seviye!, Şimşek!, Soğukkanlı!, Geri dönüş!** | Named combos, as in-run toasts (with "!") and as plain names on the result |
 | **Kombo x1,25** | Always two decimals, the language's decimal mark |
 | **Doğrulanıyor…** | While the API replays a run — no number before it answers |
@@ -81,7 +84,7 @@ not translated word for word: each language gets a joke that lands in it.
 | **Hesap bilgileri** | Ayarlar's account door, right above **Çıkış yap** ("@ekin · Apple bağlı", a guest's "Misafir hesap"), and its page: **Kullanıcı adı**, **Bağlı hesaplar**, and **Hesabı sil** last, in red |
 | **Rekor · Arkadaş · Tur** · **İSTATİSTİKLER** | The three numbers under a profile's name (Arkadaş opens the friend list and wears the requests waiting), and the tile with four more whose sheet has all of them: **Oyun**, **Hareketler**, **En iyiler** |
 | **Seçtiğin ad bir daha değişmez** | Said wherever a name is picked, before it is saved — there is no confirm step |
-| **Lige 2 oyun kaldı** · **KİLİTLİ** | The league before a new player's first 20 counted runs: "Lig, ilk 20 oyunundan sonra açılır. Deneme turu sayılmaz." |
+| **Dereceli’ye 2 oyun kaldı** · **Dereceli açıldı!** | Dereceli before a new player's first 20 counted Normal or Günlük runs: "Dereceli, 20 Normal ya da Günlük oyundan sonra açılır."; the run that opens it: "Dereceli açıldı!" and "İlk 3 dereceli oyunun Elo’nu belirler." Before placement the league screen says "Lig sıralaması Dereceli oyuncularının" |
 | **Hesabını koru** | Attach Apple, Google or an email to a guest account — a step after the name ("Şimdi değil" skips it), and once, when a guest's league opens ("Ligdesin!…") |
 | **Oyunu birlikte geliştirelim mi?** · **İzin ver / İzin verme** | The one question about usage analytics (ribbon "SENİN SEÇİMİN"), on the welcome before anything else — and once in the lobby of a phone that predates it. Two slabs of one size, neither gold. It says what is counted ("hangi ekranlara girdiğini ve ne kadar oynadığını sayarız") and what never leaves the phone ("Adın, e-postan ya da konumun gönderilmez") |
 | **Kullanım verisi** | The switch in Ayarlar for that answer: on — "Hangi ekranlara girdiğini ve ne kadar oynadığını sayarız."; off — "Yalnızca oyunun çalışması için gereken cihaz bilgisi gider." Never "izleme", "takip" or "tracking" to the player |
@@ -101,7 +104,8 @@ Use these and nothing else for them. A ribbon's capitals are in brackets.
 | Altın post | Gold post | Gold-Post | Post doré | Post dorado | منشور ذهبي |
 | Kırmızı post · Dokunma! | Red post · Don't touch! | Roter Post · Nicht berühren! | Post rouge · Touche pas ! | Post rojo · ¡No toques! | منشور أحمر · لا تلمس! |
 | Günün akışı (GÜNÜN AKIŞI) | Daily Feed (DAILY FEED) | Tages-Feed (TAGES-FEED) | Fil du jour (FIL DU JOUR) | Feed del día (FEED DEL DÍA) | خلاصة اليوم |
-| Serbest oyun | Free play | Freies Spiel | Partie libre | Juego libre | لعب حر |
+| Günlük · Normal · Dereceli | Daily · Normal · Ranked | Täglich · Normal · Gewertet | Quotidien · Normal · Classé | Diario · Normal · Competitivo | يومي · عادي · مصنَّف |
+| Normal oyun · Dereceli oyun | Normal game · Ranked game | Normales Spiel · Gewertetes Spiel | Partie normale · Partie classée | Partida normal · Partida competitiva | مباراة عادية · مباراة مصنَّفة |
 | Oyna · Zirve · Lig · Mesajlar · Profil | Play · Summit · League · Messages · Profile | Spielen · Gipfel · Liga · Chats · Profil | Jouer · Sommet · Ligue · Messages · Profil | Jugar · Cumbre · Liga · Mensajes · Perfil | العب · القمة · الدوري · الرسائل · الملف |
 | SEZON REKORU · Yukarı kaydır, oyna | SEASON RECORD · Swipe up to play | SAISONREKORD · Nach oben wischen und spielen | RECORD DE LA SAISON · Glisse vers le haut pour jouer | RÉCORD DE LA TEMPORADA · Desliza hacia arriba para jugar | الرقم القياسي للموسم · اسحب للأعلى والعب |
 | SENİ BEKLEYEN VS · @deniz sana VS attı | VS WAITING FOR YOU · @deniz sent you a VS | EIN VS WARTET AUF DICH · @deniz hat dir ein VS geschickt | UN VS T’ATTEND · @deniz t’a lancé un VS | UN VS TE ESPERA · @deniz te mandó un VS | تحدٍّ بانتظارك · ‎@deniz‎ أرسل لك تحديًا |
@@ -114,7 +118,10 @@ Use these and nothing else for them. A ribbon's capitals are in brackets.
 | Geç onu | Pass them | Überholen | Dépasser | Superar | تجاوزه |
 | Bronz · Gümüş · Altın · Platin · Elmas | Bronze · Silver · Gold · Platinum · Diamond | Bronze · Silber · Gold · Platin · Diamant | Bronze · Argent · Or · Platine · Diamant | Bronce · Plata · Oro · Platino · Diamante | البرونز · الفضة · الذهب · البلاتين · الماس |
 | Altın lig | Gold league | Gold-Liga | Ligue Or | Liga Oro | دوري الذهب |
-| Terfi bölgesi · Düşme bölgesi | Promotion zone · Relegation zone | Aufstiegszone · Abstiegszone | Zone de promotion · Zone de relégation | Zona de ascenso · Zona de descenso | منطقة الصعود · منطقة الهبوط |
+| MasterClass | MasterClass | MasterClass | MasterClass | MasterClass | ماستر كلاس |
+| Elo · Hedef · Yerleşme (YERLEŞME) | Elo · Target · Placement (PLACEMENT) | Elo · Ziel · Einstufung (EINSTUFUNG) | Elo · Objectif · Placement (PLACEMENT) | Elo · Objetivo · Clasificación (CLASIFICACIÓN) | إيلو · الهدف · التصنيف الأولي |
+| Hükmen yenilgi · Kalkan | Forfeit · Shield | Kampflos verloren · Schild | Défaite par forfait · Bouclier | Derrota por abandono · Escudo | خسارة بالانسحاب · درع |
+| Lig sıralaması (LİG SIRALAMASI) | League ranking (LEAGUE RANKING) | Liga-Rangliste (LIGA-RANGLISTE) | Classement de la ligue (CLASSEMENT DE LA LIGUE) | Tabla de la liga (TABLA DE LA LIGA) | ترتيب الدوري |
 | Kusursuz seviye! · Şimşek! · Soğukkanlı! · Geri dönüş! | Flawless level! · Lightning! · Cool head! · Comeback! | Makelloses Level! · Blitz! · Eiskalt! · Comeback! | Niveau parfait ! · Éclair ! · Sang-froid ! · Remontada ! | ¡Nivel perfecto! · ¡Relámpago! · ¡Sangre fría! · ¡Remontada! | مستوى مثالي! · برق! · أعصاب باردة! · عودة قوية! |
 | İsimli kombolar | Named combos | Spezialkombos | Combos spéciaux | Combos especiales | الكومبو الخاصة |
 | Sezon rekoru · Mükemmel · Tur (stats) | Season record · Perfect · Runs | Saisonrekord · Perfekt · Runden | Record de la saison · Parfait · Parties | Récord de la temporada · Perfecto · Partidas | الرقم القياسي للموسم · مثالي · الجولات |
@@ -133,7 +140,7 @@ Use these and nothing else for them. A ribbon's capitals are in brackets.
 | Sana ne diyelim? · Şimdilik geç | What should we call you? · Skip for now | Wie sollen wir dich nennen? · Erst mal überspringen | On t'appelle comment ? · Passer pour l'instant | ¿Cómo te llamamos? · Saltar por ahora | بماذا نناديك؟ · تخطَّ الآن |
 | Adını seç | Pick your name | Wähle deinen Namen | Choisis ton nom | Elige tu nombre | اختر اسمك |
 | Seçtiğin ad bir daha değişmez | The name you pick never changes | Dein gewählter Name bleibt für immer | Le nom choisi ne change plus jamais | El nombre que elijas no cambia nunca | الاسم الذي تختاره لن يتغيّر أبدًا |
-| Lige 2 oyun kaldı · KİLİTLİ | 2 games to the league · LOCKED | Noch 2 Spiele bis zur Liga · GESPERRT | Encore 2 parties avant la ligue · VERROUILLÉ | Faltan 2 partidas para la liga · BLOQUEADA | مباراتان للوصول إلى الدوري · مقفل |
+| Dereceli’ye 2 oyun kaldı | 2 games to Ranked | Noch 2 Spiele bis Gewertet | Encore 2 parties avant le mode classé | Faltan 2 partidas para Competitivo | مباراتان للوصول إلى المصنَّف |
 | Hesabını koru · Şimdi değil · Ligdesin! | Protect your account · Not now · You're in the league! | Konto sichern · Nicht jetzt · Du bist in der Liga! | Protège ton compte · Pas maintenant · Tu es dans la ligue ! | Protege tu cuenta · Ahora no · ¡Estás en la liga! | احمِ حسابك · ليس الآن · أنت في الدوري! |
 | Apple hesabıma geç | Switch to my Apple account | Zu meinem Apple-Konto wechseln | Passer à mon compte Apple | Cambiar a mi cuenta de Apple | الانتقال إلى حسابي على Apple |
 | Giriş yolları · Bağı kaldır | Sign-in methods · Unlink | Anmeldewege · Verknüpfung lösen | Moyens de connexion · Dissocier | Métodos de acceso · Desvincular | طرق تسجيل الدخول · إلغاء الربط |

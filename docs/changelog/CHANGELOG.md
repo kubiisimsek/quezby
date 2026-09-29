@@ -1,5 +1,150 @@
 # Changelog
 
+## 2026-09-29 — The league is the rating's, and it never resets
+
+The owner: with Elo there is no need for a league that ends every week, rank
+by Elo directly, as in chess. The Hafta / Ay / Tüm zamanlar score boards
+stay exactly as they are. Changes the two entries below.
+
+- **Weekly groups are gone:** no 30-player groups, no week's close, no +50 /
+  +30 / +15 Elo bonus. A player's league is their rating's tier, and the
+  league screen ranks its players by Elo: those who played Dereceli in the
+  last 14 days, highest first, never reset (`GET /ratings?scope=league`;
+  before placement it answers no rows).
+- **API:** `LeagueService`, `LeagueGroup`, `LeagueMember`, `GET
+  /leagues/current` and the admin `leagues` routes are removed;
+  `FinishRunResponse.league`, `RatingChangeKind` `bonus` and
+  `AdminPlayerDetail.league` go with them. Migration
+  `2026_10_01_000200_drop_weekly_league_groups` drops `league_groups` and
+  `league_members` (their data is gone for good) and the day rows the boards
+  kept for group points; no run writes a day row any more. The unreleased
+  migration that turned zones into bonuses is deleted, and `rating_changes`
+  never gets `league_member_id`. `leagues.unlock_runs` is now
+  `rating.unlock_runs` (same `QUEZBY_LEAGUE_UNLOCK_RUNS`). The admin funnel's
+  `league` step and a player's `league` first now mean placed by Elo;
+  `AdminRatingsResponse.rules.bonus` is `rules.unlockRuns`;
+  `limits.leagueGroupSize` is gone.
+- **App:** the league screen keeps its stage and latest changes, and under
+  them LİG SIRALAMASI: `ClimbRow`s in Elo and your floor pinned
+  (`FloorCard` `unit="elo"`: "Sen · 2.340 Elo", "@deniz'e 40 Elo", Geç onu
+  plays rated); "Lig sıralaması Dereceli oyuncularının" before placement, a
+  gold "Dereceli oyna" for a placed player off the list. The result screen
+  has no group tile. The lobby's "Ligdesin!" ask comes once a guest is
+  placed. Help, league and rating copy in six languages.
+- **Admin:** the Ligler pages are gone; Reytingler shows the Dereceli
+  threshold instead of the bonus; the player page has no weekly seat.
+- Tests: Pest (the league board, the removed route and tables, day rows,
+  moderation, seeders, roles), the app (`LeagueScreen`, `HomeScreen`,
+  `ResultView`, `FloorCard`, `HelpScreen`), SDK and the panel.
+
+## 2026-09-29 — Dereceli: Elo is played for in its own mode
+
+The owner: Elo must not start at once — like CS2's competitive mode, learn
+the game first, then play rated. Three modes now: **Günlük** (the day's
+feed), **Normal** (free play, renamed) and **Dereceli** (`RunMode::Rated`,
+`rated`), picked from the sheet the lobby's Oyna opens. Changes the entry
+below.
+
+- **Only Dereceli moves Elo.** Normal, Günlük and VS runs never touch the
+  rating; all three modes still go on the Hafta / Ay / Tüm zamanlar boards.
+- **Dereceli opens after 20 counted Normal or Günlük runs** (ranked and
+  scoring, `leagues.unlock_runs`); a rated start before that is
+  `409 rated_locked`. It never locks again once played. Progress comes as
+  `unlock` (`LeagueUnlock = { required, remaining, placement }`) on
+  `GET /rating`, `GET /leagues/current` and the finish's `leagueUnlock`,
+  `remaining: 0` on the run that opens it.
+- **Placement is 3 rated runs** (`rating.placement_runs`), still held inside
+  1200–1800. Nobody is seeded from runs played before (`RatingKind::Seed` and
+  `RatingSeedTest` are gone) — a strong Normal record no longer sets a weak
+  start, which is how a 22.000 personal best lost 83.
+- **Weekly groups are Dereceli's:** a placed player sits down with their first
+  rated run of the week, and points are each day's best **rated** score (the
+  `daily` board rows are written by rated runs only). Calibration reads rated
+  runs only.
+- **App:** the lobby's Oyna (a tap or the swipe up) opens **Mod seç**
+  (`ModeSheet`): a tile per mode with what it plays for ("Skorun Zirve'ye
+  yazılır", "Elo için oyna · Hedef 72.400", the placement count, the day's rule
+  or "Bugünkü hakkını kullandın", which opens the day's board); Dereceli is
+  dimmed with a lock, "Dereceli'ye 17 oyun kaldı" and a bar while shut. The
+  owner found a switch over the slab too heavy, so the slab is compact too
+  (60 pt, two chevrons). The lobby's league notice counts the games
+  to Dereceli; the League screen's stage shows the lock with a gold "Normal
+  oyna", then the placement with a gold "Dereceli oyna"; its weekly group says
+  "Haftalık grup Dereceli oyuncularının" until placement. The result counts
+  the games left and celebrates "Dereceli açıldı!" with the burst. A
+  "Dereceli" pill in the HUD, a Dereceli filter and row in Geçmiş oyunlar, no
+  offline practice for a rated run. "Serbest oyun" is "Normal oyun"
+  everywhere; help explains the modes in six languages (`modes` catalog).
+- **Admin:** runs show and filter the `Dereceli` mode.
+- Tests: Pest `RatedUnlockTest` (new), rating, league, board, finish, daily,
+  moderation and seeder tests on rated runs; the app's `HomeScreen` mode sheet, `LeagueScreen` locked / placing / group states,
+  `ResultView` unlock and opened tiles, `GameScreen`, `Hud`, `useGame`,
+  `HistoryScreen`, `Segmented` `said`.
+
+## 2026-09-29 — Elo: the league comes from a rating
+
+The owner asked for an Elo system (researched against chess.com, Lichess,
+FIDE, Valorant, League, Apex, Clash Royale, Brawl Stars, Duolingo and
+TETR.IO): 0–5000 in six leagues a thousand wide — Bronz, Gümüş, Altın,
+Platin, Elmas and **MasterClass** (5000 and up) — a start between 1000 and
+2000, the rating up past a score and down short of it, never more than 100 a
+run, and the league taken from it. Plan: "Hedef skora karşı maç"
+(`docs/product/scoring.md` → *Elo*).
+
+- **A match against a target:** each counted run plays against the score a
+  player of their rating typically makes (`quezby.rating.targets`, per engine
+  version: 0 → 8.000 … 5000 → 800.000). `Δ = round(100 × tanh((P − R) / W))`,
+  `W` 800 (400 for the 15 runs after placement and 5 back after 30 idle
+  days). The target shown is rounded up to a hundred, so reaching it never
+  loses. `RatingBalanceTest` holds the engine's players in their leagues
+  (casual ~1070, average ~1910, good ~2825, pro ~3830, elite ~4540).
+- **Placement:** five runs, then the rating of their median, held inside
+  1200–1800 — everyone starts in Gümüş. Players who played before are placed
+  from their last 20 ranked runs the first time the API meets them.
+  **Shield:** 3 runs after a promotion; **Bronz** loses half; floor 0.
+- **Forfeits:** a run left unfinished (`abandoned`, `expired`), one the engine
+  throws out and one flagged for how it was played is the full loss — a bad
+  run can no longer vanish by cutting the connection and starting another.
+  A banned player's, a failed phone's and a past season's runs do not count;
+  a countdown given up is cancelled for nothing (`POST /runs/{id}/cancel`,
+  5 s). The app sends a finish kept on the phone before it starts a new run.
+  A moderator's reject takes back what a run won, never what it lost.
+- **Weekly groups stay, zones go:** 30 players of one league, points from
+  each day's best; the week's first three earn +50, +30, +15 Elo (one paid
+  place per five members who scored), credited when each comes back.
+- **`fast_decisions` no longer catches guessers:** a player who swipes
+  everything is as fast on the reels they get wrong; the flag is dropped when
+  more than 10 % of the fast gestures were wrong (`fast_wrong_share`), since a
+  hard flag now costs rating.
+- **App:** the lobby's league notice ("Gümüş lig · 1.640 Elo", "Hedef
+  72.400", or "Yerleşme 2/5"); the result's Elo tile (count-up, ±move,
+  target, confetti on a new league, a shake on a fall); the league screen
+  (six-rung ladder, Elo in gold, a notched bar through the league, latest
+  changes, the gold bonus band); Zirve's **Elo** tab; Elo on the profile and
+  player cards; MasterClass's orchid and crown (`tierMaster`). `Meter`
+  `notches`, `ClimbRow`/`Podium` `unit`.
+- **Admin:** Reytingler (leagues by rating, the top 50, the rules, the
+  calibration report), a player's rating and history, a run's rating change;
+  group tables show bonuses. `php artisan quezby:rating:calibrate`.
+- Copy in six languages (`rating` catalog; league, lobby, result and help
+  lines).
+- Contract: `LeagueTier` + `master`; `RunRating`, `RatingResponse`,
+  `RatingChange`, `RatingBoardResponse`; `FinishRunResponse.rating`;
+  `PlayerCard.rating`; `LeagueMember/LeagueStanding.bonus`,
+  `LeagueResponse.bonusPlaces/podiumGap`, `lastWeek.bonus` (zones and outcomes
+  removed); admin `AdminPlayerRating`, `AdminRunRating`,
+  `AdminRatingsResponse`, `AdminCalibrationResponse` (types);
+  `rating.current/board`, `runs.cancel`, admin `ratings.get/calibration`
+  (SDK). Tables `player_ratings`, `rating_changes`; `league_members.bonus`,
+  `bonus_at` (and `outcome` dropped).
+- Tests: Pest `TargetTableTest`, `RatingBalanceTest`, `RatingRunTest`,
+  `RatingForfeitTest`, `RatingSeedTest`, `RatingModerationTest`,
+  `RatingEndpointTest`, `Admin/RatingsTest`, and the league, unlock, profile,
+  search, anti-cheat, verifier and seeder tests updated; the app's
+  `ResultView`, `LeagueScreen`, `HomeScreen`, `LeaderboardScreen`,
+  `ProfileScreen`, `PlayerSheet`, `TierBadge`, `useGame`, `HelpScreen`,
+  `tiers`; SDK endpoints; the panel's Reytingler, player, run and league pages.
+
 ## 2026-09-29 — The bell, and Mesajlar in two
 
 The owner asked where the notifications were ("VS geldi" had no place of its

@@ -51,9 +51,8 @@ test('a finished run is replayed, ranked and recorded on every board', function 
         ],
         'passed' => [],
         'daily' => null,
-        // A new player's first counted run: the league opens nineteen runs later.
-        'league' => null,
-        'leagueUnlock' => ['required' => 20, 'remaining' => 19],
+        // A new player's first counted run: Dereceli opens nineteen runs later.
+        'leagueUnlock' => ['required' => 20, 'remaining' => 19, 'placement' => 3],
     ]);
 
     $bonuses = $response->json('run.breakdown.bonuses');
@@ -76,9 +75,9 @@ test('a finished run is replayed, ranked and recorded on every board', function 
         ->and($run->actions)->toBe($fixture['actions'])
         ->and($run->open_user_id)->toBeNull()
         ->and($run->stats['swipes'])->toBe($stats['swipes']);
-    // The day's row too: no board shows it, but the league adds each day's best up.
+    // A free run keeps no day row: only a rated run adds to a weekly group.
     expect(LeaderboardEntry::query()->where('user_id', $user->id)->where('season', 2)->pluck('period')->map->value->all())
-        ->toEqualCanonicalizing(['daily', 'weekly', 'monthly', 'all']);
+        ->toEqualCanonicalizing(['weekly', 'monthly', 'all']);
 });
 
 test('the share text speaks the request\'s language', function (string $acceptLanguage, string $shareText) {
@@ -213,7 +212,6 @@ test('a log that stops before the first reel is a quit that places nobody', func
         ->assertJsonPath('run.endedBy', 'quit')
         ->assertJsonPath('isNewBest', false)
         ->assertJsonPath('best', null)
-        ->assertJsonPath('league', null)
         ->assertJsonPath('ranks', ['weekly' => null, 'monthly' => null, 'all' => null]);
 
     expect(LeaderboardEntry::query()->count())->toBe(0);

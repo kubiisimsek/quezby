@@ -12,11 +12,11 @@ use App\Game\ReelKind;
 use App\Game\Replay;
 use App\Game\Rules;
 use App\Game\Run as Engine;
-use App\Models\LeagueGroup;
 use App\Models\Run;
 use App\Models\User;
 use App\Services\Integrity\DeviceCheckResult;
 use App\Services\Integrity\DeviceIntegrity;
+use App\Services\Rating\RatingService;
 use App\Services\RunClock;
 use App\Services\RunService;
 use App\Services\Social\FriendService;
@@ -33,7 +33,7 @@ use RuntimeException;
 /**
  * Local demo data, played the real way. Two dozen players and eight Istanbul
  * days of runs, each one started and finished through `RunService`: the
- * server replays it, and the boards, today's "Günün akışı", the leagues and
+ * server replays it, and the boards, today's "Günün akışı", the ratings and
  * the lifetime numbers fill exactly as they would in production. A small bot
  * plays for the players — the engine's own thumbs, casual to pro — while the
  * clock is moved on so every run took as long as it would on a phone: it
@@ -62,16 +62,20 @@ final class DemoSeeder extends Seeder
     private const MIN_RUN_MS = 45000;
 
     /**
-     * Counted runs that open a demo player's league. The players stand for
-     * veterans: with the real threshold (`leagues.unlock_runs`, 20) a week of
-     * demo play would open hardly anyone's league.
+     * Counted free and daily runs that open a demo player's Dereceli. The
+     * players stand for veterans: with the real threshold
+     * (`rating.unlock_runs`, 20) a week of demo play would open hardly
+     * anyone's. Once it is open, their free runs are rated.
      */
     public const VETERAN_UNLOCK_RUNS = 3;
+
+    /** Rated runs that place a demo veteran (`rating.placement_runs`, 3, for real players). */
+    public const VETERAN_PLACEMENT_RUNS = 1;
 
     public function __construct(
         /** How many of the demo players to create, at most 24. */
         public int $players = 24,
-        /** Istanbul days to fill, today included. Eight always reach back into last week's league. */
+        /** Istanbul days to fill, today included. Eight always reach back into last week. */
         public int $days = 8,
     ) {}
 
@@ -90,29 +94,34 @@ final class DemoSeeder extends Seeder
 
         $began = hrtime(true);
         $testNow = Carbon::getTestNow();
-        $unlockRuns = config('quezby.leagues.unlock_runs');
-        config(['quezby.leagues.unlock_runs' => self::VETERAN_UNLOCK_RUNS]);
-        // Resolved after the line above, so its league service opens at the veterans' threshold.
+        $unlockRuns = config('quezby.rating.unlock_runs');
+        $placementRuns = config('quezby.rating.placement_runs');
+        config([
+            'quezby.rating.unlock_runs' => self::VETERAN_UNLOCK_RUNS,
+            'quezby.rating.placement_runs' => self::VETERAN_PLACEMENT_RUNS,
+        ]);
+        // Resolved after the lines above, so its rating service opens and places at the veterans' thresholds.
         $runs = app(RunService::class);
+        $ratings = app(RatingService::class);
         $now = CarbonImmutable::now('UTC');
         $timezone = (string) config('quezby.leaderboard.timezone');
         $today = $now->setTimezone($timezone)->startOfDay();
         $first = $today->subDays(max(1, $this->days) - 1);
 
         try {
-            DB::transaction(function () use ($runs, $friends, $devices, $clock, $names, $now, $today, $first) {
+            DB::transaction(function () use ($runs, $ratings, $friends, $devices, $clock, $names, $now, $today, $first) {
                 $players = $this->createPlayers($names, $first);
                 $this->befriend($players, $friends, $first);
 
                 for ($day = $first; $day->lessThanOrEqualTo($today); $day = $day->addDay()) {
                     foreach ($players as $player) {
-                        $this->playDay($runs, $devices, $clock, $player, $day, $day->equalTo($today), $now);
+                        $this->playDay($runs, $ratings, $devices, $clock, $player, $day, $day->equalTo($today), $now);
                     }
                 }
             });
         } finally {
             Carbon::setTestNow($testNow);
-            config(['quezby.leagues.unlock_runs' => $unlockRuns]);
+            config(['quezby.rating.unlock_runs' => $unlockRuns, 'quezby.rating.placement_runs' => $placementRuns]);
         }
 
         $this->report($names, (hrtime(true) - $began) / 1e9);
@@ -191,7 +200,7 @@ final class DemoSeeder extends Seeder
      *
      * @param  array{user: User, skill: float, top: bool}  $player
      */
-    private function playDay(RunService $runs, DeviceIntegrity $devices, RunClock $clock, array $player, CarbonImmutable $day, bool $isToday, CarbonImmutable $now): void
+    private function playDay(RunService $runs, RatingService $ratings, DeviceIntegrity $devices, RunClock $clock, array $player, CarbonImmutable $day, bool $isToday, CarbonImmutable $now): void
     {
         $dice = self::dice(crc32($player['user']->username.'|'.$day->format('Y-m-d')));
         $skill = $player['skill'];
@@ -232,6 +241,10 @@ final class DemoSeeder extends Seeder
         }
 
         foreach ($plan as [$mode, $hand]) {
+            // A veteran whose Dereceli is open plays for Elo.
+            if ($mode === RunMode::Free && $ratings->unlock($player['user']) === null) {
+                $mode = RunMode::Rated;
+            }
             $finishedAt = $this->playRun($runs, $clock, $player['user'], $mode, $hand, $at->utc(), $deadline->utc());
             if ($finishedAt === null) {
                 return;
@@ -409,13 +422,13 @@ final class DemoSeeder extends Seeder
         $friendships = intdiv(DB::table('friendships')->whereIn('user_id', $users)->count(), 2);
 
         $this->command?->outputComponents()->info(sprintf(
-            'Demo: %d players, %d runs (%d ranked, %d held for review), %d friendships, %d league groups — %.1f s.',
+            'Demo: %d players, %d runs (%d ranked, %d held for review), %d friendships, %d placed — %.1f s.',
             $users->count(),
             $runs->sum(),
             $runs[RunStatus::Ranked->value] ?? 0,
             $runs[RunStatus::Review->value] ?? 0,
             $friendships,
-            LeagueGroup::query()->count(),
+            DB::table('player_ratings')->whereIn('user_id', $users)->whereNotNull('rating')->count(),
             $seconds,
         ));
     }

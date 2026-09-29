@@ -25,6 +25,7 @@ return [
     'run_rejected' => 'Bu oyun doğrulanamadı, sıralamaya giremez.',
     'engine_outdated' => 'Oyun sürümün güncel değil, sıralamaya girmek için uygulamayı güncelle.',
     'daily_already_played' => 'Günün akışını bugün oynadın. Yarın yeni akış seni bekliyor.',
+    'rated_locked' => 'Dereceli henüz açılmadı. Önce Normal ya da Günlük oyunlarını oyna.',
     'cannot_befriend_self' => 'Kendine arkadaşlık isteği gönderemezsin.',
     'friend_limit' => 'En fazla :limit arkadaşın olabilir.',
     'request_limit' => 'Cevap bekleyen en fazla :limit isteğin olabilir. Biri cevap verince yenisini gönder.',

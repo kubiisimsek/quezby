@@ -9,14 +9,13 @@ import type {
   AdminBoardKeysResponse,
   AdminBoardQuery,
   AdminBoardResponse,
+  AdminCalibrationQuery,
+  AdminCalibrationResponse,
   AdminContentQuery,
   AdminContentResponse,
   AdminCounts,
   AdminCreateRequest,
   AdminDeletePlayerRequest,
-  AdminLeagueGroupResponse,
-  AdminLeaguesQuery,
-  AdminLeaguesResponse,
   AdminLoginRequest,
   AdminMeResponse,
   AdminOverview,
@@ -26,6 +25,7 @@ import type {
   AdminPlayerResponse,
   AdminPlayersQuery,
   AdminPlayersResponse,
+  AdminRatingsResponse,
   AdminReasonRequest,
   AdminRenameResponse,
   AdminReportsQuery,
@@ -131,10 +131,10 @@ export function createAdminClient(options: AdminClientOptions) {
       keys: (query: AdminBoardKeysQuery) =>
         request<AdminBoardKeysResponse>('/boards/keys', { query }),
     },
-    leagues: {
-      list: (query: AdminLeaguesQuery = {}) => request<AdminLeaguesResponse>('/leagues', { query }),
-      group: (groupId: number) =>
-        request<AdminLeagueGroupResponse>(`/leagues/groups/${id(groupId)}`),
+    ratings: {
+      get: () => request<AdminRatingsResponse>('/ratings'),
+      calibration: (query: AdminCalibrationQuery = {}) =>
+        request<AdminCalibrationResponse>('/ratings/calibration', { query }),
     },
     analytics: {
       get: (query: AdminAnalyticsQuery = {}) => request<AdminAnalytics>('/analytics', { query }),

@@ -62,8 +62,7 @@ final class SystemStatus
             'limits' => [
                 'reviewTopAll' => (int) config('quezby.plausibility.review_top_all'),
                 'reviewTopWeekly' => (int) config('quezby.plausibility.review_top_weekly'),
-                'leagueGroupSize' => (int) config('quezby.leagues.group_size'),
-                'leagueUnlockRuns' => (int) config('quezby.leagues.unlock_runs'),
+                'leagueUnlockRuns' => (int) config('quezby.rating.unlock_runs'),
                 'runTtlMinutes' => $ttl,
                 'adminTokenHours' => (int) config('quezby.admin.token_hours'),
             ],

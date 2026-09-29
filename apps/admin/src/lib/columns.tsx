@@ -1,5 +1,5 @@
-import type { AdminAuditEntry, AdminPlayerRef, AdminRunFlag, AdminRunRow, AdminRunStatus, RunFlagCode } from '@quezby/types';
-import { Ban, Terminal } from 'lucide-react';
+import type { AdminAuditEntry, AdminPlayerRef, AdminRunFlag, AdminRunRow, AdminRunStatus, LeagueTier, RunFlagCode } from '@quezby/types';
+import { Ban, Crown, Medal, Terminal } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import { Avatar } from '@/components/base/avatar';
@@ -11,9 +11,11 @@ import {
   AUDIT_VIA,
   formatDate,
   formatDateTime,
+  formatDelta,
   formatNumber,
   formatPerMille,
   formatRelative,
+  LEAGUE_TIER,
   playerName,
   RUN_FLAG,
   RUN_MODE,
@@ -21,6 +23,7 @@ import {
   SEVERITY,
   shortId,
 } from '@/lib/format';
+import { cn } from '@/lib/utils';
 
 /**
  * The cells more than one table draws: who a player is, a run's status and
@@ -79,6 +82,23 @@ export function When({ at, as = 'relative' }: { at: string | null | undefined; a
 export function RunStatusTag({ status }: { status: AdminRunStatus }) {
   const { tone, label, hint } = RUN_STATUS[status];
   return <Tag tone={tone} label={label} title={hint} />;
+}
+
+/** A league by its name; MasterClass wears a crown. */
+export function TierTag({ tier }: { tier: LeagueTier }) {
+  return <Tag tone="secondary" icon={tier === 'master' ? <Crown /> : <Medal />} label={LEAGUE_TIER[tier]} />;
+}
+
+/**
+ * A rating's move, signed, and in the colour of its news: green up, red
+ * down, grey for none. The sign says it too, so it is never colour alone.
+ */
+export function EloDelta({ value, unit = false }: { value: number; unit?: boolean }) {
+  return (
+    <span className={cn('whitespace-nowrap font-semibold tabular', value > 0 ? 'text-ok-text' : value < 0 ? 'text-bad-text' : 'text-ink-muted')}>
+      {unit ? `${formatDelta(value)} Elo` : formatDelta(value)}
+    </span>
+  );
 }
 
 /** A run's signals as tags, the hard ones first; past `max` a count of the rest. */

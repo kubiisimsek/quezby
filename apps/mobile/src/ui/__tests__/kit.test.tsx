@@ -103,6 +103,22 @@ describe('@/ui/kit', () => {
     expect(screen.getByPlaceholderText('ekin')).toBeOnTheScreen();
   });
 
+  it('reads a segment out by what it says when it has more to say than its label', async () => {
+    await render(
+      <Segmented
+        value="free"
+        onChange={jest.fn()}
+        options={[
+          { value: 'free', label: 'Normal' },
+          { value: 'rated', label: 'Dereceli', said: 'Dereceli, kilitli: 12 oyun kaldı' },
+        ]}
+      />,
+    );
+
+    expect(screen.getByRole('tab', { name: 'Dereceli, kilitli: 12 oyun kaldı' })).toBeOnTheScreen();
+    expect(screen.getByRole('tab', { name: 'Normal' })).toBeSelected();
+  });
+
   it('draws each tone as its slab: gold plays, magenta acts, violet is the quiet one', async () => {
     const face = async (tone: 'play' | 'primary' | 'onBrandSoft' | 'danger') => {
       await screen.rerender(<Button label="Düğme" tone={tone} onPress={jest.fn()} />);

@@ -206,8 +206,101 @@ altın skoru ve geçmişi tutar.
 4. `pnpm engine:lock` — yeni sürümü mühürle.
 5. Aynı değişikliği `apps/api/app/Game/Rules.php` (ve `Run.php`) içinde yap,
    `Rules::ENGINE_VERSION`'ı eşitle; `php artisan test` PHP paritesini ve kilidi doğrular.
-6. Uygulamanın yeni sürümünü yayınla ve `QUEZBY_*_MIN_VERSION`'ı yükselt; eski
+6. Yeni sürümün Elo hedef tablosunu ekle: `config/quezby.php` ›
+   `rating.targets[ENGINE_VERSION]` (simülasyon medyanlarından; bkz. *Elo*).
+   Tablo yoksa `TargetTableTest` kırılır; eski tablolar silinmez.
+7. Uygulamanın yeni sürümünü yayınla ve `QUEZBY_*_MIN_VERSION`'ı yükselt; eski
    motorla açılan tur `engine_outdated` alır.
+
+## Elo
+
+Oyunun üç modu var, lobide altın butonun üstündeki seçiciyle seçilir:
+
+| Mod | `RunMode` | Ne için oynanır |
+| --- | --- | --- |
+| **Günlük** | `daily` | Günün akışı: herkes aynı seed, günde tek hak |
+| **Normal** | `free` | İstediğin kadar; skor Zirve'ye yazılır |
+| **Dereceli** | `rated` | Elo ve ligindeki sıra |
+
+Üçü de Hafta / Ay / Tüm zamanlar tablolarına yazılır; **Elo'yu yalnız
+Dereceli değiştirir** (CS2'nin rekabetçi modu gibi). Dereceli, oyuncunun
+**20 sayılan Normal ya da Günlük** turundan sonra açılır (`ranked`, skor > 0;
+`rating.unlock_runs`). Açılmadan başlatılan dereceli tur `409 rated_locked`
+alır. Bir kez dereceli oynayan oyuncu için bir daha kilitlenmez. İlerleme
+`unlock` olarak `/rating`'de ve bitişin `leagueUnlock`'ında
+gelir; kilidi açan turda `remaining: 0` ile.
+
+Oyuncunun **ligi, Elo'sunun kademesidir**: 0–999 Bronz, 1000–1999 Gümüş,
+2000–2999 Altın, 3000–3999 Platin, 4000–4999 Elmas, 5000 ve üstü
+**MasterClass** (tavansız). Taban 0. Her şeyi API hesaplar
+(`App\Services\Rating`); telefon yalnızca çizer.
+
+**Her dereceli tur bir hedefe karşı maçtır.** Rakip yok; onun yerine reytinge göre bir
+*hedef skor* var: o reytingdeki oyuncunun tipik (medyan) skoru. Hedef tablo
+motor sürümüne bağlıdır (`quezby.rating.targets`), her 1000 reytingde bir çapa,
+arası geometrik (motorun skorları bir beceri basamağında 2–3 katına çıkar):
+
+| Reyting | 0 | 1000 | 2000 | 3000 | 4000 | 5000 | 6000 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Hedef (motor v2) | 8 B | 34 B | 100 B | 240 B | 480 B | 800 B | 1,1 M |
+
+- `P(skor)`: skorun, hangi reytingin tipik skoru olduğu (tablonun tersi).
+- **Değişim** `Δ = round(100 × tanh((P − R) / W))`: hedefi geçen artar,
+  altında kalan düşer; ne kadar farkla, o kadar çok, **asla ±100'ü aşmaz**.
+  `W = 800`; yerleşmeden sonraki 15 turda ve 30+ gün aradan sonra dönüşte 5
+  turda `W = 400` (iki kat hızlı).
+- Oyuncuya gösterilen **hedef**, gerçek hedefin yüze yukarı yuvarlanmışıdır:
+  onu tutturan asla kaybetmez.
+- **Yerleşme:** ilk 3 dereceli sonuç reytingi gizli tutar; 3.'sü
+  `clamp(P(medyan), 1200, 1800)` ile yerleştirir, herkes Gümüş'te başlar
+  (`rating.placement_runs`). Normal ve Günlük turlar yerleşmeye sayılmaz;
+  Elo'dan önce oynanmış turlardan tohumlama yoktur.
+- **Terfi kalkanı:** yeni bir kademeye giren oyuncu 3 tur boyunca o kademenin
+  tabanının altına düşmez. Yalnız normal tur sonuçlarında; hükmen kayıp
+  kalkanı deler.
+- **Bronz'da kayıp yarıdır** (yukarı yuvarlanır).
+
+| Tur | Elo'ya etkisi |
+| --- | --- |
+| Dereceli tur (`ranked`) | Hemen sayılır |
+| Normal tur, Günün akışı, VS | Hiçbir etkisi yok (Normal ve Günlük, Dereceli'nin kilidine sayılır) |
+| `review` | Bekler; moderatör onaylarsa **onay anındaki** reytinge, turun kendi motor sürümünün tablosuyla sayılır |
+| Oynanışından sert bayrak (`wall_clock`, `fast_decisions`, `hold_bounds`, `client_mismatch`, `checkpoint_*`, `slow_motion`) | **Hükmen kayıp**: −100 (Bronz'da −50) |
+| Yarım bırakılan (`abandoned`), süresi dolan (`expired`), motorun reddettiği (`rejected`) | **Hükmen kayıp** |
+| Yasaklı oyuncunun, yalnız `device_integrity` bayraklı, eski sezonun turu | Sayılmaz (`void`) |
+| Geri sayımda iptal (`POST /runs/{id}/cancel`, ilk 5 sn) ya da hiç reel görmeden 30 sn içinde biten | Sayılmaz |
+
+Hükmen kayıp bir kaçış kapısını kapatır: kötü giden bir turu bağlantıyı kesip
+yenisini başlatarak ya da bozuk bir kayıt göndererek yok etmek. Oyundan çıkmak
+turu **o anki skoruyla** gönderir; kaçmak asla ondan iyi değildir. Telefon,
+yeni tura başlamadan önce ağ yüzünden bekleyen bitişini gönderir, geri sayımda
+vazgeçilen turu iptal eder.
+
+**Moderasyon:** reddedilen bir tur yalnızca **kazandırdığını** geri alır (bir
+kez; `reversal`); kaybettirdiği ve hükmen kayıplar kalır. Yasaklı oyuncunun
+reytingi donar ve Elo tabelasında görünmez.
+
+**Lig sıralaması** (lig ekranı): satrançtaki gibi, ligin kendisi Elo'nun
+kademesidir ve sıralaması **hiç sıfırlanmaz**. Haftalık grup, hafta kapanışı
+ve Elo bonusu yoktur. Lig ekranı, oyuncunun liginde son 14 günde dereceli
+oynamış oyuncuları Elo'ya göre sıralar (`GET /ratings?scope=league`,
+`rating.board_active_days`); oyuncunun satırı altta sabit durur, bir üsttekini
+geçmek için gereken Elo'yla. Yerleşmemiş oyuncunun lig sıralaması yoktur.
+Hafta / Ay / Tüm zamanlar skor tabloları bundan ayrıdır ve aynen sürer; gün
+satırı hiçbir tur için yazılmaz.
+
+**Sezon:** Elo taşınır (beceriye çapalı). Hedef tablo gerçek oyunculara göre
+`php artisan quezby:rating:calibrate --days=30` (ya da admin paneli →
+Reytingler) ile ayarlanır: son dönemde en az 10 dereceli turu olan oyuncuların medyanları,
+liglerin hedef payları (Bronz %20 · Gümüş %35 · Altın %25 · Platin %13 · Elmas
+%6 · MasterClass %1) tutacak şekilde çapa önerir; hiçbir şey yazmaz. Tablo
+değişince reytingler sıfırlanmaz, oyuncular birkaç turda yeni dengeye kayar.
+
+**Söz** (`tests/Unit/Rating/RatingBalanceTest.php`, motorun ±%20 sözü gibi):
+motor profilleri (gerçek başparmak için −%15) kendi liglerinde durur — yeni
+başlayan ~1070 ve ortalama ~1910 Gümüş, iyi ~2825 Altın, profesyonel ~3830
+Platin, elit ~4540 Elmas; kusursuza yakın oyun MasterClass. Dengede sapma < 120,
+tipik değişim ±75 içinde.
 
 ## Hile koruması
 
@@ -217,6 +310,7 @@ görünen her sayı sunucudan gelir.
 1. `POST /runs` motor ve içerik sürümünü ister; eski uygulama tur açamaz
    (`engine_outdated`). Seed sunucudan gelir; oyuncunun **tek açık turu**
    olabilir (yenisi eskisini `abandoned` yapar), süresi geçen tur `expired` olur.
+   İkisi de Elo'da hükmen kayıptır (bkz. *Elo*); geri sayımda iptal edilen değil.
 2. Uygulama yalnızca hareketleri gönderir: her reel için `[hareket, t, d]`.
 3. Sunucu PHP motoruyla tekrar oynatır; motorun reddettiği kayıt (`late_action`,
    `gesture_not_allowed`…) tur olarak sayılmaz (`rejected`).
@@ -224,7 +318,10 @@ görünen her sayı sunucudan gelir.
    - `wall_clock`: geçen süre, uygulamanın gerçek temposundan kısa — 1,8 sn geri
      sayım + her reelin aktif süresi + karardan sonraki bekleme (0/160/260 ms) ve
      170 ms kayma, 1 sn tolerans. Tempo `@quezby/config` `PACE` ile paylaşılır.
-   - `fast_decisions`: ≥30 kaydırma/beğeni isabetinin %20'den fazlası 250 ms altında.
+   - `fast_decisions`: ≥30 kaydırma/beğeni isabetinin %20'den fazlası 250 ms altında
+     — ama 250 ms altındaki tüm hareketlerin %10'dan fazlası yanlışsa bayrak
+     kalkar (`fast_wrong_share`): her şeyi kaydıran oyuncu tahmin ediyordur,
+     bot değildir; yanlış hareketlerde de aynı hızdadır.
    - `hold_bounds`: uygulamanın çoktan bitireceği uzunlukta bir basılı tutma.
    - `client_mismatch`: uygulamanın gösterdiği skor sunucununkiyle aynı değil.
    - `banned`: oyuncu (sessizce) yasaklı.

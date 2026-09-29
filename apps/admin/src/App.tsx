@@ -16,12 +16,11 @@ const AuditPage = lazy(() => import('@/pages/AuditPage').then((module) => ({ def
 const BoardsPage = lazy(() => import('@/pages/BoardsPage').then((module) => ({ default: module.BoardsPage })));
 const ContentPage = lazy(() => import('@/pages/ContentPage').then((module) => ({ default: module.ContentPage })));
 const DailyPage = lazy(() => import('@/pages/DailyPage').then((module) => ({ default: module.DailyPage })));
-const LeagueGroupPage = lazy(() => import('@/pages/LeagueGroupPage').then((module) => ({ default: module.LeagueGroupPage })));
-const LeaguesPage = lazy(() => import('@/pages/LeaguesPage').then((module) => ({ default: module.LeaguesPage })));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage').then((module) => ({ default: module.NotFoundPage })));
 const OverviewPage = lazy(() => import('@/pages/OverviewPage').then((module) => ({ default: module.OverviewPage })));
 const PlayerPage = lazy(() => import('@/pages/PlayerPage').then((module) => ({ default: module.PlayerPage })));
 const PlayersPage = lazy(() => import('@/pages/PlayersPage').then((module) => ({ default: module.PlayersPage })));
+const RatingsPage = lazy(() => import('@/pages/RatingsPage').then((module) => ({ default: module.RatingsPage })));
 const ReportsPage = lazy(() => import('@/pages/ReportsPage').then((module) => ({ default: module.ReportsPage })));
 const RunPage = lazy(() => import('@/pages/RunPage').then((module) => ({ default: module.RunPage })));
 const RunsPage = lazy(() => import('@/pages/RunsPage').then((module) => ({ default: module.RunsPage })));
@@ -50,8 +49,7 @@ export const appRoutes: RouteObject[] = [
           { path: '/runs/:runId', element: <RunPage /> },
           { path: '/boards', element: <BoardsPage /> },
           { path: '/daily', element: <DailyPage /> },
-          { path: '/leagues', element: <LeaguesPage /> },
-          { path: '/leagues/:groupId', element: <LeagueGroupPage /> },
+          { path: '/ratings', element: <RatingsPage /> },
           { path: '/content', element: <ContentPage /> },
           { path: '/audit', element: <AuditPage /> },
           {

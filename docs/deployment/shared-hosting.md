@@ -87,8 +87,8 @@ openssl rand -hex 32                                # çıktıyı OPS_TOKEN= sat
   okunabiliyorsa panelin **Sistem** sayfası "Push bildirimleri (Firebase)"
   satırında **Açık** der; değilse hiçbir şey gönderilmez, başka hiçbir şey de
   bozulmaz.
-- `QUEZBY_LEAGUE_UNLOCK_RUNS=20`: yeni oyuncunun ligi kaç sayılan turdan sonra
-  açılır. Her ortamda aynı kalır.
+- `QUEZBY_LEAGUE_UNLOCK_RUNS=20`: Dereceli'nin (ve Elo ile ligin) kaç sayılan
+  Normal ya da Günlük turdan sonra açıldığı. Her ortamda aynı kalır.
 - `MODERATION_TOKEN` yalnızca moderasyon yaparken dolu olsun (aşağıda 6b).
 - Analitik (`docs/product/analytics.md`): `QUEZBY_ANALYTICS_ENABLED=true`,
   `QUEZBY_ANALYTICS_SAMPLE=1000`, `QUEZBY_ANALYTICS_VISIT_DAYS=30`,

@@ -23,6 +23,7 @@ return [
     'run_rejected' => "Cette partie n'a pas pu être vérifiée, elle n'entre pas au classement.",
     'engine_outdated' => "Ta version du jeu n'est plus à jour. Mets l'app à jour pour entrer au classement.",
     'daily_already_played' => "Tu as déjà joué le Fil du jour. Un nouveau t'attend demain.",
+    'rated_locked' => "Le mode classé n'est pas encore ouvert. Joue d'abord des parties normales ou quotidiennes.",
     'cannot_befriend_self' => "Tu ne peux pas t'envoyer une demande d'ami.",
     'friend_limit' => 'Tu peux avoir :limit amis au maximum.',
     'request_limit' => "Tu peux avoir :limit demandes en attente au maximum. Envoie-en une nouvelle quand quelqu'un répond.",

@@ -76,6 +76,11 @@ return [
 
         // No human plays this many reels; a longer log is refused unread.
         'max_actions' => 5000,
+
+        // A run given up this soon after it started — in the 3, 2, 1 — is
+        // cancelled for nothing (`POST /runs/{id}/cancel`); later, leaving it
+        // is a forfeit like any other.
+        'cancel_seconds' => 5,
     ],
 
     /*
@@ -87,8 +92,10 @@ return [
     | passed (`now − startedAt < activeMs + reels × min_transition_ms −
     | clock_tolerance_ms`), or when, among at least `fast_min_samples` skip and
     | like hits, more than `fast_share_limit` were decided under
-    | `fast_decision_ms`. Its checkpoint receipts hold it to the clock on the
-    | way, too: a slowed-down game passes the first check, not the second.
+    | `fast_decision_ms` — unless more than `fast_wrong_share` of all its fast
+    | gestures were wrong, which is a guesser, not a bot. Its checkpoint
+    | receipts hold it to the clock on the way, too: a slowed-down game passes
+    | the first check, not the second.
     |
     */
 
@@ -107,6 +114,7 @@ return [
         'fast_decision_ms' => 250,
         'fast_share_limit' => 0.2,
         'fast_min_samples' => 30,
+        'fast_wrong_share' => 0.1,
         'hold_slack_ms' => 150,
 
         // Soft signals: only a top score that shows one waits for review.
@@ -218,17 +226,66 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Leagues and friends
+    | Friends
     |--------------------------------------------------------------------------
     */
 
-    'leagues' => [
-        'group_size' => 30,
-        // Promoted and demoted per 30 members, scaled down for smaller groups.
-        'zone_per_30' => 5,
-        // Counted runs (ranked, scoring — never a VS) before the league opens
-        // to a new player. Once seated, a player is never locked out again.
+    /*
+    |--------------------------------------------------------------------------
+    | Elo
+    |--------------------------------------------------------------------------
+    |
+    | Only Dereceli (`rated`) runs play for Elo. Each is a match against a
+    | target: the score a player of that rating typically makes (`targets`, per engine version — a new
+    | season needs its own). Past it the rating rises, short of it it falls,
+    | by `max_delta × tanh((P − R) / width)` where P is the rating whose
+    | typical score the run's was — never more than `max_delta` either way.
+    | `docs/product/scoring.md` → "Elo".
+    |
+    */
+
+    'rating' => [
+        // Free and daily runs, ranked and scoring, before Dereceli — and with
+        // it Elo and a league — opens to a player. Once they have played a
+        // rated run, it never closes again.
         'unlock_runs' => (int) env('QUEZBY_LEAGUE_UNLOCK_RUNS', 20),
+        'max_delta' => 100,
+        'width' => 800,
+        // Faster moves while the rating is still finding its level: right
+        // after placement, and when a player comes back after a long break.
+        'provisional_width' => 400,
+        'provisional_runs' => 15,
+        'return_provisional_runs' => 5,
+        'return_after_days' => 30,
+        // The first rated runs place a player: the rating their median
+        // scores, held inside `placement_min`–`placement_max` (Gümüş).
+        'placement_runs' => 3,
+        'placement_min' => 1200,
+        'placement_max' => 1800,
+        // Runs after a promotion that cannot drop the player out of the new league.
+        'shield_runs' => 3,
+        // Losses in Bronz, per cent.
+        'bronze_loss_percent' => 50,
+        // A run finished without a single reel this soon after its start was
+        // given up in the countdown: it does not count.
+        'void_window_seconds' => 30,
+        // The Elo board: players with a counted run in this many days.
+        'board_active_days' => 14,
+        'board_limit' => 50,
+        // Changes `GET /rating` lists.
+        'history' => 20,
+        // `quezby:rating:calibrate`: a player's median counts once they have
+        // this many runs in the window; the anchors are set so the leagues
+        // hold these shares of them, per cent, Bronz first.
+        'calibration' => [
+            'min_runs' => 10,
+            'shares' => ['bronze' => 20, 'silver' => 35, 'gold' => 25, 'platinum' => 13, 'diamond' => 6, 'master' => 1],
+        ],
+        // Rating → the score a player of it typically makes, per engine
+        // version. Calibrated from real players with `quezby:rating:calibrate`.
+        'targets' => [
+            2 => [0 => 8000, 1000 => 34000, 2000 => 100000, 3000 => 240000, 4000 => 480000, 5000 => 800000, 6000 => 1100000],
+        ],
     ],
 
     'friends' => [

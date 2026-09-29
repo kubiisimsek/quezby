@@ -27,7 +27,7 @@ export function ApproveRunDialog({ run, open, onOpenChange, onDone }: DialogProp
       tone="primary"
       icon={<CircleCheck />}
       title={`${playerName(run.player?.username)} · ${formatNumber(run.score)} sıralamaya girsin mi?`}
-      description="Tur, oynandığı günün, haftanın, ayın ve sezonun tablolarına girer; oyuncunun istatistiklerine ve ligine sayılır."
+      description="Tur, oynandığı haftanın, ayın ve sezonun tablolarına girer ve oyuncunun istatistiklerine sayılır. Dereceli bir tursa reytingine de sayılır."
       confirmLabel="Onayla"
       loading={approve.isPending}
       onConfirm={() =>

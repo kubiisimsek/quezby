@@ -40,6 +40,7 @@ import {
 } from '@/game/gesture';
 import { messageFor } from '@/lib/errors';
 import { feel } from '@/lib/haptics';
+import { sendPendingRun } from '@/hooks/usePendingRunSender';
 import { usePendingRun } from '@/stores/pendingRun';
 import { SPRING } from '@/ui/motion';
 
@@ -120,6 +121,9 @@ const now = () => {
 
 /** How long a finish waits for a checkpoint still on its way, so its receipt can ride along. */
 const CHECKPOINT_WAIT_MS = 2000;
+
+/** How long a start waits for a finish kept on the phone to go first. */
+const PENDING_WAIT_MS = 4000;
 
 /** How soon after a check-in was lost it may go again. */
 const CHECK_IN_RETRY_AFTER_MS = 5_000;
@@ -744,6 +748,11 @@ export function useGame(mode: RunMode = 'free', vs: VsTarget | null = null) {
         return;
       }
       try {
+        // A run kept on the phone goes first: starting another would leave it to the API as a forfeit.
+        if (usePendingRun.getState().run) {
+          await settled([sendPendingRun()], PENDING_WAIT_MS);
+          if (!aliveRef.current) return;
+        }
         const started = await api.runs.start({
           mode,
           engineVersion: ENGINE_VERSION,
@@ -754,8 +763,8 @@ export function useGame(mode: RunMode = 'free', vs: VsTarget | null = null) {
         begin(started.seed, started.runId);
       } catch (error) {
         if (!aliveRef.current) return;
-        // A VS is played on its seed and verified, or not at all.
-        if (error instanceof ApiError && error.code === 'engine_outdated' && mode !== 'vs') {
+        // A VS and a rated run are played on the API's seed and verified, or not at all.
+        if (error instanceof ApiError && error.code === 'engine_outdated' && mode !== 'vs' && mode !== 'rated') {
           practiceRef.current = 'outdated';
           setPractice('outdated');
           track('outdated_run');
@@ -771,6 +780,7 @@ export function useGame(mode: RunMode = 'free', vs: VsTarget | null = null) {
 
   /**
    * Closing ends the run and scores it. Only a countdown just walks away —
+   * and tells the API, which lets a run given up that early go for nothing —
    * except in a coached run, which has nothing behind it to go back to: it
    * always ends in its result.
    */
@@ -779,6 +789,8 @@ export function useGame(mode: RunMode = 'free', vs: VsTarget | null = null) {
     if (phase === 'countdown' && practiceRef.current !== 'tutorial') {
       clearTimers();
       modeRef.current = 'over';
+      const runId = runIdRef.current;
+      if (runId) void api.runs.cancel(runId).catch(() => undefined);
       return;
     }
     finish();

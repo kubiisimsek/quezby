@@ -30,7 +30,7 @@ navigation/
                      on Mesajlar, the conversations that want a look (a line unread, a VS
                      waiting for you) and the friend requests waiting
   options.tsx        stack options (no header, night behind transitions), tab(), nav theme
-  types.ts           one param list per navigator; Game takes { mode: 'free' | 'daily' } or
+  types.ts           one param list per navigator; Game takes { mode: 'free' | 'daily' | 'rated' } or
                      { mode: 'vs', opponent, duelId? } (a VS sent to a friend, or the answer
                      to theirs); Tutorial is the same GameScreen, as a new player's practice
                      run; the Mesajlar slot is `Inbox` ({ segment? } opens it on its
@@ -69,23 +69,43 @@ screens/
                      the Thread; "+N VS daha" opens Mesajlar; "GÜNÜN AKIŞI #17" — open, the
                      rule, its countdown and a small magenta "Oyna"; played, your place,
                      your score in gold and the countdown to the next; the body opens
-                     Daily (its stage, board and Paylaş); the league ("KİLİTLİ · Lige 2 oyun
-                     kaldı" with a `Meter` before a new player's first 20 counted runs, your
-                     place and zone, or "Ligine katıl"); the rival with "Geç onu". Pinned
-                     over the dock, outside the scroll: `SwipePlay` — the screen's one gold
-                     slab, breathing, chevrons climbing over it, "Yukarı kaydır, oyna" under
-                     it: a tap or a swipe up plays free. The consent card comes before the
+                     Daily (its stage, board and Paylaş); the league ("Gümüş lig · 1.640
+                     Elo" with the emblem and a "Hedef 72.400" tag — the score the next run
+                     has to beat — or "YERLEŞME · Yerleşme 2/3" with a notched `Meter`
+                     while the first rated runs place the player, or "DERECELİ · Dereceli’ye
+                     12 oyun kaldı" with a `Meter` while Dereceli is shut); the rival with
+                     "Geç onu". Pinned over the dock, outside the scroll: `SwipePlay`, the
+                     screen's one gold slab (compact, 60 pt), breathing, two chevrons
+                     climbing over it, "Yukarı kaydır, oyna" under it: a tap or a swipe up
+                     opens ModeSheet ("Mod seç"), one raised tile per mode — Günlük (the
+                     day's rule, or "Bugünkü hakkını kullandın" and then it opens Daily),
+                     Normal ("Skorun Zirve'ye yazılır"), Dereceli ("Elo için oyna · Hedef
+                     72.400", the placement count, or while shut a lock, "Dereceli'ye 12
+                     oyun kaldı" and a `Meter`, dimmed and not pressable, read aloud as
+                     "Dereceli, kilitli: 12 oyun kaldı"). The game opens once the sheet has
+                     left. The consent card comes before the
                      notices while unasked; a guest just seated in a league is asked once
                      to keep the account (SignInWaysSheet, "Ligdesin!")
   leaderboard/       Zirve — a stage with TopBar (countdown, players, search → FindFriends),
                      Herkes / Arkadaşlar, the podium on 3D metal pedestals (crown and a spotlight
-                     for #1), the period tabs (Hafta · Ay · Tüm zamanlar — there is no day
+                     for #1), the tabs (Hafta · Ay · Tüm zamanlar · Elo — there is no day
                      board), the climb as tiles with "▲ fark", your floor pinned with a gold
-                     "Geç onu"
-  league/            the week's league: "HAFTALIK LİG", your tier's emblem big between the tiers
-                     below and above, TERFİ / DÜŞME BÖLGESİ banners over their rows, last week's
-                     result (confetti on a promotion), your floor pinned; before a new
-                     player's first 20 counted runs, "Lige N oyun kaldı" with a gold "Oyna"
+                     "Geç onu". The Elo tab: the ratings of the players who played in the
+                     last 14 days, each row's league under the name, no posts, no countdown
+                     and no floor card (your row after a break when you are below the list)
+  league/            "LİG": your league's emblem big between the leagues below and above, its
+                     name, your Elo in gold, a notched `Meter` through the league (quarters)
+                     with "Platin'e 660 Elo" ("Tavanı yok" in MasterClass), tags for the
+                     next target, a shield, the peak; while placing, "Yerleşme 2/3" and a
+                     gold "Dereceli oyna"; while Dereceli is shut, a lock, "Dereceli’ye N oyun
+                     kaldı", a `Meter` and a gold "Normal oyna". Under
+                     it: SON DEĞİŞİMLER (the rating's latest moves), then LİG SIRALAMASI —
+                     the league's players by Elo (`GET /ratings?scope=league`), never reset,
+                     each a `ClimbRow` with `unit="elo"`, your floor pinned (`FloorCard`
+                     `unit="elo"`: "Sen · 2.340 Elo", "@deniz'e 40 Elo"; Geç onu plays
+                     rated); before placement, "Lig sıralaması Dereceli oyuncularının" with
+                     no button (the stage holds the way in); placed but not on it (no rated
+                     run in 14 days), a gold "Dereceli oyna"
   daily/             Günün akışı: TopBar with a back slab, "AKIŞ #17", your score and place in a
                      well with the share grid, then "GÜNÜN ZİRVESİ" — its podium and climb
   friends/           Mesajlar — the dock's social tab (InboxScreen): its head carries a
@@ -125,7 +145,7 @@ screens/
                      and the countdown. Read on sight; asked again when the pulse moves
   history/           Geçmiş oyunlar (TopBar with a back slab): every run played to its end,
                      newest first, as the API counted it — a `Segmented` Hepsi / Günün akışı /
-                     VS, day headings (Bugün, Dün, then the date), a `RunTile` each; a tap
+                     Dereceli / VS, day headings (Bugün, Dün, then the date), a `RunTile` each; a tap
                      opens RunSheet; with none yet, the gold "Oyna"
   profile/           kept short: a player card (framed portrait — your photo or your
                      initials — with a camera `IconButton` slab on its corner that opens the
@@ -186,17 +206,25 @@ game/
                      it, `Backdrop` lays the kind's pattern (or the old glows), rays, tape or scanlines
   Hud.tsx            a close slab · the chunky dopamine meter (notched, labelled) · the score in
                      Rubik · level and a gold combo pill (x1,00–x1,50) on their own row — and
-                     on a VS, a pill with who it is against ("VS · @ekin")
+                     on a VS, a pill with who it is against ("VS · @ekin"); on a rated run, a
+                     "Dereceli" pill with the shield
   FeedbackLayer.tsx  points rising in Rubik, heart burst, a miss slammed on a red slab and shaken,
                      named combos stamped in as tilted gold ribbons
   ResultView.tsx     the run's end, drawn only from the API's answer: a stage with the score
                      slammed in and counting up ("YENİ REKOR!" banner and confetti on a record),
-                     then bonuses stamped in, stat tiles, rank tiles (▲/▼, Hafta · Ay · Tüm
-                     zamanlar), "Bu hafta geçtiklerin", the league, the daily's grid — about
+                     then the Elo tile (the emblem, the rating counting up, "+42" / "−18"
+                     slammed in green or red, "Skor … · Hedef …", "Sıradaki hedef …"; a new
+                     league in gold with the burst, a fall in red with a shake; placement's
+                     count; held, forfeit and not-counted runs said as such), bonuses
+                     stamped in, stat tiles, rank tiles (▲/▼, Hafta · Ay · Tüm
+                     zamanlar), "Bu hafta geçtiklerin", after a Normal or Günlük run while
+                     Dereceli is shut,
+                     "Dereceli’ye N oyun kaldı" with a `Meter` — on the run that opens it,
+                     "Dereceli açıldı!" in gold with the burst — the daily's grid — about
                      100 ms apart; the buttons slide up last in a tray; a tap skips to the end;
                      review, flagged and practice states, and
                      "Bu cihazda skorlar sıralamaya girmiyor" when `flagReason` is `device`;
-                     "Lige N oyun kaldı" while the league is locked; the practice run as
+                     "Haftalık gruba N oyun kaldı" while the group is locked; the practice run as
                      "DENEME TURU" with the kinds it never reached, magenta "Devam et" and
                      "Bir daha dene". A VS run leads with its VS tile: sent — "VS GÖNDERİLDİ",
                      a `FaceOff`, the score kept from the friend, the time they have left and a
@@ -278,24 +306,24 @@ A new shape goes into the family it belongs to and into that list.
 | `Divider`, `Avatar`, `IconChip` | A groove; a player's framed portrait (their photo, `src`, over their initials in Rubik — the initials show when there is none or it will not load; `primary` = you); a gem — a glyph on a bright outlined tile |
 | `Row`, `ArrowNub`, `SwitchRow`, `Toggle` | A line that opens something (ends in a small arrow slab) — or, without `onPress`, a line that only says something, with no arrow and no press (a picked username, locked) / that arrow / a setting with the game's toggle (green groove, springing knob, role `switch`) |
 | `PlayerRow` | A player in a list: portrait (`src`), @name, league, season best — and one action beside it (a `FriendButton`), a separate target from the row that opens their card |
-| `Tag`, `Callout`, `Stat`, `StatRow`, `Meter` | A status pill; a message with a gem (copy built from pieces is set in its text); a stat tile (gem, label, Rubik number); a chunky bar with a shine |
+| `Tag`, `Callout`, `Stat`, `StatRow`, `Meter` | A status pill; a message with a gem (copy built from pieces is set in its text); a stat tile (gem, label, Rubik number); a chunky bar with a shine — `notches` cuts it into even steps (a league's quarters, placement's runs) |
 | `StatGrid` | Stat tiles in 2 or 3 even columns; a value's size steps down with its length (`valueSize`) — never iOS's shrink-to-fit, which draws a sheet's first row a few points tall |
 | `Field`, `PasswordField` | A dark well with a label, glyph and trailing control; the ring lights magenta while you type |
-| `Segmented` | A tab strip: the chosen view raised as a magenta slab out of a dark groove |
+| `Segmented` | A tab strip: the chosen view raised as a magenta slab out of a dark groove; an option's `said` replaces its label for a screen reader (a lock's reason) |
 | `Loading`, `Skeleton`, `SkeletonList`, `EmptyState` | Waiting (gold spinner, dark skeleton tiles) and nothing-yet (a gem, a title, the fix) |
 | `MedalBadge` | A coin in its metal on its rim — a crown for first, a medal for the others; `sm/md/lg` |
-| `TierBadge` | A league emblem in the tier's metal, outlined, its mark cut in; `showLabel`; `sm/md/lg/xl` |
+| `TierBadge` | A league emblem in the tier's metal, outlined, its mark cut in — six leagues, MasterClass's a crown; `showLabel`; `sm/md/lg/xl` |
 | `CountdownChip` | Time left, in cyan on a dark pill, counted on the server's clock (`endsAt` + `serverTime`) |
 | `Podium` | A board's top three on 3D pedestals in their metals, with portraits (`avatarUrl`) and coins, a crown dropping on #1; 2-1-3; rises once |
 | `Spotlight` | Rays of light behind a winner or a tier's emblem, drawn once in the colour given |
-| `ClimbRow` | A board row from #4 down as a tile: rank, portrait (`avatarUrl`), name, score and "▲ 1.240" to pass the row above; yours in magenta; `detail` ("3 gün") |
-| `FloorCard` | "Senin katın" — your floor pinned under a board: rank in gold, who to pass and how far, "Geç onu" |
+| `ClimbRow` | A board row from #4 down as a tile: rank, portrait (`avatarUrl`), name, score and "▲ 1.240" to pass the row above; yours in magenta; `detail` (a league); `unit` `elo` reads the numbers aloud as Elo (so does `Podium`'s) |
+| `FloorCard` | "Senin katın" — your floor pinned under a board: rank in gold, who to pass and how far, "Geç onu"; `unit="elo"` on an Elo board ("Sen · 2.340 Elo", "@deniz'e 40 Elo") |
 | `BonusChip` | A named combo as a pill with its gem: Kusursuz seviye, Şimşek, Soğukkanlı, Geri dönüş, `×count`, `+points` |
 | `ShareGrid` | The server's emoji share grid, one square to a cell |
 | `LobbyCard` | A door: a gem, its capital name over a Rubik title, live state on the right, an arrow slab when it opens something; sinks under the thumb — the profile's İSTATİSTİKLER and GEÇMİŞ OYUNLAR |
 | `NoticeCard` | A notification — on the lobby's lock screen and in Bildirimler: a gem or a portrait (`lead`), what it is in capitals over one line, one live line (`meta`: words, a `CountdownChip`, a `Meter`, a `Tag`), its answer at the end (`right`). All the same height (76). `fresh` lights its edge and its name in magenta: not seen yet. The body (`onPress`) and the answer are two targets side by side — ✓ never opens the body |
 | `PlayButton` | The gold play slab: breathes 1 → 1.04 → 1 (1.6 s each way) with a glint crossing it — the only loop outside a reel; `breathing` pauses it, reduced motion never starts it |
-| `SwipePlay` | The lobby's one gold action, as a lock screen's unlock: `PlayButton` under three climbing chevrons, a line under it ("Yukarı kaydır, oyna"). A tap plays, and so does a swipe up (`usePanGesture`: ≥ 44 pt or a flick), the slab following the thumb and springing back; the chevrons climb on the slab's breath |
+| `SwipePlay` | The lobby's one gold action, as a lock screen's unlock: a compact `PlayButton` (60 pt) under two climbing chevrons, a line under it ("Yukarı kaydır, oyna"). A tap calls `onPlay` (the lobby opens its modes), and so does a swipe up (`usePanGesture`: ≥ 44 pt or a flick), the slab following the thumb and springing back; the chevrons climb on the slab's breath |
 | `RankChips` | Your place on each board in gold, one well per board; "—" where you have not placed |
 | `Counters` | A few numbers side by side, each in a well over its name — the profile's Rekor (gold) · Arkadaş · Tur, the statistics tile's four; a counter with `onPress` sinks and may wear a `Count` (`badge`) |
 | `FaceOff` | Two players face to face: you on the start side framed in magenta, them on the end side in violet, a caption under each portrait when given ("SEN", `@ekin`), and a gold "VS" between — or, for two who have played before, how they stand (`middle`: `3 – 2`). The lobby's rival, a conversation's head-to-head, the VS sheet and a VS just sent |

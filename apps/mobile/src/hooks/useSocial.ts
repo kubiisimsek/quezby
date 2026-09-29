@@ -78,7 +78,7 @@ export function refreshSocial(client: QueryClient, username?: string): void {
     'blocks',
     'search',
     'leaderboard',
-    'league',
+    'ratings',
   ]) {
     void client.invalidateQueries({ queryKey: [key] });
   }

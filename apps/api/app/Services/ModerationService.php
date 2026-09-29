@@ -11,6 +11,7 @@ use App\Models\LeaderboardEntry;
 use App\Models\Run;
 use App\Models\User;
 use App\Services\Admin\AuditLog;
+use App\Services\Rating\RatingService;
 use App\Support\Actor;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -27,7 +28,7 @@ final class ModerationService
         private readonly LeaderboardService $leaderboards,
         private readonly PlayerStatsService $playerStats,
         private readonly RunStatsBuilder $statsBuilder,
-        private readonly LeagueService $leagues,
+        private readonly RatingService $ratings,
         private readonly AuditLog $audit,
     ) {}
 
@@ -56,7 +57,9 @@ final class ModerationService
                 return false;
             }
             $run->refresh();
-            $this->audit->record($actor, AuditAction::RunApprove, $run, details: ['score' => $run->score]);
+            // The rating moves from where it stands now: the run is counted the moment it is let through.
+            $ratingDelta = $this->ratings->approved($run);
+            $this->audit->record($actor, AuditAction::RunApprove, $run, details: ['score' => $run->score] + ($ratingDelta === null ? [] : ['ratingDelta' => $ratingDelta]));
             if ($run->user->isBanned() || (int) $run->score === 0) {
                 return true;
             }
@@ -64,16 +67,15 @@ final class ModerationService
             $replay = Engine::replay($run->seed, $run->actions ?? []);
             $this->playerStats->add($run->user, $replay->summary, $this->statsBuilder->build($replay, $run->seed, $run->content_version));
             $this->leaderboards->record($run);
-            $this->leagues->join($run);
 
             return true;
         });
     }
 
     /**
-     * Throws a run out and rebuilds its player's boards from what is left.
-     * False when it cannot be — a VS run never ranks, so there is nothing to
-     * throw out of anywhere.
+     * Throws a run out, rebuilds its player's boards from what is left and
+     * takes back what it won them in rating. False when it cannot be — a VS
+     * run never ranks, so there is nothing to throw out of anywhere.
      */
     public function reject(Run $run, string $reason, Actor $actor): bool
     {
@@ -91,7 +93,8 @@ final class ModerationService
                 'flag_codes' => RunFlag::codesOf($flags),
             ]);
             $this->leaderboards->rebuildFor($run->user);
-            $this->audit->record($actor, AuditAction::RunReject, $run, $reason, ['was' => $was->value, 'score' => $run->score]);
+            $ratingDelta = $this->ratings->rejected($run);
+            $this->audit->record($actor, AuditAction::RunReject, $run, $reason, ['was' => $was->value, 'score' => $run->score] + ($ratingDelta === null ? [] : ['ratingDelta' => $ratingDelta]));
         });
 
         return true;

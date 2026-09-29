@@ -1,4 +1,4 @@
-import type { LeagueResponse, PlayerStats, StatsResponse } from '@quezby/types';
+import type { PlayerStats, StatsResponse } from '@quezby/types';
 import { getApps, type ReactNativeFirebase } from '@react-native-firebase/app';
 import { deleteToken } from '@react-native-firebase/messaging';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
@@ -9,7 +9,7 @@ import { useSession } from '@/auth/session';
 import { useLanguage } from '@/i18n/language';
 import { ProfileScreen } from '@/screens/profile/ProfileScreen';
 import { usePush } from '@/stores/push';
-import { buildInbox, buildMe, buildRanks } from '@/test/factories';
+import { buildInbox, buildMe, buildPlacing, buildRanks, buildRating } from '@/test/factories';
 import { renderWithProviders } from '@/test/renderWithProviders';
 
 jest.mock('@/config/env', () => ({
@@ -28,7 +28,7 @@ jest.mock('@/api/client', () => ({
       blocks: jest.fn(),
     },
     auth: { logout: jest.fn() },
-    leagues: { current: jest.fn() },
+    rating: { current: jest.fn() },
   },
 }));
 
@@ -42,7 +42,7 @@ const mocked = api as unknown as {
     blocks: jest.Mock;
   };
   auth: { logout: jest.Mock };
-  leagues: { current: jest.Mock };
+  rating: { current: jest.Mock };
 };
 
 type Props = Parameters<typeof ProfileScreen>[0];
@@ -75,26 +75,6 @@ function stats(
       ...overrides,
     },
     topLiked,
-  };
-}
-
-function league(overrides: Partial<LeagueResponse> = {}): LeagueResponse {
-  return {
-    season: 1,
-    weekKey: '2026-W39',
-    tier: 'gold',
-    endsAt: '2026-09-27T21:00:00.000Z',
-    serverTime: '2026-09-24T10:00:00.000Z',
-    joined: false,
-    unlock: null,
-    members: [],
-    me: null,
-    promoteCount: 5,
-    demoteCount: 5,
-    promotionGap: null,
-    nextRankProgress: null,
-    lastWeek: null,
-    ...overrides,
   };
 }
 
@@ -136,7 +116,7 @@ describe('ProfileScreen', () => {
     mocked.me.inbox.mockResolvedValue(buildInbox({ friends: 12 }));
     mocked.me.updateSettings.mockResolvedValue({ user: buildMe() });
     mocked.auth.logout.mockResolvedValue(undefined);
-    mocked.leagues.current.mockResolvedValue(league());
+    mocked.rating.current.mockResolvedValue(buildRating({ rating: 2_450, tier: 'gold' }));
     mocked.me.unregisterPushToken.mockResolvedValue(undefined);
     mocked.me.blocks.mockResolvedValue({ users: [] });
     usePush.setState({ token: null, permission: 'granted' });
@@ -188,6 +168,7 @@ describe('ProfileScreen', () => {
 
       expect(screen.getByText('@ekin')).toBeOnTheScreen();
       expect(await screen.findByLabelText('Altın lig')).toBeOnTheScreen();
+      expect(screen.getByText('2.450 Elo')).toBeOnTheScreen();
       expect(screen.getByText('Misafir hesap')).toBeOnTheScreen();
       expect(screen.getByLabelText('12.345 Rekor')).toBeOnTheScreen();
       expect(await screen.findByLabelText('12 arkadaş')).toBeOnTheScreen();
@@ -212,7 +193,7 @@ describe('ProfileScreen', () => {
 
     it('waits for numbers the API has not named', async () => {
       useSession.setState({ user: buildMe({ best: null }), ranks: null });
-      mocked.leagues.current.mockRejectedValue(new Error('offline'));
+      mocked.rating.current.mockRejectedValue(new Error('offline'));
       mocked.me.inbox.mockReturnValue(new Promise(() => undefined));
       await renderProfile();
 
@@ -221,11 +202,11 @@ describe('ProfileScreen', () => {
       expect(screen.getByLabelText('Hafta: sıralamada değilsin')).toBeOnTheScreen();
     });
 
-    it('names no league before it has opened to the player', async () => {
-      mocked.leagues.current.mockResolvedValue(league({ unlock: { required: 3, remaining: 2 } }));
+    it('names no league and no Elo while the player is still placing', async () => {
+      mocked.rating.current.mockResolvedValue(buildPlacing(2));
       await renderProfile();
-      // The league's answer has landed and been drawn.
-      await waitFor(() => expect(mocked.leagues.current).toHaveBeenCalled());
+      // The rating's answer has landed and been drawn.
+      await waitFor(() => expect(mocked.rating.current).toHaveBeenCalled());
       await act(async () => {
         await new Promise<void>((resolve) => {
           setTimeout(() => resolve(), 20);
@@ -233,6 +214,7 @@ describe('ProfileScreen', () => {
       });
 
       expect(screen.queryByLabelText(/ lig$/)).not.toBeOnTheScreen();
+      expect(screen.queryByText(/Elo$/)).not.toBeOnTheScreen();
     });
 
     it('keeps how the account is kept for Hesap bilgileri', async () => {

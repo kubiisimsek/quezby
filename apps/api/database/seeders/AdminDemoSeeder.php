@@ -12,6 +12,7 @@ use App\Models\Admin;
 use App\Models\Run;
 use App\Models\User;
 use App\Services\ModerationService;
+use App\Services\Rating\RatingService;
 use App\Support\Actor;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -69,15 +70,16 @@ final class AdminDemoSeeder extends Seeder
             $rooted = $this->player('root.telefon', 'android', 'install-rooted');
             $cheat = $this->player('yasakli.hesap', 'android', 'install-cheat');
 
+            // The bot plays Dereceli: every flagged run of it is a forfeit on its Elo.
             foreach (range(1, 4) as $hour) {
                 $this->playedRun($speedy, RunStatus::Flagged, 180_000 + $hour * 7_000, $hour, [
                     ['code' => 'fast_decisions', 'fast' => 44, 'samples' => 60, 'severity' => 'hard'],
                     ['code' => 'wall_clock', 'elapsedMs' => 61_000, 'neededMs' => 190_000, 'severity' => 'hard'],
-                ]);
+                ], RunMode::Rated);
             }
             $this->playedRun($speedy, RunStatus::Flagged, 240_000, 30, [
                 ['code' => 'client_mismatch', 'serverScore' => 240_000, 'clientScore' => 900_000, 'serverReels' => 300, 'clientReels' => 900, 'severity' => 'hard'],
-            ]);
+            ], RunMode::Rated);
             $this->playedRun($steady, RunStatus::Ranked, 90_000, 5, [
                 ['code' => 'reaction_cv', 'cv' => 0.04, 'samples' => 80, 'severity' => 'soft'],
             ]);
@@ -102,6 +104,15 @@ final class AdminDemoSeeder extends Seeder
             $this->playedRun($cheat, RunStatus::Flagged, 400_000, 12, [
                 ['code' => 'checkpoint_forged', 'receipt' => 1, 'severity' => 'hard'],
             ]);
+
+            // The suspects' runs count as the finish would have counted them: a
+            // rated run flagged for how it was played is a forfeit.
+            $ratings = app(RatingService::class);
+            Run::query()
+                ->with('user')
+                ->whereIn('user_id', [$speedy->id, $steady->id, $twin->id, $rooted->id, $cheat->id])
+                ->orderBy('finished_at')
+                ->each(fn (Run $run) => $ratings->forFinishedRun($run));
 
             $cli = Actor::cli();
             $moderation->reject($rejected->load('user'), 'Aynı telefondan ikinci hesap, skor şüpheli', $cli);

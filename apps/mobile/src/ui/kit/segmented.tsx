@@ -16,7 +16,8 @@ export function Segmented<T extends string>({
 }: {
   value: T;
   onChange: (value: T) => void;
-  options: Array<{ value: T; label: string; icon?: IconName; count?: number }>;
+  /** `said`: what a screen reader says instead of the label — a locked view's reason. */
+  options: Array<{ value: T; label: string; icon?: IconName; count?: number; said?: string }>;
 }) {
   const theme = useTheme();
 
@@ -35,7 +36,7 @@ export function Segmented<T extends string>({
             key={option.value}
             accessibilityRole="tab"
             accessibilityState={{ selected: on }}
-            accessibilityLabel={option.label}
+            accessibilityLabel={option.said ?? option.label}
             onPress={() => onChange(option.value)}
             style={({ pressed }) => [
               segmented.item,

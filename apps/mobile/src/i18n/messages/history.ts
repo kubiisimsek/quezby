@@ -20,11 +20,12 @@ const fmt: Record<Locale, Formats> = {
 const tr = {
   title: 'Geçmiş oyunlar',
   tagline: 'Oynadığın her tur, sunucunun saydığı haliyle',
-  filters: { all: 'Hepsi', daily: 'Günün akışı', vs: 'VS' },
+  filters: { all: 'Hepsi', daily: 'Günün akışı', rated: 'Dereceli', vs: 'VS' },
   today: 'Bugün',
   yesterday: 'Dün',
   kinds: {
-    free: 'Serbest oyun',
+    free: 'Normal oyun',
+    rated: 'Dereceli oyun',
     vs: (name: string) => `VS · ${name}`,
     vsGone: 'VS · silinmiş oyuncu',
   },
@@ -67,11 +68,12 @@ export type HistoryMessages = typeof tr;
 const en: HistoryMessages = {
   title: 'Past games',
   tagline: 'Every run you played, as the server counted it',
-  filters: { all: 'All', daily: 'Daily Feed', vs: 'VS' },
+  filters: { all: 'All', daily: 'Daily Feed', rated: 'Ranked', vs: 'VS' },
   today: 'Today',
   yesterday: 'Yesterday',
   kinds: {
-    free: 'Free play',
+    free: 'Normal game',
+    rated: 'Ranked game',
     vs: (name) => `VS · ${name}`,
     vsGone: 'VS · deleted player',
   },
@@ -110,11 +112,12 @@ const en: HistoryMessages = {
 const de: HistoryMessages = {
   title: 'Vergangene Spiele',
   tagline: 'Jede Runde, wie der Server sie gezählt hat',
-  filters: { all: 'Alle', daily: 'Tages-Feed', vs: 'VS' },
+  filters: { all: 'Alle', daily: 'Tages-Feed', rated: 'Gewertet', vs: 'VS' },
   today: 'Heute',
   yesterday: 'Gestern',
   kinds: {
-    free: 'Freies Spiel',
+    free: 'Normales Spiel',
+    rated: 'Gewertetes Spiel',
     vs: (name) => `VS · ${name}`,
     vsGone: 'VS · gelöschter Spieler',
   },
@@ -153,11 +156,12 @@ const de: HistoryMessages = {
 const ar: HistoryMessages = {
   title: 'الألعاب السابقة',
   tagline: 'كل جولة لعبتها، كما احتسبها الخادم',
-  filters: { all: 'الكل', daily: 'خلاصة اليوم', vs: 'التحديات' },
+  filters: { all: 'الكل', daily: 'خلاصة اليوم', rated: 'مصنَّف', vs: 'التحديات' },
   today: 'اليوم',
   yesterday: 'أمس',
   kinds: {
-    free: 'لعب حر',
+    free: 'مباراة عادية',
+    rated: 'مباراة مصنَّفة',
     vs: (name) => `تحدٍّ · ${name}`,
     vsGone: 'تحدٍّ · لاعب محذوف',
   },
@@ -203,11 +207,12 @@ const ar: HistoryMessages = {
 const fr: HistoryMessages = {
   title: 'Parties passées',
   tagline: 'Chaque partie jouée, comptée par le serveur',
-  filters: { all: 'Toutes', daily: 'Fil du jour', vs: 'VS' },
+  filters: { all: 'Toutes', daily: 'Fil du jour', rated: 'Classé', vs: 'VS' },
   today: 'Aujourd’hui',
   yesterday: 'Hier',
   kinds: {
-    free: 'Partie libre',
+    free: 'Partie normale',
+    rated: 'Partie classée',
     vs: (name) => `VS · ${name}`,
     vsGone: 'VS · joueur supprimé',
   },
@@ -246,11 +251,12 @@ const fr: HistoryMessages = {
 const es: HistoryMessages = {
   title: 'Partidas anteriores',
   tagline: 'Cada partida, tal como la contó el servidor',
-  filters: { all: 'Todas', daily: 'Feed del día', vs: 'VS' },
+  filters: { all: 'Todas', daily: 'Feed del día', rated: 'Competitivo', vs: 'VS' },
   today: 'Hoy',
   yesterday: 'Ayer',
   kinds: {
-    free: 'Juego libre',
+    free: 'Partida normal',
+    rated: 'Partida competitiva',
     vs: (name) => `VS · ${name}`,
     vsGone: 'VS · jugador eliminado',
   },

@@ -19,9 +19,11 @@ import { inbox } from './inbox';
 import { kit } from './kit';
 import { language } from './language';
 import { league } from './league';
+import { modes } from './modes';
 import { nav } from './nav';
 import { profile } from './profile';
 import { push } from './push';
+import { rating } from './rating';
 import { reels } from './reels';
 import { result } from './result';
 import { tiers } from './tiers';
@@ -54,9 +56,11 @@ const AREAS = {
   kit,
   language,
   league,
+  modes,
   nav,
   profile,
   push,
+  rating,
   reels,
   result,
   tiers,

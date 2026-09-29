@@ -4,11 +4,14 @@ namespace Tests;
 
 use App\Content\Catalog;
 use App\Enums\AdminRole;
+use App\Enums\LeagueTier;
+use App\Enums\RunMode;
 use App\Game\Checkpoint;
 use App\Game\EngineError;
 use App\Game\Rules;
 use App\Game\Run as Engine;
 use App\Models\Admin;
+use App\Models\PlayerRating;
 use App\Models\Run;
 use App\Models\User;
 use App\Services\LeaderboardService;
@@ -207,14 +210,39 @@ abstract class TestCase extends BaseTestCase
 
     /**
      * A ranked run of `$score` by `$player`, put on this week's, this month's
-     * and the season's board (and the day's row the league adds up).
+     * and the season's board — and, for a rated run, the day's row the weekly
+     * group adds up.
      */
-    public function recordRanked(User $player, int $score): Run
+    public function recordRanked(User $player, int $score, RunMode $mode = RunMode::Free): Run
     {
-        $run = Run::factory()->for($player)->ranked($score)->create();
+        $run = Run::factory()->for($player)->ranked($score)->create(['mode' => $mode]);
         app(LeaderboardService::class)->record($run);
 
         return $run;
+    }
+
+    /**
+     * `$player` placed at `$rating`, their last counted run `$ratedAt` (now by
+     * default) — as if they had played their way there. `$attributes` sets
+     * the rest of the row: a shield, provisional runs.
+     *
+     * @param  array<string, mixed>  $attributes
+     */
+    public function rate(User $player, int $rating, mixed $ratedAt = null, array $attributes = []): PlayerRating
+    {
+        $rated = PlayerRating::query()->updateOrCreate(['user_id' => $player->id], [
+            'rating' => $rating,
+            'tier' => LeagueTier::fromRating($rating),
+            'peak' => $rating,
+            'placement_scores' => null,
+            'rated_runs' => 20,
+            'provisional_left' => 0,
+            'rated_at' => $ratedAt ?? now(),
+            'changed_at' => $ratedAt ?? now(),
+            ...$attributes,
+        ]);
+
+        return $rated->refresh();
     }
 
     /** Two players made friends, both rows at once — as an accepted request leaves them. */

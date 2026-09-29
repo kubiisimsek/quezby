@@ -140,11 +140,13 @@ export type UpdateLocaleRequest = { locale: Locale };
 export type RunAction = [number, number, number];
 
 /**
- * `free`: any number a day. `daily`: "Günün akışı" — one attempt, the same
- * seed for everyone. `vs`: a friend's VS — one attempt each at one seed; it
- * never ranks anywhere.
+ * `free` (Normal): any number a day. `daily` (Günlük): "Günün akışı" — one
+ * attempt, the same seed for everyone. `rated` (Dereceli): any number a day,
+ * and the only runs that play for Elo and the weekly group — open once
+ * `RatingResponse.unlock` is null. `vs`: a friend's VS — one attempt each at
+ * one seed; it never ranks anywhere.
  */
-export type RunMode = 'free' | 'daily' | 'vs';
+export type RunMode = 'free' | 'daily' | 'rated' | 'vs';
 
 export type StartRunRequest = {
   mode: RunMode;
@@ -286,24 +288,121 @@ export type DailyResult = {
   shareText: string;
 };
 
-export type LeagueTier = 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond';
+/**
+ * The six leagues, lowest first: a thousand rating points each —
+ * `master` (MasterClass) is 5000 and up. A player's league is their rating's,
+ * ranked by Elo and never reset (`GET /ratings?scope=league`).
+ */
+export type LeagueTier = 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond' | 'master';
 
-export type LeagueZone = 'promote' | 'stay' | 'demote';
+/**
+ * How far Dereceli still is: `remaining` of `required` free and daily runs —
+ * ranked, and scoring — still to play, and the `placement` rated runs that
+ * set the Elo once it opens. Once a player has played a rated run, it stays
+ * open to them.
+ */
+export type LeagueUnlock = { required: number; remaining: number; placement: number };
 
-export type LeagueStanding = {
-  tier: LeagueTier;
+/* -------------------------------------------------------------- rating -- */
+
+/** How far a player's placement runs have got. */
+export type RatingPlacement = { played: number; required: number };
+
+/**
+ * What a finished run did to the rating. `placement`: one of the first runs
+ * (the last one places the player — `after` is set); `run`: against its
+ * target; `forfeit`: rated as the full loss (played in a way that flagged
+ * it); `void`: did not count (a banned player's, a failed phone's, given up
+ * in the countdown); `pending`: held for review, counted if let through.
+ */
+export type RunRatingKind = 'placement' | 'run' | 'forfeit' | 'void' | 'pending';
+
+export type RunRating = {
+  kind: RunRatingKind;
+  /** Null before placement. */
+  before: number | null;
+  after: number | null;
+  delta: number;
+  tierBefore: LeagueTier | null;
+  tier: LeagueTier | null;
+  /** The score the run had to reach to win rating; null in placement. */
+  target: number | null;
+  /** The next run's target; null until placed. */
+  nextTarget: number | null;
+  /** Set while placing, and on the run that placed the player. */
+  placement: RatingPlacement | null;
+  /** A fresh promotion held the player in their league. */
+  shielded: boolean;
+};
+
+/** Why the rating moved: a run, a placement, a forfeit, or a moderator's reversal. */
+export type RatingChangeKind = 'placement' | 'run' | 'forfeit' | 'void' | 'reversal';
+
+export type RatingChange = {
+  kind: RatingChangeKind;
+  delta: number;
+  before: number | null;
+  after: number | null;
+  score: number | null;
+  /** The target the run played against, as the player saw it. */
+  target: number | null;
+  tier: LeagueTier | null;
+  runId: string | null;
+  at: string;
+};
+
+/** `GET /rating`. */
+export type RatingResponse = {
+  /** How far Dereceli still is; null once it is open. */
+  unlock: LeagueUnlock | null;
+  /** False until the placement runs are played; everything but `unlock` and `placement` is null until then. */
+  placed: boolean;
+  rating: number | null;
+  tier: LeagueTier | null;
+  /** The league's first rating… */
+  floor: number | null;
+  /** …and the next league's; null in MasterClass, which has no top. */
+  ceil: number | null;
+  /** How far into the league, per-mille; null in MasterClass. */
+  progress: number | null;
+  /** The score the next run must reach to win rating. */
+  target: number | null;
+  peak: number | null;
+  placement: RatingPlacement | null;
+  /** Moves are still twice as big: right after placement, and back after a long break. */
+  provisional: boolean;
+  /** A fresh promotion's protection: `runs` more runs cannot drop the player out of `tier`. */
+  shield: { tier: LeagueTier; runs: number } | null;
+  /** Latest changes, newest first — runs that did not count are left out. */
+  history: RatingChange[];
+};
+
+export type RatingEntry = {
   rank: number;
-  members: number;
-  zone: LeagueZone;
-  points: number;
+  username: string;
+  avatarUrl: string | null;
+  rating: number;
+  tier: LeagueTier;
+  isMe: boolean;
+  isFriend: boolean;
+  /** Rating to pass the row above; null for the first. */
+  gap: number | null;
 };
 
 /**
- * The league opens after a player's first few counted runs — ranked, and
- * scoring. `remaining` of `required` are still to play; once a player has
- * sat in a league, it stays open to them.
+ * Where an Elo board looks: everyone, your friends and you, or your own
+ * league — empty before placement.
  */
-export type LeagueUnlock = { required: number; remaining: number };
+export type RatingBoardScope = LeaderboardScope | 'league';
+
+/** `GET /ratings?scope=`: the highest ratings of the players with a rated run in the last two weeks. */
+export type RatingBoardResponse = {
+  scope: RatingBoardScope;
+  entries: RatingEntry[];
+  /** The caller's row, wherever it is; null when they are not on the board. */
+  me: RatingEntry | null;
+  players: number;
+};
 
 export type FinishRunResponse = {
   run: RunResult;
@@ -315,9 +414,12 @@ export type FinishRunResponse = {
   passed: PassedPlayer[];
   /** Set for a daily run. */
   daily: DailyResult | null;
-  /** Where this week's league stands after the run; null when it did not rank, or the league is not open yet. */
-  league: LeagueStanding | null;
-  /** How far the league still is after this run; null once it is open, and after a VS. */
+  /** What a rated run did to the rating; null after any other run. */
+  rating: RunRating | null;
+  /**
+   * After a free or daily run, how far Dereceli still is — `remaining: 0` on
+   * the very run that opened it; null otherwise.
+   */
   leagueUnlock: LeagueUnlock | null;
   /** What "Paylaş" sends, written by the API from its own numbers; null after a VS, which is between two friends. */
   shareText: string | null;
@@ -358,10 +460,7 @@ export type RunDetailResponse = { summary: RunSummary; run: RunResult };
 
 /* --------------------------------------------------------- leaderboard -- */
 
-/**
- * The boards a player climbs, in Europe/Istanbul. There is no day board: the
- * API keeps each day's best only to add up league points.
- */
+/** The boards a player climbs, in Europe/Istanbul. There is no day board. */
 export type LeaderboardPeriod = 'weekly' | 'monthly' | 'all';
 
 /** A period, or `challenge`: today's "Günün akışı" board. */
@@ -430,52 +529,6 @@ export type DailyResponse = {
   players: number;
 };
 
-/* -------------------------------------------------------------- league -- */
-
-export type LeagueMember = {
-  rank: number;
-  username: string;
-  avatarUrl: string | null;
-  /** The sum of the player's best score of each day this week. */
-  points: number;
-  daysPlayed: number;
-  isMe: boolean;
-  isFriend: boolean;
-  zone: LeagueZone;
-  gap: number | null;
-};
-
-export type LeagueOutcome = 'promoted' | 'stayed' | 'demoted';
-
-export type LeagueResponse = {
-  season: number;
-  /** `2026-W39`, Europe/Istanbul. */
-  weekKey: string;
-  tier: LeagueTier;
-  endsAt: string;
-  serverTime: string;
-  /** False until the week's first ranked run seats the player in a group — never before the league is open. */
-  joined: boolean;
-  /** Counted runs still to play before the league opens; null once it is open. */
-  unlock: LeagueUnlock | null;
-  members: LeagueMember[];
-  me: LeagueMember | null;
-  promoteCount: number;
-  demoteCount: number;
-  /** Points that would take the caller into the promotion zone; null when already in it or there is no way up. */
-  promotionGap: number | null;
-  /** How far the caller's points are towards passing the member above, per-mille. */
-  nextRankProgress: number | null;
-  lastWeek: {
-    weekKey: string;
-    tier: LeagueTier;
-    rank: number;
-    members: number;
-    outcome: LeagueOutcome;
-    newTier: LeagueTier;
-  } | null;
-};
-
 /* --------------------------------------------------------------- social -- */
 
 /**
@@ -499,7 +552,9 @@ export type PlayerCard = {
   avatarUrl: string | null;
   createdAt: string;
   best: BestScore | null;
+  /** Their rating's league; null until placed. */
   league: LeagueTier | null;
+  rating: number | null;
   ranks: { weekly: number | null; all: number | null };
   stats: { runs: number; reels: number; likes: number; perfects: number };
   /** Friends who are not banned. */
@@ -916,6 +971,8 @@ export type ApiErrorCode =
   | 'run_rejected'
   | 'engine_outdated'
   | 'daily_already_played'
+  /** Dereceli is not open yet: `RatingResponse.unlock` says how far it is. */
+  | 'rated_locked'
   | 'cannot_befriend_self'
   /** Your friend list is full — checked on whoever asks or accepts. */
   | 'friend_limit'

@@ -102,7 +102,9 @@ final class PlayerActivity
         $firsts = [
             PlayerMilestone::Protected->value => $user->identities()->min('created_at'),
             PlayerMilestone::FirstRun->value => $user->runs()->where('status', RunStatus::Ranked->value)->where('score', '>', 0)->min('finished_at'),
-            PlayerMilestone::League->value => DB::table('league_members')->where('user_id', $user->id)->min('joined_at'),
+            // Placed: the first change that set a rating from none.
+            PlayerMilestone::League->value => DB::table('rating_changes')->where('user_id', $user->id)
+                ->whereNull('before')->whereNotNull('after')->min('created_at'),
         ];
         foreach ($firsts as $milestone => $at) {
             if (is_string($at)) {

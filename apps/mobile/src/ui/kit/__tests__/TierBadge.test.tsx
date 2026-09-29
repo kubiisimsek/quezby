@@ -12,6 +12,7 @@ const TIERS: Array<[LeagueTier, string, string]> = [
   ['gold', 'Altın', arena.tierGold],
   ['platinum', 'Platin', arena.tierPlatinum],
   ['diamond', 'Elmas', arena.tierDiamond],
+  ['master', 'MasterClass', arena.tierMaster],
 ];
 
 describe('TierBadge', () => {

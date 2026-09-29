@@ -14,6 +14,7 @@ use App\Game\EngineError;
 use App\Models\Run;
 use App\Models\User;
 use App\Services\Integrity\DeviceIntegrity;
+use App\Services\Rating\RatingService;
 use App\Services\Social\DuelService;
 use Carbon\CarbonInterface;
 use Illuminate\Container\Attributes\Config;
@@ -24,7 +25,8 @@ use Illuminate\Validation\ValidationException;
 /**
  * A run from seed to board. The app never tells the API a score: it sends
  * what the player did, and everything a player sees afterwards — the score,
- * the stats, the ranks, the league, the daily card — is worked out here.
+ * the stats, the ranks, the rating, the daily card — is worked
+ * out here.
  */
 final class RunService
 {
@@ -37,17 +39,19 @@ final class RunService
         private readonly RunStatsBuilder $statsBuilder,
         private readonly PlayerStatsService $playerStats,
         private readonly DailyService $daily,
-        private readonly LeagueService $leagues,
         private readonly DeviceIntegrity $devices,
         private readonly Checkpoint $checkpoints,
         private readonly DuelService $duels,
+        private readonly RatingService $ratings,
+        private readonly RunCloser $closer,
         #[Config('quezby.plausibility')]
         private readonly array $plausibility,
     ) {}
 
     /**
      * Hands out a seed. A player has one open run at a time — starting
-     * another abandons it — and one daily run per Istanbul day. The run
+     * another abandons it, a forfeit on their rating — and one daily run per
+     * Istanbul day. The run
      * records the player's device verdict standing now; the finish judges it.
      *
      * A VS run either opens a VS against `$opponent`, on a fresh seed, or
@@ -71,15 +75,22 @@ final class RunService
         if ($dayKey !== null && $user->runs()->where('daily_key', $dayKey)->exists()) {
             throw ApiException::of(ErrorCode::DailyAlreadyPlayed);
         }
+        if ($mode->rated() && $this->ratings->unlock($user) !== null) {
+            throw ApiException::of(ErrorCode::RatedLocked);
+        }
         $deviceVerdict = IntegrityMode::current() === IntegrityMode::Off ? null : $this->devices->verdictAt($user, $now);
 
         for ($attempt = 0; ; $attempt++) {
             try {
                 return DB::transaction(function () use ($user, $mode, $dayKey, $contentVersion, $appVersion, $deviceVerdict, $now, $opponent, $duelId) {
-                    Run::query()
+                    $open = Run::query()
                         ->where('open_user_id', $user->id)
                         ->where('status', RunStatus::Started)
-                        ->update(['status' => RunStatus::Abandoned, 'open_user_id' => null, 'finished_at' => $now]);
+                        ->lockForUpdate()
+                        ->get();
+                    foreach ($open as $left) {
+                        $this->closer->closeUnfinished($left->setRelation('user', $user), RunStatus::Abandoned, $now);
+                    }
 
                     $duel = null;
                     if ($mode === RunMode::Vs) {
@@ -120,6 +131,27 @@ final class RunService
     }
 
     /**
+     * Gives up a run in its countdown: closed as abandoned, and — within
+     * `runs.cancel_seconds` of its start — for nothing. Later it is a forfeit,
+     * as leaving it for a new one would be: a run already under way is ended
+     * with its score, never cancelled. A run already closed is left as it is.
+     *
+     * @throws ApiException not_found
+     */
+    public function cancel(User $user, string $runId): void
+    {
+        $run = $user->runs()->find($runId) ?? throw ApiException::of(ErrorCode::NotFound);
+        $run->setRelation('user', $user);
+        if ($run->status !== RunStatus::Started) {
+            return;
+        }
+        $now = now();
+        $early = $run->started_at->diffInSeconds($now) <= (int) config('quezby.runs.cancel_seconds');
+
+        $this->closer->closeUnfinished($run, RunStatus::Abandoned, $now, spared: $early);
+    }
+
+    /**
      * Signs how far a started run has got — its reels and the hash of those
      * moves — with the time the API saw it. Nothing is written: the receipt
      * goes back to the app and comes back with the finish, where the
@@ -144,7 +176,8 @@ final class RunService
 
     /**
      * Replays the player's log and stores the server's result. Only a
-     * `ranked` run touches the boards, the league and the lifetime numbers;
+     * `ranked` run touches the boards and the lifetime numbers, a rated one
+     * the rating too;
      * a run quit before the first point is kept but places nobody. A VS run
      * is `played` (or `flagged`): it only settles its VS.
      *
@@ -163,7 +196,7 @@ final class RunService
             throw ApiException::of(ErrorCode::RunAlreadyFinished);
         }
         if ($run->hasExpired($now)) {
-            $this->close($run, ['status' => RunStatus::Expired, 'open_user_id' => null]);
+            $this->closer->closeUnfinished($run, RunStatus::Expired, $now);
             throw ApiException::of(ErrorCode::RunExpired);
         }
         if ($run->engine_version !== (int) config('quezby.engine_version')) {
@@ -185,6 +218,10 @@ final class RunService
                 'status' => RunStatus::Rejected,
                 'flags' => [['code' => 'engine_error', 'error' => $error->error, 'reelIndex' => $error->reelIndex, 'severity' => 'hard']],
             ]);
+            if ($closed) {
+                // A log the app could not have written is the same way out of a bad run as leaving it.
+                $this->ratings->forfeit($run);
+            }
 
             throw ApiException::of($closed ? ErrorCode::RunRejected : ErrorCode::RunAlreadyFinished);
         }
@@ -223,20 +260,19 @@ final class RunService
                 throw ApiException::of(ErrorCode::RunAlreadyFinished);
             }
 
+            $rating = $this->ratings->forFinishedRun($run);
             $outcome = null;
-            $league = null;
             if ($run->status === RunStatus::Ranked) {
                 $this->playerStats->add($user, $summary, $stats);
                 if ($run->score > 0) {
                     $outcome = $this->leaderboards->record($run);
-                    $league = $this->leagues->join($run);
                 }
             }
-            $leagueUnlock = $league === null && $run->mode->ranks() ? $this->leagues->unlock($user) : null;
+            $leagueUnlock = $this->ratings->unlockAfter($run);
             $daily = $run->mode === RunMode::Daily ? $this->daily->resultFor($run) : null;
             $duel = $run->mode === RunMode::Vs ? $this->duels->onRunFinished($run) : null;
 
-            return new FinishedRun($run, $outcome, $league, $leagueUnlock, $daily, $duel);
+            return new FinishedRun($run, $outcome, $leagueUnlock, $daily, $duel, $rating);
         });
     }
 
@@ -250,7 +286,8 @@ final class RunService
             ->where('user_id', $user->id)
             ->where('status', RunStatus::Started)
             ->where('started_at', '<', $now->copy()->subMinutes((int) config('quezby.runs.ttl_minutes')))
-            ->update(['status' => RunStatus::Expired, 'open_user_id' => null]);
+            ->get()
+            ->each(fn (Run $run) => $this->closer->closeUnfinished($run->setRelation('user', $user), RunStatus::Expired, $now));
     }
 
     /**

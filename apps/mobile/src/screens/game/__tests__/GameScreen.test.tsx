@@ -57,7 +57,7 @@ function controller(overrides: Partial<GameController> = {}): GameController {
 
 function setup(
   game: GameController,
-  mode: 'free' | 'daily' | 'vs' = 'free',
+  mode: 'free' | 'daily' | 'rated' | 'vs' = 'free',
   vs: { opponent: string; duelId?: string } | null = null,
 ) {
   jest.mocked(useGame).mockReturnValue(game);
@@ -168,7 +168,7 @@ describe('GameScreen', () => {
 
     expect(screen.getByText('Bugünün akışını oynadın')).toBeTruthy();
     expect(screen.getByText('Bugünkü hakkını kullandın.')).toBeTruthy();
-    await fireEvent.press(screen.getByText('Serbest oyna'));
+    await fireEvent.press(screen.getByText('Normal oyna'));
     expect(navigation.replace).toHaveBeenCalledWith('Game', { mode: 'free' });
     await fireEvent.press(screen.getByText('Günün tablosu'));
     expect(navigation.replace).toHaveBeenCalledWith('Daily');
@@ -219,6 +219,28 @@ describe('GameScreen', () => {
     expect(game.retrySubmit).toHaveBeenCalled();
     await fireEvent.press(screen.getByText('Ana sayfaya dön'));
     expect(navigation.goBack).toHaveBeenCalled();
+  });
+
+  describe('as Dereceli', () => {
+    it('asks for a rated run, and marks it over the game', async () => {
+      await setup(controller({ phase: 'playing' }), 'rated').render();
+
+      expect(useGame).toHaveBeenCalledWith('rated', null);
+      expect(screen.getByText('Dereceli')).toBeTruthy();
+    });
+
+    it('never offers offline practice for a rated run', async () => {
+      await setup(controller({ phase: 'error' }), 'rated').render();
+
+      expect(screen.getByText('Sunucuya ulaşılamadı.')).toBeTruthy();
+      expect(screen.queryByText('Çevrimdışı antrenman')).toBeNull();
+    });
+
+    it('marks nothing on a free run', async () => {
+      await setup(controller({ phase: 'playing' })).render();
+
+      expect(screen.queryByText('Dereceli')).toBeNull();
+    });
   });
 
   describe('as a VS', () => {
@@ -293,7 +315,7 @@ describe('GameScreen', () => {
             },
             passed: [],
             daily: null,
-            league: null,
+            rating: null,
             leagueUnlock: null,
             shareText: null,
             duel: buildDuel({
@@ -403,7 +425,7 @@ describe('GameScreen', () => {
       await render();
 
       expect(screen.getByText("You've played today's Daily Feed")).toBeTruthy();
-      await fireEvent.press(screen.getByText('Free play'));
+      await fireEvent.press(screen.getByText('Play Normal'));
       expect(navigation.replace).toHaveBeenCalledWith('Game', { mode: 'free' });
       await fireEvent.press(screen.getByText("Today's board"));
       expect(navigation.replace).toHaveBeenCalledWith('Daily');

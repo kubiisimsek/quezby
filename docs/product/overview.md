@@ -55,17 +55,21 @@ hesabına giren doğrudan lobiye geçer.
    (✓ oynar, ✗ reddeder), bugünün **Günün akışı** (küçük bir **Oyna** ile),
    ligdeki yerin, bu hafta hemen üstündeki rakip. Günün akışı oynanmasa da
    lobi boş durmaz. Dock'un üstündeki tek altın düğme — "Yukarı kaydır, oyna",
-   dokunmak da yeter — serbest bir tur başlatır.
-2. **Oyna** → sunucudan seed'li bir tur açılır (`POST /runs`, `free`, `daily`
-   ya da bir arkadaşla `vs`).
+   dokunmak da yeter — "Mod seç" penceresini açar: **Günlük · Normal ·
+   Dereceli** (bkz. *Modlar*).
+2. **Oyna** → sunucudan seed'li bir tur açılır (`POST /runs`, `free`, `daily`,
+   `rated` ya da bir arkadaşla `vs`).
 3. 3-2-1, sonra reeller: kaydır, çift dokun, basılı tut, dokunma.
 4. Her 20 reelde seviye (puan çarpanı) artar, pencere daralır, bar hızlanır;
    hatasız seriler kombo çarpanını x1,50'ye taşır, isimli kombolar patlar.
 5. Tur bitince hareket kaydı sunucuya gider; sunucu tekrar oynatır, skoru
-   doğrular, tablolara, lige ve istatistiklere yazar (`POST /runs/{id}/finish`).
+   doğrular, tablolara ve istatistiklere, dereceliyse Elo'ya yazar
+   (`POST /runs/{id}/finish`).
 6. Sonuç ekranı önce "Doğrulanıyor…" der, sonra **yalnızca sunucunun**
-   sayılarını gösterir: skor, puanın nereden geldiği, sıra değişimi, bu hafta
-   geçtiklerin, lig durumun, günlükse paylaşım kartı. Bir VS turunda sıra ve
+   sayılarını gösterir: skor, Elo (yeni reyting, ±değişim, hedef; yeni ligde
+   konfeti), puanın nereden geldiği, sıra değişimi, bu hafta geçtiklerin,
+   Dereceli'ye kalan oyun (açıldığı turda "Dereceli açıldı!" ve konfeti),
+   günlükse paylaşım kartı. Bir VS turunda sıra ve
    paylaşım yoktur; VS'in kendisi vardır: gönderildi, ya da kazandın,
    kaybettin, berabere.
 
@@ -73,38 +77,61 @@ Tur süresi yeni başlayanda ~2, ortalama oyuncuda ~3,5, iyi oyuncuda 5–6,
 profesyonelde ~7,5 dakikadır. Aynı yetenek aynı sürede ±%20 aynı skoru yapar.
 Ayrıntılar: [scoring.md](./scoring.md).
 
+## Modlar
+
+CS2'nin rekabetçi modu gibi: önce oyunu öğren, sonra dereceli oyna.
+
+- **Günlük** (`daily`): Günün akışı, aşağıda.
+- **Normal** (`free`): istediğin kadar oyna; skor Zirve'ye yazılır.
+- **Dereceli** (`rated`): Elo için oynanır. **20 sayılan Normal ya da Günlük
+  turdan sonra açılır** (`QUEZBY_LEAGUE_UNLOCK_RUNS`; deneme turu ve VS
+  sayılmaz). Kilitliyken "Mod seç"te Dereceli kilitli ve soluk durur,
+  "Dereceli'ye 12 oyun kaldı" ve bir ilerleme çubuğuyla; lobideki lig kartı ve
+  Lig ekranı da ilerlemeyi gösterir.
+  İlk **3 dereceli tur yerleşmedir**, sonra her dereceli tur Elo'yu değiştirir.
+  Bir kez dereceli oynayan için hep açıktır.
+
+Üç modun skorları da Hafta / Ay / Tüm zamanlar tablolarına yazılır; Elo'yu ve
+lig sıralamasını yalnız Dereceli besler.
+
 ## Her gün
 
 - **Günün akışı:** her İstanbul günü herkes aynı reel dizisini oynar, **tek
   hak** (başlatınca kullanılır). Kendi tablosu vardır (`challenge`) ve normal
-  tablolara, lige de sayılır. Sonucu Wordle gibi paylaşılır:
+  tablolara da sayılır; Elo'ya sayılmaz. Sonucu Wordle gibi paylaşılır:
   `Quezby · Günün akışı #17 · 🟩🟩🟨🟥⬛ · 52.340 puan · #37/1.204` — kare
   başına bir seviye (🟩 hatasız, 🟨 bir-iki hata, 🟥 daha fazla, ⬛ bittiği yer).
   Metni sunucu yazar.
-- **Haftalık ligler:** Bronz · Gümüş · Altın · Platin · Elmas. Lig, oyuncunun
-  **ilk 20 sayılan turundan** (sıralı ve puan almış; deneme turu ve VS
-  sayılmaz; `QUEZBY_LEAGUE_UNLOCK_RUNS`) sonra açılır — birkaç tur oynayıp
-  bırakanlar grupları doldurmaz; lobi ve Lig sekmesi "Lige 12 oyun kaldı"
-  der. Bir kez lige girmiş oyuncu için hep açıktır.
-  Sonra haftanın ilk sıralı turunda benzer kademedeki en fazla 30 kişilik bir
-  gruba oturursun.
-  **Lig puanı, haftanın her gününün en iyi skorlarının toplamıdır** — her gün
-  bir tur, bir akşamda kasmaktan değerlidir. Hafta bitince ilk 5 bir üst lige
-  çıkar, son 5 düşer (küçük gruplarda orantılı; Bronz'dan aşağı, Elmas'tan
-  yukarı yok). Cron yok: geçen hafta, oyuncu yeniden oynadığında kapanır.
+- **Lig = Elo:** Bronz · Gümüş · Altın · Platin · Elmas · **MasterClass**, her
+  biri 1000 Elo (MasterClass 5000 ve üstü). Her dereceli turun bir **hedef
+  skoru** var: geçen Elo kazanır, altında kalan kaybeder, bir tur en fazla ±100.
+  İlk 3 dereceli tur yerleşmedir, herkes Gümüş'te başlar; "Mod seç"teki
+  Dereceli kutusu ve lobideki lig kartı bir sonraki turun hedefini gösterir
+  ("Elo için oyna · Hedef 88.400").
+  Yarım bırakılan dereceli tur hükmen kayıptır.
+  Ayrıntılar: [scoring.md → Elo](./scoring.md#elo).
+- **Lig sıralaması hiç sıfırlanmaz:** satrançtaki gibi ligin Elo'nun
+  kademesidir; Lig ekranı ligindeki oyuncuları (son 14 günde dereceli
+  oynamış) Elo'ya göre sıralar, senin satırın altta, üsttekine kalan Elo'yla
+  ("@deniz'e 40 Elo", **Geç onu** dereceli oynatır). Haftalık grup, hafta
+  kapanışı ve Elo bonusu yoktur. Yerleşmeden önce Lig ekranı "Lig sıralaması
+  Dereceli oyuncularının" der.
 
 ## Rekabet
 
 - Sıralamalar: **Bu hafta**, **Bu ay**, **Tüm zamanlar** (Europe/Istanbul) ve
-  **Günün akışı**. Günlük tablo yoktur: günün en iyi skoru yalnızca lig puanı
-  için tutulur. Her oyuncunun o dönemdeki en iyi turu tek satır; eşitlikte
+  **Günün akışı**. Günlük tablo yoktur: günün en iyi dereceli skoru yalnızca
+  grup puanı için tutulur. Her oyuncunun o dönemdeki en iyi turu tek satır; eşitlikte
   önce yapan önde. Tüm zamanlar sezonun (kural sürümünün) tüm zamanlarıdır.
 - **Zirve** tasarımı: tepede podyum (taç, madalyalar), altında tırmanış —
   her satır bir üsttekini geçmek için gereken puanı gösterir — ve altta sabit
   **"Senin katın"**: sıran, bir üst sıraya ilerleme çubuğu, "@ekin'e 1.240 puan"
   ve **Geç onu**. Dönemin bitmesine geri sayım sunucu saatine göredir.
+- **Elo** sekmesi (Zirve'de dönemlerin yanında): son 14 günde dereceli turu olan
+  oyuncular reytinge göre, en yüksek önce; her satırda ligi. Yerleşmemiş ve
+  yasaklı oyuncular görünmez.
 - Her tabloda "Herkes | Arkadaşlar" (arkadaşların + sen). Bir satıra dokununca
-  oyuncu kartı açılır.
+  oyuncu kartı (lig ve Elo ile) açılır.
 - Skor istemciden asla kabul edilmez; sunucu aynı motoru PHP'de çalıştırır.
   Şüpheli turlar tabloya girmez; zirveye yakın şüpheli skorlar incelemeye düşer.
 
@@ -189,7 +216,7 @@ friends*, *Inbox*, *VS*, *Push*).
 - **Geçmiş oyunlar:** Profil'den, oynanan her tur sunucunun saydığıyla —
   sıralı, bekleyen, bayraklı ya da VS; yalnızca Günün akışı ya da yalnızca
   VS'ler süzülebilir.
-- **Profil** sadedir: portre, ad, lig; altında **Rekor · Arkadaş · Tur**
+- **Profil** sadedir: portre, ad, lig ve Elo; altında **Rekor · Arkadaş · Tur**
   sayaçları ve sıraların; dört sayılık **İstatistikler** kutusu (hepsi ve
   isimli kombolar, en çok beğenilen postlar bir sayfada açılır) ve Geçmiş
   oyunlar.

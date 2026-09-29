@@ -5,8 +5,8 @@ use App\Enums\MessageKind;
 use App\Enums\RunStatus;
 use App\Models\Duel;
 use App\Models\LeaderboardEntry;
-use App\Models\LeagueMember;
 use App\Models\Message;
+use App\Models\PlayerRating;
 use App\Models\PlayerStat;
 use App\Models\Run;
 use App\Models\User;
@@ -57,7 +57,7 @@ test('the challenger plays first; the friend is told without the score; the high
         ->assertJsonPath('shareText', null)
         ->assertJsonPath('passed', [])
         ->assertJsonPath('isNewBest', false)
-        ->assertJsonPath('league', null)
+        ->assertJsonMissingPath('league')
         ->assertJsonPath('leagueUnlock', null)
         ->assertJsonPath('daily', null);
     $invite = Message::query()->sole();
@@ -108,16 +108,16 @@ test('the challenger plays first; the friend is told without the score; the high
     $this->getJson('/api/v1/users/ekin')->assertJsonPath('player.relation', 'friend');
 });
 
-test('a VS never counts: no board, league, stat, record or step towards the league', function () {
+test('a VS never counts: no board, rating, stat, record or step towards Dereceli', function () {
     $duelId = challengeEkin()->json('duel.id');
     answerAsEkin($duelId);
 
     expect(Run::query()->where('mode', 'vs')->pluck('status')->map->value->all())->toBe(['played', 'played'])
         ->and(LeaderboardEntry::query()->count())->toBe(0)
         ->and(PlayerStat::query()->count())->toBe(0)
-        ->and(LeagueMember::query()->count())->toBe(0);
+        ->and(PlayerRating::query()->count())->toBe(0);
     $this->getJson('/api/v1/me')->assertJsonPath('user.best', null)->assertJsonPath('ranks', ['weekly' => null, 'monthly' => null, 'all' => null]);
-    $this->getJson('/api/v1/leagues/current')->assertJsonPath('unlock', ['required' => 20, 'remaining' => 20]);
+    $this->getJson('/api/v1/rating')->assertJsonPath('unlock', ['required' => 20, 'remaining' => 20, 'placement' => 3]);
 });
 
 test('a tie is a draw', function () {

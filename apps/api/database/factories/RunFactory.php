@@ -43,6 +43,12 @@ class RunFactory extends Factory
         ]);
     }
 
+    /** A Dereceli run: the only kind that plays for Elo and the weekly group. */
+    public function rated(): static
+    {
+        return $this->state(fn (array $attributes) => ['mode' => RunMode::Rated]);
+    }
+
     /** A finished, ranked run with the given result. */
     public function ranked(int $score, int $reels = 100): static
     {

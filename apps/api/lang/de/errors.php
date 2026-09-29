@@ -22,6 +22,7 @@ return [
     'run_rejected' => 'Dieses Spiel konnte nicht geprüft werden und kommt nicht in die Rangliste.',
     'engine_outdated' => 'Deine Spielversion ist veraltet. Aktualisiere die App, um in die Rangliste zu kommen.',
     'daily_already_played' => 'Du hast den Tages-Feed heute schon gespielt. Morgen wartet ein neuer.',
+    'rated_locked' => 'Gewertet ist noch nicht offen. Spiel zuerst normale oder tägliche Spiele.',
     'cannot_befriend_self' => 'Du kannst dir selbst keine Freundschaftsanfrage schicken.',
     'friend_limit' => 'Du kannst höchstens :limit Freunde haben.',
     'request_limit' => 'Du kannst höchstens :limit offene Anfragen haben. Schick eine neue, sobald jemand antwortet.',
