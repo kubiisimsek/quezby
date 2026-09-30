@@ -12,6 +12,7 @@ adındadır, klasör düzeni hemen aşağıda.
 | `https://quezby.com/api/…` | API (`apps/api`) | `api/`: `pnpm api:package:production` zip'i |
 | `https://quezby.com/panel/` | Yönetim paneli (`apps/admin`) | `panel/`: `pnpm admin:package:production` zip'i |
 | `https://quezby.com/privacy-policy` | Gizlilik politikası, 8 dil | kök: `.htaccess`, `robots.txt`, `legal/` (site zip'i) |
+| `https://quezby.com/delete-account` | Hesap silme sayfası, 8 dil (Google Play'in "hesap silme URL'si") | aynı site zip'i |
 
 - **API:** zip'i `public_html/api` klasörüne aç (4. adım, klasör adı `api`).
   Alan adı bağlamak gerekmez (5. adımı atla). Zip'in kökündeki `.htaccess`
@@ -31,6 +32,7 @@ adındadır, klasör düzeni hemen aşağıda.
     - `Accept-Language` başlığına bakılır;
     - eşleşme yoksa İngilizce açılır;
     - adres değişmez.
+  - `/delete-account` de aynı şekilde çalışır.
   - `/privacy-policy/de` gibi bir adres tek bir dili açar. Bilinmeyen bir dil
     `/privacy-policy`'ye döner.
   - `legal/` doğrudan açılmaz (404).

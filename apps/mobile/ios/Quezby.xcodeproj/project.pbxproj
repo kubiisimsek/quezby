@@ -7,25 +7,25 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		019282B421AE19A447A63159 /* RoundedMplus1c-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E5D62261E2454F6FDF970BD8 /* RoundedMplus1c-ExtraBold.ttf */; };
 		0C80B921A6F3F58F76C31292 /* libPods-Quezby.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DCACB8F33CDC322A6C60F78 /* libPods-Quezby.a */; };
 		0CC2164C2DD529D406381931 /* Cairo-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 75B29BB38A6008294B27057C /* Cairo-SemiBold.ttf */; };
+		12B341694F079B1959B31BCA /* GothicA1-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DC8FA4AD8BB6F0AE38AE0723 /* GothicA1-SemiBold.ttf */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		25046AE84FBB971E974878EE /* Nunito-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A4040B0656FCD6335C62D399 /* Nunito-Black.ttf */; };
+		2CAEA1D30B0BD1681B8DE126 /* RoundedMplus1c-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 71EB1DF04E40BAE7E58008F9 /* RoundedMplus1c-Bold.ttf */; };
+		40F124572D860A406F8236F1 /* GothicA1-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3EAFEA45B587CA7C6CA21C4C /* GothicA1-Bold.ttf */; };
 		4BDB570B78CD1DFB6A5B13FD /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 082800B53256E153D5AA0F55 /* InfoPlist.strings */; };
+		602F2907CB7C88155FE42045 /* Jua-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D45DB45865D924A8C5DB3B61 /* Jua-Regular.ttf */; };
 		62C76BA68E185CA1C91B8648 /* Cairo-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 84530F2E6F210FEC23C8EBDF /* Cairo-Black.ttf */; };
 		63C0AE3C31CF5AA725772094 /* RoundedMplus1c-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B2A2034948719561E68669FE /* RoundedMplus1c-Medium.ttf */; };
-		2CAEA1D30B0BD1681B8DE126 /* RoundedMplus1c-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 71EB1DF04E40BAE7E58008F9 /* RoundedMplus1c-Bold.ttf */; };
-		019282B421AE19A447A63159 /* RoundedMplus1c-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E5D62261E2454F6FDF970BD8 /* RoundedMplus1c-ExtraBold.ttf */; };
 		6859DB4E4C24393205FBF08A /* RoundedMplus1c-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 470329DB7B328A63F71B834D /* RoundedMplus1c-Black.ttf */; };
-		602F2907CB7C88155FE42045 /* Jua-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D45DB45865D924A8C5DB3B61 /* Jua-Regular.ttf */; };
-		12B341694F079B1959B31BCA /* GothicA1-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DC8FA4AD8BB6F0AE38AE0723 /* GothicA1-SemiBold.ttf */; };
-		40F124572D860A406F8236F1 /* GothicA1-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3EAFEA45B587CA7C6CA21C4C /* GothicA1-Bold.ttf */; };
 		6B72BEBD0A562020980A6D78 /* GothicA1-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 80C8CE82FEF85635DBBF1FA6 /* GothicA1-ExtraBold.ttf */; };
-		8CF689D5A68CE3CB219F2388 /* GothicA1-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 20A8723A45B83E1035FF8CD1 /* GothicA1-Black.ttf */; };
 		6E2D9E987C01DB89FC089721 /* QuezbyIntegrity.m in Sources */ = {isa = PBXBuildFile; fileRef = EF313606C6A0AC4C1799DD96 /* QuezbyIntegrity.m */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		7DC8696D15D664D00B820A34 /* Cairo-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 032B8E3C8CD49DBD292206CB /* Cairo-ExtraBold.ttf */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		8CF689D5A68CE3CB219F2388 /* GothicA1-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 20A8723A45B83E1035FF8CD1 /* GothicA1-Black.ttf */; };
 		90F895FD825D65128B3291D3 /* Rubik-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = EEBB71C9E248F117AAFDC07F /* Rubik-Black.ttf */; };
 		994ABBCA01C71933B2CC91DD /* Nunito-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8A6D9971EA3C4268DE1FBD2A /* Nunito-Bold.ttf */; };
 		A9603E37E51DE20B3985631A /* Nunito-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0527CF8F59F65E99F9961F32 /* Nunito-ExtraBold.ttf */; };
@@ -44,37 +44,37 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Quezby/Info.plist; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = Quezby/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		1998605AA1881745395454B1 /* Environment.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Environment.xcconfig; sourceTree = "<group>"; };
+		20A8723A45B83E1035FF8CD1 /* GothicA1-Black.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "GothicA1-Black.ttf"; path = "../assets/fonts/GothicA1-Black.ttf"; sourceTree = "<group>"; };
 		3B4392A12AC88292D35C810B /* Pods-Quezby.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Quezby.debug.xcconfig"; path = "Target Support Files/Pods-Quezby/Pods-Quezby.debug.xcconfig"; sourceTree = "<group>"; };
+		3EAFEA45B587CA7C6CA21C4C /* GothicA1-Bold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "GothicA1-Bold.ttf"; path = "../assets/fonts/GothicA1-Bold.ttf"; sourceTree = "<group>"; };
+		470329DB7B328A63F71B834D /* RoundedMplus1c-Black.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "RoundedMplus1c-Black.ttf"; path = "../assets/fonts/RoundedMplus1c-Black.ttf"; sourceTree = "<group>"; };
 		5709B34CF0A7D63546082F79 /* Pods-Quezby.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Quezby.release.xcconfig"; path = "Target Support Files/Pods-Quezby/Pods-Quezby.release.xcconfig"; sourceTree = "<group>"; };
 		5D624868C62CEBC3F3D73B18 /* Nunito-SemiBold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "Nunito-SemiBold.ttf"; path = "../assets/fonts/Nunito-SemiBold.ttf"; sourceTree = "<group>"; };
 		5DCACB8F33CDC322A6C60F78 /* libPods-Quezby.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Quezby.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5ED3156D0E67001AF4078B06 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Quezby/en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		65CA77D710AD97E6BE136E0F /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = Quezby/fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		6EA8566893907A583A04D44A /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = Quezby/tr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		71EB1DF04E40BAE7E58008F9 /* RoundedMplus1c-Bold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "RoundedMplus1c-Bold.ttf"; path = "../assets/fonts/RoundedMplus1c-Bold.ttf"; sourceTree = "<group>"; };
 		75B29BB38A6008294B27057C /* Cairo-SemiBold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "Cairo-SemiBold.ttf"; path = "../assets/fonts/Cairo-SemiBold.ttf"; sourceTree = "<group>"; };
 		76174D69801EF8AD6DD82290 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = Quezby/ar.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = Quezby/AppDelegate.swift; sourceTree = "<group>"; };
+		80C8CE82FEF85635DBBF1FA6 /* GothicA1-ExtraBold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "GothicA1-ExtraBold.ttf"; path = "../assets/fonts/GothicA1-ExtraBold.ttf"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Quezby/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		84530F2E6F210FEC23C8EBDF /* Cairo-Black.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "Cairo-Black.ttf"; path = "../assets/fonts/Cairo-Black.ttf"; sourceTree = "<group>"; };
-		B2A2034948719561E68669FE /* RoundedMplus1c-Medium.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "RoundedMplus1c-Medium.ttf"; path = "../assets/fonts/RoundedMplus1c-Medium.ttf"; sourceTree = "<group>"; };
-		71EB1DF04E40BAE7E58008F9 /* RoundedMplus1c-Bold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "RoundedMplus1c-Bold.ttf"; path = "../assets/fonts/RoundedMplus1c-Bold.ttf"; sourceTree = "<group>"; };
-		E5D62261E2454F6FDF970BD8 /* RoundedMplus1c-ExtraBold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "RoundedMplus1c-ExtraBold.ttf"; path = "../assets/fonts/RoundedMplus1c-ExtraBold.ttf"; sourceTree = "<group>"; };
-		470329DB7B328A63F71B834D /* RoundedMplus1c-Black.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "RoundedMplus1c-Black.ttf"; path = "../assets/fonts/RoundedMplus1c-Black.ttf"; sourceTree = "<group>"; };
-		D45DB45865D924A8C5DB3B61 /* Jua-Regular.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "Jua-Regular.ttf"; path = "../assets/fonts/Jua-Regular.ttf"; sourceTree = "<group>"; };
-		DC8FA4AD8BB6F0AE38AE0723 /* GothicA1-SemiBold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "GothicA1-SemiBold.ttf"; path = "../assets/fonts/GothicA1-SemiBold.ttf"; sourceTree = "<group>"; };
-		3EAFEA45B587CA7C6CA21C4C /* GothicA1-Bold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "GothicA1-Bold.ttf"; path = "../assets/fonts/GothicA1-Bold.ttf"; sourceTree = "<group>"; };
-		80C8CE82FEF85635DBBF1FA6 /* GothicA1-ExtraBold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "GothicA1-ExtraBold.ttf"; path = "../assets/fonts/GothicA1-ExtraBold.ttf"; sourceTree = "<group>"; };
-		20A8723A45B83E1035FF8CD1 /* GothicA1-Black.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "GothicA1-Black.ttf"; path = "../assets/fonts/GothicA1-Black.ttf"; sourceTree = "<group>"; };
-		AE41226AEEA07E21C84DC282 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = Quezby/ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		F28AA6C0827C27FAA1A71FCD /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = Quezby/ko.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		8A6D9971EA3C4268DE1FBD2A /* Nunito-Bold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "Nunito-Bold.ttf"; path = "../assets/fonts/Nunito-Bold.ttf"; sourceTree = "<group>"; };
 		A197133355D8D2DB0A521EA5 /* Cairo-Bold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "Cairo-Bold.ttf"; path = "../assets/fonts/Cairo-Bold.ttf"; sourceTree = "<group>"; };
 		A4040B0656FCD6335C62D399 /* Nunito-Black.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "Nunito-Black.ttf"; path = "../assets/fonts/Nunito-Black.ttf"; sourceTree = "<group>"; };
+		AE41226AEEA07E21C84DC282 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = Quezby/ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		B2A2034948719561E68669FE /* RoundedMplus1c-Medium.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "RoundedMplus1c-Medium.ttf"; path = "../assets/fonts/RoundedMplus1c-Medium.ttf"; sourceTree = "<group>"; };
 		CA46B8EA4C4C310B97D8AB1C /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = Quezby/es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		D45DB45865D924A8C5DB3B61 /* Jua-Regular.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "Jua-Regular.ttf"; path = "../assets/fonts/Jua-Regular.ttf"; sourceTree = "<group>"; };
 		DA8B8EC790F0004F15CE64FD /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = Quezby/de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		DC8FA4AD8BB6F0AE38AE0723 /* GothicA1-SemiBold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "GothicA1-SemiBold.ttf"; path = "../assets/fonts/GothicA1-SemiBold.ttf"; sourceTree = "<group>"; };
+		E5D62261E2454F6FDF970BD8 /* RoundedMplus1c-ExtraBold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "RoundedMplus1c-ExtraBold.ttf"; path = "../assets/fonts/RoundedMplus1c-ExtraBold.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		EEBB71C9E248F117AAFDC07F /* Rubik-Black.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "Rubik-Black.ttf"; path = "../assets/fonts/Rubik-Black.ttf"; sourceTree = "<group>"; };
 		EF313606C6A0AC4C1799DD96 /* QuezbyIntegrity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = QuezbyIntegrity.m; path = Quezby/QuezbyIntegrity.m; sourceTree = "<group>"; };
+		F28AA6C0827C27FAA1A71FCD /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = Quezby/ko.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -460,7 +460,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Quezby/Quezby.entitlements;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = A7NTV288DZ;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Quezby/Info.plist;
@@ -494,7 +494,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Quezby/Quezby.entitlements;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = A7NTV288DZ;
 				INFOPLIST_FILE = Quezby/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
