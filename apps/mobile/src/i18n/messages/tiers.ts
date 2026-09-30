@@ -40,4 +40,14 @@ const es: TierMessages = tiersOf(
   (name) => `Liga ${name}`,
 );
 
-export const tiers: Record<Locale, TierMessages> = { tr, en, de, ar, fr, es };
+const ja: TierMessages = tiersOf(
+  { bronze: 'ブロンズ', silver: 'シルバー', gold: 'ゴールド', platinum: 'プラチナ', diamond: 'ダイヤモンド', master: 'マスタークラス' },
+  (name) => `${name}リーグ`,
+);
+
+const ko: TierMessages = tiersOf(
+  { bronze: '브론즈', silver: '실버', gold: '골드', platinum: '플래티넘', diamond: '다이아몬드', master: '마스터클래스' },
+  (name) => `${name} 리그`,
+);
+
+export const tiers: Record<Locale, TierMessages> = { tr, en, de, ar, fr, es, ja, ko };

@@ -79,6 +79,22 @@ describe('the catalogs', () => {
     const latinCapitals = linesOf(CATALOGS.ar, '').filter((line) => /^[A-Z]{3,}/.test(line.text));
     expect(latinCapitals.map((line) => line.path)).toEqual([]);
   });
+
+  it.each(LOCALES)('%s calls the rating qb, never Elo', (locale) => {
+    const elo = linesOf(CATALOGS[locale], '').filter((line) => /\belo\b|إيلو/i.test(line.text));
+    expect(elo.map((line) => `${line.path}: ${line.text}`)).toEqual([]);
+
+    const row = CATALOGS[locale].board.row({
+      rank: 2,
+      name: 'deniz',
+      isMe: false,
+      score: 2340,
+      gap: 12,
+      unit: 'elo',
+    });
+    expect(row).toContain('qb');
+    expect(row).not.toMatch(/\belo\b/i);
+  });
 });
 
 describe('plural', () => {

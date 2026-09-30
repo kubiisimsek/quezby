@@ -21,7 +21,7 @@ Start at `docs/product/overview.md`.
 | --- | --- |
 | Anything with a UI in the game | `docs/design/design-language.md`, then `docs/design/mobile-design-system.md` |
 | The admin panel (`apps/admin`) | `docs/design/admin-design-system.md`, then `docs/rules/admin-rules.md` |
-| Anything user-visible | `docs/design/ui-writing.md` (six languages — every word of the app lives in `apps/mobile/src/i18n/messages`, a push's in `apps/api/lang`), then `docs/product/localization.md` |
+| Anything user-visible | `docs/design/ui-writing.md` (eight languages — every word of the app lives in `apps/mobile/src/i18n/messages`, a push's in `apps/api/lang`), then `docs/product/localization.md` |
 | Game rules, scoring, difficulty | `docs/product/scoring.md` |
 | Elo, Dereceli, leagues | `docs/product/scoring.md` → "Elo" |
 | Anti-cheat, device integrity, checkpoints | `docs/product/scoring.md` → "Hile koruması" |
@@ -106,7 +106,7 @@ pnpm install
 pnpm switch-local | switch-staging | switch-production   # the app's API (one bundle id)
 pnpm dev:api | dev:mobile | dev:admin | ios | android
 pnpm lint && pnpm typecheck && pnpm test && pnpm test:api
-pnpm engine:simulate | engine:fixtures | tokens
+pnpm engine:simulate | engine:fixtures | tokens | fonts:cjk
 pnpm api:package:staging | api:package:production
 pnpm admin:package:staging | admin:package:production
 pnpm android:bundle:staging | android:bundle:production   # Play .aab, upload-key signed

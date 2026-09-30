@@ -5,7 +5,7 @@ namespace App\Enums;
 use Illuminate\Http\Request;
 
 /**
- * The six languages the game speaks, in the order the language picker lists
+ * The eight languages the game speaks, in the order the language picker lists
  * them — `Locale` in `packages/types` and `LOCALES` in `@quezby/config`,
  * tested against `packages/config/fixtures/locales.json`
  * (`tests/Unit/LocaleParityTest.php`). Each has its lines in `lang/{locale}`.
@@ -18,6 +18,8 @@ enum Locale: string
     case Ar = 'ar';
     case Fr = 'fr';
     case Es = 'es';
+    case Ja = 'ja';
+    case Ko = 'ko';
 
     /**
      * The first of the request's `Accept-Language` tags the game speaks, by
@@ -67,7 +69,7 @@ enum Locale: string
 
         $separator = match ($this) {
             self::Tr, self::De, self::Es => '.',
-            self::En, self::Ar => ',',
+            self::En, self::Ar, self::Ja, self::Ko => ',',
             // The narrow no-break space (U+202F) is not in the game's fonts.
             self::Fr => "\u{00A0}",
         };

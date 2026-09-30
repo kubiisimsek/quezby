@@ -19,6 +19,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: 'في غرفة الفندق 11 زرًا، وما زال أحد الأضواء مضاءً.',
       fr: "À l'hôtel, 11 interrupteurs. Une lampe reste allumée.",
       es: 'Hotel: 11 interruptores. Una luz sigue encendida.',
+      ja: 'ホテルのスイッチ11個。1つだけ電気が消えない。',
+      ko: '호텔 방 스위치 11개. 불 하나가 아직도 안 꺼진다.',
     },
   },
   {
@@ -32,6 +34,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: '«لقد وصلت إلى وجهتك». وحولي حقل فقط.',
       fr: "« Vous êtes arrivé. » Je suis au milieu d'un champ.",
       es: '“Ha llegado a su destino.” Estoy en medio de un campo.',
+      ja: '「目的地に到着しました」周りは一面の畑。',
+      ko: '“목적지에 도착했습니다.” 주변은 온통 밭.',
     },
   },
   {
@@ -45,6 +49,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: 'دفعت أكثر لأجل مقعد النافذة. المنظر: الجناح.',
       fr: "Place hublot payée en plus. Vue : l'aile.",
       es: 'Pagué extra por la ventanilla. Vista: el ala.',
+      ja: '窓側の席に追加料金を払った。景色：翼。',
+      ko: '창가 자리에 돈 더 냈다. 풍경: 날개.',
     },
   },
   {
@@ -58,6 +64,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: 'انتهى مسار الدراجات فجأة. فماذا أكون الآن؟',
       fr: "La piste cyclable s'arrête net. Je suis quoi, moi ?",
       es: 'El carril para bicis se acabó. ¿Y ahora qué soy?',
+      ja: '自転車レーンが急に終わった。じゃあ今の私は何？',
+      ko: '자전거 도로가 갑자기 끝났다. 그럼 난 이제 뭐지?',
     },
   },
   {
@@ -71,6 +79,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: 'عرضت عليها مقعدي فقالت: «اجلس أنت». والآن نقف كلانا.',
       fr: "J'offre ma place, elle me la rend. Personne ne s'assoit.",
       es: 'Ofrecí mi asiento y me dijo “siéntate tú”. Nadie se sentó.',
+      ja: '席を譲ったら「あなたが座って」と言われ、2人とも立ってる',
+      ko: '자리 양보했더니 “앉아요” 하셔서 둘 다 서 있다',
     },
   },
   {
@@ -84,6 +94,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: 'ميداليات المفاتيح بالأسماء… كلها إلا اسمي، كالعادة.',
       fr: 'Porte-clés prénoms : tous sauf le mien. Encore.',
       es: 'Llaveros con nombres: todos menos el mío. Otra vez.',
+      ja: '名前入りキーホルダー、今回も私の名前だけない。',
+      ko: '이름 새긴 열쇠고리에 내 이름만 또 없다.',
     },
   },
   {
@@ -97,6 +109,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: 'إرهاق السفر: جسدي في البيت، ونومي ما زال في الطريق.',
       fr: 'Décalage horaire : mon corps est rentré, pas mon sommeil.',
       es: 'Jet lag: mi cuerpo llegó, mi sueño sigue de viaje.',
+      ja: '時差ボケ：体は家、眠気はまだ移動中。',
+      ko: '시차 적응 중: 몸은 집에, 잠은 아직 이동 중.',
     },
   },
   {
@@ -104,7 +118,7 @@ export const TRAVEL_SKIP: readonly Draft[] = [
     user: ACCOUNTS.screens,
     body: {
       format: 'chat',
-      contact: { tr: 'Annem', en: 'Mom', de: 'Mama', ar: 'أمي', fr: 'Maman', es: 'Mamá' },
+      contact: { tr: 'Annem', en: 'Mom', de: 'Mama', ar: 'أمي', fr: 'Maman', es: 'Mamá', ja: 'お母さん', ko: '엄마' },
       lines: [
         {
           from: 'them',
@@ -115,6 +129,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
             ar: 'هل وصلت؟',
             fr: "t'as atterri ?",
             es: '¿ya aterrizaste?',
+            ja: '着いた？',
+            ko: '도착했어?',
           },
         },
         {
@@ -126,6 +142,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
             ar: 'أمي، لم نقلع بعد',
             fr: 'maman, on a même pas décollé',
             es: 'mamá, ni siquiera despegamos',
+            ja: 'お母さん、まだ離陸してないよ',
+            ko: '엄마 아직 이륙도 안 했어',
           },
         },
         {
@@ -137,6 +155,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
             ar: 'حسنًا، اكتب لي حين تهبط',
             fr: "ok, écris-moi quand t'atterris",
             es: 'ok, avísame cuando aterrices',
+            ja: 'わかった、着いたら連絡してね',
+            ko: '알았어, 내리면 연락해',
           },
         },
         {
@@ -148,6 +168,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
             ar: 'هل هبطت؟',
             fr: 'atterri ?',
             es: '¿aterrizaste?',
+            ja: '着陸した？',
+            ko: '내렸어?',
           },
         },
       ],
@@ -159,6 +181,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: 'الطائرة ما زالت على المدرج',
       fr: "L'avion est encore sur la piste",
       es: 'El avión sigue en la pista',
+      ja: '飛行機はまだ滑走路の上',
+      ko: '비행기는 아직 활주로 위',
     },
   },
   {
@@ -173,6 +197,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
         ar: 'مجموعة الإجازة',
         fr: 'Groupe vacances',
         es: 'Grupo del viaje',
+        ja: '旅行グループ',
+        ko: '여행 단톡방',
       },
       lines: [
         {
@@ -184,6 +210,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
             ar: 'خطة الغد: الفطور في 7، والمتحف في 8',
             fr: 'demain : petit-déj à 7 h, musée à 8 h',
             es: 'mañana: desayuno a las 7, museo a las 8',
+            ja: '明日の予定：7時朝食、8時美術館',
+            ko: '내일 일정: 7시 아침, 8시 박물관',
           },
         },
         {
@@ -195,6 +223,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
             ar: 'القلعة في 9، وجولة في المدينة في 11…',
             fr: 'château à 9 h, visite de la ville à 11 h…',
             es: 'castillo a las 9, paseo a las 11…',
+            ja: '9時お城、11時市内観光…',
+            ko: '9시 성, 11시 시내 투어…',
           },
         },
         {
@@ -206,6 +236,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
             ar: 'في السابعة؟',
             fr: 'à 7 h ??',
             es: '¿¿a las 7??',
+            ja: '7時？？',
+            ko: '7시??',
           },
         },
         {
@@ -217,6 +249,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
             ar: 'ظننت أننا في إجازة',
             fr: "je croyais qu'on était en vacances",
             es: 'creí que estábamos de vacaciones',
+            ja: '休暇中だと思ってた',
+            ko: '우리 휴가 온 거 아니었어?',
           },
         },
       ],
@@ -228,6 +262,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: 'وهذه الصفحة الأولى من الخطة فقط',
       fr: "Et ce n'est que la page 1 du programme",
       es: 'Y esa es solo la página uno del plan',
+      ja: 'これで計画書の1ページ目',
+      ko: '이게 겨우 계획표 1페이지',
     },
   },
   {
@@ -242,6 +278,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
         ar: 'صديقي',
         fr: 'Mon pote',
         es: 'Mi mejor amigo',
+        ja: '親友',
+        ko: '절친',
       },
       lines: [
         {
@@ -253,6 +291,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
             ar: 'أين أنت؟',
             fr: "t'es où ?",
             es: '¿dónde estás?',
+            ja: '今どこ？',
+            ko: '어디야?',
           },
         },
         {
@@ -264,6 +304,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
             ar: 'في المترو، بقيت محطتان',
             fr: 'dans le métro, encore 2 stations',
             es: 'en el metro, faltan 2 estaciones',
+            ja: '地下鉄、あと2駅',
+            ko: '지하철이야, 2정거장 남았어',
           },
         },
         {
@@ -275,6 +317,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
             ar: 'لكن موقعك المباشر يبتعد',
             fr: "ta position en direct s'éloigne, là",
             es: 'pero tu ubicación en vivo se aleja',
+            ja: 'でも位置情報、離れていってるけど',
+            ko: '근데 실시간 위치는 멀어지는데',
           },
         },
         {
@@ -286,6 +330,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
             ar: 'حسنًا، بقيت 3 محطات',
             fr: 'ok, encore 3 stations',
             es: 'ok, faltan 3 estaciones',
+            ja: 'わかった、あと3駅',
+            ko: '알았어, 3정거장 남았어',
           },
         },
       ],
@@ -297,6 +343,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: 'ركبت في الاتجاه المعاكس طبعًا',
       fr: 'Mauvaise direction, évidemment',
       es: 'Dirección contraria, obvio',
+      ja: '反対方面の電車に乗ってた',
+      ko: '반대 방향으로 탔었다',
     },
   },
   {
@@ -311,6 +359,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
         ar: 'السائق',
         fr: 'Chauffeur',
         es: 'Conductor',
+        ja: 'ドライバー',
+        ko: '기사님',
       },
       lines: [
         {
@@ -322,6 +372,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
             ar: 'وصلت، سيارة بيضاء',
             fr: 'je suis là, voiture blanche',
             es: 'ya llegué, auto blanco',
+            ja: '着きました、白い車です',
+            ko: '도착했어요, 흰색 차예요',
           },
         },
         {
@@ -333,6 +385,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
             ar: 'هنا 6 سيارات بيضاء',
             fr: 'y a 6 voitures blanches ici',
             es: 'aquí hay 6 autos blancos',
+            ja: '白い車が6台いるんですが',
+            ko: '여기 흰색 차가 6대 있는데요',
           },
         },
         {
@@ -344,6 +398,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
             ar: 'أنا ألوّح لك',
             fr: 'je vous fais signe',
             es: 'le estoy haciendo señas',
+            ja: '手を振ってます',
+            ko: '손 흔들고 있어요',
           },
         },
         {
@@ -355,6 +411,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
             ar: 'كلهم يلوّحون',
             fr: 'ils font tous signe',
             es: 'todos están haciendo señas',
+            ja: '全員振ってます',
+            ko: '다들 흔들고 있어요',
           },
         },
       ],
@@ -366,6 +424,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: 'في النهاية سألته عن رقم اللوحة',
       fr: "J'ai fini par demander la plaque",
       es: 'Al final le pedí el número de placa',
+      ja: '最後にナンバーを聞いた',
+      ko: '결국 차 번호를 물어봤다',
     },
   },
   {
@@ -380,6 +440,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
         ar: 'هبطت الطائرة وإشارة الحزام ما زالت مضاءة. أنت:',
         fr: 'Atterrissage, voyant ceinture allumé. Toi :',
         es: 'Aterrizaste, pero la luz del cinturón sigue. Tú:',
+        ja: '着陸。ベルト着用サインはまだ点灯中。あなたは？',
+        ko: '착륙했는데 벨트 사인이 아직 켜져 있다. 나는?',
       },
       options: [
         {
@@ -389,6 +451,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
           ar: 'أبقى جالسًا',
           fr: 'Je reste assis',
           es: 'Me quedo sentado',
+          ja: '座って待つ',
+          ko: '앉아서 기다린다',
         },
         {
           tr: 'Hemen ayağa kalkarım',
@@ -397,6 +461,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
           ar: 'أقف فورًا',
           fr: 'Je me lève direct',
           es: 'Me levanto ya',
+          ja: 'すぐに立ち上がる',
+          ko: '바로 일어선다',
         },
       ],
       winner: 1,
@@ -408,6 +474,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: 'فُتح الباب بعد 20 دقيقة',
       fr: "La porte s'est ouverte 20 minutes après",
       es: 'La puerta se abrió 20 minutos después',
+      ja: 'ドアが開いたのは20分後',
+      ko: '문은 20분 뒤에 열렸다',
     },
   },
   {
@@ -422,6 +490,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
         ar: 'سيارتك ضائعة في المرآب. ماذا تفعل؟',
         fr: 'Ta voiture est perdue dans le parking. Toi :',
         es: 'No encuentras tu auto en el estacionamiento. Tú:',
+        ja: '駐車場で車が見つからない。あなたは？',
+        ko: '주차장에서 차를 못 찾겠다. 나는?',
       },
       options: [
         {
@@ -431,6 +501,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
           ar: 'أبحث في كل طابق',
           fr: 'Tous les étages à pied',
           es: 'Recorro cada piso',
+          ja: '全フロアを歩く',
+          ko: '층마다 돌아본다',
         },
         {
           tr: 'Bip bip, dinlerim',
@@ -439,6 +511,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
           ar: 'أضغط المفتاح وأنصت',
           fr: "Bip-bip, et j'écoute",
           es: 'Bip bip y escucho',
+          ja: 'ピッと鳴らして聞く',
+          ko: '삑삑 울려서 듣는다',
         },
       ],
       winner: 1,
@@ -450,6 +524,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: 'صفّارة خافتة من الطابق الرابع',
       fr: 'Un petit bip venu du niveau 4',
       es: 'Un bip lejano desde el piso 4',
+      ja: '4階からかすかにピッ',
+      ko: '4층에서 희미하게 삑',
     },
   },
   {
@@ -464,6 +540,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
         ar: 'حجزت غرفة «مطلة على البحر». من النافذة ترى:',
         fr: 'Chambre « vue sur mer » réservée. Par la fenêtre :',
         es: 'Reservaste “vista al mar”. Por la ventana ves:',
+        ja: '「オーシャンビュー」の部屋を予約。窓の外は？',
+        ko: '“바다 전망” 객실을 예약했다. 창밖에는?',
       },
       options: [
         {
@@ -473,6 +551,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
           ar: 'البحر',
           fr: 'La mer',
           es: 'El mar',
+          ja: '海',
+          ko: '바다',
         },
         {
           tr: 'Otopark',
@@ -481,6 +561,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
           ar: 'موقف سيارات',
           fr: 'Un parking',
           es: 'Un estacionamiento',
+          ja: '駐車場',
+          ko: '주차장',
         },
         {
           tr: 'Karşı otelin duvarı',
@@ -489,6 +571,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
           ar: 'جدار فندق آخر',
           fr: "Le mur d'en face",
           es: 'La pared de otro hotel',
+          ja: '隣のホテルの壁',
+          ko: '옆 호텔 벽',
         },
       ],
       winner: 2,
@@ -500,6 +584,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: 'قالوا إن البحر خلف ذلك الجدار',
       fr: 'Paraît que la mer est derrière le mur',
       es: 'Dicen que el mar está detrás de la pared',
+      ja: '壁の向こうは海なんだって',
+      ko: '벽 너머가 바다라고 한다',
     },
   },
   {
@@ -514,6 +600,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
         ar: 'السائق على بُعد دقيقتين',
         fr: 'CHAUFFEUR À 2 MIN',
         es: 'CONDUCTOR A 2 MIN',
+        ja: 'ドライバー到着まで2分',
+        ko: '기사님 2분 거리',
       },
       value: null,
       shape: 'flat',
@@ -526,6 +614,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: 'على بُعد دقيقتين منذ ساعة',
       fr: 'À 2 minutes depuis une heure',
       es: 'A 2 minutos desde hace una hora',
+      ja: '1時間ずっと「あと2分」',
+      ko: '1시간째 2분 거리',
     },
   },
   {
@@ -540,8 +630,10 @@ export const TRAVEL_SKIP: readonly Draft[] = [
         ar: 'وزن حقيبتي',
         fr: 'POIDS DE MA VALISE',
         es: 'PESO DE MI MALETA',
+        ja: 'スーツケースの重さ',
+        ko: '캐리어 무게',
       },
-      value: { tr: '×2', en: '×2', de: '×2', ar: '×2', fr: '×2', es: '×2' },
+      value: { tr: '×2', en: '×2', de: '×2', ar: '×2', fr: '×2', es: '×2', ja: '×2', ko: '×2' },
       shape: 'rise',
       axis: 'days',
     },
@@ -552,6 +644,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: 'كانت نصف فارغة في طريق الذهاب',
       fr: "À l'aller, elle était à moitié vide",
       es: 'A la ida iba medio vacía',
+      ja: '行きは半分空っぽだった',
+      ko: '갈 때는 반이 비어 있었다',
     },
   },
   {
@@ -566,6 +660,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
         ar: 'متجر التذكارات',
         fr: 'BOUTIQUE SOUVENIRS',
         es: 'TIENDA DE RECUERDOS',
+        ja: 'おみやげ屋',
+        ko: '기념품 가게',
       },
       items: [
         {
@@ -575,6 +671,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
           ar: 'مغناطيس ثلاجة (12)',
           fr: 'MAGNETS DE FRIGO (12)',
           es: 'IMANES (12 UNIDADES)',
+          ja: 'マグネット 12個',
+          ko: '냉장고 자석 (12개)',
         },
       ],
     },
@@ -585,6 +683,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: 'الهدية نفسها للجميع… وفتحوها على المائدة نفسها.',
       fr: 'Le même pour tous. Déballés à la même table.',
       es: 'El mismo para todos. Los abrieron en la misma mesa.',
+      ja: '全員に同じおみやげ。同じ食卓で開けられた。',
+      ko: '모두에게 같은 선물. 한자리에서 같이 뜯었다.',
     },
   },
   {
@@ -599,6 +699,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
         ar: 'ميني بار الفندق',
         fr: "MINIBAR DE L'HÔTEL",
         es: 'MINIBAR DEL HOTEL',
+        ja: 'ホテルのミニバー',
+        ko: '호텔 미니바',
       },
       items: [
         {
@@ -608,6 +710,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
           ar: 'فول سوداني (كيس صغير)',
           fr: 'CACAHUÈTES (MINI)',
           es: 'FRUTOS SECOS (MINI)',
+          ja: 'ピーナッツ（小袋）',
+          ko: '땅콩 (미니 봉지)',
         },
       ],
     },
@@ -618,6 +722,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: 'ظننته ضيافة مجانية',
       fr: "Je croyais que c'était offert",
       es: 'Creí que era cortesía',
+      ja: 'サービスだと思ってた',
+      ko: '무료인 줄 알았다',
     },
   },
   {
@@ -632,6 +738,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
         ar: 'الصيدلية',
         fr: 'PARAPHARMACIE',
         es: 'FARMACIA',
+        ja: 'ドラッグストア',
+        ko: '드러그스토어',
       },
       items: [
         {
@@ -641,6 +749,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
           ar: 'شامبو (حجم السفر)',
           fr: 'SHAMPOING MINI FORMAT',
           es: 'CHAMPÚ (TAMAÑO VIAJE)',
+          ja: 'シャンプー（旅行用）',
+          ko: '샴푸 (여행용)',
         },
         {
           tr: 'DİŞ MACUNU (MİNİ)',
@@ -649,6 +759,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
           ar: 'معجون أسنان (صغير)',
           fr: 'DENTIFRICE (MINI)',
           es: 'PASTA DENTAL (MINI)',
+          ja: '歯みがき粉（ミニ）',
+          ko: '치약 (미니)',
         },
       ],
     },
@@ -659,6 +771,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: 'كل شيء صغير… حتى الإجازة: يومان.',
       fr: 'Tout est mini. Les vacances aussi : 2 jours.',
       es: 'Todo es mini. Las vacaciones también: 2 días.',
+      ja: '全部ミニサイズ。旅行もミニ：2日間。',
+      ko: '전부 미니. 여행도 미니: 2일.',
     },
   },
   {
@@ -667,7 +781,7 @@ export const TRAVEL_SKIP: readonly Draft[] = [
     body: {
       format: 'fact',
       eyebrow: null,
-      big: { tr: '3', en: '3', de: '3', ar: '3', fr: '3', es: '3' },
+      big: { tr: '3', en: '3', de: '3', ar: '3', fr: '3', es: '3', ja: '3', ko: '3' },
       text: {
         tr: 'durak fazla gittin; bu postu bitireceğim diye',
         en: 'stops past yours. Just to finish this post.',
@@ -675,6 +789,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
         ar: 'محطات بعد محطتك… فقط لتُكمل هذا المنشور',
         fr: 'stations de trop. Juste pour finir ce post.',
         es: 'estaciones de más. Solo por terminar este post.',
+        ja: '駅乗り過ごした。この投稿を見終わるために。',
+        ko: '정거장 더 갔어요. 이 게시물 끝까지 보려고요.',
       },
     },
     caption: {
@@ -684,6 +800,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: 'طريق العودة من الرصيف المقابل',
       fr: "Le retour, c'est le quai d'en face",
       es: 'La vuelta es en el andén de enfrente',
+      ja: '帰りは向かいのホームから',
+      ko: '돌아가는 건 반대편 승강장',
     },
   },
   {
@@ -692,7 +810,7 @@ export const TRAVEL_SKIP: readonly Draft[] = [
     body: {
       format: 'fact',
       eyebrow: null,
-      big: { tr: '10', en: '10', de: '10', ar: '10', fr: '10', es: '10' },
+      big: { tr: '10', en: '10', de: '10', ar: '10', fr: '10', es: '10', ja: '10', ko: '10' },
       text: {
         tr: 'kartpostal aldın tatilde; hepsi hâlâ çekmecede, pullarıyla',
         en: 'postcards bought on the trip. Still in a drawer, stamps and all.',
@@ -700,6 +818,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
         ar: 'بطاقات بريدية اشتريتها في الإجازة… كلها في الدرج مع طوابعها',
         fr: 'cartes postales achetées. Au fond du tiroir, avec les timbres.',
         es: 'postales compradas. Siguen en un cajón, con sus sellos.',
+        ja: '枚のポストカードを旅先で買った。切手付きで今も引き出しの中。',
+        ko: '장의 엽서를 여행에서 샀어요. 우표 붙인 채 아직 서랍 속.',
       },
     },
     caption: {
@@ -709,6 +829,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: 'سأرسلها العام القادم، ستكون أكثر حنينًا',
       fr: "Je les enverrai l'an prochain, ce sera plus nostalgique.",
       es: 'Las mando el año que viene, más nostálgico aún.',
+      ja: '来年送る。そのほうがエモいし。',
+      ko: '내년에 보내야지. 더 감성 있게.',
     },
   },
   {
@@ -723,8 +845,10 @@ export const TRAVEL_SKIP: readonly Draft[] = [
         ar: 'إحصائية المتحف',
         fr: 'STATS DU MUSÉE',
         es: 'DATO DEL MUSEO',
+        ja: '美術館データ',
+        ko: '박물관 통계',
       },
-      big: { tr: '41', en: '41', de: '41', ar: '41', fr: '41', es: '41' },
+      big: { tr: '41', en: '41', de: '41', ar: '41', fr: '41', es: '41', ja: '41', ko: '41' },
       text: {
         tr: 'numaralı eserin önündesin; sesli rehber 14’ü anlatıyor',
         en: 'is the piece in front of you. The audio guide is on 14.',
@@ -732,6 +856,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
         ar: 'هو رقم القطعة أمامك… والدليل الصوتي يشرح رقم 14',
         fr: "est l'œuvre devant toi. L'audioguide parle de la 14.",
         es: 'es la obra frente a ti. La audioguía habla de la 14.',
+        ja: '番の作品の前にいる。音声ガイドは14番を解説中。',
+        ko: '번 작품 앞에 있어요. 오디오 가이드는 14번 설명 중.',
       },
     },
     caption: {
@@ -741,6 +867,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: 'الدليل يقول «لوحة»، وأمامي مزهرية',
       fr: 'Le guide dit « tableau ». Devant moi : un vase.',
       es: 'La guía dice “cuadro”. Frente a mí hay un jarrón.',
+      ja: 'ガイドは「絵画」と言うけど、目の前には花瓶',
+      ko: '가이드는 “그림”이라는데 내 앞엔 꽃병',
     },
   },
   {
@@ -755,6 +883,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
         ar: 'تصنيف مقاعد الطائرة',
         fr: "TIER LIST DES SIÈGES D'AVION",
         es: 'TIER LIST: ASIENTOS DE AVIÓN',
+        ja: '飛行機の座席Tier表',
+        ko: '비행기 좌석 티어표',
       },
       rows: [['🪟', '🌅'], ['🚶', '🦵'], ['🚻'], ['🥪']],
     },
@@ -765,6 +895,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: 'المقعد الأوسط في ذيل القائمة: بلا مسند ذراع',
       fr: 'Siège du milieu en C : zéro accoudoir.',
       es: 'Asiento del medio en C: cero reposabrazos.',
+      ja: '真ん中の席はC。ひじ掛けは両方とも隣の人のもの。',
+      ko: '가운데 자리는 C. 팔걸이 둘 다 옆 사람 거.',
     },
   },
   {
@@ -779,6 +911,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
         ar: 'تصنيف المواصلات في المدينة',
         fr: 'TIER LIST DES TRANSPORTS',
         es: 'TIER LIST DEL TRANSPORTE',
+        ja: '市内交通Tier表',
+        ko: '시내 교통 티어표',
       },
       rows: [['🚋', '🚶'], ['🚇', '🚲'], ['🚌', '🛴'], ['🚗']],
     },
@@ -789,6 +923,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: 'الترام في القمة، والسبب الوحيد: جرسه.',
       fr: 'Tram en S. Une seule raison : la cloche.',
       es: 'El tranvía es S. Única razón: la campanita.',
+      ja: '路面電車はS。理由はひとつ：ベル。',
+      ko: '트램은 S. 이유는 단 하나: 종소리.',
     },
   },
   {
@@ -805,6 +941,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
           ar: 'المطار',
           fr: 'Aéroport',
           es: 'Aeropuerto',
+          ja: '空港',
+          ko: '공항',
         },
         text: {
           tr: 'Biniş kapın 3’ten 86’ya taşındı',
@@ -813,6 +951,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
           ar: 'نُقلت بوابتك من 3 إلى 86',
           fr: 'Ta porte passe de la 3 à la 86',
           es: 'Tu puerta cambió de la 3 a la 86',
+          ja: '搭乗口が3番から86番に変更されました',
+          ko: '탑승구가 3번에서 86번으로 변경됐어요',
         },
       },
     },
@@ -823,6 +963,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: 'البوابة 86 تكاد تكون في مدينة أخرى',
       fr: "La porte 86 est quasi dans la ville d'à côté",
       es: 'La puerta 86 está casi en otra ciudad',
+      ja: '86番ゲートはほぼ隣町',
+      ko: '86번 게이트는 거의 옆 동네',
     },
   },
   {
@@ -839,6 +981,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
           ar: 'المترجم',
           fr: 'Traducteur',
           es: 'Traductor',
+          ja: '翻訳アプリ',
+          ko: '번역기',
         },
         text: {
           tr: '14. çeviri: “Tuvalet nerede?”',
@@ -847,6 +991,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
           ar: 'الترجمة رقم 14: «أين الحمّام؟»',
           fr: '14e traduction : « Les toilettes ? »',
           es: 'Traducción 14: “¿Dónde está el baño?”',
+          ja: '14回目の翻訳：「トイレはどこ？」',
+          ko: '14번째 번역: “화장실 어디예요?”',
         },
       },
     },
@@ -857,6 +1003,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: 'إجازة 14 يومًا… وما زلت لم أحفظها',
       fr: '14 jours de vacances, toujours pas retenu',
       es: '14 días de viaje y todavía no me la sé',
+      ja: '14日間の旅行。まだ覚えられない。',
+      ko: '14일 여행인데 아직도 못 외웠다',
     },
   },
   {
@@ -871,6 +1019,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
         ar: 'إن أردت أن تتقدّم في الحياة، فتقدّم أولًا إلى آخر الحافلة.',
         fr: 'Pour avancer dans la vie, commence par avancer au fond du bus.',
         es: 'Si quieres avanzar en la vida, avanza primero al fondo del bus.',
+        ja: '人生で前に進みたいなら、まずバスの奥へお進みください。',
+        ko: '인생에서 앞으로 나아가고 싶다면, 먼저 버스 안쪽으로 들어가라.',
       },
     },
     caption: {
@@ -880,6 +1030,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: 'قالها السائق 6 مرات هذا الصباح',
       fr: "Le chauffeur l'a dit 6 fois ce matin",
       es: 'El conductor lo dijo 6 veces esta mañana',
+      ja: '運転手さんが今朝6回言ってた',
+      ko: '기사님이 오늘 아침에만 6번 말했다',
     },
   },
   {
@@ -894,6 +1046,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
         ar: 'الضياع اكتشاف أيضًا. — شخص تاه 20 دقيقة في ممر الفندق',
         fr: "Se perdre, c'est découvrir. — Moi, 20 minutes dans le couloir de l'hôtel",
         es: 'Perderse también es descubrir. — Yo, 20 minutos en el pasillo del hotel',
+        ja: '迷子もまた発見である。— ホテルの廊下を20分さまよった私',
+        ko: '길을 잃는 것도 발견이다. — 호텔 복도를 20분 헤맨 나',
       },
     },
     caption: {
@@ -903,6 +1057,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: 'غرفتي 312، وكنت أقف أمام 213.',
       fr: "Ma chambre, c'est la 312. J'étais devant la 213.",
       es: 'Mi habitación es la 312. Estaba frente a la 213.',
+      ja: '部屋は312号室。私がいたのは213の前。',
+      ko: '내 방은 312호. 난 213호 앞에 있었다.',
     },
   },
   {
@@ -917,6 +1073,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
         ar: 'العالم كتاب، وأنا أكتفي بقراءة التقييمات.',
         fr: 'Le monde est un livre. Moi, je lis juste les avis.',
         es: 'El mundo es un libro. Yo solo leo las reseñas.',
+        ja: '世界は一冊の本だ。私はレビューだけ読んでいる。',
+        ko: '세상은 한 권의 책이다. 나는 리뷰만 읽는다.',
       },
     },
     caption: {
@@ -926,6 +1084,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: 'قرأت 1,482 تقييمًا، ولم أغادر البيت.',
       fr: 'Lu 1 482 avis. Pas mis un pied dehors.',
       es: 'Leí 1482 reseñas. No salí de casa.',
+      ja: 'レビューを1,482件読んだ。家からは出てない。',
+      ko: '리뷰 1,482개 읽음. 집 밖엔 안 나감.',
     },
   },
   {
@@ -940,6 +1100,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
         ar: 'كل مغامرة تبدأ بخطوة. وخطوتي: العودة لأتفقّد الباب.',
         fr: 'Tout voyage commence par un pas. Le mien : retour à la porte.',
         es: 'Toda aventura empieza con un paso. El mío: volver a revisar la puerta.',
+        ja: 'どんな冒険も一歩から始まる。私の一歩は、鍵の確認に戻ること。',
+        ko: '모든 여행은 한 걸음부터. 내 첫걸음은 문 잠갔나 보러 돌아가기.',
       },
     },
     caption: {
@@ -949,6 +1111,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: 'عدت 3 مرات. كان مقفلًا.',
       fr: '3 allers-retours. Elle était fermée.',
       es: 'Volví 3 veces. Estaba cerrada.',
+      ja: '3回戻った。鍵はかかってた。',
+      ko: '3번 돌아갔다. 잠겨 있었다.',
     },
   },
   {
@@ -963,6 +1127,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
         ar: 'بعض المناظر لا تتّسع لها صورة، خاصةً إذا وقف أمامها 40 سائحًا.',
         fr: 'Certaines vues ne tiennent pas en photo. Surtout derrière 40 touristes.',
         es: 'Hay vistas que no caben en una foto. Menos detrás de 40 turistas.',
+        ja: '写真に収まらない景色もある。前に観光客が40人いればなおさらだ。',
+        ko: '사진에 다 담기지 않는 풍경이 있다. 앞에 관광객 40명이 있으면 더더욱.',
       },
     },
     caption: {
@@ -972,6 +1138,8 @@ export const TRAVEL_SKIP: readonly Draft[] = [
       ar: 'وكنت واحدًا من الأربعين، آسف.',
       fr: "J'étais l'un des 40. Pardon.",
       es: 'Yo era uno de los 40. Perdón.',
+      ja: '私もその40人のひとりでした。すみません',
+      ko: '나도 그 40명 중 하나였다. 죄송.',
     },
   },
 ];
@@ -988,6 +1156,8 @@ export const TRAVEL_LIKE: readonly Draft[] = [
       ar: 'ركنت السيارة من أول محاولة!! لكن بلا شهود',
       fr: 'créneau réussi du premier coup !! zéro témoin',
       es: '¡¡me estacioné a la primera!! pero sin testigos',
+      ja: '縦列駐車、一発で成功！！目撃者はいないけど',
+      ko: '평행 주차 한 번에 성공!! 목격자는 없지만',
     },
   },
   {
@@ -1001,6 +1171,8 @@ export const TRAVEL_LIKE: readonly Draft[] = [
       ar: 'أول رحلة لي في قطار ليلي… والسرير أحلى من الفندق',
       fr: 'mon premier train de nuit, couchette >>> hôtel',
       es: 'mi primer tren nocturno, litera >>> hotel',
+      ja: '初めての夜行列車、寝台 >>> ホテル',
+      ko: '첫 야간열차, 침대칸 >>> 호텔',
     },
   },
   {
@@ -1014,6 +1186,8 @@ export const TRAVEL_LIKE: readonly Draft[] = [
       ar: 'سألني أحدهم عن الطريق وكنت أعرفه!! صرت من أهل المدينة',
       fr: "on m'a demandé le chemin, je savais !! je suis du coin",
       es: '¡¡me preguntaron una calle y la sabía!! ya soy de aquí',
+      ja: '道を聞かれて答えられた！！もう地元民',
+      ko: '누가 길 물어봤는데 알았음!! 이제 현지인',
     },
   },
   {
@@ -1027,6 +1201,8 @@ export const TRAVEL_LIKE: readonly Draft[] = [
       ar: 'أول رحلة لي وحدي: اتضح أنني رفيقة رائعة',
       fr: 'premier voyage en solo : je suis de super compagnie',
       es: 'mi primer viaje sola: resulta que soy buena compañía',
+      ja: '初ひとり旅：自分と気が合うことが判明',
+      ko: '첫 혼자 여행: 나랑 나 완전 잘 맞음',
     },
   },
   {
@@ -1041,6 +1217,8 @@ export const TRAVEL_LIKE: readonly Draft[] = [
         ar: 'إلى جدتي',
         fr: 'pour mamie',
         es: 'para la abuela',
+        ja: 'おばあちゃんへ',
+        ko: '할머니께',
       },
     },
     caption: {
@@ -1050,6 +1228,8 @@ export const TRAVEL_LIKE: readonly Draft[] = [
       ar: 'وصلت البطاقة بعدي، فقرأناها معًا',
       fr: "la carte est arrivée après moi, on l'a lue ensemble",
       es: 'la postal llegó después que yo, la leímos juntas',
+      ja: 'ハガキが私より後に届いたから、一緒に読んだ',
+      ko: '엽서가 나보다 늦게 도착해서 같이 읽었음',
     },
   },
   {
@@ -1064,6 +1244,8 @@ export const TRAVEL_LIKE: readonly Draft[] = [
         ar: 'في القمة',
         fr: 'tout en haut',
         es: 'en lo más alto',
+        ja: 'てっぺん',
+        ko: '꼭대기',
       },
     },
     caption: {
@@ -1073,6 +1255,8 @@ export const TRAVEL_LIKE: readonly Draft[] = [
       ar: 'ركبت العجلة الدوّارة!! بعينين مغمضتين، لكنها تُحسب',
       fr: "j'ai fait la grande roue !! les yeux fermés, mais ça compte",
       es: '¡¡me subí a la rueda gigante!! ojos cerrados, pero cuenta',
+      ja: '観覧車に乗った！！目はつぶってたけどセーフ',
+      ko: '관람차 탔다!! 눈은 감았지만 인정',
     },
   },
   {
@@ -1087,6 +1271,8 @@ export const TRAVEL_LIKE: readonly Draft[] = [
         ar: 'صديقي ريكس',
         fr: 'mon pote rex',
         es: 'mi amigo rex',
+        ja: '相棒レックス',
+        ko: '내 친구 렉스',
       },
     },
     caption: {
@@ -1096,6 +1282,8 @@ export const TRAVEL_LIKE: readonly Draft[] = [
       ar: 'طابور التصوير مع الديناصور: 30 طفلًا وأنا',
       fr: 'file pour la photo avec le dino : 30 enfants et moi',
       es: 'fila para la foto con el dinosaurio: 30 niños y yo',
+      ja: '恐竜との写真待ちの列：子ども30人と私',
+      ko: '공룡 사진 줄: 어린이 30명과 나',
     },
   },
   {
@@ -1110,6 +1298,8 @@ export const TRAVEL_LIKE: readonly Draft[] = [
         ar: 'المقعد الأمامي',
         fr: 'premier rang',
         es: 'primera fila',
+        ja: 'いちばん前の席',
+        ko: '맨 앞자리',
       },
     },
     caption: {
@@ -1119,6 +1309,8 @@ export const TRAVEL_LIKE: readonly Draft[] = [
       ar: 'جلست في مقدمة الترام، ولوّح لي السائق',
       fr: "tout devant dans le tram, le conducteur m'a fait coucou",
       es: 'me senté al frente en el tranvía y el conductor me saludó',
+      ja: '路面電車の最前列に座ったら、運転士さんに手を振られた',
+      ko: '트램 맨 앞에 앉았더니 기관사님이 손 흔들어 줌',
     },
   },
   {
@@ -1132,6 +1324,8 @@ export const TRAVEL_LIKE: readonly Draft[] = [
       ar: 'رحلة بحقيبة ظهر: 5 مدن، حقيبة واحدة، ولا كيّ أبدًا',
       fr: 'dump sac à dos : 5 villes, 1 sac, 0 repassage',
       es: 'dump mochilero: 5 ciudades, 1 mochila, 0 planchado',
+      ja: 'バックパック旅まとめ：5都市、バッグ1つ、アイロン0回',
+      ko: '배낭여행 덤프: 5개 도시, 가방 1개, 다림질 0번',
     },
   },
   {
@@ -1145,6 +1339,8 @@ export const TRAVEL_LIKE: readonly Draft[] = [
       ar: 'العودة إلى البيت: حقيبة، وغسيل، ورائحة البيت تلك',
       fr: 'dump du retour : valise, lessive et cette odeur de maison',
       es: 'dump del regreso: maleta, ropa sucia y ese olor a casa',
+      ja: '帰宅まとめ：スーツケース、洗濯物、そして家のにおい',
+      ko: '귀가 덤프: 캐리어, 빨래, 그리고 그 집 냄새',
     },
   },
   {
@@ -1158,6 +1354,8 @@ export const TRAVEL_LIKE: readonly Draft[] = [
       ar: 'جولة الجسور: عبرنا جسور المدينة السبعة في يوم واحد!!',
       fr: 'tour des ponts : les 7 ponts de la ville en un jour !!',
       es: '¡¡ruta de puentes: los 7 puentes de la ciudad en un día!!',
+      ja: '橋めぐり：街の7つの橋を1日で全部歩いた！！',
+      ko: '다리 투어: 도시의 다리 7개를 하루에 다 걸었다!!',
     },
   },
   {
@@ -1171,6 +1369,8 @@ export const TRAVEL_LIKE: readonly Draft[] = [
       ar: 'صرت سائحة في مدينتي… واتضح أنها جميلة جدًا',
       fr: 'touriste dans ma propre ville, elle est trop belle en fait',
       es: 'fui turista en mi propia ciudad y resulta que es preciosa',
+      ja: '地元で観光客してみたら、めちゃくちゃきれいな街だった',
+      ko: '내 도시에서 관광객 놀이 해 봄, 알고 보니 엄청 예쁨',
     },
   },
 ];
@@ -1187,6 +1387,8 @@ export const TRAVEL_HOLD: readonly Draft[] = [
       ar: 'موقف فارغ أمام الباب مباشرة. هل أحلم؟',
       fr: 'Une place libre pile devant la porte. Je rêve ?',
       es: 'Un lugar libre justo frente a la puerta. ¿Estoy soñando?',
+      ja: 'ドアの真ん前に空き駐車スペース。これは夢？',
+      ko: '문 바로 앞에 빈 주차 자리. 꿈인가요?',
     },
   },
   {
@@ -1200,6 +1402,8 @@ export const TRAVEL_HOLD: readonly Draft[] = [
       ar: 'كل الإشارات خضراء حتى البيت. لا تُفلت!',
       fr: "Que des feux verts jusqu'à la maison. Lâche pas !",
       es: 'Semáforos en verde hasta casa. ¡No sueltes!',
+      ja: '家までずっと青信号。離さないで！',
+      ko: '집까지 전부 초록불. 절대 놓지 마세요!',
     },
   },
   {
@@ -1213,6 +1417,8 @@ export const TRAVEL_HOLD: readonly Draft[] = [
       ar: 'أول حقيبة على السير هي حقيبتك. هذا لا يحدث أبدًا!',
       fr: 'Première valise sur le tapis : la tienne. Du jamais vu !',
       es: 'La primera maleta en la cinta es la tuya. ¡Nunca pasa!',
+      ja: 'ターンテーブルの最初の荷物があなたのもの。ありえない！',
+      ko: '벨트에서 첫 번째로 나온 가방이 내 거! 절대 없는 일!',
     },
   },
   {
@@ -1226,6 +1432,8 @@ export const TRAVEL_HOLD: readonly Draft[] = [
       ar: 'مطر غزير، وسيارة أجرة فارغة تتجه نحوك',
       fr: 'Il pleut des cordes et un taxi libre arrive vers toi',
       es: 'Llueve a cántaros y un taxi libre viene hacia ti',
+      ja: '土砂降りの中、空車のタクシーがこっちに来る',
+      ko: '폭우 속에 빈 택시가 이쪽으로 온다',
     },
   },
   {
@@ -1239,6 +1447,8 @@ export const TRAVEL_HOLD: readonly Draft[] = [
       ar: 'أول صباح في الإجازة، وأمامك 14 يومًا كاملة.',
       fr: 'Premier matin de vacances. 14 jours devant toi.',
       es: 'Primera mañana de vacaciones. Quedan 14 días enteros.',
+      ja: '休暇の初日の朝。まるまる14日間ある。',
+      ko: '휴가 첫날 아침. 무려 14일이 남았다.',
     },
   },
   {
@@ -1252,6 +1462,8 @@ export const TRAVEL_HOLD: readonly Draft[] = [
       ar: 'هبطت الطائرة قبل موعدها بنصف ساعة. لا أحد يصدق!',
       fr: "Atterrissage avec une demi-heure d'avance. Incroyable !",
       es: 'Aterrizaste media hora antes. ¡Nadie lo puede creer!',
+      ja: '飛行機が30分早く着陸。誰も信じられない！',
+      ko: '비행기가 30분 일찍 착륙. 다들 믿기지 않는 눈치!',
     },
   },
   {
@@ -1265,6 +1477,8 @@ export const TRAVEL_HOLD: readonly Draft[] = [
       ar: 'رفيق سفر أسطوري: هادئ ويتقاسم معك مسند الذراع',
       fr: "Voisin de siège légendaire : discret et partage l'accoudoir",
       es: 'Vecino de asiento ideal: callado y te deja el apoyabrazos',
+      ja: '伝説の隣人：静かで、ひじ掛けを半分こしてくれる',
+      ko: '전설의 옆자리 승객: 조용하고 팔걸이도 나눠 씀',
     },
   },
 ];
@@ -1282,6 +1496,8 @@ export const TRAVEL_FREEZE: readonly Draft[] = [
         ar: 'عدم الإزعاج',
         fr: 'DODO EN COURS',
         es: 'NO MOLESTAR',
+        ja: '起こさないで',
+        ko: '자는 중',
       },
       small: {
         tr: 'LÜTFEN RAHATSIZ ETMEYİN',
@@ -1290,6 +1506,8 @@ export const TRAVEL_FREEZE: readonly Draft[] = [
         ar: 'النزيل نائم',
         fr: 'PRIÈRE DE NE PAS DÉRANGER',
         es: 'HUÉSPED DURMIENDO',
+        ja: '入室はご遠慮ください',
+        ko: '방해하지 마세요',
       },
     },
     caption: {
@@ -1299,6 +1517,8 @@ export const TRAVEL_FREEZE: readonly Draft[] = [
       ar: 'لا صوت. ربما تذهب.',
       fr: 'Pas un bruit. Ils vont peut-être partir.',
       es: 'Ni un ruido. Quizás se vayan.',
+      ja: '音を立てないで。帰るかもしれない。',
+      ko: '소리 내지 마세요. 그냥 갈지도 몰라요.',
     },
     headline: {
       tr: 'Kat görevlisi kapıyı çalıyor',
@@ -1307,6 +1527,8 @@ export const TRAVEL_FREEZE: readonly Draft[] = [
       ar: 'عاملة التنظيف تطرق الباب',
       fr: 'Le ménage frappe à la porte',
       es: 'Limpieza llama a la puerta',
+      ja: '客室清掃がノックしてる',
+      ko: '객실 청소 직원이 노크하고 있어요',
     },
   },
   {
@@ -1321,6 +1543,8 @@ export const TRAVEL_FREEZE: readonly Draft[] = [
         ar: 'ارفع ذراعيك',
         fr: "BRAS EN L'AIR",
         es: 'BRAZOS ARRIBA',
+        ja: '両手を上に',
+        ko: '팔 올리세요',
       },
       small: {
         tr: 'TARAMA YAPILIYOR',
@@ -1329,6 +1553,8 @@ export const TRAVEL_FREEZE: readonly Draft[] = [
         ar: 'جارٍ الفحص',
         fr: 'SCAN EN COURS',
         es: 'ESCANEO EN CURSO',
+        ja: 'スキャン中',
+        ko: '스캔 중',
       },
     },
     caption: {
@@ -1338,6 +1564,8 @@ export const TRAVEL_FREEZE: readonly Draft[] = [
       ar: 'لا تتحرك حتى ينتهي الفحص.',
       fr: 'Bouge pas avant la fin du scan.',
       es: 'No te muevas hasta que termine el escaneo.',
+      ja: 'スキャンが終わるまで動かないで。',
+      ko: '스캔이 끝날 때까지 움직이지 마세요.',
     },
     headline: {
       tr: 'Havalimanı tarayıcısındasın',
@@ -1346,6 +1574,8 @@ export const TRAVEL_FREEZE: readonly Draft[] = [
       ar: 'أنت داخل جهاز الفحص في المطار',
       fr: "Tu es dans le scanner de l'aéroport",
       es: 'Estás en el escáner del aeropuerto',
+      ja: '空港のボディスキャナーの中',
+      ko: '공항 보안 검색대에 서 있어요',
     },
   },
   {
@@ -1360,6 +1590,8 @@ export const TRAVEL_FREEZE: readonly Draft[] = [
         ar: 'انتظر',
         fr: 'ATTENDEZ',
         es: 'ESPERE',
+        ja: '待って',
+        ko: '기다리세요',
       },
       small: {
         tr: 'YAYA IŞIĞI KIRMIZI',
@@ -1368,6 +1600,8 @@ export const TRAVEL_FREEZE: readonly Draft[] = [
         ar: 'الإشارة حمراء للمشاة',
         fr: 'FEU ROUGE PIÉTONS',
         es: 'SEMÁFORO EN ROJO',
+        ja: '歩行者信号は赤',
+        ko: '보행자 신호 빨간불',
       },
     },
     caption: {
@@ -1377,6 +1611,8 @@ export const TRAVEL_FREEZE: readonly Draft[] = [
       ar: 'الإشارة ما زالت حمراء. لا تتحرك.',
       fr: "C'est encore rouge. Bouge pas.",
       es: 'Sigue en rojo. No te muevas.',
+      ja: 'まだ赤。動かないで。',
+      ko: '아직 빨간불이에요. 움직이지 마세요.',
     },
     headline: {
       tr: 'Kalabalık senin ilk adımını bekliyor',
@@ -1385,6 +1621,8 @@ export const TRAVEL_FREEZE: readonly Draft[] = [
       ar: 'الجميع ينتظر خطوتك الأولى',
       fr: 'Toute la foule attend ton premier pas',
       es: 'Toda la gente espera tu primer paso',
+      ja: 'みんながあなたの一歩目を待ってる',
+      ko: '다들 당신이 먼저 건너길 기다려요',
     },
   },
   {
@@ -1399,6 +1637,8 @@ export const TRAVEL_FREEZE: readonly Draft[] = [
         ar: 'عربة هادئة',
         fr: 'VOITURE CALME',
         es: 'VAGÓN SILENCIO',
+        ja: '静かな車両',
+        ko: '정숙 칸',
       },
       small: {
         tr: 'ALÇAK SESLE KONUŞUNUZ',
@@ -1407,6 +1647,8 @@ export const TRAVEL_FREEZE: readonly Draft[] = [
         ar: 'يرجى التزام الهدوء',
         fr: 'MERCI DE RESTER DISCRET',
         es: 'POR FAVOR, GUARDE SILENCIO',
+        ja: '小声でお話しください',
+        ko: '조용히 대화해 주세요',
       },
     },
     caption: {
@@ -1416,6 +1658,8 @@ export const TRAVEL_FREEZE: readonly Draft[] = [
       ar: 'نصفه مفتوح. إياك أن تتحرك.',
       fr: 'À moitié ouvert. Surtout, bouge pas.',
       es: 'Medio abierta. Ni se te ocurra moverte.',
+      ja: '半分開いてる。絶対に動かないで。',
+      ko: '반쯤 뜯었어요. 절대 움직이지 마세요.',
     },
     headline: {
       tr: 'Sessiz vagonda cips paketi açıyorsun',
@@ -1424,6 +1668,8 @@ export const TRAVEL_FREEZE: readonly Draft[] = [
       ar: 'تفتح كيس رقائق في العربة الهادئة',
       fr: 'Tu ouvres des chips en voiture calme',
       es: 'Abres una bolsa crujiente en el vagón',
+      ja: '静かな車両でポテチの袋を開けてる',
+      ko: '정숙 칸에서 과자 봉지를 뜯는 중',
     },
   },
   {
@@ -1438,6 +1684,8 @@ export const TRAVEL_FREEZE: readonly Draft[] = [
         ar: 'محطة القطار',
         fr: 'GARE',
         es: 'ESTACIÓN DE TREN',
+        ja: '駅のホーム',
+        ko: '기차역',
       },
     },
     caption: {
@@ -1447,6 +1695,8 @@ export const TRAVEL_FREEZE: readonly Draft[] = [
       ar: 'الصوت مشوّش. إن تحركت فاتك.',
       fr: 'Ça grésille. Si tu bouges, tu rates tout.',
       es: 'Hay ruido. Si te mueves, te lo pierdes.',
+      ja: '音がガサガサ。動いたら聞き逃す。',
+      ko: '지직거려요. 움직이면 놓쳐요.',
     },
     headline: {
       tr: 'Peron anonsu başladı, herkes dondu',
@@ -1455,6 +1705,8 @@ export const TRAVEL_FREEZE: readonly Draft[] = [
       ar: 'بدأ إعلان الرصيف، وتجمّد الجميع',
       fr: 'Annonce en gare. Tout le monde se fige.',
       es: 'Anuncio en el andén. Todos se congelan.',
+      ja: 'ホームのアナウンス開始、全員フリーズ',
+      ko: '승강장 안내 방송 시작, 모두 얼음',
     },
   },
   {
@@ -1469,6 +1721,8 @@ export const TRAVEL_FREEZE: readonly Draft[] = [
         ar: 'حافلة الرحلات',
         fr: 'CAR DE TOURISME',
         es: 'BUS TURÍSTICO',
+        ja: '観光バス',
+        ko: '관광버스',
       },
     },
     caption: {
@@ -1478,6 +1732,8 @@ export const TRAVEL_FREEZE: readonly Draft[] = [
       ar: 'إن تحركت، بدأ العدّ من جديد.',
       fr: 'Si tu bouges, il recommence.',
       es: 'Si te mueves, empieza otra vez.',
+      ja: '動いたら最初から数え直し。',
+      ko: '움직이면 처음부터 다시 세야 해요.',
     },
     headline: {
       tr: 'Rehber kafa sayıyor: 23, 24…',
@@ -1486,6 +1742,8 @@ export const TRAVEL_FREEZE: readonly Draft[] = [
       ar: 'المرشد يعدّ الركّاب: 23، 24…',
       fr: 'Le guide compte les têtes : 23, 24…',
       es: 'El guía cuenta cabezas: 23, 24…',
+      ja: 'ガイドが人数を数えてる：23、24…',
+      ko: '가이드가 인원 체크 중: 23, 24…',
     },
   },
   {
@@ -1500,6 +1758,8 @@ export const TRAVEL_FREEZE: readonly Draft[] = [
         ar: 'عربة المترو',
         fr: 'RAME DE MÉTRO',
         es: 'VAGÓN DE METRO',
+        ja: '地下鉄の車内',
+        ko: '지하철 안',
       },
     },
     caption: {
@@ -1509,6 +1769,8 @@ export const TRAVEL_FREEZE: readonly Draft[] = [
       ar: 'الفصل على وشك الانتهاء. لا تتحرك.',
       fr: 'Le chapitre se termine. Bouge pas.',
       es: 'El capítulo está por terminar. No te muevas.',
+      ja: 'もうすぐ章の終わり。じっとして。',
+      ko: '곧 챕터가 끝나요. 가만히 있어요.',
     },
     headline: {
       tr: 'Yanındakinin kitabını gizlice okuyorsun',
@@ -1517,6 +1779,8 @@ export const TRAVEL_FREEZE: readonly Draft[] = [
       ar: 'تقرأ خلسةً كتاب الراكب بجانبك',
       fr: 'Tu lis en douce le livre de ton voisin',
       es: 'Lees a escondidas el libro de tu vecino',
+      ja: '隣の人の本をこっそり読んでる',
+      ko: '옆 사람 책을 몰래 읽는 중',
     },
   },
 ];

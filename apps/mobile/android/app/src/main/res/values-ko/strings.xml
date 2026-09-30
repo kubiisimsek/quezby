@@ -1,0 +1,5 @@
+<resources>
+    <!-- The notification channel every push goes to (MainApplication, firebase.json). -->
+    <string name="notification_channel_social">친구와 VS</string>
+    <string name="notification_channel_social_description">친구 요청, VS 초대와 결과, 친구의 메시지</string>
+</resources>

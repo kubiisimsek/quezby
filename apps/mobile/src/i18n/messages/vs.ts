@@ -244,4 +244,78 @@ const es: VsMessages = {
   hud: (name) => `VS · ${name}`,
 };
 
-export const vs: Record<Locale, VsMessages> = { tr, en, de, ar, fr, es };
+const ja: VsMessages = {
+  sheet: {
+    title: 'VS',
+    you: 'あなた',
+    rules: {
+      seed: '同じフィードで、1人1回ずつ。',
+      first: (name) => `先にあなたがプレイ。${name}がプレイするまで、スコアは非公開です。`,
+      time: 'フレンドには制限時間があります。時間切れになると、VSはどちらにもカウントされません。',
+      counts: 'VSはランキング、リーグ、成績には記録されません。',
+    },
+    play: 'プレイ',
+  },
+  result: {
+    sent: 'VS送信完了',
+    sentBody: (name) => `${name}がプレイすると、結果がメッセージに届きます。それまでスコアは非公開です。`,
+    won: '勝ち！',
+    lost: '負け',
+    draw: '引き分け',
+    you: 'あなた',
+    invalid: '無効',
+    unfinished: '未完了',
+    voidTitle: 'VSは送信されませんでした',
+    voidBody: 'このプレイは無効になったため、VSはフレンドに届きませんでした。',
+    closed: 'このVSは終了しました。',
+    h2h: (wins, losses) => `対戦成績 ${wins} – ${losses}`,
+    rematch: 'リベンジ',
+    toThread: 'チャットに戻る',
+  },
+  notice: {
+    eyebrow: '届いたVS',
+    title: (name) => `${name}からVSが届きました`,
+    label: (name) => `${name}からVSが届きました。チャットを開く`,
+    more: (_count, count) => `ほかにVS ${count}件`,
+  },
+  hud: (name) => `VS · ${name}`,
+};
+
+const ko: VsMessages = {
+  sheet: {
+    title: 'VS',
+    you: '나',
+    rules: {
+      seed: '같은 피드, 한 사람당 한 번씩.',
+      first: (name) => `내가 먼저 플레이해요. ${name} 님이 플레이할 때까지 내 점수는 숨겨져요.`,
+      time: '친구에게는 플레이할 시간이 주어져요. 시간이 지나면 VS는 누구에게도 기록되지 않아요.',
+      counts: 'VS는 랭킹, 리그, 통계에 기록되지 않아요.',
+    },
+    play: '플레이',
+  },
+  result: {
+    sent: 'VS 전송 완료',
+    sentBody: (name) => `${name} 님이 플레이하면 결과가 메시지함으로 와요. 그때까지 내 점수는 숨겨져요.`,
+    won: '승리!',
+    lost: '패배',
+    draw: '무승부',
+    you: '나',
+    invalid: '무효',
+    unfinished: '미완료',
+    voidTitle: 'VS를 보내지 못했어요',
+    voidBody: '이번 게임이 무효 처리되어 VS가 친구에게 가지 않았어요.',
+    closed: '종료된 VS예요.',
+    h2h: (wins, losses) => `상대 전적 ${wins} – ${losses}`,
+    rematch: '재대결',
+    toThread: '채팅으로 돌아가기',
+  },
+  notice: {
+    eyebrow: '나를 기다리는 VS',
+    title: (name) => `${name} 님이 VS를 보냈어요`,
+    label: (name) => `${name} 님이 VS를 보냈어요, 채팅 열기`,
+    more: (_count, count) => `VS ${count}개 더`,
+  },
+  hud: (name) => `VS · ${name}`,
+};
+
+export const vs: Record<Locale, VsMessages> = { tr, en, de, ar, fr, es, ja, ko };

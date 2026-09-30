@@ -5,19 +5,21 @@ import { StyleSheet, View } from 'react-native';
 
 import { useLanguage, useT } from '@/i18n';
 import { IS_RTL } from '@/i18n/native';
+import { needsNewFaces, scriptOf } from '@/i18n/script';
 import { Icon } from '@/ui/icons';
 import { Button, Divider, Panel, Txt } from '@/ui/kit';
 import { AnimatedPressable, common } from '@/ui/kit/shared';
 import { usePressScale } from '@/ui/motion';
 import { Sheet } from '@/ui/sheet';
-import { ARABIC_FONT, LATIN_FONT, RADIUS, SPACE, TYPE, useTheme, withAlpha } from '@/ui/theme';
+import { ARABIC_FONT, JAPANESE_FONT, KOREAN_FONT, LATIN_FONT, RADIUS, SPACE, TYPE, useTheme, withAlpha } from '@/ui/theme';
 
 /**
- * The six languages, each written in its own words and its own script —
+ * The eight languages, each written in its own words and its own script —
  * whatever the game speaks now — with its name in the current language
- * under it. A language read the same way changes at once, the sheet still
- * open; one read the other way (to or from Arabic) asks first, because the
- * game closes and opens again to turn around.
+ * under it. A language read the same way and set in the same faces changes
+ * at once, the sheet still open; one read the other way (to or from Arabic)
+ * or set in faces of its own (to or from Japanese or Korean) asks first,
+ * because the game closes and opens again for it.
  */
 export function LanguageSheet({
   open,
@@ -34,7 +36,7 @@ export function LanguageSheet({
 
   const pick = (locale: Locale) => {
     if (locale === current) return;
-    if (isRtl(locale) !== IS_RTL) {
+    if (isRtl(locale) !== IS_RTL || needsNewFaces(locale)) {
       setTurning(locale);
       return;
     }
@@ -89,7 +91,12 @@ export function LanguageSheet({
 
 /** A language's own name, set in a face that carries its script. */
 function nameStyle(locale: Locale) {
-  return isRtl(locale) ? styles.arabicName : styles.latinName;
+  return {
+    latin: styles.latinName,
+    arabic: styles.arabicName,
+    japanese: styles.japaneseName,
+    korean: styles.koreanName,
+  }[scriptOf(locale)];
 }
 
 function LanguageRow({
@@ -165,4 +172,6 @@ const styles = StyleSheet.create({
   latinName: { fontFamily: LATIN_FONT.semibold, lineHeight: TYPE.heading.lineHeight },
   // Cairo's letters climb and hang further than Latin ones: more room for the line.
   arabicName: { fontFamily: ARABIC_FONT.bold, fontSize: 17, lineHeight: 28 },
+  japaneseName: { fontFamily: JAPANESE_FONT.semibold, lineHeight: 24 },
+  koreanName: { fontFamily: KOREAN_FONT.semibold, lineHeight: 24 },
 });

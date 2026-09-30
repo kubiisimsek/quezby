@@ -20,6 +20,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
       ar: 'أغنية عيد الميلاد: 8 أشخاص و8 نغمات مختلفة',
       fr: 'Joyeux anniversaire : 8 voix, 8 tonalités',
       es: 'Cumpleaños feliz: 8 personas, 8 tonos distintos',
+      ja: '誕生日の歌：8人いて8通りのキー',
+      ko: '생일 축하 노래: 8명, 8개의 음정',
     },
   },
   {
@@ -33,6 +35,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
       ar: 'الكتاب الذي أعرته وصل إلى قارئه الرابع، وأنا لم أقرأه بعد',
       fr: 'Mon livre prêté en est à son 4e lecteur. Moi, jamais lu.',
       es: 'Mi libro prestado va por su 4.º lector. Yo ni lo he leído.',
+      ja: '貸した本が4人目の手に。私はまだ読んでない。',
+      ko: '빌려준 책이 4번째 사람한테 갔다. 난 읽지도 않았는데.',
     },
   },
   {
@@ -46,6 +50,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
       ar: 'وجهي وأنا أكتب «هههههه»',
       fr: "Ma tête quand j'écris « MDRRR »",
       es: 'Mi cara mientras escribo “JAJAJAJA”',
+      ja: '「www」って打ってる時の顔',
+      ko: '“ㅋㅋㅋㅋㅋ” 칠 때 내 표정',
     },
   },
   {
@@ -59,6 +65,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
       ar: 'تأخرت 10 دقائق… وما زلت أول الواصلين',
       fr: "10 min de retard. Et personne n'était encore là.",
       es: 'Llegué 10 minutos tarde. Aún no había nadie.',
+      ja: '10分遅刻した。それでも一番乗り。',
+      ko: '10분 늦었다. 그래도 내가 1등으로 도착.',
     },
   },
   {
@@ -72,6 +80,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
       ar: 'سأل الجميع «هل ما زال الموعد قائمًا؟» آملين أن يُلغى',
       fr: 'Chacun demande « ça tient toujours ? » en espérant un non',
       es: 'Todos preguntaron “¿sigue en pie?” esperando un no',
+      ja: 'みんな「今日やる？」と聞く。中止を願いながら。',
+      ko: '다들 “오늘 하는 거 맞지?” 물어봄. 취소되길 바라면서.',
     },
   },
   {
@@ -85,6 +95,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
       ar: 'تغيّر اسم المجموعة للمرة الـ47. الاسم الآن: «البطاطس»',
       fr: 'Nom du groupe changé pour la 47e fois. Là : « les patates »',
       es: 'El grupo cambió de nombre 47 veces. Ahora: “las papas”',
+      ja: 'グループ名が47回目の変更。今は「じゃがいも」。',
+      ko: '단톡방 이름 47번째 변경. 지금은 “감자들”',
     },
   },
   // chat
@@ -100,6 +112,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
         ar: 'الحفلة المفاجئة',
         fr: 'Fête surprise',
         es: 'Fiesta sorpresa',
+        ja: 'サプライズ計画',
+        ko: '깜짝 파티',
       },
       lines: [
         {
@@ -111,6 +125,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
             ar: 'الكعكة عليّ، من سيحضر البالونات؟',
             fr: "j'ai le gâteau, qui s'occupe des ballons ?",
             es: 'yo llevo el pastel, ¿quién trae los globos?',
+            ja: 'ケーキは私。風船は誰が買う？',
+            ko: '케이크는 내가, 풍선은 누가 사?',
           },
         },
         {
@@ -122,6 +138,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
             ar: 'أنا! وإياكم أن يفلت السرّ من أحد',
             fr: 'moi ! et personne ne vend la mèche',
             es: '¡yo! y que nadie diga nada',
+            ja: '私！でも誰も口をすべらせないでね',
+            ko: '나! 근데 다들 입 조심해',
           },
         },
         {
@@ -133,6 +151,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
             ar: 'أي حفلة؟ 👀',
             fr: 'quelle fête ? 👀',
             es: '¿qué fiesta? 👀',
+            ja: '何のパーティー？👀',
+            ko: '무슨 파티? 👀',
           },
         },
       ],
@@ -144,6 +164,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
       ar: 'أضفنا صاحبة عيد الميلاد إلى المجموعة',
       fr: 'On avait ajouté la principale intéressée au groupe',
       es: 'Agregamos a la cumpleañera al grupo',
+      ja: '誕生日の本人もグループに入ってた',
+      ko: '생일 주인공도 단톡방에 있었다',
     },
   },
   {
@@ -158,11 +180,13 @@ export const FRIENDS_SKIP: readonly Draft[] = [
         ar: 'صديقي',
         fr: 'Mon pote',
         es: 'Mi mejor amigo',
+        ja: '親友',
+        ko: '절친',
       },
       lines: [
-        { from: 'them', text: { tr: 'kanka', en: 'hey', de: 'hey', ar: 'يا صديقي', fr: 'hé', es: 'oye' } },
-        { from: 'them', text: { tr: 'bak', en: 'so', de: 'also', ar: 'اسمع', fr: 'écoute', es: 'mira' } },
-        { from: 'them', text: { tr: 'şey', en: 'um', de: 'ähm', ar: 'يعني…', fr: 'euh', es: 'este…' } },
+        { from: 'them', text: { tr: 'kanka', en: 'hey', de: 'hey', ar: 'يا صديقي', fr: 'hé', es: 'oye', ja: 'ねえ', ko: '야' } },
+        { from: 'them', text: { tr: 'bak', en: 'so', de: 'also', ar: 'اسمع', fr: 'écoute', es: 'mira', ja: 'あのさ', ko: '있잖아' } },
+        { from: 'them', text: { tr: 'şey', en: 'um', de: 'ähm', ar: 'يعني…', fr: 'euh', es: 'este…', ja: 'えっと', ko: '그게' } },
         {
           from: 'them',
           text: {
@@ -172,6 +196,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
             ar: 'لا عليك، انسَ الأمر',
             fr: 'laisse tomber',
             es: 'olvídalo',
+            ja: 'やっぱいいや',
+            ko: '아냐 됐어',
           },
         },
         {
@@ -183,6 +209,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
             ar: 'ما هذا الآن؟!',
             fr: "C'ÉTAIT QUOI, ÇA ?",
             es: '¿¿QUÉ FUE ESO??',
+            ja: '今の何！？',
+            ko: '방금 그거 뭐야',
           },
         },
       ],
@@ -194,6 +222,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
       ar: '4 إشعارات، و0 معلومات',
       fr: '4 notifs, 0 info',
       es: '4 notificaciones, 0 información',
+      ja: '通知4件、情報0',
+      ko: '알림 4개, 정보 0개',
     },
   },
   {
@@ -208,6 +238,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
         ar: 'مجموعة النزهة',
         fr: 'Pique-nique',
         es: 'Grupo del pícnic',
+        ja: 'ピクニック組',
+        ko: '피크닉 모임',
       },
       lines: [
         {
@@ -219,6 +251,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
             ar: 'ليُحضر كل واحد شيئًا!',
             fr: 'chacun apporte un truc !',
             es: '¡que cada uno traiga algo!',
+            ja: 'みんな何か持ってきてね！',
+            ko: '다들 하나씩 가져와!',
           },
         },
         {
@@ -230,6 +264,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
             ar: 'سأحضر المناديل',
             fr: 'moi, les serviettes',
             es: 'yo llevo servilletas',
+            ja: '私は紙ナプキン持ってく',
+            ko: '난 냅킨 가져갈게',
           },
         },
         {
@@ -241,6 +277,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
             ar: 'وأنا سأحضر مناديل',
             fr: 'moi aussi, des serviettes',
             es: 'yo también servilletas',
+            ja: '私も紙ナプキン',
+            ko: '나도 냅킨',
           },
         },
         {
@@ -252,6 +290,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
             ar: 'المناديل عليّ 🙋',
             fr: 'serviettes pour moi aussi 🙋',
             es: 'las servilletas, yo 🙋',
+            ja: '紙ナプキンは任せて🙋',
+            ko: '냅킨은 나한테 맡겨 🙋',
           },
         },
       ],
@@ -263,6 +303,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
       ar: 'وصلت 6 علب مناديل… ولم يصل أي طعام',
       fr: '6 paquets de serviettes. Zéro nourriture.',
       es: 'Llegaron 6 paquetes de servilletas. Cero comida.',
+      ja: 'ピクニックに紙ナプキン6袋。食べ物ゼロ。',
+      ko: '피크닉에 냅킨 6팩 도착. 음식은 0.',
     },
   },
   {
@@ -277,6 +319,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
         ar: 'كاتم أسراري',
         fr: 'Mon confident',
         es: 'Mi confidente',
+        ja: '秘密の相談相手',
+        ko: '비밀 친구',
       },
       lines: [
         {
@@ -288,6 +332,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
             ar: 'هل تستطيع كتمان سر؟',
             fr: 'tu sais garder un secret ?',
             es: '¿sabes guardar un secreto?',
+            ja: '秘密守れる？',
+            ko: '비밀 지킬 수 있어?',
           },
         },
         {
@@ -299,6 +345,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
             ar: 'طبعًا! 🤐',
             fr: 'bien sûr ! 🤐',
             es: '¡claro! 🤐',
+            ja: 'もちろん！🤐',
+            ko: '당연하지! 🤐',
           },
         },
         {
@@ -310,6 +358,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
             ar: 'رائع، لأنني لا أستطيع. اسمع:',
             fr: 'super, parce que moi, non. écoute :',
             es: 'genial, porque yo no. escucha:',
+            ja: 'よかった、私は無理。聞いて：',
+            ko: '잘됐다, 난 못 지키거든. 들어 봐:',
           },
         },
       ],
@@ -321,6 +371,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
       ar: 'السرّ غيّر صاحبه فقط',
       fr: 'Le secret a juste changé de main',
       es: 'El secreto solo cambió de manos',
+      ja: '秘密は持ち主が替わっただけ',
+      ko: '비밀은 주인만 바뀌었다',
     },
   },
   // poll
@@ -336,6 +388,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
         ar: 'ستنشر أنت صورة المجموعة. أيّها تختار؟',
         fr: 'Tu postes la photo de groupe. Laquelle ?',
         es: 'Tú subes la foto grupal. ¿Cuál eliges?',
+        ja: 'グループ写真を投稿するのはあなた。どれにする？',
+        ko: '단체 사진은 내가 올린다. 어떤 걸로?',
       },
       options: [
         {
@@ -345,6 +399,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
           ar: 'الجميع يبدون رائعين',
           fr: 'Tout le monde est bien',
           es: 'Todos salen bien',
+          ja: 'みんな盛れてる',
+          ko: '다 잘 나온 거',
         },
         {
           tr: 'Ben güzel çıkmışım',
@@ -353,6 +409,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
           ar: 'أنا أبدو رائعًا',
           fr: 'Moi, je suis bien',
           es: 'Yo salgo bien',
+          ja: '私が盛れてる',
+          ko: '내가 잘 나온 거',
         },
       ],
       winner: 1,
@@ -364,6 +422,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
       ar: 'الباقون يقولون «احذفها». فات الأوان.',
       fr: 'Les autres : « supprime ! » Trop tard.',
       es: 'Los demás dicen “bórrala”. Muy tarde.',
+      ja: 'みんな「消して」って言ってる。もう遅い。',
+      ko: '다들 “지워”라고 한다. 이미 늦었다.',
     },
   },
   {
@@ -378,6 +438,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
         ar: 'صديق جديد سأل عن نكتتكم الخاصة. ماذا تفعل؟',
         fr: 'Le nouveau demande votre private joke. Toi :',
         es: 'El nuevo pregunta por su chiste interno. Tú:',
+        ja: '新メンバーに内輪ネタを聞かれた。あなたは？',
+        ko: '새 친구가 우리끼리 농담을 물어봤다. 나는:',
       },
       options: [
         {
@@ -387,6 +449,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
           ar: 'أشرح كل شيء',
           fr: 'Tout expliquer',
           es: 'Lo explico todo',
+          ja: '最初から説明する',
+          ko: '처음부터 설명한다',
         },
         {
           tr: '“Orada olacaktın”',
@@ -395,6 +459,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
           ar: '«كان يجب أن تكون هناك»',
           fr: '« Fallait être là »',
           es: '“Tenías que estar ahí”',
+          ja: '「いればわかった」',
+          ko: '“거기 있었어야 해”',
         },
       ],
       winner: 1,
@@ -406,6 +472,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
       ar: 'حاولنا مرة… ولم يضحك سوانا',
       fr: 'Essayé une fois. On était seuls à rire.',
       es: 'Lo intentamos una vez. Solo nos reímos nosotros.',
+      ja: '一度やってみた。笑ったのは私たちだけ。',
+      ko: '한 번 해 봤다. 우리만 웃었다.',
     },
   },
   {
@@ -420,6 +488,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
         ar: 'حفلة مبيت، الساعة 4 فجرًا. الموضوع:',
         fr: 'Soirée pyjama, 4 h du mat. Le sujet :',
         es: 'Fiesta de pijamas, 4 de la mañana. El tema:',
+        ja: 'パジャマパーティー、午前4時。話題は：',
+        ko: '파자마 파티, 새벽 4시. 주제는:',
       },
       options: [
         {
@@ -429,6 +499,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
           ar: 'لننم الآن',
           fr: 'On dort, là',
           es: 'A dormir ya',
+          ja: 'もう寝よう',
+          ko: '이제 자자',
         },
         {
           tr: 'Hayatın anlamı',
@@ -437,6 +509,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
           ar: 'معنى الحياة',
           fr: 'Le sens de la vie',
           es: 'El sentido de la vida',
+          ja: '人生の意味',
+          ko: '인생의 의미',
         },
       ],
       winner: 1,
@@ -448,6 +522,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
       ar: 'في الصباح، لم يتذكر أحد الجواب',
       fr: 'Au réveil, personne se rappelait la réponse',
       es: 'Por la mañana nadie recordaba la respuesta',
+      ja: '朝には誰も答えを覚えてなかった',
+      ko: '아침엔 아무도 답을 기억 못 했다',
     },
   },
   {
@@ -462,6 +538,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
         ar: 'في المجموعة: «من متفرغ يوم السبت؟» ماذا تفعل؟',
         fr: 'Le groupe : « Qui est dispo samedi ? » Toi :',
         es: 'En el grupo: “¿Quién puede el sábado?” Tú:',
+        ja: 'グループに「土曜空いてる人？」あなたは：',
+        ko: '단톡방에 “토요일 되는 사람?” 나는:',
       },
       options: [
         {
@@ -471,6 +549,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
           ar: '«أنا!» فورًا',
           fr: '« Moi ! » direct',
           es: '“¡Yo!” al instante',
+          ja: 'すぐ「はい！」',
+          ko: '바로 “나!” 한다',
         },
         {
           tr: 'Önce kimler var?',
@@ -479,6 +559,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
           ar: 'أنتظر لأرى من سيأتي',
           fr: 'Je vois qui vient',
           es: 'Veo quién va primero',
+          ja: 'まず誰が来るか見る',
+          ko: '누가 오는지 먼저 본다',
         },
       ],
       winner: 1,
@@ -490,6 +572,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
       ar: 'تفرّغي يعتمد على قائمة الحضور',
       fr: 'Mes dispos dépendent de la liste des invités',
       es: 'Mi disponibilidad depende de quién vaya',
+      ja: '予定が空くかは参加者しだい',
+      ko: '내 스케줄은 참석자 명단에 달려 있다',
     },
   },
   // chart
@@ -505,6 +589,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
         ar: 'من قالوا «سآتي»',
         fr: 'NOMBRE DE « JE VIENS »',
         es: 'LOS QUE DIJERON “VOY”',
+        ja: '「行く」と言った人',
+        ko: '“간다”고 한 사람',
       },
       value: {
         tr: '-%92',
@@ -513,6 +599,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
         ar: '-92%',
         fr: '-92 %',
         es: '-92 %',
+        ja: '-92%',
+        ko: '-92%',
       },
       shape: 'crash',
       axis: 'days',
@@ -524,6 +612,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
       ar: 'في يوم الموعد، صار لدى الجميع انشغال مفاجئ',
       fr: 'Le jour J, tout le monde avait un empêchement',
       es: 'El día del plan, a todos les surgió algo',
+      ja: '当日、全員に急用ができた',
+      ko: '당일에 다들 갑자기 일이 생겼다',
     },
   },
   {
@@ -538,6 +628,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
         ar: 'رسائل مجموعة الثانوية',
         fr: 'GROUPE DU LYCÉE',
         es: 'CHAT DEL COLEGIO',
+        ja: '高校グループの通知',
+        ko: '고등학교 단톡방 메시지',
       },
       value: {
         tr: '+%4.000',
@@ -546,6 +638,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
         ar: '+4,000%',
         fr: '+4 000 %',
         es: '+4000 %',
+        ja: '+4,000%',
+        ko: '+4,000%',
       },
       shape: 'spike',
       axis: 'months',
@@ -557,6 +651,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
       ar: 'أرسل أحدهم صورة تعود إلى 12 عامًا',
       fr: "Quelqu'un a posté une photo d'il y a 12 ans",
       es: 'Alguien mandó una foto de hace 12 años',
+      ja: '誰かが12年前の写真を投下した',
+      ko: '누가 12년 전 사진을 올렸다',
     },
   },
   // receipt
@@ -572,6 +668,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
         ar: 'مقصف السينما',
         fr: 'CONFISERIE DU CINÉ',
         es: 'CAFETERÍA DEL CINE',
+        ja: '映画館の売店',
+        ko: '영화관 매점',
       },
       items: [
         {
@@ -581,6 +679,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
           ar: 'فشار (حجم للمشاركة)',
           fr: 'POP-CORN (À PARTAGER)',
           es: 'PALOMITAS PARA 2',
+          ja: 'ポップコーン ペア',
+          ko: '팝콘 (나눠 먹기용)',
         },
       ],
     },
@@ -591,6 +691,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
       ar: 'كنا سنتقاسمه… فانتهى قبل الإعلانات',
       fr: 'On devait partager. Fini avant les bandes-annonces.',
       es: 'Íbamos a compartir. Se acabó antes de los tráileres.',
+      ja: '分けるはずだった。予告編の途中でなくなった。',
+      ko: '나눠 먹기로 했는데 예고편 끝나기 전에 사라졌다',
     },
   },
   {
@@ -605,6 +707,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
         ar: 'متجر الجوارب',
         fr: 'BONNETERIE',
         es: 'CALCETERÍA',
+        ja: '靴下専門店',
+        ko: '양말 가게',
       },
       items: [
         {
@@ -614,6 +718,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
           ar: 'جوارب (مغلّفة كهدية)',
           fr: 'CHAUSSETTES (CADEAU)',
           es: 'CALCETINES (REGALO)',
+          ja: '靴下（ギフト包装）',
+          ko: '양말 (선물 포장)',
         },
       ],
     },
@@ -624,6 +730,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
       ar: 'فكرت في الهدية 3 أسابيع… والنتيجة: جوارب',
       fr: '3 semaines à chercher un cadeau. Résultat : chaussettes.',
       es: '3 semanas pensando el regalo. Resultado: calcetines.',
+      ja: 'プレゼントを3週間考えた。結論：靴下。',
+      ko: '선물을 3주 고민했다. 결론: 양말.',
     },
   },
   // fact
@@ -633,7 +741,7 @@ export const FRIENDS_SKIP: readonly Draft[] = [
     body: {
       format: 'fact',
       eyebrow: null,
-      big: { tr: '0', en: '0', de: '0', ar: '0', fr: '0', es: '0' },
+      big: { tr: '0', en: '0', de: '0', ar: '0', fr: '0', es: '0', ja: '0', ko: '0' },
       text: {
         tr: 'kez “bir ara buluşalım” dediğin biriyle gerçekten buluştun',
         en: "times you actually met up after “let's catch up sometime”",
@@ -641,6 +749,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
         ar: 'مرة تحوّل فيها «لنلتقِ في وقت ما» إلى لقاء حقيقي',
         fr: 'fois où « on se voit un de ces quatre » a vraiment eu lieu',
         es: 'veces que el “a ver cuándo nos vemos” se cumplió',
+        ja: '回。「今度ごはん行こう」が実現した回数',
+        ko: '번. “언제 밥 한번 먹자” 후 실제로 만난 횟수',
       },
     },
     caption: {
@@ -650,6 +760,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
       ar: '«في وقت ما» ليس موجودًا في أي تقويم',
       fr: '« Un de ces quatre », ça existe pas',
       es: 'El “a ver cuándo” nunca llega',
+      ja: '「今度」はカレンダーにない',
+      ko: '“언제 한번”은 달력에 없다',
     },
   },
   {
@@ -664,8 +776,10 @@ export const FRIENDS_SKIP: readonly Draft[] = [
         ar: 'تقرير المجموعة',
         fr: 'RAPPORT DU GROUPE',
         es: 'INFORME DEL GRUPO',
+        ja: 'グループチャット報告',
+        ko: '단톡방 리포트',
       },
-      big: { tr: '112', en: '112', de: '112', ar: '112', fr: '112', es: '112' },
+      big: { tr: '112', en: '112', de: '112', ar: '112', fr: '112', es: '112', ja: '112', ko: '112' },
       text: {
         tr: 'mesaj “nereye gidelim?” üstüne. Karar: her zamanki yer',
         en: 'messages about “where should we go?” Verdict: the usual place',
@@ -673,6 +787,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
         ar: 'رسالة حول «إلى أين نذهب؟»، والقرار: المكان المعتاد',
         fr: "messages sur « on va où ? » Verdict : comme d'hab",
         es: 'mensajes sobre “¿a dónde vamos?”. Veredicto: al de siempre',
+        ja: '件の「どこ行く？」の末、結論はいつもの店',
+        ko: '개의 “어디 갈까?” 메시지. 결론: 늘 가던 곳',
       },
     },
     caption: {
@@ -682,6 +798,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
       ar: 'طاولتنا كانت جاهزة أصلًا',
       fr: 'Notre table nous attendait déjà',
       es: 'Nuestra mesa ya nos esperaba',
+      ja: '席はもう用意されてた',
+      ko: '우리 자리는 이미 준비돼 있었다',
     },
   },
   {
@@ -696,8 +814,10 @@ export const FRIENDS_SKIP: readonly Draft[] = [
         ar: 'لقاء الأصدقاء القدامى',
         fr: 'LA BANDE SE RETROUVE',
         es: 'REENCUENTRO DE AMIGOS',
+        ja: '旧友の同窓会',
+        ko: '옛 친구들 재회',
       },
-      big: { tr: '3', en: '3', de: '3', ar: '3', fr: '3', es: '3' },
+      big: { tr: '3', en: '3', de: '3', ar: '3', fr: '3', es: '3', ja: '3', ko: '3' },
       text: {
         tr: 'kez aynı anıyı anlattınız; her seferinde biraz daha büyüdü',
         en: 'times you all told the same story. It got bigger every time.',
@@ -705,6 +825,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
         ar: 'مرات رويتم القصة نفسها، وفي كل مرة كبرت أكثر',
         fr: 'fois la même anecdote ce soir. Elle grossit à chaque fois.',
         es: 'veces contaron la misma anécdota. Cada vez fue más épica.',
+        ja: '回、同じ思い出話。そのたびに話が盛られた',
+        ko: '번이나 같은 추억을 얘기했다. 할 때마다 커졌다.',
       },
     },
     caption: {
@@ -714,6 +836,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
       ar: 'في المرة الرابعة ظهر فيها تنين',
       fr: 'À la quatrième, il y avait un dragon',
       es: 'A la cuarta ya había un dragón',
+      ja: '4回目にはドラゴンが出てきた',
+      ko: '네 번째엔 용이 나왔다',
     },
   },
   // tier
@@ -729,6 +853,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
         ar: 'تصنيف الأصدقاء',
         fr: 'TIER LIST DES POTES',
         es: 'TIER LIST DE AMIGOS',
+        ja: '友だちティアリスト',
+        ko: '친구 무리 티어 리스트',
       },
       rows: [['🚗'], ['🔋', '🍕', '📸'], ['🗓️', '🎧'], ['⏰']],
     },
@@ -739,6 +865,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
       ar: 'صاحب السيارة في القمة بلا نقاش',
       fr: "Le pote qui a une voiture, c'est S d'office",
       es: 'El amigo con auto va en la S, sin discusión',
+      ja: '車を持ってる友だちは文句なしのS',
+      ko: '차 있는 친구는 논쟁의 여지 없이 S',
     },
   },
   {
@@ -753,6 +881,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
         ar: 'تصنيف ليلة الأفلام',
         fr: 'TIER LIST SOIRÉE FILM',
         es: 'TIER LIST NOCHE DE PELIS',
+        ja: '映画の夜ティアリスト',
+        ko: '영화의 밤 티어 리스트',
       },
       rows: [['🍿', '🤫'], ['😭', '🛋️'], ['😴'], ['🗣️', '📱']],
     },
@@ -763,6 +893,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
       ar: 'من يوقف الفيلم ليسأل «ماذا حدث؟» في ذيل القائمة',
       fr: "Mettre pause pour demander « il s'est passé quoi ? » : C",
       es: 'Pausar para preguntar “¿qué pasó?”: C',
+      ja: '一時停止して「今どうなった？」って聞く人：C',
+      ko: '영화 멈추고 “방금 뭐였어?” 묻는 사람: C',
     },
   },
   // notifications
@@ -780,6 +912,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
           ar: 'صديقتي',
           fr: 'Ma meilleure amie',
           es: 'Mi mejor amiga',
+          ja: '親友',
+          ko: '절친',
         },
         text: {
           tr: 'Seninle 147 fotoğraf paylaştı',
@@ -788,6 +922,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
           ar: 'شاركت معك 147 صورة',
           fr: 'A partagé 147 photos avec toi',
           es: 'Compartió 147 fotos contigo',
+          ja: '147枚の写真をあなたと共有しました',
+          ko: '사진 147장을 공유했어요',
         },
       },
     },
@@ -798,6 +934,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
       ar: 'أظهر في واحدة منها: مرفقي',
       fr: 'Je suis sur une : mon coude',
       es: 'Salgo en una: mi codo',
+      ja: '1枚だけ私が写ってる：ひじ',
+      ko: '그중 한 장에 나도 있다: 내 팔꿈치',
     },
   },
   {
@@ -814,6 +952,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
           ar: 'أعياد الميلاد',
           fr: 'Anniversaires',
           es: 'Cumpleaños',
+          ja: '誕生日',
+          ko: '생일',
         },
         text: {
           tr: 'Bugün 3 arkadaşının doğum günü',
@@ -822,6 +962,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
           ar: 'اليوم عيد ميلاد 3 من أصدقائك',
           fr: "C'est l'anniversaire de 3 amis",
           es: 'Hoy cumplen años 3 amigos',
+          ja: '今日は友だち3人の誕生日',
+          ko: '오늘 친구 3명의 생일이에요',
         },
       },
     },
@@ -832,6 +974,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
       ar: 'أرسلت الرسالة نفسها للثلاثة… ونسيت تغيير الاسم',
       fr: 'Même message aux trois. Sans changer le prénom.',
       es: 'Mismo mensaje a los tres. Sin cambiar el nombre.',
+      ja: '同じ文を送った。名前を変え忘れた。',
+      ko: '똑같은 메시지 보냈다. 이름 바꾸는 걸 깜빡했다.',
     },
   },
   // quote
@@ -847,6 +991,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
         ar: 'الصداقة الحقيقية أن تتصفحا هاتفيكما جنبًا إلى جنب في صمت.',
         fr: "La vraie amitié, c'est scroller côte à côte sans un mot.",
         es: 'La verdadera amistad es ver el teléfono juntos sin decir nada.',
+        ja: '本当の友情とは、並んで黙ってスマホを見られること。',
+        ko: '진정한 우정은 나란히 말없이 휴대폰만 봐도 편한 것이다.',
       },
     },
     caption: {
@@ -856,6 +1002,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
       ar: 'التقينا 3 ساعات وتبادلنا كلمتين',
       fr: '3 heures ensemble, 2 mots échangés',
       es: '3 horas juntos, 2 palabras',
+      ja: '3時間会って、しゃべったのは2語',
+      ko: '3시간 만나서 2마디 했다',
     },
   },
   {
@@ -870,6 +1018,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
         ar: 'المشاركة جميلة. — صديقي وهو يأكل من بطاطسي',
         fr: "Partager, c'est beau. — Mon pote, qui pique dans mes frites",
         es: 'Compartir es bonito. — Mi amigo, comiendo de mis papas',
+        ja: '分け合うって素敵。—私の皿からポテトを取る友だち',
+        ko: '나눔은 아름답다. — 내 접시에서 감자튀김 집어 가는 친구',
       },
     },
     caption: {
@@ -879,6 +1029,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
       ar: 'قال إنه ليس جائعًا',
       fr: "Il avait dit qu'il avait pas faim",
       es: 'Dijo que no tenía hambre',
+      ja: '「お腹すいてない」って言ってたのに',
+      ko: '“배 안 고파”라고 했었다',
     },
   },
   {
@@ -893,6 +1045,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
         ar: 'استمع إلى قلبك. — صديقي الذي يوافق على كل أفكاري المجنونة',
         fr: 'Écoute ton cœur. — Mon pote, qui dit oui à toutes mes idées folles',
         es: 'Sigue a tu corazón. — Mi amiga, que dice que sí a todas mis locuras',
+        ja: '心の声に従って。—私の無茶なアイデアに全部賛成する友だち',
+        ko: '마음이 시키는 대로 해. — 내 모든 엉뚱한 아이디어에 찬성하는 친구',
       },
     },
     caption: {
@@ -902,6 +1056,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
       ar: 'شعري الأخضر خير دليل',
       fr: 'Mes cheveux verts en sont la preuve',
       es: 'Mi pelo verde lo demuestra',
+      ja: '緑の髪がその証拠',
+      ko: '초록 머리가 그 증거다',
     },
   },
   {
@@ -916,6 +1072,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
         ar: 'الأصدقاء يكملون من حيث توقفوا. — نحن، والنقاش نفسه بعد 10 سنوات',
         fr: 'Les amis reprennent où ils en étaient. — Nous, même débat, 10 ans après',
         es: 'La amistad sigue donde quedó. — Nosotros, mismo debate tras 10 años',
+        ja: '友情は中断したところから続く。—10年後も同じ口論をする私たち',
+        ko: '우정은 멈춘 곳에서 다시 이어진다. — 10년 뒤 같은 말다툼 중인 우리',
       },
     },
     caption: {
@@ -925,6 +1083,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
       ar: 'الموضوع: من كان محقًا؟ لم يُحسم بعد.',
       fr: 'Sujet : qui avait raison. Toujours pas tranché.',
       es: 'Tema: quién tenía razón. Sigue sin resolverse.',
+      ja: '議題：誰が正しかったか。未解決。',
+      ko: '주제: 누가 옳았나. 아직 미해결.',
     },
   },
   {
@@ -939,6 +1099,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
         ar: 'التواصل هو كل شيء. — أنا، ولديّ 400 رسالة غير مقروءة: ماذا فاتني؟',
         fr: "Tout est dans la communication. — Moi, 400 non-lus : j'ai raté quoi ?",
         es: 'La comunicación lo es todo. — Yo, con 400 sin leer: ¿qué me perdí?',
+        ja: 'コミュニケーションがすべて。—400件未読で「何があった？」と聞く私',
+        ko: '소통이 전부다. — 메시지 400개 안 읽고 무슨 일이냐고 묻는 나',
       },
     },
     caption: {
@@ -948,6 +1110,8 @@ export const FRIENDS_SKIP: readonly Draft[] = [
       ar: 'جاء الرد: «اقرأ في الأعلى»',
       fr: 'Réponse : « remonte »',
       es: 'Respuesta: “lee arriba”',
+      ja: '返事：「上にスクロールして」',
+      ko: '돌아온 답: “위로 올려 봐”',
     },
   },
 ];
@@ -965,6 +1129,8 @@ export const FRIENDS_LIKE: readonly Draft[] = [
       ar: '20 عامًا من الصداقة، وأول ما قالته لي: «معك قلم؟»',
       fr: "20 ans d'amitié. ses premiers mots : « t'as un stylo ? »",
       es: '20 años de amigas. su primera frase: “¿tienes lápiz?”',
+      ja: '20年来の親友。最初の一言は「ペン持ってる？」',
+      ko: '20년 된 절친. 첫마디는 “펜 있어?”',
     },
   },
   {
@@ -978,6 +1144,8 @@ export const FRIENDS_LIKE: readonly Draft[] = [
       ar: 'حفلة مفاجئة: 12 شخصًا، 3 أسابيع، ولا تسريب واحد!!',
       fr: 'fête surprise : 12 personnes, 3 semaines, 0 fuite !!',
       es: '¡¡fiesta sorpresa: 12 personas, 3 semanas, 0 filtraciones!!',
+      ja: 'サプライズ会：12人、3週間、バレ0！！',
+      ko: '깜짝 파티: 12명, 3주, 유출 0!!',
     },
   },
   {
@@ -991,6 +1159,8 @@ export const FRIENDS_LIKE: readonly Draft[] = [
       ar: 'تكوين الصداقات في الكبر صعب… لكنني وجدت صديقة!!',
       fr: "se faire des amis à l'âge adulte, c'est dur. réussi !!",
       es: 'hacer amigos de adulta es difícil. ¡¡lo logré!!',
+      ja: '大人になってから友だちを作るのは難しい。できた！！',
+      ko: '어른이 돼서 친구 사귀기 어렵다던데. 사귀었다!!',
     },
   },
   {
@@ -1004,6 +1174,8 @@ export const FRIENDS_LIKE: readonly Draft[] = [
       ar: 'أنا وصديقتي اشترينا الكنزة نفسها في اليوم نفسه، دون اتفاق',
       fr: 'ma meilleure amie et moi : même pull, même jour, pur hasard',
       es: 'mi mejor amiga y yo: mismo suéter, mismo día, sin avisarnos',
+      ja: '親友と同じ日に同じセーターを買ってた。偶然。',
+      ko: '절친이랑 같은 날 같은 니트를 샀다. 약속도 안 했는데.',
     },
   },
   // polaroid
@@ -1019,6 +1191,8 @@ export const FRIENDS_LIKE: readonly Draft[] = [
         ar: 'لقطة نادرة: أنا',
         fr: 'image rare : moi',
         es: 'imagen rara: yo',
+        ja: '激レア：私',
+        ko: '희귀 사진: 나',
       },
     },
     caption: {
@@ -1028,6 +1202,8 @@ export const FRIENDS_LIKE: readonly Draft[] = [
       ar: 'مصوّرة الشلّة… وهذه أول صورة لي هذا العام',
       fr: 'la photographe du groupe, enfin sur une photo cette année',
       es: 'soy la fotógrafa del grupo y por fin salgo en una',
+      ja: 'グループのカメラ係。今年初めて写った',
+      ko: '우리 모임 사진 담당. 올해 처음 사진에 나옴',
     },
   },
   {
@@ -1042,6 +1218,8 @@ export const FRIENDS_LIKE: readonly Draft[] = [
         ar: 'أساور الصداقة',
         fr: "bracelets d'amitié",
         es: 'pulseras de la amistad',
+        ja: '友情ブレスレット',
+        ko: '우정 팔찌',
       },
     },
     caption: {
@@ -1051,6 +1229,8 @@ export const FRIENDS_LIKE: readonly Draft[] = [
       ar: 'صنعنا أساور… وخرجت أسورتي بحجم خاتم',
       fr: "on a fait des bracelets, le mien a la taille d'une bague",
       es: 'hicimos pulseras y la mía quedó del tamaño de un anillo',
+      ja: 'ブレスレットを作った。私のは指輪サイズ。',
+      ko: '팔찌 만들었는데 내 건 반지 크기가 됐다',
     },
   },
   {
@@ -1065,6 +1245,8 @@ export const FRIENDS_LIKE: readonly Draft[] = [
         ar: 'نحن في الثامنة',
         fr: 'nous, à 8 ans',
         es: 'nosotras a los 8',
+        ja: '8歳の私たち',
+        ko: '8살의 우리',
       },
     },
     caption: {
@@ -1074,6 +1256,8 @@ export const FRIENDS_LIKE: readonly Draft[] = [
       ar: 'وجدنا رسائلنا السرية القديمة… ونسينا الشيفرة',
       fr: 'on a retrouvé nos lettres secrètes. oublié le code',
       es: 'encontramos nuestras cartas secretas. olvidamos la clave',
+      ja: '昔の秘密の手紙を発見。暗号を忘れてた',
+      ko: '옛날 비밀 편지를 찾았다. 암호를 까먹었다',
     },
   },
   {
@@ -1088,6 +1272,8 @@ export const FRIENDS_LIKE: readonly Draft[] = [
         ar: 'منتصف الليل تمامًا',
         fr: 'minuit pile',
         es: 'medianoche en punto',
+        ja: '0時ちょうど',
+        ko: '자정 정각',
       },
     },
     caption: {
@@ -1097,6 +1283,8 @@ export const FRIENDS_LIKE: readonly Draft[] = [
       ar: 'كنت عند باب صديقي لأكون أول من يهنّئه بعيد ميلاده',
       fr: 'devant chez mon pote pour être le premier à le fêter',
       es: 'en la puerta de mi amigo para ser el primero en felicitarlo',
+      ja: '一番に祝いたくて友だちの家の前にいた',
+      ko: '제일 먼저 축하하려고 친구 집 앞에 있었다',
     },
   },
   // dump
@@ -1111,6 +1299,8 @@ export const FRIENDS_LIKE: readonly Draft[] = [
       ar: 'حفلة مبيت: عمرنا 30 عامًا، لا تخبروا أحدًا',
       fr: 'soirée pyjama : on a 30 ans, chut',
       es: 'fiesta de pijamas: tenemos 30 años, no le digan a nadie',
+      ja: 'パジャマ会まとめ：30歳です、内緒で',
+      ko: '파자마 파티 사진 털기: 우리 30살, 비밀로 해 줘',
     },
   },
   {
@@ -1124,6 +1314,8 @@ export const FRIENDS_LIKE: readonly Draft[] = [
       ar: 'ليلة أفلام: اخترنا فيلم رعب… 4 أشخاص تحت بطانية واحدة',
       fr: "soirée film : film d'horreur, 4 sous 1 plaid",
       es: 'noche de pelis: de terror. 4 personas, 1 manta',
+      ja: '映画の夜：ホラーを選んだ。4人で毛布1枚',
+      ko: '영화의 밤: 공포 영화 골랐다. 4명이 담요 하나',
     },
   },
   {
@@ -1137,6 +1329,8 @@ export const FRIENDS_LIKE: readonly Draft[] = [
       ar: 'شلة الثانوية بعد 10 سنوات: كما نحن، لكن في البيت قبل العاشرة',
       fr: 'la bande du lycée 10 ans après : pareil, mais au lit à 22 h',
       es: 'los del colegio 10 años después: iguales, en casa a las 10',
+      ja: '高校の仲間と10年ぶり：変わらない、22時に帰るだけ',
+      ko: '고교 동창 10년 후: 그대로다, 밤 10시면 귀가할 뿐',
     },
   },
   {
@@ -1150,6 +1344,8 @@ export const FRIENDS_LIKE: readonly Draft[] = [
       ar: 'يوم مع صديقتي: 3 مقاهٍ، وحديقتان، و9 ساعات… والكلام لم ينتهِ',
       fr: 'journée entre copines : 3 cafés, 2 parcs, 9 h de papotage',
       es: 'con mi mejor amiga: 3 cafés, 2 parques, 9 horas de charla',
+      ja: '親友デー：カフェ3軒、公園2つ、9時間、話は尽きない',
+      ko: '절친 데이: 카페 3곳, 공원 2곳, 9시간, 할 말이 안 끝남',
     },
   },
 ];
@@ -1166,6 +1362,8 @@ export const FRIENDS_HOLD: readonly Draft[] = [
       ar: 'حدث أسطوري: الستة متفرغون في اليوم نفسه',
       fr: 'Légendaire : les 6 potes libres le même jour',
       es: 'Legendario: los 6 del grupo libres el mismo día',
+      ja: '伝説：グループの6人全員が同じ日に空いてる',
+      ko: '전설: 단톡방 6명이 같은 날 전부 시간 됨',
     },
   },
   {
@@ -1179,6 +1377,8 @@ export const FRIENDS_HOLD: readonly Draft[] = [
       ar: 'صديقك اتصل… فقط ليطمئن عليك',
       fr: 'Ton meilleur pote appelle. Juste comme ça.',
       es: 'Tu mejor amigo llamó. Solo para saludar.',
+      ja: '親友から電話。「元気？」って聞くためだけに。',
+      ko: '절친이 전화했다. 그냥 “잘 지내?” 하려고.',
     },
   },
   {
@@ -1192,6 +1392,8 @@ export const FRIENDS_HOLD: readonly Draft[] = [
       ar: 'المظلة المُعارة عادت إلى صاحبها. لحظة تاريخية',
       fr: 'Le parapluie prêté est revenu. Historique.',
       es: 'El paraguas prestado volvió. Histórico.',
+      ja: '貸した傘が持ち主に戻った。歴史的瞬間。',
+      ko: '빌려준 우산이 주인에게 돌아왔다. 역사적 순간.',
     },
   },
   {
@@ -1205,6 +1407,8 @@ export const FRIENDS_HOLD: readonly Draft[] = [
       ar: 'صورة جماعية والجميع بعيون مفتوحة. لأول مرة!',
       fr: 'Photo de groupe : tous les yeux ouverts. Une première !',
       es: 'Foto grupal: todos con los ojos abiertos. ¡Por fin!',
+      ja: '集合写真：全員の目が開いてる。史上初！',
+      ko: '단체 사진: 전원 눈 뜸. 최초!',
     },
   },
   {
@@ -1218,6 +1422,8 @@ export const FRIENDS_HOLD: readonly Draft[] = [
       ar: 'ليلة أفلام: اتفق الجميع على أول اقتراح!',
       fr: "Soirée film : tout le monde d'accord du premier coup !",
       es: 'Noche de pelis: ¡todos de acuerdo a la primera!',
+      ja: '映画の夜：最初の案で全員一致！',
+      ko: '영화의 밤: 첫 제안에 모두 합의!',
     },
   },
   {
@@ -1231,6 +1437,8 @@ export const FRIENDS_HOLD: readonly Draft[] = [
       ar: 'غرض نادر: سرّ بقي سرًّا فعلًا',
       fr: 'Objet rare : un secret vraiment gardé',
       es: 'Objeto raro: un secreto que sí se guardó',
+      ja: 'レアアイテム：本当に守られた秘密',
+      ko: '희귀 아이템: 진짜로 지켜진 비밀',
     },
   },
   {
@@ -1244,6 +1452,8 @@ export const FRIENDS_HOLD: readonly Draft[] = [
       ar: 'الشموع مضاءة: تمنَّ أمنية وانفخ في اللحظة المناسبة!',
       fr: 'Bougies allumées : un vœu, et souffle pile à temps !',
       es: 'Velas encendidas: ¡pide un deseo y sopla justo a tiempo!',
+      ja: 'ろうそく点火：願いごとをして、今吹いて！',
+      ko: '촛불 켜짐: 소원 빌고 딱 맞춰 불어요!',
     },
   },
   {
@@ -1257,6 +1467,8 @@ export const FRIENDS_HOLD: readonly Draft[] = [
       ar: 'الأضواء مطفأة والجميع مختبئ… اترك الآن: مفاجأة!',
       fr: 'Lumières éteintes, tous cachés… lâche : SURPRISE !',
       es: 'Luces apagadas, todos escondidos… suelta: ¡SORPRESA!',
+      ja: '電気を消して、みんな隠れた…離して：サプライズ！',
+      ko: '불 끄고 다들 숨었다… 손 떼요: 서프라이즈!',
     },
   },
 ];
@@ -1275,6 +1487,8 @@ export const FRIENDS_FREEZE: readonly Draft[] = [
         ar: 'توقفت الموسيقى',
         fr: 'MUSIQUE STOP',
         es: '¡ESTATUAS!',
+        ja: '音楽ストップ',
+        ko: '음악 멈춤',
       },
       small: {
         tr: 'HERKES HEYKEL OLSUN',
@@ -1283,6 +1497,8 @@ export const FRIENDS_FREEZE: readonly Draft[] = [
         ar: 'كونوا تماثيل',
         fr: 'TOUT LE MONDE EN STATUE',
         es: 'SE ACABÓ LA MÚSICA',
+        ja: '全員その場で静止',
+        ko: '모두 얼음',
       },
     },
     caption: {
@@ -1292,6 +1508,8 @@ export const FRIENDS_FREEZE: readonly Draft[] = [
       ar: 'من يتحرك يخرج من اللعبة.',
       fr: "Un geste et t'es éliminé.",
       es: 'El que se mueve, pierde.',
+      ja: '動いたら脱落。',
+      ko: '움직이면 탈락.',
     },
     headline: {
       tr: 'Doğum günü partisinde heykel oyunu',
@@ -1300,6 +1518,8 @@ export const FRIENDS_FREEZE: readonly Draft[] = [
       ar: 'لعبة التماثيل في حفلة عيد الميلاد',
       fr: "Jeu des statues à l'anniversaire",
       es: 'Estatuas musicales en el cumpleaños',
+      ja: '誕生日会でだるまさんがころんだ',
+      ko: '생일 파티에서 얼음 게임 중',
     },
   },
   {
@@ -1314,6 +1534,8 @@ export const FRIENDS_FREEZE: readonly Draft[] = [
         ar: 'من التالي؟',
         fr: 'AU SUIVANT !',
         es: '¿QUIÉN SIGUE?',
+        ja: '次は誰？',
+        ko: '다음은 누구?',
       },
       small: {
         tr: 'MİKROFON SAHİPSİZ',
@@ -1322,6 +1544,8 @@ export const FRIENDS_FREEZE: readonly Draft[] = [
         ar: 'الميكروفون بلا صاحب',
         fr: 'LE MICRO EST LIBRE',
         es: 'MICRÓFONO LIBRE',
+        ja: 'マイクは空いています',
+        ko: '마이크 주인 없음',
       },
     },
     caption: {
@@ -1331,6 +1555,8 @@ export const FRIENDS_FREEZE: readonly Draft[] = [
       ar: 'من تلتقي عيناه بعيونهم يغنّي.',
       fr: 'Croise un regard et tu chantes.',
       es: 'Si cruzas miradas, cantas tú.',
+      ja: '目が合った人が歌う。',
+      ko: '눈 마주치면 노래해야 해요.',
     },
     headline: {
       tr: 'Karaokede mikrofon ortada kaldı',
@@ -1339,6 +1565,8 @@ export const FRIENDS_FREEZE: readonly Draft[] = [
       ar: 'ليلة كاريوكي: لا أحد يمسك الميكروفون',
       fr: 'Karaoké : personne ne tient le micro',
       es: 'Karaoke: nadie tiene el micrófono',
+      ja: 'カラオケでマイクが宙に浮いてる',
+      ko: '노래방에서 마이크가 주인을 잃었어요',
     },
   },
   {
@@ -1353,6 +1581,8 @@ export const FRIENDS_FREEZE: readonly Draft[] = [
         ar: 'لا تمرّر',
         fr: 'PAS DE SWIPE',
         es: 'NO DESLICES',
+        ja: 'スワイプ禁止',
+        ko: '넘기지 마세요',
       },
       small: {
         tr: 'BAŞKASININ GALERİSİ',
@@ -1361,6 +1591,8 @@ export const FRIENDS_FREEZE: readonly Draft[] = [
         ar: 'معرض صور شخص آخر',
         fr: "LA GALERIE D'UN AUTRE",
         es: 'GALERÍA AJENA',
+        ja: '他人のアルバム',
+        ko: '남의 사진첩',
       },
     },
     caption: {
@@ -1370,6 +1602,8 @@ export const FRIENDS_FREEZE: readonly Draft[] = [
       ar: 'ولا حتى نظرة إلى معرض الصور.',
       fr: "Même pas un coup d'œil à la galerie.",
       es: 'Ni una mirada a la galería.',
+      ja: 'アルバムをのぞくのも禁止。',
+      ko: '사진첩은 훔쳐보지도 마세요.',
     },
     headline: {
       tr: 'Kanka fotoğraf için telefonunu verdi',
@@ -1378,6 +1612,8 @@ export const FRIENDS_FREEZE: readonly Draft[] = [
       ar: 'صديقتك أعطتك هاتفها لتلتقط صورة',
       fr: 'Ta pote te passe son tel pour une photo',
       es: 'Tu amiga te da su teléfono para una foto',
+      ja: '親友が撮影用にスマホを渡してきた',
+      ko: '절친이 사진 찍어 달라고 폰을 줬어요',
     },
   },
   // cctv
@@ -1393,6 +1629,8 @@ export const FRIENDS_FREEZE: readonly Draft[] = [
         ar: 'غرفة المعيشة',
         fr: 'SALON',
         es: 'SALA',
+        ja: 'リビング',
+        ko: '거실',
       },
     },
     caption: {
@@ -1402,6 +1640,8 @@ export const FRIENDS_FREEZE: readonly Draft[] = [
       ar: 'لا تتنفس حتى.',
       fr: 'Ne respire même pas.',
       es: 'Ni respires.',
+      ja: '息もしないで。',
+      ko: '숨도 쉬지 마세요.',
     },
     headline: {
       tr: 'Kanka 500 domino dizdi, son taşı koyuyor',
@@ -1410,6 +1650,8 @@ export const FRIENDS_FREEZE: readonly Draft[] = [
       ar: 'صديقك يضع قطعة الدومينو رقم 500',
       fr: 'Ton pote pose le 500e domino',
       es: 'Tu amigo coloca la ficha de dominó 500',
+      ja: '友だちがドミノ500個目を置くところ',
+      ko: '친구가 도미노 500개째를 세우는 중',
     },
   },
   {
@@ -1424,6 +1666,8 @@ export const FRIENDS_FREEZE: readonly Draft[] = [
         ar: 'غرفة الجلوس',
         fr: 'SALON',
         es: 'SALA',
+        ja: 'リビング',
+        ko: '거실',
       },
     },
     caption: {
@@ -1433,6 +1677,8 @@ export const FRIENDS_FREEZE: readonly Draft[] = [
       ar: 'تظاهر بالإعجاب. لا تتحرك.',
       fr: "Aie l'air ému. Bouge pas.",
       es: 'Pon cara de impresionado. No te muevas.',
+      ja: '感動してる顔で。動かないで。',
+      ko: '감동한 표정 유지. 움직이지 마세요.',
     },
     headline: {
       tr: 'Kankanın en sevdiği film. Seni izliyor.',
@@ -1441,6 +1687,8 @@ export const FRIENDS_FREEZE: readonly Draft[] = [
       ar: 'فيلم صديقك المفضل… وهو يراقب وجهك',
       fr: 'Film culte de ton pote. Il te regarde.',
       es: 'La peli favorita de tu amigo. Te mira.',
+      ja: '親友の推し映画。あなたを見てる。',
+      ko: '친구 인생 영화. 친구가 날 보고 있어요',
     },
   },
   {
@@ -1455,6 +1703,8 @@ export const FRIENDS_FREEZE: readonly Draft[] = [
         ar: 'الأريكة',
         fr: 'CANAPÉ',
         es: 'SOFÁ',
+        ja: 'ソファ',
+        ko: '소파',
       },
     },
     caption: {
@@ -1464,6 +1714,8 @@ export const FRIENDS_FREEZE: readonly Draft[] = [
       ar: 'تنمّل ذراعك؟ لا تتحرك.',
       fr: 'Bras engourdi ? Bouge pas.',
       es: '¿Se te durmió el brazo? No te muevas.',
+      ja: '腕がしびれても動かないで。',
+      ko: '팔이 저려도 움직이지 마세요.',
     },
     headline: {
       tr: 'Kanka omzunda uyuyakaldı',
@@ -1472,6 +1724,8 @@ export const FRIENDS_FREEZE: readonly Draft[] = [
       ar: 'صديقك نام على كتفك',
       fr: "Ton pote s'est endormi sur ton épaule",
       es: 'Tu amigo se durmió en tu hombro',
+      ja: '友だちが肩で寝ちゃった',
+      ko: '친구가 내 어깨에서 잠들었어요',
     },
   },
 ];

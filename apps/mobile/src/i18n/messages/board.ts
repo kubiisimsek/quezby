@@ -12,6 +12,8 @@ const fmt: Record<Locale, Formats> = {
   ar: formatsFor('ar'),
   fr: formatsFor('fr'),
   es: formatsFor('es'),
+  ja: formatsFor('ja'),
+  ko: formatsFor('ko'),
 };
 
 /** One row read aloud, on the climb or on the podium. */
@@ -75,6 +77,8 @@ const points = {
       many: `${fmt.ar.score(n)} نقطة`,
       other: `${fmt.ar.score(n)} نقطة`,
     }),
+  ja: (n: number) => `${fmt.ja.score(n)}ポイント`,
+  ko: (n: number) => `${fmt.ko.score(n)}점`,
 };
 
 /**
@@ -325,9 +329,9 @@ const fr: BoardMessages = {
     listed([
       rang(rank),
       `${handle(name)}${isMe ? ', toi' : ''}`,
-      unit === 'elo' ? `${fmt.fr.score(score)}\u00A0Elo` : points.fr(score),
+      unit === 'elo' ? `${fmt.fr.score(score)}\u00A0qb` : points.fr(score),
       detail,
-      gap == null ? null : `${unit === 'elo' ? `${fmt.fr.gap(gap)}\u00A0Elo` : points.fr(gap)} pour dépasser`,
+      gap == null ? null : `${unit === 'elo' ? `${fmt.fr.gap(gap)}\u00A0qb` : points.fr(gap)} pour dépasser`,
     ]),
   posts: (count) =>
     plural('fr', count, {
@@ -407,4 +411,91 @@ const es: BoardMessages = {
   },
 };
 
-export const board: Record<Locale, BoardMessages> = { tr, en, de, ar, fr, es };
+const ja: BoardMessages = {
+  summit: {
+    title: 'トップ',
+    periods: { weekly: '週間', monthly: '月間', all: '全期間' },
+    failed: 'ランキングを読み込めませんでした',
+    retry: 'もう一度試す',
+    emptyTitle: 'トップはまだ空っぽ',
+    emptyHint: 'この期間はまだ誰もプレイしていません。一番乗りして、名前をトップに刻もう！',
+    play: 'プレイ',
+  },
+  players: (count) => `${fmt.ja.score(count)}人`,
+  scopes: { everyone: 'みんな', friends: 'フレンド' },
+  place: (rank) => `${fmt.ja.score(rank)}位`,
+  vacant: (rank) => `${fmt.ja.score(rank)}位、空き`,
+  you: 'あなた',
+  row: ({ rank, name, isMe, score, detail, gap, unit = 'points' }) =>
+    listed(
+      [
+        `${fmt.ja.score(rank)}位`,
+        `${handle(name)}${isMe ? '、あなた' : ''}`,
+        unit === 'elo' ? `${fmt.ja.score(score)} qb` : points.ja(score),
+        detail,
+        gap == null ? null : `追い抜くまで${unit === 'elo' ? `${fmt.ja.gap(gap)} qb` : points.ja(gap)}`,
+      ],
+      '、',
+    ),
+  posts: (count) => `投稿${fmt.ja.score(count)}件`,
+  between: 'あいだにほかのプレイヤーがいます',
+  floor: {
+    name: 'あなたのフロア',
+    ribbon: 'あなたのフロア',
+    you: 'あなた',
+    youScored: (score) => `あなた · ${fmt.ja.score(score)}`,
+    unranked: 'この期間はまだ順位がありません。',
+    top: 'あなたがトップ！その座を守ろう。',
+    toPass: (name, gap) => `${handle(name)}まであと${fmt.ja.gap(gap)}pt`,
+    toNext: (gap) => `次の順位まであと${fmt.ja.gap(gap)}pt`,
+    youRated: (rating) => `あなた · ${fmt.ja.score(rating)} qb`,
+    toPassElo: (name, gap) => `${handle(name)}まであと${fmt.ja.gap(gap)} qb`,
+    progress: '次の順位までの進み具合',
+    pass: '追い抜く',
+    play: 'プレイ',
+  },
+};
+
+const ko: BoardMessages = {
+  summit: {
+    title: '정상',
+    periods: { weekly: '주간', monthly: '월간', all: '전체 기간' },
+    failed: '랭킹을 불러오지 못했어요',
+    retry: '다시 시도',
+    emptyTitle: '정상이 비어 있어요',
+    emptyHint: '이 기간에는 아직 아무도 플레이하지 않았어요. 가장 먼저 플레이하고 맨 위에 이름을 올리세요.',
+    play: '플레이',
+  },
+  players: (count) => `${fmt.ko.score(count)}명`,
+  scopes: { everyone: '전체', friends: '친구' },
+  place: (rank) => `${fmt.ko.score(rank)}위`,
+  vacant: (rank) => `${fmt.ko.score(rank)}위, 비어 있음`,
+  you: '나',
+  row: ({ rank, name, isMe, score, detail, gap, unit = 'points' }) =>
+    listed([
+      `${fmt.ko.score(rank)}위`,
+      `${handle(name)}${isMe ? ', 나' : ''}`,
+      unit === 'elo' ? `${fmt.ko.score(score)} qb` : points.ko(score),
+      detail,
+      gap == null ? null : `추월까지 ${unit === 'elo' ? `${fmt.ko.gap(gap)} qb` : points.ko(gap)}`,
+    ]),
+  posts: (count) => `게시물 ${fmt.ko.score(count)}개`,
+  between: '중간에 다른 플레이어가 더 있어요',
+  floor: {
+    name: '내 층',
+    ribbon: '내 층',
+    you: '나',
+    youScored: (score) => `나 · ${fmt.ko.score(score)}`,
+    unranked: '이 기간에는 아직 순위가 없어요.',
+    top: '정상에 올랐어요! 자리를 지키세요.',
+    toPass: (name, gap) => `${handle(name)}까지 ${points.ko(gap)}`,
+    toNext: (gap) => `다음 순위까지 ${points.ko(gap)}`,
+    youRated: (rating) => `나 · ${fmt.ko.score(rating)} qb`,
+    toPassElo: (name, gap) => `${handle(name)}까지 ${fmt.ko.gap(gap)} qb`,
+    progress: '다음 순위까지 진행도',
+    pass: '추월하기',
+    play: '플레이',
+  },
+};
+
+export const board: Record<Locale, BoardMessages> = { tr, en, de, ar, fr, es, ja, ko };

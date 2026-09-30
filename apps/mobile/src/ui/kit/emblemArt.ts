@@ -6,6 +6,9 @@ import type { LeagueTier } from '@quezby/types';
  * player's portrait in the tier's metal (`emblem` in `design/palette.mjs`);
  * nothing here knows a colour.
  *
+ * Everything stays inside the canvas, two units in from its edge — a frame
+ * fits the box it is given, rays turning and all.
+ *
  * A league is a frame, the way a game dresses a player's picture for their
  * rank: a metal bezel round the portrait and a plate under it with the
  * league's mark. It reads at a glance by its silhouette before its colour —
@@ -168,12 +171,12 @@ const CROWN_MARK = 'M42 76 40 50 51 60 60 44 69 60 80 50 78 76Z';
 const RIVETS = dot(60, 24.5, 2.2) + dots(26, 58, 2.2);
 const STUDS = stud(60, 24.5, 3.4) + stud(26, 58, 3.4) + stud(94, 58, 3.4);
 
-const TOP_SPIKE = 'M50 22 60 3 70 22Z';
-const TIARA = 'M38 24 42 6 50 16 60 0 70 16 78 6 82 24C75 21 67 20 60 20C53 20 45 21 38 24Z';
-const TIARA_GEMS = dot(60, 3, 3.4) + dots(42, 7.5, 2.6);
-const CROWN = 'M34 26 32 3 45 13 52 -2 60 9 68 -2 75 13 88 3 86 26C78 21 69 19.5 60 19.5C51 19.5 42 21 34 26Z';
+const TOP_SPIKE = 'M50 22 60 4 70 22Z';
+const TIARA = 'M38 24 42 8 50 17 60 4 70 17 78 8 82 24C75 21 67 20 60 20C53 20 45 21 38 24Z';
+const TIARA_GEMS = dot(60, 7, 3.2) + dots(42, 9.5, 2.4);
+const CROWN = 'M34 26 32 8 45 16 52 4 60 12.5 68 4 75 16 88 8 86 26C78 21 69 19.5 60 19.5C51 19.5 42 21 34 26Z';
 const CROWN_BAND = 'M35 20.5C43 16.5 51 15.5 60 15.5C69 15.5 77 16.5 85 20.5L86 26C78 21 69 19.5 60 19.5C51 19.5 42 21 34 26Z';
-const CROWN_GEMS = dots(52, 1, 3) + dots(32, 5, 2.6) + dot(60, 16, 3.6);
+const CROWN_GEMS = dots(52, 6, 2.6) + dots(32, 9.5, 2.4) + dot(60, 16, 3.6);
 const HALO_RING = dot(60, 60, 55);
 
 export const FRAMES: Record<LeagueTier, Frame> = {
@@ -195,7 +198,7 @@ export const FRAMES: Record<LeagueTier, Frame> = {
     glow: false,
   },
   gold: {
-    back: [{ d: pair(wing(3, 19)), fill: 'rim', outline: 3.2 }],
+    back: [{ d: pair(wing(3, 17)), fill: 'rim', outline: 3.2 }],
     mark: [{ d: STAR, fill: 'accent', outline: 4 }],
     front: [{ d: STUDS, fill: 'gem', outline: 1.4 }],
     sparkles: [[16, 22, 5]],
@@ -204,7 +207,7 @@ export const FRAMES: Record<LeagueTier, Frame> = {
   platinum: {
     back: [
       { d: TOP_SPIKE, fill: 'rim', outline: 3.2 },
-      { d: pair(wing(4, 23)), fill: 'rim', outline: 3.2 },
+      { d: pair(wing(4, 19)), fill: 'rim', outline: 3.2 },
     ],
     mark: [
       { d: HEX_GEM, fill: 'gem', outline: 4 },
@@ -220,7 +223,7 @@ export const FRAMES: Record<LeagueTier, Frame> = {
   },
   diamond: {
     back: [
-      { d: pair(wing(5, 26)), fill: 'rim', outline: 3.2 },
+      { d: pair(wing(5, 20)), fill: 'rim', outline: 3.2 },
       { d: TIARA, fill: 'rim', outline: 3 },
     ],
     mark: [
@@ -242,10 +245,10 @@ export const FRAMES: Record<LeagueTier, Frame> = {
   },
   master: {
     back: [
-      { d: rays(12, 64), fill: 'halo', opacity: 0.3, spin: true },
+      { d: rays(12, 58), fill: 'halo', opacity: 0.3, spin: true },
       { d: HALO_RING, fill: 'none', stroke: 'accent', strokeWidth: 3, opacity: 0.85 },
-      { d: pair(wing(5, 30)), fill: 'shade', outline: 3.2 },
-      { d: pair(wing(4, 22)), fill: 'rim', outline: 2.8 },
+      { d: pair(wing(5, 20.4)), fill: 'shade', outline: 3.2 },
+      { d: pair(wing(4, 15)), fill: 'rim', outline: 2.8 },
       { d: CROWN, fill: 'accent', outline: 3 },
       { d: CROWN_BAND, fill: 'hi', opacity: 0.35 },
     ],
@@ -258,7 +261,7 @@ export const FRAMES: Record<LeagueTier, Frame> = {
       { d: CROWN_GEMS, fill: 'gem', outline: 1.6 },
     ],
     sparkles: [
-      [8, 16, 7],
+      [9, 16, 7],
       [112, 18, 6],
       [110, 96, 5],
       [10, 92, 5],

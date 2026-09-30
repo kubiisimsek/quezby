@@ -398,6 +398,8 @@ export const LOCALE_LABEL: Record<Locale, string> = {
   ar: 'Arapça',
   fr: 'Fransızca',
   es: 'İspanyolca',
+  ja: 'Japonca',
+  ko: 'Korece',
 };
 
 export const DEVICE_VERDICT: Record<AdminDeviceVerdict, Label> = {

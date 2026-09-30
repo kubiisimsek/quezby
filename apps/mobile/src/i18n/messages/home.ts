@@ -394,4 +394,112 @@ const es: HomeMessages = {
   },
 };
 
-export const home: Record<Locale, HomeMessages> = { tr, en, de, ar, fr, es };
+const ja: HomeMessages = {
+  help: 'ヘルプ',
+  thisWeek: '今週',
+  device: {
+    eyebrow: 'ランキング',
+    title: 'この端末ではオフ',
+    body: (why) => `${why}プレイはできますが、スコアはランキングに入りません。`,
+  },
+  today: {
+    free: 'ノーマルでプレイ',
+    placed: (rank, _count, players) => `${rank} / ${players}人`,
+    tags: {
+      review: 'スコアを確認しています',
+      flagged: '確認できず、ランキング外です',
+      unfinished: '結果がまだ届いていません',
+      void: '今日のプレイはカウントされませんでした',
+      unplaced: 'ランキング外',
+    },
+  },
+  league: {
+    title: 'リーグ',
+    rated: (league, elo) => `${league} · ${elo}`,
+  },
+  rival: {
+    title: 'ターゲット',
+    gap: (name, _count, points) => `${handle(name)}まであと${points}ポイント`,
+    ahead: (name) => `週間ランキングで${handle(name)}がすぐ上にいます。`,
+    pass: '追い抜く',
+  },
+  clock: { label: 'シーズンベスト' },
+  swipe: '上にスワイプしてプレイ',
+  notice: {
+    daily: (day) => `今日のフィード #${day}`,
+    play: 'プレイ',
+    playLabel: '今日のフィードをプレイ',
+    league: 'リーグ',
+    rival: 'ターゲット · 今週',
+  },
+  records: {
+    title: 'シーズンベスト',
+    boards: { weekly: '週間', monthly: '月間', all: '全期間' },
+  },
+  protect:
+    'リーグに参加中！機種変更してもリーグとスコアを失わないように、ログイン方法を連携しよう。',
+  countdown: {
+    endsIn: '終了まで',
+    over: '終了',
+  },
+  rankChips: {
+    ranked: (board, rank) => `${board}：${rank}`,
+    unranked: (board) => `${board}：ランキング外`,
+  },
+};
+
+const ko: HomeMessages = {
+  help: '도움말',
+  thisWeek: '이번 주',
+  device: {
+    eyebrow: '랭킹',
+    title: '이 기기에서는 꺼져 있어요',
+    body: (why) => `${why} 플레이는 할 수 있지만 점수는 랭킹에 들어가지 않아요.`,
+  },
+  today: {
+    free: '일반 플레이',
+    placed: (rank, _count, players) => `${rank} / ${players}명`,
+    tags: {
+      review: '점수를 검토하고 있어요',
+      flagged: '확인되지 않아 순위권 밖이에요',
+      unfinished: '결과가 아직 오지 않았어요',
+      void: '오늘 게임은 집계되지 않았어요',
+      unplaced: '순위권 밖',
+    },
+  },
+  league: {
+    title: '리그',
+    rated: (league, elo) => `${league} · ${elo}`,
+  },
+  rival: {
+    title: '내 목표',
+    gap: (name, _count, points) => `${handle(name)}까지 ${points}점`,
+    ahead: (name) => `주간 랭킹에서 ${handle(name)} 님이 바로 앞에 있어요.`,
+    pass: '추월하기',
+  },
+  clock: { label: '시즌 최고 기록' },
+  swipe: '위로 밀어서 플레이',
+  notice: {
+    daily: (day) => `오늘의 피드 #${day}`,
+    play: '플레이',
+    playLabel: '오늘의 피드 플레이하기',
+    league: '리그',
+    rival: '내 목표 · 이번 주',
+  },
+  records: {
+    title: '시즌 최고 기록',
+    boards: { weekly: '주간', monthly: '월간', all: '전체 기간' },
+  },
+  protect:
+    '리그에 들어왔어요! 폰을 바꿔도 리그와 점수를 잃지 않도록 로그인 방법을 연결하세요.',
+  countdown: {
+    endsIn: '종료까지',
+    over: '종료됨',
+  },
+  rankChips: {
+    ranked: (board, rank) => `${board}: ${rank}`,
+    unranked: (board) => `${board}: 순위권 밖`,
+  },
+};
+
+export const home: Record<Locale, HomeMessages> = { tr, en, de, ar, fr, es, ja, ko };

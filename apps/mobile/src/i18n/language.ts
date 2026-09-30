@@ -5,7 +5,8 @@ import { create } from 'zustand';
 
 import { queryClient } from '@/api/queryClient';
 import { clearFlipGuard, flipTo, needsFlip } from '@/i18n/direction';
-import { phoneLanguageTags } from '@/i18n/native';
+import { phoneLanguageTags, restartApp } from '@/i18n/native';
+import { needsNewFaces } from '@/i18n/script';
 
 const KEY = 'quezby.language.v1';
 
@@ -40,25 +41,53 @@ type LanguageState = LanguageRecord & {
   phase: 'loading' | 'ready' | 'restarting';
   hydrate: () => Promise<void>;
   /**
-   * The player picked a language. Between two left-to-right languages the
-   * game changes at once; to or from Arabic it reloads. The account learns it
-   * from `useLanguageSync`.
+   * The player picked a language. Between two languages read the same way
+   * and set in the same faces the game changes at once; to or from Arabic,
+   * Japanese or Korean it reloads. The account learns it from
+   * `useLanguageSync`.
    */
   choose: (locale: Locale) => Promise<void>;
   /**
-   * An account seen on this phone for the first time — a sign-in, or a
-   * session the keychain kept across a reinstall — brings its language. True
-   * when the app must reload to read it: the phase turns `restarting` and the
-   * caller reloads once the session is safely stored (`reload`).
+   * An account seen on this phone for the first time — a sign-in — brings
+   * its language. True when the app must reload to speak it — the other way
+   * round, or in other faces: the phase turns `restarting` and the caller
+   * reloads once the session is safely stored (`reload`).
    */
   takeAccount: (user: { id: string; locale: Locale }) => Promise<boolean>;
-  /** Reloads into the language taken from an account, the other way round. */
+  /** Reloads into the language taken from an account: the other way round, or in its own faces. */
   reload: () => Promise<void>;
 };
 
 /** The first of the phone's languages the game speaks, or null. */
 export function phoneLocale(): Locale | null {
   return bestLocale(phoneLanguageTags());
+}
+
+/**
+ * The language a launch starts in: the one chosen on this phone — unless the
+ * phone's own language changed since, the newer wish — else the phone's, else
+ * English. `Boot` reads it before the app loads, to pick the faces; `hydrate`
+ * decides the same way.
+ */
+export async function startupLocale(): Promise<Locale> {
+  return resolve(await readRecord(), phoneLocale()).locale;
+}
+
+async function readRecord(): Promise<LanguageRecord> {
+  try {
+    const raw = await AsyncStorage.getItem(KEY);
+    return pick(raw ? JSON.parse(raw) : null);
+  } catch {
+    return pick(null);
+  }
+}
+
+function resolve(stored: LanguageRecord, phone: Locale | null): { record: LanguageRecord; locale: Locale } {
+  const record =
+    stored.chosen && stored.device && phone && phone !== stored.device
+      ? { ...stored, chosen: phone, device: phone }
+      : stored;
+  return { record, locale: record.chosen ?? phone ?? FALLBACK_LOCALE };
 }
 
 function pick(value: unknown): LanguageRecord {
@@ -103,21 +132,9 @@ export const useLanguage = create<LanguageState>((set, get) => {
 
     hydrate: async () => {
       if (get().phase !== 'loading') return;
-      let record: LanguageRecord;
-      try {
-        const raw = await AsyncStorage.getItem(KEY);
-        record = pick(raw ? JSON.parse(raw) : null);
-      } catch {
-        record = pick(null);
-      }
-
-      const phone = phoneLocale();
-      if (record.chosen && record.device && phone && phone !== record.device) {
-        record = { ...record, chosen: phone, device: phone };
-        await save(record);
-      }
-
-      const locale = record.chosen ?? phone ?? FALLBACK_LOCALE;
+      const stored = await readRecord();
+      const { record, locale } = resolve(stored, phoneLocale());
+      if (record !== stored) await save(record);
       set({ ...record, locale });
 
       if (needsFlip(locale) && (await flipTo(locale, { automatic: true }))) {
@@ -131,10 +148,15 @@ export const useLanguage = create<LanguageState>((set, get) => {
     choose: async (locale) => {
       const record: LanguageRecord = { ...recordOf(get()), chosen: locale, device: phoneLocale() };
       const flip = needsFlip(locale);
-      settle(record, flip ? null : locale);
+      const faces = !flip && needsNewFaces(locale);
+      settle(record, flip || faces ? null : locale);
       await save(record);
-      if (!flip) return;
+      if (!flip && !faces) return;
       set({ phase: 'restarting' });
+      if (faces) {
+        restartApp(`faces:${locale}`);
+        return;
+      }
       if (await flipTo(locale, { automatic: false })) return;
       // The phone would not turn around: play on in the new language as the app reads.
       set({ phase: 'ready' });
@@ -143,17 +165,21 @@ export const useLanguage = create<LanguageState>((set, get) => {
 
     takeAccount: async (user) => {
       const record: LanguageRecord = { chosen: user.locale, device: phoneLocale(), account: user.id };
-      const flip = needsFlip(user.locale);
-      settle(record, flip ? null : user.locale);
+      const reload = needsFlip(user.locale) || needsNewFaces(user.locale);
+      settle(record, reload ? null : user.locale);
       // About to reload: the splash covers the wait, and nothing writes the old language anywhere.
-      if (flip) set({ phase: 'restarting' });
+      if (reload) set({ phase: 'restarting' });
       await save(record);
-      return flip;
+      return reload;
     },
 
     reload: async () => {
       const locale = get().chosen ?? get().locale;
       set({ phase: 'restarting' });
+      if (!needsFlip(locale) && needsNewFaces(locale)) {
+        restartApp(`faces:${locale}`);
+        return;
+      }
       if (!(await flipTo(locale, { automatic: true }))) {
         set({ phase: 'ready' });
         settle(recordOf(get()), locale);

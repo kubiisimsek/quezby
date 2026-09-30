@@ -8,7 +8,7 @@ export const SKIP_CHAT: readonly Draft[] = [
     user: ACCOUNTS.food,
     body: {
       format: 'chat',
-      contact: { tr: 'Annem', en: 'Mom', de: 'Mama', ar: 'أمي', fr: 'Maman', es: 'Mamá' },
+      contact: { tr: 'Annem', en: 'Mom', de: 'Mama', ar: 'أمي', fr: 'Maman', es: 'Mamá', ja: 'お母さん', ko: '엄마' },
       lines: [
         {
           from: 'them',
@@ -19,6 +19,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'هل أكلت خضارًا اليوم؟',
             fr: "t'as mangé des légumes aujourd'hui ?",
             es: '¿comiste verduras hoy?',
+            ja: '今日、野菜食べた？',
+            ko: '오늘 채소 먹었어?',
           },
         },
         {
@@ -30,6 +32,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'طبعًا',
             fr: 'bien sûr',
             es: 'claro',
+            ja: 'もちろん',
+            ko: '당연하지',
           },
         },
         {
@@ -41,6 +45,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'ماذا أكلت؟',
             fr: 'lesquels ?',
             es: '¿cuáles?',
+            ja: '何食べたの？',
+            ko: '뭐 먹었는데?',
           },
         },
         {
@@ -52,6 +58,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'بطاطس مقلية 🍟',
             fr: 'des frites 🍟',
             es: 'papas fritas 🍟',
+            ja: 'フライドポテト 🍟',
+            ko: '감자튀김 🍟',
           },
         },
       ],
@@ -63,6 +71,8 @@ export const SKIP_CHAT: readonly Draft[] = [
       ar: 'تقنيًا، هذا ليس كذبًا',
       fr: "Techniquement, c'est pas faux",
       es: 'Técnicamente no es mentira',
+      ja: '嘘はついてない。厳密には',
+      ko: '엄밀히 말하면 거짓말은 아님',
     },
   },
   {
@@ -70,7 +80,7 @@ export const SKIP_CHAT: readonly Draft[] = [
     user: ACCOUNTS.screens,
     body: {
       format: 'chat',
-      contact: { tr: 'Babam', en: 'Dad', de: 'Papa', ar: 'أبي', fr: 'Papa', es: 'Papá' },
+      contact: { tr: 'Babam', en: 'Dad', de: 'Papa', ar: 'أبي', fr: 'Papa', es: 'Papá', ja: 'お父さん', ko: '아빠' },
       lines: [
         {
           from: 'me',
@@ -81,6 +91,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'أبي، نسيت المفتاح 🙈',
             fr: "papa j'ai oublié ma clé 🙈",
             es: 'papá, olvidé la llave 🙈',
+            ja: 'お父さん、鍵忘れた 🙈',
+            ko: '아빠 나 열쇠 두고 왔어 🙈',
           },
         },
         {
@@ -92,6 +104,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'تحية طيبة وبعد،',
             fr: 'Bonjour.',
             es: 'Buenas tardes.',
+            ja: '拝啓',
+            ko: '안녕하십니까.',
           },
         },
         {
@@ -103,6 +117,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'تحت أصيص الزرع. مع التحية، والدك',
             fr: 'Sous le pot de fleurs. Cordialement, Papa',
             es: 'Bajo la maceta. Atentamente, Papá',
+            ja: '植木鉢の下です。敬具、父より',
+            ko: '화분 밑에 있음. 이상. 아빠가',
           },
         },
       ],
@@ -114,6 +130,8 @@ export const SKIP_CHAT: readonly Draft[] = [
       ar: 'أبي يكتب الرسائل كأنها خطابات رسمية',
       fr: 'Papa, roi du SMS administratif',
       es: 'Papá escribe mensajes como cartas formales',
+      ja: '父のLINEが毎回ビジネス文書',
+      ko: '아빠 카톡은 항상 공문서',
     },
   },
   {
@@ -128,6 +146,8 @@ export const SKIP_CHAT: readonly Draft[] = [
         ar: 'صديقي',
         fr: 'Mon pote',
         es: 'Mi mejor amigo',
+        ja: '親友',
+        ko: '절친',
       },
       lines: [
         {
@@ -139,6 +159,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'هذا أنت تمامًا 😂',
             fr: "mdr c'est trop toi 😂",
             es: 'jaja este eres tú 😂',
+            ja: 'これ完全にあんたじゃん 😂',
+            ko: 'ㅋㅋ 이거 완전 너잖아 😂',
           },
         },
         {
@@ -150,6 +172,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'بل هذا أنت 😂',
             fr: "non, ça c'est toi 😂",
             es: 'no, este eres tú 😂',
+            ja: 'いや、こっちがあんたでしょ 😂',
+            ko: '아니 이게 진짜 너야 😂',
           },
         },
         {
@@ -161,6 +185,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'بالمناسبة، كيف حالك؟',
             fr: 'au fait, ça va ?',
             es: 'por cierto, ¿cómo estás?',
+            ja: 'てか元気？',
+            ko: '근데 잘 지내?',
           },
         },
         {
@@ -172,6 +198,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'وهذا أيضًا أنت 😂',
             fr: "mdr ça aussi c'est toi 😂",
             es: 'jaja este también eres tú 😂',
+            ja: 'これもあんたじゃん 😂',
+            ko: 'ㅋㅋ 이것도 완전 너 😂',
           },
         },
       ],
@@ -183,6 +211,8 @@ export const SKIP_CHAT: readonly Draft[] = [
       ar: '90% من صداقتنا إرسال فيديوهات',
       fr: "Notre amitié, c'est 90 % de vidéos",
       es: 'Nuestra amistad es 90 % mandar videos',
+      ja: '友情の90%は動画の送り合い',
+      ko: '우리 우정의 90%는 릴스 보내기',
     },
   },
   {
@@ -190,7 +220,7 @@ export const SKIP_CHAT: readonly Draft[] = [
     user: ACCOUNTS.screens,
     body: {
       format: 'chat',
-      contact: { tr: 'Patron', en: 'Boss', de: 'Chef', ar: 'المدير', fr: 'Patron', es: 'Jefe' },
+      contact: { tr: 'Patron', en: 'Boss', de: 'Chef', ar: 'المدير', fr: 'Patron', es: 'Jefe', ja: '部長', ko: '팀장님' },
       lines: [
         {
           from: 'them',
@@ -201,6 +231,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'هل لديك دقيقة؟ سؤال سريع',
             fr: "t'as deux minutes ? petite question",
             es: '¿tienes un minuto? una pregunta rápida',
+            ja: '今ちょっといい？質問1つだけ',
+            ko: '잠깐 괜찮아요? 짧게 하나만 물어볼게요',
           },
         },
         {
@@ -212,6 +244,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'طبعًا، تفضّل',
             fr: 'oui, vas-y',
             es: 'claro, dime',
+            ja: 'はい、どうぞ',
+            ko: '네, 말씀하세요',
           },
         },
         {
@@ -223,6 +257,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'رائع، حجزت لنا اجتماعًا لمدة ساعتين',
             fr: "super, j'ai calé une réunion de 2 h",
             es: 'genial, programé una reunión de 2 horas',
+            ja: 'よかった、2時間の会議入れといたから',
+            ko: '좋아요, 2시간짜리 회의 잡았어요',
           },
         },
       ],
@@ -234,6 +270,8 @@ export const SKIP_CHAT: readonly Draft[] = [
       ar: '«سؤال سريع» ليس سريعًا أبدًا',
       fr: "Une « petite question », qu'il disait",
       es: 'La “pregunta rápida” nunca es rápida',
+      ja: '「ちょっといい？」がちょっとで済んだことはない',
+      ko: '“잠깐이면 돼”는 절대 잠깐이 아님',
     },
   },
   {
@@ -248,6 +286,8 @@ export const SKIP_CHAT: readonly Draft[] = [
         ar: 'زميل السكن',
         fr: 'Coloc',
         es: 'Compañero de casa',
+        ja: 'ルームメイト',
+        ko: '룸메이트',
       },
       lines: [
         {
@@ -259,6 +299,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'من أكل الزبادي الخاص بي؟',
             fr: 'qui a mangé mon yaourt ?',
             es: '¿quién se comió mi yogur?',
+            ja: '冷蔵庫の私のヨーグルト食べたの誰？',
+            ko: '냉장고에 있던 내 요거트 누가 먹었어?',
           },
         },
         {
@@ -270,6 +312,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'لم يكن عليه اسم',
             fr: 'y avait pas ton nom dessus',
             es: 'no tenía tu nombre',
+            ja: '名前書いてなかったし',
+            ko: '이름 안 써 있었는데?',
           },
         },
         {
@@ -281,6 +325,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'كان مكتوبًا على الغطاء: ليس لك',
             fr: "sur le couvercle c'était écrit PAS À TOI",
             es: 'la tapa decía NO ES TUYO',
+            ja: 'フタに「あなたのじゃない」って書いてあった',
+            ko: '뚜껑에 “네 거 아님”이라고 써 있었거든',
           },
         },
       ],
@@ -292,6 +338,8 @@ export const SKIP_CHAT: readonly Draft[] = [
       ar: 'قانون السكن المشترك: الغطاء ملزِم',
       fr: 'Droit de la coloc : le couvercle fait foi',
       es: 'Ley de convivencia: la tapa es un contrato',
+      ja: 'ルームシェア法：フタの文字は法的拘束力あり',
+      ko: '룸메 법: 뚜껑에 쓴 건 법적 효력 있음',
     },
   },
   {
@@ -299,7 +347,7 @@ export const SKIP_CHAT: readonly Draft[] = [
     user: ACCOUNTS.screens,
     body: {
       format: 'chat',
-      contact: { tr: 'Teyzem', en: 'Auntie', de: 'Tante', ar: 'خالتي', fr: 'Tatie', es: 'Tía' },
+      contact: { tr: 'Teyzem', en: 'Auntie', de: 'Tante', ar: 'خالتي', fr: 'Tatie', es: 'Tía', ja: 'おばさん', ko: '이모' },
       lines: [
         {
           from: 'them',
@@ -310,6 +358,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'أنت تفهم في أمور الهواتف، صحيح؟',
             fr: "Toi, tu t'y connais en téléphones ?",
             es: 'Tú sabes de teléfonos, ¿verdad?',
+            ja: 'あなた、スマホ詳しいわよね？',
+            ko: '너 이런 휴대폰 잘 알지?',
           },
         },
         {
@@ -321,6 +371,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'قليلًا، ماذا حدث يا خالتي؟',
             fr: "un peu, qu'est-ce qui se passe ?",
             es: 'un poco, ¿qué pasó, tía?',
+            ja: 'まあね、どうしたの？',
+            ko: '조금요, 무슨 일이세요?',
           },
         },
         {
@@ -332,6 +384,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'أظنني حذفت الإنترنت، هل تعيده لي؟',
             fr: "J'ai effacé internet, tu peux le remettre ?",
             es: 'Borré el internet. ¿Lo vuelves a poner?',
+            ja: 'インターネット消しちゃったみたい。戻せる？',
+            ko: '인터넷을 지운 것 같아. 다시 깔아 줄래?',
           },
         },
       ],
@@ -343,6 +397,8 @@ export const SKIP_CHAT: readonly Draft[] = [
       ar: 'أنا قسم الدعم الفني في العائلة',
       fr: 'Je suis le service informatique de la famille',
       es: 'Soy el soporte técnico de la familia',
+      ja: '家族の情シスは私です',
+      ko: '우리 집 전산팀은 나 혼자임',
     },
   },
   {
@@ -357,6 +413,8 @@ export const SKIP_CHAT: readonly Draft[] = [
         ar: 'رفيق النادي',
         fr: 'Pote de muscu',
         es: 'Amigo del gimnasio',
+        ja: 'ジム仲間',
+        ko: '헬스 메이트',
       },
       lines: [
         {
@@ -368,6 +426,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'هل ستأتي إلى النادي؟',
             fr: 'tu viens à la salle ?',
             es: '¿vienes al gimnasio?',
+            ja: 'ジム来る？',
+            ko: '헬스장 올 거야?',
           },
         },
         {
@@ -379,6 +439,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'نعم، لبست ملابس الرياضة',
             fr: "ouais, j'ai déjà mis ma tenue",
             es: 'sí, ya me puse la ropa de deporte',
+            ja: '行く行く、もうジャージ着てる',
+            ko: '가지, 벌써 운동복 입었어',
           },
         },
         {
@@ -390,6 +452,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'رائع! أين أنت؟',
             fr: "top ! t'es où ?",
             es: '¡genial! ¿dónde estás?',
+            ja: 'いいね！今どこ？',
+            ko: '오 좋아! 어디야?',
           },
         },
         {
@@ -401,6 +465,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'على الأريكة، أقوم بالإحماء',
             fr: "sur le canapé, je m'échauffe",
             es: 'en el sofá, calentando',
+            ja: 'ソファでウォーミングアップ中',
+            ko: '소파에서 몸 푸는 중',
           },
         },
       ],
@@ -412,6 +478,8 @@ export const SKIP_CHAT: readonly Draft[] = [
       ar: 'اليوم الثالث من الإحماء',
       fr: 'Échauffement, jour 3',
       es: 'Día 3 de calentamiento',
+      ja: 'ウォーミングアップ3日目',
+      ko: '몸풀기 3일 차',
     },
   },
   {
@@ -426,6 +494,8 @@ export const SKIP_CHAT: readonly Draft[] = [
         ar: 'خطة السبت',
         fr: 'Plan du samedi',
         es: 'Plan del sábado',
+        ja: '土曜の予定',
+        ko: '토요일 약속',
       },
       lines: [
         {
@@ -437,6 +507,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'سنلتقي يوم السبت بالتأكيد!',
             fr: "samedi on se voit, c'est sûr !",
             es: '¡este sábado nos vemos sí o sí!',
+            ja: '今週の土曜は絶対会おうね！',
+            ko: '이번 토요일엔 무조건 보는 거다!',
           },
         },
         {
@@ -448,6 +520,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'رائع! في أي ساعة؟',
             fr: 'trop bien ! à quelle heure ?',
             es: '¡genial! ¿a qué hora?',
+            ja: 'やった！何時にする？',
+            ko: '좋아! 몇 시에?',
           },
         },
         {
@@ -459,6 +533,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'سنرى',
             fr: 'on verra',
             es: 'ya veremos',
+            ja: 'また決めよ',
+            ko: '그때 봐서',
           },
         },
         {
@@ -470,6 +546,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'وأين؟',
             fr: 'et où ?',
             es: '¿y dónde?',
+            ja: '場所は？',
+            ko: '어디서?',
           },
         },
         {
@@ -481,6 +559,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'سنرى ذلك أيضًا',
             fr: 'on verra aussi',
             es: 'eso también lo vemos',
+            ja: 'それもまた決めよ',
+            ko: '그것도 그때 봐서',
           },
         },
       ],
@@ -492,6 +572,8 @@ export const SKIP_CHAT: readonly Draft[] = [
       ar: 'هذه الخطة لن تتحقق أبدًا',
       fr: "Ce plan n'aura jamais lieu",
       es: 'Este plan nunca va a pasar',
+      ja: 'この予定、絶対実現しないやつ',
+      ko: '이 약속, 절대 성사 안 됨',
     },
   },
   {
@@ -506,6 +588,8 @@ export const SKIP_CHAT: readonly Draft[] = [
         ar: 'جار الطابق العلوي',
         fr: 'Voisin du dessus',
         es: 'Vecino de arriba',
+        ja: '上の階の人',
+        ko: '윗집',
       },
       lines: [
         {
@@ -517,6 +601,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'مرحبًا، هل يمكنني أخذ بيضتين؟',
             fr: 'salut, tu peux me dépanner de 2 œufs ?',
             es: 'hola, ¿me prestas 2 huevos?',
+            ja: 'こんにちは、卵2個もらえますか？',
+            ko: '안녕하세요, 달걀 2개만 빌릴 수 있을까요?',
           },
         },
         {
@@ -528,6 +614,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'طبعًا، تعال خذهما',
             fr: 'bien sûr, passe les prendre',
             es: 'claro, ven a buscarlos',
+            ja: 'どうぞ、取りに来てください',
+            ko: '그럼요, 가지러 오세요',
           },
         },
         {
@@ -539,6 +627,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'وأيضًا طحين وسكر وحليب… وفرنك',
             fr: 'et farine, sucre, lait… et ton four',
             es: 'y harina, azúcar, leche… y tu horno',
+            ja: 'あと小麦粉と砂糖と牛乳…とオーブンも',
+            ko: '밀가루, 설탕, 우유… 그리고 오븐도요',
           },
         },
       ],
@@ -550,6 +640,8 @@ export const SKIP_CHAT: readonly Draft[] = [
       ar: 'يبدو أنهم سيخبزون الكعكة عندي',
       fr: "Je crois qu'ils font le gâteau chez moi",
       es: 'Creo que van a hornear en mi casa',
+      ja: 'うちのキッチンでケーキ焼く気だ',
+      ko: '케이크를 우리 집에서 굽겠다는 거네',
     },
   },
   {
@@ -564,6 +656,8 @@ export const SKIP_CHAT: readonly Draft[] = [
         ar: 'أختي',
         fr: 'Frangine',
         es: 'Hermanita',
+        ja: '妹',
+        ko: '여동생',
       },
       lines: [
         {
@@ -575,15 +669,17 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'هل أستطيع استعارة سترتك الزرقاء؟',
             fr: "je peux t'emprunter ton sweat bleu ?",
             es: '¿me prestas tu sudadera azul?',
+            ja: '青いパーカー借りていい？',
+            ko: '파란 후드티 빌려도 돼?',
           },
         },
         {
           from: 'me',
-          text: { tr: 'hayır', en: 'no', de: 'nein', ar: 'لا', fr: 'non', es: 'no' },
+          text: { tr: 'hayır', en: 'no', de: 'nein', ar: 'لا', fr: 'non', es: 'no', ja: 'ダメ', ko: '안 돼' },
         },
         {
           from: 'them',
-          text: { tr: 'tamam', en: 'ok', de: 'okay', ar: 'حسنًا', fr: 'ok', es: 'ok' },
+          text: { tr: 'tamam', en: 'ok', de: 'okay', ar: 'حسنًا', fr: 'ok', es: 'ok', ja: 'わかった', ko: '알겠어' },
         },
         {
           from: 'them',
@@ -594,6 +690,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'بالمناسبة، أنا أرتديها الآن',
             fr: "je l'ai déjà sur moi au fait",
             es: 'por cierto, ya la tengo puesta',
+            ja: 'ちなみに今着てる',
+            ko: '참고로 지금 입고 있음',
           },
         },
       ],
@@ -605,6 +703,8 @@ export const SKIP_CHAT: readonly Draft[] = [
       ar: 'السؤال كان مجرد إجراء شكلي',
       fr: "Demander, c'était juste pour la forme",
       es: 'Preguntar era pura formalidad',
+      ja: '妹の「いい？」はただの事後報告',
+      ko: '동생의 “빌려도 돼?”는 그냥 통보임',
     },
   },
   {
@@ -619,6 +719,8 @@ export const SKIP_CHAT: readonly Draft[] = [
         ar: 'مجموعة المشروع',
         fr: 'Projet de groupe',
         es: 'Trabajo en grupo',
+        ja: 'グループ課題',
+        ko: '조별 과제',
       },
       lines: [
         {
@@ -630,6 +732,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'العرض غدًا، هل أنهى الجميع أجزاءهم؟',
             fr: 'exposé demain, tout le monde a fini ?',
             es: 'la presentación es mañana, ¿ya terminaron?',
+            ja: '発表明日だけど、みんな自分の分終わった？',
+            ko: '발표 내일인데 다들 자기 파트 끝냈어?',
           },
         },
         {
@@ -641,6 +745,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'أي عرض؟',
             fr: 'quel exposé ?',
             es: '¿qué presentación?',
+            ja: '発表って何の？',
+            ko: '무슨 발표?',
           },
         },
         {
@@ -652,6 +758,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'لحظة، هل أنا في هذه المجموعة أصلًا؟',
             fr: 'attends, je suis dans le groupe ?',
             es: 'espera, ¿estoy en este grupo?',
+            ja: 'え、私このグループだったの？',
+            ko: '잠깐, 나 이 조였어?',
           },
         },
       ],
@@ -663,6 +771,8 @@ export const SKIP_CHAT: readonly Draft[] = [
       ar: 'العمل الجماعي = عمل فردي',
       fr: 'Travail de groupe = travail solo',
       es: 'Trabajo en grupo = trabajo individual',
+      ja: 'グループ課題＝ひとり課題',
+      ko: '조별 과제 = 개인 과제',
     },
   },
   {
@@ -670,7 +780,7 @@ export const SKIP_CHAT: readonly Draft[] = [
     user: ACCOUNTS.vlog,
     body: {
       format: 'chat',
-      contact: { tr: 'Anneannem', en: 'Grandma', de: 'Oma', ar: 'جدتي', fr: 'Mamie', es: 'Abuela' },
+      contact: { tr: 'Anneannem', en: 'Grandma', de: 'Oma', ar: 'جدتي', fr: 'Mamie', es: 'Abuela', ja: 'おばあちゃん', ko: '할머니' },
       lines: [
         {
           from: 'them',
@@ -681,6 +791,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'يا حبيبي، كيف أرسل رسالة صوتية؟',
             fr: 'mon chéri, comment on envoie un vocal ?',
             es: 'mi amor, ¿cómo mando un audio?',
+            ja: 'ねえ、音声メッセージってどうやって送るの？',
+            ko: '얘야, 음성 메시지는 어떻게 보내니?',
           },
         },
         {
@@ -692,6 +804,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'اضغطي مطولًا على الميكروفون يا جدتي',
             fr: 'reste appuyée sur le micro, Mamie',
             es: 'mantén presionado el micrófono, abuela',
+            ja: 'マイクを長押しするんだよ、おばあちゃん',
+            ko: '할머니, 마이크 버튼 길게 누르세요',
           },
         },
         {
@@ -703,6 +817,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'حسنًا، أنا أضغط',
             fr: "d'accord, j'appuie",
             es: 'listo, lo estoy presionando',
+            ja: 'はいはい、押してるよ',
+            ko: '그래, 누르고 있다',
           },
         },
         {
@@ -714,6 +830,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'ألو؟ ألو؟؟ هل تسمعني؟',
             fr: "ALLÔ ? ALLÔ ?? TU M'ENTENDS ?",
             es: '¿HOLA? ¿¿HOLA?? ¿ME OYES?',
+            ja: 'もしもし？もしもし？？聞こえる？',
+            ko: '여보세요? 여보세요?? 들리니?',
           },
         },
       ],
@@ -725,6 +843,8 @@ export const SKIP_CHAT: readonly Draft[] = [
       ar: 'أول رسالة صوتية لجدتي (تقريبًا)',
       fr: 'Le premier vocal de Mamie (presque)',
       es: 'El primer audio de mi abuela (casi)',
+      ja: 'おばあちゃん初の音声メッセージ（未遂）',
+      ko: '할머니의 첫 음성 메시지 (반쯤 성공)',
     },
   },
   {
@@ -739,6 +859,8 @@ export const SKIP_CHAT: readonly Draft[] = [
         ar: 'ابنة عمي',
         fr: 'Cousine',
         es: 'Prima',
+        ja: 'いとこ',
+        ko: '사촌',
       },
       lines: [
         {
@@ -750,6 +872,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'يجب أن أخبرك بشيء',
             fr: 'faut que je te raconte un truc',
             es: 'tengo que contarte algo',
+            ja: 'ちょっと話したいことがある',
+            ko: '너한테 할 말 있어',
           },
         },
         {
@@ -761,6 +885,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'ماذا؟؟ أخبريني!',
             fr: 'quoi ?? raconte !',
             es: '¿¿qué?? ¡cuéntame!',
+            ja: 'なに？？教えて！',
+            ko: '뭔데?? 말해 봐!',
           },
         },
         {
@@ -772,6 +898,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'سأخبرك غدًا وجهًا لوجه',
             fr: 'je te dis demain, en vrai',
             es: 'mañana te cuento en persona',
+            ja: '明日会って話す',
+            ko: '내일 만나서 말해 줄게',
           },
         },
         {
@@ -783,6 +911,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'لا يمكنك أن تفعلي هذا بي 😭',
             fr: 'tu peux pas me faire ça 😭',
             es: 'no me puedes hacer esto 😭',
+            ja: 'それはないって 😭',
+            ko: '이러는 게 어딨어 😭',
           },
         },
       ],
@@ -794,6 +924,8 @@ export const SKIP_CHAT: readonly Draft[] = [
       ar: 'كيف سأنتظر حتى الغد؟',
       fr: "Comment je tiens jusqu'à demain ?",
       es: '¿Cómo espero hasta mañana?',
+      ja: '明日まで待てるわけないでしょ',
+      ko: '내일까지 어떻게 기다려?',
     },
   },
   {
@@ -808,6 +940,8 @@ export const SKIP_CHAT: readonly Draft[] = [
         ar: 'مجموعة الصف',
         fr: 'Groupe de la classe',
         es: 'Grupo de la clase',
+        ja: 'クラスのグループ',
+        ko: '반 단톡방',
       },
       lines: [
         {
@@ -819,6 +953,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'متى موعد تسليم الواجب؟',
             fr: "le devoir, c'est pour quand ?",
             es: '¿para cuándo es la tarea?',
+            ja: '宿題の締め切りいつだっけ？',
+            ko: '숙제 언제까지였지?',
           },
         },
         {
@@ -830,6 +966,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'الليلة حتى 23:59',
             fr: 'ce soir, 23 h 59',
             es: 'hoy, hasta las 23:59',
+            ja: '今夜23:59まで',
+            ko: '오늘 밤 23:59까지',
           },
         },
         {
@@ -841,11 +979,13 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'كم الساعة الآن؟',
             fr: 'il est quelle heure, là ?',
             es: '¿qué hora es?',
+            ja: '今何時？',
+            ko: '지금 몇 시야?',
           },
         },
         {
           from: 'them',
-          text: { tr: '23.51', en: '11:51', de: '23:51', ar: '23:51', fr: '23 h 51', es: '23:51' },
+          text: { tr: '23.51', en: '11:51', de: '23:51', ar: '23:51', fr: '23 h 51', es: '23:51', ja: '23:51', ko: '23:51' },
         },
       ],
     },
@@ -856,6 +996,8 @@ export const SKIP_CHAT: readonly Draft[] = [
       ar: 'واجب في 8 دقائق؟ تحدٍّ مقبول',
       fr: 'Un devoir en 8 minutes ? Facile.',
       es: '¿Tarea en 8 minutos? Claro que sí.',
+      ja: '8分で宿題？余裕です。',
+      ko: '8분 만에 숙제? 가능합니다.',
     },
   },
   {
@@ -870,6 +1012,8 @@ export const SKIP_CHAT: readonly Draft[] = [
         ar: 'صديقي',
         fr: 'Mon pote',
         es: 'Mi mejor amigo',
+        ja: '親友',
+        ko: '절친',
       },
       lines: [
         {
@@ -881,6 +1025,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'ماذا نأكل على العشاء؟',
             fr: 'on mange quoi ce soir ?',
             es: '¿qué cenamos hoy?',
+            ja: '夜ごはん何にする？',
+            ko: '저녁 뭐 먹을래?',
           },
         },
         {
@@ -892,6 +1038,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'لا يهم، اختر أنت',
             fr: 'peu importe, choisis',
             es: 'me da igual, tú elige',
+            ja: 'なんでもいいよ',
+            ko: '아무거나',
           },
         },
         {
@@ -903,6 +1051,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'برغر؟',
             fr: 'burger ?',
             es: '¿hamburguesas?',
+            ja: 'ハンバーガーは？',
+            ko: '햄버거?',
           },
         },
         {
@@ -914,6 +1064,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'لا، ليس برغر',
             fr: 'ah non, pas de burger',
             es: 'no, hamburguesas no',
+            ja: 'ハンバーガーはやだ',
+            ko: '햄버거는 좀',
           },
         },
       ],
@@ -925,6 +1077,8 @@ export const SKIP_CHAT: readonly Draft[] = [
       ar: '«لا يهم» تعني: أي شيء إلا هذا',
       fr: '« Peu importe » = tout sauf ça',
       es: '“Me da igual” = todo menos eso',
+      ja: '「なんでもいい」＝それ以外なら',
+      ko: '“아무거나” = 그거 빼고 아무거나',
     },
   },
   {
@@ -939,6 +1093,8 @@ export const SKIP_CHAT: readonly Draft[] = [
         ar: 'مجموعة العائلة',
         fr: 'Groupe famille',
         es: 'Grupo familiar',
+        ja: '家族グループ',
+        ko: '가족 단톡방',
       },
       lines: [
         {
@@ -950,6 +1106,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'من سيحضر غداء الجمعة؟',
             fr: 'qui vient au repas de dimanche ?',
             es: '¿quién viene a comer el domingo?',
+            ja: '日曜のごはん、来る人いる？',
+            ko: '일요일 저녁 먹으러 올 사람?',
           },
         },
         {
@@ -961,6 +1119,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'أنا!',
             fr: 'moi !',
             es: '¡yo!',
+            ja: 'はい！',
+            ko: '나!',
           },
         },
         {
@@ -972,6 +1132,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'ممتاز، غسل الصحون عليك',
             fr: "super, c'est toi qui fais la vaisselle",
             es: 'genial, te toca lavar los platos',
+            ja: 'よし、皿洗いよろしく',
+            ko: '좋아, 설거지는 네 담당',
           },
         },
       ],
@@ -983,6 +1145,8 @@ export const SKIP_CHAT: readonly Draft[] = [
       ar: 'من يرد أولًا يخسر',
       fr: 'Le premier qui répond a perdu',
       es: 'El primero en responder pierde',
+      ja: '最初に返信した人の負け',
+      ko: '먼저 답장하는 사람이 지는 거',
     },
   },
   {
@@ -997,6 +1161,8 @@ export const SKIP_CHAT: readonly Draft[] = [
         ar: 'صديقي',
         fr: 'Mon pote',
         es: 'Mi mejor amigo',
+        ja: '親友',
+        ko: '절친',
       },
       lines: [
         {
@@ -1008,11 +1174,13 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'هل نمت؟',
             fr: 'tu dors ?',
             es: '¿ya te dormiste?',
+            ja: '寝た？',
+            ko: '자?',
           },
         },
         {
           from: 'me',
-          text: { tr: 'evet', en: 'yes', de: 'ja', ar: 'نعم', fr: 'oui', es: 'sí' },
+          text: { tr: 'evet', en: 'yes', de: 'ja', ar: 'نعم', fr: 'oui', es: 'sí', ja: '寝た', ko: '응, 자' },
         },
         {
           from: 'them',
@@ -1023,6 +1191,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'النائم لا يرد على الرسائل 🤨',
             fr: "quelqu'un qui dort répond pas 🤨",
             es: 'los que duermen no contestan 🤨',
+            ja: '寝てる人は返信できないでしょ 🤨',
+            ko: '자는 사람은 답장 못 하거든 🤨',
           },
         },
         {
@@ -1034,6 +1204,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'أنا أرد وأنا نائم',
             fr: 'je réponds en dormant',
             es: 'contesto dormido',
+            ja: '寝ながら打ってる',
+            ko: '자면서 치는 중',
           },
         },
       ],
@@ -1045,6 +1217,8 @@ export const SKIP_CHAT: readonly Draft[] = [
       ar: 'الساعة 3 فجرًا وكلانا متصل',
       fr: "3 h du mat' et on est encore connectés",
       es: 'Son las 3 a. m. y seguimos conectados',
+      ja: '深夜3時、ふたりともまだオンライン',
+      ko: '새벽 3시, 둘 다 아직 폰 보는 중',
     },
   },
   {
@@ -1052,7 +1226,7 @@ export const SKIP_CHAT: readonly Draft[] = [
     user: ACCOUNTS.screens,
     body: {
       format: 'chat',
-      contact: { tr: 'Annem', en: 'Mom', de: 'Mama', ar: 'أمي', fr: 'Maman', es: 'Mamá' },
+      contact: { tr: 'Annem', en: 'Mom', de: 'Mama', ar: 'أمي', fr: 'Maman', es: 'Mamá', ja: 'お母さん', ko: '엄마' },
       lines: [
         {
           from: 'them',
@@ -1063,6 +1237,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'هل أخذت سترتك؟',
             fr: "t'as pris un gilet ?",
             es: '¿llevas abrigo?',
+            ja: 'カーディガン持った？',
+            ko: '카디건 챙겼어?',
           },
         },
         {
@@ -1074,6 +1250,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'أمي، الحرارة 40 درجة',
             fr: 'maman, il fait 30 degrés',
             es: 'mamá, hace 30 grados',
+            ja: 'お母さん、今日30度だよ',
+            ko: '엄마 오늘 30도야',
           },
         },
         {
@@ -1085,6 +1263,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'سيبرد الجو في المساء',
             fr: 'le soir, ça se rafraîchit',
             es: 'por la noche refresca',
+            ja: '夜は冷えるから',
+            ko: '저녁엔 쌀쌀해져',
           },
         },
       ],
@@ -1096,6 +1276,8 @@ export const SKIP_CHAT: readonly Draft[] = [
       ar: 'في نشرة أمي الجوية، الشتاء دائمًا',
       fr: "Dans la météo de maman, c'est toujours l'hiver",
       es: 'En el pronóstico de mamá siempre es invierno',
+      ja: '母の天気予報は一年中冬',
+      ko: '엄마 일기예보는 1년 내내 겨울',
     },
   },
   {
@@ -1110,6 +1292,8 @@ export const SKIP_CHAT: readonly Draft[] = [
         ar: 'زميل السكن',
         fr: 'Coloc',
         es: 'Compañero de casa',
+        ja: 'ルームメイト',
+        ko: '룸메이트',
       },
       lines: [
         {
@@ -1121,6 +1305,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'أنا في البقالة، هل تحتاج شيئًا؟',
             fr: 'au supermarché, tu veux quelque chose ?',
             es: 'estoy en el súper, ¿necesitas algo?',
+            ja: 'スーパーにいるけど、何かいる？',
+            ko: '마트인데 뭐 필요한 거 있어?',
           },
         },
         {
@@ -1132,6 +1318,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'حليب، بيض، خبز',
             fr: 'du lait, des œufs, du pain',
             es: 'leche, huevos y pan',
+            ja: '牛乳と卵とパン',
+            ko: '우유, 달걀, 빵',
           },
         },
         {
@@ -1143,6 +1331,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'حسنًا 👍',
             fr: 'ok 👍',
             es: 'listo 👍',
+            ja: '了解 👍',
+            ko: '오케이 👍',
           },
         },
         {
@@ -1154,6 +1344,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'اشتريت رقائق ومثلجات، أنا قادم',
             fr: "j'ai pris des chips et une glace, j'arrive",
             es: 'compré helado y galletas, ya voy',
+            ja: 'ポテチとアイス買った、今帰る',
+            ko: '과자랑 아이스크림 샀어, 가는 중',
           },
         },
       ],
@@ -1165,6 +1357,8 @@ export const SKIP_CHAT: readonly Draft[] = [
       ar: 'قائمة المشتريات مجرد اقتراح',
       fr: "La liste de courses, c'est indicatif",
       es: 'La lista del súper es solo una sugerencia',
+      ja: '買い物リストはあくまで参考',
+      ko: '장보기 목록은 그냥 참고용',
     },
   },
   {
@@ -1179,6 +1373,8 @@ export const SKIP_CHAT: readonly Draft[] = [
         ar: 'زميلتي في العمل',
         fr: 'Collègue',
         es: 'Compañera de trabajo',
+        ja: '同僚',
+        ko: '회사 동료',
       },
       lines: [
         {
@@ -1190,6 +1386,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'غدًا عطلة نهاية الأسبوع، صحيح؟',
             fr: "demain c'est vendredi, non ?",
             es: 'mañana es viernes, ¿verdad?',
+            ja: '明日って金曜だよね？',
+            ko: '내일 금요일 맞죠?',
           },
         },
         {
@@ -1201,6 +1399,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'الأسبوع بدأ أمس',
             fr: 'on est mardi',
             es: 'hoy es martes',
+            ja: '今日、火曜だよ',
+            ko: '오늘 화요일이에요',
           },
         },
         {
@@ -1212,6 +1412,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'كيف؟ نحن نعمل منذ أسبوع كامل',
             fr: 'comment ça ? on bosse depuis une semaine',
             es: '¿cómo? llevamos una semana trabajando',
+            ja: '火曜？もう1週間働いてるんだけど',
+            ko: '화요일이요? 일주일째 일하는 중인데요',
           },
         },
       ],
@@ -1223,6 +1425,8 @@ export const SKIP_CHAT: readonly Draft[] = [
       ar: 'اليوم الثاني من الأسبوع يدوم أسبوعًا',
       fr: 'Un mardi, ça dure une semaine',
       es: 'Los martes duran una semana',
+      ja: '火曜日だけで1週間ある',
+      ko: '화요일 하나가 일주일 같음',
     },
   },
   {
@@ -1237,6 +1441,8 @@ export const SKIP_CHAT: readonly Draft[] = [
         ar: 'أختي',
         fr: 'Frangine',
         es: 'Hermanita',
+        ja: '妹',
+        ko: '여동생',
       },
       lines: [
         {
@@ -1248,6 +1454,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'كيف حال الصبّار الذي أهديتك إياه؟',
             fr: "il va bien, le cactus que je t'ai offert ?",
             es: '¿cómo está el cactus que te regalé?',
+            ja: 'あげたサボテン元気？',
+            ko: '내가 준 선인장 잘 있어?',
           },
         },
         {
@@ -1259,6 +1467,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'رائع! أسقيه كل يوم 💧',
             fr: "super ! je l'arrose tous les jours 💧",
             es: '¡genial! lo riego todos los días 💧',
+            ja: '元気！毎日水あげてる 💧',
+            ko: '응! 매일 물 주고 있어 💧',
           },
         },
         {
@@ -1270,6 +1480,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'لكنه صناعي',
             fr: 'il est en plastique',
             es: 'es de plástico',
+            ja: 'それ、偽物だよ',
+            ko: '그거 가짜인데',
           },
         },
       ],
@@ -1281,6 +1493,8 @@ export const SKIP_CHAT: readonly Draft[] = [
       ar: '3 أشهر وأنا أسقي البلاستيك',
       fr: "3 mois que j'arrose du plastique",
       es: '3 meses regando plástico',
+      ja: '3か月、プラスチックに水やってた',
+      ko: '3개월째 플라스틱에 물 주는 중',
     },
   },
   {
@@ -1288,7 +1502,7 @@ export const SKIP_CHAT: readonly Draft[] = [
     user: ACCOUNTS.screens,
     body: {
       format: 'chat',
-      contact: { tr: 'Babam', en: 'Dad', de: 'Papa', ar: 'أبي', fr: 'Papa', es: 'Papá' },
+      contact: { tr: 'Babam', en: 'Dad', de: 'Papa', ar: 'أبي', fr: 'Papa', es: 'Papá', ja: 'お父さん', ko: '아빠' },
       lines: [
         {
           from: 'me',
@@ -1299,6 +1513,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'أبي، أنا جائع',
             fr: "papa, j'ai faim",
             es: 'papá, tengo hambre',
+            ja: 'お父さん、お腹すいた',
+            ko: '아빠 배고파',
           },
         },
         {
@@ -1310,6 +1526,8 @@ export const SKIP_CHAT: readonly Draft[] = [
             ar: 'أهلًا يا جائع، أنا أبوك 😎',
             fr: "Enchanté J'ai faim, moi c'est Papa 😎",
             es: 'Hola, Hambre, soy papá 😎',
+            ja: '奇遇だね、電車もすいてるよ 😎',
+            ko: '배고프면 배 먹어야지 😎',
           },
         },
       ],
@@ -1321,6 +1539,8 @@ export const SKIP_CHAT: readonly Draft[] = [
       ar: 'يكرر هذه النكتة منذ 15 عامًا',
       fr: "Ça fait 15 ans qu'il me la fait, celle-là",
       es: 'Lleva 15 años haciendo ese chiste',
+      ja: 'このギャグ、15年続いてる',
+      ko: '이 개그를 15년째 하는 중',
     },
   },
 ];

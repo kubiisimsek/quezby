@@ -13,6 +13,8 @@ const fmt: Record<Locale, Formats> = {
   ar: formatsFor('ar'),
   fr: formatsFor('fr'),
   es: formatsFor('es'),
+  ja: formatsFor('ja'),
+  ko: formatsFor('ko'),
 };
 
 const NBSP = ' ';
@@ -310,4 +312,90 @@ const es: RatingMessages = {
   },
 };
 
-export const rating: Record<Locale, RatingMessages> = { tr, en, de, ar, fr, es };
+const ja: RatingMessages = {
+  elo: (value) => `${value} qb`,
+  delta: (value) => signed('ja', value),
+  toNext: (tier, points) => `${tiers.ja.names[tier]}まであと${points} qb`,
+  noCeiling: '上限なし',
+  peak: (value) => `最高 ${value}`,
+  shield: (runs) => `シールド · ${runs}回`,
+  placement: {
+    ribbon: '認定戦',
+    title: (played, required) => `認定戦 ${played}/${required}`,
+    hint: (required) => `最初の${required}回のランク戦で、スタートするリーグが決まります。`,
+  },
+  result: {
+    ribbon: 'QB',
+    line: (score, target) => `スコア ${score} · 目標 ${target}`,
+    placed: (tier) => `認定完了：${tiers.ja.league(tier)}！`,
+    promoted: (tier) => `${tiers.ja.league(tier)}に昇格！`,
+    demoted: (tier) => `${tiers.ja.league(tier)}に降格しました。`,
+    shielded: 'シールドのおかげでリーグに残留',
+    forfeit: '不戦敗',
+    void: 'このプレイはqbにカウントされませんでした',
+    pending: 'スコアの確認後にqbへ反映されます',
+    score: (score) => `スコア ${score}`,
+    deltaLabel: (delta) => `${delta} qb`,
+    verdict: { beat: '目標突破', short: '目標に届かず', even: '目標ぴったり' },
+    banner: { up: '昇格！', down: '降格', placed: '認定完了！' },
+  },
+  history: {
+    title: 'qbの履歴',
+    open: 'qbの履歴を開く',
+    empty: 'qbの変動はまだありません。',
+    kinds: {
+      placement: '認定戦',
+      run: 'プレイ',
+      forfeit: '不戦敗',
+      void: 'ノーカウント',
+      reversal: '取り消し',
+      adjust: '調整',
+    },
+    run: (score, target) => `${score} · 目標 ${target}`,
+  },
+};
+
+const ko: RatingMessages = {
+  elo: (value) => `${value} qb`,
+  delta: (value) => signed('ko', value),
+  toNext: (tier, points) => `${tiers.ko.names[tier]}까지 ${points} qb`,
+  noCeiling: '상한 없음',
+  peak: (value) => `최고 ${value}`,
+  shield: (runs) => `보호막 · ${runs}판`,
+  placement: {
+    ribbon: '배치고사',
+    title: (played, required) => `배치고사 ${played}/${required}`,
+    hint: (required) => `처음 ${required}판의 랭크전으로 시작할 리그가 정해져요.`,
+  },
+  result: {
+    ribbon: 'QB',
+    line: (score, target) => `점수 ${score} · 목표 ${target}`,
+    placed: (tier) => `배치 완료: ${tiers.ko.league(tier)}!`,
+    promoted: (tier) => `${tiers.ko.league(tier)}로 승급했어요!`,
+    demoted: (tier) => `${tiers.ko.league(tier)}로 강등됐어요.`,
+    shielded: '보호막 덕분에 리그에 남았어요',
+    forfeit: '몰수패',
+    void: '이번 게임은 qb에 반영되지 않았어요',
+    pending: '점수 검토가 끝나면 qb에 반영돼요',
+    score: (score) => `점수 ${score}`,
+    deltaLabel: (delta) => `${delta} qb`,
+    verdict: { beat: '목표 돌파', short: '목표 미달', even: '목표 적중' },
+    banner: { up: '승급!', down: '강등', placed: '배치 완료!' },
+  },
+  history: {
+    title: 'qb 기록',
+    open: 'qb 기록 열기',
+    empty: '아직 qb 변동이 없어요.',
+    kinds: {
+      placement: '배치고사',
+      run: '게임',
+      forfeit: '몰수패',
+      void: '미반영',
+      reversal: '취소됨',
+      adjust: '조정',
+    },
+    run: (score, target) => `${score} · 목표 ${target}`,
+  },
+};
+
+export const rating: Record<Locale, RatingMessages> = { tr, en, de, ar, fr, es, ja, ko };

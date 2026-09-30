@@ -64,7 +64,7 @@ test('a language it does not speak falls back to the player\'s own, then to Turk
     searchTooShort($acceptLanguage)->assertStatus(422)
         ->assertJsonPath('error.message', 'Para buscar, escribe de 2 a 20 letras, números, puntos o asteriscos.');
 })->with([
-    'Japanese' => ['ja-JP, ja;q=0.9'],
+    'Chinese' => ['zh-CN, zh;q=0.9'],
     'anything' => ['*'],
     'an empty header' => [''],
 ]);
@@ -152,7 +152,9 @@ test('a new guest plays in the language it signed up in', function (string $acce
     'German' => ['de', 'de'],
     'Latin American Spanish' => ['es-419,es;q=0.9', 'es'],
     'Arabic' => ['ar-SA', 'ar'],
-    'a language it does not speak' => ['ja', 'tr'],
+    'Japanese' => ['ja-JP', 'ja'],
+    'Korean' => ['ko-KR,ko;q=0.9', 'ko'],
+    'a language it does not speak' => ['zh', 'tr'],
 ]);
 
 test('signing in with an email keeps the player\'s language', function () {
@@ -208,7 +210,7 @@ test('the phone sets the player\'s language', function (string $locale) {
         ->assertJsonStructure(['user' => ['id', 'username', 'settings', 'locale', 'best', 'createdAt']]);
 
     expect($player->fresh()->locale)->toBe(Locale::from($locale));
-})->with(['tr', 'en', 'de', 'ar', 'fr', 'es']);
+})->with(['tr', 'en', 'de', 'ar', 'fr', 'es', 'ja', 'ko']);
 
 test('the language set is the one a request naming none gets', function () {
     $this->signIn();
@@ -217,7 +219,7 @@ test('the language set is the one a request naming none gets', function () {
     searchTooShort('')->assertJsonPath('error.message', 'Gib zum Suchen 2 bis 20 Buchstaben, Ziffern, Punkte oder Sterne ein.');
 });
 
-test('only the six languages can be set', function (mixed $locale) {
+test('only the eight languages can be set', function (mixed $locale) {
     $player = $this->signIn(User::factory()->withUsername()->locale(Locale::En)->create());
 
     $this->assertApiError($this->putJson('/api/v1/me/locale', ['locale' => $locale]), 422, 'validation_failed')

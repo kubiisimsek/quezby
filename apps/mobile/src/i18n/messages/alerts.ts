@@ -186,4 +186,62 @@ const es: AlertsMessages = {
   fresh: 'Nuevo',
 };
 
-export const alerts: Record<Locale, AlertsMessages> = { tr, en, de, ar, fr, es };
+const ja: AlertsMessages = {
+  title: '通知',
+  tagline: '申請とVS',
+  empty: 'まだ通知はありません',
+  emptyHint: 'フレンド申請やVSはここに表示されます。',
+  failed: '通知を読み込めませんでした',
+  retry: '再試行',
+  kinds: {
+    friend_request: 'フレンド申請',
+    friends: '新しいフレンド',
+    vs_invite: 'VS',
+    vs_result: 'VSの結果',
+    vs_declined: 'VS',
+    vs_expired: 'VS',
+  },
+  lines: {
+    friendRequest: (name) => `${name}からフレンド申請が届きました`,
+    friends: (name) => `${name}が申請を承認しました`,
+    vsInvite: (name) => `${name}からVSが届きました`,
+    won: (name) => `${name}とのVSに勝ちました`,
+    lost: (name) => `${name}とのVSに負けました`,
+    draw: (name) => `${name}とのVSは引き分けでした`,
+    finished: (name) => `${name}とのVSが終わりました`,
+    declined: (name) => `${name}がVSを断りました`,
+    expired: (name) => `${name}は時間内にVSをプレイしませんでした`,
+  },
+  fresh: '新着',
+};
+
+const ko: AlertsMessages = {
+  title: '알림',
+  tagline: '요청과 VS',
+  empty: '아직 알림이 없어요',
+  emptyHint: '친구 요청과 VS가 여기에 표시돼요.',
+  failed: '알림을 불러올 수 없어요',
+  retry: '다시 시도',
+  kinds: {
+    friend_request: '친구 요청',
+    friends: '새 친구',
+    vs_invite: 'VS',
+    vs_result: 'VS 결과',
+    vs_declined: 'VS',
+    vs_expired: 'VS',
+  },
+  lines: {
+    friendRequest: (name) => `${name} 님이 친구 요청을 보냈어요`,
+    friends: (name) => `${name} 님이 요청을 수락했어요`,
+    vsInvite: (name) => `${name} 님이 VS를 보냈어요`,
+    won: (name) => `${name} 님과의 VS에서 이겼어요`,
+    lost: (name) => `${name} 님과의 VS에서 졌어요`,
+    draw: (name) => `${name} 님과의 VS가 무승부로 끝났어요`,
+    finished: (name) => `${name} 님과의 VS가 끝났어요`,
+    declined: (name) => `${name} 님이 VS를 거절했어요`,
+    expired: (name) => `${name} 님이 시간 안에 VS를 플레이하지 않았어요`,
+  },
+  fresh: '새 알림',
+};
+
+export const alerts: Record<Locale, AlertsMessages> = { tr, en, de, ar, fr, es, ja, ko };

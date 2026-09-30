@@ -19,6 +19,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'بحثت عن هاتفي… مستعينًا بمصباح هاتفي',
       fr: "J'ai cherché mon tel. Avec la lampe du tel.",
       es: 'Busqué mi teléfono. Con la linterna del teléfono.',
+      ja: 'スマホを探した。スマホのライトで。',
+      ko: '폰을 찾았다. 폰 손전등을 켜고.',
     },
   },
   {
@@ -32,6 +34,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'كتبت حرفًا واحدًا فاقترحت لوحة المفاتيح: «سأتأخر»',
       fr: "Une lettre, et le clavier propose « j'arrive en retard »",
       es: 'Escribo una letra y el teclado sugiere “llego tarde”',
+      ja: '「ご」と打っただけで予測変換が「ごめん遅れる」',
+      ko: '“ㅈ”만 쳤는데 키보드가 “좀 늦을 듯” 추천',
     },
   },
   {
@@ -45,6 +49,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'شعرت بجيبي يهتز… والهاتف في يدي',
       fr: 'Ma poche a vibré. Mon tel était dans ma main.',
       es: 'Me vibró el bolsillo. El teléfono estaba en mi mano.',
+      ja: 'ポケットが震えた気がした。スマホは手に持ってた。',
+      ko: '주머니에서 진동이 온 줄 알았다. 폰은 손에 있었다.',
     },
   },
   {
@@ -58,6 +64,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'حيلة: فعّل الوضع الداكن وستصبح غامضًا فورًا',
       fr: 'Astuce : mode sombre = mystère instantané',
       es: 'Truco: activa el modo oscuro y sé un misterio',
+      ja: '裏ワザ：ダークモードにすれば一瞬でミステリアス',
+      ko: '꿀팁: 다크 모드 켜면 바로 신비로운 사람 됨',
     },
   },
   {
@@ -71,6 +79,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'سيلفي في المرآة: أوضح شيء فيها هو الهاتف',
       fr: "Selfie miroir : le plus net, c'est le téléphone",
       es: 'Selfie en el espejo: lo más nítido es el teléfono',
+      ja: '鏡の自撮り：いちばんピントが合ってるのはスマホ',
+      ko: '거울 셀카: 제일 선명하게 나온 건 폰',
     },
   },
   {
@@ -84,6 +94,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'واقي الشاشة: 9 فقاعات، ولكل واحدة اسم',
       fr: "Protection d'écran : 9 bulles. Elles ont toutes un prénom.",
       es: 'Protector de pantalla: 9 burbujas. Todas tienen nombre.',
+      ja: '保護フィルムに気泡が9個。全員に名前をつけた。',
+      ko: '보호 필름 기포 9개. 전부 이름 지어 줬다.',
     },
   },
   {
@@ -98,6 +110,8 @@ export const PHONE_SKIP: readonly Draft[] = [
         ar: 'صديقي',
         fr: 'Mon pote',
         es: 'Mi mejor amigo',
+        ja: '親友',
+        ko: '절친',
       },
       lines: [
         {
@@ -109,6 +123,8 @@ export const PHONE_SKIP: readonly Draft[] = [
             ar: 'أحضرت الديك، أنا قادم',
             fr: "j'ai le bateau, j'arrive",
             es: 'ya tengo el pastor, voy para allá',
+            ja: '景気買った、今から行く',
+            ko: '군뱀 사서 가는 중',
           },
         },
         {
@@ -120,6 +136,8 @@ export const PHONE_SKIP: readonly Draft[] = [
             ar: 'الديك؟؟',
             fr: 'LE BATEAU ??',
             es: '¿¿EL PASTOR??',
+            ja: '景気？？',
+            ko: '군뱀??',
           },
         },
         {
@@ -131,6 +149,8 @@ export const PHONE_SKIP: readonly Draft[] = [
             ar: 'الكيك! التصحيح التلقائي 😩',
             fr: 'LE GÂTEAU. correcteur 😩',
             es: 'PASTEL. autocorrector 😩',
+            ja: 'ケーキ。変換ミス 😩',
+            ko: '군밤. 자동 수정 😩',
           },
         },
         {
@@ -142,6 +162,8 @@ export const PHONE_SKIP: readonly Draft[] = [
             ar: 'الديك كان أطرف بصراحة',
             fr: "le bateau, c'était plus drôle",
             es: 'el pastor sonaba más divertido',
+            ja: '景気が買えるなら買ってきて',
+            ko: '솔직히 군뱀이 더 끌렸는데',
           },
         },
       ],
@@ -153,6 +175,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'التصحيح التلقائي يفعلها مجددًا',
       fr: 'Le correcteur a encore fait des siennes',
       es: 'El autocorrector otra vez haciendo de las suyas',
+      ja: '予測変換、今日も絶好調',
+      ko: '자동 수정이 또 일했다',
     },
   },
   {
@@ -160,7 +184,7 @@ export const PHONE_SKIP: readonly Draft[] = [
     user: ACCOUNTS.screens,
     body: {
       format: 'chat',
-      contact: { tr: 'Annem', en: 'Mom', de: 'Mama', ar: 'أمي', fr: 'Maman', es: 'Mamá' },
+      contact: { tr: 'Annem', en: 'Mom', de: 'Mama', ar: 'أمي', fr: 'Maman', es: 'Mamá', ja: 'お母さん', ko: '엄마' },
       lines: [
         {
           from: 'me',
@@ -171,6 +195,8 @@ export const PHONE_SKIP: readonly Draft[] = [
             ar: 'أمي تسأل مجددًا متى سأعود 🙄',
             fr: 'maman demande ENCORE quand je rentre 🙄',
             es: 'mamá pregunta OTRA VEZ cuándo vuelvo 🙄',
+            ja: '母からまた「何時に帰るの」って 🙄',
+            ko: '엄마가 또 몇 시에 오냐고 물어봄 🙄',
           },
         },
         {
@@ -182,6 +208,8 @@ export const PHONE_SKIP: readonly Draft[] = [
             ar: 'نعم. متى ستعود؟',
             fr: 'Oui. Tu rentres quand ?',
             es: 'Sí. ¿Cuándo vuelves?',
+            ja: 'そうよ。で、何時に帰るの？',
+            ko: '그래. 그래서 몇 시에 오는데?',
           },
         },
       ],
@@ -193,6 +221,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'محادثة خاطئة… وأيّ محادثة!',
       fr: 'Mauvaise conversation. La pire de toutes.',
       es: 'Chat equivocado. El más equivocado de todos.',
+      ja: '誤爆した。最悪の相手に。',
+      ko: '톡 잘못 보냄. 하필 엄마한테.',
     },
   },
   {
@@ -200,7 +230,16 @@ export const PHONE_SKIP: readonly Draft[] = [
     user: ACCOUNTS.family,
     body: {
       format: 'chat',
-      contact: { tr: 'Anneannem', en: 'Grandma', de: 'Oma', ar: 'جدتي', fr: 'Mamie', es: 'Abuela' },
+      contact: {
+        tr: 'Anneannem',
+        en: 'Grandma',
+        de: 'Oma',
+        ar: 'جدتي',
+        fr: 'Mamie',
+        es: 'Abuela',
+        ja: 'おばあちゃん',
+        ko: '할머니',
+      },
       lines: [
         {
           from: 'them',
@@ -211,6 +250,8 @@ export const PHONE_SKIP: readonly Draft[] = [
             ar: 'احترق المربى 😂😂',
             fr: "j'ai fait brûler la confiture 😂😂",
             es: 'se me quemó la mermelada 😂😂',
+            ja: 'ジャム焦がしちゃった 😂😂',
+            ko: '잼 다 태웠다 😂😂',
           },
         },
         {
@@ -222,6 +263,8 @@ export const PHONE_SKIP: readonly Draft[] = [
             ar: 'لماذا تضحكين يا جدتي؟',
             fr: 'pourquoi tu ris, Mamie ?',
             es: '¿por qué te ríes, abuela?',
+            ja: 'おばあちゃん、なんで笑ってるの？',
+            ko: '할머니 왜 웃어요?',
           },
         },
         {
@@ -233,6 +276,8 @@ export const PHONE_SKIP: readonly Draft[] = [
             ar: 'أنا أبكي يا حبيبي 😂😂😂',
             fr: 'mais je pleure, mon chéri 😂😂😂',
             es: 'estoy llorando, mi amor 😂😂😂',
+            ja: '泣いてるのよ 😂😂😂',
+            ko: '우는 거란다 얘야 😂😂😂',
           },
         },
       ],
@@ -244,6 +289,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'في قاموس جدتي، 😂 تعني البكاء',
       fr: 'Dans le dico de Mamie, 😂 veut dire pleurer',
       es: 'En el diccionario de la abuela, 😂 es llorar',
+      ja: 'おばあちゃんの辞書では😂は「泣く」',
+      ko: '할머니 사전에서 😂는 ‘운다’는 뜻',
     },
   },
   {
@@ -258,6 +305,8 @@ export const PHONE_SKIP: readonly Draft[] = [
         ar: 'الجارة القديمة',
         fr: 'Ancienne voisine',
         es: 'Vecina de antes',
+        ja: '前のお隣さん',
+        ko: '예전 옆집',
       },
       lines: [
         {
@@ -269,6 +318,8 @@ export const PHONE_SKIP: readonly Draft[] = [
             ar: 'هل اتصلت بي؟',
             fr: "tu m'as appelée ?",
             es: '¿me llamaste?',
+            ja: '今電話くれた？',
+            ko: '방금 전화했어요?',
           },
         },
         {
@@ -280,6 +331,8 @@ export const PHONE_SKIP: readonly Draft[] = [
             ar: 'آسف، اتصل جيبي وحده 🙈',
             fr: 'oups, appel de poche 🙈',
             es: 'uy, fue el bolsillo 🙈',
+            ja: 'ううん、ポケットの中で押しちゃった 🙈',
+            ko: '아뇨, 주머니에서 눌렸나 봐요 🙈',
           },
         },
         {
@@ -291,6 +344,8 @@ export const PHONE_SKIP: readonly Draft[] = [
             ar: 'استمعت إلى خطواتك 10 دقائق',
             fr: "j'ai écouté ta balade pendant 10 min",
             es: 'escuché tu caminata 10 minutos',
+            ja: '10分間、歩く音を聞いてた',
+            ko: '10분 동안 걷는 소리 들었어요',
           },
         },
         {
@@ -302,6 +357,8 @@ export const PHONE_SKIP: readonly Draft[] = [
             ar: 'جيبك يتصل بي أكثر منك بالمناسبة',
             fr: 'ta poche appelle plus souvent que toi',
             es: 'tu bolsillo llama más que tú, eh',
+            ja: 'ちなみにポケットのほうがよく電話くれるよ',
+            ko: '주머니가 본인보다 더 자주 전화하네요',
           },
         },
       ],
@@ -313,6 +370,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'جيبي اجتماعي أكثر مني',
       fr: 'Ma poche est plus sociable que moi',
       es: 'Mi bolsillo es más sociable que yo',
+      ja: '私よりポケットのほうが社交的',
+      ko: '내 주머니가 나보다 인싸다',
     },
   },
   {
@@ -327,6 +386,8 @@ export const PHONE_SKIP: readonly Draft[] = [
         ar: 'سقط هاتفك على وجهه. ماذا تفعل؟',
         fr: 'Ton tel tombe côté écran. Tu fais quoi ?',
         es: 'Tu teléfono cae boca abajo. Tú:',
+        ja: 'スマホが画面から落ちた。あなたは？',
+        ko: '폰이 화면 쪽으로 떨어졌다. 나는?',
       },
       options: [
         {
@@ -336,6 +397,8 @@ export const PHONE_SKIP: readonly Draft[] = [
           ar: 'أقلبه فورًا',
           fr: 'Je le retourne direct',
           es: 'Le doy la vuelta ya',
+          ja: 'すぐ裏返す',
+          ko: '바로 뒤집는다',
         },
         {
           tr: 'Gözüm kapalı çeviririm',
@@ -344,6 +407,8 @@ export const PHONE_SKIP: readonly Draft[] = [
           ar: 'أغمض عينيّ ثم أقلبه',
           fr: 'Les yeux fermés',
           es: 'Con los ojos cerrados',
+          ja: '目を閉じて裏返す',
+          ko: '눈 감고 뒤집는다',
         },
       ],
       winner: 1,
@@ -355,6 +420,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'ما دمت لا أنظر، فهو ليس مكسورًا',
       fr: "Tant que je regarde pas, c'est pas cassé",
       es: 'Si no lo miro, no está roto',
+      ja: '見なければ割れてないのと同じ',
+      ko: '안 보면 안 깨진 거다',
     },
   },
   {
@@ -369,6 +436,8 @@ export const PHONE_SKIP: readonly Draft[] = [
         ar: 'انفتحت الكاميرا الأمامية فجأة. ماذا تفعل؟',
         fr: 'Caméra selfie ouverte par erreur. Tu fais quoi ?',
         es: 'Se abre la cámara frontal sin querer. Tú:',
+        ja: 'うっかりインカメが起動。あなたは？',
+        ko: '전면 카메라가 실수로 켜졌다. 나는?',
       },
       options: [
         {
@@ -378,8 +447,19 @@ export const PHONE_SKIP: readonly Draft[] = [
           ar: 'أغلقها بهدوء',
           fr: 'Je ferme calmement',
           es: 'La cierro con calma',
+          ja: '冷静に閉じる',
+          ko: '침착하게 끈다',
         },
-        { tr: 'Çığlık atarım', en: 'Scream', de: 'Schreien', ar: 'أصرخ', fr: 'Je hurle', es: 'Grito' },
+        {
+          tr: 'Çığlık atarım',
+          en: 'Scream',
+          de: 'Schreien',
+          ar: 'أصرخ',
+          fr: 'Je hurle',
+          es: 'Grito',
+          ja: '悲鳴をあげる',
+          ko: '비명을 지른다',
+        },
       ],
       winner: 1,
     },
@@ -390,6 +470,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'صرخنا كلانا: أنا وأنا',
       fr: 'On a crié tous les deux. Moi et moi.',
       es: 'Gritamos los dos: yo y yo.',
+      ja: '2人とも悲鳴をあげた。私と私。',
+      ko: '둘 다 소리 질렀다. 나랑 나.',
     },
   },
   {
@@ -404,6 +486,8 @@ export const PHONE_SKIP: readonly Draft[] = [
         ar: 'رنّ هاتفك في مكان هادئ تمامًا. ماذا تفعل؟',
         fr: 'Ton tel sonne en plein silence. Et là ?',
         es: 'Tu teléfono suena en pleno silencio. Tú:',
+        ja: '静かな場所でスマホが鳴った。あなたは？',
+        ko: '조용한 곳에서 폰이 울렸다. 나는?',
       },
       options: [
         {
@@ -413,6 +497,8 @@ export const PHONE_SKIP: readonly Draft[] = [
           ar: 'أُسكته فورًا',
           fr: 'Je coupe vite',
           es: 'Lo silencio rápido',
+          ja: 'すぐに止める',
+          ko: '바로 끈다',
         },
         {
           tr: 'Etrafa kızgın bakarım',
@@ -421,6 +507,8 @@ export const PHONE_SKIP: readonly Draft[] = [
           ar: 'أنظر إلى الآخرين بغضب',
           fr: 'Je toise les autres',
           es: 'Miro mal a los demás',
+          ja: '周りをにらむ',
+          ko: '주변을 째려본다',
         },
       ],
       winner: 1,
@@ -432,6 +520,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'هاتف مَن هذا؟ يا للإزعاج!',
       fr: "C'est le tel de qui ? Quelle honte.",
       es: '¿De quién es ese teléfono? Qué falta de respeto.',
+      ja: '誰のスマホ？マナー悪すぎ',
+      ko: '누구 폰이야, 매너 없게',
     },
   },
   {
@@ -446,6 +536,8 @@ export const PHONE_SKIP: readonly Draft[] = [
         ar: 'المساعد الصوتي لم يفهمك. ماذا تفعل؟',
         fr: "L'assistant vocal n'a pas compris. Et là ?",
         es: 'El asistente de voz no te entendió. Tú:',
+        ja: '音声アシスタントに伝わらない。あなたは？',
+        ko: '음성 비서가 못 알아들었다. 나는?',
       },
       options: [
         {
@@ -455,6 +547,8 @@ export const PHONE_SKIP: readonly Draft[] = [
           ar: 'أعيد الجملة',
           fr: 'Je répète',
           es: 'Lo repito',
+          ja: 'もう一度言う',
+          ko: '다시 말한다',
         },
         {
           tr: 'Aynısını bağırırım',
@@ -463,6 +557,8 @@ export const PHONE_SKIP: readonly Draft[] = [
           ar: 'أعيدها بصوت أعلى',
           fr: 'Pareil, mais plus FORT',
           es: 'Lo mismo, MÁS FUERTE',
+          ja: '同じことを叫ぶ',
+          ko: '똑같이 소리친다',
         },
       ],
       winner: 1,
@@ -474,6 +570,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'ثم أتهجّاها. ثم أفعلها بنفسي.',
       fr: "Puis j'épelle. Puis je le fais moi-même.",
       es: 'Luego lo deletreo. Luego lo hago yo.',
+      ja: '次は一語ずつ区切る。最後は自分でやる。',
+      ko: '그다음엔 또박또박. 결국 내가 한다.',
     },
   },
   {
@@ -488,6 +586,8 @@ export const PHONE_SKIP: readonly Draft[] = [
         ar: '«يكتب…»',
         fr: "« EN TRAIN D'ÉCRIRE… »",
         es: '“ESCRIBIENDO…”',
+        ja: '「入力中…」',
+        ko: '“입력 중…”',
       },
       value: null,
       shape: 'zigzag',
@@ -500,6 +600,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'يكتب، يتوقف، يكتب… ثم يختفي.',
       fr: 'Écrit, arrête, écrit… hors ligne.',
       es: 'Escribe, para, escribe… se desconectó.',
+      ja: '入力中、止まって、また入力中…オフラインになった。',
+      ko: '입력 중, 멈춤, 입력 중… 오프라인.',
     },
   },
   {
@@ -514,6 +616,8 @@ export const PHONE_SKIP: readonly Draft[] = [
         ar: 'مستوى صوت هاتفي',
         fr: 'VOLUME DE MON TEL',
         es: 'VOLUMEN DE MI TELÉFONO',
+        ja: 'スマホの音量',
+        ko: '내 폰 볼륨',
       },
       value: null,
       shape: 'zigzag',
@@ -526,6 +630,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'إما بأعلى صوت أو صامت، ولا وسط بينهما',
       fr: 'Soit à fond, soit en silencieux. Pas de milieu.',
       es: 'O a todo volumen o en silencio. Sin término medio.',
+      ja: '最大か無音か。その間はない。',
+      ko: '최대 아니면 무음. 중간은 없다.',
     },
   },
   {
@@ -540,6 +646,8 @@ export const PHONE_SKIP: readonly Draft[] = [
         ar: 'سطوع الشاشة',
         fr: "LUMINOSITÉ DE L'ÉCRAN",
         es: 'BRILLO DE PANTALLA',
+        ja: '画面の明るさ',
+        ko: '화면 밝기',
       },
       value: {
         tr: '%100',
@@ -548,6 +656,8 @@ export const PHONE_SKIP: readonly Draft[] = [
         ar: '100%',
         fr: '100 %',
         es: '100 %',
+        ja: '100%',
+        ko: '100%',
       },
       shape: 'spike',
       axis: 'hours',
@@ -559,6 +669,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'فتحت هاتفي في الظلام… فأشرقت الشمس',
       fr: 'Tel allumé dans le noir. Lever de soleil.',
       es: 'Abrí el teléfono a oscuras. Amaneció.',
+      ja: '暗闇でスマホをつけたら、日の出',
+      ko: '어둠 속에서 폰 켰더니 해가 떴다',
     },
   },
   {
@@ -573,6 +685,8 @@ export const PHONE_SKIP: readonly Draft[] = [
         ar: 'محل تصليح الهواتف',
         fr: 'RÉPARATION MOBILES',
         es: 'SERVICIO TÉCNICO',
+        ja: 'スマホ修理店',
+        ko: '휴대폰 수리점',
       },
       items: [
         {
@@ -582,6 +696,8 @@ export const PHONE_SKIP: readonly Draft[] = [
           ar: 'تغيير الشاشة',
           fr: "CHANGEMENT D'ÉCRAN",
           es: 'CAMBIO DE PANTALLA',
+          ja: '画面交換',
+          ko: '액정 교체',
         },
         {
           tr: 'KILIF (BU SEFER)',
@@ -590,6 +706,8 @@ export const PHONE_SKIP: readonly Draft[] = [
           ar: 'غطاء (هذه المرة)',
           fr: 'COQUE (CETTE FOIS)',
           es: 'FUNDA (ESTA VEZ)',
+          ja: 'ケース（今度こそ）',
+          ko: '케이스 (이번엔 꼭)',
         },
       ],
     },
@@ -600,6 +718,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'تعلّمت الدرس… وكلّفني شاشة',
       fr: "Leçon apprise. Ça m'a coûté un écran.",
       es: 'Lección aprendida. Me costó una pantalla.',
+      ja: '学んだ。授業料は画面1枚。',
+      ko: '교훈 얻었다. 수업료는 액정 하나.',
     },
   },
   {
@@ -614,6 +734,8 @@ export const PHONE_SKIP: readonly Draft[] = [
         ar: 'محل الإنارة',
         fr: 'LUMINAIRES',
         es: 'ILUMINACIÓN',
+        ja: '照明ショップ',
+        ko: '조명 가게',
       },
       items: [
         {
@@ -623,6 +745,8 @@ export const PHONE_SKIP: readonly Draft[] = [
           ar: 'إضاءة حلقية',
           fr: 'ANNEAU LUMINEUX',
           es: 'ARO DE LUZ',
+          ja: 'リングライト',
+          ko: '링 라이트',
         },
       ],
     },
@@ -633,6 +757,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'الآن تظهر فوضى غرفتي بوضوح تام',
       fr: 'Maintenant, mon bazar est super net aussi',
       es: 'Ahora mi habitación desordenada se ve nítida',
+      ja: '散らかった部屋までくっきり映るようになった',
+      ko: '이제 어질러진 내 방도 선명하게 나온다',
     },
   },
   {
@@ -641,7 +767,7 @@ export const PHONE_SKIP: readonly Draft[] = [
     body: {
       format: 'fact',
       eyebrow: null,
-      big: { tr: '3', en: '3', de: '3', ar: '3', fr: '3', es: '3' },
+      big: { tr: '3', en: '3', de: '3', ar: '3', fr: '3', es: '3', ja: '3', ko: '3' },
       text: {
         tr: 'kez kendi adını yazdın; otomatik düzeltme üçünü de değiştirdi',
         en: 'times you typed your own name. Autocorrect “fixed” all 3.',
@@ -649,6 +775,8 @@ export const PHONE_SKIP: readonly Draft[] = [
         ar: 'مرات كتبت اسمك… فغيّره التصحيح التلقائي في كل مرة',
         fr: 'fois où tu as tapé ton prénom. « Corrigé » les 3 fois.',
         es: 'veces escribiste tu nombre. El corrector lo “arregló” las 3.',
+        ja: '回、自分の名前を打った。3回とも予測変換に直された。',
+        ko: '번 자기 이름을 쳤는데, 자동 수정이 3번 다 바꿨어요.',
       },
     },
     caption: {
@@ -658,6 +786,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'صرت تشك في اسمك',
       fr: 'Tu doutes même de ton prénom',
       es: 'Ya dudas hasta de tu nombre',
+      ja: 'もう自分の名前にも自信がない',
+      ko: '이제 자기 이름도 헷갈려요',
     },
   },
   {
@@ -666,7 +796,7 @@ export const PHONE_SKIP: readonly Draft[] = [
     body: {
       format: 'fact',
       eyebrow: null,
-      big: { tr: '5', en: '5', de: '5', ar: '5', fr: '5', es: '5' },
+      big: { tr: '5', en: '5', de: '5', ar: '5', fr: '5', es: '5', ja: '5', ko: '5' },
       text: {
         tr: 'kez QR kodun fotoğrafını çektin; menü bir türlü açılmadı',
         en: 'times you took a photo of the QR code. The menu never opened.',
@@ -674,6 +804,8 @@ export const PHONE_SKIP: readonly Draft[] = [
         ar: 'مرات التقطت صورة لرمز QR… ولم تُفتح القائمة أبدًا',
         fr: 'fois où tu as pris le QR code en photo. Menu toujours fermé.',
         es: 'veces le tomaste una foto al código QR. El menú nunca abrió.',
+        ja: '回、QRコードを写真に撮った。メニューは開かなかった。',
+        ko: '번 QR 코드를 사진으로 찍었어요. 메뉴는 끝내 안 열렸고요.',
       },
     },
     caption: {
@@ -683,6 +815,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'في النهاية أحضروا لك قائمة ورقية',
       fr: "Au final, on t'a apporté un menu papier",
       es: 'Al final te trajeron el menú de papel',
+      ja: '結局、紙のメニューが出てきた',
+      ko: '결국 종이 메뉴판을 갖다줬다',
     },
   },
   {
@@ -690,8 +824,8 @@ export const PHONE_SKIP: readonly Draft[] = [
     user: ACCOUNTS.facts,
     body: {
       format: 'fact',
-      eyebrow: { tr: 'BUGÜN', en: 'TODAY', de: 'HEUTE', ar: 'اليوم', fr: "AUJOURD'HUI", es: 'HOY' },
-      big: { tr: '1', en: '1', de: '1', ar: '1', fr: '1', es: '1' },
+      eyebrow: { tr: 'BUGÜN', en: 'TODAY', de: 'HEUTE', ar: 'اليوم', fr: "AUJOURD'HUI", es: 'HOY', ja: '今日', ko: '오늘' },
+      big: { tr: '1', en: '1', de: '1', ar: '1', fr: '1', es: '1', ja: '1', ko: '1' },
       text: {
         tr: 'bilinmeyen numara aradı; kim olduğunu 2 saat düşündün',
         en: 'unknown number called. You spent 2 hours guessing who.',
@@ -699,6 +833,8 @@ export const PHONE_SKIP: readonly Draft[] = [
         ar: 'رقم مجهول اتصل بك… وقضيت ساعتين تخمّن من يكون',
         fr: "numéro inconnu a appelé. Tu as cherché qui c'était pendant 2 h.",
         es: 'número desconocido te llamó. Pasaste 2 horas adivinando quién.',
+        ja: '件の知らない番号から着信。誰だったのか2時間考えた。',
+        ko: '통, 모르는 번호로 전화가 왔어요. 누군지 2시간 고민했죠.',
       },
     },
     caption: {
@@ -708,6 +844,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'كان عامل التوصيل',
       fr: "C'était le livreur",
       es: 'Era el repartidor',
+      ja: '宅配便だった',
+      ko: '택배 기사님이었다',
     },
   },
   {
@@ -722,6 +860,8 @@ export const PHONE_SKIP: readonly Draft[] = [
         ar: 'تصنيف نغمات الرنين',
         fr: 'TIER LIST DES SONNERIES',
         es: 'TIER LIST DE TONOS',
+        ja: '着信音Tier表',
+        ko: '벨소리 티어표',
       },
       rows: [['🔕'], ['🐦', '🎹'], ['🔔', '🎺'], ['☎️']],
     },
@@ -732,6 +872,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'ترنّ النغمة الكلاسيكية فيتحسّس 30 شخصًا جيوبهم',
       fr: 'Sonnerie classique : 30 personnes fouillent leur poche',
       es: 'Suena el tono clásico y 30 personas revisan su bolsillo',
+      ja: '定番の着信音が鳴ると、30人がポケットを確認する',
+      ko: '기본 벨소리 울리면 30명이 주머니를 뒤진다',
     },
   },
   {
@@ -746,6 +888,8 @@ export const PHONE_SKIP: readonly Draft[] = [
         ar: 'أين أجد هاتفي',
         fr: 'OÙ JE RETROUVE MON TEL',
         es: 'DÓNDE ENCUENTRO MI TELÉFONO',
+        ja: 'スマホが見つかる場所',
+        ko: '내 폰이 발견되는 곳',
       },
       rows: [['🛋️'], ['🛏️', '🧥'], ['🧺', '🚗'], ['🧊']],
     },
@@ -756,6 +900,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'وجدته في الثلاجة… وكان استقباله باردًا',
       fr: "Retrouvé dans le frigo. L'accueil a été glacial.",
       es: 'Apareció en la nevera. Me recibió con frialdad.',
+      ja: '冷蔵庫で見つけた。対応が冷たかった。',
+      ko: '냉장고에서 찾았다. 태도가 싸늘했다.',
     },
   },
   {
@@ -772,6 +918,8 @@ export const PHONE_SKIP: readonly Draft[] = [
           ar: 'التحديث',
           fr: 'Mise à jour',
           es: 'Actualización',
+          ja: 'アップデート',
+          ko: '업데이트',
         },
         text: {
           tr: 'Yeni: her şeyin yeri değişti!',
@@ -780,6 +928,8 @@ export const PHONE_SKIP: readonly Draft[] = [
           ar: 'الجديد: كل شيء تغيّر مكانه!',
           fr: 'Nouveau : tout a changé de place !',
           es: 'Novedad: ¡todo cambió de lugar!',
+          ja: '新機能：すべての場所が変わりました！',
+          ko: '새 기능: 모든 게 자리를 옮겼어요!',
         },
       },
     },
@@ -790,6 +940,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'ضعت في الإعدادات، أحتاج إلى خريطة',
       fr: 'Il me faut une carte pour les réglages',
       es: 'Me perdí en Ajustes. Necesito un mapa.',
+      ja: '設定アプリで迷子。地図ください。',
+      ko: '설정에서 길 잃음. 지도 좀 보내 줘',
     },
   },
   {
@@ -806,6 +958,8 @@ export const PHONE_SKIP: readonly Draft[] = [
           ar: 'لوحة المفاتيح',
           fr: 'Clavier',
           es: 'Teclado',
+          ja: 'キーボード',
+          ko: '키보드',
         },
         text: {
           tr: 'Sözlüğe eklendi: “tmmmmm”',
@@ -814,6 +968,8 @@ export const PHONE_SKIP: readonly Draft[] = [
           ar: 'أُضيفت إلى القاموس: «حسنًااا»',
           fr: 'Ajouté au dictionnaire : « okkkk »',
           es: 'Añadido al diccionario: “okiiii”',
+          ja: '辞書に登録：「りょ」',
+          ko: '사전에 추가됨: “ㅇㅋㅇㅋㅇㅋ”',
         },
       },
     },
@@ -824,6 +980,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'لوحة مفاتيحي صارت تتكلم مثلي',
       fr: 'Mon clavier parle comme moi maintenant',
       es: 'Mi teclado ya habla como yo',
+      ja: 'キーボードが私の口調になってきた',
+      ko: '키보드가 이제 나처럼 말한다',
     },
   },
   {
@@ -840,6 +998,8 @@ export const PHONE_SKIP: readonly Draft[] = [
           ar: 'الإعدادات',
           fr: 'Réglages',
           es: 'Ajustes',
+          ja: '設定',
+          ko: '설정',
         },
         text: {
           tr: 'Uçak modu 6 saattir açık',
@@ -848,6 +1008,8 @@ export const PHONE_SKIP: readonly Draft[] = [
           ar: 'وضع الطيران مفعّل منذ 6 ساعات',
           fr: 'Mode avion activé depuis 6 h',
           es: 'Modo avión activado hace 6 horas',
+          ja: '機内モードが6時間オンになっています',
+          ko: '비행기 모드 6시간째 켜짐',
         },
       },
     },
@@ -858,6 +1020,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'وأنا حزين لأن لا أحد يراسلني',
       fr: "Et moi qui croyais que personne m'écrivait",
       es: 'Y yo triste porque nadie me escribía',
+      ja: '誰からも連絡が来ないって落ち込んでた',
+      ko: '아무도 연락 안 한다고 서운해했는데',
     },
   },
   {
@@ -874,6 +1038,8 @@ export const PHONE_SKIP: readonly Draft[] = [
           ar: 'المساعد الصوتي',
           fr: 'Assistant vocal',
           es: 'Asistente de voz',
+          ja: '音声アシスタント',
+          ko: '음성 비서',
         },
         text: {
           tr: '“Anime” için sonuçlar gösteriliyor',
@@ -882,6 +1048,8 @@ export const PHONE_SKIP: readonly Draft[] = [
           ar: 'نتائج البحث عن «مانجو»',
           fr: 'Résultats pour « pelle à maman »',
           es: 'Buscando llamas cerca de ti…',
+          ja: '「パパイヤ」の検索結果を表示中',
+          ko: '‘엄마 전’ 레시피를 찾았어요',
         },
       },
     },
@@ -892,6 +1060,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'قلتُ: «اتصل بماما»',
       fr: "J'avais dit « appelle maman »",
       es: 'Dije “llama a mamá”',
+      ja: '「パパに電話」って言ったのに',
+      ko: '“엄마 전화”라고 했는데',
     },
   },
   {
@@ -906,6 +1076,8 @@ export const PHONE_SKIP: readonly Draft[] = [
         ar: 'كن نفسك، فالفلاتر تتكفّل بالباقي.',
         fr: "Sois toi-même. Les filtres s'occupent du reste.",
         es: 'Sé tú mismo. Del resto se encargan los filtros.',
+        ja: '自分らしくいよう。ほかの誰かはフィルターがやってくれる。',
+        ko: '너 자신이 되어라. 나머지는 필터가 알아서 한다.',
       },
     },
     caption: {
@@ -915,6 +1087,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'اليوم اخترت أذني الكلب',
       fr: "Aujourd'hui : oreilles de chien",
       es: 'Hoy elegí orejas de perro',
+      ja: '今日の私は犬耳で',
+      ko: '오늘의 선택: 강아지 귀',
     },
   },
   {
@@ -929,6 +1103,8 @@ export const PHONE_SKIP: readonly Draft[] = [
         ar: 'الصمت أبلغ جواب. — هاتفي الصامت منذ 3 سنوات',
         fr: 'Le silence est une réponse. — Mon tel, en silencieux depuis 3 ans',
         es: 'El silencio lo dice todo. — Mi teléfono, en silencio hace 3 años',
+        ja: '沈黙は最強の答えだ。— 3年間マナーモードの私のスマホ',
+        ko: '침묵은 가장 강력한 대답이다. — 3년째 무음 모드인 내 폰',
       },
     },
     caption: {
@@ -938,6 +1114,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'إن كنت اتصلت بي، فآسف',
       fr: "Si tu m'as appelé, désolé",
       es: 'Si me llamaste, perdón',
+      ja: '電話くれてたらごめん',
+      ko: '전화했다면 미안',
     },
   },
   {
@@ -952,6 +1130,8 @@ export const PHONE_SKIP: readonly Draft[] = [
         ar: 'الحياة مثل الصورة البانورامية: إن تحركت ظهرت بشكل غريب.',
         fr: "La vie, c'est comme un panorama : si tu bouges, tu sors bizarre.",
         es: 'La vida es como una panorámica: si te mueves, sales raro.',
+        ja: '人生はパノラマ写真。動くと変に写る。',
+        ko: '인생은 파노라마 같다. 움직이면 이상하게 나온다.',
       },
     },
     caption: {
@@ -961,6 +1141,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: 'الأسبوع الماضي ظهرت بثلاث أذرع',
       fr: "La semaine dernière, j'avais 3 bras",
       es: 'La semana pasada salí con 3 brazos',
+      ja: '先週、腕が3本で写った',
+      ko: '지난주엔 팔이 3개로 나왔다',
     },
   },
   {
@@ -975,6 +1157,8 @@ export const PHONE_SKIP: readonly Draft[] = [
         ar: 'التوقيت هو كل شيء. — شخصان يتكلمان معًا في مكالمة فيديو',
         fr: "Le timing, c'est tout. — Deux qui parlent en même temps en visio",
         es: 'El momento justo lo es todo. — Dos hablando a la vez en videollamada',
+        ja: 'タイミングがすべて。— ビデオ通話で同時にしゃべる2人',
+        ko: '타이밍이 전부다. — 영상 통화에서 동시에 말하는 두 사람',
       },
     },
     caption: {
@@ -984,6 +1168,8 @@ export const PHONE_SKIP: readonly Draft[] = [
       ar: '«تكلّم أنت». «لا، أنت أولًا».',
       fr: '« Vas-y. » « Non, vas-y toi. »',
       es: '“Tú primero.” “No, tú.”',
+      ja: '「どうぞ」「いえ、どうぞ」',
+      ko: '“먼저 말해.” “아냐, 너 먼저.”',
     },
   },
 ];
@@ -1000,6 +1186,8 @@ export const PHONE_LIKE: readonly Draft[] = [
       ar: 'ساعة كاملة بلا هاتف!! (نسيته في الغرفة الأخرى)',
       fr: "une heure sans téléphone !! (oublié dans l'autre pièce)",
       es: '¡¡una hora sin teléfono!! (lo dejé en otra habitación)',
+      ja: '1時間スマホ見なかった！！（別の部屋に置き忘れてた）',
+      ko: '1시간 동안 폰 안 봄!! (다른 방에 두고 옴)',
     },
   },
   {
@@ -1013,6 +1201,8 @@ export const PHONE_LIKE: readonly Draft[] = [
       ar: 'علّمت جدتي مكالمات الفيديو، وصارت تتصل كل يوم',
       fr: "j'ai appris la visio à mamie, elle appelle tous les jours",
       es: 'le enseñé videollamadas a mi abuela, ahora llama a diario',
+      ja: 'おばあちゃんにビデオ通話を教えたら、毎日かかってくる',
+      ko: '할머니한테 영상 통화 알려 드림. 이제 매일 전화 오심',
     },
   },
   {
@@ -1026,6 +1216,8 @@ export const PHONE_LIKE: readonly Draft[] = [
       ar: 'لحّنت نغمة رنيني بنفسي: 4 نغمات لكنها لي',
       fr: "j'ai composé ma sonnerie : 4 notes, mais à moi",
       es: 'compuse mi propio tono: 4 notas, pero mías',
+      ja: '着信音を自分で作曲した。4音だけど私の曲',
+      ko: '벨소리 직접 작곡함. 음 4개지만 내 거',
     },
   },
   {
@@ -1040,6 +1232,8 @@ export const PHONE_LIKE: readonly Draft[] = [
         ar: '#بلا_فلتر',
         fr: '#sansfiltre',
         es: '#sinfiltro',
+        ja: '#加工なし',
+        ko: '#필터없음',
       },
     },
     caption: {
@@ -1049,6 +1243,8 @@ export const PHONE_LIKE: readonly Draft[] = [
       ar: 'أول مرة أنشر صورة بلا فلتر، صفّقوا لي',
       fr: 'première photo sans filtre, applaudissez',
       es: 'primera foto sin filtro, aplausos por favor',
+      ja: '初めて無加工で投稿する。拍手ください',
+      ko: '처음으로 필터 없이 올림. 박수 부탁',
     },
   },
   {
@@ -1063,6 +1259,8 @@ export const PHONE_LIKE: readonly Draft[] = [
         ar: 'كلها القطة نفسها',
         fr: 'toujours le même chat',
         es: 'es el mismo gato',
+        ja: '全部同じ猫',
+        ko: '전부 같은 고양이',
       },
     },
     caption: {
@@ -1072,6 +1270,8 @@ export const PHONE_LIKE: readonly Draft[] = [
       ar: 'التقطت صورة بانورامية فظهرت قطتي 3 مرات',
       fr: 'photo panoramique : mon chat y est 3 fois',
       es: 'hice una panorámica y mi gato salió 3 veces',
+      ja: 'パノラマ撮ったら、猫が3回写り込んだ',
+      ko: '파노라마 찍었더니 고양이가 3번 나옴',
     },
   },
   {
@@ -1086,6 +1286,8 @@ export const PHONE_LIKE: readonly Draft[] = [
         ar: 'لن أستبدله',
         fr: 'pas question de le changer',
         es: 'no pienso jubilarlo',
+        ja: '引退させません',
+        ko: '은퇴는 없다',
       },
     },
     caption: {
@@ -1095,6 +1297,8 @@ export const PHONE_LIKE: readonly Draft[] = [
       ar: 'أوفى أصدقائي: هاتفي ذو السبع سنوات',
       fr: 'mon plus fidèle ami : mon tel de 7 ans',
       es: 'mi amigo más fiel: mi teléfono de 7 años',
+      ja: 'いちばん忠実な相棒：7年使ってるスマホ',
+      ko: '제일 의리 있는 친구: 7년 된 내 폰',
     },
   },
   {
@@ -1109,6 +1313,8 @@ export const PHONE_LIKE: readonly Draft[] = [
         ar: 'صنع يدوي',
         fr: 'fait main',
         es: 'hecho a mano',
+        ja: 'ハンドメイド',
+        ko: '핸드메이드',
       },
     },
     caption: {
@@ -1118,6 +1324,8 @@ export const PHONE_LIKE: readonly Draft[] = [
       ar: 'لوّنت غطاء هاتفي بنفسي… وخرجت عن الخطوط قليلًا',
       fr: "j'ai peint ma coque moi-même, ça déborde un peu",
       es: 'pinté mi propia funda, me salí un poquito',
+      ja: 'スマホケースを自分で塗った。ちょっとはみ出た',
+      ko: '폰 케이스 직접 칠함. 살짝 삐져나감',
     },
   },
   {
@@ -1131,6 +1339,8 @@ export const PHONE_LIKE: readonly Draft[] = [
       ar: 'هاتف جديد! والعلبة سأحتفظ بها طبعًا',
       fr: 'nouveau tel : je garde la boîte, évidemment',
       es: 'teléfono nuevo: la caja me la quedo, obvio',
+      ja: '新しいスマホまとめ：箱はもちろん捨てない',
+      ko: '새 폰 덤프: 박스는 당연히 안 버림',
     },
   },
   {
@@ -1144,6 +1354,8 @@ export const PHONE_LIKE: readonly Draft[] = [
       ar: 'مكالمة الفيديو: أجمل لحظات تجمّدنا',
       fr: 'dump de visio : nos plus beaux arrêts sur image',
       es: 'resumen de videollamada: nuestras mejores caras congeladas',
+      ja: 'ビデオ通話まとめ：いちばんきれいに固まった瞬間',
+      ko: '영상 통화 덤프: 제일 예쁘게 멈춘 순간들',
     },
   },
   {
@@ -1157,6 +1369,8 @@ export const PHONE_LIKE: readonly Draft[] = [
       ar: 'من معرض صوري: قطة، غروب، وداخل جيبي',
       fr: 'ma galerie : chat, coucher de soleil, fond de poche',
       es: 'mi galería: gato, atardecer y el interior de mi bolsillo',
+      ja: 'カメラロールまとめ：猫、夕日、ポケットの中',
+      ko: '앨범 덤프: 고양이, 노을, 주머니 속',
     },
   },
 ];
@@ -1173,6 +1387,8 @@ export const PHONE_HOLD: readonly Draft[] = [
       ar: 'وجدت تلك الصورة في المعرض خلال ثانيتين!',
       fr: 'Retrouvé LA photo de ta galerie en 2 secondes !',
       es: '¡Encontraste esa foto de tu galería en 2 segundos!',
+      ja: 'カメラロールのあの写真を2秒で発見！',
+      ko: '앨범 속 그 사진을 2초 만에 찾았어요!',
     },
   },
   {
@@ -1186,6 +1402,8 @@ export const PHONE_HOLD: readonly Draft[] = [
       ar: 'اكتشاف نادر: رسالة صوتية مدتها 10 ثوانٍ',
       fr: 'Trouvaille rare : un vocal de 10 secondes',
       es: 'Hallazgo raro: un audio de 10 segundos',
+      ja: 'レア発見：10秒のボイスメッセージ',
+      ko: '희귀템: 10초짜리 음성 메시지',
     },
   },
   {
@@ -1199,6 +1417,8 @@ export const PHONE_HOLD: readonly Draft[] = [
       ar: 'أرسلتها إلى المجموعة الخطأ وحذفتها قبل أن يراها أحد!',
       fr: "Mauvais groupe, supprimé avant que quelqu'un le voie !",
       es: '¡Grupo equivocado, y lo borraste antes de que lo vieran!',
+      ja: 'グループを間違えたけど、誰かが見る前に消せた！',
+      ko: '단톡방 잘못 보냈는데 아무도 보기 전에 삭제!',
     },
   },
   {
@@ -1212,6 +1432,8 @@ export const PHONE_HOLD: readonly Draft[] = [
       ar: 'سقط الهاتف على وجهه… والشاشة سليمة!',
       fr: 'Tel tombé côté écran… et intact !',
       es: 'El teléfono cayó boca abajo… ¡y la pantalla intacta!',
+      ja: 'スマホが画面から落下…でも無傷！',
+      ko: '폰이 화면 쪽으로 떨어짐… 액정 멀쩡!',
     },
   },
   {
@@ -1225,6 +1447,8 @@ export const PHONE_HOLD: readonly Draft[] = [
       ar: 'المساعد الصوتي فهمك من أول مرة. تسجيل نادر.',
       fr: "L'assistant vocal a compris du premier coup. Image rare.",
       es: 'El asistente de voz entendió a la primera. Imágenes únicas.',
+      ja: '音声アシスタントが一発で理解した。貴重映像。',
+      ko: '음성 비서가 한 번에 알아들었다. 희귀 영상.',
     },
   },
   {
@@ -1238,6 +1462,8 @@ export const PHONE_HOLD: readonly Draft[] = [
       ar: 'فتحت هاتفك وتذكرت السبب. أسطوري!',
       fr: 'Tel déverrouillé, et tu sais encore pourquoi. Légendaire !',
       es: 'Abriste el teléfono y recordaste para qué. ¡Legendario!',
+      ja: 'スマホを開いて、開いた理由を覚えてた。伝説！',
+      ko: '폰을 켜고 왜 켰는지 기억났어요. 전설!',
     },
   },
   {
@@ -1251,6 +1477,8 @@ export const PHONE_HOLD: readonly Draft[] = [
       ar: 'اكتشفت الخطأ الإملائي في آخر ثانية. أرسل الآن!',
       fr: 'Faute repérée à la dernière seconde. Envoie maintenant !',
       es: 'Detectaste el error justo a tiempo. ¡Ahora envía!',
+      ja: '誤字にギリギリで気づいた。さあ送信！',
+      ko: '마지막 순간에 오타 발견. 이제 전송!',
     },
   },
   {
@@ -1264,6 +1492,8 @@ export const PHONE_HOLD: readonly Draft[] = [
       ar: 'ولا بصمة إصبع واحدة: شاشة لامعة تمامًا',
       fr: 'Pas une seule trace de doigt : un écran impeccable',
       es: 'Ni una huella: una pantalla impecable',
+      ja: '指紋ひとつない、ピカピカの画面',
+      ko: '지문 하나 없는 반짝반짝한 화면',
     },
   },
 ];
@@ -1281,6 +1511,8 @@ export const PHONE_FREEZE: readonly Draft[] = [
         ar: 'وضع البورتريه',
         fr: 'MODE PORTRAIT',
         es: 'MODO RETRATO',
+        ja: 'ポートレート',
+        ko: '인물 모드',
       },
       small: {
         tr: 'ARKA PLAN BULANIKLAŞIYOR',
@@ -1289,6 +1521,8 @@ export const PHONE_FREEZE: readonly Draft[] = [
         ar: 'جارٍ تمويه الخلفية',
         fr: 'ARRIÈRE-PLAN FLOUTÉ',
         es: 'DESENFOCANDO EL FONDO',
+        ja: '背景をぼかしています',
+        ko: '배경 흐림 처리 중',
       },
     },
     caption: {
@@ -1298,6 +1532,8 @@ export const PHONE_FREEZE: readonly Draft[] = [
       ar: 'إن تحركت صرت ضبابيًا أنت أيضًا.',
       fr: 'Si tu bouges, toi aussi tu passes dans le flou.',
       es: 'Si te mueves, también te desenfoca.',
+      ja: '動いたら、あなたもぼける。',
+      ko: '움직이면 같이 흐려져요.',
     },
     headline: {
       tr: 'Portre modu sonunda seni netledi',
@@ -1306,6 +1542,8 @@ export const PHONE_FREEZE: readonly Draft[] = [
       ar: 'وضع البورتريه أظهرك بوضوح أخيرًا',
       fr: 'Enfin la mise au point sur toi',
       es: 'El modo retrato por fin te enfocó',
+      ja: 'ポートレートでやっとピントが合った',
+      ko: '인물 모드가 드디어 초점을 잡았어요',
     },
   },
   {
@@ -1320,6 +1558,8 @@ export const PHONE_FREEZE: readonly Draft[] = [
         ar: 'شاشة مكسورة',
         fr: 'ÉCRAN FISSURÉ',
         es: 'PANTALLA ROTA',
+        ja: '画面割れ',
+        ko: '액정 깨짐',
       },
       small: {
         tr: 'ÇATLAK İLERLEYEBİLİR',
@@ -1328,6 +1568,8 @@ export const PHONE_FREEZE: readonly Draft[] = [
         ar: 'قد يمتدّ الشق',
         fr: "LA FISSURE PEUT S'ÉTENDRE",
         es: 'LA GRIETA PUEDE CRECER',
+        ja: 'ヒビが広がるおそれあり',
+        ko: '금이 더 갈 수 있음',
       },
     },
     caption: {
@@ -1337,6 +1579,8 @@ export const PHONE_FREEZE: readonly Draft[] = [
       ar: 'لا تلمسها أبدًا، فالشقّ ينتشر.',
       fr: 'Souffle même pas dessus.',
       es: 'Ni le respires encima.',
+      ja: '息もかけないで。',
+      ko: '숨도 쉬지 마세요.',
     },
     headline: {
       tr: 'Ekrandaki çatlak büyümek üzere',
@@ -1345,6 +1589,8 @@ export const PHONE_FREEZE: readonly Draft[] = [
       ar: 'الشقّ على وشك أن يكبر',
       fr: "La fissure est sur le point de s'étendre",
       es: 'La grieta está a punto de crecer',
+      ja: '画面のヒビが広がりそう',
+      ko: '액정 금이 번지기 직전이에요',
     },
   },
   {
@@ -1359,6 +1605,8 @@ export const PHONE_FREEZE: readonly Draft[] = [
         ar: 'جارٍ مسح الرمز',
         fr: 'SCAN QR',
         es: 'ESCANEANDO QR',
+        ja: 'QR読み取り中',
+        ko: 'QR 인식 중',
       },
       small: {
         tr: 'KAMERAYI SABİT TUTUN',
@@ -1367,6 +1615,8 @@ export const PHONE_FREEZE: readonly Draft[] = [
         ar: 'ثبّت الكاميرا',
         fr: "NE BOUGEZ PAS L'APPAREIL",
         es: 'MANTENGA LA CÁMARA QUIETA',
+        ja: 'カメラを動かさないで',
+        ko: '카메라를 고정하세요',
       },
     },
     caption: {
@@ -1376,6 +1626,8 @@ export const PHONE_FREEZE: readonly Draft[] = [
       ar: 'إن تحركت ستبدأ من جديد.',
       fr: 'Si tu bouges, tu recommences.',
       es: 'Si te mueves, empiezas de nuevo.',
+      ja: '動いたら、最初からやり直し。',
+      ko: '움직이면 처음부터 다시 해야 해요.',
     },
     headline: {
       tr: 'Menü açılmak üzere, elin titremesin',
@@ -1384,6 +1636,8 @@ export const PHONE_FREEZE: readonly Draft[] = [
       ar: 'قائمة الطعام على وشك أن تُفتح، لا ترتجف',
       fr: "Le menu va s'ouvrir. Tremble pas.",
       es: 'El menú está por abrirse. Pulso firme.',
+      ja: 'メニューが開く寸前。手を止めて',
+      ko: '메뉴가 곧 열려요. 손 떨지 마세요',
     },
   },
   {
@@ -1398,6 +1652,8 @@ export const PHONE_FREEZE: readonly Draft[] = [
         ar: 'الوضع الليلي',
         fr: 'MODE NUIT',
         es: 'MODO NOCHE',
+        ja: 'ナイトモード',
+        ko: '야간 모드',
       },
       small: {
         tr: 'POZLAMA: 8 SANİYE',
@@ -1406,6 +1662,8 @@ export const PHONE_FREEZE: readonly Draft[] = [
         ar: 'مدة التعريض: 8 ثوانٍ',
         fr: 'POSE : 8 SECONDES',
         es: 'EXPOSICIÓN: 8 SEGUNDOS',
+        ja: '露光：8秒',
+        ko: '노출: 8초',
       },
     },
     caption: {
@@ -1415,6 +1673,8 @@ export const PHONE_FREEZE: readonly Draft[] = [
       ar: 'كن قطعة أثاث لثماني ثوانٍ.',
       fr: 'Sois un meuble pendant 8 secondes.',
       es: 'Sé un mueble durante 8 segundos.',
+      ja: '8秒間、家具になって。',
+      ko: '8초 동안 가구가 되세요.',
     },
     headline: {
       tr: 'Gece fotoğrafı çekiliyor',
@@ -1423,6 +1683,8 @@ export const PHONE_FREEZE: readonly Draft[] = [
       ar: 'جارٍ التقاط صورة ليلية',
       fr: 'Photo de nuit en cours',
       es: 'Foto nocturna en proceso',
+      ja: '夜景を撮影中',
+      ko: '야간 사진 촬영 중',
     },
   },
   {
@@ -1437,6 +1699,8 @@ export const PHONE_FREEZE: readonly Draft[] = [
         ar: 'تحذير',
         fr: 'ATTENTION',
         es: 'CUIDADO',
+        ja: '注意',
+        ko: '주의',
       },
       small: {
         tr: 'TELEFON MASANIN KENARINDA',
@@ -1445,6 +1709,8 @@ export const PHONE_FREEZE: readonly Draft[] = [
         ar: 'الهاتف على حافة الطاولة',
         fr: 'TÉLÉPHONE AU BORD DE LA TABLE',
         es: 'TELÉFONO AL BORDE DE LA MESA',
+        ja: '机のはしにスマホあり',
+        ko: '폰이 책상 끝에 있음',
       },
     },
     caption: {
@@ -1454,6 +1720,8 @@ export const PHONE_FREEZE: readonly Draft[] = [
       ar: 'لا تتحرك. اهتزازة أخرى وسيسقط.',
       fr: 'Bouge pas. Encore un bzz et il tombe.',
       es: 'No te muevas. Una vibración más y se cae.',
+      ja: '動かないで。あと1回震えたら落ちる。',
+      ko: '움직이지 마세요. 한 번 더 울리면 떨어져요.',
     },
     headline: {
       tr: 'Titreşim telefonu kenara getirdi',
@@ -1462,6 +1730,8 @@ export const PHONE_FREEZE: readonly Draft[] = [
       ar: 'الاهتزاز دفع الهاتف إلى الحافة',
       fr: "Le vibreur l'a poussé au bord",
       es: 'La vibración lo llevó hasta el borde',
+      ja: 'バイブでスマホがはしまで移動した',
+      ko: '진동이 폰을 끝까지 밀어냈어요',
     },
   },
   {
@@ -1476,6 +1746,8 @@ export const PHONE_FREEZE: readonly Draft[] = [
         ar: 'غرفة المعيشة',
         fr: 'SALON',
         es: 'SALA',
+        ja: 'リビング',
+        ko: '거실',
       },
     },
     caption: {
@@ -1485,6 +1757,8 @@ export const PHONE_FREEZE: readonly Draft[] = [
       ar: 'إن ضحكت فسيعيد التسجيل للمرة السادسة.',
       fr: "Si tu ris, c'est la 6e prise.",
       es: 'Si te ríes, va por el sexto intento.',
+      ja: '笑ったら6回目の録り直し。',
+      ko: '웃으면 6번째 다시 녹음해요.',
     },
     headline: {
       tr: 'Kanka sesli mesajda, gözü sende',
@@ -1493,6 +1767,8 @@ export const PHONE_FREEZE: readonly Draft[] = [
       ar: 'صديقك يسجّل رسالة صوتية وعيناه عليك',
       fr: 'Ton pote enregistre un vocal et te fixe',
       es: 'Tu amigo graba un audio y te mira',
+      ja: '親友がボイス録音中、こっち見てる',
+      ko: '절친이 음성 녹음 중, 날 보고 있어요',
     },
   },
   {
@@ -1507,6 +1783,8 @@ export const PHONE_FREEZE: readonly Draft[] = [
         ar: 'المقهى',
         fr: 'CAFÉ',
         es: 'CAFETERÍA',
+        ja: 'カフェ',
+        ko: '카페',
       },
     },
     caption: {
@@ -1516,6 +1794,8 @@ export const PHONE_FREEZE: readonly Draft[] = [
       ar: 'اظهر بشكل جميل على الأقل. لا تتحرك.',
       fr: 'Soigne ta pose. Bouge pas.',
       es: 'Al menos sal bien. No te muevas.',
+      ja: 'せめて盛れてて。動かないで。',
+      ko: '기왕이면 잘 나와야죠. 움직이지 마세요.',
     },
     headline: {
       tr: 'Yan masanın selfiesinde sen de varsın',
@@ -1524,6 +1804,8 @@ export const PHONE_FREEZE: readonly Draft[] = [
       ar: 'سيلفي على الطاولة المجاورة، وأنت خلفهم',
       fr: 'Selfie à la table voisine, tu es dedans',
       es: 'Selfie en la mesa de al lado: sales tú',
+      ja: '隣の席の自撮りに写り込んでる',
+      ko: '옆 테이블 셀카에 같이 찍혔어요',
     },
   },
   {
@@ -1538,6 +1820,8 @@ export const PHONE_FREEZE: readonly Draft[] = [
         ar: 'الممر',
         fr: 'COULOIR',
         es: 'PASILLO',
+        ja: '廊下',
+        ko: '복도',
       },
     },
     caption: {
@@ -1547,6 +1831,8 @@ export const PHONE_FREEZE: readonly Draft[] = [
       ar: 'إن تحركت فسترقص معها.',
       fr: 'Si tu bouges, tu danses.',
       es: 'Si te mueves, bailas.',
+      ja: '動いたら、あなたも出演決定。',
+      ko: '움직이면 바로 출연 확정이에요.',
     },
     headline: {
       tr: 'Kardeşin dans videosu için eleman arıyor',
@@ -1555,6 +1841,8 @@ export const PHONE_FREEZE: readonly Draft[] = [
       ar: 'أختك تبحث عن شريك لفيديو رقص',
       fr: 'Ta sœur cherche un danseur pour sa vidéo',
       es: 'Tu hermana busca pareja para su video',
+      ja: 'きょうだいがダンス動画の相方を探してる',
+      ko: '동생이 댄스 영상 파트너를 찾아요',
     },
   },
 ];

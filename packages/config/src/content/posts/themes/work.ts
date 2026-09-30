@@ -19,6 +19,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'لا ورق في الطابعة… ومع ذلك الورق عالق',
       fr: 'Imprimante vide. Bourrage papier quand même.',
       es: 'Impresora sin papel. Y aun así, papel atascado.',
+      ja: 'プリンターに紙がない。なのに紙詰まり。',
+      ko: '프린터에 종이 없음. 근데 종이 걸림.',
     },
   },
   {
@@ -32,6 +34,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'لا أعرف عيد ميلاد مَن… جئت من أجل الكعكة',
       fr: "Je sais pas c'est l'anniv de qui. Je viens pour le gâteau.",
       es: 'No sé de quién es el cumpleaños. Vine por el pastel.',
+      ja: '誰の誕生日か知らない。ケーキ目当てで来た。',
+      ko: '누구 생일인지 모름. 케이크 먹으러 옴.',
     },
   },
   {
@@ -45,6 +49,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'استراحة الغداء في 12:30، وجوعي في 10:30',
       fr: 'Pause déj à 12 h 30. Ma faim, à 10 h 30.',
       es: 'Almuerzo a las 12:30. Mi hambre, a las 10:30.',
+      ja: '昼休みは12:30。空腹は10:30。',
+      ko: '점심시간 12:30. 내 배꼽시계 10:30.',
     },
   },
   {
@@ -58,6 +64,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'أول يوم عمل: انتظرت كلمة المرور طوال اليوم',
       fr: 'Premier jour de boulot : 8 h à attendre mon mot de passe',
       es: 'Primer día: ocho horas esperando mi contraseña',
+      ja: '初出勤：一日中パスワード待ちだった',
+      ko: '첫 출근: 하루 종일 비밀번호만 기다림',
     },
   },
   {
@@ -71,6 +79,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'رنّ الهاتف… فنظر بعضنا إلى بعض',
       fr: 'Le téléphone sonne. Tout le monde se regarde.',
       es: 'Sonó el teléfono. Todos nos miramos.',
+      ja: '電話が鳴った。全員で顔を見合わせた。',
+      ko: '전화가 울렸다. 다들 서로 눈치만 봄.',
     },
   },
   {
@@ -84,6 +94,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'عمل بدوام جزئي، وتعب بدوام كامل',
       fr: 'Job à mi-temps, fatigue à plein temps',
       es: 'Trabajo a tiempo parcial, cansancio a tiempo completo',
+      ja: '仕事はパート、疲れはフルタイム',
+      ko: '일은 파트타임, 피곤함은 풀타임',
     },
   },
   {
@@ -91,7 +103,7 @@ export const WORK_SKIP: readonly Draft[] = [
     user: ACCOUNTS.family,
     body: {
       format: 'chat',
-      contact: { tr: 'Annem', en: 'Mom', de: 'Mama', ar: 'أمي', fr: 'Maman', es: 'Mamá' },
+      contact: { tr: 'Annem', en: 'Mom', de: 'Mama', ar: 'أمي', fr: 'Maman', es: 'Mamá', ja: 'お母さん', ko: '엄마' },
       lines: [
         {
           from: 'them',
@@ -102,6 +114,8 @@ export const WORK_SKIP: readonly Draft[] = [
             ar: 'كيف كان أول يوم لك في العمل؟',
             fr: 'alors, ce premier jour au boulot ?',
             es: '¿qué tal tu primer día de trabajo?',
+            ja: '初出勤どうだった？',
+            ko: '첫 출근 어땠어?',
           },
         },
         {
@@ -113,6 +127,8 @@ export const WORK_SKIP: readonly Draft[] = [
             ar: 'كان جيدًا يا أمي',
             fr: 'bien, maman',
             es: 'bien, mamá',
+            ja: 'よかったよ、お母さん',
+            ko: '좋았어, 엄마',
           },
         },
         {
@@ -124,6 +140,8 @@ export const WORK_SKIP: readonly Draft[] = [
             ar: 'هل صادقت أحدًا؟ هل أكلت سندويشك؟',
             fr: "des copains ? t'as mangé ton goûter ?",
             es: '¿hiciste amigos? ¿te comiste la merienda?',
+            ja: 'お友だちできた？お弁当食べた？',
+            ko: '친구는 사귀었어? 도시락은 다 먹었어?',
           },
         },
       ],
@@ -135,6 +153,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'أمي تظن أنني بدأت المدرسة للتو',
       fr: "Pour ma mère, c'était ma rentrée des classes",
       es: 'Mi mamá cree que empecé la escuela',
+      ja: '母の中では、私は入園したらしい',
+      ko: '엄마는 내가 유치원 입학한 줄 앎',
     },
   },
   {
@@ -149,6 +169,8 @@ export const WORK_SKIP: readonly Draft[] = [
         ar: 'الدعم الفني',
         fr: 'Support info',
         es: 'Soporte técnico',
+        ja: '情シス',
+        ko: '전산팀',
       },
       lines: [
         {
@@ -160,6 +182,8 @@ export const WORK_SKIP: readonly Draft[] = [
             ar: 'الطابعة لا تعمل مجددًا 😩',
             fr: "l'imprimante marche plus 😩",
             es: 'la impresora no funciona otra vez 😩',
+            ja: 'またプリンターが動かない 😩',
+            ko: '프린터 또 고장 났어요 😩',
           },
         },
         {
@@ -171,6 +195,8 @@ export const WORK_SKIP: readonly Draft[] = [
             ar: 'هل هي موصولة بالكهرباء؟',
             fr: 'elle est branchée ?',
             es: '¿está enchufada?',
+            ja: 'コンセント入ってます？',
+            ko: '전원 코드 꽂혀 있나요?',
           },
         },
         {
@@ -182,6 +208,8 @@ export const WORK_SKIP: readonly Draft[] = [
             ar: 'لحظة، سأتحقق…',
             fr: 'attends, je regarde…',
             es: 'espera, voy a ver…',
+            ja: 'ちょっと見てみます…',
+            ko: '잠깐 확인해 볼게요…',
           },
         },
         {
@@ -193,6 +221,8 @@ export const WORK_SKIP: readonly Draft[] = [
             ar: 'هذه المحادثة لم تحدث أبدًا',
             fr: "cette conversation n'a jamais eu lieu",
             es: 'esta conversación nunca ocurrió',
+            ja: 'この会話はなかったことに',
+            ko: '이 대화는 없던 걸로 해요',
           },
         },
       ],
@@ -204,6 +234,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'الدعم الفني يحل المشكلة من أول سؤال',
       fr: 'Le support règle tout dès la première question',
       es: 'Soporte lo resuelve todo con la primera pregunta',
+      ja: '情シスはいつも最初の質問で解決する',
+      ko: '전산팀은 늘 첫 질문에서 해결함',
     },
   },
   {
@@ -218,6 +250,8 @@ export const WORK_SKIP: readonly Draft[] = [
         ar: 'مجموعة المكتب',
         fr: 'Groupe du bureau',
         es: 'Grupo de la oficina',
+        ja: '会社のグループ',
+        ko: '회사 단톡방',
       },
       lines: [
         {
@@ -229,6 +263,8 @@ export const WORK_SKIP: readonly Draft[] = [
             ar: 'حالة طوارئ!!',
             fr: 'URGENCE !!',
             es: '¡¡EMERGENCIA!!',
+            ja: '緊急事態！！',
+            ko: '긴급 상황!!',
           },
         },
         {
@@ -240,6 +276,8 @@ export const WORK_SKIP: readonly Draft[] = [
             ar: 'ماذا حدث؟؟',
             fr: 'quoi ??',
             es: '¿¿qué pasó??',
+            ja: 'どうした？？',
+            ko: '무슨 일인데??',
           },
         },
         {
@@ -251,6 +289,8 @@ export const WORK_SKIP: readonly Draft[] = [
             ar: 'آلة القهوة تعطّلت',
             fr: 'la machine à café est en panne',
             es: 'se rompió la cafetera',
+            ja: 'コーヒーマシンが壊れた',
+            ko: '커피 머신 고장 남',
           },
         },
       ],
@@ -262,6 +302,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'حالة الطوارئ الحقيقية الوحيدة في المكتب',
       fr: 'La seule vraie urgence au bureau',
       es: 'La única emergencia real de la oficina',
+      ja: 'オフィスで唯一の本物の緊急事態',
+      ko: '사무실의 유일한 진짜 비상 사태',
     },
   },
   {
@@ -269,7 +311,7 @@ export const WORK_SKIP: readonly Draft[] = [
     user: ACCOUNTS.screens,
     body: {
       format: 'chat',
-      contact: { tr: 'Patron', en: 'Boss', de: 'Chef', ar: 'المدير', fr: 'Patron', es: 'Jefe' },
+      contact: { tr: 'Patron', en: 'Boss', de: 'Chef', ar: 'المدير', fr: 'Patron', es: 'Jefe', ja: '部長', ko: '부장님' },
       lines: [
         {
           from: 'them',
@@ -280,6 +322,8 @@ export const WORK_SKIP: readonly Draft[] = [
             ar: 'هل يمكنك المرور على مكتبي؟',
             fr: 'tu peux passer dans mon bureau ?',
             es: '¿puedes pasar por mi oficina?',
+            ja: 'ちょっと部屋に来てくれる？',
+            ko: '잠깐 내 방으로 와 줄래요?',
           },
         },
         {
@@ -291,6 +335,8 @@ export const WORK_SKIP: readonly Draft[] = [
             ar: 'طبعًا… هل هناك مشكلة؟ 😰',
             fr: 'bien sûr… il y a un souci ? 😰',
             es: 'claro… ¿pasa algo? 😰',
+            ja: 'はい…何かありましたか？ 😰',
+            ko: '네… 무슨 문제라도 있나요? 😰',
           },
         },
         {
@@ -302,6 +348,8 @@ export const WORK_SKIP: readonly Draft[] = [
             ar: 'لا، أحضرت لك شوكولاتة من إجازتي 🍫',
             fr: 'non, du chocolat de mes vacances pour toi 🍫',
             es: 'no, te traje chocolate de mis vacaciones 🍫',
+            ja: 'いや、旅行のお土産があるんだ 🍫',
+            ko: '아니, 여행 기념 초콜릿 줄게요 🍫',
           },
         },
       ],
@@ -313,6 +361,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'مرّت مسيرتي المهنية كلها أمام عيني',
       fr: 'Toute ma carrière a défilé devant mes yeux',
       es: 'Toda mi carrera pasó ante mis ojos',
+      ja: 'キャリアが走馬灯のように駆け巡った',
+      ko: '내 커리어가 주마등처럼 스쳐 지나감',
     },
   },
   {
@@ -327,6 +377,8 @@ export const WORK_SKIP: readonly Draft[] = [
         ar: 'الجمعة 4:55 مساءً، ووصلتك مهمة جديدة. ماذا تفعل؟',
         fr: 'Vendredi, 16 h 55, nouvelle tâche. Toi :',
         es: 'Viernes, 16:55, llega una tarea nueva. Tú:',
+        ja: '金曜16:55に新しい仕事が来た。あなたは：',
+        ko: '금요일 16:55, 새 업무가 왔다. 당신은:',
       },
       options: [
         {
@@ -336,6 +388,8 @@ export const WORK_SKIP: readonly Draft[] = [
           ar: 'أبدأ فورًا',
           fr: "Je m'y mets",
           es: 'Empiezo ya',
+          ja: 'すぐ始める',
+          ko: '바로 시작한다',
         },
         {
           tr: 'Pazartesinin işi',
@@ -344,6 +398,8 @@ export const WORK_SKIP: readonly Draft[] = [
           ar: 'هذه مهمة يوم الاثنين',
           fr: "C'est pour lundi",
           es: 'Eso es del lunes',
+          ja: '月曜の仕事',
+          ko: '월요일의 일',
         },
       ],
       winner: 1,
@@ -355,6 +411,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'نسختي يوم الاثنين ستتولى الأمر',
       fr: "Le moi de lundi s'en chargera",
       es: 'El yo del lunes se encarga',
+      ja: '月曜の自分がなんとかする',
+      ko: '월요일의 내가 알아서 하겠지',
     },
   },
   {
@@ -369,6 +427,8 @@ export const WORK_SKIP: readonly Draft[] = [
         ar: 'بدأ الاجتماع المرئي. كاميرتك:',
         fr: 'La visio commence. Ta caméra :',
         es: 'Empieza la videollamada. Tu cámara:',
+        ja: 'ビデオ会議が始まる。カメラは：',
+        ko: '화상 회의가 시작된다. 카메라는:',
       },
       options: [
         {
@@ -378,6 +438,8 @@ export const WORK_SKIP: readonly Draft[] = [
           ar: 'مفتوحة وأنا أبتسم',
           fr: 'Allumée, je souris',
           es: 'Encendida, sonriendo',
+          ja: 'オン、笑顔で',
+          ko: '켜고 활짝 웃기',
         },
         {
           tr: '“İnternetim çekmiyor”',
@@ -386,6 +448,8 @@ export const WORK_SKIP: readonly Draft[] = [
           ar: '«الإنترنت ضعيف»',
           fr: '« Ma connexion rame »',
           es: '“Mi internet falla”',
+          ja: '「回線が不安定で」',
+          ko: '“인터넷이 끊겨서”',
         },
       ],
       winner: 1,
@@ -397,6 +461,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'الإنترنت عندي لا يضعف إلا في الاجتماعات',
       fr: "Ma connexion rame qu'en réunion",
       es: 'Mi internet solo falla en las reuniones',
+      ja: 'うちのネット、会議のときだけ落ちる',
+      ko: '우리 집 인터넷은 회의 때만 끊김',
     },
   },
   {
@@ -411,6 +477,8 @@ export const WORK_SKIP: readonly Draft[] = [
         ar: 'بقيت رشفة واحدة في إبريق المكتب. ماذا تفعل؟',
         fr: 'Il reste une gorgée dans la cafetière. Toi :',
         es: 'Queda un sorbo en la cafetera de la oficina. Tú:',
+        ja: '会社のコーヒーポットに残り一口。あなたは：',
+        ko: '사무실 커피포트에 딱 한 모금 남음. 당신은:',
       },
       options: [
         {
@@ -420,6 +488,8 @@ export const WORK_SKIP: readonly Draft[] = [
           ar: 'أُعدّ إبريقًا جديدًا',
           fr: "J'en refais",
           es: 'Preparo más',
+          ja: '新しく淹れる',
+          ko: '새로 내린다',
         },
         {
           tr: 'Yudumu bırakırım',
@@ -428,6 +498,8 @@ export const WORK_SKIP: readonly Draft[] = [
           ar: 'أترك الرشفة',
           fr: 'Je laisse la gorgée',
           es: 'Dejo el sorbo',
+          ja: '一口残しておく',
+          ko: '한 모금 남겨 둔다',
         },
       ],
       winner: 1,
@@ -439,6 +511,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'تلك الرشفة هناك منذ يوم الاثنين',
       fr: 'Cette gorgée est là depuis lundi',
       es: 'Ese sorbo está ahí desde el lunes',
+      ja: 'その一口、月曜からそこにある',
+      ko: '그 한 모금은 월요일부터 거기 있었음',
     },
   },
   {
@@ -453,6 +527,8 @@ export const WORK_SKIP: readonly Draft[] = [
         ar: 'إنتاجيتي',
         fr: 'MA PRODUCTIVITÉ',
         es: 'MI PRODUCTIVIDAD',
+        ja: '私の生産性',
+        ko: '나의 생산성',
       },
       value: null,
       shape: 'spike',
@@ -465,6 +541,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'الليلة التي تسبق موعد التسليم',
       fr: 'La veille de la date limite',
       es: 'La noche antes de la entrega',
+      ja: '締め切り前夜',
+      ko: '마감 전날 밤',
     },
   },
   {
@@ -479,6 +557,8 @@ export const WORK_SKIP: readonly Draft[] = [
         ar: 'حرارة المكتب',
         fr: 'TEMPÉRATURE DU BUREAU',
         es: 'CLIMA EN LA OFICINA',
+        ja: 'オフィスの室温',
+        ko: '사무실 온도',
       },
       value: null,
       shape: 'zigzag',
@@ -491,6 +571,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'تنقّل جهاز تحكم المكيّف بين 14 يدًا',
       fr: 'La télécommande de la clim a changé 14 fois de main',
       es: 'El control del aire pasó por 14 manos',
+      ja: 'エアコンのリモコンが14回持ち主を変えた',
+      ko: '에어컨 리모컨 주인이 14번 바뀜',
     },
   },
   {
@@ -505,6 +587,8 @@ export const WORK_SKIP: readonly Draft[] = [
         ar: 'عدد الاجتماعات',
         fr: 'NOMBRE DE RÉUNIONS',
         es: 'NÚMERO DE REUNIONES',
+        ja: '会議の数',
+        ko: '회의 횟수',
       },
       value: {
         tr: '+%40',
@@ -513,6 +597,8 @@ export const WORK_SKIP: readonly Draft[] = [
         ar: '+40%',
         fr: '+40 %',
         es: '+40 %',
+        ja: '+40%',
+        ko: '+40%',
       },
       shape: 'rise',
       axis: 'months',
@@ -524,6 +610,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'منذ اجتماع «لنقلّل الاجتماعات»',
       fr: 'Depuis la réunion « moins de réunions »',
       es: 'Desde la reunión para tener menos reuniones',
+      ja: '「会議を減らす会議」以来',
+      ko: '“회의 줄이기 회의” 이후로',
     },
   },
   {
@@ -538,9 +626,11 @@ export const WORK_SKIP: readonly Draft[] = [
         ar: 'مكتبة وقرطاسية',
         fr: 'PAPETERIE',
         es: 'PAPELERÍA',
+        ja: '文房具店',
+        ko: '문구점',
       },
       items: [
-        { tr: 'ZIMBA', en: 'STAPLER', de: 'HEFTER', ar: 'دبّاسة', fr: 'AGRAFEUSE', es: 'ENGRAPADORA' },
+        { tr: 'ZIMBA', en: 'STAPLER', de: 'HEFTER', ar: 'دبّاسة', fr: 'AGRAFEUSE', es: 'ENGRAPADORA', ja: 'ホッチキス', ko: '스테이플러' },
         {
           tr: 'İSİM ETİKETİ',
           en: 'NAME LABELS',
@@ -548,6 +638,8 @@ export const WORK_SKIP: readonly Draft[] = [
           ar: 'ملصقات بالاسم',
           fr: 'ÉTIQUETTES À MON NOM',
           es: 'ETIQUETAS DE NOMBRE',
+          ja: '名前シール',
+          ko: '이름 스티커',
         },
       ],
     },
@@ -558,6 +650,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'هذه الدبّاسة لن تغادر مكتبي بعد اليوم',
       fr: 'Cette agrafeuse ne quittera plus mon bureau',
       es: 'Esta engrapadora no sale más de mi escritorio',
+      ja: '今度こそホッチキスは机から出さない',
+      ko: '이번엔 스테이플러 절대 안 빌려줌',
     },
   },
   {
@@ -572,6 +666,8 @@ export const WORK_SKIP: readonly Draft[] = [
         ar: 'متجر ملابس',
         fr: 'PRÊT-À-PORTER',
         es: 'TIENDA DE ROPA',
+        ja: 'アパレルショップ',
+        ko: '옷 가게',
       },
       items: [
         {
@@ -581,6 +677,8 @@ export const WORK_SKIP: readonly Draft[] = [
           ar: 'قميص رسمي',
           fr: 'CHEMISE HABILLÉE',
           es: 'CAMISA FORMAL',
+          ja: 'ワイシャツ',
+          ko: '정장 셔츠',
         },
         {
           tr: 'PİJAMA ALTI',
@@ -589,6 +687,8 @@ export const WORK_SKIP: readonly Draft[] = [
           ar: 'بنطال بيجامة',
           fr: 'BAS DE PYJAMA',
           es: 'PANTALÓN DE PIJAMA',
+          ja: 'パジャマのズボン',
+          ko: '잠옷 바지',
         },
       ],
     },
@@ -599,6 +699,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'إطلالتي للاجتماعات المرئية اكتملت',
       fr: 'Ma tenue de visio est complète',
       es: 'Conjunto para videollamadas: listo',
+      ja: 'ビデオ会議コーデ、完成',
+      ko: '화상 회의 코디 완성',
     },
   },
   {
@@ -613,8 +715,10 @@ export const WORK_SKIP: readonly Draft[] = [
         ar: 'تقرير البريد',
         fr: 'BILAN DES MAILS',
         es: 'INFORME DE CORREO',
+        ja: 'メールレポート',
+        ko: '이메일 리포트',
       },
-      big: { tr: '4', en: '4', de: '4', ar: '4', fr: '4', es: '4' },
+      big: { tr: '4', en: '4', de: '4', ar: '4', fr: '4', es: '4', ja: '4', ko: '4' },
       text: {
         tr: 'kez “bir önceki e-postamda belirttiğim gibi” yazdın',
         en: 'times you wrote “as per my last email”',
@@ -622,6 +726,8 @@ export const WORK_SKIP: readonly Draft[] = [
         ar: 'مرات كتبتَ فيها «كما ذكرتُ في رسالتي السابقة»',
         fr: 'fois où tu as écrit « comme indiqué dans mon dernier mail »',
         es: 'veces escribiste “como mencioné en mi último correo”',
+        ja: '回「前回のメールでお伝えした通り」と書いた',
+        ko: '번 “지난 메일에서 말씀드렸듯이”라고 씀',
       },
     },
     caption: {
@@ -631,6 +737,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'مهذّب، لكنك غاضب جدًا',
       fr: 'Poli, mais furieux',
       es: 'Educado, pero furioso',
+      ja: '丁寧だけど激怒してる',
+      ko: '공손하지만 엄청 화남',
     },
   },
   {
@@ -639,7 +747,7 @@ export const WORK_SKIP: readonly Draft[] = [
     body: {
       format: 'fact',
       eyebrow: null,
-      big: { tr: '11', en: '11', de: '11', ar: '11', fr: '11', es: '11' },
+      big: { tr: '11', en: '11', de: '11', ar: '11', fr: '11', es: '11', ja: '11', ko: '11' },
       text: {
         tr: 'kez “beni duyabiliyor musunuz?” diye sordun',
         en: 'times you asked “can you hear me?”',
@@ -647,6 +755,8 @@ export const WORK_SKIP: readonly Draft[] = [
         ar: 'مرة سألتَ: «هل تسمعونني؟»',
         fr: "fois où tu as demandé « vous m'entendez ? »",
         es: 'veces preguntaste “¿me escuchan?”',
+        ja: '回「聞こえてますか？」と聞いた',
+        ko: '번 “제 목소리 들리세요?”라고 물음',
       },
     },
     caption: {
@@ -656,6 +766,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'كانوا يسمعونك. طوال الوقت.',
       fr: "Ils t'entendaient. Depuis le début.",
       es: 'Te escuchaban. Todo el tiempo.',
+      ja: '聞こえてた。ずっと聞こえてた。',
+      ko: '다 들렸음. 늘 들렸음.',
     },
   },
   {
@@ -670,8 +782,10 @@ export const WORK_SKIP: readonly Draft[] = [
         ar: 'تقرير يوم الاثنين',
         fr: 'RAPPORT DU LUNDI',
         es: 'INFORME DEL LUNES',
+        ja: '月曜レポート',
+        ko: '월요일 리포트',
       },
-      big: { tr: '14', en: '14', de: '14', ar: '14', fr: '14', es: '14' },
+      big: { tr: '14', en: '14', de: '14', ar: '14', fr: '14', es: '14', ja: '14', ko: '14' },
       text: {
         tr: 'kez “hafta sonun nasıldı?” sorusuna “iyiydi” dedin',
         en: 'times you answered “how was your weekend?” with “good”',
@@ -679,6 +793,8 @@ export const WORK_SKIP: readonly Draft[] = [
         ar: 'مرة أجبتَ عن «كيف كانت عطلتك؟» بـ«جيدة»',
         fr: 'fois où tu as répondu « bien » à « ton week-end ? »',
         es: 'veces respondiste “bien” a “¿qué tal tu fin de semana?”',
+        ja: '回「週末どうだった？」に「よかった」と答えた',
+        ko: '번 “주말 잘 보냈어요?”에 “네”라고 답함',
       },
     },
     caption: {
@@ -688,6 +804,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'لم يطلب أحد التفاصيل أصلًا',
       fr: 'Personne voulait de détails, de toute façon',
       es: 'Total, nadie quería detalles',
+      ja: 'どうせ誰も詳しく聞きたくない',
+      ko: '어차피 아무도 자세히 안 궁금해함',
     },
   },
   {
@@ -702,6 +820,8 @@ export const WORK_SKIP: readonly Draft[] = [
         ar: 'تصنيف أدوات المكتب',
         fr: 'TIER LIST DU BUREAU',
         es: 'TIER LIST DE LA OFICINA',
+        ja: 'オフィス用品Tier表',
+        ko: '사무용품 티어표',
       },
       rows: [['☕️'], ['💻', '🖱️'], ['📎', '📌'], ['🖨️']],
     },
@@ -712,6 +832,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'الطابعة في الأخير، والشعور متبادل',
       fr: "L'imprimante en C. C'est réciproque.",
       es: 'La impresora, en la C. Es mutuo.',
+      ja: 'プリンターはC。向こうも私を嫌ってるし',
+      ko: '프린터는 C. 걔도 나 싫어하니까',
     },
   },
   {
@@ -726,6 +848,8 @@ export const WORK_SKIP: readonly Draft[] = [
         ar: 'تصنيف أماكن العمل من المنزل',
         fr: 'TIER LIST DU TÉLÉTRAVAIL',
         es: 'TIER LIST DEL TELETRABAJO',
+        ja: '在宅勤務Tier表',
+        ko: '재택근무 티어표',
       },
       rows: [['🛏️'], ['🛋️'], ['🍽️'], ['🪑']],
     },
@@ -736,6 +860,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'لا أجلس إلى المكتب إلا حين تُفتح الكاميرا',
       fr: "Je m'assois au bureau que quand la caméra tourne",
       es: 'Uso el escritorio solo con la cámara encendida',
+      ja: '机に座るのはカメラをオンにする時だけ',
+      ko: '책상엔 카메라 켤 때만 앉음',
     },
   },
   {
@@ -745,7 +871,7 @@ export const WORK_SKIP: readonly Draft[] = [
       format: 'notifications',
       first: {
         icon: '📩',
-        app: { tr: 'E-posta', en: 'Mail', de: 'E-Mail', ar: 'البريد', fr: 'Mail', es: 'Correo' },
+        app: { tr: 'E-posta', en: 'Mail', de: 'E-Mail', ar: 'البريد', fr: 'Mail', es: 'Correo', ja: 'メール', ko: '메일' },
         text: {
           tr: 'Konu: Re: Re: Fwd: Re: Re: Re: Plan',
           en: 'Subject: Re: Re: Fwd: Re: Re: Re: Plan',
@@ -753,6 +879,8 @@ export const WORK_SKIP: readonly Draft[] = [
           ar: 'الموضوع: رد: رد: توجيه: رد: رد: الخطة',
           fr: 'Objet : RE : RE : TR : RE : Plan',
           es: 'Asunto: RE: RE: RV: RE: RE: RE: Plan',
+          ja: '件名：Re: Re: Fwd: Re: Re: Re: 計画',
+          ko: '제목: Re: Re: Fwd: Re: Re: Re: 계획',
         },
       },
     },
@@ -763,6 +891,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'لم يعد أحد يتذكر ما كانت الخطة',
       fr: 'Plus personne ne sait quel était le plan',
       es: 'Ya nadie recuerda cuál era el plan',
+      ja: '何の計画だったか、もう誰も覚えてない',
+      ko: '무슨 계획이었는지 이제 아무도 모름',
     },
   },
   {
@@ -779,6 +909,8 @@ export const WORK_SKIP: readonly Draft[] = [
           ar: 'رد تلقائي',
           fr: 'Réponse auto',
           es: 'Autorespuesta',
+          ja: '自動返信',
+          ko: '자동 응답',
         },
         text: {
           tr: 'İzindeyim. Dönünce de pek bakmam.',
@@ -787,6 +919,8 @@ export const WORK_SKIP: readonly Draft[] = [
           ar: 'في إجازة. ولن أقرأها بعد عودتي أيضًا.',
           fr: 'En congé. Et je lirai pas au retour.',
           es: 'Estoy fuera. Al volver tampoco lo leeré.',
+          ja: '休暇中です。戻っても読みません。',
+          ko: '휴가 중이에요. 복귀해도 안 읽어요.',
         },
       },
     },
@@ -797,6 +931,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'أصدق رد تلقائي هذا العام',
       fr: "La réponse auto la plus honnête de l'année",
       es: 'La autorespuesta más honesta del año',
+      ja: '今年いちばん正直な自動返信',
+      ko: '올해 가장 솔직한 자동 응답',
     },
   },
   {
@@ -813,6 +949,8 @@ export const WORK_SKIP: readonly Draft[] = [
           ar: 'اجتماع مرئي',
           fr: 'Visio',
           es: 'Videollamada',
+          ja: 'ビデオ会議',
+          ko: '화상 회의',
         },
         text: {
           tr: 'Kameran 20 dakikadır açık',
@@ -821,6 +959,8 @@ export const WORK_SKIP: readonly Draft[] = [
           ar: 'كاميرتك مفتوحة منذ 20 دقيقة',
           fr: 'Ta caméra est allumée depuis 20 min',
           es: 'Tu cámara lleva 20 minutos encendida',
+          ja: 'カメラが20分前からオンです',
+          ko: '카메라가 20분째 켜져 있어요',
         },
       },
     },
@@ -831,6 +971,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'شاهدني 12 شخصًا وأنا أتناول الفطور',
       fr: "12 personnes m'ont regardé petit-déjeuner",
       es: '12 personas me vieron desayunar',
+      ja: '朝ごはんを12人に見られた',
+      ko: '12명이 내 아침 식사를 지켜봄',
     },
   },
   {
@@ -845,6 +987,8 @@ export const WORK_SKIP: readonly Draft[] = [
         ar: 'كان يمكن لهذا الاجتماع أن يكون رسالة، وللرسالة ألّا تكون أصلًا.',
         fr: 'Cette réunion aurait pu être un mail. Et ce mail, rien du tout.',
         es: 'Esta reunión pudo ser un correo. Y ese correo, nada.',
+        ja: 'この会議はメールで済んだ。そのメールすら要らなかった。',
+        ko: '이 회의는 메일로 충분했다. 그 메일조차 필요 없었다.',
       },
     },
     caption: {
@@ -854,6 +998,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'ومع ذلك استمر الاجتماع ساعة كاملة',
       fr: 'La réunion a quand même duré une heure',
       es: 'Aun así, la reunión duró una hora',
+      ja: 'それでも会議は1時間続いた',
+      ko: '그래도 회의는 1시간 걸림',
     },
   },
   {
@@ -868,6 +1014,8 @@ export const WORK_SKIP: readonly Draft[] = [
         ar: 'أحِبّ أيام الاثنين. — شخص لم يعِش يوم اثنين قط',
         fr: "Aime tes lundis. — Quelqu'un qui n'en a jamais eu",
         es: 'Ama tus lunes. — Alguien que nunca tuvo uno',
+        ja: '月曜日を愛そう。— 月曜を知らない誰か',
+        ko: '월요일을 사랑하라. — 월요일을 겪어 본 적 없는 사람',
       },
     },
     caption: {
@@ -877,6 +1025,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'أنا متأكد أنها كُتبت يوم سبت',
       fr: "C'est sûrement écrit un samedi",
       es: 'Seguro que lo escribieron un sábado',
+      ja: 'これ絶対土曜日に書いたでしょ',
+      ko: '이거 분명 토요일에 썼을 거임',
     },
   },
   {
@@ -891,6 +1041,8 @@ export const WORK_SKIP: readonly Draft[] = [
         ar: 'لا شيء نهائي أبدًا. — العرض_النهائي_النهائي_3',
         fr: "Rien n'est jamais définitif. — présentation_finale_FINALE_v3",
         es: 'Nada es definitivo. — presentación_final_FINAL_v3',
+        ja: '最終版なんて存在しない。— 企画書_最終_本当に最終_v3',
+        ko: '끝이란 없다. — 발표_최종_진짜최종_진짜진짜최종',
       },
     },
     caption: {
@@ -900,6 +1052,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'وعلى سطح المكتب 14 نسخة أخرى',
       fr: 'Il y en a 14 autres sur mon bureau',
       es: 'Hay 14 más en mi escritorio',
+      ja: 'デスクトップにあと14個ある',
+      ko: '바탕화면에 14개 더 있음',
     },
   },
   {
@@ -914,6 +1068,8 @@ export const WORK_SKIP: readonly Draft[] = [
         ar: 'اتبع أحلامك. لكن املأ هذا الجدول أولًا.',
         fr: "Suis tes rêves. Mais d'abord, remplis ce tableau.",
         es: 'Persigue tus sueños. Pero primero, completa esta tabla.',
+        ja: '夢を追いかけよう。でもまず、この表を埋めて。',
+        ko: '꿈을 좇아라. 하지만 먼저 이 엑셀부터 채워라.',
       },
     },
     caption: {
@@ -923,6 +1079,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'واتضح أن للجدول صفحة ثانية',
       fr: 'Et le tableau a un deuxième onglet',
       es: 'Y la tabla tiene una segunda hoja',
+      ja: '表には2枚目のシートもあった',
+      ko: '알고 보니 시트가 하나 더 있었음',
     },
   },
   {
@@ -937,6 +1095,8 @@ export const WORK_SKIP: readonly Draft[] = [
         ar: 'خلف كل عرض تقديمي ناجح 3 كابلات موصولة بالخطأ.',
         fr: 'Derrière chaque belle présentation, 3 câbles mal branchés.',
         es: 'Detrás de cada gran presentación hay 3 cables mal conectados.',
+        ja: '成功したプレゼンの裏には、逆に挿したケーブルが3本ある。',
+        ko: '모든 성공한 발표 뒤에는 거꾸로 꽂은 케이블 3개가 있다.',
       },
     },
     caption: {
@@ -946,6 +1106,8 @@ export const WORK_SKIP: readonly Draft[] = [
       ar: 'ثم احتجنا إلى محوّل آخر',
       fr: 'Puis il a fallu un autre adaptateur',
       es: 'Luego hizo falta otro adaptador',
+      ja: 'そのあとアダプターがもう一個必要になった',
+      ko: '그다음엔 어댑터가 하나 더 필요했음',
     },
   },
 ];
@@ -962,6 +1124,8 @@ export const WORK_LIKE: readonly Draft[] = [
       ar: 'حصلت على ترقية!! وقرأت مسمّاي الوظيفي الجديد 40 مرة',
       fr: "promu !! j'ai relu mon nouveau titre 40 fois",
       es: '¡¡me ascendieron!! leí mi nuevo cargo 40 veces',
+      ja: '昇進した！！新しい肩書きを40回読んだ',
+      ko: '승진했다!! 새 직함 40번 읽음',
     },
   },
   {
@@ -975,6 +1139,8 @@ export const WORK_LIKE: readonly Draft[] = [
       ar: 'قدّمت أول عرض لي، وارتجف صوتي مرتين فقط',
       fr: 'ma première présentation, ma voix a tremblé que 2 fois',
       es: 'primera presentación: la voz solo me tembló 2 veces',
+      ja: '初プレゼン終了、声が震えたのは2回だけ',
+      ko: '첫 발표 끝, 목소리 떨린 건 2번뿐',
     },
   },
   {
@@ -988,6 +1154,8 @@ export const WORK_LIKE: readonly Draft[] = [
       ar: 'سلّمنا أول مشروع لنا، فريقي رائع',
       fr: 'premier projet livré, mon équipe est géniale',
       es: 'primer proyecto entregado, mi equipo es lo máximo',
+      ja: '初プロジェクト納品、うちのチーム最高',
+      ko: '첫 프로젝트 납품 완료, 우리 팀 최고',
     },
   },
   {
@@ -1002,6 +1170,8 @@ export const WORK_LIKE: readonly Draft[] = [
         ar: 'العضو الجديد في مكتبي',
         fr: 'nouvelle collègue',
         es: 'nueva compañera',
+        ja: 'デスクの新メンバー',
+        ko: '내 책상의 새 멤버',
       },
     },
     caption: {
@@ -1011,6 +1181,8 @@ export const WORK_LIKE: readonly Draft[] = [
       ar: 'نبتة مكتبي اسمها «الجمعة»، والجميع يحبها',
       fr: "ma plante au bureau s'appelle vendredi, tous l'adorent",
       es: 'mi planta de la oficina se llama viernes. todos la aman',
+      ja: '観葉植物の名前は金曜日。社内で大人気',
+      ko: '내 화분 이름은 금요일. 사무실 인기 스타',
     },
   },
   {
@@ -1025,6 +1197,8 @@ export const WORK_LIKE: readonly Draft[] = [
         ar: 'أنا، على الحائط',
         fr: 'moi, au mur',
         es: 'yo, en la pared',
+        ja: '壁に飾られた私',
+        ko: '벽에 걸린 나',
       },
     },
     caption: {
@@ -1034,6 +1208,8 @@ export const WORK_LIKE: readonly Draft[] = [
       ar: 'صرت موظف الشهر، وأمي ستؤطّر الصورة',
       fr: 'employé du mois ! ma mère va le faire encadrer',
       es: '¡empleado del mes! mi mamá lo va a enmarcar',
+      ja: '今月の社員に選ばれた。母が額に入れるって',
+      ko: '이달의 사원 됨, 엄마가 액자 맞추는 중',
     },
   },
   {
@@ -1048,6 +1224,8 @@ export const WORK_LIKE: readonly Draft[] = [
         ar: 'أول قلب أرسمه',
         fr: 'mon premier cœur',
         es: 'mi primer corazón',
+        ja: 'はじめてのハート',
+        ko: '나의 첫 하트',
       },
     },
     caption: {
@@ -1057,6 +1235,8 @@ export const WORK_LIKE: readonly Draft[] = [
       ar: 'أسبوعي الثاني في المقهى، رسمت قلبًا (تقريبًا)',
       fr: "2e semaine au café, j'ai fait un cœur (presque)",
       es: 'segunda semana en la cafetería, hice un corazón (casi)',
+      ja: 'カフェバイト2週目、ハート描けた（たぶん）',
+      ko: '카페 알바 2주 차, 하트 성공 (거의)',
     },
   },
   {
@@ -1071,6 +1251,8 @@ export const WORK_LIKE: readonly Draft[] = [
         ar: 'أول يوم عمل',
         fr: 'premier jour de boulot',
         es: 'primer día de trabajo',
+        ja: '初出勤',
+        ko: '첫 출근',
       },
     },
     caption: {
@@ -1080,6 +1262,8 @@ export const WORK_LIKE: readonly Draft[] = [
       ar: 'أبي ربط لي ربطة العنق، وما زلت لا أعرف كيف',
       fr: "papa m'a fait mon nœud de cravate, je sais toujours pas",
       es: 'mi papá me hizo el nudo de la corbata, sigo sin saber',
+      ja: 'ネクタイは父が結んだ。自分はまだ結べない',
+      ko: '넥타이는 아빠가 매 줌. 난 아직도 못 맴',
     },
   },
   {
@@ -1093,6 +1277,8 @@ export const WORK_LIKE: readonly Draft[] = [
       ar: 'نزهة الشركة: قسم المحاسبة فاز بشدّ الحبل',
       fr: 'pique-nique du boulot : la compta a gagné au tir à la corde',
       es: 'picnic de la empresa: contabilidad ganó el tira y afloja',
+      ja: '社内ピクニックまとめ：綱引きは経理部の勝ち',
+      ko: '회사 야유회 모음: 줄다리기 우승은 회계팀',
     },
   },
   {
@@ -1106,6 +1292,8 @@ export const WORK_LIKE: readonly Draft[] = [
       ar: 'أسبوع العمل من المنزل: 5 أيام لم أرَ فيها حذاءً',
       fr: 'semaine en télétravail : 5 jours sans voir mes chaussures',
       es: 'semana de teletrabajo: 5 días sin ver mis zapatos',
+      ja: '在宅勤務まとめ：5日間くつを見てない',
+      ko: '재택근무 모음: 5일째 신발 구경도 못 함',
     },
   },
   {
@@ -1119,6 +1307,8 @@ export const WORK_LIKE: readonly Draft[] = [
       ar: 'آخر يوم في التدريب: الفريق كتب لي بطاقة، لم أبكِ (بكيت)',
       fr: "fin de stage : une carte de l'équipe, pas pleuré (si)",
       es: 'fin de las prácticas: tarjeta del equipo, no lloré (sí)',
+      ja: 'インターン最終日：寄せ書きもらった。泣いてない（泣いた）',
+      ko: '인턴 마지막 날: 팀이 카드 써 줌. 안 울었음 (울었음)',
     },
   },
 ];
@@ -1135,6 +1325,8 @@ export const WORK_HOLD: readonly Draft[] = [
       ar: 'أُلغي الاجتماع! فترة ما بعد الظهر كلها لك',
       fr: "Réunion annulée ! Tout l'après-midi est à toi",
       es: '¡Reunión cancelada! Toda la tarde es tuya',
+      ja: '会議が中止！午後はまるごと自由',
+      ko: '회의 취소! 오후는 통째로 자유',
     },
   },
   {
@@ -1148,6 +1340,8 @@ export const WORK_HOLD: readonly Draft[] = [
       ar: 'صندوق الوارد: 0. لن يصدّق أحد ذلك.',
       fr: 'Boîte de réception : 0. Personne va te croire.',
       es: 'Bandeja de entrada: 0. Nadie te lo va a creer.',
+      ja: '受信トレイ：0件。誰も信じてくれないはず。',
+      ko: '받은편지함: 0. 아무도 안 믿을 듯.',
     },
   },
   {
@@ -1161,6 +1355,8 @@ export const WORK_HOLD: readonly Draft[] = [
       ar: 'الجمعة، 4:59 مساءً. اترك في الخامسة تمامًا.',
       fr: 'Vendredi, 16 h 59. Lâche à 17 h pile.',
       es: 'Viernes, 16:59. Suelta a las 17:00 en punto.',
+      ja: '金曜16:59。17:00ちょうどに離して。',
+      ko: '금요일 16:59. 17:00 정각에 손 떼기.',
     },
   },
   {
@@ -1174,6 +1370,8 @@ export const WORK_HOLD: readonly Draft[] = [
       ar: 'تمت الموافقة على إجازتك، ومعها عطلة طويلة!',
       fr: 'Congé validé. Avec le pont en prime !',
       es: 'Vacaciones aprobadas. ¡Con puente incluido!',
+      ja: '休暇が承認された。しかも連休に！',
+      ko: '휴가 승인. 게다가 연휴 확정!',
     },
   },
   {
@@ -1187,6 +1385,8 @@ export const WORK_HOLD: readonly Draft[] = [
       ar: 'اكتشاف نادر: كرسي مكتب لا يُصدر صريرًا',
       fr: 'Trouvaille rare : une chaise de bureau qui grince pas',
       es: 'Hallazgo raro: una silla de oficina que no rechina',
+      ja: 'レア発見：きしまないオフィスチェア',
+      ko: '희귀템 발견: 삐걱대지 않는 사무실 의자',
     },
   },
   {
@@ -1200,6 +1400,8 @@ export const WORK_HOLD: readonly Draft[] = [
       ar: 'المكتب بجانب النافذة صار شاغرًا… وهو لك!',
       fr: 'Le bureau près de la fenêtre est libre. Pour toi !',
       es: 'Se liberó el escritorio junto a la ventana. ¡Es tuyo!',
+      ja: '窓側の席が空いた。あなたの席だ！',
+      ko: '창가 자리가 비었다. 이제 당신 자리!',
     },
   },
   {
@@ -1213,6 +1415,8 @@ export const WORK_HOLD: readonly Draft[] = [
       ar: 'معجزة: غداؤك ما زال في ثلاجة المكتب',
       fr: 'Miracle : ton déj est encore dans le frigo du bureau',
       es: 'Milagro: tu almuerzo sigue en el refrigerador',
+      ja: '奇跡：冷蔵庫のお弁当がまだある',
+      ko: '기적: 냉장고에 둔 도시락이 아직 있음',
     },
   },
 ];
@@ -1230,6 +1434,8 @@ export const WORK_FREEZE: readonly Draft[] = [
         ar: 'على الهواء',
         fr: 'EN DIRECT',
         es: 'EN VIVO',
+        ja: '生配信中',
+        ko: '생방송',
       },
       small: {
         tr: 'HER ŞEYİ GÖRÜYORLAR',
@@ -1238,6 +1444,8 @@ export const WORK_FREEZE: readonly Draft[] = [
         ar: 'الجميع يرى كل شيء',
         fr: 'ILS VOIENT TOUT',
         es: 'LO VEN TODO',
+        ja: '全部見られてる',
+        ko: '다 보고 있음',
       },
     },
     caption: {
@@ -1247,6 +1455,8 @@ export const WORK_FREEZE: readonly Draft[] = [
       ar: 'لا تضغط على أي تبويب.',
       fr: 'Clique sur aucun onglet.',
       es: 'No hagas clic en ninguna pestaña.',
+      ja: 'タブは一つもクリックしないで。',
+      ko: '탭 하나도 누르지 마세요.',
     },
     headline: {
       tr: 'Ekranını 40 kişiyle paylaşıyorsun',
@@ -1255,6 +1465,8 @@ export const WORK_FREEZE: readonly Draft[] = [
       ar: 'أنت تشارك شاشتك مع 40 شخصًا',
       fr: 'Ton écran est partagé avec 40 personnes',
       es: 'Compartes pantalla con 40 personas',
+      ja: '画面を40人に共有中',
+      ko: '40명에게 화면 공유 중',
     },
   },
   {
@@ -1269,6 +1481,8 @@ export const WORK_FREEZE: readonly Draft[] = [
         ar: 'لا تلمسوها',
         fr: 'PAS TOUCHE',
         es: 'NO LA TOQUEN',
+        ja: 'さわるな',
+        ko: '손대지 마시오',
       },
       small: {
         tr: 'YAZICI SONUNDA ÇALIŞIYOR',
@@ -1277,6 +1491,8 @@ export const WORK_FREEZE: readonly Draft[] = [
         ar: 'الطابعة تعمل أخيرًا',
         fr: "L'IMPRIMANTE MARCHE ENFIN",
         es: 'LA IMPRESORA POR FIN FUNCIONA',
+        ja: 'プリンターがやっと動いた',
+        ko: '프린터 드디어 작동 중',
       },
     },
     caption: {
@@ -1286,6 +1502,8 @@ export const WORK_FREEZE: readonly Draft[] = [
       ar: 'إياك أن تعطس.',
       fr: 'Surtout, éternue pas.',
       es: 'Ni se te ocurra estornudar.',
+      ja: 'くしゃみ厳禁。',
+      ko: '재채기 절대 금지.',
     },
     headline: {
       tr: 'Çıktın geliyor: sayfa 1/40',
@@ -1294,6 +1512,8 @@ export const WORK_FREEZE: readonly Draft[] = [
       ar: 'جارٍ الطباعة: الصفحة 1 من 40',
       fr: 'Impression : page 1 sur 40',
       es: 'Imprimiendo: página 1 de 40',
+      ja: '印刷中：1/40ページ',
+      ko: '인쇄 중: 1/40쪽',
     },
   },
   {
@@ -1308,6 +1528,8 @@ export const WORK_FREEZE: readonly Draft[] = [
         ar: 'انتبه',
         fr: 'ATTENTION',
         es: 'CUIDADO',
+        ja: '注意',
+        ko: '주의',
       },
       small: {
         tr: 'EVRAK KULESİ SALLANIYOR',
@@ -1316,6 +1538,8 @@ export const WORK_FREEZE: readonly Draft[] = [
         ar: 'برج الأوراق يتمايل',
         fr: 'LA PILE DE DOSSIERS VACILLE',
         es: 'TORRE DE PAPELES INESTABLE',
+        ja: '書類の塔がグラグラ',
+        ko: '서류 탑 흔들리는 중',
       },
     },
     caption: {
@@ -1325,6 +1549,8 @@ export const WORK_FREEZE: readonly Draft[] = [
       ar: 'إن تنفّست سقطت.',
       fr: 'Respire et tout tombe.',
       es: 'Si respiras, se cae.',
+      ja: '息をしたら崩れる。',
+      ko: '숨 쉬면 무너져요.',
     },
     headline: {
       tr: 'Masandaki dosya yığını devrilmek üzere',
@@ -1333,6 +1559,8 @@ export const WORK_FREEZE: readonly Draft[] = [
       ar: 'كومة الملفات على مكتبك على وشك السقوط',
       fr: "La pile de dossiers va s'effondrer",
       es: 'La pila de carpetas está a punto de caer',
+      ja: '机の書類の山が崩れそう',
+      ko: '책상 위 서류 더미가 무너지기 직전',
     },
   },
   {
@@ -1347,6 +1575,8 @@ export const WORK_FREEZE: readonly Draft[] = [
         ar: 'غرفة الاجتماعات',
         fr: 'SALLE DE RÉUNION',
         es: 'SALA DE REUNIONES',
+        ja: '会議室',
+        ko: '회의실',
       },
     },
     caption: {
@@ -1356,6 +1586,8 @@ export const WORK_FREEZE: readonly Draft[] = [
       ar: 'لا يتحرك أحد، وسينتهي الاجتماع.',
       fr: "Personne bouge, et c'est fini.",
       es: 'Que nadie se mueva y se acaba.',
+      ja: '誰も動かなければ会議は終わる。',
+      ko: '아무도 안 움직이면 회의 끝나요.',
     },
     headline: {
       tr: 'Son slayt: “Soru var mı?”',
@@ -1364,6 +1596,8 @@ export const WORK_FREEZE: readonly Draft[] = [
       ar: 'الشريحة الأخيرة: «هل من أسئلة؟»',
       fr: 'Dernière diapo : « Des questions ? »',
       es: 'Última diapositiva: “¿Alguna pregunta?”',
+      ja: '最後のスライド：「質問は？」',
+      ko: '마지막 슬라이드: “질문 있나요?”',
     },
   },
   {
@@ -1378,6 +1612,8 @@ export const WORK_FREEZE: readonly Draft[] = [
         ar: 'المصعد',
         fr: 'ASCENSEUR',
         es: 'ASCENSOR',
+        ja: 'エレベーター',
+        ko: '엘리베이터',
       },
     },
     caption: {
@@ -1387,6 +1623,8 @@ export const WORK_FREEZE: readonly Draft[] = [
       ar: 'انظر إلى أرقام الطوابق فقط.',
       fr: "Regarde juste les numéros d'étage.",
       es: 'Mira solo los números de los pisos.',
+      ja: '階数表示だけ見つめて。',
+      ko: '층수 표시만 보세요.',
     },
     headline: {
       tr: 'Asansöre genel müdür bindi',
@@ -1395,6 +1633,8 @@ export const WORK_FREEZE: readonly Draft[] = [
       ar: 'المدير العام دخل المصعد للتو',
       fr: "Le PDG vient d'entrer dans l'ascenseur",
       es: 'La directora acaba de subir al ascensor',
+      ja: 'エレベーターに社長が乗ってきた',
+      ko: '엘리베이터에 사장님이 탔다',
     },
   },
   {
@@ -1409,6 +1649,8 @@ export const WORK_FREEZE: readonly Draft[] = [
         ar: 'المكتب المنزلي',
         fr: 'BUREAU À LA MAISON',
         es: 'OFICINA EN CASA',
+        ja: '自宅の仕事部屋',
+        ko: '홈 오피스',
       },
     },
     caption: {
@@ -1418,6 +1660,8 @@ export const WORK_FREEZE: readonly Draft[] = [
       ar: 'كن مقنعًا. لا ترمش.',
       fr: 'Sois crédible. Cligne pas des yeux.',
       es: 'Que sea creíble. No parpadees.',
+      ja: '本気で演じて。まばたき禁止。',
+      ko: '진짜처럼. 눈도 깜빡이지 마세요.',
     },
     headline: {
       tr: 'Toplantıda donmuş taklidi yapıyorsun',
@@ -1426,6 +1670,8 @@ export const WORK_FREEZE: readonly Draft[] = [
       ar: 'تتظاهر بأن صورتك متجمّدة في الاجتماع',
       fr: "Tu fais l'image figée en pleine réunion",
       es: 'Finges estar congelado en la reunión',
+      ja: '会議で画面フリーズのふり中',
+      ko: '회의 중 화면 멈춘 척하는 중',
     },
   },
   {
@@ -1440,6 +1686,8 @@ export const WORK_FREEZE: readonly Draft[] = [
         ar: 'المطبخ · الطابق 3',
         fr: 'CUISINE · 3E ÉTAGE',
         es: 'COCINA · PISO 3',
+        ja: '給湯室・3階',
+        ko: '탕비실 · 3층',
       },
     },
     caption: {
@@ -1449,6 +1697,8 @@ export const WORK_FREEZE: readonly Draft[] = [
       ar: 'ابدُ بريئًا. لا تتحرك.',
       fr: 'Prends un air innocent. Bouge pas.',
       es: 'Pon cara de inocente. No te muevas.',
+      ja: '何食わぬ顔で。動かないで。',
+      ko: '모르는 척. 움직이지 마세요.',
     },
     headline: {
       tr: 'Biri “Bu kupalar kimin?” diye soruyor',
@@ -1457,6 +1707,8 @@ export const WORK_FREEZE: readonly Draft[] = [
       ar: 'أحدهم يسأل: «لمن هذه الأكواب؟»',
       fr: 'Quelqu’un demande à qui sont ces tasses',
       es: 'Alguien pregunta de quién son las tazas',
+      ja: '「このマグ誰の？」と誰かが聞いてる',
+      ko: '누가 “이 컵 누구 거예요?” 묻는 중',
     },
   },
 ];

@@ -248,4 +248,82 @@ const es: PushMessages = {
   },
 };
 
-export const push: Record<Locale, PushMessages> = { tr, en, de, ar, fr, es };
+const ja: PushMessages = {
+  onboarding: {
+    eyebrow: '通知',
+    title: 'お知らせを受け取る？',
+    body: '通知をオンにすれば、ゲームの出来事を見逃しません。広告は届きません。',
+    kinds: {
+      friends: 'だれかがあなたをフレンドに追加したとき',
+      vs: 'フレンドからVSが届いたとき、VSが終わったとき',
+      messages: 'フレンドからメッセージが届いたとき',
+    },
+    allow: '通知をオンにする',
+    later: 'あとで',
+  },
+  nudge: {
+    title: '通知がオフです',
+    body: 'VSが届いたときや、申請が承認されたときに気づけません。',
+    blocked: 'スマホの設定で通知をオンにすると、VSや申請が届くようになります。',
+    vs: (name) => `${name}がプレイしたらわかるように、通知をオンにしよう。`,
+    allow: '通知をオンにする',
+    openSettings: '設定を開く',
+    hide: '非表示',
+  },
+  settings: {
+    title: '通知',
+    description: 'どのお知らせをスマホに届けますか？',
+    friends: 'フレンド',
+    friendsHint: '届いた申請と承認',
+    vs: 'VS',
+    vsHint: '招待と結果',
+    messages: '定型メッセージ',
+    messagesHint: 'フレンドから届いたもの',
+    off: 'スマホの設定で通知がオフになっています。',
+    openSettings: '設定を開く',
+    allow: '通知を許可',
+    unavailable: 'このバージョンでは通知はまだ使えません。',
+    failed: '設定を保存できませんでした',
+  },
+};
+
+const ko: PushMessages = {
+  onboarding: {
+    eyebrow: '알림',
+    title: '소식을 받아 볼까요?',
+    body: '알림을 켜면 게임에서 놓치는 게 없어요. 광고는 없어요.',
+    kinds: {
+      friends: '누군가 나를 친구로 추가했을 때',
+      vs: '친구가 VS를 보냈을 때, VS가 끝났을 때',
+      messages: '친구가 메시지를 보냈을 때',
+    },
+    allow: '알림 켜기',
+    later: '나중에',
+  },
+  nudge: {
+    title: '알림이 꺼져 있어요',
+    body: 'VS를 받거나 친구가 요청을 수락해도 알 수 없어요.',
+    blocked: '휴대폰 설정에서 알림을 켜야 VS와 요청을 받을 수 있어요.',
+    vs: (name) => `${name} 님이 플레이하면 알 수 있게 알림을 켜세요.`,
+    allow: '알림 켜기',
+    openSettings: '설정 열기',
+    hide: '숨기기',
+  },
+  settings: {
+    title: '알림',
+    description: '어떤 소식을 휴대폰으로 받을까요?',
+    friends: '친구',
+    friendsHint: '받은 요청과 수락된 요청',
+    vs: 'VS',
+    vsHint: '초대와 결과',
+    messages: '빠른 메시지',
+    messagesHint: '친구가 보낸 메시지',
+    off: '휴대폰 설정에서 알림이 꺼져 있어요.',
+    openSettings: '설정 열기',
+    allow: '알림 허용',
+    unavailable: '이 버전에서는 아직 알림을 사용할 수 없어요.',
+    failed: '설정을 저장할 수 없어요',
+  },
+};
+
+export const push: Record<Locale, PushMessages> = { tr, en, de, ar, fr, es, ja, ko };

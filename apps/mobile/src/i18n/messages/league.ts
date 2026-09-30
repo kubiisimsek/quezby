@@ -107,4 +107,36 @@ const es: LeagueMessages = {
   },
 };
 
-export const league: Record<Locale, LeagueMessages> = { tr, en, de, ar, fr, es };
+const ja: LeagueMessages = {
+  ribbon: 'リーグ',
+  board: 'リーグランキング',
+  failed: 'リーグランキングを読み込めませんでした',
+  retry: '再試行',
+  closed: {
+    title: 'リーグランキングはランク戦プレイヤー専用です',
+    hint: '認定戦を終えると、リーグのランキングに入れます。',
+  },
+  idle: {
+    title: '14日間ランク戦をプレイしていません',
+    hint: 'ランク戦を1回プレイすれば、リーグのランキングに戻れます。',
+    action: 'ランク戦をプレイ',
+  },
+};
+
+const ko: LeagueMessages = {
+  ribbon: '리그',
+  board: '리그 순위',
+  failed: '리그 순위를 불러올 수 없어요',
+  retry: '다시 시도',
+  closed: {
+    title: '리그 순위는 랭크전 플레이어 전용이에요',
+    hint: '배치고사를 마치면 리그 순위에 들어가요.',
+  },
+  idle: {
+    title: '14일 동안 랭크전을 플레이하지 않았어요',
+    hint: '랭크전 한 판이면 리그 순위로 돌아와요.',
+    action: '랭크전 플레이',
+  },
+};
+
+export const league: Record<Locale, LeagueMessages> = { tr, en, de, ar, fr, es, ja, ko };

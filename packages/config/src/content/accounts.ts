@@ -12,6 +12,8 @@ export const ACCOUNTS = {
     ar: '@yawmiyat.vlog',
     fr: '@vlog.quotidien',
     es: '@vlog.diario',
+    ja: '@mainichi.vlog',
+    ko: '@ilsang.vlog',
   },
   food: {
     tr: '@yemek.defteri',
@@ -20,6 +22,8 @@ export const ACCOUNTS = {
     ar: '@daftar.tabkh',
     fr: '@carnet.bouffe',
     es: '@diario.comida',
+    ja: '@gohan.nikki',
+    ko: '@bapsang.ilgi',
   },
   home: {
     tr: '@evden.notlar',
@@ -28,6 +32,8 @@ export const ACCOUNTS = {
     ar: '@min.albait',
     fr: '@notes.de.chez.moi',
     es: '@notas.desde.casa',
+    ja: '@ouchi.memo',
+    ko: '@jibeseo.memo',
   },
   plain: {
     tr: '@siradan.hesap',
@@ -36,6 +42,8 @@ export const ACCOUNTS = {
     ar: '@hisab.aadi',
     fr: '@compte.banal',
     es: '@cuenta.normal',
+    ja: '@tada.no.akaunto',
+    ko: '@geunyang.gyejeong',
   },
   hacks: {
     tr: '@hayat.hilesi',
@@ -44,6 +52,8 @@ export const ACCOUNTS = {
     ar: '@hiyal.hayat',
     fr: '@astuce.du.jour',
     es: '@trucos.de.vida',
+    ja: '@seikatsu.no.chie',
+    ko: '@saenghwal.kkultip',
   },
   trends: {
     tr: '@trend.avcisi',
@@ -52,6 +62,8 @@ export const ACCOUNTS = {
     ar: '@qannas.trend',
     fr: '@chasseur.de.trends',
     es: '@caza.tendencias',
+    ja: '@hayari.hunter',
+    ko: '@trend.sanyangkkun',
   },
   facts: {
     tr: '@bilgi.kutusu',
@@ -60,6 +72,8 @@ export const ACCOUNTS = {
     ar: '@hal.ta3lam',
     fr: '@le.saviez.vous',
     es: '@sabias.que',
+    ja: '@mame.chishiki',
+    ko: '@japhak.sajeon',
   },
   motivation: {
     tr: '@motivasyon.34',
@@ -68,6 +82,8 @@ export const ACCOUNTS = {
     ar: '@tahfeez.yawmi',
     fr: '@motivation.75',
     es: '@motivacion.365',
+    ja: '@yaruki.03',
+    ko: '@donggibuyeo.02',
   },
   asmr: {
     tr: '@sessiz.asmr',
@@ -76,6 +92,8 @@ export const ACCOUNTS = {
     ar: '@asmr.hudoo',
     fr: '@asmr.chuchote',
     es: '@asmr.silencioso',
+    ja: '@shizuka.asmr',
+    ko: '@joyonghan.asmr',
   },
   zeynep: {
     tr: '@zeynep.k',
@@ -84,6 +102,8 @@ export const ACCOUNTS = {
     ar: '@noor.k',
     fr: '@chloe.k',
     es: '@lucia.k',
+    ja: '@yui.k',
+    ko: '@seoyeon.k',
   },
   ali: {
     tr: '@kanka.ali',
@@ -92,6 +112,8 @@ export const ACCOUNTS = {
     ar: '@sahbi.ali',
     fr: '@frerot.theo',
     es: '@bro.pablo',
+    ja: '@dachi.ryota',
+    ko: '@chingu.minjun',
   },
   elif: {
     tr: '@elif.ay',
@@ -100,6 +122,8 @@ export const ACCOUNTS = {
     ar: '@layla.qamar',
     fr: '@lea.lune',
     es: '@sofia.luna',
+    ja: '@hina.tsuki',
+    ko: '@haeun.dal',
   },
   ece: {
     tr: '@ece.su',
@@ -108,6 +132,8 @@ export const ACCOUNTS = {
     ar: '@salma.r',
     fr: '@jade.ln',
     es: '@carla.mar',
+    ja: '@mio.hana',
+    ko: '@sua.kkot',
   },
   burak: {
     tr: '@burak.07',
@@ -116,6 +142,8 @@ export const ACCOUNTS = {
     ar: '@yousef.07',
     fr: '@lucas.13',
     es: '@diego.07',
+    ja: '@haruto.06',
+    ko: '@doyun.051',
   },
   deniz: {
     tr: '@deniz*m',
@@ -124,6 +152,8 @@ export const ACCOUNTS = {
     ar: '@rana*m',
     fr: '@manon*b',
     es: '@paula*g',
+    ja: '@saki*m',
+    ko: '@yuna*k',
   },
   can: {
     tr: '@can.can',
@@ -132,6 +162,8 @@ export const ACCOUNTS = {
     ar: '@karim.karim',
     fr: '@hugo.hugo',
     es: '@dani.dani',
+    ja: '@ren.ren',
+    ko: '@jun.jun',
   },
   mert: {
     tr: '@mert*34',
@@ -140,6 +172,8 @@ export const ACCOUNTS = {
     ar: '@hamza*99',
     fr: '@enzo*75',
     es: '@javi*10',
+    ja: '@sota*tokyo',
+    ko: '@seojun*seoul',
   },
   rare: {
     tr: '@nadir.icerik',
@@ -148,6 +182,8 @@ export const ACCOUNTS = {
     ar: '@muhtawa.nadir',
     fr: '@contenu.rare',
     es: '@contenido.unico',
+    ja: '@mezurashii.douga',
+    ko: '@huigwi.yeongsang',
   },
   gold: {
     tr: '@altin.reel',
@@ -156,6 +192,8 @@ export const ACCOUNTS = {
     ar: '@manshour.dhahabi',
     fr: '@post.dore',
     es: '@post.dorado',
+    ja: '@ougon.toukou',
+    ko: '@hwanggeum.gesimul',
   },
   treasure: {
     tr: '@hazine*avcisi',
@@ -164,6 +202,8 @@ export const ACCOUNTS = {
     ar: '@sayyad*kunuz',
     fr: '@chasse*au*tresor',
     es: '@caza*tesoros',
+    ja: '@takara*sagashi',
+    ko: '@bomul*chatgi',
   },
   live: {
     tr: '@canli.yayin',
@@ -172,6 +212,8 @@ export const ACCOUNTS = {
     ar: '@bath.mubasher',
     fr: '@en.direct',
     es: '@en.vivo',
+    ja: '@nama.haishin',
+    ko: '@saeng.bangsong',
   },
   // Friends — their posts are pink: double-tap.
   emre: {
@@ -181,6 +223,8 @@ export const ACCOUNTS = {
     ar: '@omar.saeed',
     fr: '@louis.b',
     es: '@mateo.ruiz',
+    ja: '@kaito.mori',
+    ko: '@hyeonu.kim',
   },
   selin: {
     tr: '@selin.yildiz',
@@ -189,6 +233,8 @@ export const ACCOUNTS = {
     ar: '@mariam.najm',
     fr: '@ines.etoile',
     es: '@valeria.sol',
+    ja: '@aoi.hoshi',
+    ko: '@jimin.byeol',
   },
   kaan: {
     tr: '@kaan.94',
@@ -197,6 +243,8 @@ export const ACCOUNTS = {
     ar: '@tariq.94',
     fr: '@nathan.94',
     es: '@marcos.94',
+    ja: '@riku.94',
+    ko: '@jiho.94',
   },
   ayse: {
     tr: '@ayse.bal',
@@ -205,6 +253,8 @@ export const ACCOUNTS = {
     ar: '@huda.asal',
     fr: '@camille.miel',
     es: '@carmen.miel',
+    ja: '@sakura.mitsu',
+    ko: '@yeeun.kkul',
   },
   bora: {
     tr: '@bora.gezgin',
@@ -213,6 +263,8 @@ export const ACCOUNTS = {
     ar: '@ziad.rahhal',
     fr: '@arthur.voyage',
     es: '@alvaro.viajes',
+    ja: '@shota.tabi',
+    ko: '@dohyeon.yeohaeng',
   },
   ipek: {
     tr: '@ipek.cizer',
@@ -221,6 +273,8 @@ export const ACCOUNTS = {
     ar: '@dana.tarsum',
     fr: '@lou.dessine',
     es: '@martina.dibuja',
+    ja: '@nana.egaku',
+    ko: '@chaewon.geurim',
   },
   // Pages — each format has a few regulars.
   polls: {
@@ -230,6 +284,8 @@ export const ACCOUNTS = {
     ar: '@istitlaa.alyawm',
     fr: '@sondage.du.jour',
     es: '@encuesta.diaria',
+    ja: '@ankeeto.jikan',
+    ko: '@tupyo.sigan',
   },
   screens: {
     tr: '@ss.arsivi',
@@ -238,6 +294,8 @@ export const ACCOUNTS = {
     ar: '@luqtat.shasha',
     fr: '@captures.cultes',
     es: '@capturas.top',
+    ja: '@sukusho.hokanko',
+    ko: '@kaepcheo.moeum',
   },
   charts: {
     tr: '@grafik.gunlugu',
@@ -246,6 +304,8 @@ export const ACCOUNTS = {
     ar: '@rasm.bayani',
     fr: '@graphique.du.jour',
     es: '@grafico.diario',
+    ja: '@gurafu.nikki',
+    ko: '@geuraepeu.ilgi',
   },
   receipts: {
     tr: '@fis.koleksiyonu',
@@ -254,6 +314,8 @@ export const ACCOUNTS = {
     ar: '@fawateer.albaqala',
     fr: '@tickets.de.caisse',
     es: '@tickets.del.super',
+    ja: '@reshiito.atsume',
+    ko: '@yeongsujeung.moeum',
   },
   tiers: {
     tr: '@tier.listesi',
@@ -262,6 +324,8 @@ export const ACCOUNTS = {
     ar: '@tier.qawaem',
     fr: '@tier.listes',
     es: '@tier.listas',
+    ja: '@tier.hyou',
+    ko: '@tier.pyo',
   },
   quotes: {
     tr: '@guzel.sozler',
@@ -270,6 +334,8 @@ export const ACCOUNTS = {
     ar: '@aqwal.hakeema',
     fr: '@citations.du.jour',
     es: '@frases.celebres',
+    ja: '@kokoro.no.meigen',
+    ko: '@myeongeon.moeum',
   },
   notifs: {
     tr: '@bildirim.yagmuru',
@@ -278,6 +344,8 @@ export const ACCOUNTS = {
     ar: '@isharat.kathira',
     fr: '@notifs.en.pagaille',
     es: '@lluvia.de.avisos',
+    ja: '@tsuuchi.arashi',
+    ko: '@allim.pokpung',
   },
   jackpot: {
     tr: '@buyuk.ikramiye',
@@ -286,6 +354,8 @@ export const ACCOUNTS = {
     ar: '@aljaeza.alkubra',
     fr: '@gros.lot',
     es: '@premio.gordo',
+    ja: '@ooatari.jikan',
+    ko: '@daebak.sigan',
   },
   cctv: {
     tr: '@kamera.kayitta',
@@ -294,6 +364,8 @@ export const ACCOUNTS = {
     ar: '@kamera.tusajjil',
     fr: '@camera.cachee',
     es: '@camara.oculta',
+    ja: '@bouhan.camera',
+    ko: '@cctv.pochak',
   },
   signs: {
     tr: '@uyari.levhasi',
@@ -302,6 +374,8 @@ export const ACCOUNTS = {
     ar: '@lafitat.tahdheer',
     fr: '@panneaux.danger',
     es: '@senales.peligro',
+    ja: '@keikoku.hyoushiki',
+    ko: '@gyeonggo.pyojipan',
   },
   // The feed at a thousand posts: more friends and a page for every corner of the day.
   cemre: {
@@ -311,6 +385,8 @@ export const ACCOUNTS = {
     ar: '@reem.n',
     fr: '@alice.n',
     es: '@elena.n',
+    ja: '@mei.n',
+    ko: '@minji.b',
   },
   berk: {
     tr: '@berk.t',
@@ -319,6 +395,8 @@ export const ACCOUNTS = {
     ar: '@khaled.t',
     fr: '@jules.t',
     es: '@adrian.t',
+    ja: '@yuto.t',
+    ko: '@hajun.t',
   },
   naz: {
     tr: '@naz.ay',
@@ -327,6 +405,8 @@ export const ACCOUNTS = {
     ar: '@lina.m',
     fr: '@louise.m',
     es: '@noa.m',
+    ja: '@rin.m',
+    ko: '@naeun.m',
   },
   onur: {
     tr: '@onur.k',
@@ -335,6 +415,8 @@ export const ACCOUNTS = {
     ar: '@samir.k',
     fr: '@leo.k',
     es: '@sergio.k',
+    ja: '@kenta.k',
+    ko: '@junho.k',
   },
   melis: {
     tr: '@melis.d',
@@ -343,6 +425,8 @@ export const ACCOUNTS = {
     ar: '@yasmin.d',
     fr: '@clara.d',
     es: '@daniela.d',
+    ja: '@miyu.d',
+    ko: '@yerin.d',
   },
   arda: {
     tr: '@arda.y',
@@ -351,6 +435,8 @@ export const ACCOUNTS = {
     ar: '@hadi.y',
     fr: '@ethan.y',
     es: '@ivan.y',
+    ja: '@sora.y',
+    ko: '@seungmin.y',
   },
   defne: {
     tr: '@defne.s',
@@ -359,6 +445,8 @@ export const ACCOUNTS = {
     ar: '@farah.s',
     fr: '@zoe.s',
     es: '@alba.s',
+    ja: '@akari.s',
+    ko: '@dain.s',
   },
   baris: {
     tr: '@baris.o',
@@ -367,6 +455,8 @@ export const ACCOUNTS = {
     ar: '@rami.o',
     fr: '@gabriel.o',
     es: '@hector.o',
+    ja: '@daiki.o',
+    ko: '@taeyun.o',
   },
   irem: {
     tr: '@irem.k',
@@ -375,6 +465,8 @@ export const ACCOUNTS = {
     ar: '@dima.k',
     fr: '@eva.k',
     es: '@irene.k',
+    ja: '@emi.k',
+    ko: '@soyeon.k',
   },
   tolga: {
     tr: '@tolga.b',
@@ -383,6 +475,8 @@ export const ACCOUNTS = {
     ar: '@bassem.b',
     fr: '@tom.b',
     es: '@raul.b',
+    ja: '@takumi.b',
+    ko: '@jaehyeon.b',
   },
   yagmur: {
     tr: '@yagmur.e',
@@ -391,6 +485,8 @@ export const ACCOUNTS = {
     ar: '@mayar.e',
     fr: '@margot.e',
     es: '@lluvia.e',
+    ja: '@natsu.e',
+    ko: '@yeoreum.e',
   },
   efe: {
     tr: '@efe.c',
@@ -399,6 +495,8 @@ export const ACCOUNTS = {
     ar: '@adam.c',
     fr: '@noah.c',
     es: '@marco.c',
+    ja: '@sho.c',
+    ko: '@eunho.c',
   },
   kitchen: {
     tr: '@mutfak.kazasi',
@@ -407,6 +505,8 @@ export const ACCOUNTS = {
     ar: '@kawareth.almatbakh',
     fr: '@cuisine.ratee',
     es: '@cocina.desastre',
+    ja: '@daidokoro.shippai',
+    ko: '@jubang.daechamsa',
   },
   school: {
     tr: '@okul.gunlugu',
@@ -415,6 +515,8 @@ export const ACCOUNTS = {
     ar: '@yawmiyat.almadrasa',
     fr: '@journal.de.classe',
     es: '@diario.escolar',
+    ja: '@gakkou.nikki',
+    ko: '@hakgyo.ilgi',
   },
   office: {
     tr: '@ofis.hayati',
@@ -423,6 +525,8 @@ export const ACCOUNTS = {
     ar: '@hayat.almaktab',
     fr: '@vie.de.bureau',
     es: '@vida.de.oficina',
+    ja: '@shachiku.nikki',
+    ko: '@jikjangin.ilsang',
   },
   city: {
     tr: '@sehir.halleri',
@@ -431,6 +535,8 @@ export const ACCOUNTS = {
     ar: '@lahazat.almadina',
     fr: '@scenes.de.ville',
     es: '@momentos.urbanos',
+    ja: '@machi.no.hitokoma',
+    ko: '@dosi.pungyeong',
   },
   weather: {
     tr: '@hava.nasil',
@@ -439,6 +545,8 @@ export const ACCOUNTS = {
     ar: '@mazaj.altaqs',
     fr: '@meteo.du.jour',
     es: '@clima.del.dia',
+    ja: '@kyou.no.tenki',
+    ko: '@oneul.nalssi',
   },
   sport: {
     tr: '@spor.bahane',
@@ -447,6 +555,8 @@ export const ACCOUNTS = {
     ar: '@aadhar.riyadiya',
     fr: '@excuses.sport',
     es: '@excusas.gym',
+    ja: '@kintore.iiwake',
+    ko: '@undong.pinggye',
   },
   games: {
     tr: '@oyun.gecesi',
@@ -455,6 +565,8 @@ export const ACCOUNTS = {
     ar: '@laylat.alaab',
     fr: '@soiree.jeux',
     es: '@noche.de.juegos',
+    ja: '@game.no.yoru',
+    ko: '@bamsaem.geim',
   },
   sleep: {
     tr: '@uyku.modu',
@@ -463,6 +575,8 @@ export const ACCOUNTS = {
     ar: '@wadh.alnawm',
     fr: '@mode.dodo',
     es: '@modo.sueno',
+    ja: '@suimin.mode',
+    ko: '@sumyeon.mode',
   },
   shopping: {
     tr: '@sepet.dolu',
@@ -471,6 +585,8 @@ export const ACCOUNTS = {
     ar: '@alsalla.mumtalia',
     fr: '@panier.plein',
     es: '@carrito.lleno',
+    ja: '@kaato.manpai',
+    ko: '@jangbaguni.gadeuk',
   },
   pets: {
     tr: '@pati.dunyasi',
@@ -479,6 +595,8 @@ export const ACCOUNTS = {
     ar: '@alam.alhayawanat',
     fr: '@monde.des.pattes',
     es: '@mundo.patitas',
+    ja: '@nikukyu.world',
+    ko: '@daengnyang.segye',
   },
   family: {
     tr: '@aile.halleri',
@@ -487,6 +605,8 @@ export const ACCOUNTS = {
     ar: '@jalsat.aailiya',
     fr: '@chat.de.famille',
     es: '@chat.familiar',
+    ja: '@kazoku.chat',
+    ko: '@gajok.dantokbang',
   },
   mornings: {
     tr: '@sabah.rutini',
@@ -495,6 +615,8 @@ export const ACCOUNTS = {
     ar: '@rotin.alsabah',
     fr: '@routine.du.matin',
     es: '@rutina.matutina',
+    ja: '@asakatsu.nikki',
+    ko: '@achim.rutin',
   },
   alert: {
     tr: '@alarm.durumu',
@@ -503,6 +625,8 @@ export const ACCOUNTS = {
     ar: '@halat.inthar',
     fr: '@mode.alerte',
     es: '@modo.alerta',
+    ja: '@keihou.mode',
+    ko: '@gyeongbo.mode',
   },
   lucky: {
     tr: '@sansli.gun',
@@ -511,5 +635,7 @@ export const ACCOUNTS = {
     ar: '@yawm.alhazz',
     fr: '@jour.de.chance',
     es: '@dia.de.suerte',
+    ja: '@taian.kichijitsu',
+    ko: '@unsu.joeun.nal',
   },
 } satisfies Record<string, Localized>;

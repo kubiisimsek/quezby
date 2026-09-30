@@ -142,4 +142,42 @@ const es: KitMessages = {
   },
 };
 
-export const kit: Record<Locale, KitMessages> = { tr, en, de, ar, fr, es };
+const ja: KitMessages = {
+  topBar: { back: '戻る' },
+  sheet: { close: '閉じる', save: '保存' },
+  iconButton: {
+    badge: (label, count) => `${label}、新着${count}件`,
+  },
+  socialButton: { apple: 'Appleで続ける', google: 'Googleで続行' },
+  faceOff: { versus: 'VS', label: (left, right) => `${left} VS ${right}` },
+  toast: { open: 'タップして開く' },
+  passwordField: { show: 'パスワードを表示', hide: 'パスワードを隠す' },
+  playerRow: {
+    me: (name) => `${name} · あなた`,
+    noRecord: 'まだ記録なし',
+    record: (score) => `シーズンベスト ${score}`,
+    label: ({ name, me, league, record }) =>
+      [me ? `${name}、あなた` : name, league, record].filter(Boolean).join('、'),
+  },
+};
+
+const ko: KitMessages = {
+  topBar: { back: '뒤로' },
+  sheet: { close: '닫기', save: '저장' },
+  iconButton: {
+    badge: (label, count) => `${label}, 새 항목 ${count}개`,
+  },
+  socialButton: { apple: 'Apple로 계속하기', google: 'Google로 계속하기' },
+  faceOff: { versus: 'VS', label: (left, right) => `${left} VS ${right}` },
+  toast: { open: '탭해서 열기' },
+  passwordField: { show: '비밀번호 표시', hide: '비밀번호 숨기기' },
+  playerRow: {
+    me: (name) => `${name} · 나`,
+    noRecord: '아직 기록 없음',
+    record: (score) => `시즌 최고 기록 ${score}`,
+    label: ({ name, me, league, record }) =>
+      [me ? `${name}, 나` : name, league, record].filter(Boolean).join(', '),
+  },
+};
+
+export const kit: Record<Locale, KitMessages> = { tr, en, de, ar, fr, es, ja, ko };

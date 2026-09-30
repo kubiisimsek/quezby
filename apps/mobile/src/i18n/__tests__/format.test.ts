@@ -7,6 +7,8 @@ describe('formatsFor', () => {
   const fr = formatsFor('fr');
   const es = formatsFor('es');
   const ar = formatsFor('ar');
+  const ja = formatsFor('ja');
+  const ko = formatsFor('ko');
 
   it('writes Turkish exactly as the game always has', () => {
     expect(tr.score(12345)).toBe('12.345');
@@ -113,6 +115,24 @@ describe('formatsFor', () => {
     ]);
     expect(tr.time(at)).toBe('21:05');
     expect(tr.date('2026-09-24T21:30:00.000Z')).toBe('25 Eylül');
+  });
+
+  it('writes Japanese and Korean their own way: dates, clocks, lists, counts', () => {
+    const at = '2026-09-24T18:05:00.000Z';
+    expect([ja.date(at), ko.date(at)]).toEqual(['9月24日', '9월 24일']);
+    expect([ja.score(12345), ko.score(12345)]).toEqual(['12,345', '12,345']);
+    expect([ja.combo(1250), ko.perMille(942)]).toEqual(['x1.25', '94.2%']);
+    expect([ja.countdown(3_725_000), ko.countdown(3_725_000)]).toEqual(['1時間 2分', '1시간 2분']);
+    expect([ja.playTime(45_000), ko.playTime(45_000)]).toEqual(['45秒', '45초']);
+    expect(ja.list(['Apple', 'Google', 'メール'], 'and')).toBe('Apple、Googleとメール');
+    expect(ko.list(['Apple', '이메일'], 'or')).toBe('Apple 또는 이메일');
+    expect([ja.compact(1234), ko.compact(1234)]).toEqual(['1.2千', '1.2천']);
+    expect([ja.rankChange(null, 4), ko.rankChange(null, 4)]).toEqual(['初登場', '신규']);
+    const now = Date.parse('2026-09-28T12:00:00.000Z');
+    expect([ja.ago('2026-09-28T11:59:30.000Z', now), ko.ago('2026-09-28T09:00:00.000Z', now)]).toEqual([
+      'たった今',
+      '3시간',
+    ]);
   });
 
   it('says how long ago, short, and past a week the date', () => {

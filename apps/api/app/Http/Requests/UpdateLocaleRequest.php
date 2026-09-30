@@ -6,7 +6,7 @@ use App\Enums\Locale;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-/** `UpdateLocaleRequest` in `packages/types`: one of the six languages. */
+/** `UpdateLocaleRequest` in `packages/types`: one of the eight languages. */
 class UpdateLocaleRequest extends FormRequest
 {
     /**

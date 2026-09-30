@@ -4,7 +4,16 @@ import { AXIS_POINTS, LAYOUTS, PATTERNS, chartPoints, dressOf, mediaOf, type Med
 
 /** Words that say which language they are in. */
 function words(text: string): Localized {
-  return { tr: `tr ${text}`, en: `en ${text}`, de: `de ${text}`, ar: `ar ${text}`, fr: `fr ${text}`, es: `es ${text}` };
+  return {
+    tr: `tr ${text}`,
+    en: `en ${text}`,
+    de: `de ${text}`,
+    ar: `ar ${text}`,
+    fr: `fr ${text}`,
+    es: `es ${text}`,
+    ja: `ja ${text}`,
+    ko: `ko ${text}`,
+  };
 }
 
 function post(body: PostBody): Post {

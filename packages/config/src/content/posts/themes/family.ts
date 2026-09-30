@@ -19,6 +19,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
       ar: 'عشاء العائلة: 6 أحاديث معًا… وجدتي في كلها',
       fr: 'Repas de famille : 6 conversations. Mamie est dans toutes.',
       es: 'Cena familiar: 6 charlas a la vez. La abuela, en todas.',
+      ja: '家族の食卓：会話が6つ同時進行。全部におばあちゃん',
+      ko: '가족 식사: 대화 6개 동시 진행. 할머니는 전부 참여.',
     },
   },
   {
@@ -32,6 +34,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
       ar: 'اتصل جدي بالفيديو… وشاهدت جبينه 20 دقيقة',
       fr: 'Appel vidéo avec papi : 20 minutes de front.',
       es: 'Videollamada con el abuelo: 20 minutos de su frente.',
+      ja: 'おじいちゃんとビデオ通話：20分間おでこを見てた',
+      ko: '할아버지 영상 통화: 20분 동안 이마만 봄',
     },
   },
   {
@@ -45,6 +49,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
       ar: 'أغلق أبي صندوق السيارة… وحقيبتي ما زالت في يدي',
       fr: "Papa vient de fermer le coffre. J'ai encore mon sac.",
       es: 'Papá cerró el maletero. Mi bolso sigue en mi mano.',
+      ja: '父がトランクを閉めた。私のバッグはまだ手の中。',
+      ko: '아빠가 트렁크를 닫았다. 내 가방은 아직 내 손에.',
     },
   },
   {
@@ -58,6 +64,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
       ar: '«كم كبرت!»… يا خالتي، عمري 26 سنة',
       fr: "« Comme t'as grandi ! » Tata, j'ai 26 ans.",
       es: '“¡Cómo has crecido!” Tía, tengo 26 años.',
+      ja: '「大きくなったねえ！」おばさん、私26歳です。',
+      ko: '“많이 컸네!” 이모, 저 26살이에요.',
     },
   },
   {
@@ -71,6 +79,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
       ar: 'أرسل أبي لقطة شاشة… صوّرها بهاتف أمي',
       fr: "La capture d'écran de papa : prise avec le tel de maman",
       es: 'La captura de papá: una foto con el teléfono de mamá',
+      ja: '父がスクショを送ってきた。母のスマホで撮影したやつ。',
+      ko: '아빠가 캡처를 보냄. 엄마 폰으로 화면을 찍어서.',
     },
   },
   {
@@ -84,6 +94,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
       ar: 'أعرت ابن عمي الصغير هاتفي 5 دقائق… فتغيّرت لغته',
       fr: 'Mon petit cousin a eu mon tel 5 minutes. Nouvelle langue.',
       es: '5 minutos con mi primito y mi teléfono cambió de idioma',
+      ja: 'いとこにスマホを5分貸したら、言語が変わってた',
+      ko: '사촌 동생한테 폰 5분 줬더니 언어가 바뀌어 있음',
     },
   },
   {
@@ -91,7 +103,7 @@ export const FAMILY_SKIP: readonly Draft[] = [
     user: ACCOUNTS.screens,
     body: {
       format: 'chat',
-      contact: { tr: 'Babam', en: 'Dad', de: 'Papa', ar: 'أبي', fr: 'Papa', es: 'Papá' },
+      contact: { tr: 'Babam', en: 'Dad', de: 'Papa', ar: 'أبي', fr: 'Papa', es: 'Papá', ja: 'お父さん', ko: '아빠' },
       lines: [
         {
           from: 'me',
@@ -102,11 +114,13 @@ export const FAMILY_SKIP: readonly Draft[] = [
             ar: 'أبي، هل أنت متفرغ يوم السبت؟',
             fr: "papa, t'es dispo samedi ?",
             es: 'papá, ¿estás libre el sábado?',
+            ja: 'お父さん、土曜ひま？',
+            ko: '아빠 토요일에 시간 돼?',
           },
         },
         {
           from: 'them',
-          text: { tr: 'Evet.', en: 'Yes.', de: 'Ja.', ar: 'نعم.', fr: 'Oui.', es: 'Sí.' },
+          text: { tr: 'Evet.', en: 'Yes.', de: 'Ja.', ar: 'نعم.', fr: 'Oui.', es: 'Sí.', ja: 'はい。', ko: '네.' },
         },
         {
           from: 'me',
@@ -117,6 +131,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
             ar: 'أبي، السبت مضى 😅',
             fr: "papa, samedi c'était la semaine dernière 😅",
             es: 'papá, el sábado ya pasó 😅',
+            ja: 'お父さん、土曜もう過ぎたよ 😅',
+            ko: '아빠 토요일 이미 지났어 😅',
           },
         },
         {
@@ -128,6 +144,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
             ar: 'إذن السبت الذي يليه.',
             fr: 'Alors samedi prochain.',
             es: 'Entonces el próximo sábado.',
+            ja: 'では次の土曜日。',
+            ko: '그럼 다음 토요일.',
           },
         },
       ],
@@ -139,6 +157,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
       ar: 'مدة ردّ أبي: 5 أيام عمل',
       fr: 'Délai de réponse de papa : 5 jours ouvrés',
       es: 'Tiempo de respuesta de papá: 5 días hábiles',
+      ja: '父の返信速度：5営業日',
+      ko: '아빠의 답장 속도: 영업일 기준 5일',
     },
   },
   {
@@ -146,7 +166,7 @@ export const FAMILY_SKIP: readonly Draft[] = [
     user: ACCOUNTS.family,
     body: {
       format: 'chat',
-      contact: { tr: 'Dayım', en: 'Uncle', de: 'Onkel', ar: 'خالي', fr: 'Tonton', es: 'Tío' },
+      contact: { tr: 'Dayım', en: 'Uncle', de: 'Onkel', ar: 'خالي', fr: 'Tonton', es: 'Tío', ja: 'おじさん', ko: '외삼촌' },
       lines: [
         {
           from: 'them',
@@ -157,6 +177,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
             ar: 'شواء يوم العطلة، والجميع مدعو! 🔥',
             fr: 'Barbecue dimanche, tous invités ! 🔥',
             es: '¡Asado el domingo, todos invitados! 🔥',
+            ja: '日曜はバーベキュー、全員集合！ 🔥',
+            ko: '일요일 바비큐 파티, 다 와라! 🔥',
           },
         },
         {
@@ -168,6 +190,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
             ar: 'رائع! ماذا نُحضر؟',
             fr: 'trop bien ! on apporte quoi ?',
             es: '¡genial! ¿qué llevamos?',
+            ja: 'やった！何持っていけばいい？',
+            ko: '좋아요! 뭐 가져갈까요?',
           },
         },
         {
@@ -179,6 +203,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
             ar: 'اللحم والفحم… والشوّاية',
             fr: 'La viande, le charbon et le barbecue',
             es: 'La carne, el carbón y la parrilla',
+            ja: '肉と炭、あとグリルも',
+            ko: '고기랑 숯, 그리고 그릴',
           },
         },
       ],
@@ -190,6 +216,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
       ar: 'الدعوة من خالي… والباقي علينا',
       fr: 'Il invite. On apporte tout le reste.',
       es: 'Él invita. Nosotros ponemos el resto.',
+      ja: '招待はおじさん、残りは全部うち',
+      ko: '초대는 외삼촌이, 나머지는 우리가',
     },
   },
   {
@@ -197,7 +225,7 @@ export const FAMILY_SKIP: readonly Draft[] = [
     user: ACCOUNTS.screens,
     body: {
       format: 'chat',
-      contact: { tr: 'Annem', en: 'Mom', de: 'Mama', ar: 'أمي', fr: 'Maman', es: 'Mamá' },
+      contact: { tr: 'Annem', en: 'Mom', de: 'Mama', ar: 'أمي', fr: 'Maman', es: 'Mamá', ja: 'お母さん', ko: '엄마' },
       lines: [
         {
           from: 'them',
@@ -208,6 +236,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
             ar: 'شاهد هذا الفيديو، مضحك جدًا 😂',
             fr: 'Regarde cette vidéo, trop drôle 😂',
             es: 'Mira este video, qué risa 😂',
+            ja: 'この動画見て、すごく面白いから 😂',
+            ko: '이 영상 봐봐, 진짜 웃겨 😂',
           },
         },
         {
@@ -219,6 +249,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
             ar: 'أمي، أنا من أرسله إليك',
             fr: "maman, c'est moi qui te l'ai envoyée",
             es: 'mamá, yo te lo mandé',
+            ja: 'お母さん、それ送ったの私',
+            ko: '엄마 그거 내가 보낸 거야',
           },
         },
         {
@@ -230,6 +262,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
             ar: 'إذن شاهده مرة أخرى',
             fr: 'Alors regarde-la encore',
             es: 'Entonces míralo otra vez',
+            ja: 'じゃあもう一回見なさい',
+            ko: '그럼 한 번 더 봐',
           },
         },
       ],
@@ -241,6 +275,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
       ar: 'إعادة تدوير عائلية',
       fr: 'Le recyclage familial',
       es: 'Reciclaje familiar',
+      ja: '家族内リサイクル',
+      ko: '가족 내 재활용',
     },
   },
   {
@@ -248,7 +284,7 @@ export const FAMILY_SKIP: readonly Draft[] = [
     user: ACCOUNTS.family,
     body: {
       format: 'chat',
-      contact: { tr: 'Babaannem', en: 'Grandma', de: 'Oma', ar: 'جدتي', fr: 'Mamie', es: 'Abuela' },
+      contact: { tr: 'Babaannem', en: 'Grandma', de: 'Oma', ar: 'جدتي', fr: 'Mamie', es: 'Abuela', ja: 'おばあちゃん', ko: '할머니' },
       lines: [
         {
           from: 'them',
@@ -259,6 +295,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
             ar: 'هل ستأتي في عطلة نهاية الأسبوع؟',
             fr: 'Tu viens ce week-end ?',
             es: '¿Vienes este fin de semana?',
+            ja: '週末は来るの？',
+            ko: '주말에 올 거니?',
           },
         },
         {
@@ -270,6 +308,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
             ar: 'ربما، سأرى',
             fr: 'peut-être, je verrai',
             es: 'tal vez, ya veré',
+            ja: 'たぶん、考えとく',
+            ko: '아마도, 봐서',
           },
         },
         {
@@ -281,6 +321,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
             ar: 'حسنًا، طبخت أكلتك المفضلة 😊',
             fr: "Super, j'ai déjà fait ton plat préféré 😊",
             es: 'Perfecto, ya hice tu comida favorita 😊',
+            ja: 'よかった、好物もう作ってあるよ 😊',
+            ko: '그래, 네가 좋아하는 거 벌써 해 놨다 😊',
           },
         },
       ],
@@ -292,6 +334,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
       ar: 'يبدو أنني ذاهب',
       fr: "Bon, j'y vais, apparemment",
       es: 'Parece que voy',
+      ja: '行くしかないみたい',
+      ko: '가야 할 것 같음',
     },
   },
   {
@@ -306,6 +350,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
         ar: 'كم محاولة تحتاج أمك لتناديك باسمك الصحيح؟',
         fr: "En combien d'essais ta mère trouve ton prénom ?",
         es: '¿Cuántos intentos para que mamá diga tu nombre?',
+        ja: '母があなたの名前を正しく呼ぶのは何回目？',
+        ko: '엄마가 내 이름을 몇 번 만에 제대로 부를까?',
       },
       options: [
         {
@@ -315,6 +361,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
           ar: 'من أول مرة',
           fr: 'Du premier coup',
           es: 'Al primero',
+          ja: '1回目',
+          ko: '한 번에',
         },
         {
           tr: 'Kardeşimden sonra',
@@ -323,6 +371,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
           ar: 'بعد اسم أخي',
           fr: 'Après mon frère',
           es: 'Después de mi hermano',
+          ja: '兄弟の名前のあと',
+          ko: '동생 이름 다음',
         },
         {
           tr: 'Kediden bile sonra',
@@ -331,6 +381,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
           ar: 'حتى بعد اسم القطة',
           fr: 'Même après le chat',
           es: 'Hasta después del gato',
+          ja: '猫の名前よりあと',
+          ko: '고양이 이름보다 뒤',
         },
       ],
       winner: 2,
@@ -342,6 +394,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
       ar: 'أخي، القطة، خالي… ثم أنا',
       fr: 'Mon frère, le chat, mon oncle… puis moi',
       es: 'Mi hermano, el gato, mi tío… y luego yo',
+      ja: '弟、猫、おじさん…そして私',
+      ko: '동생, 고양이, 삼촌… 그다음이 나',
     },
   },
   {
@@ -356,6 +410,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
         ar: 'قال أبي: «أعرف طريقًا مختصرًا». النتيجة؟',
         fr: 'Papa : « Je connais un raccourci. » Résultat ?',
         es: 'Papá dijo: “conozco un atajo”. ¿Resultado?',
+        ja: '父「この道なら知ってる」結果は：',
+        ko: '아빠: “이 길 내가 알아.” 결과는:',
       },
       options: [
         {
@@ -365,6 +421,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
           ar: 'وفّرنا 10 دقائق',
           fr: '10 minutes gagnées',
           es: 'Ahorramos 10 minutos',
+          ja: '10分短縮',
+          ko: '10분 단축',
         },
         {
           tr: 'Aynı köprü, 3. kez',
@@ -373,6 +431,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
           ar: 'الجسر نفسه 3 مرات',
           fr: 'Même pont, 3e fois',
           es: 'Mismo puente, 3 veces',
+          ja: '同じ橋を3回目',
+          ko: '같은 다리 3번째',
         },
       ],
       winner: 1,
@@ -384,6 +444,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
       ar: 'فتح الخريطة يجرح كبرياءه',
       fr: 'Ouvrir la carte ? Son orgueil dit non.',
       es: 'Abrir el mapa hiere su orgullo',
+      ja: '地図アプリを開くのはプライドが許さない',
+      ko: '지도 앱 켜는 건 아빠 자존심이 허락 안 함',
     },
   },
   {
@@ -398,9 +460,11 @@ export const FAMILY_SKIP: readonly Draft[] = [
         ar: 'قالت أمك: «في الخزانة». هل وجدته؟',
         fr: 'Maman : « Dans le placard. » Trouvé ?',
         es: 'Mamá dijo: “está en el armario”. ¿Lo encontraste?',
+        ja: '母「クローゼットにあるでしょ」見つかった？',
+        ko: '엄마: “옷장에 있잖아.” 찾았어?',
       },
       options: [
-        { tr: 'Buldum', en: 'Found it', de: 'Gefunden', ar: 'وجدته', fr: 'Trouvé', es: 'Lo encontré' },
+        { tr: 'Buldum', en: 'Found it', de: 'Gefunden', ar: 'وجدته', fr: 'Trouvé', es: 'Lo encontré', ja: '見つけた', ko: '찾았다' },
         {
           tr: 'O gelince bulundu',
           en: 'She found it instantly',
@@ -408,6 +472,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
           ar: 'وجدته هي فورًا',
           fr: "Elle l'a trouvé direct",
           es: 'Ella, en un segundo',
+          ja: '母が来たら一瞬で出た',
+          ko: '엄마 오니까 나옴',
         },
       ],
       winner: 1,
@@ -419,6 +485,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
       ar: 'بحثت في الرف نفسه، صدقًا',
       fr: "J'avais regardé pile là. Promis.",
       es: 'Busqué en ese mismo estante. Lo juro.',
+      ja: '同じ棚を見たんだって。本当に。',
+      ko: '똑같은 칸 봤다니까. 진짜로.',
     },
   },
   {
@@ -433,8 +501,10 @@ export const FAMILY_SKIP: readonly Draft[] = [
         ar: 'طريق جدي إلى المدرسة',
         fr: 'TRAJET ÉCOLE DE PAPI',
         es: 'RUTA ESCOLAR DEL ABUELO',
+        ja: 'おじいちゃんの通学距離',
+        ko: '할아버지의 등굣길',
       },
-      value: { tr: '12 km', en: '12 mi', de: '12 km', ar: '12 كم', fr: '12 km', es: '12 km' },
+      value: { tr: '12 km', en: '12 mi', de: '12 km', ar: '12 كم', fr: '12 km', es: '12 km', ja: '12km', ko: '12km' },
       shape: 'rise',
       axis: 'months',
     },
@@ -445,6 +515,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
       ar: 'يطول كيلومترًا مع كل مرة يرويها',
       fr: "S'allonge d'1 km à chaque récit",
       es: 'Crece 1 km cada vez que lo cuenta',
+      ja: '話すたびに1kmずつ伸びる',
+      ko: '얘기할 때마다 1km씩 늘어남',
     },
   },
   {
@@ -459,6 +531,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
         ar: 'الضجيج في البيت',
         fr: 'LE BRUIT À LA MAISON',
         es: 'RUIDO EN CASA',
+        ja: '家の騒がしさ',
+        ko: '집안 소음',
       },
       value: null,
       shape: 'crash',
@@ -471,6 +545,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
       ar: 'سافر إخوتي إلى المخيّم… وفي اليوم الثالث اشتقت إليهم',
       fr: 'Frères et sœurs en colo. Jour 3 : ils me manquent.',
       es: 'Mis hermanos se fueron de campamento. Día 3: los extraño.',
+      ja: '弟たちがキャンプへ。3日目、もう恋しい。',
+      ko: '동생들 캠프 감. 3일째: 보고 싶음.',
     },
   },
   {
@@ -485,6 +561,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
         ar: 'ملابس أطفال',
         fr: 'MODE ENFANT',
         es: 'ROPA INFANTIL',
+        ja: '子ども服',
+        ko: '아동복',
       },
       items: [
         {
@@ -494,6 +572,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
           ar: 'معطف (أكبر بمقاسين)',
           fr: 'MANTEAU (TAILLE +2)',
           es: 'ABRIGO (2 TALLAS MÁS)',
+          ja: 'コート（2サイズ上）',
+          ko: '점퍼 (2사이즈 업)',
         },
       ],
     },
@@ -504,6 +584,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
       ar: 'أمي: «ستكبر عليه». وما زلت أنتظر منذ 3 سنوات',
       fr: "Maman : « Tu vas grandir. » J'attends toujours.",
       es: 'Mamá: “Ya crecerás”. Sigo esperando.',
+      ja: '母「すぐ大きくなるから」3年待ってる。',
+      ko: '엄마: “금방 커.” 3년째 기다리는 중.',
     },
   },
   {
@@ -518,6 +600,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
         ar: 'مكتبة وقرطاسية',
         fr: 'PAPETERIE',
         es: 'PAPELERÍA',
+        ja: '文房具店',
+        ko: '문구점',
       },
       items: [
         {
@@ -527,6 +611,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
           ar: 'ألوان قابلة للغسل',
           fr: 'CRAYONS LAVABLES',
           es: 'CRAYONES LAVABLES',
+          ja: '水で落ちるクレヨン',
+          ko: '물로 지워지는 크레용',
         },
         {
           tr: 'SÜNGER (3 ADET)',
@@ -535,6 +621,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
           ar: 'إسفنج (3 قطع)',
           fr: 'ÉPONGES (LOT DE 3)',
           es: 'ESPONJAS (3 UNIDADES)',
+          ja: 'スポンジ（3個）',
+          ko: '스펀지 (3개)',
         },
       ],
     },
@@ -545,6 +633,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
       ar: 'ابن عمي الصغير عندنا طوال العطلة… والجدران قلقة',
       fr: 'Mon petit cousin vient ce week-end. Les murs tremblent.',
       es: 'Mi primito viene el fin de semana. Las paredes tiemblan.',
+      ja: '週末はいとこが来る。壁が震えてる。',
+      ko: '사촌 동생이 주말에 옴. 벽들이 긴장 중.',
     },
   },
   {
@@ -559,8 +649,10 @@ export const FAMILY_SKIP: readonly Draft[] = [
         ar: 'يوميات مجالسة الأطفال',
         fr: 'JOURNAL DE BABY-SITTING',
         es: 'CUIDANDO AL PRIMITO',
+        ja: '子守り日記',
+        ko: '아기 돌보기 일지',
       },
-      big: { tr: '47', en: '47', de: '47', ar: '47', fr: '47', es: '47' },
+      big: { tr: '47', en: '47', de: '47', ar: '47', fr: '47', es: '47', ja: '47', ko: '47' },
       text: {
         tr: 'kez “neden?” diye sordu küçük kuzenin; daha öğlen olmadı',
         en: "times your little cousin asked “but why?” It's not even noon.",
@@ -568,6 +660,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
         ar: 'مرة سألك ابن عمك الصغير «لماذا؟»… ولم يحن الظهر بعد',
         fr: 'fois « pourquoi ? » de ton petit cousin. Même pas midi.',
         es: 'veces tu primito preguntó “¿por qué?”. Y aún no es mediodía.',
+        ja: '回、いとこが「なんで？」と聞いた。まだお昼前。',
+        ko: '번, 사촌 동생이 “왜?”라고 물음. 아직 점심도 안 됨.',
       },
     },
     caption: {
@@ -577,6 +671,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
       ar: 'نفدت إجاباتك، ولم تنفد أسئلته',
       fr: "Tu n'as plus de réponses. Lui a encore des questions.",
       es: 'Tú ya no tienes respuestas. Él sigue con preguntas.',
+      ja: '答えは尽きた。質問は尽きない。',
+      ko: '대답은 바닥났는데 질문은 끝이 없음',
     },
   },
   {
@@ -585,7 +681,7 @@ export const FAMILY_SKIP: readonly Draft[] = [
     body: {
       format: 'fact',
       eyebrow: null,
-      big: { tr: '20', en: '20', de: '20', ar: '20', fr: '20', es: '20' },
+      big: { tr: '20', en: '20', de: '20', ar: '20', fr: '20', es: '20', ja: '20', ko: '20' },
       text: {
         tr: 'dakika sürdü dayının fıkrası; sonunu unuttu',
         en: "minutes of your uncle's joke. He forgot the punchline.",
@@ -593,6 +689,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
         ar: 'دقيقة استغرقتها نكتة خالك… ثم نسي نهايتها',
         fr: "minutes de blague de ton oncle. Il a oublié la chute.",
         es: 'minutos duró el chiste de tu tío. Olvidó el final.',
+        ja: '分続いたおじさんのジョーク。オチを忘れた。',
+        ko: '분 동안 이어진 삼촌 개그. 결말을 까먹음.',
       },
     },
     caption: {
@@ -602,6 +700,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
       ar: 'ومع ذلك كانت أطرف نكتة في السهرة',
       fr: 'Quand même la meilleure blague de la soirée',
       es: 'Igual fue el mejor chiste de la noche',
+      ja: 'それでも今夜いちばんウケた',
+      ko: '그래도 오늘 밤 제일 웃긴 개그였음',
     },
   },
   {
@@ -616,8 +716,10 @@ export const FAMILY_SKIP: readonly Draft[] = [
         ar: 'تقرير مجموعة العائلة',
         fr: 'BILAN DU GROUPE FAMILLE',
         es: 'CHAT FAMILIAR: INFORME',
+        ja: '家族グループレポート',
+        ko: '가족 단톡방 리포트',
       },
-      big: { tr: '174', en: '174', de: '174', ar: '174', fr: '174', es: '174' },
+      big: { tr: '174', en: '174', de: '174', ar: '174', fr: '174', es: '174', ja: '174', ko: '174' },
       text: {
         tr: 'mesaj aile grubunda; konu: pazar kahvaltısı saat kaçta',
         en: 'messages in the family group. Topic: Sunday breakfast time.',
@@ -625,6 +727,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
         ar: 'رسالة في مجموعة العائلة، والموضوع: موعد فطور يوم العطلة',
         fr: "messages au groupe famille pour fixer l'heure du brunch",
         es: 'mensajes en el grupo familiar para decidir la hora del desayuno',
+        ja: '件のメッセージ。議題：日曜の朝ごはんは何時か',
+        ko: '개의 메시지. 주제: 일요일 아침 몇 시에 먹을지',
       },
     },
     caption: {
@@ -634,6 +738,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
       ar: 'القرار: الموعد المعتاد',
       fr: "Verdict : l'heure habituelle",
       es: 'Decisión: la hora de siempre',
+      ja: '結論：いつもの時間',
+      ko: '결론: 늘 먹던 시간',
     },
   },
   {
@@ -648,6 +754,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
         ar: 'تصنيف بيت الجدة',
         fr: 'TIER LIST CHEZ MAMIE',
         es: 'TIER LIST: CASA DE LA ABUELA',
+        ja: 'おばあちゃん家Tier表',
+        ko: '할머니 집 티어표',
       },
       rows: [['🍪', '🥧'], ['🫖', '🧶'], ['📺', '🕰️'], ['📶']],
     },
@@ -658,6 +766,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
       ar: 'لا إنترنت، لكن البسكويت بلا حدود. صفقة عادلة.',
       fr: 'Pas de Wi-Fi, mais biscuits à volonté. Ça se vaut.',
       es: 'Sin wifi, pero galletas infinitas. Trato justo.',
+      ja: 'Wi-Fiはないけどお菓子は無限。公平だ。',
+      ko: '와이파이는 없지만 간식은 무제한. 공평함.',
     },
   },
   {
@@ -672,6 +782,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
         ar: 'تصنيف رسائل مجموعة العائلة',
         fr: 'TIER LIST DU GROUPE FAMILLE',
         es: 'TIER LIST DEL GRUPO FAMILIAR',
+        ja: '家族LINE Tier表',
+        ko: '가족 단톡방 티어표',
       },
       rows: [['👶', '🎉'], ['🐈', '🍲'], ['🌅', '🌹'], ['🔗']],
     },
@@ -682,6 +794,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
       ar: 'الرسائل المتسلسلة في القاع… ومن يعترض فليرسلها إلى 10',
       fr: "Les chaînes : C. Pas d'accord ? Transfère à 10 personnes.",
       es: 'Cadenas: nivel C. ¿Objeciones? Reenvía a 10 personas.',
+      ja: 'チェーンメールはC。文句ある人は10人に転送',
+      ko: '행운의 편지는 C. 반대하면 10명에게 전달하세요.',
     },
   },
   {
@@ -691,7 +805,7 @@ export const FAMILY_SKIP: readonly Draft[] = [
       format: 'notifications',
       first: {
         icon: '👨',
-        app: { tr: 'Babam', en: 'Dad', de: 'Papa', ar: 'أبي', fr: 'Papa', es: 'Papá' },
+        app: { tr: 'Babam', en: 'Dad', de: 'Papa', ar: 'أبي', fr: 'Papa', es: 'Papá', ja: 'お父さん', ko: '아빠' },
         text: {
           tr: 'YARIN 8’DE YOLA ÇIKIYORUZ. HAZIR OL.',
           en: 'WE LEAVE AT 8 TOMORROW. BE READY.',
@@ -699,6 +813,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
           ar: 'سنخرج غدًا الساعة 8!!!! كن جاهزًا!!!!',
           fr: 'ON PART DEMAIN À 8 HEURES. SOIS PRÊT.',
           es: 'SALIMOS MAÑANA A LAS 8. PREPÁRATE.',
+          ja: '明日8時に出発。準備しておくこと。',
+          ko: '내일 8시에 출발한다. 준비해라.',
         },
       },
     },
@@ -709,6 +825,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
       ar: 'ليس غاضبًا… إنه يحب علامات التعجب فقط',
       fr: "Il n'est pas fâché. Juste les majuscules.",
       es: 'No está enojado. Solo dejó las mayúsculas.',
+      ja: '怒ってない。句点「。」をつける世代なだけ。',
+      ko: '화난 거 아님. 아빠 원래 말투임.',
     },
   },
   {
@@ -725,6 +843,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
           ar: 'الإشارات',
           fr: 'Identifications',
           es: 'Etiquetas',
+          ja: 'タグ付け',
+          ko: '태그',
         },
         text: {
           tr: 'Annen seni etiketledi: “bebekken 🥰”',
@@ -733,6 +853,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
           ar: 'أشارت إليك أمك: «وأنت رضيع 🥰»',
           fr: "Maman t'a identifié : « bébé 🥰 »",
           es: 'Mamá te etiquetó: “de bebé 🥰”',
+          ja: 'お母さんがタグ付け：「赤ちゃんの頃 🥰」',
+          ko: '엄마가 태그함: “아기 시절 🥰”',
         },
       },
     },
@@ -743,6 +865,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
       ar: 'رآها أصدقائي… جميعهم',
       fr: "Tous mes amis l'ont vue. Tous.",
       es: 'La vieron mis amigos. Todos.',
+      ja: '友だちみんな見た。全員。',
+      ko: '친구들이 다 봤음. 전부 다.',
     },
   },
   {
@@ -752,7 +876,7 @@ export const FAMILY_SKIP: readonly Draft[] = [
       format: 'notifications',
       first: {
         icon: '👵',
-        app: { tr: 'Babaannem', en: 'Grandma', de: 'Oma', ar: 'جدتي', fr: 'Mamie', es: 'Abuela' },
+        app: { tr: 'Babaannem', en: 'Grandma', de: 'Oma', ar: 'جدتي', fr: 'Mamie', es: 'Abuela', ja: 'おばあちゃん', ko: '할머니' },
         text: {
           tr: '7 cevapsız arama',
           en: '7 missed calls',
@@ -760,6 +884,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
           ar: '7 مكالمات فائتة',
           fr: '7 appels manqués',
           es: '7 llamadas perdidas',
+          ja: '不在着信7件',
+          ko: '부재중 전화 7통',
         },
       },
     },
@@ -770,6 +896,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
       ar: 'كنت أستحمّ 3 دقائق فقط',
       fr: "J'étais sous la douche 3 minutes",
       es: 'Estuve 3 minutos en la ducha',
+      ja: 'シャワーを浴びてたのはたった3分',
+      ko: '샤워는 딱 3분 했음',
     },
   },
   {
@@ -784,6 +912,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
         ar: 'الحياة قصيرة… أما دقائق أمي الخمس فلا.',
         fr: 'La vie est courte. Les cinq minutes de maman, non.',
         es: 'La vida es corta. Los cinco minutos de mamá, no.',
+        ja: '人生は短い。でも母の「5分だけ」は長い。',
+        ko: '인생은 짧다. 엄마의 5분은 길다.',
       },
     },
     caption: {
@@ -793,6 +923,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
       ar: 'لبست حذائي… قبل ساعة',
       fr: 'Chaussures aux pieds. Depuis une heure.',
       es: 'Zapatos puestos. Hace una hora.',
+      ja: '靴を履いた。1時間前に。',
+      ko: '신발 신었음. 1시간 전에.',
     },
   },
   {
@@ -807,6 +939,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
         ar: 'أن تكبر يعني أن توبّخ من ترك الضوء مضاءً.',
         fr: "Grandir, c'est râler contre ceux qui laissent la lumière allumée.",
         es: 'Madurar es regañar a alguien por dejar la luz encendida.',
+        ja: '大人になるとは、電気のつけっぱなしを注意する日のこと。',
+        ko: '어른이 된다는 건 불 켜 놓은 사람한테 잔소리하는 날이 오는 것.',
       },
     },
     caption: {
@@ -816,6 +950,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
       ar: 'أبي فخور جدًا',
       fr: 'Papa est si fier',
       es: 'Papá está orgulloso',
+      ja: '父が誇らしげ',
+      ko: '아빠가 뿌듯해함',
     },
   },
   {
@@ -830,6 +966,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
         ar: 'بعض الناس يولدون أبطالًا… وبعضهم يولد أكبر أبناء العم.',
         fr: "Certains naissent héros. D'autres naissent l'aîné des cousins.",
         es: 'Algunos nacen héroes. Otros nacen siendo el primo mayor.',
+        ja: '英雄に生まれる人もいる。いとこの最年長に生まれる人もいる。',
+        ko: '누군가는 영웅으로 태어난다. 누군가는 사촌 중 맏이로 태어난다.',
       },
     },
     caption: {
@@ -839,6 +977,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
       ar: 'تركوا الصغار عندي مجددًا',
       fr: "On m'a encore confié les petits",
       es: 'Otra vez me dejaron a los pequeños',
+      ja: 'また小さい子たちを任された',
+      ko: '또 꼬맹이들을 나한테 맡김',
     },
   },
   {
@@ -853,6 +993,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
         ar: 'الإخوة يعيشون طفولة واحدة… ولا يروونها بالطريقة نفسها أبدًا.',
         fr: 'Frères et sœurs vivent la même enfance. Jamais la même version.',
         es: 'Los hermanos comparten infancia. Nunca la cuentan igual.',
+        ja: 'きょうだいは同じ子ども時代を過ごす。でも話は絶対に食い違う。',
+        ko: '형제는 같은 어린 시절을 보낸다. 하지만 절대 똑같이 기억하지 않는다.',
       },
     },
     caption: {
@@ -862,6 +1004,8 @@ export const FAMILY_SKIP: readonly Draft[] = [
       ar: 'من كسر المصباح؟ ما زال الأمر محل خلاف',
       fr: "Qui a cassé la lampe ? Le débat reste ouvert.",
       es: '¿Quién rompió la lámpara? Sigue en debate.',
+      ja: 'ランプを割った犯人はいまだ議論中',
+      ko: '스탠드 깬 범인은 아직도 논쟁 중',
     },
   },
 ];
@@ -878,6 +1022,8 @@ export const FAMILY_LIKE: readonly Draft[] = [
       ar: 'أول كلمة نطقتها ابنة أختي كانت اسمي!! أبكي',
       fr: 'le premier mot de ma nièce, mon prénom !! je pleure',
       es: '¡¡la primera palabra de mi sobrina fue mi nombre!! lloro',
+      ja: '姪の初めての言葉が私の名前！！泣いてる',
+      ko: '조카의 첫 말이 내 이름!! 눈물 남',
     },
   },
   {
@@ -891,6 +1037,8 @@ export const FAMILY_LIKE: readonly Draft[] = [
       ar: 'تقاعد أبي بعد 35 سنة!! واستيقظ اليوم الساعة 6 كعادته',
       fr: 'papa à la retraite après 35 ans de boulot !! debout à 6 h',
       es: '¡¡papá se jubiló tras 35 años!! igual se levantó a las 6',
+      ja: '父が35年勤めて定年！！今日も6時起き',
+      ko: '아빠 35년 만에 은퇴!! 오늘도 6시 기상',
     },
   },
   {
@@ -904,6 +1052,8 @@ export const FAMILY_LIKE: readonly Draft[] = [
       ar: 'جالست ابنة خالتي الصغيرة… وشربت 14 كوب شاي وهمي',
       fr: 'baby-sitting de ma cousine : 14 tasses de thé imaginaire',
       es: 'cuidé a mi primita: me tomé 14 tazas de té imaginario',
+      ja: 'いとこの子守りで、ままごとのお茶を14杯',
+      ko: '사촌 동생 돌봄, 소꿉놀이 차 14잔 마심',
     },
   },
   {
@@ -917,6 +1067,8 @@ export const FAMILY_LIKE: readonly Draft[] = [
       ar: 'الشجرة التي زرعتها مع جدي صارت أطول مني',
       fr: "l'arbre planté avec papi est plus grand que moi",
       es: 'el árbol que plantamos con el abuelo ya es más alto que yo',
+      ja: 'おじいちゃんと植えた木、今では私より高い',
+      ko: '할아버지랑 심은 나무가 이제 나보다 큼',
     },
   },
   {
@@ -931,6 +1083,8 @@ export const FAMILY_LIKE: readonly Draft[] = [
         ar: 'عائلتنا (رسمتها أختي)',
         fr: 'notre famille, par ma sœur',
         es: 'la familia, por mi hermana',
+        ja: '家族の絵（妹作）',
+        ko: '우리 가족 (동생 그림)',
       },
     },
     caption: {
@@ -940,6 +1094,8 @@ export const FAMILY_LIKE: readonly Draft[] = [
       ar: 'رسمت الكلب أكبر مني… سجّلت ذلك',
       fr: 'elle a dessiné le chien plus grand que moi. noté.',
       es: 'dibujó al perro más grande que a mí. anotado.',
+      ja: '犬を私より大きく描いてる。覚えとく。',
+      ko: '강아지를 나보다 크게 그림. 기억해 둠.',
     },
   },
   {
@@ -947,7 +1103,7 @@ export const FAMILY_LIKE: readonly Draft[] = [
     user: ACCOUNTS.selin,
     body: {
       format: 'polaroid',
-      note: { tr: '50. yıl', en: '50 years', de: '50 jahre', ar: '50 عامًا', fr: '50 ans', es: '50 años' },
+      note: { tr: '50. yıl', en: '50 years', de: '50 jahre', ar: '50 عامًا', fr: '50 ans', es: '50 años', ja: '結婚50年', ko: '50주년' },
     },
     caption: {
       tr: 'dedemle babaannem, hâlâ el ele',
@@ -956,6 +1112,8 @@ export const FAMILY_LIKE: readonly Draft[] = [
       ar: 'جدي وجدتي… يدًا بيد حتى اليوم',
       fr: 'papi et mamie, toujours main dans la main',
       es: 'mis abuelos, todavía de la mano',
+      ja: 'おじいちゃんとおばあちゃん、今も手をつないでる',
+      ko: '할머니 할아버지, 아직도 손잡고 다니심',
     },
   },
   {
@@ -970,6 +1128,8 @@ export const FAMILY_LIKE: readonly Draft[] = [
         ar: 'صوّرتها أمي',
         fr: 'photo de maman',
         es: 'foto de mamá',
+        ja: '母が撮った',
+        ko: '엄마가 찍음',
       },
     },
     caption: {
@@ -979,6 +1139,8 @@ export const FAMILY_LIKE: readonly Draft[] = [
       ar: 'نصفها إصبع… لكنها صورتي المفضلة',
       fr: "moitié doigt, mais c'est ma préférée",
       es: 'la mitad es su dedo, pero es mi favorita',
+      ja: '半分は指。でもこれがいちばん好き',
+      ko: '반은 손가락인데 이게 제일 좋음',
     },
   },
   {
@@ -993,6 +1155,8 @@ export const FAMILY_LIKE: readonly Draft[] = [
         ar: 'قهوة أبي',
         fr: 'le café de papa',
         es: 'el café de papá',
+        ja: '父のコーヒー',
+        ko: '아빠의 커피',
       },
     },
     caption: {
@@ -1002,6 +1166,8 @@ export const FAMILY_LIKE: readonly Draft[] = [
       ar: 'صنعت لأبي قهوة، فقال: «لا بأس». أعلى مديح',
       fr: "café pour papa. il a dit « pas mal ». record d'éloges",
       es: 'le hice café a papá. dijo “no está mal”. récord de elogios',
+      ja: '父にコーヒーを淹れた。「まあまあ」だって。最高評価',
+      ko: '아빠한테 커피 타 줌. “괜찮네” 하심. 역대급 칭찬',
     },
   },
   {
@@ -1015,6 +1181,8 @@ export const FAMILY_LIKE: readonly Draft[] = [
       ar: 'لقاء أبناء العم: 11 شخصًا، حمّام واحد، ولا نوم',
       fr: 'week-end cousins : 11 personnes, 1 salle de bain, 0 dodo',
       es: 'fin de semana de primos: 11, un baño, cero sueño',
+      ja: 'いとこ会：11人、お風呂1つ、睡眠ゼロ',
+      ko: '사촌 모임: 11명, 화장실 1개, 수면 0시간',
     },
   },
   {
@@ -1028,6 +1196,8 @@ export const FAMILY_LIKE: readonly Draft[] = [
       ar: 'عطلة في مزرعة خالي: 40 حبة طماطم وديك عنيد',
       fr: 'chez mon oncle à la campagne : 40 tomates, 1 coq têtu',
       es: 'en el campo con mi tío: 40 tomates, 1 gallo terco',
+      ja: 'おじさんの田舎で週末：トマト40個、頑固なニワトリ1羽',
+      ko: '외삼촌네 시골 주말: 토마토 40개, 고집 센 수탉 1마리',
     },
   },
   {
@@ -1041,6 +1211,8 @@ export const FAMILY_LIKE: readonly Draft[] = [
       ar: 'أعدنا صورة عائلية قديمة… وقميص أبي هو نفسه',
       fr: 'photo de famille refaite. papa a gardé la même chemise',
       es: 'foto familiar recreada: papá aún tiene la misma camisa',
+      ja: '昔の家族写真を再現。父のシャツは当時のまま',
+      ko: '옛날 가족사진 재현, 아빠 셔츠는 그때 그대로',
     },
   },
   {
@@ -1054,6 +1226,8 @@ export const FAMILY_LIKE: readonly Draft[] = [
       ar: 'عيد ميلاد جدي الثمانين: 4 أجيال في صورة واحدة',
       fr: 'les 80 ans de papi : 4 générations sur une photo',
       es: 'los 80 del abuelo: 4 generaciones en una foto',
+      ja: 'おじいちゃんの80歳の誕生日：4世代で1枚に',
+      ko: '할아버지 팔순 잔치: 4대가 한 컷에',
     },
   },
 ];
@@ -1070,6 +1244,8 @@ export const FAMILY_HOLD: readonly Draft[] = [
       ar: 'مصروف سري من جدتك… «لا تخبر أمك»',
       fr: "L'argent de poche de mamie. « Le dis pas à ta mère. »",
       es: 'El dinerito de la abuela. “No le digas a tu mamá.”',
+      ja: 'おばあちゃんのお小遣い。「お母さんには内緒ね」',
+      ko: '할머니 용돈. “엄마한테는 비밀이다.”',
     },
   },
   {
@@ -1083,6 +1259,8 @@ export const FAMILY_HOLD: readonly Draft[] = [
       ar: 'غرض نادر: آخر حلوى في جيب جدك',
       fr: 'Objet rare : le dernier bonbon de la poche de papi',
       es: 'Objeto raro: el último caramelo del bolsillo del abuelo',
+      ja: 'レアアイテム：おじいちゃんのポケットの最後のアメ',
+      ko: '희귀템: 할아버지 주머니 속 마지막 사탕',
     },
   },
   {
@@ -1096,6 +1274,8 @@ export const FAMILY_HOLD: readonly Draft[] = [
       ar: 'وصفة جدتك السرية… أعطتها لك وحدك',
       fr: 'La recette secrète de mamie. Rien que pour toi.',
       es: 'La receta secreta de la abuela. Solo para ti.',
+      ja: 'おばあちゃんの秘伝レシピ。あなただけに教えてくれた',
+      ko: '할머니의 비밀 레시피. 당신에게만 알려 주셨어요.',
     },
   },
   {
@@ -1109,6 +1289,8 @@ export const FAMILY_HOLD: readonly Draft[] = [
       ar: 'المقعد الأمامي لك! نسيت أختك أن تحجزه',
       fr: 'Place avant pour toi ! Ta sœur a oublié de la réclamer.',
       es: '¡El asiento de adelante es tuyo! Tu hermana se olvidó.',
+      ja: '助手席ゲット！妹が「前は私」って言い忘れた',
+      ko: '앞자리 당첨! 동생이 “앞자리 내 거” 외치는 걸 까먹음',
     },
   },
   {
@@ -1122,6 +1304,8 @@ export const FAMILY_HOLD: readonly Draft[] = [
       ar: 'قال أبوك «حسنًا، اذهب»… اترك قبل أن يغيّر رأيه!',
       fr: "Papa a dit oui. Lâche avant qu'il change d'avis !",
       es: 'Papá dijo “sí, ve”. ¡Suelta antes de que cambie de idea!',
+      ja: '父が「いいよ、行きな」と言った。気が変わる前に離して！',
+      ko: '아빠가 “그래, 가라” 했다. 마음 바뀌기 전에 손 떼기!',
     },
   },
   {
@@ -1135,6 +1319,8 @@ export const FAMILY_HOLD: readonly Draft[] = [
       ar: '6 علب من طبخ أمك… تكفي أسبوعًا كاملًا',
       fr: '6 boîtes de petits plats de maman. Une semaine de festin.',
       es: '6 recipientes con comida de mamá. Para toda la semana.',
+      ja: '母が持たせてくれた料理6箱。1週間はもつ。',
+      ko: '엄마가 싸 준 반찬 6통. 일주일은 거뜬.',
     },
   },
   {
@@ -1148,6 +1334,8 @@ export const FAMILY_HOLD: readonly Draft[] = [
       ar: 'أعطاك أخوك يد التحكم… بإرادته!',
       fr: 'Ton frère te passe la manette. De lui-même.',
       es: 'Tu hermano te pasó el control. Por voluntad propia.',
+      ja: '弟がコントローラーを渡してくれた。自分から。',
+      ko: '동생이 게임 패드를 넘겨줬어요. 자발적으로.',
     },
   },
 ];
@@ -1165,6 +1353,8 @@ export const FAMILY_FREEZE: readonly Draft[] = [
         ar: 'منطقة محظورة',
         fr: 'ZONE INTERDITE',
         es: 'ZONA PROHIBIDA',
+        ja: '立入禁止',
+        ko: '출입 금지',
       },
       small: {
         tr: 'BABAMIN ALETLERİ',
@@ -1173,6 +1363,8 @@ export const FAMILY_FREEZE: readonly Draft[] = [
         ar: 'أدوات أبي',
         fr: 'LES OUTILS DE PAPA',
         es: 'HERRAMIENTAS DE PAPÁ',
+        ja: '父の工具',
+        ko: '아빠 공구',
       },
     },
     caption: {
@@ -1182,6 +1374,8 @@ export const FAMILY_FREEZE: readonly Draft[] = [
       ar: 'واحد منها عندك. لا تتحرك.',
       fr: 'Il y en a un chez toi. Bouge pas.',
       es: 'Uno lo tienes tú. No te muevas.',
+      ja: '1本はあなたの部屋に。動かないで。',
+      ko: '하나는 방에 있잖아요. 움직이지 마세요.',
     },
     headline: {
       tr: 'Baban tornavidalarını sayıyor',
@@ -1190,6 +1384,8 @@ export const FAMILY_FREEZE: readonly Draft[] = [
       ar: 'أبوك يعدّ مفكّاته',
       fr: 'Papa compte ses tournevis',
       es: 'Papá está contando sus destornilladores',
+      ja: '父がドライバーを数えてる',
+      ko: '아빠가 드라이버를 세는 중',
     },
   },
   {
@@ -1204,6 +1400,8 @@ export const FAMILY_FREEZE: readonly Draft[] = [
         ar: 'محجوز',
         fr: 'RÉSERVÉ',
         es: 'RESERVADO',
+        ja: '予約席',
+        ko: '지정석',
       },
       small: {
         tr: 'BABAMIN KOLTUĞU',
@@ -1212,6 +1410,8 @@ export const FAMILY_FREEZE: readonly Draft[] = [
         ar: 'كرسي أبي',
         fr: 'LE FAUTEUIL DE PAPA',
         es: 'EL SILLÓN DE PAPÁ',
+        ja: '父の特等席',
+        ko: '아빠 전용 의자',
       },
     },
     caption: {
@@ -1221,6 +1421,8 @@ export const FAMILY_FREEZE: readonly Draft[] = [
       ar: 'ربما لا يلاحظ. لا تتحرك.',
       fr: 'Il le verra peut-être pas. Bouge pas.',
       es: 'Quizás no se dé cuenta. No te muevas.',
+      ja: 'バレないかも。動かないで。',
+      ko: '모를 수도 있어요. 움직이지 마세요.',
     },
     headline: {
       tr: 'Baban geldi, sen onun koltuğundasın',
@@ -1229,6 +1431,8 @@ export const FAMILY_FREEZE: readonly Draft[] = [
       ar: 'وصل أبوك وأنت على كرسيه',
       fr: "Papa rentre et t'es dans son fauteuil",
       es: 'Llegó papá y estás en su sillón',
+      ja: '父が帰宅。あなたは父の席に',
+      ko: '아빠가 왔는데 아빠 자리에 앉아 있음',
     },
   },
   {
@@ -1243,6 +1447,8 @@ export const FAMILY_FREEZE: readonly Draft[] = [
         ar: 'لا تلمس',
         fr: 'NE TOUCHEZ PAS',
         es: 'NO TOCAR',
+        ja: '触れるな',
+        ko: '손대지 마시오',
       },
       small: {
         tr: 'BABAANNEMİN DANTELLERİ',
@@ -1251,6 +1457,8 @@ export const FAMILY_FREEZE: readonly Draft[] = [
         ar: 'مفارش جدتي',
         fr: 'LES NAPPERONS DE MAMIE',
         es: 'LOS TAPETES DE LA ABUELA',
+        ja: 'おばあちゃんのレース',
+        ko: '할머니의 레이스',
       },
     },
     caption: {
@@ -1260,6 +1468,8 @@ export const FAMILY_FREEZE: readonly Draft[] = [
       ar: 'لست أنت الفاعل. لا تتحرك.',
       fr: "C'est pas toi. Bouge pas.",
       es: 'No fuiste tú. No te muevas.',
+      ja: 'あなたじゃない。動かないで。',
+      ko: '당신 짓 아니에요. 움직이지 마세요.',
     },
     headline: {
       tr: 'Dantel yamuk, babaannen geliyor',
@@ -1268,6 +1478,8 @@ export const FAMILY_FREEZE: readonly Draft[] = [
       ar: 'المفرش مائل… وجدتك قادمة',
       fr: 'Napperon de travers. Mamie arrive.',
       es: 'Tapete torcido. Viene la abuela.',
+      ja: 'レースが曲がってる。おばあちゃんが来る',
+      ko: '레이스가 삐뚤어졌는데 할머니가 오심',
     },
   },
   {
@@ -1282,6 +1494,8 @@ export const FAMILY_FREEZE: readonly Draft[] = [
         ar: 'المدخل',
         fr: 'ENTRÉE',
         es: 'RECIBIDOR',
+        ja: '玄関',
+        ko: '현관',
       },
     },
     caption: {
@@ -1291,6 +1505,8 @@ export const FAMILY_FREEZE: readonly Draft[] = [
       ar: 'إن لم تتحرك فلن تراك.',
       fr: 'Si tu bouges pas, elle te voit pas.',
       es: 'Si no te mueves, no te ve.',
+      ja: '動かなければ見つからない。',
+      ko: '안 움직이면 못 봐요.',
     },
     headline: {
       tr: 'Teyzen yanağını sıkmaya geliyor',
@@ -1299,6 +1515,8 @@ export const FAMILY_FREEZE: readonly Draft[] = [
       ar: 'خالتك قادمة لتقرص خدّك',
       fr: 'Tata arrive pour te pincer la joue',
       es: 'Tu tía viene a pellizcarte las mejillas',
+      ja: 'おばさんがほっぺをつまみに来る',
+      ko: '이모가 볼 꼬집으러 오는 중',
     },
   },
   {
@@ -1313,6 +1531,8 @@ export const FAMILY_FREEZE: readonly Draft[] = [
         ar: 'صالون جدتي',
         fr: 'CHEZ MAMIE',
         es: 'CASA DE LA ABUELA',
+        ja: 'おばあちゃん家',
+        ko: '할머니 댁 거실',
       },
     },
     caption: {
@@ -1322,6 +1542,8 @@ export const FAMILY_FREEZE: readonly Draft[] = [
       ar: 'اجلس معتدلًا. ابتسم. لا تتحرك.',
       fr: 'Tiens-toi droit. Souris. Bouge pas.',
       es: 'Siéntate derecho. Sonríe. No te muevas.',
+      ja: '背筋を伸ばして。笑顔で。動かないで。',
+      ko: '똑바로 앉아요. 웃어요. 움직이지 마세요.',
     },
     headline: {
       tr: 'Annen o bakışı attı',
@@ -1330,6 +1552,8 @@ export const FAMILY_FREEZE: readonly Draft[] = [
       ar: 'أمك رمقتك بتلك النظرة',
       fr: "Maman t'a lancé son regard noir",
       es: 'Mamá te echó esa mirada',
+      ja: '母が「あの目」をした',
+      ko: '엄마가 그 눈빛을 보냈다',
     },
   },
   {
@@ -1344,6 +1568,8 @@ export const FAMILY_FREEZE: readonly Draft[] = [
         ar: 'المطبخ',
         fr: 'CUISINE',
         es: 'COCINA',
+        ja: 'キッチン',
+        ko: '주방',
       },
     },
     caption: {
@@ -1353,6 +1579,8 @@ export const FAMILY_FREEZE: readonly Draft[] = [
       ar: 'على شفتك كريمة. لا تتحرك.',
       fr: "T'as de la crème sur la lèvre. Bouge pas.",
       es: 'Tienes crema en el labio. No te muevas.',
+      ja: '口にクリームついてる。動かないで。',
+      ko: '입술에 크림 묻었어요. 움직이지 마세요.',
     },
     headline: {
       tr: 'Annen pastayı kimin yediğini soruyor',
@@ -1361,6 +1589,8 @@ export const FAMILY_FREEZE: readonly Draft[] = [
       ar: 'أمك تسأل: من أكل الكعكة؟',
       fr: 'Maman demande qui a mangé le gâteau',
       es: 'Mamá pregunta quién se comió el pastel',
+      ja: '母が「ケーキ食べたの誰？」と聞いてる',
+      ko: '엄마가 케이크 누가 먹었냐고 묻는 중',
     },
   },
   {
@@ -1375,6 +1605,8 @@ export const FAMILY_FREEZE: readonly Draft[] = [
         ar: 'غرفة الجلوس',
         fr: 'SALON',
         es: 'SALA DE ESTAR',
+        ja: 'リビング',
+        ko: '거실',
       },
     },
     caption: {
@@ -1384,6 +1616,8 @@ export const FAMILY_FREEZE: readonly Draft[] = [
       ar: 'احبس أنفاسك. لا تتحرك.',
       fr: 'Retiens ton souffle. Bouge pas.',
       es: 'Aguanta la respiración. No te muevas.',
+      ja: '息を止めて。動かないで。',
+      ko: '숨 참아요. 움직이지 마세요.',
     },
     headline: {
       tr: 'Minik kuzenin yürümek üzere',
@@ -1392,6 +1626,8 @@ export const FAMILY_FREEZE: readonly Draft[] = [
       ar: 'ابن عمك الصغير على وشك أن يمشي',
       fr: 'Ton petit cousin va se mettre à marcher',
       es: 'Tu primito está a punto de caminar',
+      ja: '小さないとこが歩き出しそう',
+      ko: '아기 사촌이 곧 걸을 것 같음',
     },
   },
 ];

@@ -20,6 +20,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'وصل الطبق الرئيسي… وأنا شبعت من الخبز',
       fr: "Le plat arrive. J'ai déjà calé sur le pain.",
       es: 'Llegó el plato principal. Ya me llené de pan.',
+      ja: 'メインが来た。私はパンでもう満腹。',
+      ko: '메인 요리 등장. 난 이미 빵으로 배부름.',
     },
   },
   {
@@ -33,6 +35,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'بصلة واحدة أبكتني أكثر من أي حلقة أخيرة',
       fr: "Cet oignon m'a plus fait pleurer qu'un final de saison",
       es: 'Esta cebolla me hizo llorar más que un final de serie',
+      ja: '玉ねぎ、どのドラマの最終回より泣けた',
+      ko: '양파 하나에 드라마 최종회보다 더 울었다',
     },
   },
   {
@@ -46,6 +50,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'اسودّ الموز… ومصيره الآن كعكة',
       fr: 'Bananes noires. Leur destin : finir en gâteau.',
       es: 'Plátanos negros. Su destino: pan de plátano.',
+      ja: 'バナナが黒くなった。運命はバナナケーキ。',
+      ko: '바나나가 까매졌다. 운명은 바나나빵.',
     },
   },
   {
@@ -59,6 +65,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'جرّبت 9 قطع في غرفة القياس… والفائز: قميصي',
       fr: "Cabine d'essayage : 9 tenues. Gagnant : mon t-shirt.",
       es: 'Probador: 9 prendas. Ganó mi propia camiseta.',
+      ja: '試着9着。優勝は自分のTシャツ。',
+      ko: '탈의실에서 9벌. 우승은 원래 입던 티셔츠.',
     },
   },
   {
@@ -72,6 +80,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'كسرت بيضة… ومطاردة القشرة مستمرة منذ 10 دقائق',
       fr: 'Un œuf cassé. Chasse à la coquille : 10e minute.',
       es: 'Rompí un huevo. Cazando cáscaras: minuto 10.',
+      ja: '卵を割った。殻探し、10分経過。',
+      ko: '달걀 하나 깼다. 껍데기 찾기 10분째.',
     },
   },
   {
@@ -85,6 +95,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'رأيت السعر… فأعدته إلى الرف بهدوء',
       fr: 'Vu le prix. Reposé tout doucement en rayon.',
       es: 'Vi el precio. Lo devolví al estante despacito.',
+      ja: '値札を見た。そっと棚に戻した。',
+      ko: '가격 봤다. 조용히 선반에 돌려놨다.',
     },
   },
   {
@@ -98,6 +110,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'طلبته «حارًا قليلًا»… وقليل الطاهي بركان',
       fr: "J'ai dit « doux ». Le chef a compris « lave ».",
       es: 'Pedí “poco picante”. El chef entendió “lava”.',
+      ja: '「辛さ控えめ」で頼んだ。シェフの控えめは溶岩。',
+      ko: '“덜 맵게” 했는데 셰프 기준은 용암이었다.',
     },
   },
   {
@@ -105,7 +119,7 @@ export const FOOD_SKIP: readonly Draft[] = [
     user: ACCOUNTS.screens,
     body: {
       format: 'chat',
-      contact: { tr: 'Anneannem', en: 'Grandma', de: 'Oma', ar: 'جدتي', fr: 'Mamie', es: 'Abuela' },
+      contact: { tr: 'Anneannem', en: 'Grandma', de: 'Oma', ar: 'جدتي', fr: 'Mamie', es: 'Abuela', ja: 'おばあちゃん', ko: '할머니' },
       lines: [
         {
           from: 'me',
@@ -116,6 +130,8 @@ export const FOOD_SKIP: readonly Draft[] = [
             ar: 'جدتي، كم من الطحين للكعكة؟',
             fr: 'mamie, combien de farine pour le gâteau ?',
             es: 'abuela, ¿cuánta harina lleva el pastel?',
+            ja: 'おばあちゃん、ケーキの粉どれくらい？',
+            ko: '할머니, 케이크에 밀가루 얼마나 넣어요?',
           },
         },
         {
@@ -127,6 +143,8 @@ export const FOOD_SKIP: readonly Draft[] = [
             ar: 'بقدر ما يحتاج',
             fr: "ce qu'il faut",
             es: 'la que pida la masa',
+            ja: '生地が欲しがるだけ',
+            ko: '반죽이 먹는 만큼',
           },
         },
         {
@@ -138,6 +156,8 @@ export const FOOD_SKIP: readonly Draft[] = [
             ar: 'يعني كم كوبًا؟',
             fr: 'donc… combien de verres ?',
             es: '¿o sea, cuántas tazas?',
+            ja: 'つまり何カップ？',
+            ko: '그러니까 몇 컵이요?',
           },
         },
         {
@@ -149,6 +169,8 @@ export const FOOD_SKIP: readonly Draft[] = [
             ar: 'ستعرف حين ترى القوام',
             fr: 'tu verras bien à la texture',
             es: 'lo sabrás cuando lo veas',
+            ja: '見ればわかるよ',
+            ko: '보면 알아',
           },
         },
       ],
@@ -160,6 +182,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'وحدة القياس: الإحساس',
       fr: "Unité de mesure : à l'œil",
       es: 'Unidad de medida: a ojo',
+      ja: '計量単位：目分量',
+      ko: '계량 단위: 눈대중',
     },
   },
   {
@@ -167,7 +191,7 @@ export const FOOD_SKIP: readonly Draft[] = [
     user: ACCOUNTS.food,
     body: {
       format: 'chat',
-      contact: { tr: 'Annem', en: 'Mom', de: 'Mama', ar: 'أمي', fr: 'Maman', es: 'Mamá' },
+      contact: { tr: 'Annem', en: 'Mom', de: 'Mama', ar: 'أمي', fr: 'Maman', es: 'Mamá', ja: 'お母さん', ko: '엄마' },
       lines: [
         {
           from: 'them',
@@ -178,6 +202,8 @@ export const FOOD_SKIP: readonly Draft[] = [
             ar: 'هل اشتريت الخبز؟',
             fr: "t'as pris du pain ?",
             es: '¿compraste pan?',
+            ja: 'パン買った？',
+            ko: '빵 샀어?',
           },
         },
         {
@@ -189,6 +215,8 @@ export const FOOD_SKIP: readonly Draft[] = [
             ar: 'نعم، وما زال ساخنًا 😋',
             fr: 'oui, encore tout chaud 😋',
             es: 'sí, calentito 😋',
+            ja: '買ったよ、ほかほか😋',
+            ko: '샀지, 따끈따끈 😋',
           },
         },
         {
@@ -200,6 +228,8 @@ export const FOOD_SKIP: readonly Draft[] = [
             ar: 'وأين طرفاه؟',
             fr: 'ils sont où, les bouts ?',
             es: '¿y las puntas?',
+            ja: '両端はどこ？',
+            ko: '양쪽 끝은 어디 갔어?',
           },
         },
         {
@@ -211,6 +241,8 @@ export const FOOD_SKIP: readonly Draft[] = [
             ar: 'المخبز صار يبيعه بلا أطراف',
             fr: 'ils le vendent sans bouts maintenant',
             es: 'ahora lo venden sin puntas',
+            ja: 'パン屋さん、最近は端なしなんだって',
+            ko: '요즘 빵집은 끝 없이 팔더라',
           },
         },
       ],
@@ -222,6 +254,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'الخبز الساخن لا يصل إلى البيت كاملًا أبدًا',
       fr: "Une baguette chaude n'arrive jamais entière",
       es: 'El pan caliente nunca llega entero a casa',
+      ja: '焼きたてパンは無傷で家に着かない',
+      ko: '따끈한 빵은 절대 멀쩡히 집에 못 온다',
     },
   },
   {
@@ -229,7 +263,7 @@ export const FOOD_SKIP: readonly Draft[] = [
     user: ACCOUNTS.shopping,
     body: {
       format: 'chat',
-      contact: { tr: 'Babam', en: 'Dad', de: 'Papa', ar: 'أبي', fr: 'Papa', es: 'Papá' },
+      contact: { tr: 'Babam', en: 'Dad', de: 'Papa', ar: 'أبي', fr: 'Papa', es: 'Papá', ja: 'お父さん', ko: '아빠' },
       lines: [
         {
           from: 'them',
@@ -240,6 +274,8 @@ export const FOOD_SKIP: readonly Draft[] = [
             ar: 'هل السترة التي في الصورة جديدة؟',
             fr: 'la veste sur la photo, elle est neuve ?',
             es: '¿la chaqueta de la foto es nueva?',
+            ja: '写真の上着、新しいの？',
+            ko: '사진 속 재킷 새로 샀어?',
           },
         },
         {
@@ -251,6 +287,8 @@ export const FOOD_SKIP: readonly Draft[] = [
             ar: 'لا، عندي منذ زمن',
             fr: "non, je l'ai depuis des siècles",
             es: 'no, la tengo desde hace siglos',
+            ja: 'いや、前から持ってるよ',
+            ko: '아니, 원래 있던 거야',
           },
         },
         {
@@ -262,6 +300,8 @@ export const FOOD_SKIP: readonly Draft[] = [
             ar: 'لكن البطاقة ما زالت معلّقة بها',
             fr: "l'étiquette pend encore",
             es: 'todavía le cuelga la etiqueta',
+            ja: 'タグぶら下がってるけど',
+            ko: '근데 택이 달랑거리던데',
           },
         },
       ],
@@ -273,6 +313,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'البطاقة فضحتني',
       fr: "L'étiquette a tout balancé",
       es: 'La etiqueta me delató',
+      ja: 'タグが全部白状した',
+      ko: '택이 다 자백했다',
     },
   },
   {
@@ -287,6 +329,8 @@ export const FOOD_SKIP: readonly Draft[] = [
         ar: 'زميل السكن',
         fr: 'Coloc',
         es: 'Compañero de casa',
+        ja: 'ルームメイト',
+        ko: '룸메이트',
       },
       lines: [
         {
@@ -298,6 +342,8 @@ export const FOOD_SKIP: readonly Draft[] = [
             ar: 'ما هذه الرائحة في المطبخ؟',
             fr: 'ça sent quoi dans la cuisine ?',
             es: '¿qué es ese olor en la cocina?',
+            ja: 'キッチンから変なにおいが',
+            ko: '부엌에서 무슨 냄새 나는데',
           },
         },
         {
@@ -309,6 +355,8 @@ export const FOOD_SKIP: readonly Draft[] = [
             ar: 'طبخت!',
             fr: "j'ai cuisiné !",
             es: '¡cociné!',
+            ja: '料理したの！',
+            ko: '요리했어!',
           },
         },
         {
@@ -320,6 +368,8 @@ export const FOOD_SKIP: readonly Draft[] = [
             ar: 'ماذا طبخت؟',
             fr: "c'est quoi ?",
             es: '¿qué cosa?',
+            ja: '何を？',
+            ko: '뭘 만들었는데?',
           },
         },
         {
@@ -331,6 +381,8 @@ export const FOOD_SKIP: readonly Draft[] = [
             ar: 'في البداية كانت معكرونة',
             fr: "au début, c'étaient des pâtes",
             es: 'al principio era pasta',
+            ja: '最初はパスタだった',
+            ko: '처음엔 파스타였어',
           },
         },
       ],
@@ -342,6 +394,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'توصية الطاهي: لا تسأل',
       fr: 'Conseil du chef : ne demande pas',
       es: 'Sugerencia del chef: no preguntes',
+      ja: 'シェフのおすすめ：聞かずに食べて',
+      ko: '셰프 추천: 묻지 말고 드세요',
     },
   },
   {
@@ -356,6 +410,8 @@ export const FOOD_SKIP: readonly Draft[] = [
         ar: 'فمك ممتلئ، والنادل يسأل: «هل كل شيء بخير؟»',
         fr: 'Le serveur demande si ça va. Bouche pleine. Toi :',
         es: 'Boca llena. Te preguntan: “¿Todo bien?” Tú:',
+        ja: '口がいっぱい。店員「いかがですか？」あなたは：',
+        ko: '입에 음식 가득. 직원: “괜찮으세요?” 나는:',
       },
       options: [
         {
@@ -365,6 +421,8 @@ export const FOOD_SKIP: readonly Draft[] = [
           ar: 'أجيب بالكلام',
           fr: 'Je réponds',
           es: 'Respondo',
+          ja: '声で答える',
+          ko: '말로 대답한다',
         },
         {
           tr: 'Başparmak 👍',
@@ -373,6 +431,8 @@ export const FOOD_SKIP: readonly Draft[] = [
           ar: 'أرفع إبهامي 👍',
           fr: 'Pouce levé 👍',
           es: 'Pulgar arriba 👍',
+          ja: 'グッド👍',
+          ko: '엄지 척 👍',
         },
       ],
       winner: 1,
@@ -384,6 +444,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'الإبهام يتكلم كل اللغات',
       fr: 'Le pouce parle toutes les langues',
       es: 'El pulgar habla todos los idiomas',
+      ja: '親指は万国共通語',
+      ko: '엄지는 만국 공통어',
     },
   },
   {
@@ -398,6 +460,8 @@ export const FOOD_SKIP: readonly Draft[] = [
         ar: 'ثلاثة طوابير عند الصناديق. أيها أسرع؟',
         fr: 'Trois caisses ouvertes. Laquelle avance vite ?',
         es: 'Tres cajas abiertas. ¿Cuál avanza más rápido?',
+        ja: 'レジに3列。一番早く進むのは？',
+        ko: '계산대 줄이 세 개. 어디가 제일 빠를까요?',
       },
       options: [
         {
@@ -407,6 +471,8 @@ export const FOOD_SKIP: readonly Draft[] = [
           ar: 'الطابور الذي أختاره',
           fr: 'Celle que je choisis',
           es: 'La que yo elija',
+          ja: '私が選んだ列',
+          ko: '내가 고른 줄',
         },
         {
           tr: 'Diğer ikisi',
@@ -415,6 +481,8 @@ export const FOOD_SKIP: readonly Draft[] = [
           ar: 'الطابوران الآخران',
           fr: 'Les deux autres',
           es: 'Las otras dos',
+          ja: '残りの2列',
+          ko: '나머지 두 줄',
         },
       ],
       winner: 1,
@@ -426,6 +494,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'غيّرت الطابور… فتوقف هو أيضًا',
       fr: "J'ai changé de file. Elle s'est arrêtée aussi.",
       es: 'Me cambié de fila. También se detuvo.',
+      ja: '列を移ったら、そっちも止まった',
+      ko: '줄 바꿨더니 거기도 멈췄다',
     },
   },
   {
@@ -440,6 +510,8 @@ export const FOOD_SKIP: readonly Draft[] = [
         ar: 'ينقصك القليل للشحن المجاني. ماذا تفعل؟',
         fr: 'Presque la livraison gratuite. Toi :',
         es: 'Te falta poco para el envío gratis. Tú:',
+        ja: '送料無料まであと少し。どうする？',
+        ko: '무료배송까지 조금 남았어요. 어떻게 할래요?',
       },
       options: [
         {
@@ -449,6 +521,8 @@ export const FOOD_SKIP: readonly Draft[] = [
           ar: 'أدفع ثمن الشحن',
           fr: 'Je paie la livraison',
           es: 'Pago el envío',
+          ja: '送料を払う',
+          ko: '배송비 낸다',
         },
         {
           tr: 'Bir şey daha eklerim',
@@ -457,6 +531,8 @@ export const FOOD_SKIP: readonly Draft[] = [
           ar: 'أضيف شيئًا آخر',
           fr: "J'ajoute un truc",
           es: 'Agrego algo más',
+          ja: 'もう1品足す',
+          ko: '하나 더 담는다',
         },
       ],
       winner: 1,
@@ -468,6 +544,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'وفّرت الشحن… وتضاعفت السلة ثلاث مرات',
       fr: 'Livraison offerte. Panier triplé.',
       es: 'Envío gratis. Carrito triplicado.',
+      ja: '送料無料達成。カートは3倍。',
+      ko: '무료배송 달성. 장바구니는 세 배.',
     },
   },
   {
@@ -482,6 +560,8 @@ export const FOOD_SKIP: readonly Draft[] = [
         ar: 'مسار المندوب',
         fr: 'TRAJET DU LIVREUR',
         es: 'RUTA DEL REPARTIDOR',
+        ja: '配達員のルート',
+        ko: '배달 기사님 경로',
       },
       value: null,
       shape: 'zigzag',
@@ -494,6 +574,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'دار المندوب حول بيتي 3 مرات',
       fr: 'Le livreur a fait 3 fois le tour de chez moi',
       es: 'El repartidor dio 3 vueltas a mi casa',
+      ja: '配達員が家の周りを3周した',
+      ko: '배달 기사님이 우리 집 주변을 3바퀴 돌았다',
     },
   },
   {
@@ -508,6 +590,8 @@ export const FOOD_SKIP: readonly Draft[] = [
         ar: 'نضارة السبانخ',
         fr: 'FRAÎCHEUR DES ÉPINARDS',
         es: 'FRESCURA DE LA ESPINACA',
+        ja: 'ほうれん草の鮮度',
+        ko: '시금치 신선도',
       },
       value: null,
       shape: 'fall',
@@ -520,6 +604,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'الاثنين: خطة عصير أخضر. الجمعة: وداعًا.',
       fr: 'Lundi : projet smoothie. Vendredi : adieu.',
       es: 'Lunes: plan de batido. Viernes: adiós.',
+      ja: '月曜：スムージー計画。金曜：お別れ。',
+      ko: '월요일: 스무디 계획. 금요일: 작별.',
     },
   },
   {
@@ -534,6 +620,8 @@ export const FOOD_SKIP: readonly Draft[] = [
         ar: 'مستوى شبعي',
         fr: 'MON NIVEAU DE SATIÉTÉ',
         es: 'MI NIVEL DE LLENURA',
+        ja: '満腹度',
+        ko: '내 배부름 지수',
       },
       value: null,
       shape: 'crash',
@@ -546,6 +634,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'هناك دائمًا مكان للحلوى',
       fr: 'Il y a toujours de la place pour le dessert',
       es: 'Para el postre siempre hay espacio',
+      ja: 'デザートは別腹',
+      ko: '디저트 배는 따로 있다',
     },
   },
   {
@@ -560,6 +650,8 @@ export const FOOD_SKIP: readonly Draft[] = [
         ar: 'سوبرماركت',
         fr: 'SUPERMARCHÉ',
         es: 'SUPERMERCADO',
+        ja: 'スーパー',
+        ko: '슈퍼마켓',
       },
       items: [
         {
@@ -569,6 +661,8 @@ export const FOOD_SKIP: readonly Draft[] = [
           ar: 'وجبات خفيفة (11 نوعًا)',
           fr: 'EN-CAS (11 SORTES)',
           es: 'SNACKS (11 TIPOS)',
+          ja: 'お菓子 11種類',
+          ko: '과자 11종',
         },
       ],
     },
@@ -579,6 +673,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'هذا ما يحدث حين تتسوق جائعًا',
       fr: 'Les courses le ventre vide, voilà le résultat',
       es: 'Así se ve ir al súper con hambre',
+      ja: '空腹でスーパーに行った代償',
+      ko: '배고플 때 장 보면 이렇게 된다',
     },
   },
   {
@@ -593,6 +689,8 @@ export const FOOD_SKIP: readonly Draft[] = [
         ar: 'البقالة',
         fr: 'ÉPICERIE',
         es: 'TIENDA DE LA ESQUINA',
+        ja: 'コンビニ',
+        ko: '편의점',
       },
       items: [
         {
@@ -602,6 +700,8 @@ export const FOOD_SKIP: readonly Draft[] = [
           ar: 'حقيبة قماشية',
           fr: 'SAC EN TISSU',
           es: 'BOLSA DE TELA',
+          ja: 'エコバッグ',
+          ko: '에코백',
         },
       ],
     },
@@ -612,6 +712,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'نسيتها مجددًا… وصارت المجموعة 28',
       fr: 'Encore oublié. La collection en est à 28.',
       es: 'Otra vez la olvidé. Ya van 28.',
+      ja: 'また忘れた。コレクション28個目。',
+      ko: '또 까먹었다. 컬렉션 28개 달성.',
     },
   },
   {
@@ -626,6 +728,8 @@ export const FOOD_SKIP: readonly Draft[] = [
         ar: 'متجر ملابس',
         fr: 'PRÊT-À-PORTER',
         es: 'TIENDA DE ROPA',
+        ja: '洋服店',
+        ko: '옷 가게',
       },
       items: [
         {
@@ -635,6 +739,8 @@ export const FOOD_SKIP: readonly Draft[] = [
           ar: 'قميص أسود (3 قطع)',
           fr: 'T-SHIRT NOIR (3)',
           es: 'CAMISETA NEGRA (3)',
+          ja: '黒Tシャツ×3',
+          ko: '검정 티셔츠 3장',
         },
       ],
     },
@@ -645,6 +751,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'كنت أنوي شراء شيء ملوّن هذه المرة',
       fr: 'Cette fois, je voulais de la couleur',
       es: 'Esta vez iba a comprar algo de color',
+      ja: '今回こそカラフルな服を買うはずだった',
+      ko: '이번엔 컬러 있는 걸 사려고 했는데',
     },
   },
   {
@@ -659,6 +767,8 @@ export const FOOD_SKIP: readonly Draft[] = [
         ar: 'محل حلويات',
         fr: 'PÂTISSERIE',
         es: 'PASTELERÍA',
+        ja: 'ケーキ屋',
+        ko: '제과점',
       },
       items: [
         {
@@ -668,6 +778,8 @@ export const FOOD_SKIP: readonly Draft[] = [
           ar: 'إكلير (12 قطعة)',
           fr: 'ÉCLAIRS (12)',
           es: 'ÉCLAIRS (12)',
+          ja: 'エクレア×12',
+          ko: '에클레어 12개',
         },
       ],
     },
@@ -678,6 +790,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'اشتريتها للضيوف… والضيوف اعتذروا',
       fr: 'Pour les invités. Qui ont annulé.',
       es: 'Los compré para las visitas. Cancelaron.',
+      ja: '来客用に買った。来客がキャンセル。',
+      ko: '손님 온다고 샀는데 손님이 취소함.',
     },
   },
   {
@@ -692,8 +806,10 @@ export const FOOD_SKIP: readonly Draft[] = [
         ar: 'أثناء البحث عن وصفة',
         fr: 'EN QUÊTE DE RECETTE',
         es: 'BUSCANDO UNA RECETA',
+        ja: 'レシピ検索中',
+        ko: '레시피 찾는 중',
       },
-      big: { tr: '14', en: '14', de: '14', ar: '14', fr: '14', es: '14' },
+      big: { tr: '14', en: '14', de: '14', ar: '14', fr: '14', es: '14', ja: '14', ko: '14' },
       text: {
         tr: 'paragraf hikâye okudun; tarif en alttaydı',
         en: 'paragraphs of life story. The recipe was at the very bottom.',
@@ -701,6 +817,8 @@ export const FOOD_SKIP: readonly Draft[] = [
         ar: 'فقرة من قصة حياة الكاتب… والوصفة في آخر الصفحة',
         fr: 'paragraphes de blabla. La recette était tout en bas.',
         es: 'párrafos de historia personal. La receta, al final.',
+        ja: '段落の身の上話のあと、やっとレシピ',
+        ko: '문단짜리 사연 끝에 겨우 레시피 등장',
       },
     },
     caption: {
@@ -710,6 +828,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'وعرفت أيضًا كل شيء عن إجازة الكاتب',
       fr: "Et tout sur les vacances de l'autrice",
       es: 'Y todo sobre las vacaciones de la autora',
+      ja: 'ついでに作者の夏休みにも詳しくなった',
+      ko: '덤으로 글쓴이 여름휴가까지 알게 됨',
     },
   },
   {
@@ -718,7 +838,7 @@ export const FOOD_SKIP: readonly Draft[] = [
     body: {
       format: 'fact',
       eyebrow: null,
-      big: { tr: '23', en: '23', de: '23', ar: '23', fr: '23', es: '23' },
+      big: { tr: '23', en: '23', de: '23', ar: '23', fr: '23', es: '23', ja: '23', ko: '23' },
       text: {
         tr: 'saklama kabın var; kapağı uyan sadece 2',
         en: 'food containers in your cupboard. Lids that fit: 2',
@@ -726,6 +846,8 @@ export const FOOD_SKIP: readonly Draft[] = [
         ar: 'علبة حفظ في خزانتك… والأغطية المناسبة: 2',
         fr: 'boîtes alimentaires au placard. Couvercles qui vont : 2',
         es: 'recipientes en tu cocina. Tapas que les quedan: 2',
+        ja: '個の保存容器。合うフタはたった2個。',
+        ko: '개의 밀폐용기. 맞는 뚜껑은 단 2개.',
       },
     },
     caption: {
@@ -735,6 +857,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'الأغطية تعيش في بُعد آخر',
       fr: 'Les couvercles vivent dans une autre dimension',
       es: 'Las tapas viven en otra dimensión',
+      ja: 'フタは別の次元で暮らしている',
+      ko: '뚜껑들은 다른 차원에 산다',
     },
   },
   {
@@ -749,8 +873,10 @@ export const FOOD_SKIP: readonly Draft[] = [
         ar: 'قسم الخضار والفواكه',
         fr: 'RAYON FRUITS ET LÉGUMES',
         es: 'SECCIÓN DE FRUTAS',
+        ja: '青果売り場',
+        ko: '채소 코너',
       },
-      big: { tr: '4', en: '4', de: '4', ar: '4', fr: '4', es: '4' },
+      big: { tr: '4', en: '4', de: '4', ar: '4', fr: '4', es: '4', ja: '4', ko: '4' },
       text: {
         tr: 'dakika poşetin ağzını açmaya uğraştın',
         en: 'minutes trying to open one produce bag',
@@ -758,6 +884,8 @@ export const FOOD_SKIP: readonly Draft[] = [
         ar: 'دقائق وأنت تحاول فتح كيس الخضار',
         fr: "minutes à essayer d'ouvrir un sachet",
         es: 'minutos intentando abrir una bolsita',
+        ja: '分間、ポリ袋の口を開けようと格闘した',
+        ko: '분 동안 비닐봉지 입구와 씨름했다',
       },
     },
     caption: {
@@ -767,6 +895,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'اتضح أنني كنت أمسكه مقلوبًا',
       fr: "Je le tenais à l'envers depuis le début",
       es: 'Resulta que lo tenía al revés',
+      ja: 'やっと開いた。上下逆に持ってた。',
+      ko: '드디어 열었다. 알고 보니 거꾸로 들고 있었음.',
     },
   },
   {
@@ -781,6 +911,8 @@ export const FOOD_SKIP: readonly Draft[] = [
         ar: 'تصنيف يوم التسوق',
         fr: 'TIER LIST DU SHOPPING',
         es: 'TIER LIST DE COMPRAS',
+        ja: '買い物の日ティアリスト',
+        ko: '장보는 날 티어 리스트',
       },
       rows: [['🍦', '🥨'], ['👟', '👕'], ['🕶️', '🧴'], ['🅿️']],
     },
@@ -791,6 +923,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'التسوق ساعة… والخروج من الموقف ساعتان',
       fr: 'Shopping : 1 h. Sortir du parking : 2 h.',
       es: 'Compras: 1 hora. Salir del estacionamiento: 2.',
+      ja: '買い物1時間、駐車場から出るのに2時間',
+      ko: '쇼핑 1시간, 주차장 탈출 2시간',
     },
   },
   {
@@ -805,6 +939,8 @@ export const FOOD_SKIP: readonly Draft[] = [
         ar: 'تصنيف سلة النزهة',
         fr: 'TIER LIST DU PIQUE-NIQUE',
         es: 'TIER LIST DEL PÍCNIC',
+        ja: 'ピクニックのティアリスト',
+        ko: '피크닉 바구니 티어 리스트',
       },
       rows: [['🍉', '🥪'], ['🍇', '🧃', '🍓'], ['🥗', '🥒'], ['🐜']],
     },
@@ -815,6 +951,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'النمل يظن نفسه دائمًا في القمة',
       fr: 'Les fourmis se croient toujours en S',
       es: 'Las hormigas siempre se creen de la S',
+      ja: 'アリはいつも自分をSランクだと思ってる',
+      ko: '개미들은 늘 자기가 S급인 줄 안다',
     },
   },
   {
@@ -831,6 +969,8 @@ export const FOOD_SKIP: readonly Draft[] = [
           ar: 'المؤقت',
           fr: 'Minuteur',
           es: 'Temporizador',
+          ja: 'タイマー',
+          ko: '타이머',
         },
         text: {
           tr: 'Yumurtalar hazır! (18 dakika önce)',
@@ -839,6 +979,8 @@ export const FOOD_SKIP: readonly Draft[] = [
           ar: 'البيض جاهز! (قبل 18 دقيقة)',
           fr: 'Les œufs sont prêts ! (il y a 18 min)',
           es: '¡Los huevos están listos! (hace 18 min)',
+          ja: '卵がゆで上がりました！（18分前）',
+          ko: '달걀이 다 삶아졌어요! (18분 전)',
         },
       },
     },
@@ -849,6 +991,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'وداعًا للبيض نصف المسلوق',
       fr: "Adieu l'œuf à la coque",
       es: 'Iban a quedar blanditos. Ya no.',
+      ja: '半熟の予定が固ゆでに',
+      ko: '반숙 계획은 물 건너갔다',
     },
   },
   {
@@ -865,6 +1009,8 @@ export const FOOD_SKIP: readonly Draft[] = [
           ar: 'المرتجعات',
           fr: 'Retours',
           es: 'Devoluciones',
+          ja: '返品',
+          ko: '반품',
         },
         text: {
           tr: 'İade için son gün: bugün',
@@ -873,6 +1019,8 @@ export const FOOD_SKIP: readonly Draft[] = [
           ar: 'آخر يوم للإرجاع: اليوم',
           fr: "Dernier jour de retour : aujourd'hui",
           es: 'Último día para devolverlo: hoy',
+          ja: '返品期限：今日まで',
+          ko: '반품 마감일: 오늘',
         },
       },
     },
@@ -883,6 +1031,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'طرد الإرجاع بجانب الباب منذ 30 يومًا',
       fr: 'Le colis de retour attend à la porte depuis 30 jours',
       es: 'La devolución lleva 30 días junto a la puerta',
+      ja: '返品の箱、30日間ずっと玄関にある',
+      ko: '반품 상자가 30일째 현관 옆에 있다',
     },
   },
   {
@@ -897,6 +1047,8 @@ export const FOOD_SKIP: readonly Draft[] = [
         ar: 'التوفير مهم. — شخص اشترى 4 أشياء لا يحتاجها بخصم 50%',
         fr: 'Il faut savoir économiser. — Moi, avec 4 trucs inutiles à -50 %',
         es: 'Ahorrar es importante. — Yo, con 4 cosas que no necesitaba al 50 %',
+        ja: '節約は大切。—半額で要らない物を4つ買った人',
+        ko: '절약이 중요하다. — 50% 할인에 필요 없는 걸 4개 산 사람',
       },
     },
     caption: {
@@ -906,6 +1058,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'لحقت بالتخفيضات… وطارت النقود',
       fr: "La promo n'a pas filé. Mon argent, si.",
       es: 'No se me escapó la oferta. Mi dinero, sí.',
+      ja: 'セールは逃さなかった。お金が逃げた。',
+      ko: '세일은 안 놓쳤다. 돈을 놓쳤다.',
     },
   },
   {
@@ -920,6 +1074,8 @@ export const FOOD_SKIP: readonly Draft[] = [
         ar: 'الاستعداد هو كل شيء. — أنا في منتصف الوصفة بلا طحين',
         fr: 'Tout est dans la préparation. — Moi, à mi-recette, sans farine',
         es: 'La preparación lo es todo. — Yo, a mitad de receta y sin harina',
+        ja: '準備がすべて。—レシピの途中で小麦粉切れに気づいた私',
+        ko: '준비가 전부다. — 레시피 중간에 밀가루가 없다는 걸 안 나',
       },
     },
     caption: {
@@ -929,6 +1085,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'الخطة البديلة: سلطة فواكه بدل الكعكة',
       fr: 'Plan B : salade de fruits au lieu du gâteau',
       es: 'Plan B: ensalada de frutas en vez de pastel',
+      ja: 'プランB：ケーキの代わりにフルーツサラダ',
+      ko: '플랜 B: 케이크 대신 과일 샐러드',
     },
   },
   {
@@ -943,6 +1101,8 @@ export const FOOD_SKIP: readonly Draft[] = [
         ar: 'خير الطعام ما قلّ ودلّ. — أنا أمام ثلاث حبات بازلاء في مطعم فاخر',
         fr: "Moins, c'est plus. — Moi, devant trois petits pois dans un resto chic",
         es: 'Menos es más. — Yo, ante un plato enorme con un bocado diminuto',
+        ja: '少ないほど豊か。—高級店で豆3粒の皿を見つめる私',
+        ko: '적을수록 좋다. — 고급 레스토랑에서 완두콩 세 알 접시를 보는 나',
       },
     },
     caption: {
@@ -952,6 +1112,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'وفي طريق العودة اشتريت شطيرة',
       fr: 'Au retour, sandwich obligatoire',
       es: 'De regreso, me comí un sándwich',
+      ja: '帰りにラーメンで仕上げた',
+      ko: '나오는 길에 김밥 한 줄 먹었다',
     },
   },
   {
@@ -966,6 +1128,8 @@ export const FOOD_SKIP: readonly Draft[] = [
         ar: 'كن جريئًا وجرّب الجديد. — أنا وأنا أطلب الطبق المعتاد',
         fr: "Ose essayer du nouveau. — Moi, qui commande comme d'habitude",
         es: 'Atrévete a probar cosas nuevas. — Yo, pidiendo lo de siempre',
+        ja: '勇気を出して新しいことに挑戦しよう。—「いつもの」を頼む私',
+        ko: '용기 내서 새로운 걸 시도하라. — “늘 먹던 걸로” 시키는 나',
       },
     },
     caption: {
@@ -975,6 +1139,8 @@ export const FOOD_SKIP: readonly Draft[] = [
       ar: 'قرأت القائمة 20 دقيقة… لماذا؟',
       fr: "J'ai lu la carte pendant 20 minutes. Pourquoi ?",
       es: 'Leí el menú 20 minutos. ¿Para qué?',
+      ja: 'メニューを20分読んだ。なぜ？',
+      ko: '메뉴판을 20분 읽었다. 왜?',
     },
   },
 ];
@@ -991,6 +1157,8 @@ export const FOOD_LIKE: readonly Draft[] = [
       ar: 'خبزي الأول انتفخ!! صفّقت لنفسي',
       fr: 'mon premier pain a levé !! je me suis applaudie',
       es: '¡¡mi primer pan subió!! me aplaudí sola',
+      ja: '初めてのパンがふくらんだ！！自分に拍手',
+      ko: '첫 빵이 부풀었다!! 셀프 박수',
     },
   },
   {
@@ -1004,6 +1172,8 @@ export const FOOD_LIKE: readonly Draft[] = [
       ar: 'قلبت الكريب في الهواء… وعاد إلى المقلاة!!',
       fr: "j'ai fait sauter ma crêpe, retombée dans la poêle !!",
       es: '¡¡lancé el crepe al aire y cayó en la sartén!!',
+      ja: 'クレープを空中で返したら、フライパンに着地！！',
+      ko: '크레페를 공중에서 뒤집었는데 팬에 착지함!!',
     },
   },
   {
@@ -1017,6 +1187,8 @@ export const FOOD_LIKE: readonly Draft[] = [
       ar: 'أول مرة أصنع المانتي: 312 حبة، عددتها واحدة واحدة',
       fr: 'premiers raviolis maison : 312, je les ai comptés',
       es: 'mis primeros raviolis caseros: 312, los conté',
+      ja: '初めての手作り餃子：312個、全部数えた',
+      ko: '첫 만두 빚기: 312개, 하나하나 셌다',
     },
   },
   {
@@ -1030,6 +1202,8 @@ export const FOOD_LIKE: readonly Draft[] = [
       ar: 'كشك الليموناضة باع 12 كوبًا (9 منها لأمي)',
       fr: 'mon stand de citronnade : 12 verres (dont 9 à maman)',
       es: 'mi puesto de limonada vendió 12 vasos (9 a mi mamá)',
+      ja: 'レモネード屋台で12杯売れた（うち9杯は母）',
+      ko: '레모네이드 가판대 12잔 팔았다 (9잔은 엄마)',
     },
   },
   {
@@ -1044,6 +1218,8 @@ export const FOOD_LIKE: readonly Draft[] = [
         ar: 'من أول راتب',
         fr: 'premier salaire',
         es: 'primer sueldo',
+        ja: '初任給で',
+        ko: '첫 월급으로',
       },
     },
     caption: {
@@ -1053,6 +1229,8 @@ export const FOOD_LIKE: readonly Draft[] = [
       ar: 'دعوت عائلتي إلى العشاء… والحساب عليّ!!',
       fr: "j'ai invité ma famille au resto, c'est moi qui paie !!",
       es: '¡¡invité a cenar a mi familia, pago yo!!',
+      ja: '家族を食事に連れてった、今日はおごり！！',
+      ko: '가족 외식 시켜 드림, 오늘은 내가 쏜다!!',
     },
   },
   {
@@ -1067,6 +1245,8 @@ export const FOOD_LIKE: readonly Draft[] = [
         ar: 'بجعة (صارت بطة)',
         fr: 'cygne (plutôt canard)',
         es: 'cisne (salió pato)',
+        ja: '白鳥（アヒルになった）',
+        ko: '백조 (오리가 됨)',
       },
     },
     caption: {
@@ -1076,6 +1256,8 @@ export const FOOD_LIKE: readonly Draft[] = [
       ar: 'أول مائدة أعدّها للضيوف!! حتى المناديل مطوية',
       fr: 'mon premier dîner !! serviettes pliées et tout',
       es: '¡¡primera cena con invitados!! hasta doblé servilletas',
+      ja: '初めてのおもてなし！！ナプキンまで折った',
+      ko: '첫 손님 초대 상차림!! 냅킨까지 접었음',
     },
   },
   {
@@ -1090,6 +1272,8 @@ export const FOOD_LIKE: readonly Draft[] = [
         ar: 'كنز من سوق المستعمل',
         fr: 'trésor de friperie',
         es: 'tesoro de segunda mano',
+        ja: '古着の掘り出し物',
+        ko: '빈티지 득템',
       },
     },
     caption: {
@@ -1099,6 +1283,8 @@ export const FOOD_LIKE: readonly Draft[] = [
       ar: 'وجدت سترة العمر في متجر للملابس المستعملة',
       fr: 'trouvé la veste de ma vie en friperie',
       es: 'la chaqueta de mi vida, y de segunda mano',
+      ja: '人生の一着を古着屋で見つけた',
+      ko: '인생 재킷을 빈티지 가게에서 찾았다',
     },
   },
   {
@@ -1113,6 +1299,8 @@ export const FOOD_LIKE: readonly Draft[] = [
         ar: 'هذا قلب',
         fr: "c'est un cœur",
         es: 'es un corazón',
+        ja: 'これはハート',
+        ko: '이건 하트임',
       },
     },
     caption: {
@@ -1122,6 +1310,8 @@ export const FOOD_LIKE: readonly Draft[] = [
       ar: 'أول قلب أرسمه على القهوة!! يشبه غيمة قليلًا',
       fr: 'mon premier cœur en latte art !! un peu nuage',
       es: '¡¡mi primer corazón de latte art!! parece una nube',
+      ja: '初ラテアートのハート！！ちょっと雲っぽい',
+      ko: '첫 라떼아트 하트!! 좀 구름 같음',
     },
   },
   {
@@ -1135,6 +1325,8 @@ export const FOOD_LIKE: readonly Draft[] = [
       ar: 'جولة السوق: الباعة صاروا يعرفون اسمي',
       fr: 'dump du marché : les vendeurs savent mon prénom',
       es: 'día de mercado: los vendedores ya saben mi nombre',
+      ja: '朝市の写真まとめ：店の人に名前を覚えられた',
+      ko: '시장 사진 털기: 상인분들이 이제 내 이름을 안다',
     },
   },
   {
@@ -1148,6 +1340,8 @@ export const FOOD_LIKE: readonly Draft[] = [
       ar: 'جولة المول: 5 متاجر، 3 ساعات، زوج جوارب واحد',
       fr: 'journée shopping : 5 boutiques, 3 h, 1 paire de chaussettes',
       es: 'día de compras: 5 tiendas, 3 horas, 1 par de calcetines',
+      ja: 'モールの写真まとめ：5店、3時間、靴下1足',
+      ko: '쇼핑몰 사진 털기: 매장 5곳, 3시간, 양말 1켤레',
     },
   },
   {
@@ -1161,6 +1355,8 @@ export const FOOD_LIKE: readonly Draft[] = [
       ar: 'دورة الطبخ: قال الشيف «ممتاز» (لكن ليس لي)',
       fr: 'cours de cuisine : le chef a dit « parfait » (pas à moi)',
       es: 'clase de cocina: el chef dijo “perfecto” (no a mí)',
+      ja: '料理教室まとめ：先生が「最高」って言った（隣の人に）',
+      ko: '요리 수업 사진 털기: 셰프가 “완벽해” 했다 (옆 사람한테)',
     },
   },
 ];
@@ -1177,6 +1373,8 @@ export const FOOD_HOLD: readonly Draft[] = [
       ar: 'غطاء المرطبان انفتح من المحاولة الأولى!',
       fr: "Le bocal s'est ouvert du premier coup !",
       es: '¡El frasco se abrió al primer intento!',
+      ja: '瓶のフタが一発で開いた！',
+      ko: '병뚜껑이 한 번에 열렸다!',
     },
   },
   {
@@ -1190,6 +1388,8 @@ export const FOOD_HOLD: readonly Draft[] = [
       ar: 'عربة تسوّق عجلاتها الأربع سليمة!',
       fr: 'Un chariot qui roule droit !',
       es: '¡Un carrito con las cuatro ruedas buenas!',
+      ja: '4輪ともまっすぐ進むカート！',
+      ko: '바퀴 네 개가 다 멀쩡한 카트!',
     },
   },
   {
@@ -1203,6 +1403,8 @@ export const FOOD_HOLD: readonly Draft[] = [
       ar: 'المعكرونة على القوام المثالي. صفّها الآن!',
       fr: 'Pâtes parfaitement al dente. Égoutte maintenant !',
       es: 'Pasta al dente perfecta. ¡Escúrrela ya!',
+      ja: 'パスタがちょうどアルデンテ。今すぐ湯切り！',
+      ko: '파스타가 딱 알 덴테. 지금 바로 건지세요!',
     },
   },
   {
@@ -1216,6 +1418,8 @@ export const FOOD_HOLD: readonly Draft[] = [
       ar: 'انفجرت كل الحبات ولم تحترق واحدة. أخرجها الآن!',
       fr: "Tout a éclaté, rien n'a brûlé. Sors-le maintenant !",
       es: 'Todas reventaron, ninguna se quemó. ¡Sácalas ya!',
+      ja: '全部はじけて焦げゼロ。今すぐ出して！',
+      ko: '옥수수 전부 터졌고 탄 건 없다. 지금 꺼내세요!',
     },
   },
   {
@@ -1229,6 +1433,8 @@ export const FOOD_HOLD: readonly Draft[] = [
       ar: 'علبة البسكويت فيها بسكويت فعلًا!',
       fr: 'La boîte à biscuits contient vraiment des biscuits !',
       es: '¡La lata de galletas tiene galletas de verdad!',
+      ja: 'クッキー缶に本当にクッキーが入ってた！',
+      ko: '쿠키 통에 진짜 쿠키가 들어 있다!',
     },
   },
   {
@@ -1242,6 +1448,8 @@ export const FOOD_HOLD: readonly Draft[] = [
       ar: 'سعره عند الصندوق أقل من سعر الرف!',
       fr: "Moins cher en caisse qu'en rayon !",
       es: '¡En la caja salió más barato que en la etiqueta!',
+      ja: 'レジで値札より安くなった！',
+      ko: '계산대에서 표시 가격보다 싸게 찍혔다!',
     },
   },
   {
@@ -1255,6 +1463,8 @@ export const FOOD_HOLD: readonly Draft[] = [
       ar: 'النادل: «الحلوى على حساب المحل»',
       fr: 'Le serveur : « Le dessert est offert. »',
       es: '“El postre, cortesía de la casa.”',
+      ja: '店員さん「デザートはサービスです」',
+      ko: '직원: “디저트는 서비스예요.”',
     },
   },
   {
@@ -1268,6 +1478,8 @@ export const FOOD_HOLD: readonly Draft[] = [
       ar: 'اشتريته من الإنترنت وجاء على مقاسك من أول مرة!',
       fr: 'Commandé en ligne, et à ta taille du premier coup !',
       es: '¡Lo pediste en línea y te quedó a la primera!',
+      ja: 'ネットで買った服が一発でぴったり！',
+      ko: '인터넷으로 산 옷이 한 번에 딱 맞았다!',
     },
   },
 ];
@@ -1285,6 +1497,8 @@ export const FOOD_FREEZE: readonly Draft[] = [
         ar: 'لا تفتح الفرن',
         fr: 'NE PAS OUVRIR',
         es: 'NO ABRIR',
+        ja: '開けないで',
+        ko: '열지 마세요',
       },
       small: {
         tr: 'KEK KABARIYOR',
@@ -1293,6 +1507,8 @@ export const FOOD_FREEZE: readonly Draft[] = [
         ar: 'الكعكة تنتفخ',
         fr: 'GÂTEAU EN TRAIN DE MONTER',
         es: 'PASTEL SUBIENDO',
+        ja: 'ケーキふくらみ中',
+        ko: '케이크 부푸는 중',
       },
     },
     caption: {
@@ -1302,6 +1518,8 @@ export const FOOD_FREEZE: readonly Draft[] = [
       ar: 'حركة واحدة وتهبط.',
       fr: 'Un geste et il retombe.',
       es: 'Un movimiento y se baja.',
+      ja: '少しでも揺れたらケーキがしぼむ。',
+      ko: '조금만 흔들려도 케이크가 꺼져요.',
     },
     headline: {
       tr: 'Kek tam kabarıyor',
@@ -1310,6 +1528,8 @@ export const FOOD_FREEZE: readonly Draft[] = [
       ar: 'الكعكة تنتفخ الآن',
       fr: 'Le gâteau est en train de monter',
       es: 'El pastel está subiendo',
+      ja: 'ケーキが今ふくらみ中',
+      ko: '케이크가 부풀고 있어요',
     },
   },
   {
@@ -1324,6 +1544,8 @@ export const FOOD_FREEZE: readonly Draft[] = [
         ar: 'لا تهزّ',
         fr: 'NE PAS SECOUER',
         es: 'NO MOVER',
+        ja: 'ゆらさないで',
+        ko: '흔들지 마세요',
       },
       small: {
         tr: 'MUHALLEBİ DONUYOR',
@@ -1332,6 +1554,8 @@ export const FOOD_FREEZE: readonly Draft[] = [
         ar: 'المهلبية تتماسك',
         fr: 'LE FLAN PREND',
         es: 'EL FLAN ESTÁ CUAJANDO',
+        ja: 'プリン固まり中',
+        ko: '푸딩 굳는 중',
       },
     },
     caption: {
@@ -1341,6 +1565,8 @@ export const FOOD_FREEZE: readonly Draft[] = [
       ar: 'لا تهزّ الطاولة حتى.',
       fr: 'Ne touche même pas la table.',
       es: 'Ni siquiera toques la mesa.',
+      ja: 'テーブルも揺らさないで。',
+      ko: '테이블도 흔들지 마세요.',
     },
     headline: {
       tr: 'Muhallebi donmak üzere',
@@ -1349,6 +1575,8 @@ export const FOOD_FREEZE: readonly Draft[] = [
       ar: 'المهلبية على وشك أن تتماسك',
       fr: 'Le flan a presque pris',
       es: 'El flan está por cuajar',
+      ja: 'プリンがもうすぐ固まる',
+      ko: '푸딩이 곧 굳어요',
     },
   },
   {
@@ -1363,6 +1591,8 @@ export const FOOD_FREEZE: readonly Draft[] = [
         ar: 'تنبيه',
         fr: 'ATTENTION',
         es: 'CUIDADO',
+        ja: '注意',
+        ko: '주의',
       },
       small: {
         tr: 'ALTTAN ALMAYINIZ',
@@ -1371,6 +1601,8 @@ export const FOOD_FREEZE: readonly Draft[] = [
         ar: 'لا تأخذ من الأسفل',
         fr: 'NE PAS PRENDRE PAR-DESSOUS',
         es: 'NO TOMAR DE ABAJO',
+        ja: '下から取らないで',
+        ko: '아래에서 빼지 마세요',
       },
     },
     caption: {
@@ -1380,6 +1612,8 @@ export const FOOD_FREEZE: readonly Draft[] = [
       ar: 'لا تفكر في الأمر حتى.',
       fr: "N'y pense même pas.",
       es: 'Ni lo pienses.',
+      ja: '考えることすら禁止。',
+      ko: '생각도 하지 마세요.',
     },
     headline: {
       tr: 'En güzel portakal en altta',
@@ -1388,6 +1622,8 @@ export const FOOD_FREEZE: readonly Draft[] = [
       ar: 'أجمل برتقالة في أسفل الهرم',
       fr: 'La plus belle orange est tout en bas',
       es: 'La mejor naranja está en la base',
+      ja: '一番いいみかんが一番下に',
+      ko: '제일 좋은 귤이 맨 밑에 있어요',
     },
   },
   {
@@ -1402,6 +1638,8 @@ export const FOOD_FREEZE: readonly Draft[] = [
         ar: 'ساخن',
         fr: 'CHAUD',
         es: 'CALIENTE',
+        ja: '高温注意',
+        ko: '뜨거워요',
       },
       small: {
         tr: 'TEPSİYE DOKUNMAYIN',
@@ -1410,6 +1648,8 @@ export const FOOD_FREEZE: readonly Draft[] = [
         ar: 'لا تلمس الصينية',
         fr: 'NE PAS TOUCHER LA PLAQUE',
         es: 'NO TOCAR LA BANDEJA',
+        ja: '天板にさわらないで',
+        ko: '트레이 만지지 마세요',
       },
     },
     caption: HANDS_OFF,
@@ -1420,6 +1660,8 @@ export const FOOD_FREEZE: readonly Draft[] = [
       ar: 'الصينية خرجت من الفرن للتو',
       fr: 'La plaque sort à peine du four',
       es: 'La bandeja acaba de salir del horno',
+      ja: '天板がオーブンから出たところ',
+      ko: '트레이가 방금 오븐에서 나왔어요',
     },
   },
   {
@@ -1434,6 +1676,8 @@ export const FOOD_FREEZE: readonly Draft[] = [
         ar: 'المطعم',
         fr: 'RESTAURANT',
         es: 'RESTAURANTE',
+        ja: 'レストラン',
+        ko: '레스토랑',
       },
     },
     caption: {
@@ -1443,6 +1687,8 @@ export const FOOD_FREEZE: readonly Draft[] = [
       ar: 'الجميع تجمّد. لا تتحرك أنت أيضًا.',
       fr: 'Tout le monde est figé. Toi aussi.',
       es: 'Todos se congelaron. Tú tampoco te muevas.',
+      ja: '全員フリーズ。あなたも動かないで。',
+      ko: '모두 얼음. 움직이지 마세요.',
     },
     headline: {
       tr: 'Hesap masaya geldi',
@@ -1451,6 +1697,8 @@ export const FOOD_FREEZE: readonly Draft[] = [
       ar: 'وصلت الفاتورة إلى الطاولة',
       fr: "L'addition arrive sur la table",
       es: 'Llegó la cuenta a la mesa',
+      ja: 'お会計が来た',
+      ko: '계산서가 나왔어요',
     },
   },
   {
@@ -1465,6 +1713,8 @@ export const FOOD_FREEZE: readonly Draft[] = [
         ar: 'متجر الملابس',
         fr: 'BOUTIQUE',
         es: 'TIENDA DE ROPA',
+        ja: '洋服店',
+        ko: '옷 가게',
       },
     },
     caption: {
@@ -1474,6 +1724,8 @@ export const FOOD_FREEZE: readonly Draft[] = [
       ar: 'أنت تتفرّج فقط. لا تتحرك.',
       fr: 'Tu regardes juste. Bouge pas.',
       es: 'Solo estás mirando. No te muevas.',
+      ja: '見てるだけです。動かないで。',
+      ko: '그냥 구경 중이에요. 움직이지 마세요.',
     },
     headline: {
       tr: 'Satış danışmanı sana doğru geliyor',
@@ -1482,6 +1734,8 @@ export const FOOD_FREEZE: readonly Draft[] = [
       ar: 'موظف المبيعات قادم نحوك',
       fr: 'Un vendeur arrive droit sur toi',
       es: 'Un vendedor viene hacia ti',
+      ja: '店員さんがこっちに来る',
+      ko: '점원이 다가오고 있어요',
     },
   },
   {
@@ -1496,6 +1750,8 @@ export const FOOD_FREEZE: readonly Draft[] = [
         ar: 'السوبرماركت',
         fr: 'SUPERMARCHÉ',
         es: 'SUPERMERCADO',
+        ja: 'スーパー',
+        ko: '마트',
       },
     },
     caption: {
@@ -1505,6 +1761,8 @@ export const FOOD_FREEZE: readonly Draft[] = [
       ar: 'لا تتحرك. ربما لا يتذكرك.',
       fr: "Bouge pas. Peut-être qu'il a oublié.",
       es: 'No te muevas. Quizá no se acuerde.',
+      ja: '動かないで。覚えてないかも。',
+      ko: '움직이지 마세요. 기억 못 할지도.',
     },
     headline: {
       tr: 'Tadım standı seni 4. kez görüyor',
@@ -1513,6 +1771,8 @@ export const FOOD_FREEZE: readonly Draft[] = [
       ar: 'موظف التذوق يراك للمرة الرابعة',
       fr: "Le stand dégustation t'a vu 4 fois",
       es: 'En la degustación ya te vieron 4 veces',
+      ja: '試食コーナー、これで4回目',
+      ko: '시식 코너 4번째 방문',
     },
   },
 ];

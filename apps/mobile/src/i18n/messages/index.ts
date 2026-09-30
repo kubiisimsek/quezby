@@ -34,7 +34,7 @@ import { welcome } from './welcome';
 
 /**
  * Every word the game says, in one language — `useT()` hands the current one
- * to a screen. One file per area of the game holds its lines in all six
+ * to a screen. One file per area of the game holds its lines in all eight
  * languages side by side; Turkish is the source and fixes the shape, so a
  * line missing in any language does not compile.
  */
@@ -92,4 +92,6 @@ export const CATALOGS: Readonly<Record<Locale, Messages>> = {
   ar: catalog('ar'),
   fr: catalog('fr'),
   es: catalog('es'),
+  ja: catalog('ja'),
+  ko: catalog('ko'),
 };

@@ -16,6 +16,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
         ar: 'غرفة النوم',
         fr: 'CHAMBRE',
         es: 'DORMITORIO',
+        ja: '寝室',
+        ko: '침실',
       },
     },
     caption: {
@@ -25,6 +27,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
       ar: 'الشاحن معك. لا تتحرك.',
       fr: "C'est toi qui l'as. Bouge pas.",
       es: 'Lo tienes tú. No te muevas.',
+      ja: '充電器は君が持ってる。動くな。',
+      ko: '충전기는 네가 갖고 있어. 움직이지 마.',
     },
     headline: {
       tr: 'Kardeşin şarj aletini arıyor',
@@ -33,6 +37,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
       ar: 'أخوك يبحث عن شاحنه',
       fr: 'Ton frère cherche son chargeur',
       es: 'Tu hermano busca su cargador',
+      ja: '弟が充電器を探してる！',
+      ko: '동생이 충전기를 찾고 있어요!',
     },
   },
   {
@@ -47,6 +53,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
         ar: 'غرفة المكتب',
         fr: 'BUREAU',
         es: 'ESTUDIO',
+        ja: '書斎',
+        ko: '서재',
       },
     },
     caption: {
@@ -56,6 +64,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
       ar: 'لا تنظر في عينيها.',
       fr: 'Évite son regard.',
       es: 'No lo mires a los ojos.',
+      ja: '目を合わせるな。',
+      ko: '눈 마주치지 마.',
     },
     headline: {
       tr: 'Kedi kupayı masadan itmek üzere',
@@ -64,6 +74,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
       ar: 'القطة على وشك إسقاط كوبك',
       fr: 'Le chat va faire tomber ta tasse',
       es: 'El gato va a tirar tu taza',
+      ja: '猫がマグカップを落とす寸前！',
+      ko: '고양이가 머그컵을 떨어뜨리기 직전!',
     },
   },
   {
@@ -78,6 +90,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
         ar: 'صالون التجميل',
         fr: 'SALON DE COIFFURE',
         es: 'PELUQUERÍA',
+        ja: '美容院',
+        ko: '미용실',
       },
     },
     caption: {
@@ -87,6 +101,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
       ar: 'إن تحركت صارت الغرّة مائلة.',
       fr: 'Un geste et elle sera de travers.',
       es: 'Si te mueves, queda torcido.',
+      ja: '動いたら前髪がななめになる。',
+      ko: '움직이면 앞머리 삐뚤어져.',
     },
     headline: {
       tr: 'Kuaför kâkülünü kesiyor',
@@ -95,6 +111,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
       ar: 'المصففة تقص غرّتك',
       fr: 'La coiffeuse coupe ta frange',
       es: 'Te están cortando el flequillo',
+      ja: '美容師さんが前髪をカット中！',
+      ko: '미용사가 앞머리를 자르는 중!',
     },
   },
   {
@@ -109,6 +127,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
         ar: 'المدخل',
         fr: 'ENTRÉE',
         es: 'ENTRADA',
+        ja: '玄関',
+        ko: '현관',
       },
     },
     caption: {
@@ -118,6 +138,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
       ar: 'تظاهر بأنك نائم.',
       fr: 'Fais semblant de dormir.',
       es: 'Hazte el dormido.',
+      ja: '寝たふりをしろ。',
+      ko: '자는 척해.',
     },
     headline: {
       tr: 'Köpek tasmayı getirdi, seni arıyor',
@@ -126,6 +148,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
       ar: 'الكلب أحضر المقود ويبحث عنك',
       fr: 'Le chien a apporté sa laisse',
       es: 'El perro trajo la correa',
+      ja: '犬がリードをくわえて来た！',
+      ko: '강아지가 목줄을 물고 왔어요!',
     },
   },
   {
@@ -140,6 +164,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
         ar: 'الحديقة',
         fr: 'JARDIN',
         es: 'JARDÍN',
+        ja: '庭',
+        ko: '뒷마당',
       },
     },
     caption: HANDS_OFF,
@@ -150,6 +176,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
       ar: 'الغمّيضة: الباحث أمامك تمامًا',
       fr: 'Cache-cache : il passe juste devant toi',
       es: 'Escondite: te buscan justo al lado',
+      ja: 'かくれんぼ：鬼がすぐそこに！',
+      ko: '숨바꼭질: 술래가 바로 앞에!',
     },
   },
   {
@@ -164,6 +192,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
         ar: 'المكتبة',
         fr: 'BIBLIOTHÈQUE',
         es: 'BIBLIOTECA',
+        ja: '図書館',
+        ko: '도서관',
       },
     },
     caption: {
@@ -173,6 +203,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
       ar: 'ولا تقلب صفحة حتى.',
       fr: 'Tourne même pas une page.',
       es: 'Ni se te ocurra pasar la página.',
+      ja: 'ページもめくるな。',
+      ko: '책장도 넘기지 마.',
     },
     headline: {
       tr: 'Kütüphaneci “şşşt” dedi',
@@ -181,6 +213,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
       ar: 'أمينة المكتبة طلبت منك الهدوء',
       fr: "La bibliothécaire t'a fait « chut »",
       es: 'La bibliotecaria te pidió silencio',
+      ja: '司書さんに「シーッ」された！',
+      ko: '사서가 “쉿” 했어요!',
     },
   },
   {
@@ -195,6 +229,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
         ar: 'غرفة المعيشة',
         fr: 'SALON',
         es: 'SALA',
+        ja: 'リビング',
+        ko: '거실',
       },
     },
     caption: {
@@ -204,6 +240,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
       ar: 'لم ترَ شيئًا. لا تتحرك.',
       fr: "T'as rien vu. Bouge pas.",
       es: 'No viste nada. No te muevas.',
+      ja: '何も見てない。動くな。',
+      ko: '넌 아무것도 못 봤어. 움직이지 마.',
     },
     headline: {
       tr: 'Sana sürpriz parti hazırlıyorlar',
@@ -212,6 +250,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
       ar: 'يجهّزون لك حفلة مفاجئة',
       fr: 'Ils préparent ta fête surprise',
       es: 'Te preparan una fiesta sorpresa',
+      ja: '君のサプライズパーティーを準備中！',
+      ko: '깜짝 파티를 준비하고 있어요!',
     },
   },
   {
@@ -226,6 +266,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
         ar: 'المطبخ',
         fr: 'CUISINE',
         es: 'COCINA',
+        ja: 'キッチン',
+        ko: '주방',
       },
     },
     caption: {
@@ -235,6 +277,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
       ar: 'ربما لم يلاحظ أحد.',
       fr: "Peut-être que personne n'a vu.",
       es: 'Quizá nadie se dio cuenta.',
+      ja: '誰も気づいてない…かも。',
+      ko: '아무도 눈치 못 챘을지도.',
     },
     headline: {
       tr: 'Gece 3. Buzdolabı. Işık açık.',
@@ -243,6 +287,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
       ar: 'الثالثة فجرًا. الثلاجة. الضوء مضاء.',
       fr: '3 h du mat. Frigo. Lumière allumée.',
       es: '3 de la mañana. Nevera. Luz encendida.',
+      ja: '深夜3時。冷蔵庫。明かりがついた。',
+      ko: '새벽 3시. 냉장고. 불이 켜졌다.',
     },
   },
   {
@@ -257,6 +303,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
         ar: 'الشرفة',
         fr: 'BALCON',
         es: 'BALCÓN',
+        ja: 'ベランダ',
+        ko: '베란다',
       },
     },
     caption: {
@@ -266,6 +314,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
       ar: 'لا تتطوع. لا تتحرك.',
       fr: 'Te porte pas volontaire. Bouge pas.',
       es: 'No te ofrezcas. No te muevas.',
+      ja: '名乗り出るな。動くな。',
+      ko: '자원하지 마. 움직이지 마.',
     },
     headline: {
       tr: 'Çamaşır asacak gönüllü aranıyor',
@@ -274,6 +324,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
       ar: 'مطلوب متطوع لنشر الغسيل',
       fr: 'Qui veut étendre le linge ?',
       es: 'Se busca voluntario para tender la ropa',
+      ja: '洗濯物を干す人、募集中！',
+      ko: '빨래 널 사람 구해요!',
     },
   },
   {
@@ -288,6 +340,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
         ar: 'غرفة الطعام',
         fr: 'SALLE À MANGER',
         es: 'COMEDOR',
+        ja: 'ダイニング',
+        ko: '다이닝룸',
       },
     },
     caption: HANDS_OFF,
@@ -298,6 +352,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
       ar: 'جدّك بدأ يقول: «هذه الهواتف…»',
       fr: 'Papi commence : « ces téléphones… »',
       es: 'El abuelo empezó: «estos teléfonos…»',
+      ja: '祖父が「最近のスマホは…」と言い出した',
+      ko: '할아버지가 “요즘 폰은…” 하셨어요',
     },
   },
   {
@@ -312,6 +368,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
         ar: 'صالة الرياضة',
         fr: 'GYMNASE',
         es: 'GIMNASIO',
+        ja: 'ジム',
+        ko: '헬스장',
       },
     },
     caption: {
@@ -321,6 +379,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
       ar: 'كن خفيًّا.',
       fr: 'Fais-toi tout petit.',
       es: 'Hazte invisible.',
+      ja: '透明人間になれ。',
+      ko: '투명 인간이 돼.',
     },
     headline: {
       tr: 'Antrenör “bir tur daha” diyecek',
@@ -329,6 +389,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
       ar: 'المدرب سيقول: «لفّة أخرى»',
       fr: 'Le coach va dire « encore un tour »',
       es: 'El entrenador va a pedir otra vuelta',
+      ja: 'コーチが「あと1周」と言いそう！',
+      ko: '코치가 “한 바퀴 더” 할 기세예요!',
     },
   },
   {
@@ -343,6 +405,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
         ar: 'الباب الأمامي',
         fr: "PORTE D'ENTRÉE",
         es: 'PUERTA PRINCIPAL',
+        ja: '玄関前',
+        ko: '현관문 앞',
       },
     },
     caption: {
@@ -352,6 +416,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
       ar: 'لا أحد في البيت… ولا أنت.',
       fr: 'Y a personne. Toi non plus.',
       es: 'No hay nadie. Tú tampoco.',
+      ja: '家には誰もいない。君もいない。',
+      ko: '집에 아무도 없어. 너도 없어.',
     },
     headline: {
       tr: 'Komşu zile bastı',
@@ -360,6 +426,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
       ar: 'الجار يرنّ الجرس',
       fr: 'La voisine sonne à la porte',
       es: 'La vecina tocó el timbre',
+      ja: 'お隣さんがピンポンした！',
+      ko: '이웃이 초인종을 눌렀어요!',
     },
   },
   {
@@ -374,6 +442,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
         ar: 'غرفة الأطفال',
         fr: "CHAMBRE D'ENFANT",
         es: 'CUARTO DE NIÑOS',
+        ja: '子ども部屋',
+        ko: '아이 방',
       },
     },
     caption: HANDS_OFF,
@@ -384,6 +454,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
       ar: 'تفتيش الواجبات في الطريق',
       fr: 'Contrôle des devoirs en approche',
       es: 'Viene la revisión de la tarea',
+      ja: '宿題チェックが来る！',
+      ko: '숙제 검사가 다가와요!',
     },
   },
   {
@@ -398,6 +470,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
         ar: 'الكورنيش',
         fr: 'BORD DE MER',
         es: 'PASEO MARÍTIMO',
+        ja: '海辺',
+        ko: '해변',
       },
     },
     caption: HANDS_OFF,
@@ -408,6 +482,8 @@ export const FREEZE_CCTV: readonly Draft[] = [
       ar: 'نورس يحدّق في شطيرتك',
       fr: 'Une mouette lorgne ton sandwich',
       es: 'Una gaviota vigila tu sándwich',
+      ja: 'カモメがサンドイッチを狙ってる！',
+      ko: '갈매기가 샌드위치를 노리고 있어요!',
     },
   },
 ];

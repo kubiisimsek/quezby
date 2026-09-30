@@ -1,0 +1,3 @@
+/* Why the app may ask for the photo library and the camera: the profile photo. */
+"NSPhotoLibraryUsageDescription" = "選んだ写真をプロフィール写真に使います。ほかの目的には使いません。";
+"NSCameraUsageDescription" = "カメラはプロフィール写真を撮るときだけ使います。";

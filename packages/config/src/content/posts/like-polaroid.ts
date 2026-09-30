@@ -15,6 +15,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
         ar: 'بورتريه ذاتي',
         fr: 'autoportrait',
         es: 'autorretrato',
+        ja: '自画像',
+        ko: '자화상',
       },
     },
     caption: {
@@ -24,6 +26,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
       ar: 'رسمت نفسي… ولا تشبهني أبدًا',
       fr: 'je me suis dessinée, aucune ressemblance',
       es: 'me dibujé y no me parezco nada',
+      ja: '自分を描いたら別人になった',
+      ko: '내 얼굴 그렸는데 하나도 안 닮음',
     },
   },
   {
@@ -38,6 +42,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
         ar: 'أحسنت يا بطل',
         fr: 'bon chien',
         es: 'buen chico',
+        ja: 'いい子だね',
+        ko: '착하지',
       },
     },
     caption: {
@@ -47,6 +53,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
       ar: 'كلبي تعلّم الجلوس (أحيانًا)',
       fr: 'mon chien sait faire assis (parfois)',
       es: 'mi perro ya sabe sentarse (a veces)',
+      ja: 'うちの犬がおすわりを覚えた（たまに）',
+      ko: '우리 강아지 앉아 배웠음 (가끔)',
     },
   },
   {
@@ -61,6 +69,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
         ar: 'هواية جديدة',
         fr: 'nouveau hobby',
         es: 'nuevo pasatiempo',
+        ja: '新しい趣味',
+        ko: '새 취미',
       },
     },
     caption: {
@@ -70,6 +80,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
       ar: 'اشتريت طقم طبول، والجيران في غاية السعادة',
       fr: "j'ai acheté une batterie, les voisins adorent",
       es: 'me compré una batería, los vecinos encantados',
+      ja: 'ドラム買った、ご近所さん大喜び',
+      ko: '드럼 샀는데 이웃들이 아주 좋아함',
     },
   },
   {
@@ -84,6 +96,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
         ar: 'شريك سكني الجديد',
         fr: 'nouveau coloc',
         es: 'mi nuevo compañero',
+        ja: '新しいルームメイト',
+        ko: '새 룸메이트',
       },
     },
     caption: {
@@ -93,6 +107,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
       ar: 'لا يحب العناق، لكنه طيب جدًا',
       fr: 'il aime pas les câlins, mais il est adorable',
       es: 'no le gustan los abrazos, pero es un amor',
+      ja: 'ハグは苦手だけど、根はいいやつ',
+      ko: '포옹은 싫어하지만 착한 애야',
     },
   },
   {
@@ -107,6 +123,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
         ar: 'مفاجأة!',
         fr: 'surprise !',
         es: '¡sorpresa!',
+        ja: 'サプライズ！',
+        ko: '서프라이즈!',
       },
     },
     caption: {
@@ -116,6 +134,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
       ar: 'صنعت كعكة لأمي، مائلة قليلًا فقط',
       fr: 'un gâteau pour maman, à peine penché',
       es: 'le hice un pastel a mamá, apenas torcido',
+      ja: '母にケーキ作った、ちょっとだけ傾いてる',
+      ko: '엄마한테 케이크 만들어 줌, 살짝 기울었음',
     },
   },
   {
@@ -130,6 +150,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
         ar: 'حذائي الوفي',
         fr: 'mes fidèles chaussures',
         es: 'mis fieles botas',
+        ja: '相棒のブーツ',
+        ko: '든든한 내 등산화',
       },
     },
     caption: {
@@ -139,6 +161,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
       ar: 'مشينا 20 كم… وقدماي تخاصمانني',
       fr: '20 km de rando, mes pieds me font la tête',
       es: 'caminamos 20 km y mis pies ya no me hablan',
+      ja: '20km歩いたら足が口をきいてくれない',
+      ko: '20km 걸었더니 발이 나랑 말을 안 함',
     },
   },
   {
@@ -153,6 +177,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
         ar: 'مقعد النافذة',
         fr: 'côté hublot',
         es: 'junto a la ventanilla',
+        ja: '窓側の席',
+        ko: '창가 자리',
       },
     },
     caption: {
@@ -162,6 +188,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
       ar: 'أول رحلة طيران لي، لم أرفع عيني عن الغيوم',
       fr: "mon tout premier vol, j'ai fixé les nuages",
       es: 'mi primer vuelo, no dejé de mirar las nubes',
+      ja: '初めての飛行機、ずっと雲を見てた',
+      ko: '첫 비행, 구름만 계속 봤음',
     },
   },
   {
@@ -176,6 +204,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
         ar: 'النغمة الوحيدة التي أعرفها',
         fr: 'mon seul accord',
         es: 'el único acorde que sé',
+        ja: '唯一弾けるコード',
+        ko: '유일하게 아는 코드',
       },
     },
     caption: {
@@ -185,6 +215,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
       ar: 'دروس الغيتار، الأسبوع الأول',
       fr: 'cours de guitare, semaine 1',
       es: 'clases de guitarra, semana 1',
+      ja: 'ギター教室、1週目',
+      ko: '기타 레슨 1주 차',
     },
   },
   {
@@ -199,6 +231,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
         ar: 'لا تسألوا عن البقية',
         fr: 'on parle pas des autres',
         es: 'no pregunten por el resto',
+        ja: '他のは聞かないで',
+        ko: '나머진 묻지 마',
       },
     },
     caption: {
@@ -208,6 +242,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
       ar: 'خبزت الكعك، وهذه أجمل واحدة',
       fr: "j'ai fait des biscuits, voici le plus beau",
       es: 'hice galletas, esta es la mejor',
+      ja: 'クッキー焼いた、これが一番マシなやつ',
+      ko: '쿠키 구웠는데 이게 제일 잘 나온 거',
     },
   },
   {
@@ -222,6 +258,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
         ar: 'الرياح مثالية',
         fr: 'vent parfait',
         es: 'viento perfecto',
+        ja: '風、最高',
+        ko: '바람 딱 좋음',
       },
     },
     caption: {
@@ -231,6 +269,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
       ar: 'بقيت طائرتي الورقية 5 دقائق في الجو… رقم قياسي',
       fr: 'mon cerf-volant a tenu 5 minutes, record',
       es: 'mi cometa voló 5 minutos, récord',
+      ja: '凧が5分も飛んだ、新記録',
+      ko: '연이 5분이나 날았음, 신기록',
     },
   },
   {
@@ -245,6 +285,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
         ar: 'أول سباحة',
         fr: 'première brasse',
         es: 'primera brazada',
+        ja: '初めてのひとかき',
+        ko: '첫 헤엄',
       },
     },
     caption: {
@@ -254,6 +296,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
       ar: 'تعلمت السباحة… أن تأتي متأخرًا خير من ألا تأتي',
       fr: "j'ai appris à nager. mieux vaut tard que jamais",
       es: 'aprendí a nadar. más vale tarde que nunca',
+      ja: '泳げるようになった。遅くてもゼロよりマシ',
+      ko: '수영 배웠다. 늦어도 안 하는 것보단 낫지',
     },
   },
   {
@@ -268,6 +312,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
         ar: 'بعد المطر',
         fr: 'après la pluie',
         es: 'después de la lluvia',
+        ja: '雨上がり',
+        ko: '비 온 뒤',
       },
     },
     caption: {
@@ -277,6 +323,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
       ar: 'رأيته في طريقي إلى البيت، انظروا جميعًا',
       fr: 'vu en rentrant, regardez-moi ça',
       es: 'lo vi volviendo a casa, miren esto',
+      ja: '帰り道に見つけた、みんな見て',
+      ko: '집 가는 길에 봤어, 다들 봐봐',
     },
   },
   {
@@ -291,6 +339,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
         ar: 'لن تتكرر',
         fr: 'ça se reproduira pas',
         es: 'no volverá a pasar',
+        ja: '二度とない',
+        ko: '두 번은 없음',
       },
     },
     caption: {
@@ -300,6 +350,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
       ar: 'أول سترايك في حياتي!!',
       fr: 'mon tout premier strike !!',
       es: '¡¡el primer strike de mi vida!!',
+      ja: '人生初のストライク！！',
+      ko: '인생 첫 스트라이크!!',
     },
   },
   {
@@ -314,6 +366,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
         ar: 'مباراة العودة السبت',
         fr: 'revanche samedi',
         es: 'revancha el sábado',
+        ja: 'リベンジは土曜',
+        ko: '토요일에 재대결',
       },
     },
     caption: {
@@ -323,6 +377,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
       ar: 'هزمت أبي في الشطرنج لأول مرة',
       fr: "j'ai battu mon père aux échecs, une première",
       es: 'le gané a mi papá al ajedrez por primera vez',
+      ja: '初めてチェスで父に勝った',
+      ko: '처음으로 체스에서 아빠를 이겼다',
     },
   },
   {
@@ -337,6 +393,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
         ar: 'ضيفة صغيرة',
         fr: 'petite visite',
         es: 'pequeña visita',
+        ja: '小さなお客さん',
+        ko: '작은 손님',
       },
     },
     caption: {
@@ -346,6 +404,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
       ar: 'حطّت دعسوقة على يدي، فتمنيت أمنية',
       fr: "une coccinelle sur ma main, j'ai fait un vœu",
       es: 'una mariquita en mi mano, pedí un deseo',
+      ja: 'てんとう虫が手に止まった、願いごとした',
+      ko: '무당벌레가 손에 앉아서 소원 빌었음',
     },
   },
   {
@@ -360,6 +420,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
         ar: 'من الحديقة',
         fr: 'du jardin',
         es: 'del jardín',
+        ja: '庭でとれた',
+        ko: '텃밭에서',
       },
     },
     caption: {
@@ -369,6 +431,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
       ar: 'زرعت الفراولة بنفسي (3 حبات كاملة)',
       fr: "j'ai fait pousser mes fraises (les 3)",
       es: 'coseché mis propias fresas (las 3)',
+      ja: 'いちごを自家栽培した（全部で3個）',
+      ko: '딸기 직접 키웠음 (무려 3개)',
     },
   },
   {
@@ -383,6 +447,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
         ar: 'بلا خطة',
         fr: 'sans plan',
         es: 'sin plan',
+        ja: 'ノープラン',
+        ko: '무계획',
       },
     },
     caption: {
@@ -392,6 +458,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
       ar: 'تهت من دون هاتفي… فوجدت أجمل شارع',
       fr: 'perdu sans téléphone, trouvé la plus belle rue',
       es: 'me perdí sin teléfono y encontré la mejor calle',
+      ja: 'スマホなしで迷って、最高の路地を見つけた',
+      ko: '폰 없이 헤매다 제일 예쁜 골목 발견',
     },
   },
   {
@@ -406,6 +474,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
         ar: 'جيران جدد',
         fr: 'nouveaux voisins',
         es: 'vecinos nuevos',
+        ja: '新しいご近所さん',
+        ko: '새 이웃',
       },
     },
     caption: {
@@ -415,6 +485,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
       ar: 'بنت العصافير عشًّا على نافذتي',
       fr: 'des oiseaux font leur nid à ma fenêtre',
       es: 'unos pájaros hicieron nido en mi ventana',
+      ja: '窓辺に鳥が巣を作った',
+      ko: '창틀에 새들이 둥지를 틀었다',
     },
   },
   {
@@ -429,6 +501,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
         ar: 'أبطال!',
         fr: 'champions !',
         es: '¡campeones!',
+        ja: '優勝！',
+        ko: '우승!',
       },
     },
     caption: {
@@ -438,6 +512,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
       ar: 'فزنا ببطولة الحي!!',
       fr: 'on a gagné le tournoi du quartier !!',
       es: '¡¡ganamos el torneo del barrio!!',
+      ja: '町内大会で優勝した！！',
+      ko: '동네 대회 우승했다!!',
     },
   },
   {
@@ -452,6 +528,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
         ar: 'فريق الصباح',
         fr: "l'équipe du matin",
         es: 'el equipo de la mañana',
+        ja: '朝のメンバー',
+        ko: '아침 멤버들',
       },
     },
     caption: {
@@ -461,6 +539,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
       ar: 'بطّ الحديقة صار يعرفني',
       fr: 'les canards du parc me reconnaissent',
       es: 'los patos del parque ya me conocen',
+      ja: '公園のカモに顔を覚えられた',
+      ko: '공원 오리들이 이제 날 알아봄',
     },
   },
   {
@@ -475,6 +555,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
         ar: 'بدر كامل (صدقوني)',
         fr: 'pleine lune (promis)',
         es: 'luna llena (lo juro)',
+        ja: '満月（信じて）',
+        ko: '보름달 (믿어줘)',
       },
     },
     caption: {
@@ -484,6 +566,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
       ar: 'صوّرت البدر… فظهر كنقطة صغيرة',
       fr: "j'ai photographié la pleine lune : un point",
       es: 'foto a la luna llena: salió un puntito',
+      ja: '満月を撮ったら小さい点になった',
+      ko: '보름달 찍었는데 점 하나 나옴',
     },
   },
   {
@@ -498,6 +582,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
         ar: 'تحقق الهدف',
         fr: 'objectif atteint',
         es: 'meta cumplida',
+        ja: '目標達成',
+        ko: '목표 달성',
       },
     },
     caption: {
@@ -507,6 +593,8 @@ export const LIKE_POLAROID: readonly Draft[] = [
       ar: 'قرأت 12 كتابًا هذا العام!!',
       fr: "j'ai lu 12 livres cette année !!",
       es: '¡¡leí 12 libros este año!!',
+      ja: '今年は本を12冊読んだ！！',
+      ko: '올해 책 12권 읽었다!!',
     },
   },
 ];

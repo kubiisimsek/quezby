@@ -34,4 +34,4 @@ it('says every phrase in every language', function (string $locale) {
     foreach (Phrase::cases() as $phrase) {
         expect($phrase->text())->not->toBe('phrases.'.$phrase->value)->not->toBe('');
     }
-})->with(['tr', 'en', 'de', 'ar', 'fr', 'es']);
+})->with(['tr', 'en', 'de', 'ar', 'fr', 'es', 'ja', 'ko']);

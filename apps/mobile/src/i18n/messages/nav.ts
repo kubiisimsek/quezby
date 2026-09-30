@@ -69,4 +69,24 @@ const es: NavMessages = {
   retry: 'Reintentar',
 };
 
-export const nav: Record<Locale, NavMessages> = { tr, en, de, ar, fr, es };
+const ja: NavMessages = {
+  tabs: { leaderboard: 'トップ', league: 'リーグ', play: 'プレイ', inbox: 'メッセージ', profile: 'プロフィール' },
+  updateTitle: 'アップデートが必要です',
+  updateBody: (minVersion) =>
+    `このバージョン（${minVersion}未満）はサポートが終了しました。プレイを続けるにはアップデートしてください。`,
+  openStore: 'ストアを開く',
+  offlineTitle: '接続できませんでした',
+  retry: '再試行',
+};
+
+const ko: NavMessages = {
+  tabs: { leaderboard: '정상', league: '리그', play: '플레이', inbox: '메시지', profile: '프로필' },
+  updateTitle: '업데이트가 필요해요',
+  updateBody: (minVersion) =>
+    `이 버전(${minVersion} 미만)은 더 이상 지원되지 않아요. 계속 플레이하려면 업데이트하세요.`,
+  openStore: '스토어 열기',
+  offlineTitle: '연결할 수 없어요',
+  retry: '다시 시도',
+};
+
+export const nav: Record<Locale, NavMessages> = { tr, en, de, ar, fr, es, ja, ko };

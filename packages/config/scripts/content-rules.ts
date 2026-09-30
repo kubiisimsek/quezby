@@ -2,9 +2,9 @@
  * The rules every post of the feed is held to — by the catalog's tests
  * (`src/__tests__/content.test.ts`) and, while a file of posts is being
  * written, by `scripts/check-content.ts`. A post is words a player reads in a
- * glance, in six languages, inside a format laid out for lines of a certain
- * length: these checks keep every line inside its box and every language
- * typed the way it is typed.
+ * glance, in every language the game speaks, inside a format laid out for
+ * lines of a certain length: these checks keep every line inside its box and
+ * every language typed the way it is typed.
  */
 import { ACCOUNTS } from '../src/content/accounts';
 import { AVATARS, NOTICES, RECEIPT_ITEMS, STICKERS } from '../src/content/pools';
@@ -12,7 +12,11 @@ import { FORMATS_OF, type ContentKind, type Draft, type Localized } from '../src
 import { LOCALES } from '../src/locales';
 import type { Locale } from '@quezby/types';
 
-/** The most characters a line may have, in any language — the formats are laid out for these. */
+/**
+ * The most columns a line may take, in any language — the formats are laid
+ * out for these. A Latin, Arabic or digit character is one column; a Japanese
+ * or Korean one is drawn about twice as wide, and counts two (`widthOf`).
+ */
 export const LIMITS = {
   caption: 60,
   headline: 40,
@@ -125,6 +129,17 @@ export function isOneEmoji(text: string): boolean {
   return ONE_EMOJI.test(text);
 }
 
+/** Japanese and Korean characters, and the full-width punctuation they are set with: two columns each. */
+const WIDE = /[\u1100-\u115F\u2E80-\uA4CF\uAC00-\uD7A3\uF900-\uFAFF\uFE30-\uFE4F\uFF00-\uFF60\uFFE0-\uFFE6]/u;
+
+/** How many columns a line takes: a Japanese or Korean character counts two. */
+export function widthOf(text: string): number {
+  return Array.from(text).reduce((width, char) => width + (WIDE.test(char) ? 2 : 1), 0);
+}
+
+/** A kana or kanji right before a Latin comma or full stop: Japanese is set with 、 and 。. */
+const JAPANESE_LATIN_PUNCTUATION = /[\u3040-\u30FF\u4E00-\u9FFF][,.]/u;
+
 /** The digits of a line, in order: `2.617` and `2 617` are both `2617`. */
 function digitsOf(text: string): string {
   return text.replace(/\D/g, '');
@@ -138,7 +153,7 @@ export function lineProblems(line: Line): string[] {
   const say = (locale: Locale, what: string) => problems.push(`${line.path} · ${locale}: ${what}`);
   const keys = Object.keys(line.words).sort();
   if (keys.join() !== [...LOCALES].sort().join()) {
-    problems.push(`${line.path}: written in ${keys.join(', ')}, not in the six languages`);
+    problems.push(`${line.path}: written in ${keys.join(', ')}, not in all of ${LOCALES.join(', ')}`);
     return problems;
   }
   for (const locale of LOCALES) {
@@ -148,11 +163,17 @@ export function lineProblems(line: Line): string[] {
       continue;
     }
     if (text !== text.trim() || text.includes('  ')) say(locale, 'stray spaces');
-    const length = Array.from(text).length;
-    if (length > line.limit) say(locale, `${length} characters, the most is ${line.limit}`);
+    const width = widthOf(text);
+    if (width > line.limit) {
+      say(locale, `${width} columns, the most is ${line.limit} (a Japanese or Korean character counts two)`);
+    }
     if (locale === 'fr' && /[^ !?][!?:;%]/.test(text)) {
       say(locale, 'a no-break space (U+00A0) goes before ! ? : ; %');
     }
+    if (locale === 'ja' && (/[!?]/.test(text) || JAPANESE_LATIN_PUNCTUATION.test(text))) {
+      say(locale, 'Japanese is set with full-width ！ ？ 、 。');
+    }
+    if (locale === 'ko' && /[！？。、]/.test(text)) say(locale, 'Korean is set with ! ? . , as English is');
     if (locale === 'es' && text.includes('?') && !text.includes('¿')) say(locale, 'a question opens with ¿');
     if (locale === 'es' && text.includes('!') && !text.includes('¡')) say(locale, 'an exclamation opens with ¡');
     // A Latin comma may only group digits (`12,345`, as `groupDigits` writes Arabic numbers).

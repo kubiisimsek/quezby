@@ -688,4 +688,194 @@ const es: ResultMessages = {
   shareGrid: (grid) => `Cuadrícula de resultado: ${grid}`,
 };
 
-export const result: Record<Locale, ResultMessages> = { tr, en, de, ar, fr, es };
+const jaPoints = (points: number, shown: string) => plural('ja', points, { other: `${shown}ポイント` });
+
+const ja: ResultMessages = {
+  ending: {
+    drained: 'ドーパミン切れ。飽きてアプリを閉じちゃった。',
+    penalty: 'ミスが多すぎて、フィードに見放された。',
+    quit: 'ゲームを抜けました。',
+  },
+  stage: {
+    tutorial: '練習プレイ',
+    practice: 'トレーニング',
+    unsent: 'スコアを送れませんでした',
+    unit: {
+      ranked: (_score) => 'ポイント',
+      tutorial: (_score) => '練習ポイント',
+      practice: (_score) => 'トレーニングポイント',
+    },
+    record: '新記録！',
+    recordLabel: '新記録',
+    seasonBest: (score) => `シーズンベスト：${score}`,
+  },
+  notes: {
+    unsent: {
+      title: 'スコアを確認できませんでした',
+      retry: (message) =>
+        `${message}動きはスマホに保存されています。接続が戻ったら、もう一度送れます。`,
+    },
+    tutorial: {
+      title: '練習プレイ',
+      body: 'このプレイはどこにもカウントされていません。動きはもうわかったね。次は本番！',
+    },
+    practice: {
+      title: 'トレーニング',
+      outdated: 'アプリの新しいバージョンがあります。アップデートするまで、スコアはランキングに載りません。',
+      offline: 'オフラインでプレイしたため、このスコアはランキングに送られていません。',
+    },
+    device: (why) => `${why}プレイはそのまま続けられます。`,
+    review: 'トップに近いスコアは念のため確認しています。承認されるとランキングに反映されます。',
+    flagged: {
+      title: 'ランキング対象外',
+      body: 'このプレイは確認できませんでした。スコアは保存されましたが、ランキングには表示されません。',
+    },
+  },
+  stats: {
+    posts: '投稿',
+    accuracy: '正確率',
+    maxCombo: '最大コンボ',
+    likes: 'いいね',
+    perfects: 'パーフェクト',
+    reaction: '反応速度',
+  },
+  breakdown: {
+    title: 'ポイントの内訳',
+    posts: '投稿から',
+    combos: 'コンボから',
+  },
+  ranks: {
+    periods: { weekly: '週間', monthly: '月間', all: '全期間' },
+    place: board.ja.place,
+    unranked: 'ランキング外',
+    moved: {
+      new: '初ランクイン',
+      up: (_places, shown) => `${shown}位アップ`,
+      down: (_places, shown) => `${shown}位ダウン`,
+    },
+    label: (period, place, move) => (move ? `${period}：${place}、${move}` : `${period}：${place}`),
+  },
+  daily: {
+    unplaced: '今日のランキングには入りませんでした',
+    ofPlayers: (players) => ` / ${board.ja.players(players)}`,
+  },
+  unseen: 'まだ見ていない投稿',
+  passed: {
+    title: '今週追い抜いたプレイヤー',
+    name: (name, friend) => (friend ? `${name} · フレンド` : name),
+    label: (name, friend, score, shown) =>
+      `${name}${friend ? '、フレンド' : ''}、${jaPoints(score, shown)}、追い抜きました`,
+  },
+  dock: {
+    continue: '続ける',
+    resend: 'もう一度送る',
+    replay: 'もう一度',
+    practiceAgain: 'リトライ',
+    home: 'ホームに戻る',
+    share: 'シェア',
+  },
+  bonusChip: ({ name, count, points }) =>
+    facts('、', [
+      name,
+      count === undefined ? null : `${count}回`,
+      points ? jaPoints(points.value, points.shown) : null,
+    ]),
+  shareGrid: (grid) => `結果の表：${grid}`,
+};
+
+const koPoints = (points: number, shown: string) => plural('ko', points, { other: `${shown}점` });
+
+const ko: ResultMessages = {
+  ending: {
+    drained: '도파민 고갈. 지루해서 앱을 꺼 버렸어요.',
+    penalty: '실수가 너무 많아서 피드에서 밀려났어요.',
+    quit: '게임에서 나갔어요.',
+  },
+  stage: {
+    tutorial: '연습 게임',
+    practice: '트레이닝',
+    unsent: '점수를 보내지 못했어요',
+    unit: {
+      ranked: (_score) => '점',
+      tutorial: (_score) => '연습 점수',
+      practice: (_score) => '트레이닝 점수',
+    },
+    record: '신기록!',
+    recordLabel: '신기록',
+    seasonBest: (score) => `시즌 최고 기록: ${score}`,
+  },
+  notes: {
+    unsent: {
+      title: '점수를 확인하지 못했어요',
+      retry: (message) =>
+        `${message} 동작은 휴대폰에 저장돼 있어요. 다시 연결되면 다시 보낼 수 있어요.`,
+    },
+    tutorial: {
+      title: '연습 게임',
+      body: '이번 게임은 어디에도 기록되지 않았어요. 동작은 다 봤으니, 이제 진짜 게임이에요.',
+    },
+    practice: {
+      title: '트레이닝 게임',
+      outdated: '앱의 새 버전이 있어요. 업데이트하기 전까지는 점수가 랭킹에 올라가지 않아요.',
+      offline: '오프라인으로 플레이해서 이 점수는 랭킹에 전송되지 않았어요.',
+    },
+    device: (why) => `${why} 계속 플레이할 수 있어요.`,
+    review: '상위권에 가까운 점수는 한 번 더 확인하고 있어요. 승인되면 랭킹에 반영돼요.',
+    flagged: {
+      title: '랭킹 제외',
+      body: '이 게임은 확인되지 않았어요. 점수는 저장됐지만 랭킹에는 표시되지 않아요.',
+    },
+  },
+  stats: {
+    posts: '게시물',
+    accuracy: '정확도',
+    maxCombo: '최고 콤보',
+    likes: '좋아요',
+    perfects: '퍼펙트',
+    reaction: '반응 속도',
+  },
+  breakdown: {
+    title: '점수 내역',
+    posts: '게시물에서',
+    combos: '콤보에서',
+  },
+  ranks: {
+    periods: { weekly: '주간', monthly: '월간', all: '전체' },
+    place: board.ko.place,
+    unranked: '랭킹 밖',
+    moved: {
+      new: '신규 진입',
+      up: (_places, shown) => `${shown}계단 상승`,
+      down: (_places, shown) => `${shown}계단 하락`,
+    },
+    label: (period, place, move) => (move ? `${period}: ${place}, ${move}` : `${period}: ${place}`),
+  },
+  daily: {
+    unplaced: '오늘의 랭킹에 들지 못했어요',
+    ofPlayers: (players) => ` / ${board.ko.players(players)}`,
+  },
+  unseen: '아직 못 본 게시물',
+  passed: {
+    title: '이번 주에 앞지른 플레이어',
+    name: (name, friend) => (friend ? `${name} · 친구` : name),
+    label: (name, friend, score, shown) =>
+      `${name}${friend ? ', 친구' : ''}, ${koPoints(score, shown)}, 앞질렀어요`,
+  },
+  dock: {
+    continue: '계속하기',
+    resend: '다시 보내기',
+    replay: '다시 하기',
+    practiceAgain: '재도전',
+    home: '홈으로',
+    share: '공유',
+  },
+  bonusChip: ({ name, count, points }) =>
+    facts(', ', [
+      name,
+      count === undefined ? null : `${count}번`,
+      points ? koPoints(points.value, points.shown) : null,
+    ]),
+  shareGrid: (grid) => `결과표: ${grid}`,
+};
+
+export const result: Record<Locale, ResultMessages> = { tr, en, de, ar, fr, es, ja, ko };

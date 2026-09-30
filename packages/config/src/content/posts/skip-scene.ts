@@ -14,6 +14,8 @@ export const SKIP_SCENE: readonly Draft[] = [
       ar: 'أغلقت الباب… والمفتاح في الداخل',
       fr: "Porte claquée, clés à l'intérieur",
       es: 'Cerré la puerta con las llaves dentro',
+      ja: 'ドアを閉めた。鍵は中。',
+      ko: '문 닫았다. 열쇠는 안에 있다.',
     },
   },
   {
@@ -27,6 +29,8 @@ export const SKIP_SCENE: readonly Draft[] = [
       ar: 'الأفوكادو: أمس حجر، وغدًا عجينة',
       fr: 'Avocat : hier caillou, demain purée',
       es: 'Aguacate: ayer piedra, mañana puré',
+      ja: 'アボカド：昨日は石、明日はドロドロ',
+      ko: '아보카도: 어제는 돌, 내일은 죽',
     },
   },
   {
@@ -40,6 +44,8 @@ export const SKIP_SCENE: readonly Draft[] = [
       ar: 'سقيت الزهور… وهذه حياتي الاجتماعية اليوم',
       fr: 'Plantes arrosées. Ma vie sociale du jour.',
       es: 'Regué las plantas. Esa fue mi vida social de hoy.',
+      ja: '植物に水やりした。今日の社交はこれだけ。',
+      ko: '화분에 물 줬다. 오늘 사회생활 끝.',
     },
   },
   {
@@ -53,6 +59,8 @@ export const SKIP_SCENE: readonly Draft[] = [
       ar: 'كانت الغيمة تشبه أرنبًا. لم تعد كذلك.',
       fr: "Ce nuage, c'était un lapin. Plus maintenant.",
       es: 'Esa nube parecía un conejo. Ya no.',
+      ja: 'あの雲、ウサギに見えたのに。もう違う。',
+      ko: '저 구름 토끼 같았는데. 이제 아님.',
     },
   },
   {
@@ -66,6 +74,8 @@ export const SKIP_SCENE: readonly Draft[] = [
       ar: 'حيلة: ادفع الفوضى خارج الصورة',
       fr: 'Astuce : pousse le bazar hors du cadre',
       es: 'Truco: empuja el desorden fuera de la foto',
+      ja: 'ライフハック：散らかりは画角の外へ',
+      ko: '생활 꿀팁: 어질러진 건 화면 밖으로 밀기',
     },
   },
   {
@@ -79,6 +89,8 @@ export const SKIP_SCENE: readonly Draft[] = [
       ar: 'لحقت بالترند أخيرًا… وكان قد انتهى',
       fr: 'Tendance enfin rattrapée. Déjà démodée.',
       es: 'Por fin me subí a la moda. Ya pasó.',
+      ja: 'やっと流行に追いついた。もう終わってた。',
+      ko: '드디어 유행 따라잡음. 이미 끝났더라.',
     },
   },
   {
@@ -92,6 +104,8 @@ export const SKIP_SCENE: readonly Draft[] = [
       ar: 'للأخطبوط 3 قلوب، ولديّ 0 طاقة',
       fr: 'La pieuvre a 3 cœurs. Moi, 0 énergie.',
       es: 'El pulpo tiene 3 corazones. Yo, 0 energía.',
+      ja: 'タコは心臓が3つ。私は元気が0。',
+      ko: '문어는 심장이 3개. 나는 에너지가 0.',
     },
   },
   {
@@ -105,6 +119,8 @@ export const SKIP_SCENE: readonly Draft[] = [
       ar: 'إجازة من الهاتف: اليوم 1، الدقيقة 4',
       fr: 'Détox numérique : jour 1, minute 4',
       es: 'Desconexión digital: día 1, minuto 4',
+      ja: 'デジタルデトックス：1日目、4分経過',
+      ko: '디지털 디톡스: 1일 차, 4분째',
     },
   },
   {
@@ -118,6 +134,8 @@ export const SKIP_SCENE: readonly Draft[] = [
       ar: 'أصوات مريحة: بري القلم… والواجب فارغ',
       fr: 'ASMR taille-crayon, devoirs pas commencés',
       es: 'ASMR de sacapuntas, la tarea sigue en blanco',
+      ja: '鉛筆削りASMR、宿題はまだ白紙',
+      ko: '연필 깎기 ASMR, 숙제는 아직 백지',
     },
   },
   {
@@ -131,6 +149,8 @@ export const SKIP_SCENE: readonly Draft[] = [
       ar: 'اشتريت آيس كريم… فذاب قبل أن أصل إلى البيت',
       fr: "Glace achetée. Fondue avant d'arriver.",
       es: 'Compré helado. Se derritió antes de llegar.',
+      ja: 'アイス買った。家に着く前に溶けた。',
+      ko: '아이스크림 샀는데 집 오기 전에 녹음.',
     },
   },
   {
@@ -144,6 +164,8 @@ export const SKIP_SCENE: readonly Draft[] = [
       ar: 'السلطة كانت من أجل الصورة فقط',
       fr: "La salade, c'était juste pour la photo",
       es: 'La ensalada era solo para la foto',
+      ja: 'サラダは写真用でした',
+      ko: '샐러드는 사진용이었음',
     },
   },
   {
@@ -157,6 +179,8 @@ export const SKIP_SCENE: readonly Draft[] = [
       ar: 'رتّبت سريري… وهذا إنجاز اليوم',
       fr: 'Lit fait. Journée terminée.',
       es: 'Hice la cama. Por hoy, suficiente.',
+      ja: 'ベッドを整えた。今日はここまで。',
+      ko: '이불 개기 완료. 오늘은 여기까지.',
     },
   },
   {
@@ -170,6 +194,8 @@ export const SKIP_SCENE: readonly Draft[] = [
       ar: 'وجدت حجرًا اليوم. حجر جميل.',
       fr: "Trouvé un caillou aujourd'hui. Joli caillou.",
       es: 'Hoy encontré una piedra. Buena piedra.',
+      ja: '今日、石を拾った。いい石。',
+      ko: '오늘 돌을 주웠다. 좋은 돌.',
     },
   },
   {
@@ -183,6 +209,8 @@ export const SKIP_SCENE: readonly Draft[] = [
       ar: 'حيلة: لن تنفد البطارية إن لم تستخدم الهاتف',
       fr: 'Astuce : batterie éternelle, tel éteint',
       es: 'Truco: batería infinita si no usas el teléfono',
+      ja: '裏ワザ：電池が減らない（スマホを使わない）',
+      ko: '꿀팁: 배터리 무한 (폰을 안 쓰면 됨)',
     },
   },
   {
@@ -196,6 +224,8 @@ export const SKIP_SCENE: readonly Draft[] = [
       ar: 'ترند جديد: الفطور على العشاء',
       fr: 'Nouvelle tendance : le petit-déj au dîner',
       es: 'Nueva tendencia: desayuno para cenar',
+      ja: '新トレンド：夜ごはんに朝ごはん',
+      ko: '새 트렌드: 저녁으로 아침 먹기',
     },
   },
   {
@@ -209,6 +239,8 @@ export const SKIP_SCENE: readonly Draft[] = [
       ar: 'العسل لا يفسد أبدًا. أما خططي فتفسد.',
       fr: 'Le miel ne périme jamais. Mes plans, si.',
       es: 'La miel nunca se echa a perder. Mis planes, sí.',
+      ja: 'ハチミツは永遠にもつ。私の予定はもたない。',
+      ko: '꿀은 절대 상하지 않는다. 내 계획은 늘 틀어진다.',
     },
   },
   {
@@ -222,6 +254,8 @@ export const SKIP_SCENE: readonly Draft[] = [
       ar: 'كل يوم أفضل بنسبة 1%. اليوم: 0%.',
       fr: "Chaque jour 1 % meilleur. Aujourd'hui : 0 %.",
       es: 'Cada día un 1 % mejor. Hoy: 0 %.',
+      ja: '毎日1%成長。今日は0%。',
+      ko: '매일 1%씩 성장. 오늘은 0%.',
     },
   },
   {
@@ -235,6 +269,8 @@ export const SKIP_SCENE: readonly Draft[] = [
       ar: 'أصوات مريحة: تقليب الصفحات (دون قراءة)',
       fr: 'ASMR pages qui tournent (je lis pas le livre)',
       es: 'ASMR de pasar páginas (no leo el libro)',
+      ja: 'ページめくりASMR（読んではいない）',
+      ko: '책장 넘기기 ASMR (읽지는 않음)',
     },
   },
   {
@@ -248,6 +284,8 @@ export const SKIP_SCENE: readonly Draft[] = [
       ar: 'يومياتي: لم يحدث شيء اليوم',
       fr: "Vlog du jour : il ne s'est rien passé",
       es: 'Vlog diario: hoy no pasó nada',
+      ja: '日常vlog：今日は何も起きなかった',
+      ko: '일상 브이로그: 오늘은 아무 일도 없었음',
     },
   },
   {
@@ -261,6 +299,8 @@ export const SKIP_SCENE: readonly Draft[] = [
       ar: 'طبخت قليلًا من الأرز… فامتلأت كل القدور',
       fr: 'Juste un peu de riz. Trois casseroles pleines.',
       es: 'Un poco de arroz. Todas las ollas llenas.',
+      ja: 'ご飯を少しだけ炊いた。鍋が全部埋まった。',
+      ko: '쌀 조금 넣었는데 냄비가 전부 꽉 참.',
     },
   },
   {
@@ -274,6 +314,8 @@ export const SKIP_SCENE: readonly Draft[] = [
       ar: 'نظّفت البيت كله… ولم يزرني أحد',
       fr: "Appart nickel. Personne n'est passé.",
       es: 'Limpié toda la casa. No vino nadie.',
+      ja: '家じゅう掃除した。誰も来なかった。',
+      ko: '집 전체를 청소했다. 아무도 안 왔다.',
     },
   },
   {
@@ -287,6 +329,8 @@ export const SKIP_SCENE: readonly Draft[] = [
       ar: 'قشّر الموزة من الأسفل (لن يتغير شيء)',
       fr: 'Épluche la banane par le bas (ça change rien)',
       es: 'Pela la banana por abajo (no cambia nada)',
+      ja: 'バナナは下からむこう（何も変わらない）',
+      ko: '바나나는 아래부터 까기 (아무것도 안 바뀜)',
     },
   },
   {
@@ -300,6 +344,8 @@ export const SKIP_SCENE: readonly Draft[] = [
       ar: 'ينام الكوالا 20 ساعة يوميًا. قدوتي.',
       fr: 'Le koala dort 20 h par jour. Objectif.',
       es: 'Los koalas duermen 20 horas al día. Metas.',
+      ja: 'コアラは1日20時間寝る。目標。',
+      ko: '코알라는 하루 20시간 잔다. 내 목표.',
     },
   },
   {
@@ -313,6 +359,8 @@ export const SKIP_SCENE: readonly Draft[] = [
       ar: 'خرجت للجري… وتوقفت عند المخبز',
       fr: 'Parti courir. Arrêté à la boulangerie.',
       es: 'Salí a correr. Terminé en la panadería.',
+      ja: 'ランニングに出た。パン屋で止まった。',
+      ko: '달리기하러 나갔다가 빵집에서 멈춤.',
     },
   },
 ];

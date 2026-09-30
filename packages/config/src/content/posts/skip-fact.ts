@@ -15,6 +15,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: 'إحصائية اليوم',
         fr: 'LA STAT DU JOUR',
         es: 'EL DATO DEL DÍA',
+        ja: '今日の統計',
+        ko: '오늘의 통계',
       },
       big: {
         tr: '58',
@@ -23,6 +25,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: '58',
         fr: '58',
         es: '58',
+        ja: '58',
+        ko: '58',
       },
       text: {
         tr: 'kez telefonuna baktın; yeni bildirim yoktu',
@@ -31,6 +35,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: 'مرة نظرت إلى هاتفك، ولا إشعار جديد',
         fr: 'fois où tu as regardé ton téléphone. Rien de nouveau.',
         es: 'veces miraste tu teléfono. Nada nuevo.',
+        ja: '回スマホを確認。新しい通知はゼロ。',
+        ko: '번 휴대폰을 확인했어요. 새 알림은 없었어요.',
       },
     },
     caption: {
@@ -40,6 +46,8 @@ export const SKIP_FACT: readonly Draft[] = [
       ar: 'والآن صارت 59',
       fr: 'Et de 59',
       es: 'Y van 59',
+      ja: 'これで59回目',
+      ko: '방금 59번이 됐어요',
     },
   },
   {
@@ -54,6 +62,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: 'العلماء في حيرة',
         fr: 'LA SCIENCE EST PERPLEXE',
         es: 'CIENTÍFICOS PERPLEJOS',
+        ja: '科学者も困惑',
+        ko: '과학자들도 당황',
       },
       big: {
         tr: '0',
@@ -62,6 +72,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: '0',
         fr: '0',
         es: '0',
+        ja: '0',
+        ko: '0',
       },
       text: {
         tr: 'kez şemsiyeni aldığın gün yağmur yağdı',
@@ -70,6 +82,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: 'مرة أمطرت في يوم حملت فيه مظلتك',
         fr: 'fois où il a plu un jour où tu avais ton parapluie',
         es: 'veces llovió un día que llevabas paraguas',
+        ja: '回、傘を持って出た日に雨が降った',
+        ko: '번, 우산을 챙긴 날 비가 왔어요',
       },
     },
     caption: {
@@ -79,6 +93,8 @@ export const SKIP_FACT: readonly Draft[] = [
       ar: 'الغيوم تراقبك',
       fr: 'Les nuages te surveillent',
       es: 'Las nubes te vigilan',
+      ja: '雲に見張られている',
+      ko: '구름이 당신을 지켜보고 있어요',
     },
   },
   {
@@ -94,6 +110,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: '7',
         fr: '7',
         es: '7',
+        ja: '7',
+        ko: '7',
       },
       text: {
         tr: 'dakikalık sesli mesaj geldi; özeti: “tamam”',
@@ -102,6 +120,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: 'دقائق من رسالة صوتية… خلاصتها: «حسنًا»',
         fr: 'minutes de vocal. En résumé : « ok »',
         es: 'minutos de audio. En resumen: “ok”',
+        ja: '分のボイスメッセージ。要約すると「OK」。',
+        ko: '분짜리 음성 메시지. 요약: “알겠어.”',
       },
     },
     caption: {
@@ -111,6 +131,8 @@ export const SKIP_FACT: readonly Draft[] = [
       ar: 'حتى بالسرعة المضاعفة لم تنتهِ',
       fr: 'Même en accéléré, interminable',
       es: 'Ni al doble de velocidad se acababa',
+      ja: '2倍速でも終わらない',
+      ko: '2배속으로 들어도 안 끝나요',
     },
   },
   {
@@ -126,6 +148,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: '14',
         fr: '14',
         es: '14',
+        ja: '14',
+        ko: '14',
       },
       text: {
         tr: 'dakika anahtarını aradın; elindeydi',
@@ -134,6 +158,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: 'دقيقة بحثت عن مفاتيحك… وكانت في يدك',
         fr: 'minutes à chercher tes clés. Elles étaient dans ta main.',
         es: 'minutos buscando tus llaves. Las tenías en la mano.',
+        ja: '分、鍵を探した。手に持っていた。',
+        ko: '분 동안 열쇠를 찾았어요. 손에 들고 있었어요.',
       },
     },
     caption: {
@@ -143,6 +169,8 @@ export const SKIP_FACT: readonly Draft[] = [
       ar: 'غدًا ستكون في جيبك',
       fr: 'Demain, elles seront dans ta poche',
       es: 'Mañana estarán en tu bolsillo',
+      ja: '明日はポケットの中にある',
+      ko: '내일은 주머니에 있을 거예요',
     },
   },
   {
@@ -157,6 +185,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: 'هذا الأسبوع',
         fr: 'CETTE SEMAINE',
         es: 'ESTA SEMANA',
+        ja: '今週',
+        ko: '이번 주',
       },
       big: {
         tr: '9',
@@ -165,6 +195,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: '9',
         fr: '9',
         es: '9',
+        ja: '9',
+        ko: '9',
       },
       text: {
         tr: 'kez “şifremi unuttum”a bastın',
@@ -173,6 +205,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: 'مرات ضغطت على «نسيت كلمة المرور»',
         fr: 'fois où tu as appuyé sur « mot de passe oublié »',
         es: 'veces tocaste “olvidé mi contraseña”',
+        ja: '回「パスワードを忘れた」を押した',
+        ko: '번 “비밀번호 찾기”를 눌렀어요',
       },
     },
     caption: {
@@ -182,6 +216,8 @@ export const SKIP_FACT: readonly Draft[] = [
       ar: 'ونسيت الجديدة أيضًا',
       fr: "T'as déjà oublié le nouveau",
       es: 'Ya olvidaste la nueva también',
+      ja: '新しいのももう忘れた',
+      ko: '새 비밀번호도 벌써 잊었죠',
     },
   },
   {
@@ -197,6 +233,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: '8',
         fr: '8',
         es: '8',
+        ja: '8',
+        ko: '8',
       },
       text: {
         tr: 'kez mikrofon kapalıyken koca bir sunum yaptın',
@@ -205,6 +243,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: 'مرات قدّمت عرضًا كاملًا والميكروفون مغلق',
         fr: 'fois où tu as fait tout un exposé micro coupé',
         es: 'veces diste toda una presentación con el micro apagado',
+        ja: '回、ミュートのまま熱いプレゼンをした',
+        ko: '번, 음소거 상태로 발표를 끝까지 했어요',
       },
     },
     caption: {
@@ -214,6 +254,8 @@ export const SKIP_FACT: readonly Draft[] = [
       ar: 'كان أفضل عروضك',
       fr: 'Ton meilleur à ce jour',
       es: 'La mejor que has dado',
+      ja: '過去最高のプレゼンだった',
+      ko: '인생 최고의 발표였어요',
     },
   },
   {
@@ -229,6 +271,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: '40',
         fr: '40',
         es: '40',
+        ja: '40',
+        ko: '40',
       },
       text: {
         tr: 'dakika ne izleyeceğini seçtin, sonra uyuyakaldın',
@@ -237,6 +281,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: 'دقيقة تختار ما ستشاهده… ثم نمت',
         fr: 'minutes à choisir quoi regarder. Puis dodo.',
         es: 'minutos eligiendo qué ver. Luego te dormiste.',
+        ja: '分かけて観るものを選び、そのまま寝落ち',
+        ko: '분 동안 볼 걸 고르다가 잠들었어요',
       },
     },
     caption: {
@@ -246,6 +292,8 @@ export const SKIP_FACT: readonly Draft[] = [
       ar: 'غدًا تكمل من حيث توقفت: الاختيار',
       fr: 'Demain, on reprend le choix',
       es: 'Mañana sigues eligiendo',
+      ja: '明日は続きから：選ぶところ',
+      ko: '내일은 이어서: 고르기부터',
     },
   },
   {
@@ -261,6 +309,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: '300',
         fr: '300',
         es: '300',
+        ja: '300',
+        ko: '300',
       },
       text: {
         tr: 'fotoğraf çektin; paylaştığın yine ilk çekilendi',
@@ -269,6 +319,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: 'صورة التقطتها… ونشرت أول واحدة',
         fr: 'photos prises. Tu as posté la toute première.',
         es: 'fotos tomadas. Publicaste la primera.',
+        ja: '枚写真を撮った。投稿したのは1枚目。',
+        ko: '장 사진을 찍었어요. 올린 건 첫 번째 사진.',
       },
     },
     caption: {
@@ -278,6 +330,8 @@ export const SKIP_FACT: readonly Draft[] = [
       ar: 'الإحساس الأول دائمًا على حق',
       fr: 'Le premier instinct a toujours raison',
       es: 'El primer instinto nunca falla',
+      ja: '最初の直感はいつも正しい',
+      ko: '첫 느낌은 언제나 옳아요',
     },
   },
   {
@@ -292,6 +346,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: 'هذا الشهر',
         fr: 'CE MOIS-CI',
         es: 'ESTE MES',
+        ja: '今月',
+        ko: '이번 달',
       },
       big: {
         tr: '21',
@@ -300,6 +356,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: '21',
         fr: '21',
         es: '21',
+        ja: '21',
+        ko: '21',
       },
       text: {
         tr: 'kez annene “sonra ararım” dedin',
@@ -308,6 +366,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: 'مرة قلت لأمك «سأتصل بك لاحقًا»',
         fr: 'fois où tu as dit à ta mère « je te rappelle »',
         es: 'veces le dijiste a tu mamá “luego te llamo”',
+        ja: '回、母に「あとで電話する」と言った',
+        ko: '번 엄마한테 “이따 전화할게”라고 했어요',
       },
     },
     caption: {
@@ -317,6 +377,8 @@ export const SKIP_FACT: readonly Draft[] = [
       ar: 'أمك رأت هذا المنشور',
       fr: 'Ta mère a vu ce post',
       es: 'Tu mamá vio este post',
+      ja: 'お母さんがこの投稿を見ました',
+      ko: '엄마가 이 게시물을 봤어요',
     },
   },
   {
@@ -332,6 +394,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: '5',
         fr: '5',
         es: '5',
+        ja: '5',
+        ko: '5',
       },
       text: {
         tr: 'kez bir odaya girip neden girdiğini unuttun',
@@ -340,6 +404,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: 'مرات دخلت غرفة ونسيت لماذا',
         fr: 'fois où tu as oublié pourquoi tu entrais dans la pièce',
         es: 'veces entraste a una habitación y olvidaste para qué',
+        ja: '回、部屋に入って何しに来たか忘れた',
+        ko: '번 방에 들어가서 왜 왔는지 잊었어요',
       },
     },
     caption: {
@@ -349,6 +415,8 @@ export const SKIP_FACT: readonly Draft[] = [
       ar: 'ستتذكر في المرة السادسة',
       fr: 'Ça te reviendra à la sixième',
       es: 'A la sexta te acordarás',
+      ja: '6回目で思い出す',
+      ko: '여섯 번째엔 기억날 거예요',
     },
   },
   {
@@ -364,6 +432,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: '4',
         fr: '4',
         es: '4',
+        ja: '4',
+        ko: '4',
       },
       text: {
         tr: 'kez “iyi seyirler” diyene “size de” dedin',
@@ -372,6 +442,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: 'مرات قيل لك «مشاهدة ممتعة» فقلت «ولك أيضًا»',
         fr: 'fois où tu as répondu « vous aussi » à « bon film »',
         es: 'veces respondiste “tú también” a “que disfrutes la película”',
+        ja: '回「いってらっしゃい」に「いってらっしゃい」と返した',
+        ko: '번 “맛있게 드세요”에 “네, 맛있게 드세요”라고 했어요',
       },
     },
     caption: {
@@ -381,6 +453,8 @@ export const SKIP_FACT: readonly Draft[] = [
       ar: 'ما زلت تفكر في الأمر، نعلم ذلك',
       fr: 'Tu y penses encore, on le sait',
       es: 'Todavía lo piensas, lo sabemos',
+      ja: '今でも思い出すよね。知ってる。',
+      ko: '아직도 생각나죠? 다 알아요.',
     },
   },
   {
@@ -396,6 +470,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: '15',
         fr: '15',
         es: '15',
+        ja: '15',
+        ko: '15',
       },
       text: {
         tr: 'sekme açık; müzik hangisinden geliyor, bilmiyorsun',
@@ -404,6 +480,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: 'تبويبًا مفتوحًا… ولا تعرف أيها يشغّل الموسيقى',
         fr: 'onglets ouverts. Lequel joue de la musique ? Mystère.',
         es: 'pestañas abiertas y no sabes cuál tiene música',
+        ja: '個のタブが開いてる。音楽がどれから流れてるか不明。',
+        ko: '개의 탭이 열려 있어요. 어디서 음악이 나오는지 몰라요.',
       },
     },
     caption: {
@@ -413,6 +491,8 @@ export const SKIP_FACT: readonly Draft[] = [
       ar: 'بدأت تغلقها واحدًا تلو الآخر',
       fr: "C'est parti pour les fermer un par un",
       es: 'Toca cerrarlas una por una',
+      ja: '1個ずつ閉じていく時間',
+      ko: '하나씩 닫아 보는 중',
     },
   },
   {
@@ -428,6 +508,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: '12%',
         fr: '12 %',
         es: '12 %',
+        ja: '12%',
+        ko: '12%',
       },
       text: {
         tr: 'şarjla evden çıktın; şarj aleti evde kaldı',
@@ -436,6 +518,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: 'شحن عند خروجك… والشاحن بقي في البيت',
         fr: 'de batterie en partant. Le chargeur est resté chez toi.',
         es: 'de batería al salir. El cargador se quedó en casa.',
+        ja: 'の充電で家を出た。充電器は家にある。',
+        ko: '배터리로 외출했어요. 충전기는 집에 두고요.',
       },
     },
     caption: {
@@ -445,6 +529,8 @@ export const SKIP_FACT: readonly Draft[] = [
       ar: 'مهمة اليوم: إيجاد مقبس كهرباء',
       fr: 'Quête du jour : trouver une prise',
       es: 'Misión del día: encontrar un enchufe',
+      ja: '今日のクエスト：コンセントを探せ',
+      ko: '오늘의 퀘스트: 콘센트 찾기',
     },
   },
   {
@@ -460,6 +546,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: '16',
         fr: '16',
         es: '16',
+        ja: '16',
+        ko: '16',
       },
       text: {
         tr: 'kez asansör düğmesine bastın; daha hızlı gelmedi',
@@ -468,6 +556,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: 'مرة ضغطت زر المصعد… ولم يأتِ أسرع',
         fr: "fois où tu as appuyé sur l'ascenseur. Il prend son temps.",
         es: 'veces presionaste el botón del ascensor. No llegó antes.',
+        ja: '回エレベーターのボタンを押した。早くは来なかった。',
+        ko: '번 엘리베이터 버튼을 눌렀어요. 더 빨리 오진 않았어요.',
       },
     },
     caption: {
@@ -477,6 +567,8 @@ export const SKIP_FACT: readonly Draft[] = [
       ar: 'ضغطة أخرى وسيأتي حتمًا',
       fr: 'Encore un appui et il arrive',
       es: 'Una vez más y seguro que llega',
+      ja: '次押せば絶対来る',
+      ko: '한 번만 더 누르면 올 거예요',
     },
   },
   {
@@ -492,6 +584,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: '90',
         fr: '90',
         es: '90',
+        ja: '90',
+        ko: '90',
       },
       text: {
         tr: 'dakikadır kulaklık takılı; müzik açık bile değil',
@@ -500,6 +594,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: 'دقيقة والسماعات في أذنيك… بلا أي موسيقى',
         fr: 'minutes avec tes écouteurs. Zéro musique.',
         es: 'minutos con auriculares puestos. Sin música.',
+        ja: '分イヤホンをしてる。音楽は流れてない。',
+        ko: '분째 이어폰을 끼고 있어요. 음악은 안 틀었어요.',
       },
     },
     caption: {
@@ -509,6 +605,8 @@ export const SKIP_FACT: readonly Draft[] = [
       ar: 'فقط كي لا يكلمك أحد',
       fr: "Juste pour qu'on te laisse tranquille",
       es: 'Solo para que nadie te hable',
+      ja: '話しかけられないためだけに',
+      ko: '아무도 말 못 걸게 하려고요',
     },
   },
   {
@@ -524,6 +622,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: '10',
         fr: '10',
         es: '10',
+        ja: '10',
+        ko: '10',
       },
       text: {
         tr: 'kez saate bakmak için telefonu açtın; saat kaç, bilmiyorsun',
@@ -532,6 +632,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: 'مرات فتحت هاتفك لتعرف الوقت… وما زلت لا تعرفه',
         fr: "fois où tu as regardé l'heure. Tu ne la connais toujours pas.",
         es: 'veces miraste la hora en el teléfono. Sigues sin saberla.',
+        ja: '回、時間を見るためにスマホを開いた。今何時か知らない。',
+        ko: '번 시간 보려고 휴대폰을 켰어요. 몇 시인지는 몰라요.',
       },
     },
     caption: {
@@ -541,6 +643,8 @@ export const SKIP_FACT: readonly Draft[] = [
       ar: 'بسرعة: كم الساعة الآن؟',
       fr: 'Vite : il est quelle heure ?',
       es: 'Rápido: ¿qué hora es?',
+      ja: 'はい、今何時？',
+      ko: '자, 지금 몇 시죠?',
     },
   },
   {
@@ -556,6 +660,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: '17',
         fr: '17',
         es: '17',
+        ja: '17',
+        ko: '17',
       },
       text: {
         tr: 'kez “bir tadına bakayım” dedin; tencere yarılandı',
@@ -564,6 +670,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: 'مرة قلت «سأتذوّق فقط»… ونصف القِدر اختفى',
         fr: 'fois « juste pour goûter ». La casserole est à moitié vide.',
         es: 'veces dijiste “solo lo pruebo”. La olla va por la mitad.',
+        ja: '回「味見だけ」と言った。鍋はもう半分。',
+        ko: '번 “맛만 볼게”라고 했어요. 냄비가 반이 됐어요.',
       },
     },
     caption: {
@@ -573,6 +681,8 @@ export const SKIP_FACT: readonly Draft[] = [
       ar: 'العشاء: حصة تذوّق',
       fr: 'Dîner : menu dégustation',
       es: 'Cena: menú degustación',
+      ja: '夕食：試食コース',
+      ko: '저녁 메뉴: 시식 코스',
     },
   },
   {
@@ -588,6 +698,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: '3',
         fr: '3',
         es: '3',
+        ja: '3',
+        ko: '3',
       },
       text: {
         tr: 'beğeni: annen, teyzen ve yanlışlıkla sen',
@@ -596,6 +708,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: 'إعجابات: أمك، خالتك، وأنت بالخطأ',
         fr: 'likes : ta mère, ta tante et toi, par erreur',
         es: 'me gusta: tu mamá, tu tía y tú sin querer',
+        ja: 'いいね：母、おば、うっかり押した自分',
+        ko: '개의 좋아요: 엄마, 이모, 실수로 누른 나',
       },
     },
     caption: {
@@ -605,6 +719,8 @@ export const SKIP_FACT: readonly Draft[] = [
       ar: 'على وشك أن يصبح ترندًا',
       fr: 'Quasiment viral',
       es: 'Prácticamente viral',
+      ja: 'バズる寸前',
+      ko: '거의 떡상 직전',
     },
   },
   {
@@ -620,6 +736,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: '6',
         fr: '6',
         es: '6',
+        ja: '6',
+        ko: '6',
       },
       text: {
         tr: 'dilim pizzanı “aç değilim” diyenler yedi',
@@ -628,6 +746,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: 'شرائح من بيتزاك أكلها من قالوا «لست جائعًا»',
         fr: "parts de ta pizza, mangées par ceux qui « n'avaient pas faim »",
         es: 'porciones de tu pizza se comieron los que “no tenían hambre”',
+        ja: '切れのピザを「お腹すいてない」人たちが食べた',
+        ko: '조각의 피자를 “배 안 고프다”던 사람들이 먹었어요',
       },
     },
     caption: {
@@ -637,6 +757,8 @@ export const SKIP_FACT: readonly Draft[] = [
       ar: 'في المرة القادمة: الحجم الكبير',
       fr: 'La prochaine fois, prends la grande',
       es: 'La próxima, pide la grande',
+      ja: '次はLサイズで',
+      ko: '다음엔 라지로 시켜요',
     },
   },
   {
@@ -651,6 +773,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: 'تقول الدراسات',
         fr: 'SELON LES ÉTUDES',
         es: 'SEGÚN LOS ESTUDIOS',
+        ja: '研究によると',
+        ko: '연구 결과에 따르면',
       },
       big: {
         tr: '1',
@@ -659,6 +783,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: '1',
         fr: '1',
         es: '1',
+        ja: '1',
+        ko: '1',
       },
       text: {
         tr: 'ayak yorganın dışında: kusursuz uyku sıcaklığı',
@@ -667,6 +793,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: 'قدم خارج البطانية: حرارة النوم المثالية',
         fr: 'pied hors de la couette : la température parfaite',
         es: 'pie fuera de la manta: la temperatura perfecta',
+        ja: '本の足を布団から出す。それが理想の寝る温度。',
+        ko: '쪽 발만 이불 밖에: 완벽한 수면 온도',
       },
     },
     caption: {
@@ -676,6 +804,8 @@ export const SKIP_FACT: readonly Draft[] = [
       ar: 'ولا يزال العلم عاجزًا عن تفسير ذلك',
       fr: "La science ne l'explique toujours pas",
       es: 'La ciencia aún no lo explica',
+      ja: '科学でもまだ説明できない',
+      ko: '과학도 아직 설명 못 해요',
     },
   },
   {
@@ -691,6 +821,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: '23',
         fr: '23',
         es: '23',
+        ja: '23',
+        ko: '23',
       },
       text: {
         tr: 'kez mikrodalgayı bip sesinden hemen önce durdurdun',
@@ -699,6 +831,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: 'مرة أوقفت الميكروويف قبل الصفارة بلحظة',
         fr: 'fois où tu as arrêté le micro-ondes juste avant le bip',
         es: 'veces paraste el microondas justo antes del pitido',
+        ja: '回、電子レンジを「チン」の直前で止めた',
+        ko: '번 전자레인지를 “띵” 소리 직전에 멈췄어요',
       },
     },
     caption: {
@@ -708,6 +842,8 @@ export const SKIP_FACT: readonly Draft[] = [
       ar: 'وضع العميل السري: مفعَّل',
       fr: 'Mode agent secret : activé',
       es: 'Modo agente secreto: activado',
+      ja: 'スパイモード：オン',
+      ko: '비밀 요원 모드: 켜짐',
     },
   },
   {
@@ -723,6 +859,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: '11',
         fr: '11',
         es: '11',
+        ja: '11',
+        ko: '11',
       },
       text: {
         tr: 'denemede arkadaşının wifi şifresini girebildin',
@@ -731,6 +869,8 @@ export const SKIP_FACT: readonly Draft[] = [
         ar: 'محاولة حتى أدخلت كلمة سر الواي فاي عند صديقك',
         fr: 'essais pour taper le code wifi chez tes potes',
         es: 'intentos para escribir bien la contraseña del wifi',
+        ja: '回目で友だちのWi-Fiパスワードを入力できた',
+        ko: '번 만에 친구 와이파이 비밀번호를 맞혔어요',
       },
     },
     caption: {
@@ -740,6 +880,8 @@ export const SKIP_FACT: readonly Draft[] = [
       ar: 'حرف كبير أم صغير؟',
       fr: 'I majuscule ou l minuscule ?',
       es: '¿I mayúscula o l minúscula?',
+      ja: '大文字のI？小文字のl？',
+      ko: '대문자 I야, 소문자 l이야?',
     },
   },
 ];

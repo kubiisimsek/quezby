@@ -10,6 +10,8 @@ const fmt: Record<Locale, Formats> = {
   ar: formatsFor('ar'),
   fr: formatsFor('fr'),
   es: formatsFor('es'),
+  ja: formatsFor('ja'),
+  ko: formatsFor('ko'),
 };
 
 /**
@@ -292,4 +294,90 @@ const es: HistoryMessages = {
   door: { eyebrow: 'PARTIDAS ANTERIORES', title: 'Todas tus partidas' },
 };
 
-export const history: Record<Locale, HistoryMessages> = { tr, en, de, ar, fr, es };
+const ja: HistoryMessages = {
+  title: '過去のゲーム',
+  tagline: 'すべてのプレイを、サーバーの集計どおりに',
+  filters: { all: 'すべて', daily: 'デイリー', rated: 'ランク戦', vs: 'VS' },
+  today: '今日',
+  yesterday: '昨日',
+  kinds: {
+    free: 'ノーマル',
+    rated: 'ランク戦',
+    vs: (name) => `VS · ${name}`,
+    vsGone: 'VS · 削除されたプレイヤー',
+  },
+  meta: (posts, time, at) => `投稿${fmt.ja.score(posts)}件 · ${time} · ${at}`,
+  tags: {
+    best: 'ベスト',
+    review: '確認中',
+    flagged: 'ノーカウント',
+    won: '勝ち',
+    lost: '負け',
+    draw: '引き分け',
+    waiting: '相手の番',
+    yourTurn: 'あなたの番',
+    expired: '期限切れ',
+    declined: '拒否',
+    cancelled: '終了',
+    void: '無効',
+  },
+  emptyTitle: 'まだ終えたゲームがありません',
+  emptyHint: 'プレイしたゲームは、サーバーの集計どおりにここに並びます。',
+  play: 'プレイ',
+  failed: '履歴を読み込めませんでした',
+  retry: 'もう一度試す',
+  row: (title, score, when) => `${title}、${score}ポイント、${when}`,
+  sheet: {
+    failed: 'プレイを読み込めませんでした',
+    review: 'スコアを確認しています。モデレーターの確認後にランキングに入ります。',
+    flagged: 'このプレイはランキングにカウントされませんでした。',
+    played: 'VSのプレイです。VSにだけカウントされました。',
+    at: (date, time) => `${date} · ${time}`,
+  },
+  door: { eyebrow: '過去のゲーム', title: 'プレイしたすべてのゲーム' },
+};
+
+const ko: HistoryMessages = {
+  title: '지난 게임',
+  tagline: '플레이한 모든 게임을 서버가 집계한 그대로',
+  filters: { all: '전체', daily: '데일리', rated: '랭크전', vs: 'VS' },
+  today: '오늘',
+  yesterday: '어제',
+  kinds: {
+    free: '일반 게임',
+    rated: '랭크전',
+    vs: (name) => `VS · ${name}`,
+    vsGone: 'VS · 삭제된 플레이어',
+  },
+  meta: (posts, time, at) => `게시물 ${fmt.ko.score(posts)}개 · ${time} · ${at}`,
+  tags: {
+    best: '최고 기록',
+    review: '검토 중',
+    flagged: '미반영',
+    won: '승리',
+    lost: '패배',
+    draw: '무승부',
+    waiting: '상대 차례',
+    yourTurn: '내 차례',
+    expired: '기간 만료',
+    declined: '거절됨',
+    cancelled: '종료됨',
+    void: '무효',
+  },
+  emptyTitle: '아직 끝낸 게임이 없어요',
+  emptyHint: '플레이한 게임은 서버가 집계한 그대로 여기에 표시돼요.',
+  play: '플레이',
+  failed: '기록을 불러오지 못했어요',
+  retry: '다시 시도',
+  row: (title, score, when) => `${title}, ${score}점, ${when}`,
+  sheet: {
+    failed: '게임을 불러오지 못했어요',
+    review: '점수를 검토하고 있어요. 운영진이 확인하면 랭킹에 반영돼요.',
+    flagged: '이번 게임은 랭킹에 반영되지 않았어요.',
+    played: 'VS 게임이었어요. VS에만 반영됐어요.',
+    at: (date, time) => `${date} · ${time}`,
+  },
+  door: { eyebrow: '지난 게임', title: '플레이한 모든 게임' },
+};
+
+export const history: Record<Locale, HistoryMessages> = { tr, en, de, ar, fr, es, ja, ko };

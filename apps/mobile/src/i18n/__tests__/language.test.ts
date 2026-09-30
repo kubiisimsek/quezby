@@ -4,7 +4,8 @@ import { getLocales } from 'react-native-localize';
 import RNRestart from 'react-native-restart';
 
 import { queryClient } from '@/api/queryClient';
-import { currentLocale, phoneLocale, useLanguage } from '@/i18n/language';
+import { currentLocale, phoneLocale, startupLocale, useLanguage } from '@/i18n/language';
+import { startIn } from '@/i18n/script';
 
 const KEY = 'quezby.language.v1';
 const GUARD = 'quezby.direction.v1';
@@ -31,6 +32,7 @@ beforeEach(async () => {
   jest.spyOn(I18nManager, 'forceRTL').mockImplementation(() => undefined);
   readingRtl(false);
   phone('tr-TR');
+  startIn('tr');
 });
 
 afterEach(() => {
@@ -49,15 +51,23 @@ describe('the language at launch', () => {
   });
 
   it('takes the first of the phone’s languages the game speaks', async () => {
-    phone('ja-JP', 'fr-CA', 'de-DE');
+    phone('zh-CN', 'fr-CA', 'de-DE');
 
     await useLanguage.getState().hydrate();
 
     expect(currentLocale()).toBe('fr');
   });
 
-  it('is English on a phone that speaks none of the six', async () => {
-    phone('ja-JP', 'pt-BR');
+  it('speaks Japanese and Korean on a phone that does', async () => {
+    phone('ja-JP', 'en-US');
+    expect(phoneLocale()).toBe('ja');
+
+    phone('ko-KR');
+    expect(phoneLocale()).toBe('ko');
+  });
+
+  it('is English on a phone that speaks none of the eight', async () => {
+    phone('zh-CN', 'pt-BR');
 
     expect(phoneLocale()).toBeNull();
     await useLanguage.getState().hydrate();
@@ -118,6 +128,25 @@ describe('the language at launch', () => {
   });
 });
 
+describe('the language a launch starts in, read before the app loads', () => {
+  it('is the one the launch will speak: picked here, else the phone’s', async () => {
+    phone('ko-KR');
+    expect(await startupLocale()).toBe('ko');
+
+    await AsyncStorage.setItem(KEY, JSON.stringify({ chosen: 'ja', device: 'ko', account: null }));
+    expect(await startupLocale()).toBe('ja');
+  });
+
+  it('follows a phone whose own language changed since the pick, as hydrate does', async () => {
+    await AsyncStorage.setItem(KEY, JSON.stringify({ chosen: 'ja', device: 'tr', account: null }));
+    phone('ko-KR');
+
+    expect(await startupLocale()).toBe('ko');
+    await useLanguage.getState().hydrate();
+    expect(currentLocale()).toBe('ko');
+  });
+});
+
 describe('choosing a language', () => {
   beforeEach(async () => {
     await useLanguage.getState().hydrate();
@@ -146,6 +175,23 @@ describe('choosing a language', () => {
     expect(JSON.parse((await AsyncStorage.getItem(KEY)) ?? '{}')).toMatchObject({ chosen: 'ar' });
   });
 
+  it('reloads the app for Japanese or Korean, set in faces of their own', async () => {
+    await useLanguage.getState().choose('ja');
+
+    expect(RNRestart.restart).toHaveBeenCalledWith('faces:ja');
+    expect(useLanguage.getState().phase).toBe('restarting');
+    expect(I18nManager.forceRTL).not.toHaveBeenCalled();
+    expect(JSON.parse((await AsyncStorage.getItem(KEY)) ?? '{}')).toMatchObject({ chosen: 'ja' });
+  });
+
+  it('reloads back to Latin faces from Japanese', async () => {
+    startIn('ja');
+
+    await useLanguage.getState().choose('en');
+
+    expect(RNRestart.restart).toHaveBeenCalledWith('faces:en');
+  });
+
   it('always tries a turn the player asked for, even after one that did not take', async () => {
     await AsyncStorage.setItem(GUARD, JSON.stringify({ to: 'rtl', build: '1.0.0+1' }));
 
@@ -165,6 +211,18 @@ describe('an account’s language', () => {
 
     expect(flip).toBe(false);
     expect(useLanguage.getState()).toMatchObject({ locale: 'de', chosen: 'de', account: 'p9' });
+  });
+
+  it('waits for the caller to reload when it needs other faces', async () => {
+    const reload = await useLanguage.getState().takeAccount({ id: 'p9', locale: 'ko' });
+
+    expect(reload).toBe(true);
+    expect(useLanguage.getState().phase).toBe('restarting');
+    expect(RNRestart.restart).not.toHaveBeenCalled();
+
+    await useLanguage.getState().reload();
+
+    expect(RNRestart.restart).toHaveBeenCalledWith('faces:ko');
   });
 
   it('waits for the caller to reload when it reads the other way', async () => {

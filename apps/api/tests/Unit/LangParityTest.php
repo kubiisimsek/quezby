@@ -7,7 +7,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Translation\MessageSelector;
 
 /*
-| Every line the API says is in all six languages (`lang/{locale}`): the
+| Every line the API says is in all eight languages (`lang/{locale}`): the
 | same files, the same keys, the same placeholders — and a counted line has
 | as many forms as its language counts with.
 */
@@ -111,7 +111,7 @@ it('counts with as many forms as the language has', function (Locale $locale) {
 })->with(Locale::cases());
 
 it('knows the forms of each language', function () {
-    expect(array_map(fn (Locale $locale) => langForms($locale), Locale::cases()))->toBe([1, 2, 2, 6, 2, 2])
+    expect(array_map(fn (Locale $locale) => langForms($locale), Locale::cases()))->toBe([1, 2, 2, 6, 2, 2, 1, 1])
         // Turkish says "1 puan" as it says "3 puan": the other languages show which lines count.
         ->and(langIsCounted('share', 'points'))->toBeTrue()
         ->and(langIsCounted('share', 'posts'))->toBeTrue()

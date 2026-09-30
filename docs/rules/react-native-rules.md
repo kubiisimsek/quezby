@@ -17,7 +17,7 @@
   style array; a static size or spacing may not.
 - Never `textTransform: 'uppercase'`.
 - **Every word a player sees comes from the catalogs** (`src/i18n/messages/`,
-  the six languages side by side; `docs/design/ui-writing.md`): `const t =
+  the eight languages side by side; `docs/design/ui-writing.md`): `const t =
   useT()` in the component, `t.<area>.<line>`. No text literal in a screen,
   kit piece or hook — ESLint refuses JSX text, copy props (`label`, `title`,
   `subtitle`, `body`, `hint`, `placeholder`, `message`, `accessibilityLabel`)
@@ -26,12 +26,16 @@
   Keep codes in state and words out of it, so a language picked mid-screen
   shows at once.
 - **The language** is `useLanguage` (`src/i18n/language.ts`): the phone's own
-  language on a first launch (English when it is none of the six), then the
+  language on a first launch (English when it is none of the eight), then the
   one picked in Ayarlar or taken from the account at sign-in;
   `useLanguageSync` writes it to the account (`PUT /me/locale`) and every
   request asks the API for it (`Accept-Language`). Arabic reads right to left
   (`I18nManager`): choosing it, or leaving it, reloads the app
-  (`react-native-restart`), guarded against reloading twice.
+  (`react-native-restart`), guarded against reloading twice. Japanese and
+  Korean bring their own faces, which styles take when their modules load:
+  `Boot` (`src/Boot.tsx`) reads the language before `App` is imported
+  (`startIn`), and moving between Latin, Japanese and Korean reloads the same
+  way (`needsNewFaces`, `src/i18n/script.ts`).
 - **Right to left is automatic, except where it is not.** React Native mirrors
   rows, margins, paddings and `left`/`right` in Arabic by itself — use them
   freely. A transform, an SVG path or a glyph that points somewhere does not
@@ -103,16 +107,19 @@ The owner judges every screen as a game. These are the rules that keep it one
   something away.
 - **Type.** Titles, numbers and button labels are Rubik through `Txt`
   (`hero`, `display`, `title`, `score`) or `embossed()`; body text is Nunito
-  (Cairo in Arabic, chosen by `FONT` — never name a face in a screen).
+  (Cairo in Arabic, M PLUS Rounded 1c in Japanese, Jua and Gothic A1 in
+  Korean, chosen by `FONT` — never name a face in a screen).
   Capitals only for ribbons and tile names (`TYPE.label`), typed in capitals
   in each language's line (the Turkish **İ**, German **SS**) — never
   `textTransform`. A letter-spacing or a line height outside `TYPE` goes
   through `tracking()` / `lh()`, so Arabic stays joined and uncut.
-- **Fonts carry the six languages.** A Latin face is allowed only if it has
+- **Fonts carry the eight languages.** A Latin face is allowed only if it has
   every letter of Turkish, German, French and Spanish (ğ Ğ ş Ş ı İ ç Ç ö Ö ü
   Ü ä ß é è ê à â œ ñ á í ó ú ¿ ¡ « ») and draws a lower-case i with its dot
   (Lilita One, Fredoka, Titan One, Luckiest Guy and other caps-only faces
-  fail); Arabic is Cairo. A new weight goes into `assets/fonts`,
+  fail); Arabic is Cairo; Japanese and Korean are subsets cut by
+  `pnpm fonts:cjk` — rerun it when a Japanese or Korean line brings a letter
+  the files lack (its test fails until then). A new weight goes into `assets/fonts`,
   `Info.plist` `UIAppFonts`, the Xcode project's resources and
   `android/app/src/main/assets/fonts`, then a native rebuild.
 - **Colour is a job.** Gold: play, records, your rank numbers. Magenta: brand,

@@ -8,7 +8,7 @@ export const SKIP_RECEIPT: readonly Draft[] = [
     user: ACCOUNTS.food,
     body: {
       format: 'receipt',
-      store: { tr: 'MANAV', en: 'PRODUCE MARKET', de: 'OBST & GEMÜSE', ar: 'خضار وفواكه', fr: 'PRIMEUR', es: 'FRUTERÍA' },
+      store: { tr: 'MANAV', en: 'PRODUCE MARKET', de: 'OBST & GEMÜSE', ar: 'خضار وفواكه', fr: 'PRIMEUR', es: 'FRUTERÍA', ja: '八百屋', ko: '청과물 가게' },
       items: [
         {
           tr: 'SARIMSAK (5 BAŞ)',
@@ -17,6 +17,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
           ar: 'ثوم (5 رؤوس)',
           fr: 'AIL (5 TÊTES)',
           es: 'AJO (5 CABEZAS)',
+          ja: 'にんにく（5玉）',
+          ko: '마늘 (5통)',
         },
       ],
     },
@@ -27,6 +29,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
       ar: 'الوصفة تقول فصًّا واحدًا. وقلبي يقول 5 رؤوس.',
       fr: 'Recette : 1 gousse. Mon cœur : 5 têtes.',
       es: 'Receta: 1 diente. Mi corazón: 5 cabezas.',
+      ja: 'レシピは1かけ。心は5玉。',
+      ko: '레시피는 마늘 1쪽. 내 마음은 5통.',
     },
   },
   {
@@ -41,6 +45,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
         ar: 'متجر الحيوانات',
         fr: 'ANIMALERIE',
         es: 'TIENDA DE MASCOTAS',
+        ja: 'ペットショップ',
+        ko: '펫숍',
       },
       items: [
         {
@@ -50,6 +56,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
           ar: 'سرير قطط فاخر',
           fr: 'PANIER CHAT DE LUXE',
           es: 'CAMA PARA GATO (LUJO)',
+          ja: '猫ベッド（高級）',
+          ko: '고양이 침대 (고급)',
         },
       ],
     },
@@ -60,6 +68,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
       ar: 'قطتي تفضّل العلبة على السرير',
       fr: 'Mon chat dort dans le carton',
       es: 'Mi gato duerme en la caja',
+      ja: 'うちの猫、ベッドの箱で寝てる',
+      ko: '우리 고양이는 침대 상자에서 잠',
     },
   },
   {
@@ -74,6 +84,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
         ar: 'متجر الإلكترونيات',
         fr: 'ÉLECTRONIQUE',
         es: 'ELECTRÓNICA',
+        ja: '家電量販店',
+        ko: '전자 제품 매장',
       },
       items: [
         {
@@ -83,6 +95,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
           ar: 'غطاء هاتف',
           fr: 'COQUE DE TÉLÉPHONE',
           es: 'FUNDA PARA TELÉFONO',
+          ja: 'スマホケース',
+          ko: '휴대폰 케이스',
         },
       ],
     },
@@ -93,6 +107,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
       ar: 'هاتفي يغيّر ملابسه أكثر مني',
       fr: 'Mon téléphone se change plus souvent que moi',
       es: 'Mi teléfono se cambia de ropa más que yo',
+      ja: 'スマホの方が私より着替えてる',
+      ko: '내 폰이 나보다 옷을 더 자주 갈아입음',
     },
   },
   {
@@ -100,7 +116,7 @@ export const SKIP_RECEIPT: readonly Draft[] = [
     user: ACCOUNTS.food,
     body: {
       format: 'receipt',
-      store: { tr: 'FIRIN', en: 'BAKERY', de: 'BÄCKEREI', ar: 'المخبز', fr: 'BOULANGERIE', es: 'PANADERÍA' },
+      store: { tr: 'FIRIN', en: 'BAKERY', de: 'BÄCKEREI', ar: 'المخبز', fr: 'BOULANGERIE', es: 'PANADERÍA', ja: 'パン屋', ko: '빵집' },
       items: [
         {
           tr: 'KRUVASAN (6 ADET)',
@@ -109,6 +125,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
           ar: 'كرواسون (6 قطع)',
           fr: 'CROISSANTS (6)',
           es: 'CROISSANTS (6)',
+          ja: 'クロワッサン（6個）',
+          ko: '크루아상 (6개)',
         },
       ],
     },
@@ -119,6 +137,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
       ar: 'واحدة لي. والخمس الباقية لي أيضًا.',
       fr: 'Un pour moi. Les cinq autres aussi.',
       es: 'Uno es para mí. Los otros cinco también.',
+      ja: '1個は自分用。残り5個も自分用。',
+      ko: '하나는 내 거. 나머지 다섯 개도 내 거.',
     },
   },
   {
@@ -133,6 +153,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
         ar: 'قرطاسية',
         fr: 'PAPETERIE',
         es: 'PAPELERÍA',
+        ja: '文房具店',
+        ko: '문구점',
       },
       items: [
         {
@@ -142,6 +164,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
           ar: 'أقلام جافة (10)',
           fr: 'STYLOS BILLE (10)',
           es: 'BOLÍGRAFOS (10)',
+          ja: 'ボールペン（10本）',
+          ko: '볼펜 (10자루)',
         },
       ],
     },
@@ -152,6 +176,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
       ar: 'في البيت 60 قلمًا. ولا واحد منها يكتب.',
       fr: "J'ai 60 stylos. Aucun n'écrit.",
       es: 'Tengo 60 bolígrafos. Ninguno escribe.',
+      ja: '家にペン60本。書けるのはゼロ。',
+      ko: '집에 펜 60자루. 나오는 건 하나도 없음.',
     },
   },
   {
@@ -159,7 +185,7 @@ export const SKIP_RECEIPT: readonly Draft[] = [
     user: ACCOUNTS.vlog,
     body: {
       format: 'receipt',
-      store: { tr: 'KAFE', en: 'COFFEE SHOP', de: 'CAFÉ', ar: 'مقهى', fr: 'CAFÉ', es: 'CAFETERÍA' },
+      store: { tr: 'KAFE', en: 'COFFEE SHOP', de: 'CAFÉ', ar: 'مقهى', fr: 'CAFÉ', es: 'CAFETERÍA', ja: 'カフェ', ko: '카페' },
       items: [
         {
           tr: 'BUZLU KAHVE (BÜYÜK)',
@@ -168,6 +194,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
           ar: 'قهوة مثلجة كبيرة',
           fr: 'CAFÉ GLACÉ (GRAND)',
           es: 'CAFÉ HELADO (GRANDE)',
+          ja: 'アイスコーヒー（L）',
+          ko: '아이스아메리카노(L)',
         },
       ],
     },
@@ -178,6 +206,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
       ar: 'الحرارة 5 تحت الصفر في الخارج. أعرف.',
       fr: 'Il fait moins 5 dehors, je sais.',
       es: 'Hace 5 grados bajo cero. Ya lo sé.',
+      ja: '外はマイナス5度。知ってる。',
+      ko: '밖은 영하 5도. 알아, 얼죽아야.',
     },
   },
   {
@@ -192,6 +222,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
         ar: 'البقالة',
         fr: 'SUPÉRETTE',
         es: 'SUPERMERCADO',
+        ja: 'スーパー',
+        ko: '마트',
       },
       items: [
         {
@@ -201,6 +233,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
           ar: 'بطاريات AAA (4)',
           fr: 'PILES AAA (4)',
           es: 'PILAS AAA (4)',
+          ja: '単4電池（4本）',
+          ko: 'AAA 건전지 (4개)',
         },
       ],
     },
@@ -211,6 +245,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
       ar: 'اشتريتها لجهاز التحكم… وهو يعمل ببطاريات AA.',
       fr: 'Pour la télécommande. Elle prend des AA.',
       es: 'Eran para el control remoto. Usa AA.',
+      ja: 'リモコン用に買った。単3だった。',
+      ko: '리모컨용으로 샀는데 AA였음.',
     },
   },
   {
@@ -225,6 +261,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
         ar: 'محل الخردوات',
         fr: 'QUINCAILLERIE',
         es: 'FERRETERÍA',
+        ja: 'ホームセンター',
+        ko: '철물점',
       },
       items: [
         {
@@ -234,6 +272,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
           ar: 'لاصق فوري',
           fr: 'COLLE EXTRA-FORTE',
           es: 'PEGAMENTO INSTANTÁNEO',
+          ja: '瞬間接着剤',
+          ko: '순간접착제',
         },
       ],
     },
@@ -244,6 +284,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
       ar: 'المزهرية ما زالت مكسورة… وأصابعي التصقت.',
       fr: 'Vase : toujours cassé. Doigts : collés.',
       es: 'El jarrón sigue roto. Mis dedos, pegados.',
+      ja: '花瓶は割れたまま。指がくっついた。',
+      ko: '꽃병은 여전히 깨짐. 손가락은 붙음.',
     },
   },
   {
@@ -258,6 +300,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
         ar: 'متجر الهدايا',
         fr: 'BOUTIQUE CADEAUX',
         es: 'TIENDA DE REGALOS',
+        ja: '雑貨屋',
+        ko: '선물 가게',
       },
       items: [
         {
@@ -267,6 +311,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
           ar: 'بطاقة عيد ميلاد',
           fr: "CARTE D'ANNIVERSAIRE",
           es: 'TARJETA DE CUMPLEAÑOS',
+          ja: 'バースデーカード',
+          ko: '생일 카드',
         },
       ],
     },
@@ -277,6 +323,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
       ar: 'اشتريت البطاقة. عيد الميلاد كان أمس.',
       fr: "Carte achetée. L'anniversaire, c'était hier.",
       es: 'Compré la tarjeta. El cumpleaños fue ayer.',
+      ja: 'カード買った。誕生日は昨日だった。',
+      ko: '카드 샀다. 생일은 어제였다.',
     },
   },
   {
@@ -284,7 +332,7 @@ export const SKIP_RECEIPT: readonly Draft[] = [
     user: ACCOUNTS.receipts,
     body: {
       format: 'receipt',
-      store: { tr: 'OPTİK', en: 'OPTICAL SHOP', de: 'OPTIKER', ar: 'محل النظارات', fr: 'OPTICIEN', es: 'ÓPTICA' },
+      store: { tr: 'OPTİK', en: 'OPTICAL SHOP', de: 'OPTIKER', ar: 'محل النظارات', fr: 'OPTICIEN', es: 'ÓPTICA', ja: 'メガネ店', ko: '안경점' },
       items: [
         {
           tr: 'MAVİ IŞIK GÖZLÜĞÜ',
@@ -293,6 +341,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
           ar: 'نظارة الضوء الأزرق',
           fr: 'LUNETTES ANTI-BLEU',
           es: 'LENTES ANTILUZ AZUL',
+          ja: 'ブルーライトメガネ',
+          ko: '블루라이트 안경',
         },
       ],
     },
@@ -303,6 +353,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
       ar: 'الآن أتصفح 9 ساعات بضمير مرتاح',
       fr: 'Je peux scroller 9 heures sans culpabiliser',
       es: 'Ahora deslizo 9 horas sin culpa',
+      ja: 'これで9時間スクロールしても罪悪感ゼロ',
+      ko: '이제 9시간 스크롤해도 죄책감 없음',
     },
   },
   {
@@ -310,7 +362,7 @@ export const SKIP_RECEIPT: readonly Draft[] = [
     user: ACCOUNTS.food,
     body: {
       format: 'receipt',
-      store: { tr: 'ŞARKÜTERİ', en: 'DELI', de: 'KÄSETHEKE', ar: 'محل الأجبان', fr: 'FROMAGERIE', es: 'QUESERÍA' },
+      store: { tr: 'ŞARKÜTERİ', en: 'DELI', de: 'KÄSETHEKE', ar: 'محل الأجبان', fr: 'FROMAGERIE', es: 'QUESERÍA', ja: 'チーズ専門店', ko: '치즈 가게' },
       items: [
         {
           tr: 'KAŞAR (100 G)',
@@ -319,6 +371,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
           ar: 'جبنة قشقوان (100 غ)',
           fr: 'COMTÉ (100 G)',
           es: 'MANCHEGO (100 G)',
+          ja: 'チェダー（100g）',
+          ko: '체다 치즈 (100g)',
         },
       ],
     },
@@ -329,6 +383,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
       ar: 'تذوّقت 7 أنواع… واشتريت 100 غرام.',
       fr: 'Goûté 7 fromages. Acheté 100 grammes.',
       es: 'Probé 7 quesos. Compré 100 gramos.',
+      ja: '7種類試食して100gだけ買った',
+      ko: '7가지 시식하고 100g 샀음',
     },
   },
   {
@@ -343,6 +399,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
         ar: 'متجر الألعاب',
         fr: 'MAGASIN DE JOUETS',
         es: 'JUGUETERÍA',
+        ja: 'おもちゃ屋',
+        ko: '장난감 가게',
       },
       items: [
         {
@@ -352,6 +410,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
           ar: 'سيارة بجهاز تحكم',
           fr: 'VOITURE TÉLÉCOMMANDÉE',
           es: 'AUTO A CONTROL REMOTO',
+          ja: 'ラジコンカー',
+          ko: 'RC 자동차',
         },
       ],
     },
@@ -362,6 +422,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
       ar: 'اشتريتها لابن أختي. أجرّبها أنا أولًا.',
       fr: "C'est pour mon neveu. Je teste d'abord.",
       es: 'Es para mi sobrino. Primero lo pruebo yo.',
+      ja: '甥っ子へのプレゼント。まず私がテスト中。',
+      ko: '조카 선물로 샀다. 일단 내가 테스트 중.',
     },
   },
   {
@@ -376,6 +438,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
         ar: 'مفروشات منزلية',
         fr: 'DÉCO MAISON',
         es: 'DECORACIÓN',
+        ja: 'インテリア雑貨',
+        ko: '홈 인테리어',
       },
       items: [
         {
@@ -385,6 +449,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
           ar: 'وسادة زينة (الثامنة)',
           fr: 'COUSSIN DÉCO (8E)',
           es: 'COJÍN (EL 8.º)',
+          ja: 'クッション（8個目）',
+          ko: '쿠션 (8번째)',
         },
       ],
     },
@@ -395,6 +461,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
       ar: 'لم يعد لي مكان على الأريكة',
       fr: 'Plus de place pour moi sur le canapé',
       es: 'Ya no hay lugar para mí en el sofá',
+      ja: 'ソファに私の座る場所がなくなった',
+      ko: '이제 소파에 내 자리가 없음',
     },
   },
   {
@@ -409,6 +477,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
         ar: 'الأدوات المنزلية',
         fr: 'ÉLECTROMÉNAGER',
         es: 'ELECTRODOMÉSTICOS',
+        ja: 'キッチン用品',
+        ko: '주방용품점',
       },
       items: [
         {
@@ -418,6 +488,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
           ar: 'مقلاة هوائية',
           fr: 'FRITEUSE SANS HUILE',
           es: 'FREIDORA DE AIRE',
+          ja: 'ノンフライヤー',
+          ko: '에어프라이어',
         },
       ],
     },
@@ -428,6 +500,8 @@ export const SKIP_RECEIPT: readonly Draft[] = [
       ar: 'غيّرت حياتي (حضّرت بطاطس مقلية)',
       fr: "Ça a changé ma vie (j'ai fait des frites)",
       es: 'Me cambió la vida (hice alitas)',
+      ja: '人生が変わった（ポテト作った）',
+      ko: '인생이 바뀌었다 (감자튀김 만듦)',
     },
   },
 ];

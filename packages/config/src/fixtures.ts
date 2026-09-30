@@ -121,6 +121,8 @@ const LARAVEL_FORMS: Record<Locale, readonly PluralCategory[]> = {
   ar: ['zero', 'one', 'two', 'few', 'many', 'other'],
   fr: ['one', 'other'],
   es: ['one', 'other'],
+  ja: ['other'],
+  ko: ['other'],
 };
 
 /** The languages, how each groups digits and counts, and how a phone's tags resolve — for `LocaleParityTest.php`. */
@@ -133,6 +135,7 @@ export function buildLocales() {
     ['ar_SA'],
     ['zh-Hant-TW', 'fr-CA'],
     ['ja-JP'],
+    ['ko_KR', 'en-US'],
     ['EN'],
     ['pt-BR', 'es-419'],
     [],

@@ -43,4 +43,16 @@ const es: WelcomeMessages = {
   play: 'Jugar',
 };
 
-export const welcome: Record<Locale, WelcomeMessages> = { tr, en, de, ar, fr, es };
+const ja: WelcomeMessages = {
+  tagline: 'いつものスクロールが、真剣勝負に。',
+  moves: '4つの動きに、ひとつの反射神経。まずは練習プレイで覚えよう。',
+  play: 'プレイ',
+};
+
+const ko: WelcomeMessages = {
+  tagline: '스크롤하던 습관이 이제 경쟁이 돼요.',
+  moves: '네 가지 동작, 하나의 반사 신경. 먼저 연습 게임으로 익혀 보세요.',
+  play: '플레이',
+};
+
+export const welcome: Record<Locale, WelcomeMessages> = { tr, en, de, ar, fr, es, ja, ko };

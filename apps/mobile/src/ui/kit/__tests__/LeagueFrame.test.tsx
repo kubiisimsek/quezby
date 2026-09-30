@@ -6,6 +6,93 @@ import { CANVAS, FRAMES } from '@/ui/kit/emblemArt';
 import { FramedAvatar, LeagueFrame, metalOf } from '@/ui/kit';
 import { emblem } from '@/ui/tokens';
 
+/**
+ * Every point a path passes through, its curves' handles included — a box a
+ * little looser than the drawing, never tighter.
+ */
+function extent(d: string) {
+  const tokens = d.match(/[MLCHVAZmlchvaz]|-?\d*\.?\d+(?:e-?\d+)?/g) ?? [];
+  let i = 0;
+  let cmd = '';
+  let x = 0;
+  let y = 0;
+  let startX = 0;
+  let startY = 0;
+  const box = { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };
+  const see = (px: number, py: number) => {
+    box.minX = Math.min(box.minX, px);
+    box.maxX = Math.max(box.maxX, px);
+    box.minY = Math.min(box.minY, py);
+    box.maxY = Math.max(box.maxY, py);
+  };
+  const num = () => Number(tokens[i++]);
+  while (i < tokens.length) {
+    if (/[A-Za-z]/.test(tokens[i] ?? '')) cmd = tokens[i++] ?? '';
+    const rel = cmd === cmd.toLowerCase();
+    switch (cmd.toUpperCase()) {
+      case 'M':
+      case 'L': {
+        const a = num();
+        const b = num();
+        x = rel ? x + a : a;
+        y = rel ? y + b : b;
+        if (cmd.toUpperCase() === 'M') {
+          startX = x;
+          startY = y;
+          cmd = rel ? 'l' : 'L';
+        }
+        see(x, y);
+        break;
+      }
+      case 'H':
+        x = rel ? x + num() : num();
+        see(x, y);
+        break;
+      case 'V':
+        y = rel ? y + num() : num();
+        see(x, y);
+        break;
+      case 'C':
+        for (let k = 0; k < 3; k += 1) {
+          const a = num();
+          const b = num();
+          const px = rel ? x + a : a;
+          const py = rel ? y + b : b;
+          see(px, py);
+          if (k === 2) {
+            x = px;
+            y = py;
+          }
+        }
+        break;
+      case 'A': {
+        const r = num();
+        num();
+        num();
+        num();
+        num();
+        const a = num();
+        const b = num();
+        const nx = rel ? x + a : a;
+        const ny = rel ? y + b : b;
+        see((x + nx) / 2 - r, (y + ny) / 2 - r);
+        see((x + nx) / 2 + r, (y + ny) / 2 + r);
+        x = nx;
+        y = ny;
+        break;
+      }
+      case 'Z':
+        x = startX;
+        y = startY;
+        break;
+      default:
+        i += 1;
+    }
+  }
+  return box;
+}
+
+
 const TIERS: LeagueTier[] = ['bronze', 'silver', 'gold', 'platinum', 'diamond', 'master'];
 const hidden = { includeHiddenElements: true };
 
@@ -78,6 +165,24 @@ describe('the frames', () => {
   it('give every league its own mark', () => {
     const marks = new Set(TIERS.map((tier) => FRAMES[tier].mark.map((shape) => shape.d).join('')));
     expect(marks.size).toBe(TIERS.length);
+  });
+
+  it('stay inside their canvas, two units in, so a frame fits the box it is given', () => {
+    for (const tier of TIERS) {
+      const frame = FRAMES[tier];
+      for (const shape of [...frame.back, ...frame.front]) {
+        const box = extent(shape.d);
+        const edge = (shape.outline ?? shape.strokeWidth ?? 0) / 2;
+        expect(box.minX - edge).toBeGreaterThanOrEqual(2);
+        expect(box.minY - edge).toBeGreaterThanOrEqual(2);
+        expect(box.maxX + edge).toBeLessThanOrEqual(CANVAS - 2);
+        expect(box.maxY + edge).toBeLessThanOrEqual(CANVAS - 2);
+      }
+      for (const [x, y, size] of frame.sparkles) {
+        expect(Math.min(x - size, y - size)).toBeGreaterThanOrEqual(2);
+        expect(Math.max(x + size, y + size)).toBeLessThanOrEqual(CANVAS - 2);
+      }
+    }
   });
 
   it('keep their wings mirrored across the middle', () => {

@@ -16,6 +16,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
         ar: 'دهان جديد',
         fr: 'PEINTURE',
         es: 'RECIÉN PINTADO',
+        ja: 'ペンキ塗りたて',
+        ko: '페인트 주의',
       },
       small: {
         tr: 'DOKUNMAYINIZ',
@@ -24,6 +26,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
         ar: 'ممنوع اللمس',
         fr: 'FRAÎCHE',
         es: 'NO TOCAR NI APOYARSE',
+        ja: 'さわらないでください',
+        ko: '손대지 마세요',
       },
     },
     caption: {
@@ -33,6 +37,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
       ar: 'انتظر حتى يجف.',
       fr: 'Attends que ça sèche.',
       es: 'Espera a que se seque.',
+      ja: '乾くまで待って。',
+      ko: '마를 때까지 기다려.',
     },
     headline: {
       tr: 'Ekranın yeni boyandı',
@@ -41,6 +47,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
       ar: 'شاشتك مطلية للتو',
       fr: "Ton écran vient d'être repeint",
       es: 'Tu pantalla está recién pintada',
+      ja: '画面、塗りたてです！',
+      ko: '화면 방금 칠했어요!',
     },
   },
   {
@@ -55,6 +63,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
         ar: 'الهدوء من فضلك',
         fr: 'SILENCE',
         es: 'SILENCIO',
+        ja: 'お静かに',
+        ko: '조용히',
       },
       small: {
         tr: 'BEBEK UYUYOR',
@@ -63,6 +73,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
         ar: 'الطفل نائم',
         fr: 'BÉBÉ ENDORMI',
         es: 'BEBÉ DURMIENDO',
+        ja: '赤ちゃんが寝ています',
+        ko: '아기가 자고 있어요',
       },
     },
     caption: {
@@ -72,6 +84,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
       ar: 'لا صوت. لا حركة.',
       fr: 'Pas un bruit. Pas un geste.',
       es: 'Ni un ruido. Ni un movimiento.',
+      ja: '物音ひとつ立てるな。ピクリとも動くな。',
+      ko: '숨소리도 내지 마. 꼼짝도 하지 마.',
     },
     headline: {
       tr: 'Bebek sonunda uyudu',
@@ -80,6 +94,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
       ar: 'نام الطفل أخيرًا',
       fr: 'Bébé dort enfin',
       es: 'El bebé por fin se durmió',
+      ja: 'やっと赤ちゃんが寝た！',
+      ko: '아기가 드디어 잠들었어요!',
     },
   },
   {
@@ -94,6 +110,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
         ar: 'لا تلمس',
         fr: 'NE PAS TOUCHER',
         es: 'NO TOCAR',
+        ja: '手を触れないで',
+        ko: '손대지 마시오',
       },
       small: {
         tr: 'MÜZE ESERİ',
@@ -102,6 +120,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
         ar: 'قطعة متحفية',
         fr: "ŒUVRE D'ART",
         es: 'PIEZA DE MUSEO',
+        ja: '展示品',
+        ko: '전시품',
       },
     },
     caption: {
@@ -111,6 +131,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
       ar: 'لا تكن الأول.',
       fr: 'Sois pas le premier.',
       es: 'No seas el primero.',
+      ja: '最初の一人にならないで。',
+      ko: '첫 번째가 되지 마.',
     },
     headline: {
       tr: '400 yıldır kimse dokunmadı',
@@ -119,6 +141,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
       ar: 'لم يلمسها أحد منذ 400 عام',
       fr: "Personne n'y a touché depuis 400 ans",
       es: 'Nadie lo ha tocado en 400 años',
+      ja: '400年間、誰もさわってない！',
+      ko: '400년 동안 아무도 안 만졌어요!',
     },
   },
   {
@@ -133,6 +157,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
         ar: 'طوارئ',
         fr: 'URGENCE',
         es: 'EMERGENCIA',
+        ja: '非常用',
+        ko: '비상용',
       },
       small: {
         tr: 'YALNIZCA ACİL DURUMDA',
@@ -141,6 +167,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
         ar: 'في حالات الطوارئ فقط',
         fr: "EN CAS D'URGENCE SEULEMENT",
         es: 'SOLO EN CASO DE EMERGENCIA',
+        ja: '非常時以外使用禁止',
+        ko: '비상시에만 사용하세요',
       },
     },
     caption: HANDS_OFF,
@@ -151,6 +179,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
       ar: 'الملل ليس حالة طارئة',
       fr: "L'ennui n'est pas une urgence",
       es: 'Aburrirse no es una emergencia',
+      ja: '退屈は非常事態じゃない！',
+      ko: '심심한 건 비상사태가 아니에요!',
     },
   },
   {
@@ -165,6 +195,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
         ar: 'أعمال بناء',
         fr: 'TRAVAUX',
         es: 'OBRAS',
+        ja: '工事中',
+        ko: '공사 중',
       },
       small: {
         tr: 'YAKLAŞMAYIN',
@@ -173,6 +205,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
         ar: 'ممنوع الاقتراب',
         fr: 'ACCÈS INTERDIT',
         es: 'PROHIBIDO EL PASO',
+        ja: '立入禁止',
+        ko: '출입 금지',
       },
     },
     caption: HANDS_OFF,
@@ -183,6 +217,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
       ar: 'هذا المنشور قيد الإنشاء',
       fr: 'Ce post est en travaux',
       es: 'Este post está en construcción',
+      ja: 'この投稿は工事中です！',
+      ko: '이 게시물은 공사 중이에요!',
     },
   },
   {
@@ -197,6 +233,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
         ar: 'تنبيه',
         fr: 'PELOUSE',
         es: 'NO PISAR',
+        ja: '芝生に',
+        ko: '잔디를',
       },
       small: {
         tr: 'BASMAYINIZ',
@@ -205,6 +243,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
         ar: 'ممنوع الدوس على العشب',
         fr: 'INTERDITE',
         es: 'EL CÉSPED',
+        ja: '入らないでください',
+        ko: '밟지 마세요',
       },
     },
     caption: HANDS_OFF,
@@ -215,6 +255,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
       ar: 'ولا على الشاشة أيضًا',
       fr: "L'écran aussi, d'ailleurs",
       es: 'Y eso incluye la pantalla',
+      ja: '画面にも入らないで！',
+      ko: '화면도 밟지 마세요!',
     },
   },
   {
@@ -229,6 +271,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
         ar: 'انتبه',
         fr: 'ATTENTION',
         es: 'CUIDADO',
+        ja: '注意',
+        ko: '주의',
       },
       small: {
         tr: 'ZEMİN ISLAK',
@@ -237,6 +281,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
         ar: 'الأرضية مبللة',
         fr: 'SOL GLISSANT',
         es: 'SUELO MOJADO',
+        ja: '床がぬれています',
+        ko: '바닥 미끄러움',
       },
     },
     caption: {
@@ -246,6 +292,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
       ar: 'ولا خطوة واحدة.',
       fr: 'Ne fais pas un seul pas.',
       es: 'Ni un paso.',
+      ja: '一歩も動くな。',
+      ko: '한 발짝도 움직이지 마.',
     },
     headline: {
       tr: 'Yer yeni silindi',
@@ -254,6 +302,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
       ar: 'الأرض مُسحت للتو',
       fr: "Le sol vient d'être lavé",
       es: 'Acaban de limpiar el suelo',
+      ja: '床、拭いたばかりです！',
+      ko: '방금 바닥 닦았어요!',
     },
   },
   {
@@ -268,6 +318,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
         ar: 'لا تقترب',
         fr: 'PAS TOUCHE',
         es: 'PROHIBIDO',
+        ja: '手を出すな',
+        ko: '손대지 마',
       },
       small: {
         tr: 'MİSAFİRLER İÇİN',
@@ -276,6 +328,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
         ar: 'للضيوف فقط',
         fr: 'RÉSERVÉ AUX INVITÉS',
         es: 'SOLO PARA VISITAS',
+        ja: 'お客さん用',
+        ko: '손님용',
       },
     },
     caption: {
@@ -285,6 +339,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
       ar: 'لو نقصت قطعة واحدة فسيلاحظون.',
       fr: "S'il en manque un, ça se verra.",
       es: 'Si falta una, se van a dar cuenta.',
+      ja: '1枚でも減ったらバレる。',
+      ko: '하나만 없어져도 다 티 나.',
     },
     headline: {
       tr: 'Kurabiyeler misafir için!',
@@ -293,6 +349,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
       ar: 'البسكويت للضيوف!',
       fr: "Les biscuits, c'est pour les invités !",
       es: '¡Las galletas son para las visitas!',
+      ja: 'クッキーはお客さん用！',
+      ko: '쿠키는 손님용이에요!',
     },
   },
   {
@@ -307,6 +365,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
         ar: 'بطارية ضعيفة',
         fr: 'BATTERIE',
         es: 'BATERÍA BAJA',
+        ja: '電池残量低下',
+        ko: '배터리 부족',
       },
       small: {
         tr: '%1 KALDI',
@@ -315,6 +375,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
         ar: 'متبقٍ 1%',
         fr: '1 % RESTANT',
         es: 'QUEDA 1 %',
+        ja: '残り1%',
+        ko: '1% 남음',
       },
     },
     caption: HANDS_OFF,
@@ -325,6 +387,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
       ar: 'إن تحركت انطفأ الهاتف',
       fr: "Un geste et ton téléphone s'éteint",
       es: 'Si te mueves, se apaga el teléfono',
+      ja: '動いたらスマホが切れる！',
+      ko: '움직이면 폰 꺼져요!',
     },
   },
   {
@@ -339,6 +403,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
         ar: 'بيت الفراشات',
         fr: 'PAPILLONS',
         es: 'MARIPOSARIO',
+        ja: 'チョウの館',
+        ko: '나비의 집',
       },
       small: {
         tr: 'YAVAŞ HAREKET EDİN',
@@ -347,6 +413,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
         ar: 'تحرّك ببطء',
         fr: 'EN LIBERTÉ',
         es: 'MOVERSE DESPACIO',
+        ja: 'ゆっくり動いてください',
+        ko: '천천히 움직이세요',
       },
     },
     caption: {
@@ -356,6 +424,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
       ar: 'كن تمثالًا.',
       fr: 'Fais la statue.',
       es: 'Sé una estatua.',
+      ja: '銅像になれ。',
+      ko: '동상처럼 굳어.',
     },
     headline: {
       tr: 'Kelebek eline kondu',
@@ -364,6 +434,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
       ar: 'فراشة حطّت على يدك',
       fr: "Un papillon s'est posé sur ta main",
       es: 'Una mariposa se posó en tu mano',
+      ja: 'チョウが手に止まった！',
+      ko: '나비가 손에 앉았어요!',
     },
   },
   {
@@ -378,6 +450,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
         ar: 'ابتسم',
         fr: 'OUISTITI',
         es: 'SONRÍE',
+        ja: 'はい、チーズ',
+        ko: '김치!',
       },
       small: {
         tr: 'ZAMANLAYICI AÇIK',
@@ -386,6 +460,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
         ar: 'المؤقت يعمل',
         fr: 'RETARDATEUR ACTIVÉ',
         es: 'TEMPORIZADOR ACTIVADO',
+        ja: 'セルフタイマー作動中',
+        ko: '셀프 타이머 작동 중',
       },
     },
     caption: {
@@ -395,6 +471,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
       ar: 'لا أحد يتحرك!',
       fr: 'Personne ne bouge !',
       es: '¡Que nadie se mueva!',
+      ja: '誰も動くな！',
+      ko: '아무도 움직이지 마!',
     },
     headline: {
       tr: 'Toplu fotoğraf: 3… 2… 1…',
@@ -403,6 +481,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
       ar: 'صورة جماعية بعد 3… 2… 1…',
       fr: 'Photo de groupe dans 3… 2… 1…',
       es: 'Foto grupal en 3… 2… 1…',
+      ja: '集合写真まで3…2…1…',
+      ko: '단체 사진 3… 2… 1…',
     },
   },
   {
@@ -417,6 +497,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
         ar: 'تمهّل',
         fr: 'RALENTIR',
         es: 'DESPACIO',
+        ja: '徐行',
+        ko: '서행',
       },
       small: {
         tr: 'KAPLUMBAĞA GEÇİDİ',
@@ -425,6 +507,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
         ar: 'معبر سلاحف',
         fr: 'PASSAGE DE TORTUES',
         es: 'CRUCE DE TORTUGAS',
+        ja: 'カメが横断中',
+        ko: '거북이 횡단 중',
       },
     },
     caption: {
@@ -434,6 +518,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
       ar: 'قد يستغرق هذا بعض الوقت.',
       fr: "Ça risque d'être long.",
       es: 'Esto va para largo.',
+      ja: 'しばらくかかりそう。',
+      ko: '좀 오래 걸릴 듯.',
     },
     headline: {
       tr: 'Kaplumbağa karşıya geçiyor',
@@ -442,6 +528,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
       ar: 'سلحفاة تعبر الطريق',
       fr: 'Une tortue traverse la route',
       es: 'Una tortuga cruza la calle',
+      ja: 'カメが道を渡っています！',
+      ko: '거북이가 길을 건너는 중이에요!',
     },
   },
   {
@@ -456,6 +544,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
         ar: 'بدأ العرض',
         fr: 'FILM EN COURS',
         es: 'PROYECCIÓN',
+        ja: '上映中',
+        ko: '상영 중',
       },
       small: {
         tr: 'TELEFONLARI KAPATIN',
@@ -464,6 +554,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
         ar: 'أطفئ هاتفك من فضلك',
         fr: 'TÉLÉPHONES ÉTEINTS',
         es: 'APAGA EL TELÉFONO',
+        ja: 'スマホの電源をお切りください',
+        ko: '휴대폰 전원을 꺼 주세요',
       },
     },
     caption: HANDS_OFF,
@@ -474,6 +566,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
       ar: 'شاشتك هي الضوء الوحيد هنا',
       fr: 'Ton écran est la seule lumière ici',
       es: 'Tu pantalla es la única luz aquí',
+      ja: '暗闇で光ってるのは君の画面だけ',
+      ko: '어둠 속에서 화면만 빛나고 있어요',
     },
   },
   {
@@ -488,6 +582,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
         ar: 'لا تطرق الزجاج',
         fr: 'NE PAS TAPER',
         es: 'NO GOLPEAR',
+        ja: 'ガラスを',
+        ko: '유리를',
       },
       small: {
         tr: 'BALIKLAR ÜRKÜYOR',
@@ -496,6 +592,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
         ar: 'الأسماك تخاف',
         fr: 'SUR LA VITRE',
         es: 'EL VIDRIO',
+        ja: 'たたかないでください',
+        ko: '두드리지 마세요',
       },
     },
     caption: HANDS_OFF,
@@ -506,6 +604,8 @@ export const FREEZE_SIGN: readonly Draft[] = [
       ar: 'السمكة المنتفخة على وشك أن تنتفخ',
       fr: 'Le poisson-globe va se gonfler',
       es: 'El pez globo está a punto de inflarse',
+      ja: 'フグがふくらみそう！',
+      ko: '복어가 부풀기 직전이에요!',
     },
   },
 ];

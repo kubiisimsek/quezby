@@ -14,6 +14,8 @@ export const LIKE_DUMP: readonly Draft[] = [
       ar: 'يوم الثلج: أرنبي أكل أنف رجل الثلج',
       fr: 'jour de neige : mon lapin a mangé le nez du bonhomme',
       es: 'día de nieve: mi conejo se comió la nariz del muñeco',
+      ja: '雪の日まとめ：うさぎが雪だるまの鼻を食べた',
+      ko: '눈 오는 날 덤프: 토끼가 눈사람 코를 먹어버림',
     },
   },
   {
@@ -27,6 +29,8 @@ export const LIKE_DUMP: readonly Draft[] = [
       ar: 'مباراة الأسبوع: سجّلت هدفين… كلاهما في مرماي',
       fr: 'foot entre potes : 2 buts (contre mon camp)',
       es: 'fútbol con amigos: metí 2 goles (los dos en contra)',
+      ja: 'フットサルの夜：2ゴール決めた（両方オウンゴール）',
+      ko: '풋살 하는 날: 2골 넣음 (둘 다 자책골)',
     },
   },
   {
@@ -40,6 +44,8 @@ export const LIKE_DUMP: readonly Draft[] = [
       ar: 'ملخص أسبوع قطتي (تحصد إعجابات أكثر مني)',
       fr: 'le dump de la semaine de mon chat (plus liké que moi)',
       es: 'el resumen semanal de mi gato (tiene más likes que yo)',
+      ja: 'うちの猫の今週まとめ（私よりいいねが多い）',
+      ko: '우리 고양이 주간 덤프 (나보다 좋아요 많음)',
     },
   },
   {
@@ -53,6 +59,8 @@ export const LIKE_DUMP: readonly Draft[] = [
       ar: 'يوم الخَبز: الوصفة قالت 20 دقيقة، واستغرق الأمر 3 ساعات',
       fr: 'jour de pâtisserie : 20 min selon la recette, 3 h en vrai',
       es: 'día de repostería: la receta decía 20 min, tardé 3 horas',
+      ja: 'ケーキの日：レシピは20分、実際は3時間',
+      ko: '베이킹 데이: 레시피엔 20분, 실제론 3시간',
     },
   },
   {
@@ -66,6 +74,8 @@ export const LIKE_DUMP: readonly Draft[] = [
       ar: 'حديقة الكلاب: هو كسب 12 صديقًا، وأنا 0',
       fr: 'parc à chiens : lui, 12 nouveaux potes. moi, 0',
       es: 'parque de perros: él hizo 12 amigos, yo 0',
+      ja: 'ドッグラン：うちの子は友だち12匹、私は0人',
+      ko: '애견 공원: 얘는 친구 12마리 사귐. 나는 0명',
     },
   },
   {
@@ -79,6 +89,8 @@ export const LIKE_DUMP: readonly Draft[] = [
       ar: 'بيتي الجديد… والصناديق تسلّم عليكم',
       fr: 'nouvel appart, les cartons vous passent le bonjour',
       es: 'casa nueva, las cajas les mandan saludos',
+      ja: '新居まとめ、段ボールからもよろしく',
+      ko: '새집 덤프, 박스들도 인사함',
     },
   },
   {
@@ -92,6 +104,8 @@ export const LIKE_DUMP: readonly Draft[] = [
       ar: 'ليلة كاريوكي: لم أترك الميكروفون لأحد، آسف',
       fr: "soirée karaoké : j'ai pas lâché le micro, pardon",
       es: 'noche de karaoke: no solté el micrófono, perdón',
+      ja: 'カラオケの夜：マイク独占してごめん',
+      ko: '노래방: 마이크 한 번도 안 넘김, 미안',
     },
   },
   {
@@ -105,6 +119,8 @@ export const LIKE_DUMP: readonly Draft[] = [
       ar: 'فطور العطلة… الهواتف أكلت أولًا',
       fr: 'brunch du dimanche, les téléphones ont mangé en premier',
       es: 'desayuno del domingo, los teléfonos comieron primero',
+      ja: '日曜ブランチ、まずスマホが食べた',
+      ko: '일요일 브런치, 폰이 먼저 먹음',
     },
   },
   {
@@ -118,6 +134,8 @@ export const LIKE_DUMP: readonly Draft[] = [
       ar: 'رحلة التخييم: 3 أيام بلا إشارة، وما زلت حيًّا',
       fr: 'camping : 3 jours sans réseau, toujours vivant',
       es: 'de campamento: 3 días sin señal, sigo vivo',
+      ja: 'キャンプまとめ：3日間圏外、生きてる',
+      ko: '캠핑 덤프: 3일간 안 터짐, 살아 있음',
     },
   },
   {
@@ -131,6 +149,8 @@ export const LIKE_DUMP: readonly Draft[] = [
       ar: 'ملخص المهرجان: 3 أيام، ساعتا نوم، وبُحّ صوتي',
       fr: 'récap festival : 3 jours, 2 h de sommeil, plus de voix',
       es: 'resumen del festival: 3 días, 2 h de sueño, sin voz',
+      ja: 'フェスまとめ：3日間、睡眠2時間、声が消えた',
+      ko: '페스티벌 요약: 3일, 잠 2시간, 목소리 실종',
     },
   },
   {
@@ -144,6 +164,8 @@ export const LIKE_DUMP: readonly Draft[] = [
       ar: 'أسبوع الرياضة: ذهبت يومًا واحدًا، وتحدثت عنه 6 أيام',
       fr: 'semaine sport : 1 jour à la salle, 6 jours à en parler',
       es: 'semana de gimnasio: fui 1 día y lo presumí los otros 6',
+      ja: 'ジム週間：1回行って6日間語った',
+      ko: '헬스 주간: 1번 가고 6일 동안 자랑함',
     },
   },
   {
@@ -157,6 +179,8 @@ export const LIKE_DUMP: readonly Draft[] = [
       ar: 'عطلة عند جدتي: قالت «صحن آخر» 9 مرات',
       fr: 'week-end chez mamie : 9 fois « encore une assiette »',
       es: 'fin de semana con la abuela: 9 veces «otro platito»',
+      ja: 'おばあちゃん家の週末：「おかわりは？」9回',
+      ko: '할머니 댁 주말: “한 그릇 더 먹어” 9번',
     },
   },
   {
@@ -170,6 +194,8 @@ export const LIKE_DUMP: readonly Draft[] = [
       ar: 'رحلة بالسيارة: 8 ساعات، ونفس الأغاني الخمس',
       fr: 'road trip : 8 h de route, les 5 mêmes chansons',
       es: 'viaje por carretera: 8 horas, las mismas 5 canciones',
+      ja: 'ドライブまとめ：8時間、同じ5曲',
+      ko: '드라이브 덤프: 8시간, 같은 노래 5곡',
     },
   },
   {
@@ -183,6 +209,8 @@ export const LIKE_DUMP: readonly Draft[] = [
       ar: 'يوم الرسم: اللوحة بيضاء، وأنا ملوّنة بالكامل',
       fr: 'journée peinture : toile blanche, moi multicolore',
       es: 'día de pintura: el lienzo en blanco, yo de colores',
+      ja: 'お絵かきの日：キャンバスは真っ白、私は絵の具まみれ',
+      ko: '그림 그리는 날: 캔버스는 새하얗고 나는 물감 범벅',
     },
   },
   {
@@ -196,6 +224,8 @@ export const LIKE_DUMP: readonly Draft[] = [
       ar: 'عيد ميلادي: أجمل هدية كانت 99 إشعارًا',
       fr: 'anniv : le plus beau cadeau, 99+ notifs',
       es: 'cumple: el mejor regalo fueron 99+ notificaciones',
+      ja: '誕生日まとめ：最高のプレゼントは通知99+',
+      ko: '생일 덤프: 최고의 선물은 알림 99+',
     },
   },
   {
@@ -209,6 +239,8 @@ export const LIKE_DUMP: readonly Draft[] = [
       ar: 'ليلة الألعاب: انتهت الصداقات، ولم تنتهِ البيتزا',
       fr: 'soirée jeux : amitiés finies, pizza pas finie',
       es: 'noche de juegos: se acabaron las amistades, la pizza no',
+      ja: 'ゲームナイト：友情は終わった、ピザは残った',
+      ko: '게임의 밤: 우정은 끝났고 피자는 남았음',
     },
   },
   {
@@ -222,6 +254,8 @@ export const LIKE_DUMP: readonly Draft[] = [
       ar: 'يوم في المتحف: 200 صورة، ولم أنظر إلى أي لوحة',
       fr: 'journée musée : 200 photos, zéro tableau regardé',
       es: 'día de museo: 200 fotos y no miré ni un cuadro',
+      ja: '美術館の日：写真200枚、作品は見てない',
+      ko: '미술관 가는 날: 사진 200장 찍고 작품은 안 봄',
     },
   },
   {
@@ -235,6 +269,8 @@ export const LIKE_DUMP: readonly Draft[] = [
       ar: 'تخرّجت!!! أمي التقطت 300 صورة، وهذه 4 منها',
       fr: 'diplômé !!! maman a pris 300 photos, en voilà 4',
       es: '¡¡¡me gradué!!! mi mamá tomó 300 fotos, aquí van 4',
+      ja: '卒業した！！！母が300枚撮った、そのうち4枚',
+      ko: '졸업했다!!! 엄마가 300장 찍음, 그중 4장',
     },
   },
   {
@@ -248,6 +284,8 @@ export const LIKE_DUMP: readonly Draft[] = [
       ar: 'أمطرت فأُلغيت الخطط… أجمل عطلة على الإطلاق',
       fr: 'il a plu, plans annulés, meilleur week-end de ma vie',
       es: 'llovió, se cancelaron los planes, el mejor fin de semana',
+      ja: '雨で予定が全部なくなった、最高の週末',
+      ko: '비 와서 약속 다 취소, 최고의 주말',
     },
   },
   {
@@ -261,6 +299,8 @@ export const LIKE_DUMP: readonly Draft[] = [
       ar: 'زيارة الأكواريوم: أخطبوط بدأ يتابعني',
       fr: 'aquarium : une pieuvre me suit maintenant',
       es: 'acuario: un pulpo empezó a seguirme',
+      ja: '水族館まとめ：タコにフォローされた',
+      ko: '아쿠아리움 덤프: 문어가 날 팔로우함',
     },
   },
   {
@@ -274,6 +314,8 @@ export const LIKE_DUMP: readonly Draft[] = [
       ar: 'رحلة صيد: 5 ساعات، ولم نصطد إلا صورة سيلفي',
       fr: "pêche : 5 h d'attente, on a attrapé un selfie",
       es: 'día de pesca: 5 horas y solo pescamos una selfie',
+      ja: '釣りの日：5時間粘って釣れたのは自撮り1枚',
+      ko: '낚시 여행: 5시간 기다려서 셀카 한 장 낚음',
     },
   },
   {
@@ -287,6 +329,8 @@ export const LIKE_DUMP: readonly Draft[] = [
       ar: 'تحديث نباتاتي الشهري: كلها ما زالت حية!!',
       fr: 'dump mensuel de mes plantes, toutes vivantes !!',
       es: 'mis plantas este mes: ¡¡todas siguen vivas!!',
+      ja: '植物の月間まとめ、全員生きてる！！',
+      ko: '식물 월간 덤프, 다 살아 있음!!',
     },
   },
 ];

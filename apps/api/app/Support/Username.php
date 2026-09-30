@@ -15,7 +15,7 @@ namespace App\Support;
  *   - `guest48128742`-like names are the API's: every new account gets one
  *     until its player picks a name (`GuestNames`)
  *
- * What each problem says, in six languages, is `lang/{locale}/username.php`.
+ * What each problem says, in every language, is `lang/{locale}/username.php`.
  */
 final class Username
 {

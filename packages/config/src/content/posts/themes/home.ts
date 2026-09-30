@@ -19,6 +19,8 @@ export const HOME_SKIP: readonly Draft[] = [
       ar: 'سأل جاري: «أين المفاتيح؟» فأجبته أنا… من خلف الجدار',
       fr: "Des murs en carton : j'ai dit « à vos souhaits » au voisin.",
       es: 'El vecino estornudó y le dije «salud» a través de la pared.',
+      ja: '隣の人がくしゃみ。「お大事に」って言った。壁越しに。',
+      ko: '옆집 재채기에 “괜찮으세요?” 했다. 벽 너머로.',
     },
   },
   {
@@ -32,6 +34,8 @@ export const HOME_SKIP: readonly Draft[] = [
       ar: 'علّقت لوحة واحدة… وفي الجدار الآن 7 ثقوب',
       fr: 'Un tableau accroché. 7 trous dans le mur.',
       es: 'Colgué un cuadro. La pared tiene 7 agujeros.',
+      ja: '絵を1枚飾った。壁の穴は7個。',
+      ko: '액자 하나 걸었다. 벽에 구멍 7개.',
     },
   },
   {
@@ -45,6 +49,8 @@ export const HOME_SKIP: readonly Draft[] = [
       ar: 'جورب أحمر واحد… وكل ملابسي البيضاء صارت وردية',
       fr: 'Une chaussette rouge. Tout mon linge blanc est rose.',
       es: 'Un calcetín rojo y toda mi ropa blanca quedó rosa.',
+      ja: '赤い靴下1枚で、白い服が全部ピンクに',
+      ko: '빨간 양말 한 짝에 흰 옷이 전부 분홍색',
     },
   },
   {
@@ -58,6 +64,8 @@ export const HOME_SKIP: readonly Draft[] = [
       ar: 'امتلأ كيس الأكياس… نحتاج كيسًا جديدًا',
       fr: 'Le sac à sacs est plein. Il nous faut un sac.',
       es: 'La bolsa de las bolsas se llenó. Necesito otra bolsa.',
+      ja: 'レジ袋入れの袋が満杯。新しい袋が要る。',
+      ko: '봉지 모아 두는 봉지가 꽉 찼다. 새 봉지가 필요함.',
     },
   },
   {
@@ -71,6 +79,8 @@ export const HOME_SKIP: readonly Draft[] = [
       ar: 'نظّفت النوافذ… وبعد 10 دقائق أمطرت',
       fr: 'Vitres nettoyées. 10 minutes après : la pluie.',
       es: 'Limpié las ventanas. A los 10 minutos, llovió.',
+      ja: '窓をふいた。10分後、雨。',
+      ko: '창문 닦았다. 10분 뒤 비.',
     },
   },
   {
@@ -84,6 +94,8 @@ export const HOME_SKIP: readonly Draft[] = [
       ar: 'لا أحد يجلس على كرسي غرفتي… إنه خزانة',
       fr: "Personne ne s'assoit sur ma chaise. C'est une armoire.",
       es: 'Nadie se sienta en mi silla. Es un armario.',
+      ja: '部屋のイスには誰も座らない。あれはクローゼット。',
+      ko: '내 방 의자엔 아무도 안 앉는다. 그건 옷장이다.',
     },
   },
   {
@@ -97,6 +109,8 @@ export const HOME_SKIP: readonly Draft[] = [
       ar: 'حيلة: شاهد فيديو إصلاح لمدة 40 دقيقة، ثم اتصل بالفني',
       fr: 'Astuce : 40 min de tuto réparation, puis appelle un pro',
       es: 'Truco: mira 40 min de tutorial y luego llama al técnico',
+      ja: '裏ワザ：修理動画を40分見て、業者を呼ぶ',
+      ko: '꿀팁: 수리 영상 40분 보고 기사님 부르기',
     },
   },
   {
@@ -111,6 +125,8 @@ export const HOME_SKIP: readonly Draft[] = [
         ar: 'زميل السكن',
         fr: 'Coloc',
         es: 'Compañero de casa',
+        ja: 'ルームメイト',
+        ko: '룸메이트',
       },
       lines: [
         {
@@ -122,6 +138,8 @@ export const HOME_SKIP: readonly Draft[] = [
             ar: 'هل الغسيل الذي في الغسالة لك؟',
             fr: "c'est ton linge dans la machine ?",
             es: '¿es tuya la ropa de la lavadora?',
+            ja: '洗濯機の洗濯物、きみの？',
+            ko: '세탁기에 빨래 있던데, 네 거야?',
           },
         },
         {
@@ -133,6 +151,8 @@ export const HOME_SKIP: readonly Draft[] = [
             ar: 'نعم، وضعته للتو',
             fr: 'oui, je viens de la lancer',
             es: 'sí, la acabo de poner',
+            ja: 'うん、さっき入れた',
+            ko: '응, 방금 넣었어',
           },
         },
         {
@@ -144,6 +164,8 @@ export const HOME_SKIP: readonly Draft[] = [
             ar: 'كان ذلك يوم الثلاثاء',
             fr: "« à l'instant », c'était mardi",
             es: 'eso fue el martes',
+            ja: 'その「さっき」は火曜日',
+            ko: '네 “방금”은 화요일이었어',
           },
         },
       ],
@@ -155,6 +177,8 @@ export const HOME_SKIP: readonly Draft[] = [
       ar: 'سأغسله مرة أخرى… وسيصير أنظف',
       fr: 'Je relance une machine. Extra frais.',
       es: 'La lavo otra vez y queda más fresca.',
+      ja: 'もう1回洗えば新品同様',
+      ko: '한 번 더 돌리면 새것처럼 뽀송해짐',
     },
   },
   {
@@ -169,6 +193,8 @@ export const HOME_SKIP: readonly Draft[] = [
         ar: 'جار الطابق العلوي',
         fr: 'Voisin du dessus',
         es: 'Vecino de arriba',
+        ja: '上の階の人',
+        ko: '윗집',
       },
       lines: [
         {
@@ -180,6 +206,8 @@ export const HOME_SKIP: readonly Draft[] = [
             ar: 'ما ذلك الصوت في الثالثة فجرًا؟',
             fr: "c'était quoi ce bruit à 3 h du matin ?",
             es: '¿qué fue ese ruido a las 3 de la mañana?',
+            ja: '夜中3時のあの音なに？',
+            ko: '새벽 3시에 그 소리 뭐예요?',
           },
         },
         {
@@ -191,6 +219,8 @@ export const HOME_SKIP: readonly Draft[] = [
             ar: 'أي صوت؟',
             fr: 'quel bruit ?',
             es: '¿qué ruido?',
+            ja: 'どの音？',
+            ko: '무슨 소리요?',
           },
         },
         {
@@ -202,6 +232,8 @@ export const HOME_SKIP: readonly Draft[] = [
             ar: 'كأن أحدًا يُسقط كرات زجاجية',
             fr: 'comme des billes qui tombent',
             es: 'como si alguien tirara canicas',
+            ja: 'ビー玉を落としたような、コロコロって音',
+            ko: '구슬 떨어뜨리는 소리요, 또르르',
           },
         },
         {
@@ -213,6 +245,8 @@ export const HOME_SKIP: readonly Draft[] = [
             ar: 'لا توجد لدينا كرات زجاجية أصلًا 😶',
             fr: "on n'a pas de billes, nous 😶",
             es: 'nosotros no tenemos canicas 😶',
+            ja: 'うちビー玉ないけど😶',
+            ko: '저희 집엔 구슬 없는데요 😶',
           },
         },
       ],
@@ -224,6 +258,8 @@ export const HOME_SKIP: readonly Draft[] = [
       ar: 'أكبر لغز في العمارة ما زال بلا حل',
       fr: "Le plus grand mystère de l'immeuble reste entier",
       es: 'El mayor misterio del edificio sigue sin resolver',
+      ja: 'マンション最大の謎、未解決のまま',
+      ko: '아파트 최대 미스터리는 오늘도 미제',
     },
   },
   {
@@ -238,6 +274,8 @@ export const HOME_SKIP: readonly Draft[] = [
         ar: 'مجموعة العمارة',
         fr: "Groupe de l'immeuble",
         es: 'Grupo del edificio',
+        ja: 'マンションのグループ',
+        ko: '아파트 단톡방',
       },
       lines: [
         {
@@ -249,6 +287,8 @@ export const HOME_SKIP: readonly Draft[] = [
             ar: 'إلى من يغني تحت الدش في السادسة صباحًا 🙂',
             fr: 'au chanteur de la douche de 6 h 🙂',
             es: 'para quien canta en la ducha a las 6 🙂',
+            ja: '朝6時にシャワーで歌ってる方へ🙂',
+            ko: '아침 6시에 샤워하며 노래하시는 분 🙂',
           },
         },
         {
@@ -260,6 +300,8 @@ export const HOME_SKIP: readonly Draft[] = [
             ar: 'صوتك جميل، لكن الوقت مبكر قليلًا',
             fr: 'jolie voix, mais un peu tôt',
             es: 'qué buena voz, pero es un poco temprano',
+            ja: 'いい声ですが、ちょっと早いです',
+            ko: '목소리는 좋은데 좀 이르네요',
           },
         },
         {
@@ -271,6 +313,8 @@ export const HOME_SKIP: readonly Draft[] = [
             ar: 'شكرًا جزيلًا 🎤',
             fr: 'oh, merci beaucoup 🎤',
             es: '¡muchas gracias! 🎤',
+            ja: 'ありがとうございます🎤',
+            ko: '정말 감사합니다 🎤',
           },
         },
       ],
@@ -282,6 +326,8 @@ export const HOME_SKIP: readonly Draft[] = [
       ar: 'قرأت جزء المديح فقط',
       fr: "J'ai lu que le compliment",
       es: 'Solo leí la parte del cumplido',
+      ja: 'ほめ言葉のとこだけ読んだ',
+      ko: '칭찬 부분만 읽었다',
     },
   },
   {
@@ -296,6 +342,8 @@ export const HOME_SKIP: readonly Draft[] = [
         ar: 'خدمة الصيانة',
         fr: 'Service technique',
         es: 'Servicio técnico',
+        ja: '修理センター',
+        ko: '서비스 센터',
       },
       lines: [
         {
@@ -307,6 +355,8 @@ export const HOME_SKIP: readonly Draft[] = [
             ar: 'الغسالة تسرّب الماء، متى تأتون؟',
             fr: 'la machine fuit, vous passez quand ?',
             es: 'la lavadora gotea, ¿cuándo pueden venir?',
+            ja: '洗濯機が水漏れです。いつ来られますか？',
+            ko: '세탁기에서 물이 새요. 언제 오실 수 있나요?',
           },
         },
         {
@@ -318,6 +368,8 @@ export const HOME_SKIP: readonly Draft[] = [
             ar: 'غدًا بين التاسعة صباحًا والسادسة مساءً',
             fr: 'demain entre 9 h et 18 h',
             es: 'mañana entre las 9 y las 18',
+            ja: '明日の9時〜18時の間です',
+            ko: '내일 9시에서 18시 사이요',
           },
         },
         {
@@ -329,6 +381,8 @@ export const HOME_SKIP: readonly Draft[] = [
             ar: 'هل يمكن تحديد وقت أدق؟',
             fr: 'vous pouvez être plus précis ?',
             es: '¿pueden ser más precisos?',
+            ja: 'もう少し絞れませんか？',
+            ko: '조금 좁혀 주실 수 있나요?',
           },
         },
         {
@@ -340,6 +394,8 @@ export const HOME_SKIP: readonly Draft[] = [
             ar: 'طبعًا: غدًا',
             fr: 'bien sûr : demain',
             es: 'claro: mañana',
+            ja: 'はい、明日です',
+            ko: '네, 내일이요',
           },
         },
       ],
@@ -351,6 +407,8 @@ export const HOME_SKIP: readonly Draft[] = [
       ar: 'قضيت اليوم كله بجانب الباب',
       fr: 'Journée entière à guetter la sonnette',
       es: 'Pasé todo el día esperando junto a la puerta',
+      ja: '一日中ドアの前で待った',
+      ko: '하루 종일 문 앞에서 기다렸다',
     },
   },
   {
@@ -365,6 +423,8 @@ export const HOME_SKIP: readonly Draft[] = [
         ar: 'الكنبة الجديدة لا تمرّ من الباب. ما الخطة؟',
         fr: 'Le canapé neuf ne passe pas la porte. Le plan ?',
         es: 'El sofá nuevo no pasa por la puerta. ¿Plan?',
+        ja: '新しいソファがドアを通らない。どうする？',
+        ko: '새 소파가 문을 못 통과해요. 어떻게 하죠?',
       },
       options: [
         {
@@ -374,6 +434,8 @@ export const HOME_SKIP: readonly Draft[] = [
           ar: 'نفكّ أرجلها',
           fr: 'On démonte les pieds',
           es: 'Quitarle las patas',
+          ja: '脚を外す',
+          ko: '다리를 뗀다',
         },
         {
           tr: 'Pencereden alırız',
@@ -382,6 +444,8 @@ export const HOME_SKIP: readonly Draft[] = [
           ar: 'ندخلها من النافذة',
           fr: 'Par la fenêtre',
           es: 'Por la ventana',
+          ja: '窓から入れる',
+          ko: '창문으로 넣는다',
         },
         {
           tr: 'Koridorda yaşar',
@@ -390,6 +454,8 @@ export const HOME_SKIP: readonly Draft[] = [
           ar: 'ستعيش في الممر',
           fr: "Il vit dans l'entrée",
           es: 'Vive en el pasillo',
+          ja: '廊下に住ませる',
+          ko: '복도에서 산다',
         },
       ],
       winner: 2,
@@ -401,6 +467,8 @@ export const HOME_SKIP: readonly Draft[] = [
       ar: 'الممر صار غرفة الجلوس',
       fr: "L'entrée, c'est le salon maintenant",
       es: 'El pasillo ya es la sala de estar',
+      ja: '廊下が今のリビング',
+      ko: '이제 복도가 거실이다',
     },
   },
   {
@@ -415,6 +483,8 @@ export const HOME_SKIP: readonly Draft[] = [
         ar: 'كيف تضع غطاء اللحاف؟',
         fr: 'Comment tu mets une housse de couette ?',
         es: '¿Cómo pones la funda del edredón?',
+        ja: '布団カバー、どうやってつける？',
+        ko: '이불 커버 어떻게 씌워요?',
       },
       options: [
         {
@@ -424,6 +494,8 @@ export const HOME_SKIP: readonly Draft[] = [
           ar: 'زاوية بعد زاوية',
           fr: 'Coin par coin',
           es: 'Esquina por esquina',
+          ja: '角を持ってつける',
+          ko: '모서리부터 잡는다',
         },
         {
           tr: 'İçine girerek',
@@ -432,6 +504,8 @@ export const HOME_SKIP: readonly Draft[] = [
           ar: 'أدخل فيه بنفسي',
           fr: 'Je me glisse dedans',
           es: 'Me meto dentro',
+          ja: '中に入る',
+          ko: '안으로 들어간다',
         },
       ],
       winner: 1,
@@ -443,6 +517,8 @@ export const HOME_SKIP: readonly Draft[] = [
       ar: 'ضعت داخل غطاء اللحاف 10 دقائق',
       fr: '10 minutes à me débattre dans la housse',
       es: 'Diez minutos dentro de la funda y sin salida',
+      ja: '布団カバーの中で10分迷子になった',
+      ko: '이불 커버 안에서 10분 동안 길을 잃었다',
     },
   },
   {
@@ -457,6 +533,8 @@ export const HOME_SKIP: readonly Draft[] = [
         ar: 'رنّ الجرس وأنت بالبيجامة. ماذا تفعل؟',
         fr: 'Ça sonne, tu es en pyjama. Tu fais quoi ?',
         es: 'Suena el timbre y estás en pijama. Tú:',
+        ja: 'インターホンが鳴った。パジャマ姿。あなたは？',
+        ko: '초인종이 울렸다. 잠옷 차림이다. 나는:',
       },
       options: [
         {
@@ -466,6 +544,8 @@ export const HOME_SKIP: readonly Draft[] = [
           ar: 'أبدّل ملابسي',
           fr: 'Je me change',
           es: 'Me cambio rápido',
+          ja: '急いで着替える',
+          ko: '얼른 옷 갈아입는다',
         },
         {
           tr: 'Sadece kafamı uzatırım',
@@ -474,6 +554,8 @@ export const HOME_SKIP: readonly Draft[] = [
           ar: 'أُخرج رأسي فقط',
           fr: 'Je passe juste la tête',
           es: 'Solo asomo la cabeza',
+          ja: '顔だけ出す',
+          ko: '고개만 내민다',
         },
       ],
       winner: 1,
@@ -485,6 +567,8 @@ export const HOME_SKIP: readonly Draft[] = [
       ar: 'عامل التوصيل لا يعرف مني إلا رأسي',
       fr: 'Le livreur ne connaît que ma tête',
       es: 'El repartidor solo conoce mi cabeza',
+      ja: '配達員さんは私の顔しか知らない',
+      ko: '택배 기사님은 내 머리만 봤다',
     },
   },
   {
@@ -499,8 +583,10 @@ export const HOME_SKIP: readonly Draft[] = [
         ar: 'الأحذية عند الباب',
         fr: "CHAUSSURES À L'ENTRÉE",
         es: 'ZAPATOS EN LA ENTRADA',
+        ja: '玄関の靴',
+        ko: '현관 신발',
       },
-      value: { tr: '31', en: '31', de: '31', ar: '31', fr: '31', es: '31' },
+      value: { tr: '31', en: '31', de: '31', ar: '31', fr: '31', es: '31', ja: '31', ko: '31' },
       shape: 'rise',
       axis: 'months',
     },
@@ -511,6 +597,8 @@ export const HOME_SKIP: readonly Draft[] = [
       ar: 'نسكن هنا 3 أشخاص فقط',
       fr: "On n'est que 3 à vivre ici",
       es: 'Aquí solo vivimos 3',
+      ja: 'この家に住んでるのは3人だけ',
+      ko: '이 집엔 딱 3명 산다',
     },
   },
   {
@@ -525,6 +613,8 @@ export const HOME_SKIP: readonly Draft[] = [
         ar: 'أماكن الأثاث',
         fr: 'PLACE DE MES MEUBLES',
         es: 'LUGAR DE MIS MUEBLES',
+        ja: '家具の配置',
+        ko: '가구 위치',
       },
       value: null,
       shape: 'zigzag',
@@ -537,6 +627,8 @@ export const HOME_SKIP: readonly Draft[] = [
       ar: 'مرة في الشهر، في الثانية ليلًا، وحدي',
       fr: 'Une fois par mois. À 2 h du matin. Sans aide.',
       es: 'Una vez al mes. A las 2 a. m. Sin ayuda.',
+      ja: '月1回、夜中の2時に、ひとりで',
+      ko: '한 달에 한 번, 새벽 2시에, 혼자서',
     },
   },
   {
@@ -544,7 +636,7 @@ export const HOME_SKIP: readonly Draft[] = [
     user: ACCOUNTS.receipts,
     body: {
       format: 'receipt',
-      store: { tr: 'ÇİÇEKÇİ', en: 'FLOWER SHOP', de: 'BLUMENLADEN', ar: 'محل الزهور', fr: 'FLEURISTE', es: 'VIVERO' },
+      store: { tr: 'ÇİÇEKÇİ', en: 'FLOWER SHOP', de: 'BLUMENLADEN', ar: 'محل الزهور', fr: 'FLEURISTE', es: 'VIVERO', ja: '花屋', ko: '꽃집' },
       items: [
         {
           tr: 'BAKIM İSTEMEZ BİTKİ',
@@ -553,6 +645,8 @@ export const HOME_SKIP: readonly Draft[] = [
           ar: 'نبتة لا تحتاج عناية',
           fr: 'PLANTE SANS ENTRETIEN',
           es: 'PLANTA SIN CUIDADOS',
+          ja: '手間いらずの植物',
+          ko: '관리 필요 없는 식물',
         },
       ],
     },
@@ -563,6 +657,8 @@ export const HOME_SKIP: readonly Draft[] = [
       ar: 'التحدي مقبول.',
       fr: 'Défi accepté.',
       es: 'Reto aceptado.',
+      ja: '挑戦を受けて立つ。',
+      ko: '도전 수락.',
     },
   },
   {
@@ -577,6 +673,8 @@ export const HOME_SKIP: readonly Draft[] = [
         ar: 'متجر الأثاث',
         fr: 'MAGASIN DE MEUBLES',
         es: 'MUEBLERÍA',
+        ja: '家具店',
+        ko: '가구점',
       },
       items: [
         {
@@ -586,6 +684,8 @@ export const HOME_SKIP: readonly Draft[] = [
           ar: 'مكتبة (تركيب ذاتي)',
           fr: 'BIBLIOTHÈQUE À MONTER',
           es: 'ESTANTERÍA PARA ARMAR',
+          ja: '本棚（組み立て式）',
+          ko: '책장 (조립식)',
         },
         {
           tr: 'SABIR (STOKTA YOK)',
@@ -594,6 +694,8 @@ export const HOME_SKIP: readonly Draft[] = [
           ar: 'الصبر (نفد من المخزون)',
           fr: 'PATIENCE (ÉPUISÉE)',
           es: 'PACIENCIA (AGOTADA)',
+          ja: '忍耐（在庫切れ）',
+          ko: '인내심 (품절)',
         },
       ],
     },
@@ -604,6 +706,8 @@ export const HOME_SKIP: readonly Draft[] = [
       ar: 'العلبة تقول 30 دقيقة… وأنا في الساعة الرابعة',
       fr: "Le carton dit 30 min. J'en suis à 4 h.",
       es: 'La caja dice 30 minutos. Voy por la hora 4.',
+      ja: '箱には30分と書いてある。今4時間目。',
+      ko: '상자엔 30분이라던데 지금 4시간째.',
     },
   },
   {
@@ -618,6 +722,8 @@ export const HOME_SKIP: readonly Draft[] = [
         ar: 'أدوات التنظيف',
         fr: 'DROGUERIE',
         es: 'TIENDA DE LIMPIEZA',
+        ja: '掃除用品',
+        ko: '청소용품',
       },
       items: [
         {
@@ -627,6 +733,8 @@ export const HOME_SKIP: readonly Draft[] = [
           ar: 'معطّر جو (خزامى)',
           fr: 'DÉSODORISANT LAVANDE',
           es: 'AROMATIZANTE LAVANDA',
+          ja: 'ラベンダーの芳香剤',
+          ko: '방향제 (라벤더)',
         },
       ],
     },
@@ -637,6 +745,8 @@ export const HOME_SKIP: readonly Draft[] = [
       ar: 'لم أنظّف… لكن البيت يفوح بالخزامى',
       fr: 'Pas fait le ménage. Mais ça sent la lavande.',
       es: 'No limpié, pero huele a lavanda.',
+      ja: '掃除はしてない。でも部屋はラベンダーの香り。',
+      ko: '청소는 안 했지만 집에서 라벤더 향이 난다',
     },
   },
   {
@@ -651,8 +761,10 @@ export const HOME_SKIP: readonly Draft[] = [
         ar: 'اجتماع سكان العمارة',
         fr: 'RÉUNION DE COPROPRIÉTÉ',
         es: 'JUNTA DE VECINOS',
+        ja: '住民会議',
+        ko: '입주민 회의',
       },
-      big: { tr: '3', en: '3', de: '3', ar: '3', fr: '3', es: '3' },
+      big: { tr: '3', en: '3', de: '3', ar: '3', fr: '3', es: '3', ja: '3', ko: '3' },
       text: {
         tr: 'saat boyunca kapı önündeki paspasın rengi konuşuldu',
         en: 'hours spent debating the color of the doormat.',
@@ -660,6 +772,8 @@ export const HOME_SKIP: readonly Draft[] = [
         ar: 'ساعات من النقاش حول لون ممسحة الباب',
         fr: 'heures à débattre de la couleur du paillasson.',
         es: 'horas debatiendo el color de la alfombra de la entrada.',
+        ja: '時間、玄関マットの色について話し合った',
+        ko: '시간 동안 현관 매트 색깔을 논의했다',
       },
     },
     caption: {
@@ -669,6 +783,8 @@ export const HOME_SKIP: readonly Draft[] = [
       ar: 'السقف يسرّب الماء… لكن الأولوية للممسحة',
       fr: "Le toit fuit, mais le paillasson d'abord",
       es: 'El techo gotea, pero primero la alfombra',
+      ja: '雨漏りより玄関マットが優先',
+      ko: '지붕은 새는데 우선순위는 현관 매트',
     },
   },
   {
@@ -677,7 +793,7 @@ export const HOME_SKIP: readonly Draft[] = [
     body: {
       format: 'fact',
       eyebrow: null,
-      big: { tr: '4', en: '4', de: '4', ar: '4', fr: '4', es: '4' },
+      big: { tr: '4', en: '4', de: '4', ar: '4', fr: '4', es: '4', ja: '4', ko: '4' },
       text: {
         tr: 'saat dolabı toplayacaktın; eski fotoğraflara baktın',
         en: 'hours meant for tidying the closet. Spent on old photos.',
@@ -685,6 +801,8 @@ export const HOME_SKIP: readonly Draft[] = [
         ar: 'ساعات لترتيب الخزانة… قضيتها مع الصور القديمة',
         fr: "heures pour ranger l'armoire. Passées sur de vieilles photos.",
         es: 'horas para ordenar el armario. Las pasaste viendo fotos viejas.',
+        ja: '時間、クローゼットを片づけるはずが昔の写真を見てた',
+        ko: '시간 동안 옷장 정리하려다 옛날 사진만 봤다',
       },
     },
     caption: {
@@ -694,6 +812,8 @@ export const HOME_SKIP: readonly Draft[] = [
       ar: 'الخزانة ما زالت فوضى… لكن قلبي ممتلئ',
       fr: "Toujours le bazar, mais que d'émotions.",
       es: 'El armario sigue igual. Pero qué nostalgia.',
+      ja: 'クローゼットは散らかったまま。でも心は満たされた。',
+      ko: '옷장은 그대로지만 마음은 꽉 찼다',
     },
   },
   {
@@ -708,8 +828,10 @@ export const HOME_SKIP: readonly Draft[] = [
         ar: 'جدول التنظيف',
         fr: 'PLANNING DU MÉNAGE',
         es: 'TURNOS DE LIMPIEZA',
+        ja: '掃除当番表',
+        ko: '청소 당번표',
       },
-      big: { tr: '0', en: '0', de: '0', ar: '0', fr: '0', es: '0' },
+      big: { tr: '0', en: '0', de: '0', ar: '0', fr: '0', es: '0', ja: '0', ko: '0' },
       text: {
         tr: 'kez uyuldu; 8 aydır buzdolabında asılı duruyor',
         en: 'times followed. On the fridge for 8 months.',
@@ -717,6 +839,8 @@ export const HOME_SKIP: readonly Draft[] = [
         ar: 'مرة التُزم به… وهو معلّق على الثلاجة منذ 8 أشهر',
         fr: 'fois respecté. Sur le frigo depuis 8 mois.',
         es: 'veces se cumplió. Lleva 8 meses en el refrigerador.',
+        ja: '回守られた。冷蔵庫に貼って8か月。',
+        ko: '번 지켜졌다. 냉장고에 붙은 지 8개월.',
       },
     },
     caption: {
@@ -726,6 +850,8 @@ export const HOME_SKIP: readonly Draft[] = [
       ar: 'أكثر شيء مرتّب في البيت هو ذلك الجدول',
       fr: "Le truc le plus rangé de l'appart : le planning",
       es: 'Lo más ordenado de la casa es esa tabla',
+      ja: '家で一番整ってるのはあの表',
+      ko: '집에서 제일 정돈된 건 그 당번표',
     },
   },
   {
@@ -740,6 +866,8 @@ export const HOME_SKIP: readonly Draft[] = [
         ar: 'تصنيف أعمال البيت',
         fr: 'TIER LIST DES CORVÉES',
         es: 'TIER LIST DE QUEHACERES',
+        ja: '家事ティアリスト',
+        ko: '집안일 티어 리스트',
       },
       rows: [['🌿', '🛋️'], ['👕', '🧦'], ['🍽️', '🗑️'], ['👔', '🧊']],
     },
@@ -750,6 +878,8 @@ export const HOME_SKIP: readonly Draft[] = [
       ar: 'الكيّ في آخر القائمة… فالتجاعيد موضة أيضًا',
       fr: "Repassage en C. Le froissé, c'est un style.",
       es: 'Planchar va en la C. Lo arrugado también es estilo.',
+      ja: 'アイロンはC。しわもファッション。',
+      ko: '다림질은 C. 구겨진 것도 스타일이다.',
     },
   },
   {
@@ -764,6 +894,8 @@ export const HOME_SKIP: readonly Draft[] = [
         ar: 'تصنيف أدوات التنظيف',
         fr: 'TIER LIST DU MATOS MÉNAGE',
         es: 'TIER LIST DE LIMPIEZA',
+        ja: '掃除道具ティアリスト',
+        ko: '청소 도구 티어 리스트',
       },
       rows: [['🧽', '🧴'], ['🧹', '🪣'], ['🧤'], ['🪶']],
     },
@@ -774,6 +906,8 @@ export const HOME_SKIP: readonly Draft[] = [
       ar: 'منفضة الريش تنقل الغبار من مكان لآخر فقط',
       fr: 'Le plumeau déplace juste la poussière',
       es: 'El plumero solo cambia el polvo de lugar',
+      ja: 'はたきはホコリを移動させてるだけ',
+      ko: '먼지떨이는 먼지를 옮길 뿐이다',
     },
   },
   {
@@ -790,6 +924,8 @@ export const HOME_SKIP: readonly Draft[] = [
           ar: 'جارة الطابق السفلي',
           fr: 'Voisine du dessous',
           es: 'Vecina de abajo',
+          ja: '下の階の人',
+          ko: '아랫집',
         },
         text: {
           tr: 'Pijamanız bizim balkona düştü 🙂',
@@ -798,6 +934,8 @@ export const HOME_SKIP: readonly Draft[] = [
           ar: 'سقطت بيجامتك على شرفتنا 🙂',
           fr: 'Votre pyjama est sur notre balcon 🙂',
           es: 'Su pijama cayó en nuestro balcón 🙂',
+          ja: 'パジャマがうちのベランダに落ちてます🙂',
+          ko: '잠옷이 저희 베란다에 떨어졌어요 🙂',
         },
       },
     },
@@ -808,6 +946,8 @@ export const HOME_SKIP: readonly Draft[] = [
       ar: 'البيجامة صارت لهم الآن',
       fr: 'Ce pyjama est à eux maintenant',
       es: 'Ese pijama ya es de ellos',
+      ja: 'あのパジャマはもう向こうのもの',
+      ko: '그 잠옷은 이제 그 집 거다',
     },
   },
   {
@@ -824,6 +964,8 @@ export const HOME_SKIP: readonly Draft[] = [
           ar: 'إدارة العمارة',
           fr: 'Syndic',
           es: 'Administración',
+          ja: '管理会社',
+          ko: '관리사무소',
         },
         text: {
           tr: 'Yarın 09.00–17.00 arası sular kesik',
@@ -832,6 +974,8 @@ export const HOME_SKIP: readonly Draft[] = [
           ar: 'المياه مقطوعة غدًا من 9 إلى 5',
           fr: "Coupure d'eau demain de 9 h à 17 h",
           es: 'Mañana no habrá agua de 9 a 17 h',
+          ja: '明日9時〜17時は断水します',
+          ko: '내일 9시부터 17시까지 단수됩니다',
         },
       },
     },
@@ -842,6 +986,8 @@ export const HOME_SKIP: readonly Draft[] = [
       ar: 'ملأت كل القدور في البيت',
       fr: "J'ai rempli toutes les casseroles",
       es: 'Llené todas las ollas de la casa',
+      ja: '家じゅうの鍋に水をためた',
+      ko: '집에 있는 냄비를 전부 채웠다',
     },
   },
   {
@@ -856,6 +1002,8 @@ export const HOME_SKIP: readonly Draft[] = [
         ar: 'لا شيء يدوم… إلا ما أصلحته بالشريط اللاصق.',
         fr: "Rien n'est éternel. Sauf mes réparations au ruban adhésif.",
         es: 'Nada es para siempre. Excepto lo que arreglé con cinta.',
+        ja: '永遠に続くものはない。テープで直したもの以外は。',
+        ko: '영원한 건 없다. 테이프로 고친 것만 빼고.',
       },
     },
     caption: {
@@ -865,6 +1013,8 @@ export const HOME_SKIP: readonly Draft[] = [
       ar: 'صامد منذ 4 سنوات',
       fr: 'Ça tient depuis quatre ans',
       es: 'Aguanta desde hace cuatro años',
+      ja: '4年たってもびくともしない',
+      ko: '4년째 멀쩡하다',
     },
   },
   {
@@ -879,6 +1029,8 @@ export const HOME_SKIP: readonly Draft[] = [
         ar: 'لا تسمّها فوضى… إنه نظام لا يفهمه أحد غيري.',
         fr: "Ce n'est pas le bazar. C'est un ordre que personne d'autre ne comprend.",
         es: 'No es desorden. Es un sistema que solo yo entiendo.',
+        ja: '散らかってるんじゃない。私にしかわからない秩序だ。',
+        ko: '어질러진 게 아니다. 나만 아는 질서다.',
       },
     },
     caption: {
@@ -888,6 +1040,8 @@ export const HOME_SKIP: readonly Draft[] = [
       ar: 'أنا وحدي أعرف مكان المقص',
       fr: "Il n'y a que moi qui sais où sont les ciseaux",
       es: 'Solo yo sé dónde están las tijeras',
+      ja: 'ハサミの場所を知ってるのは私だけ',
+      ko: '가위 위치는 나만 안다',
     },
   },
   {
@@ -902,6 +1056,8 @@ export const HOME_SKIP: readonly Draft[] = [
         ar: 'أشياء أقل، راحة أكثر. — أنا، أنقل صندوق الأسلاك للمرة الثالثة',
         fr: 'Vivre léger. — Moi, 3e déménagement avec ma boîte de câbles',
         es: 'Menos cosas, más paz. — Yo, en mi 3.ª mudanza con la caja de cables',
+        ja: 'モノを減らせば心が整う。—ケーブルの箱を3回の引っ越しで運んだ人',
+        ko: '짐이 적으면 마음이 편하다. — 케이블 상자와 세 번째 이사 중인 나',
       },
     },
     caption: {
@@ -911,6 +1067,8 @@ export const HOME_SKIP: readonly Draft[] = [
       ar: 'لا أحد يعرف لأي جهاز هذه الأسلاك',
       fr: 'Personne ne sait à quoi ils servent',
       es: 'Nadie sabe de qué son',
+      ja: 'どれが何のケーブルか、誰も知らない',
+      ko: '어떤 게 무슨 케이블인지 아무도 모른다',
     },
   },
   {
@@ -925,6 +1083,8 @@ export const HOME_SKIP: readonly Draft[] = [
         ar: 'إذا أُغلق باب فُتح آخر… إنه تيار الهواء.',
         fr: "Quand une porte se ferme, une autre s'ouvre. C'est le courant d'air.",
         es: 'Cuando una puerta se cierra, otra se abre. Es la corriente de aire.',
+        ja: 'ひとつの扉が閉まれば、別の扉が開く。すきま風で。',
+        ko: '문 하나가 닫히면 다른 문이 열린다. 맞바람 때문에.',
       },
     },
     caption: {
@@ -934,6 +1094,8 @@ export const HOME_SKIP: readonly Draft[] = [
       ar: 'أُغلقت كل أبواب البيت دفعة واحدة',
       fr: 'Toutes les portes ont claqué en même temps',
       es: 'Todas las puertas se cerraron de golpe',
+      ja: '家じゅうのドアが一斉にバタン',
+      ko: '집 안 모든 문이 동시에 쾅 닫혔다',
     },
   },
 ];
@@ -950,6 +1112,8 @@ export const HOME_LIKE: readonly Draft[] = [
       ar: 'رتّبت البهارات أبجديًا… سلام داخلي',
       fr: 'épices rangées par ordre alphabétique. la paix.',
       es: 'ordené mis especias alfabéticamente. paz interior.',
+      ja: 'スパイスを五十音順に並べた。心の平穏。',
+      ko: '향신료를 가나다순으로 정리했다. 평화.',
     },
   },
   {
@@ -963,6 +1127,8 @@ export const HOME_LIKE: readonly Draft[] = [
       ar: 'زرعنا 40 زهرة توليب مع الجيران أمام العمارة!!',
       fr: '40 tulipes plantées avec les voisins !!',
       es: '¡¡sembramos 40 tulipanes con los vecinos!!',
+      ja: 'ご近所さんと庭にチューリップを40本植えた！！',
+      ko: '이웃들이랑 화단에 튤립 40송이 심었다!!',
     },
   },
   {
@@ -976,6 +1142,8 @@ export const HOME_LIKE: readonly Draft[] = [
       ar: 'علّقت الستائر أخيرًا!! (استغرق الأمر 8 أشهر)',
       fr: 'rideaux enfin posés !! (ça a pris 8 mois)',
       es: '¡¡por fin colgué las cortinas!! (tardé 8 meses)',
+      ja: 'ついにカーテンをつけた！！（8か月かかった）',
+      ko: '드디어 커튼 달았다!! (8개월 걸림)',
     },
   },
   {
@@ -989,6 +1157,8 @@ export const HOME_LIKE: readonly Draft[] = [
       ar: 'سنة كاملة مع زميل السكن!! خلافنا الوحيد: القمامة',
       fr: 'un an de coloc !! seule dispute : les poubelles',
       es: '¡¡un año de convivencia!! única discusión: la basura',
+      ja: 'ルームメイトと1年！！ケンカはゴミ出しだけ',
+      ko: '룸메이트랑 1년!! 싸운 건 쓰레기 문제뿐',
     },
   },
   {
@@ -1003,6 +1173,8 @@ export const HOME_LIKE: readonly Draft[] = [
         ar: 'بابي أنا',
         fr: 'ma porte à moi',
         es: 'mi propia puerta',
+        ja: '自分のドア',
+        ko: '나의 문',
       },
     },
     caption: {
@@ -1012,6 +1184,8 @@ export const HOME_LIKE: readonly Draft[] = [
       ar: 'فتحت باب بيتي الخاص لأول مرة',
       fr: "j'ai ouvert la porte de chez moi pour la première fois",
       es: 'abrí la puerta de mi propia casa por primera vez',
+      ja: '初めて自分の家のドアを開けた',
+      ko: '처음으로 내 집 문을 열었다',
     },
   },
   {
@@ -1026,6 +1200,8 @@ export const HOME_LIKE: readonly Draft[] = [
         ar: 'زهرة الصبر',
         fr: 'la fleur de la patience',
         es: 'la flor de la paciencia',
+        ja: '忍耐の花',
+        ko: '인내의 꽃',
       },
     },
     caption: {
@@ -1035,6 +1211,8 @@ export const HOME_LIKE: readonly Draft[] = [
       ar: 'نبتتي أزهرت لأول مرة منذ 3 سنوات!!',
       fr: 'ma plante a fleuri pour la première fois en 3 ans !!',
       es: '¡¡mi planta floreció por primera vez en 3 años!!',
+      ja: '3年目で初めて花が咲いた！！',
+      ko: '3년 만에 처음으로 꽃이 피었다!!',
     },
   },
   {
@@ -1049,6 +1227,8 @@ export const HOME_LIKE: readonly Draft[] = [
         ar: 'أهلًا بك يا جارتنا',
         fr: 'bienvenue, voisine',
         es: 'bienvenida, vecina',
+        ja: 'ようこそ、ご近所さん',
+        ko: '환영해요, 이웃님',
       },
     },
     caption: {
@@ -1058,6 +1238,8 @@ export const HOME_LIKE: readonly Draft[] = [
       ar: 'جارة الطابق العلوي تركت لي بسكويتًا أمام الباب!!',
       fr: "la voisine du dessus m'a laissé des biscuits !!",
       es: '¡¡la vecina de arriba me dejó galletas en la puerta!!',
+      ja: '上の階の人がドアにクッキーを置いてくれた！！',
+      ko: '윗집 이웃이 문 앞에 쿠키를 두고 갔다!!',
     },
   },
   {
@@ -1072,6 +1254,8 @@ export const HOME_LIKE: readonly Draft[] = [
         ar: 'عُثر على الأرضية',
         fr: 'sol retrouvé',
         es: 'suelo encontrado',
+        ja: '床、発見',
+        ko: '바닥 발견',
       },
     },
     caption: {
@@ -1081,6 +1265,8 @@ export const HOME_LIKE: readonly Draft[] = [
       ar: 'رتّبت غرفتي… واكتشفت أن فيها أرضية',
       fr: 'chambre rangée : en fait, il y a un sol',
       es: 'ordené mi habitación y apareció el suelo',
+      ja: '部屋を片づけたら、床が出てきた',
+      ko: '방 치웠더니 바닥이 나왔다',
     },
   },
   {
@@ -1094,6 +1280,8 @@ export const HOME_LIKE: readonly Draft[] = [
       ar: 'تنظيف الربيع: البيت يلمع… وأنا منهكة',
       fr: 'dump grand ménage : la maison brille, moi je suis KO',
       es: 'limpieza de primavera: la casa brilla y yo estoy agotada',
+      ja: '春の大掃除：家はピカピカ、私はヘトヘト',
+      ko: '봄맞이 대청소: 집은 반짝, 나는 녹초',
     },
   },
   {
@@ -1107,6 +1295,8 @@ export const HOME_LIKE: readonly Draft[] = [
       ar: 'جدّدت شرفتي… وصرت أعيش فيها',
       fr: 'balcon refait, maintenant je vis dehors',
       es: 'renové el balcón y ahora prácticamente vivo ahí',
+      ja: 'ベランダを改装した。もうそこに住んでる。',
+      ko: '베란다를 꾸몄다. 이제 거기서 산다.',
     },
   },
   {
@@ -1120,6 +1310,8 @@ export const HOME_LIKE: readonly Draft[] = [
       ar: 'يوم التصليح: أصلحت 3 أشياء وكسرت واحدًا',
       fr: 'journée bricolage : 3 trucs réparés, 1 cassé',
       es: 'día de arreglos: arreglé 3 cosas y rompí 1',
+      ja: '修理の日：3つ直して1つ壊した',
+      ko: '수리의 날: 3개 고치고 1개 부숨',
     },
   },
 ];
@@ -1136,6 +1328,8 @@ export const HOME_HOLD: readonly Draft[] = [
       ar: 'دشّ أسطوري: الماء الساخن لم ينفد أبدًا',
       fr: "Douche légendaire : l'eau chaude n'a jamais manqué",
       es: 'Ducha legendaria: el agua caliente nunca se acabó',
+      ja: '伝説のシャワー：お湯が最後まで出た',
+      ko: '전설의 샤워: 온수가 끝까지 나왔다',
     },
   },
   {
@@ -1149,6 +1343,8 @@ export const HOME_HOLD: readonly Draft[] = [
       ar: 'زميلك في السكن غسل الأطباق… دون أن تطلب',
       fr: "Ton coloc a fait la vaisselle. Sans qu'on lui demande.",
       es: 'Tu compañero lavó los platos. Sin que le pidieras.',
+      ja: 'ルームメイトが皿を洗ってた。頼んでないのに。',
+      ko: '룸메이트가 설거지를 했다. 말도 안 했는데.',
     },
   },
   {
@@ -1162,6 +1358,8 @@ export const HOME_HOLD: readonly Draft[] = [
       ar: 'انتهى التركيب… ولم يتبقَّ برغي واحد',
       fr: 'Montage terminé. Pas une seule vis en trop.',
       es: 'Armado terminado. No sobró ni un tornillo.',
+      ja: '組み立て完了。ネジが1本も余らなかった。',
+      ko: '조립 완료. 나사가 하나도 안 남았다.',
     },
   },
   {
@@ -1175,6 +1373,8 @@ export const HOME_HOLD: readonly Draft[] = [
       ar: 'بقيت دقيقة في الغسالة… اترك عند الصافرة',
       fr: "Plus qu'une minute de lessive… lâche au bip",
       es: 'Queda 1 min de lavado… suelta con el pitido',
+      ja: '洗濯機、残り1分…ピッと鳴ったら離して',
+      ko: '세탁기 1분 남음… 삐 소리에 손 떼세요',
     },
   },
   {
@@ -1188,6 +1388,8 @@ export const HOME_HOLD: readonly Draft[] = [
       ar: 'صندوق الانتقال: ما تبحث عنه في الأعلى تمامًا!',
       fr: 'Carton de déménagement : ce que tu cherches est en haut !',
       es: 'Caja de mudanza: ¡lo que buscas está arriba!',
+      ja: '引っ越しの箱：探し物が一番上に！',
+      ko: '이삿짐 상자: 찾던 게 맨 위에!',
     },
   },
   {
@@ -1201,6 +1403,8 @@ export const HOME_HOLD: readonly Draft[] = [
       ar: 'جار أسطوري: لا صوت واحد منذ سنتين',
       fr: 'Voisin légendaire : pas un bruit en 2 ans',
       es: 'Vecino legendario: ni un ruido en 2 años',
+      ja: '伝説の隣人：2年間、物音ひとつなし',
+      ko: '전설의 이웃: 2년 동안 소음 제로',
     },
   },
   {
@@ -1214,6 +1418,8 @@ export const HOME_HOLD: readonly Draft[] = [
       ar: 'أخرجت القمامة… ووصلت شاحنة النظافة في اللحظة نفسها',
       fr: 'Poubelle sortie pile quand le camion passe',
       es: 'Sacaste la basura justo cuando pasó el camión',
+      ja: 'ゴミを出したら、ちょうど収集車が来た',
+      ko: '쓰레기 내놨더니 딱 그때 수거차가 왔다',
     },
   },
 ];
@@ -1224,7 +1430,7 @@ export const HOME_FREEZE: readonly Draft[] = [
     user: ACCOUNTS.alert,
     body: {
       format: 'sign',
-      sign: { tr: 'AŞIRI YÜK', en: 'OVERLOAD', de: 'ÜBERLASTUNG', ar: 'حمل زائد', fr: 'SURCHARGE', es: 'SOBRECARGA' },
+      sign: { tr: 'AŞIRI YÜK', en: 'OVERLOAD', de: 'ÜBERLASTUNG', ar: 'حمل زائد', fr: 'SURCHARGE', es: 'SOBRECARGA', ja: '過負荷', ko: '과부하' },
       small: {
         tr: 'SİGORTA ATMAK ÜZERE',
         en: 'BREAKER ABOUT TO TRIP',
@@ -1232,6 +1438,8 @@ export const HOME_FREEZE: readonly Draft[] = [
         ar: 'القاطع على وشك الفصل',
         fr: 'LES PLOMBS VONT SAUTER',
         es: 'SE VA A CORTAR LA LUZ',
+        ja: 'ブレーカーが落ちそう',
+        ko: '차단기 내려가기 직전',
       },
     },
     caption: {
@@ -1241,6 +1449,8 @@ export const HOME_FREEZE: readonly Draft[] = [
       ar: 'لا تصل أي جهاز آخر.',
       fr: 'Ne branche plus rien.',
       es: 'No conectes nada más.',
+      ja: 'これ以上コンセントに挿さないで。',
+      ko: '플러그 하나라도 더 꽂지 마세요.',
     },
     headline: {
       tr: 'Fırın, ütü ve çamaşır makinesi çalışıyor',
@@ -1249,6 +1459,8 @@ export const HOME_FREEZE: readonly Draft[] = [
       ar: 'الفرن والمكواة والغسالة تعمل معًا',
       fr: 'Four, fer et machine à laver en marche',
       es: 'Horno, plancha y lavadora a la vez',
+      ja: 'オーブンとアイロンと洗濯機が同時稼働',
+      ko: '오븐, 다리미, 세탁기가 동시에 돌아가요',
     },
   },
   {
@@ -1256,7 +1468,7 @@ export const HOME_FREEZE: readonly Draft[] = [
     user: ACCOUNTS.signs,
     body: {
       format: 'sign',
-      sign: { tr: 'KIRILACAK EŞYA', en: 'FRAGILE', de: 'ZERBRECHLICH', ar: 'قابل للكسر', fr: 'FRAGILE', es: 'FRÁGIL' },
+      sign: { tr: 'KIRILACAK EŞYA', en: 'FRAGILE', de: 'ZERBRECHLICH', ar: 'قابل للكسر', fr: 'FRAGILE', es: 'FRÁGIL', ja: '割れ物注意', ko: '파손 주의' },
       small: {
         tr: 'BU TARAF YUKARI',
         en: 'THIS SIDE UP',
@@ -1264,6 +1476,8 @@ export const HOME_FREEZE: readonly Draft[] = [
         ar: 'هذا الجانب للأعلى',
         fr: 'CE CÔTÉ EN HAUT',
         es: 'ESTE LADO ARRIBA',
+        ja: '天地無用',
+        ko: '이쪽이 위',
       },
     },
     caption: {
@@ -1273,6 +1487,8 @@ export const HOME_FREEZE: readonly Draft[] = [
       ar: 'احبس أنفاسك. لا تتحرك.',
       fr: 'Retiens ton souffle. Bouge pas.',
       es: 'Aguanta la respiración. No te muevas.',
+      ja: '息を止めて。動かないで。',
+      ko: '숨 참으세요. 움직이지 마세요.',
     },
     headline: {
       tr: 'Nakliyeci koliyi ters tutuyor',
@@ -1281,6 +1497,8 @@ export const HOME_FREEZE: readonly Draft[] = [
       ar: 'عامل النقل يحمل الصندوق مقلوبًا',
       fr: "Le déménageur tient le carton à l'envers",
       es: 'El de la mudanza carga la caja al revés',
+      ja: '引っ越し屋さんが箱を逆さに持ってる',
+      ko: '이삿짐 기사님이 상자를 거꾸로 들었어요',
     },
   },
   {
@@ -1295,6 +1513,8 @@ export const HOME_FREEZE: readonly Draft[] = [
         ar: 'سرير الضيوف',
         fr: "LIT D'APPOINT",
         es: 'CAMA INFLABLE',
+        ja: '来客用ベッド',
+        ko: '손님용 침대',
       },
       small: {
         tr: 'HAVA KAÇIRIYOR · DÖNMEYİN',
@@ -1303,6 +1523,8 @@ export const HOME_FREEZE: readonly Draft[] = [
         ar: 'يفقد الهواء · لا تتقلّب',
         fr: 'SE DÉGONFLE · NE BOUGEZ PAS',
         es: 'SE DESINFLA · NO TE GIRES',
+        ja: '空気漏れ・寝返り禁止',
+        ko: '바람 샘 · 뒤척이지 마세요',
       },
     },
     caption: {
@@ -1312,6 +1534,8 @@ export const HOME_FREEZE: readonly Draft[] = [
       ar: 'لا تتقلّب. بقيت 4 ساعات حتى الصباح.',
       fr: 'Te retourne pas. Encore 4 h avant le matin.',
       es: 'No te gires. Faltan 4 horas para el amanecer.',
+      ja: '寝返り禁止。朝まであと4時間。',
+      ko: '뒤척이지 마세요. 아침까지 4시간.',
     },
     headline: {
       tr: 'Hava yatağı yavaş yavaş sönüyor',
@@ -1320,6 +1544,8 @@ export const HOME_FREEZE: readonly Draft[] = [
       ar: 'المرتبة الهوائية تفرغ ببطء',
       fr: 'Le matelas gonflable se dégonfle',
       es: 'El colchón inflable se está desinflando',
+      ja: 'エアベッドがじわじわしぼんでいく',
+      ko: '에어 매트리스가 서서히 꺼지고 있어요',
     },
   },
   {
@@ -1327,7 +1553,7 @@ export const HOME_FREEZE: readonly Draft[] = [
     user: ACCOUNTS.alert,
     body: {
       format: 'sign',
-      sign: { tr: 'AÇMAYIN', en: 'DO NOT OPEN', de: 'NICHT ÖFFNEN', ar: 'لا تفتحه', fr: 'NE PAS OUVRIR', es: 'NO ABRIR' },
+      sign: { tr: 'AÇMAYIN', en: 'DO NOT OPEN', de: 'NICHT ÖFFNEN', ar: 'لا تفتحه', fr: 'NE PAS OUVRIR', es: 'NO ABRIR', ja: '開封禁止', ko: '열지 마세요' },
       small: {
         tr: 'NE OLDUĞUNU KİMSE BİLMİYOR',
         en: 'NOBODY KNOWS WHAT IT IS',
@@ -1335,6 +1561,8 @@ export const HOME_FREEZE: readonly Draft[] = [
         ar: 'لا أحد يعرف ما بداخله',
         fr: "PERSONNE NE SAIT CE QUE C'EST",
         es: 'NADIE SABE QUÉ ES',
+        ja: '中身は誰も知らない',
+        ko: '뭔지 아무도 모름',
       },
     },
     caption: {
@@ -1344,6 +1572,8 @@ export const HOME_FREEZE: readonly Draft[] = [
       ar: 'ليبقَ الغطاء مغلقًا.',
       fr: 'Le couvercle reste fermé.',
       es: 'La tapa se queda cerrada.',
+      ja: 'フタは閉めたままで。',
+      ko: '뚜껑은 닫아 두세요.',
     },
     headline: {
       tr: 'Buzdolabının dibinde gizemli bir kap var',
@@ -1352,6 +1582,8 @@ export const HOME_FREEZE: readonly Draft[] = [
       ar: 'علبة غامضة في آخر الثلاجة',
       fr: 'Une boîte mystère au fond du frigo',
       es: 'Un misterio al fondo del refrigerador',
+      ja: '冷蔵庫の奥に謎の容器',
+      ko: '냉장고 구석에 정체불명의 통이 있어요',
     },
   },
   {
@@ -1366,6 +1598,8 @@ export const HOME_FREEZE: readonly Draft[] = [
         ar: 'غرفة الجلوس',
         fr: 'SALON',
         es: 'SALA DE ESTAR',
+        ja: 'リビング',
+        ko: '거실',
       },
     },
     caption: {
@@ -1375,6 +1609,8 @@ export const HOME_FREEZE: readonly Draft[] = [
       ar: 'لا تخرج عن الدور.',
       fr: 'Reste dans ton rôle.',
       es: 'No salgas del personaje.',
+      ja: '家具になりきって。',
+      ko: '가구 연기 유지하세요.',
     },
     headline: {
       tr: 'Robot süpürge seni mobilya sandı',
@@ -1383,6 +1619,8 @@ export const HOME_FREEZE: readonly Draft[] = [
       ar: 'المكنسة الآلية تظنك قطعة أثاث',
       fr: "L'aspi robot te prend pour un meuble",
       es: 'La aspiradora robot te cree un mueble',
+      ja: 'ロボット掃除機があなたを家具と認識',
+      ko: '로봇청소기가 날 가구인 줄 알아요',
     },
   },
   {
@@ -1397,6 +1635,8 @@ export const HOME_FREEZE: readonly Draft[] = [
         ar: 'باب الشقة',
         fr: "PORTE D'ENTRÉE",
         es: 'PUERTA DE ENTRADA',
+        ja: '玄関',
+        ko: '현관문',
       },
     },
     caption: {
@@ -1406,6 +1646,8 @@ export const HOME_FREEZE: readonly Draft[] = [
       ar: 'كلاكما يحبس أنفاسه.',
       fr: 'Vous retenez tous les deux votre souffle.',
       es: 'Los dos contienen la respiración.',
+      ja: '二人とも息を止めている。',
+      ko: '둘 다 숨을 참고 있어요.',
     },
     headline: {
       tr: 'Kapı deliğinden baktın, o da bakıyor',
@@ -1414,6 +1656,8 @@ export const HOME_FREEZE: readonly Draft[] = [
       ar: 'نظرت من عين الباب… وأحدهم ينظر إليك',
       fr: "Quelqu'un te fixe à travers le judas",
       es: 'Miraste por la mirilla y alguien te mira',
+      ja: 'のぞき穴の向こうからも見てる',
+      ko: '문구멍 너머에서도 보고 있어요',
     },
   },
   {
@@ -1428,6 +1672,8 @@ export const HOME_FREEZE: readonly Draft[] = [
         ar: 'العمارة المقابلة',
         fr: 'EN FACE',
         es: 'ENFRENTE',
+        ja: '向かいのマンション',
+        ko: '맞은편 아파트',
       },
     },
     caption: {
@@ -1437,6 +1683,8 @@ export const HOME_FREEZE: readonly Draft[] = [
       ar: 'لا تلوّح. لا تتحرك.',
       fr: 'Fais pas coucou. Bouge pas.',
       es: 'No saludes. No te muevas.',
+      ja: '手を振らないで。動かないで。',
+      ko: '손 흔들지 마세요. 움직이지 마세요.',
     },
     headline: {
       tr: 'Karşı komşu perdenin arkasından izliyor',
@@ -1445,6 +1693,8 @@ export const HOME_FREEZE: readonly Draft[] = [
       ar: 'الجارة المقابلة تراقب من خلف الستارة',
       fr: "La voisine d'en face t'observe",
       es: 'La vecina de enfrente te está mirando',
+      ja: '向かいの人がカーテン越しに見てる',
+      ko: '맞은편 이웃이 커튼 뒤에서 보고 있어요',
     },
   },
   {
@@ -1452,7 +1702,7 @@ export const HOME_FREEZE: readonly Draft[] = [
     user: ACCOUNTS.live,
     body: {
       format: 'cctv',
-      place: { tr: 'BANYO', en: 'BATHROOM', de: 'BADEZIMMER', ar: 'الحمّام', fr: 'SALLE DE BAIN', es: 'BAÑO' },
+      place: { tr: 'BANYO', en: 'BATHROOM', de: 'BADEZIMMER', ar: 'الحمّام', fr: 'SALLE DE BAIN', es: 'BAÑO', ja: 'バスルーム', ko: '욕실' },
     },
     caption: {
       tr: 'Hiçbir şey bilmiyorsun. Kıpırdama.',
@@ -1461,6 +1711,8 @@ export const HOME_FREEZE: readonly Draft[] = [
       ar: 'أنت لا تعرف شيئًا. لا تتحرك.',
       fr: 'Tu ne sais rien. Bouge pas.',
       es: 'No sabes nada. No te muevas.',
+      ja: '何も知らない顔で。動かないで。',
+      ko: '모르는 척하세요. 움직이지 마세요.',
     },
     headline: {
       tr: 'Tesisatçı senin bantlı tamirini buldu',
@@ -1469,6 +1721,8 @@ export const HOME_FREEZE: readonly Draft[] = [
       ar: 'السبّاك اكتشف إصلاحك بالشريط اللاصق',
       fr: 'Le plombier a trouvé ton rafistolage',
       es: 'El técnico encontró tu arreglo con cinta',
+      ja: '水道屋さんがテープ修理を発見',
+      ko: '배관공이 테이프 수리를 발견했어요',
     },
   },
 ];

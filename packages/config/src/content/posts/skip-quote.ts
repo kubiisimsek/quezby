@@ -15,6 +15,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
         ar: 'الحياة لعبة، وأنا ما زلت في قائمة الإعدادات.',
         fr: 'La vie est un jeu. Moi, je suis encore dans les réglages.',
         es: 'La vida es un juego. Yo sigo en el menú de ajustes.',
+        ja: '人生はゲーム。私はまだ設定画面から出られない。',
+        ko: '인생은 게임이다. 난 아직 설정 화면에서 못 나갔다.',
       },
     },
     caption: {
@@ -24,6 +26,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
       ar: 'إنشاء الشخصية استغرق ساعتين',
       fr: 'Création du perso : 2 heures',
       es: 'Crear el personaje me llevó 2 horas',
+      ja: 'キャラメイクに2時間かかった',
+      ko: '캐릭터 커스텀만 2시간 걸림',
     },
   },
   {
@@ -38,6 +42,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
         ar: 'لا أحد كامل. لكن قطتي قريبة جدًا من الكمال.',
         fr: "Personne n'est parfait. Mais mon chat s'en approche.",
         es: 'Nadie es perfecto. Pero mi gato casi.',
+        ja: '完璧な人なんていない。でもうちの猫はほぼ完璧。',
+        ko: '완벽한 사람은 없다. 하지만 우리 고양이는 거의 완벽하다.',
       },
     },
     caption: {
@@ -47,6 +53,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
       ar: 'رأي محايد تمامًا',
       fr: 'Avis totalement objectif',
       es: 'Opinión totalmente objetiva',
+      ja: '完全に中立な意見です',
+      ko: '지극히 객관적인 의견임',
     },
   },
   {
@@ -61,6 +69,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
         ar: 'لا شيء مستحيل. — شخص يحمل كل أكياس التسوّق دفعة واحدة',
         fr: "Rien n'est impossible. — Moi, toutes les courses en un seul voyage",
         es: 'Nada es imposible. — Yo, cargando todas las bolsas en un solo viaje',
+        ja: '不可能なんてない。——買い物袋を一度で全部運ぶ私',
+        ko: '불가능은 없다. — 장바구니를 한 번에 다 옮기는 나',
       },
     },
     caption: {
@@ -70,6 +80,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
       ar: 'ذراعاي طالتا قليلًا، لكنه يستحق',
       fr: 'Mes bras ont rallongé. Ça valait le coup.',
       es: 'Brazos más largos. Valió la pena.',
+      ja: '腕が伸びた気がする。後悔はない。',
+      ko: '팔이 좀 길어졌지만 후회는 없다',
     },
   },
   {
@@ -84,6 +96,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
         ar: 'السكوت من ذهب. إلا بعد نكتتك في المجموعة.',
         fr: "Le silence est d'or. Sauf après ta blague dans le groupe.",
         es: 'El silencio es oro. Menos después de tu chiste en el grupo.',
+        ja: '沈黙は金。ただしグループLINEでスベった後は別。',
+        ko: '침묵은 금이다. 단톡방에 드립 치고 난 뒤만 빼고.',
       },
     },
     caption: {
@@ -93,6 +107,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
       ar: 'شاهدها 14 شخصًا',
       fr: 'Vu par 14 personnes',
       es: 'Visto por 14',
+      ja: '既読14',
+      ko: '14명 읽음',
     },
   },
   {
@@ -107,6 +123,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
         ar: 'المظاهر خدّاعة. خصوصًا الكنزة التي طلبتها من الإنترنت.',
         fr: "Méfie-toi des apparences. Surtout d'un pull commandé en ligne.",
         es: 'Las apariencias engañan. Sobre todo si compras ropa en línea.',
+        ja: '見た目にだまされるな。特にネットで買ったニット。',
+        ko: '겉모습에 속지 마라. 특히 인터넷으로 산 니트.',
       },
     },
     caption: {
@@ -116,6 +134,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
       ar: 'كان لونها خمريًا في الصورة',
       fr: 'Sur la photo, il était bordeaux',
       es: 'En la foto era color vino',
+      ja: '写真ではボルドーだった',
+      ko: '사진에선 버건디였음',
     },
   },
   {
@@ -130,6 +150,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
         ar: 'الأشياء الجميلة تستحق الانتظار. — شخص ينتظر الميكروويف',
         fr: 'Tout vient à point à qui sait attendre. — Moi, devant le micro-ondes',
         es: 'La paciencia es la madre de la ciencia. — Yo, frente al microondas',
+        ja: '待てば海路の日和あり。——電子レンジを見つめる私',
+        ko: '기다리면 좋은 날이 온다. — 전자레인지 앞의 나',
       },
     },
     caption: {
@@ -139,6 +161,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
       ar: '90 ثانية… كأنها عمر كامل',
       fr: '90 secondes. Une éternité.',
       es: '90 segundos. Una eternidad.',
+      ja: '90秒。永遠かと思った。',
+      ko: '90초. 거의 평생.',
     },
   },
   {
@@ -153,6 +177,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
         ar: 'أنا خبير في التأجيل. سأثبت ذلك لاحقًا.',
         fr: 'Je suis un maître de la procrastination. Je le prouverai plus tard.',
         es: 'Soy experto en procrastinar. Luego lo demuestro.',
+        ja: '先延ばしの達人です。証明はまた今度。',
+        ko: '나는 미루기의 달인이다. 증명은 나중에 하겠다.',
       },
     },
     caption: {
@@ -162,6 +188,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
       ar: 'سأضيفها إلى سيرتي الذاتية',
       fr: "Je l'ajoute à mon CV",
       es: 'Lo pongo en mi currículum',
+      ja: '履歴書に書いておく',
+      ko: '이력서에 추가함',
     },
   },
   {
@@ -176,6 +204,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
         ar: 'التكنولوجيا قرّبت المسافات. — أمي تراسلني من المطبخ',
         fr: "La technologie nous rapproche. — Maman, qui m'écrit depuis la cuisine",
         es: 'La tecnología nos acerca. — Mi mamá, escribiéndome desde la cocina',
+        ja: 'テクノロジーは人を近づける。——台所からLINEしてくる母',
+        ko: '기술은 우리를 가깝게 한다. — 부엌에서 카톡 보내는 엄마',
       },
     },
     caption: {
@@ -185,6 +215,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
       ar: 'يبدو أن الطعام جاهز',
       fr: 'Le dîner est prêt, apparemment',
       es: 'La cena está lista, al parecer',
+      ja: 'ごはんできたらしい',
+      ko: '밥 다 됐대',
     },
   },
   {
@@ -199,6 +231,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
         ar: 'الحياة رحلة. ورحلتي عالقة في الزحام.',
         fr: 'La vie est un voyage. Le mien est dans les bouchons.',
         es: 'La vida es un viaje. El mío está atascado en el tráfico.',
+        ja: '人生は旅だ。私の旅はほぼ渋滞。',
+        ko: '인생은 여행이다. 내 여행은 대부분 교통체증.',
       },
     },
     caption: {
@@ -208,6 +242,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
       ar: 'خواطر الساعة 8:30 صباحًا',
       fr: 'Pensées de 8 h 30',
       es: 'Reflexiones de las 8:30',
+      ja: '朝8時半の思考',
+      ko: '아침 8시 30분의 생각',
     },
   },
   {
@@ -222,6 +258,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
         ar: 'لكلٍّ منا تحدّياته. وتحدّيّ أنا زجاجة الكاتشب.',
         fr: 'Chacun son combat. Le mien : la bouteille de ketchup.',
         es: 'Cada uno tiene su lucha. La mía es con el kétchup.',
+        ja: '誰にでも戦いがある。私の相手はケチャップの瓶。',
+        ko: '누구에게나 싸움이 있다. 내 상대는 케첩 통이다.',
       },
     },
     caption: {
@@ -231,6 +269,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
       ar: 'الكاتشب 1، أنا 0',
       fr: 'Ketchup 1, moi 0',
       es: 'Kétchup 1, yo 0',
+      ja: 'ケチャップ1、私0',
+      ko: '케첩 1, 나 0',
     },
   },
   {
@@ -245,6 +285,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
         ar: 'اسقط سبع مرات وانهض ثماني. أو لا تنهض، اليوم عطلة.',
         fr: "Tombe sept fois, relève-toi huit. Ou pas : c'est dimanche.",
         es: 'Cáete siete veces, levántate ocho. O no, que es domingo.',
+        ja: '七転び八起き。いや、起きなくていい。今日は日曜。',
+        ko: '칠전팔기. 아니면 그냥 누워 있자. 오늘은 일요일이다.',
       },
     },
     caption: {
@@ -254,6 +296,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
       ar: 'وضع العطلة: مُفعّل',
       fr: 'Mode dimanche : activé',
       es: 'Modo domingo: activado',
+      ja: '日曜モード：オン',
+      ko: '일요일 모드: 켜짐',
     },
   },
   {
@@ -268,6 +312,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
         ar: 'العلم يزداد بالمشاركة. — صديقي الذي حرق نهاية المسلسل',
         fr: "Le savoir se partage. — Mon pote, qui m'a spoilé la fin de la série",
         es: 'El saber se comparte. — Mi amigo, que me contó el final',
+        ja: '知識は分け合うほど増える。——ドラマの最終回をネタバレした友だち',
+        ko: '지식은 나눌수록 커진다. — 드라마 결말 스포한 친구',
       },
     },
     caption: {
@@ -277,6 +323,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
       ar: 'صداقتنا أُلغيت بعد الموسم الثاني',
       fr: "Notre amitié s'est arrêtée à la saison 2",
       es: 'Nuestra amistad terminó en la temporada 2',
+      ja: '友情はシーズン2で打ち切り',
+      ko: '우리 우정은 시즌 2에서 조기 종영',
     },
   },
   {
@@ -291,6 +339,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
         ar: 'الطبخ فن، وطبخي فن تجريدي.',
         fr: "La cuisine est un art. La mienne, c'est de l'art abstrait.",
         es: 'Cocinar es un arte. Lo mío es arte moderno.',
+        ja: '料理は芸術だ。私のは現代アート。',
+        ko: '요리는 예술이다. 내 요리는 현대미술이다.',
       },
     },
     caption: {
@@ -300,6 +350,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
       ar: 'لم يعرف أحد ما هو',
       fr: "Personne n'a deviné ce que c'était",
       es: 'Nadie adivinó qué era',
+      ja: '何の料理か誰もわからなかった',
+      ko: '뭔지 아무도 못 맞힘',
     },
   },
   {
@@ -314,6 +366,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
         ar: 'بعض الألغاز لا تُحلّ أبدًا. مثل طيّ ملاءة السرير المطاطية.',
         fr: 'Certains mystères restent entiers. Comme plier un drap-housse.',
         es: 'Hay misterios sin resolver. Como doblar una sábana con elástico.',
+        ja: '永遠に解けない謎がある。ボックスシーツのたたみ方とか。',
+        ko: '풀리지 않는 미스터리도 있다. 매트리스 커버 개는 법처럼.',
       },
     },
     caption: {
@@ -323,6 +377,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
       ar: 'كوّرتها ورميتها في الخزانة',
       fr: 'Roulé en boule, direction le placard',
       es: 'La hice bola y la guardé',
+      ja: '丸めて押し入れに突っ込んだ',
+      ko: '돌돌 말아서 옷장에 넣어버림',
     },
   },
   {
@@ -337,6 +393,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
         ar: 'لا نجاح بلا ألم. — شخص ينزل الدرج بعد يوم تمارين الساقين',
         fr: "On n'a rien sans rien. — Moi, dans l'escalier après la séance jambes",
         es: 'Sin dolor no hay gloria. — Yo, en la escalera tras el día de pierna',
+        ja: '痛みなくして成長なし。——脚トレ翌日に階段を下りる私',
+        ko: '고통 없이는 얻는 것도 없다. — 하체 운동 다음 날 계단 내려가는 나',
       },
     },
     caption: {
@@ -346,6 +404,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
       ar: 'والمصعد معطّل طبعًا',
       fr: "Et l'ascenseur est en panne, évidemment",
       es: 'Y el ascensor está averiado, claro',
+      ja: 'しかもエレベーターは故障中',
+      ko: '엘리베이터는 당연히 고장',
     },
   },
   {
@@ -360,6 +420,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
         ar: 'الوقت هو الرفاهية الحقيقية. — أنا، أنتظر على الخط منذ 40 دقيقة',
         fr: "Le vrai luxe, c'est le temps. — Moi, en attente depuis 40 minutes",
         es: 'El verdadero lujo es el tiempo. — Yo, en espera desde hace 40 minutos',
+        ja: '本当の贅沢は時間だ。——保留音を40分聞いている私',
+        ko: '진정한 사치는 시간이다. — 40분째 통화 대기 중인 나',
       },
     },
     caption: {
@@ -369,6 +431,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
       ar: 'حفظت الموسيقى عن ظهر قلب',
       fr: 'Je connais la musique par cœur',
       es: 'Ya me sé la música de memoria',
+      ja: '保留音、完全に覚えた',
+      ko: '대기 음악 다 외웠음',
     },
   },
   {
@@ -383,6 +447,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
         ar: 'لا تقرأ التعليقات أبدًا. — كل من قرأ التعليقات',
         fr: 'Ne lis jamais les commentaires. — Tous ceux qui les ont lus',
         es: 'Nunca leas los comentarios. — Todos los que los leyeron',
+        ja: 'コメント欄は見るな。——コメント欄を見た全員',
+        ko: '댓글은 절대 읽지 마라. — 댓글 읽은 모든 사람',
       },
     },
     caption: {
@@ -392,6 +458,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
       ar: 'عن تجربة',
       fr: 'Appris à mes dépens',
       es: 'Lo aprendí por las malas',
+      ja: '経験者は語る',
+      ko: '경험에서 우러난 조언',
     },
   },
   {
@@ -406,6 +474,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
         ar: 'اركض خلف أحلامك. وخلف الحافلة أيضًا.',
         fr: 'Cours après tes rêves. Et après le bus.',
         es: 'Persigue tus sueños. Y el bus también.',
+        ja: '夢を追いかけろ。ついでにバスも。',
+        ko: '꿈을 향해 달려라. 버스를 향해서도.',
       },
     },
     caption: {
@@ -415,6 +485,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
       ar: 'فاتني الاثنان',
       fr: "J'ai raté les deux",
       es: 'Perdí los dos',
+      ja: '両方逃した',
+      ko: '둘 다 놓침',
     },
   },
   {
@@ -429,6 +501,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
         ar: 'لمسة واحدة تغيّر كل شيء. — شخص أعجب بصورة عمرها 6 سنوات',
         fr: "Un tap peut tout changer. — Quelqu'un qui a liké une vieille photo",
         es: 'Un toque lo cambia todo. — Alguien que dio like a una foto vieja',
+        ja: 'ワンタップですべてが変わる。——6年前の写真にいいねした人',
+        ko: '터치 한 번이 모든 걸 바꾼다. — 6년 전 사진에 좋아요 누른 사람',
       },
     },
     caption: {
@@ -438,6 +512,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
       ar: 'كان خطأً، صدقني',
       fr: "C'était un accident, promis",
       es: 'Fue sin querer, lo juro',
+      ja: '誤タップです、本当に',
+      ko: '손가락이 미끄러졌어요 진짜',
     },
   },
   {
@@ -452,6 +528,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
         ar: 'فكّرت في معنى الحياة… ثم جعت.',
         fr: "J'ai réfléchi au sens de la vie. Puis j'ai eu faim.",
         es: 'Pensé en el sentido de la vida. Luego me dio hambre.',
+        ja: '人生の意味を考えた。そしてお腹がすいた。',
+        ko: '인생의 의미를 생각했다. 그리고 배가 고파졌다.',
       },
     },
     caption: {
@@ -461,6 +539,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
       ar: 'أفكار عميقة ومعدة فارغة',
       fr: 'Pensées profondes, ventre vide',
       es: 'Pensamientos profundos, estómago vacío',
+      ja: '深い思考、空っぽの胃',
+      ko: '생각은 깊고 배는 비었다',
     },
   },
   {
@@ -475,6 +555,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
         ar: 'الصديق الحقيقي هو من يرد على هاتفه يوم الانتقال.',
         fr: "Le vrai ami, c'est celui qui décroche le jour du déménagement.",
         es: 'Un amigo de verdad contesta el día de la mudanza.',
+        ja: '本当の友だちとは、引っ越しの日に電話に出る人のこと。',
+        ko: '진짜 친구는 이삿날 전화를 받는 사람이다.',
       },
     },
     caption: {
@@ -484,6 +566,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
       ar: 'تحية لكل من كان هاتفه مغلقًا',
       fr: 'Coucou aux téléphones éteints',
       es: 'Saludos a los teléfonos apagados',
+      ja: '電源オフだったみんな、元気？',
+      ko: '그날 폰 꺼놨던 친구들 안부 전함',
     },
   },
   {
@@ -498,6 +582,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
         ar: 'كن مستقلًا… إلا عند وضع الكريم على ظهرك.',
         fr: 'Sois indépendant. Sauf pour la crème dans le dos.',
         es: 'Sé independiente. Menos para ponerte crema en la espalda.',
+        ja: '自立しよう。背中に日焼け止めを塗るとき以外は。',
+        ko: '독립적인 사람이 되자. 등에 선크림 바를 때만 빼고.',
       },
     },
     caption: {
@@ -507,6 +593,8 @@ export const SKIP_QUOTE: readonly Draft[] = [
       ar: 'صار على ظهري خريطة',
       fr: "J'ai une carte du monde dans le dos",
       es: 'Ahora tengo un mapa en la espalda',
+      ja: '背中に地図ができた',
+      ko: '등에 지도가 생김',
     },
   },
 ];

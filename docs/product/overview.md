@@ -17,9 +17,9 @@ anlamlı kılmak için var.
 İlk kez giren oyuncuyu önce oyun karşılar, form değil (Apple'ın _Onboarding
 for Games_ rehberi). Hesap, oyuncu oyunu gördükten sonra açılır; hesabı belli
 olmadan hiçbir şey sorulmaz. Oyun **telefonun dilinde** açılır — Türkçe,
-İngilizce, Almanca, Arapça, Fransızca ya da İspanyolca; telefonun dili
-bunlardan biri değilse İngilizce. Karşılamadaki küçük dil düğmesi daha
-oynamadan başka dil seçtirir ([localization.md](./localization.md)).
+İngilizce, Almanca, Arapça, Fransızca, İspanyolca, Japonca ya da Korece;
+telefonun dili bunlardan biri değilse İngilizce. Karşılamadaki küçük dil
+düğmesi daha oynamadan başka dil seçtirir ([localization.md](./localization.md)).
 
 1. **Karşılama:** marka, dört hareketin taşları ve tek altın **Oyna**. Hesap
    açılmaz, hiçbir şey sorulmaz.
@@ -171,7 +171,7 @@ yalnız o besler, hiçbir skor tablosuna yazılmaz.
 - **Lig sıralaması hiç sıfırlanmaz:** satrançtaki gibi ligin Elo'nun
   kademesidir; Lig ekranı ligindeki oyuncuları (son 14 günde dereceli
   oynamış) Elo'ya göre sıralar, senin satırın altta, üsttekine kalan Elo'yla
-  ("@deniz'e 40 Elo", **Geç onu** dereceli oynatır). Haftalık grup, hafta
+  ("@deniz'e 40 qb", **Geç onu** dereceli oynatır). Haftalık grup, hafta
   kapanışı ve Elo bonusu yoktur. Yerleşmeden önce Lig ekranı "Lig sıralaması
   Dereceli oyuncularının" der.
 
@@ -322,7 +322,7 @@ güvenlik kamerası. Her tür yalnızca kendine uyan formatları giyer
 
 - **Katalog** (`packages/config/src/content/`): 1.000 post — 560 sıradan, 200
   arkadaş, 120 altın, 120 kırmızı; her biri bir espri, bir hesap ve bir
-  format, altı dilde. İlk postlar formatlara göre (`posts/*.ts`), sonrakiler
+  format, sekiz dilde. İlk postlar formatlara göre (`posts/*.ts`), sonrakiler
   on iki temada (`posts/themes/`: ev, yemek, okul, iş, aile, arkadaşlar,
   telefon, doğa, hayvanlar, hobiler, seyahat, uyku) yazıldı; 100 reellik bir
   koşuda aynı post ortalama 5 kez tekrar eder, o da başka bir kıyafetle.

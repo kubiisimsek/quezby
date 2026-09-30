@@ -21,6 +21,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
       ar: 'كل الكتب في حقيبتي… إلا كتاب اليوم',
       fr: "Tous mes livres dans le sac. Sauf celui d'aujourd'hui.",
       es: 'Todos los libros en la mochila. Menos el de hoy.',
+      ja: 'カバンに教科書ぜんぶ入ってる。今日の分以外。',
+      ko: '가방에 책 다 있음. 오늘 거 빼고.',
     },
   },
   {
@@ -34,6 +36,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
       ar: 'رنّ الجرس، فقال المعلم: «الجرس لي، لا لكم»',
       fr: "Ça sonne. Le prof : « La sonnerie, c'est pour moi. »",
       es: 'Suena el timbre. El profe: “El timbre es para mí”.',
+      ja: 'チャイム鳴った。先生「終わりは先生が決める」',
+      ko: '종이 울렸다. 선생님: “끝은 내가 정한다.”',
     },
   },
   {
@@ -47,6 +51,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
       ar: 'أنهيت المدرسة منذ زمن، وما زلت أبحث عن س',
       fr: "L'école, c'est fini. Toujours pas trouvé x.",
       es: 'Terminé la escuela y sigo sin encontrar la x.',
+      ja: '卒業したのに、まだxが見つからない',
+      ko: '졸업했는데 아직도 x를 못 찾음',
     },
   },
   {
@@ -60,6 +66,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
       ar: 'انتظرتني حافلة المدرسة… و30 طالبًا يحدّقون بي',
       fr: "Le car m'a attendu. 30 élèves m'ont regardé monter.",
       es: 'El bus escolar me esperó. Y 30 chicos me miraron.',
+      ja: 'スクールバスが待っててくれた。30人の視線も。',
+      ko: '통학 버스가 날 기다려 줌. 30명의 시선도.',
     },
   },
   {
@@ -73,6 +81,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
       ar: 'ظلّلت المهم فقط… أي الصفحة كلها',
       fr: "J'ai surligné l'essentiel. Donc tout.",
       es: 'Subrayé solo lo importante. O sea, todo.',
+      ja: '大事なところにマーカーを引いた。つまり全部。',
+      ko: '중요한 부분에 형광펜 칠함. 그러니까 전부.',
     },
   },
   {
@@ -86,6 +96,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
       ar: 'أحدهم طلب ورقة إضافية، وأنا ما زلت عند السؤال الأول',
       fr: "Quelqu'un demande une feuille en plus. Moi : question 1.",
       es: 'Alguien pidió otra hoja. Yo sigo en la pregunta 1.',
+      ja: '誰かが追加の用紙をもらってる。私はまだ1問目。',
+      ko: '누가 답안지 추가 요청함. 난 아직 1번 문제.',
     },
   },
   {
@@ -99,6 +111,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
       ar: 'رميت قبعة التخرج في الهواء… وما زلت أبحث عنها',
       fr: 'Chapeau de diplômé lancé en l’air. Introuvable depuis.',
       es: 'Lancé el birrete al aire. Todavía lo busco.',
+      ja: '卒業帽を空に投げた。まだ探してる。',
+      ko: '학사모 던졌음. 아직도 찾는 중.',
     },
   },
   // Chats
@@ -114,6 +128,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
         ar: 'مجموعة الصف',
         fr: 'Groupe de la classe',
         es: 'Grupo de la clase',
+        ja: 'クラスのグループ',
+        ko: '반 단톡방',
       },
       lines: [
         {
@@ -125,6 +141,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
             ar: 'المعلم لن يأتي اليوم!!',
             fr: "le prof vient pas aujourd'hui !!",
             es: '¡¡el profe no viene hoy!!',
+            ja: '先生今日休みだって！！',
+            ko: '쌤 오늘 안 오신대!!',
           },
         },
         {
@@ -136,6 +154,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
             ar: 'حصة فراغ!!',
             fr: 'PAS COURS !!',
             es: '¡¡HORA LIBRE!!',
+            ja: '自習だ！！',
+            ko: '자습이다!!',
           },
         },
         {
@@ -147,6 +167,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
             ar: 'والمدير سيحضر بدلًا منه',
             fr: 'le proviseur le remplace',
             es: 'viene el director a cubrirlo',
+            ja: '代わりに校長が来るって',
+            ko: '대신 교장 쌤이 들어오신대',
           },
         },
       ],
@@ -158,6 +180,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
       ar: 'دامت الفرحة 40 ثانية',
       fr: 'La joie a duré 40 secondes',
       es: 'La alegría duró 40 segundos',
+      ja: '喜びは40秒で終わった',
+      ko: '기쁨은 40초 갔다',
     },
   },
   {
@@ -165,7 +189,7 @@ export const SCHOOL_SKIP: readonly Draft[] = [
     user: ACCOUNTS.screens,
     body: {
       format: 'chat',
-      contact: { tr: 'Babam', en: 'Dad', de: 'Papa', ar: 'أبي', fr: 'Papa', es: 'Papá' },
+      contact: { tr: 'Babam', en: 'Dad', de: 'Papa', ar: 'أبي', fr: 'Papa', es: 'Papá', ja: 'お父さん', ko: '아빠' },
       lines: [
         {
           from: 'me',
@@ -176,6 +200,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
             ar: 'أبي، هل تنظر في مسألة من واجبي؟',
             fr: 'papa, tu peux regarder un exo de maths ?',
             es: 'papá, ¿me ayudas con un problema?',
+            ja: 'お父さん、宿題の問題見てくれる？',
+            ko: '아빠 숙제 한 문제만 봐 줄래?',
           },
         },
         {
@@ -187,11 +213,13 @@ export const SCHOOL_SKIP: readonly Draft[] = [
             ar: 'أرسلها، إنها لعبة أطفال',
             fr: "envoie, c'est un jeu d'enfant",
             es: 'mándalo, es pan comido',
+            ja: '送ってみな、楽勝だ',
+            ko: '보내 봐, 식은 죽 먹기지',
           },
         },
         {
           from: 'them',
-          text: { tr: '…', en: '…', de: '…', ar: '…', fr: '…', es: '…' },
+          text: { tr: '…', en: '…', de: '…', ar: '…', fr: '…', es: '…', ja: '…', ko: '…' },
         },
         {
           from: 'them',
@@ -202,6 +230,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
             ar: 'هذا منهج جديد، اسأل أمك',
             fr: "c'est les nouvelles maths, demande à maman",
             es: 'eso es matemática nueva, pregúntale a mamá',
+            ja: 'これは新しいやり方だな。お母さんに聞いて',
+            ko: '이건 요즘 방식이네. 엄마한테 물어봐',
           },
         },
       ],
@@ -213,6 +243,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
       ar: 'أبي هُزم أمام رياضيات الصف الرابع',
       fr: 'Papa, battu par les maths de CM1',
       es: 'Papá perdió contra las matemáticas de 4.º',
+      ja: '父、小4の算数に敗れる',
+      ko: '아빠, 초4 수학에 패배',
     },
   },
   {
@@ -227,6 +259,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
         ar: 'مجموعة المذاكرة',
         fr: 'Groupe de révisions',
         es: 'Grupo de estudio',
+        ja: '勉強会',
+        ko: '스터디 모임',
       },
       lines: [
         {
@@ -238,6 +272,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
             ar: 'سنذاكر عندي الليلة، وبجدية!',
             fr: 'révisions chez moi ce soir. sérieux !',
             es: 'esta noche estudiamos en mi casa. ¡en serio!',
+            ja: '今夜うちで勉強会。ガチで！',
+            ko: '오늘 밤 우리 집에서 공부함. 진지하게!',
           },
         },
         {
@@ -249,6 +285,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
             ar: 'حسنًا، سأحضر رقائق البطاطس',
             fr: "ok, j'apporte des chips",
             es: 'ok, yo llevo snacks',
+            ja: 'OK、ポテチ持ってく',
+            ko: '오케이, 난 과자 가져갈게',
           },
         },
         {
@@ -260,6 +298,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
             ar: 'وأنا سأحضر لعبة لوحية',
             fr: 'moi, un jeu de société',
             es: 'yo, un juego de mesa',
+            ja: 'じゃあボードゲーム持ってく',
+            ko: '난 보드게임 가져갈게',
           },
         },
         {
@@ -271,6 +311,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
             ar: 'والسماعة عليّ',
             fr: "moi, l'enceinte",
             es: 'yo llevo el altavoz',
+            ja: 'スピーカーは任せて',
+            ko: '스피커는 내가 챙김',
           },
         },
       ],
@@ -282,6 +324,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
       ar: 'ولا أحد سيحضر كتابًا',
       fr: "Mais personne n'apporte de livre",
       es: 'Pero nadie lleva un libro',
+      ja: '教科書を持ってくる人はゼロ',
+      ko: '근데 책 가져오는 사람 없음',
     },
   },
   {
@@ -296,6 +340,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
         ar: 'صديقي',
         fr: 'Mon pote',
         es: 'Mi mejor amigo',
+        ja: '親友',
+        ko: '절친',
       },
       lines: [
         {
@@ -307,6 +353,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
             ar: 'من أين جاء السؤال الرابع؟؟',
             fr: "la question 4, elle sort d'où ??",
             es: '¿¿de dónde salió la pregunta 4??',
+            ja: '4問目どこから出たの？？',
+            ko: '4번 문제 대체 어디서 나온 거야??',
           },
         },
         {
@@ -318,6 +366,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
             ar: 'من الجزء الذي قال عنه «لن يأتي»',
             fr: 'du chapitre qui « tombera pas »',
             es: 'de lo que el profe dijo que “no entraba”',
+            ja: '先生が「ここは出ない」って言ったとこ',
+            ko: '쌤이 “여긴 안 나와”라고 한 데서',
           },
         },
       ],
@@ -329,6 +379,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
       ar: 'المعلم أستاذ في علم النفس العكسي',
       fr: 'Psychologie inversée, version prof',
       es: 'Psicología inversa, versión profe',
+      ja: '先生の「出ない」は「出る」の意味',
+      ko: '선생님의 “안 나와”는 “나온다”는 뜻',
     },
   },
   // Polls
@@ -344,6 +396,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
         ar: 'سأل المعلم: «هل من أسئلة؟» وأنت:',
         fr: 'Le prof : « Des questions ? » Toi :',
         es: 'El profe: “¿Alguna pregunta?”. Tú:',
+        ja: '先生「質問ある人？」あなたは：',
+        ko: '선생님: “질문 있어요?” 당신은:',
       },
       options: [
         {
@@ -353,6 +407,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
           ar: 'أطرح سؤالًا',
           fr: 'Je pose une question',
           es: 'Pregunto algo',
+          ja: '質問する',
+          ko: '질문한다',
         },
         {
           tr: 'Zili beklerim',
@@ -361,6 +417,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
           ar: 'أنتظر الجرس',
           fr: "J'attends la sonnerie",
           es: 'Espero el timbre',
+          ja: 'チャイムを待つ',
+          ko: '종을 기다린다',
         },
       ],
       winner: 1,
@@ -372,6 +430,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
       ar: 'كل سؤال يأكل 5 دقائق من الاستراحة',
       fr: 'Chaque question mange 5 minutes de récré',
       es: 'Cada pregunta se come 5 minutos del recreo',
+      ja: '質問1つで休み時間が5分減る',
+      ko: '질문 하나에 쉬는 시간 5분 삭제',
     },
   },
   {
@@ -386,9 +446,11 @@ export const SCHOOL_SKIP: readonly Draft[] = [
         ar: 'جلست لتذاكر. أول 30 دقيقة:',
         fr: 'Tu te mets à réviser. Les 30 premières minutes :',
         es: 'Te sientas a estudiar. Primeros 30 minutos:',
+        ja: '勉強しようと座った。最初の30分：',
+        ko: '공부하려고 앉았다. 처음 30분:',
       },
       options: [
-        { tr: 'Çalışırım', en: 'I study', de: 'Ich lerne', ar: 'أذاكر', fr: 'Je révise', es: 'Estudio' },
+        { tr: 'Çalışırım', en: 'I study', de: 'Ich lerne', ar: 'أذاكر', fr: 'Je révise', es: 'Estudio', ja: '勉強する', ko: '공부한다' },
         {
           tr: 'Masayı düzenlerim',
           en: 'Tidy the desk',
@@ -396,6 +458,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
           ar: 'أرتّب المكتب',
           fr: 'Je range le bureau',
           es: 'Ordeno el escritorio',
+          ja: '机を片づける',
+          ko: '책상 정리',
         },
         {
           tr: 'Renkli kalem dizerim',
@@ -404,6 +468,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
           ar: 'أرتّب الأقلام بالألوان',
           fr: 'Je trie mes stylos',
           es: 'Ordeno los colores',
+          ja: 'ペンを色順に並べる',
+          ko: '펜 색깔별 정리',
         },
       ],
       winner: 2,
@@ -415,6 +481,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
       ar: 'المكتب جاهز، والأقلام جاهزة… وأنا لا',
       fr: 'Bureau prêt. Stylos prêts. Moi, non.',
       es: 'Escritorio listo. Lápices listos. Yo, no.',
+      ja: '机も準備OK、ペンも準備OK。私はまだ。',
+      ko: '책상 준비 끝. 펜 준비 끝. 나는 아직.',
     },
   },
   {
@@ -429,6 +497,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
         ar: 'انتهى الامتحان والجميع يقارن الإجابات. وأنت:',
         fr: "Fin de l'exam, tout le monde compare. Toi :",
         es: 'Acabó el examen y todos comparan respuestas. Tú:',
+        ja: 'テスト終了。みんな答え合わせしてる。あなたは：',
+        ko: '시험 끝. 다들 답 맞춰 보는 중. 당신은:',
       },
       options: [
         {
@@ -438,6 +508,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
           ar: 'أقارن إجاباتي',
           fr: 'Je compare',
           es: 'Comparo las mías',
+          ja: '答え合わせする',
+          ko: '나도 맞춰 본다',
         },
         {
           tr: 'Kulaklarımı kapatırım',
@@ -446,6 +518,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
           ar: 'أسدّ أذنيّ',
           fr: 'Oreilles bouchées',
           es: 'Me tapo los oídos',
+          ja: '耳をふさぐ',
+          ko: '귀를 막는다',
         },
       ],
       winner: 1,
@@ -457,6 +531,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
       ar: 'في عدم المعرفة راحة',
       fr: "Moins j'en sais, mieux je me porte",
       es: 'Ojos que no ven, corazón que no siente',
+      ja: '知らぬが仏',
+      ko: '모르는 게 약',
     },
   },
   // Charts
@@ -472,6 +548,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
         ar: 'رغبتي في المذاكرة',
         fr: 'MON ENVIE DE RÉVISER',
         es: 'MIS GANAS DE ESTUDIAR',
+        ja: '勉強したい気持ち',
+        ko: '공부하고 싶은 마음',
       },
       value: null,
       shape: 'spike',
@@ -484,6 +562,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
       ar: 'بلغت ذروتها ليلة الامتحان، الساعة 2 فجرًا',
       fr: "Pic à 2 h du matin, la veille de l'exam",
       es: 'Máximo: 2 de la mañana, la víspera del examen',
+      ja: 'ピークはテスト前夜の午前2時',
+      ko: '최고점은 시험 전날 새벽 2시',
     },
   },
   {
@@ -498,6 +578,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
         ar: 'ترتيب دفتري',
         fr: 'PROPRETÉ DE MON CAHIER',
         es: 'ORDEN DE MI CUADERNO',
+        ja: 'ノートのきれいさ',
+        ko: '내 노트 정리 상태',
       },
       value: null,
       shape: 'fall',
@@ -510,6 +592,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
       ar: 'الصفحة الأولى تحفة فنية، والأخيرة نقوش هيروغليفية',
       fr: "Page 1 : chef-d'œuvre. Dernière page : hiéroglyphes.",
       es: 'Página 1: obra de arte. Última: jeroglíficos.',
+      ja: '1ページ目は芸術作品、最後のページは象形文字',
+      ko: '1쪽은 예술 작품, 마지막 쪽은 상형 문자',
     },
   },
   // Receipts
@@ -525,6 +609,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
         ar: 'مركز تصوير',
         fr: 'REPROGRAPHIE',
         es: 'CENTRO DE COPIADO',
+        ja: 'コピーセンター',
+        ko: '복사집',
       },
       items: [
         {
@@ -534,6 +620,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
           ar: 'ملخص المادة (240 صفحة)',
           fr: 'POLY DE COURS (240 P.)',
           es: 'APUNTES (240 PÁGINAS)',
+          ja: '講義ノート（240枚）',
+          ko: '강의 노트 (240쪽)',
         },
       ],
     },
@@ -544,6 +632,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
       ar: 'صوّرتها، فكأنني ذاكرتها',
       fr: 'Photocopié, donc à moitié révisé.',
       es: 'Fotocopiado, o sea, casi aprendido.',
+      ja: 'コピーした。もう覚えたも同然',
+      ko: '복사했으니 공부한 걸로 침',
     },
   },
   {
@@ -558,6 +648,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
         ar: 'قرطاسية',
         fr: 'PAPETERIE',
         es: 'PAPELERÍA',
+        ja: '文房具店',
+        ko: '문구점',
       },
       items: [
         {
@@ -567,6 +659,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
           ar: 'طقم هندسة (20 قطعة)',
           fr: 'GÉOMÉTRIE (20 PIÈCES)',
           es: 'SET DE GEOMETRÍA (20)',
+          ja: '製図セット（20点）',
+          ko: '컴퍼스 세트 (20종)',
         },
       ],
     },
@@ -577,6 +671,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
       ar: 'في 4 سنوات لم أستخدم منه إلا المسطرة',
       fr: "En 4 ans, j'ai utilisé la règle. Point.",
       es: 'En 4 años solo usé la regla',
+      ja: '4年間で使ったのは定規だけ',
+      ko: '4년 동안 쓴 건 자 하나뿐',
     },
   },
   // Facts
@@ -586,7 +682,7 @@ export const SCHOOL_SKIP: readonly Draft[] = [
     body: {
       format: 'fact',
       eyebrow: null,
-      big: { tr: '3', en: '3', de: '3', ar: '3', fr: '3', es: '3' },
+      big: { tr: '3', en: '3', de: '3', ar: '3', fr: '3', es: '3', ja: '3', ko: '3' },
       text: {
         tr: 'kez doğru cevabı sınavdan çıkar çıkmaz hatırladın',
         en: 'times you remembered the answer right after the exam',
@@ -594,6 +690,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
         ar: 'مرات تذكرت فيها الإجابة فور خروجك من الامتحان',
         fr: "fois où la réponse t'est revenue juste après l'exam",
         es: 'veces recordaste la respuesta justo al salir del examen',
+        ja: '回、テストが終わった瞬間に正解を思い出した',
+        ko: '번, 시험장 나오자마자 정답이 생각남',
       },
     },
     caption: {
@@ -603,6 +701,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
       ar: 'الإجابات تنتظرك في الممر',
       fr: 'Les réponses attendent dans le couloir',
       es: 'Las respuestas esperan en el pasillo',
+      ja: '答えは廊下で待っている',
+      ko: '정답은 복도에서 기다림',
     },
   },
   {
@@ -617,8 +717,10 @@ export const SCHOOL_SKIP: readonly Draft[] = [
         ar: 'في هذه الحصة',
         fr: 'PENDANT CE COURS',
         es: 'EN ESTA CLASE',
+        ja: 'この授業で',
+        ko: '이번 수업에서',
       },
-      big: { tr: '12', en: '12', de: '12', ar: '12', fr: '12', es: '12' },
+      big: { tr: '12', en: '12', de: '12', ar: '12', fr: '12', es: '12', ja: '12', ko: '12' },
       text: {
         tr: 'kez dersin bitmesine kaç dakika kaldığına baktın',
         en: 'times you checked how many minutes were left',
@@ -626,6 +728,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
         ar: 'مرة نظرت فيها كم دقيقة بقيت على نهاية الحصة',
         fr: 'fois où tu as vérifié combien de minutes il restait',
         es: 'veces miraste cuántos minutos faltaban',
+        ja: '回、授業の残り時間を確認した',
+        ko: '번, 수업 끝나기까지 몇 분 남았는지 확인함',
       },
     },
     caption: {
@@ -635,6 +739,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
       ar: 'الساعة تبطئ كلما نظرت إليها',
       fr: "Une horloge qu'on regarde ralentit",
       es: 'El reloj se frena si lo miras',
+      ja: '時計は見るほど遅くなる',
+      ko: '시계는 볼수록 느려짐',
     },
   },
   {
@@ -649,8 +755,10 @@ export const SCHOOL_SKIP: readonly Draft[] = [
         ar: 'أسبوع الامتحانات',
         fr: "SEMAINE D'EXAMS",
         es: 'SEMANA DE EXÁMENES',
+        ja: 'テスト週間',
+        ko: '시험 기간',
       },
-      big: { tr: '4', en: '4', de: '4', ar: '4', fr: '4', es: '4' },
+      big: { tr: '4', en: '4', de: '4', ar: '4', fr: '4', es: '4', ja: '4', ko: '4' },
       text: {
         tr: 'kez odanı topladın; ders kitabın hâlâ kapalı',
         en: 'times you cleaned your room. Textbook: still closed.',
@@ -658,6 +766,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
         ar: 'مرات رتّبت غرفتك، والكتاب ما زال مغلقًا',
         fr: 'fois où tu as rangé ta chambre. Le manuel : toujours fermé.',
         es: 'veces ordenaste tu cuarto. El libro sigue cerrado.',
+        ja: '回、部屋を片づけた。教科書はまだ閉じたまま',
+        ko: '번 방 청소함. 교과서는 아직도 덮여 있음',
       },
     },
     caption: {
@@ -667,6 +777,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
       ar: 'لم تكن غرفتك يومًا بهذه النظافة',
       fr: "Ta chambre n'a jamais été aussi propre",
       es: 'Tu cuarto nunca estuvo tan limpio',
+      ja: '部屋がこんなにきれいだったことはない',
+      ko: '방이 이렇게 깨끗했던 적은 없었음',
     },
   },
   {
@@ -675,7 +787,7 @@ export const SCHOOL_SKIP: readonly Draft[] = [
     body: {
       format: 'fact',
       eyebrow: null,
-      big: { tr: '15', en: '15', de: '15', ar: '15', fr: '15', es: '15' },
+      big: { tr: '15', en: '15', de: '15', ar: '15', fr: '15', es: '15', ja: '15', ko: '15' },
       text: {
         tr: 'dakikadır hoca yok; kimse ilk kalkan olmak istemiyor',
         en: 'minutes, no professor. Nobody wants to leave first.',
@@ -683,6 +795,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
         ar: 'دقيقة ولا أستاذ، ولا أحد يريد أن يغادر أولًا',
         fr: "minutes sans prof. Personne n'ose partir en premier.",
         es: 'minutos sin profe. Nadie quiere irse primero.',
+        ja: '分、教授が来ない。誰も最初に帰りたくない',
+        ko: '분째 교수님 안 오심. 아무도 먼저 나가기 싫음',
       },
     },
     caption: {
@@ -692,6 +806,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
       ar: 'وفي الدقيقة 16 انفتح الباب',
       fr: "16e minute : la porte s'ouvre",
       es: 'Minuto 16: se abre la puerta',
+      ja: '16分目、ドアが開いた',
+      ko: '16분째, 문이 열렸다',
     },
   },
   // Tier lists
@@ -707,6 +823,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
         ar: 'تصنيف أعذار الواجب',
         fr: 'TIER LIST DES EXCUSES',
         es: 'TIER LIST DE EXCUSAS',
+        ja: '宿題の言い訳Tier表',
+        ko: '숙제 핑계 티어표',
       },
       rows: [['🐕'], ['💻', '🖨️'], ['🐈', '🌬️'], ['🤷']],
     },
@@ -717,6 +835,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
       ar: 'لا أملك كلبًا… لكن العذر جاهز',
       fr: "Pas de chien. L'excuse marche quand même.",
       es: 'No tengo perro. La excusa, sí.',
+      ja: '犬は飼ってない。でも「犬が食べた」は使う。',
+      ko: '강아지 없음. 근데 핑계엔 강아지 있음.',
     },
   },
   {
@@ -731,6 +851,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
         ar: 'تصنيف المقصف',
         fr: 'TIER LIST DE LA CANTINE',
         es: 'TIER LIST DE LA CAFETERÍA',
+        ja: '購買Tier表',
+        ko: '매점 티어표',
       },
       rows: [['🥪', '🥯'], ['🧃', '🍫'], ['🍌', '🍪'], ['🥗']],
     },
@@ -741,6 +863,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
       ar: 'الشطيرة في القمة، ورائحتها تصل إلى الطابق الثالث',
       fr: "Le croque est S. On le sent jusqu'au 3e.",
       es: 'El sándwich es S. Se huele hasta el 3.er piso.',
+      ja: '焼きそばパンはS。3階まで匂いがする',
+      ko: '토스트 S. 냄새가 3층까지 올라옴.',
     },
   },
   // Lock screens
@@ -758,6 +882,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
           ar: 'بوابة المدرسة',
           fr: 'Espace élèves',
           es: 'Portal escolar',
+          ja: '学校ポータル',
+          ko: '학교 포털',
         },
         text: {
           tr: 'Yeni not girildi: Matematik yazılısı',
@@ -766,6 +892,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
           ar: 'رُصدت درجة جديدة: اختبار الرياضيات',
           fr: 'Nouvelle note : contrôle de maths',
           es: 'Nueva nota: examen de matemáticas',
+          ja: '新しい成績：数学のテスト',
+          ko: '새 성적 등록: 수학 시험',
         },
       },
     },
@@ -776,6 +904,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
       ar: 'حدّقت في السقف 10 دقائق قبل أن أفتحها',
       fr: "10 minutes à fixer le plafond avant d'ouvrir",
       es: 'Miré el techo 10 minutos antes de abrirla',
+      ja: '開く前に10分、天井を見つめた',
+      ko: '열기 전에 10분 동안 천장만 봄',
     },
   },
   {
@@ -792,6 +922,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
           ar: 'الجامعة',
           fr: 'Université',
           es: 'Universidad',
+          ja: '大学',
+          ko: '대학교',
         },
         text: {
           tr: 'Ders kaydı 09.00’da başlıyor',
@@ -800,6 +932,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
           ar: 'يبدأ تسجيل المقررات الساعة 9:00',
           fr: 'Inscriptions aux cours à 9 h',
           es: 'Inscripción de materias: 9:00',
+          ja: '履修登録は9:00開始',
+          ko: '수강 신청 9:00 시작',
         },
       },
     },
@@ -810,6 +944,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
       ar: 'رنّ المنبه 8:55، وتعطّل الموقع 9:01',
       fr: 'Réveil à 8 h 55. Site planté à 9 h 01.',
       es: 'Alarma a las 8:55. La web se cayó a las 9:01.',
+      ja: '8:55にアラーム。9:01にサイトが落ちた。',
+      ko: '알람 8:55. 사이트 다운 9:01.',
     },
   },
   // Quote cards
@@ -825,6 +961,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
         ar: 'المعرفة قوة. أما معرفتي فتُمحى بعد الامتحان مباشرة.',
         fr: "Le savoir, c'est le pouvoir. Le mien s'efface après l'exam.",
         es: 'El saber es poder. El mío se borra al salir del examen.',
+        ja: '知識は力なり。私の知識はテスト終了でリセットされる。',
+        ko: '아는 것이 힘이다. 내 힘은 시험 끝나면 초기화된다.',
       },
     },
     caption: {
@@ -834,6 +972,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
       ar: 'ويُعاد تحميلها قبل الامتحان القادم',
       fr: 'Réinstallation avant le prochain exam',
       es: 'Se reinstala antes del próximo examen',
+      ja: '次のテスト前に再インストール',
+      ko: '다음 시험 전에 재설치 예정',
     },
   },
   {
@@ -848,6 +988,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
         ar: 'كل نهاية بداية جديدة. — الشريحة الأخيرة للأستاذ',
         fr: 'Chaque fin est un nouveau départ. — La dernière diapo du prof',
         es: 'Cada final es un nuevo comienzo. — La última diapositiva del profe',
+        ja: '終わりは新たな始まりである。— 教授の最後のスライド',
+        ko: '모든 끝은 새로운 시작이다. — 교수님의 마지막 슬라이드',
       },
     },
     caption: {
@@ -857,6 +999,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
       ar: 'وبعد الشريحة الأخيرة جاءت 14 شريحة أخرى',
       fr: 'Après la dernière diapo, 14 autres',
       es: 'Tras la última diapositiva, vinieron 14 más',
+      ja: '最後のスライドのあと、さらに14枚',
+      ko: '마지막 슬라이드 다음에 14장 더 나옴',
     },
   },
   {
@@ -871,6 +1015,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
         ar: 'الحياة امتحان، وأنا جئت بلا قلم كالعادة.',
         fr: "La vie est un examen. Et j'ai encore oublié mon stylo.",
         es: 'La vida es un examen. Y otra vez vine sin lápiz.',
+        ja: '人生はテストだ。そして私はまたペンを忘れた。',
+        ko: '인생은 시험이다. 난 또 펜을 안 가져왔다.',
       },
     },
     caption: {
@@ -880,6 +1026,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
       ar: 'زميلي يعيرني قلمه منذ 4 سنوات',
       fr: 'Mon voisin me prête un stylo depuis 4 ans',
       es: 'Mi compañero me presta lápiz hace 4 años',
+      ja: '隣の席の子に4年間ペンを借りてる',
+      ko: '옆자리 친구가 4년째 펜 빌려주는 중',
     },
   },
   {
@@ -894,6 +1042,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
         ar: 'لا تستهن بشيء أبدًا. — شخص خاض امتحانًا بكتاب مفتوح',
         fr: "Ne sous-estime jamais rien. — Quelqu'un après un exam à livre ouvert",
         es: 'Nunca subestimes nada. — Alguien tras un examen a libro abierto',
+        ja: '何ごとも甘く見るな。— 持ち込み可のテストを受けた人',
+        ko: '절대 방심하지 마라. — 오픈북 시험을 본 사람',
       },
     },
     caption: {
@@ -903,6 +1053,8 @@ export const SCHOOL_SKIP: readonly Draft[] = [
       ar: 'كان الكتاب مفتوحًا، وعقلي مغلقًا',
       fr: 'Le livre était ouvert. Mon cerveau, non.',
       es: 'El libro estaba abierto. Mi mente, no.',
+      ja: '本は開いてた。頭は閉じてた。',
+      ko: '책은 열려 있었다. 머리는 닫혀 있었다.',
     },
   },
 ];
@@ -920,6 +1072,8 @@ export const SCHOOL_LIKE: readonly Draft[] = [
       ar: 'تجربة البركان نجحت!! الرغوة في كل مكان',
       fr: 'mon volcan a marché !! de la mousse partout',
       es: '¡¡mi volcán funcionó!! hay espuma por todos lados',
+      ja: '火山の実験成功！！そこらじゅう泡だらけ',
+      ko: '화산 실험 성공!! 사방이 거품',
     },
   },
   {
@@ -933,6 +1087,8 @@ export const SCHOOL_LIKE: readonly Draft[] = [
       ar: 'جدتي بدأت الجامعة في عمر 68!!',
       fr: 'ma grand-mère a commencé la fac à 68 ans !!',
       es: '¡¡mi abuela empezó la universidad a los 68!!',
+      ja: 'おばあちゃんが68歳で大学に入った！！',
+      ko: '우리 할머니 68세에 대학 입학!!',
     },
   },
   {
@@ -946,6 +1102,8 @@ export const SCHOOL_LIKE: readonly Draft[] = [
       ar: 'قدّمت أول عرض لي ولم ينم أحد!!',
       fr: "mon premier exposé et personne ne s'est endormi !!",
       es: '¡¡mi primera exposición y nadie se durmió!!',
+      ja: '初めての発表、誰も寝なかった！！',
+      ko: '첫 발표 했는데 아무도 안 졸았다!!',
     },
   },
   // Instant photos
@@ -961,6 +1119,8 @@ export const SCHOOL_LIKE: readonly Draft[] = [
         ar: 'حرم جديد، أنا جديد',
         fr: 'nouvelle fac, nouveau moi',
         es: 'nuevo campus, nuevo yo',
+        ja: '新キャンパス、新しい私',
+        ko: '새 캠퍼스, 새로운 나',
       },
     },
     caption: {
@@ -970,6 +1130,8 @@ export const SCHOOL_LIKE: readonly Draft[] = [
       ar: 'أول يوم لي في الجامعة، وتهت 3 مرات',
       fr: 'premier jour à la fac, perdu 3 fois',
       es: 'primer día en la uni, me perdí 3 veces',
+      ja: '大学初日、3回迷子になった',
+      ko: '대학 첫날, 3번 길 잃음',
     },
   },
   {
@@ -984,6 +1146,8 @@ export const SCHOOL_LIKE: readonly Draft[] = [
         ar: 'قصيدتي على اللوحة',
         fr: 'mon poème affiché',
         es: 'mi poema en el mural',
+        ja: '掲示板に私の詩',
+        ko: '게시판에 내 시',
       },
     },
     caption: {
@@ -993,6 +1157,8 @@ export const SCHOOL_LIKE: readonly Draft[] = [
       ar: 'المعلمة علّقت قصيدتي على لوحة الصف!!',
       fr: 'la prof a affiché mon poème en classe !!',
       es: '¡¡la profe colgó mi poema en el mural!!',
+      ja: '私の詩を先生が掲示板に貼ってくれた！！',
+      ko: '내가 쓴 시를 선생님이 게시판에 붙여 줌!!',
     },
   },
   {
@@ -1007,6 +1173,8 @@ export const SCHOOL_LIKE: readonly Draft[] = [
         ar: 'الحبر في كل مكان',
         fr: "de l'encre partout",
         es: 'tinta por todas partes',
+        ja: 'インクまみれ',
+        ko: '온통 잉크',
       },
     },
     caption: {
@@ -1016,6 +1184,8 @@ export const SCHOOL_LIKE: readonly Draft[] = [
       ar: 'أول صفحة بقلم الحبر، وأصابعي زرقاء تمامًا',
       fr: 'première page au stylo plume, doigts tout bleus',
       es: 'primera página con estilográfica, dedos azules',
+      ja: '万年筆で初めての1ページ、指が真っ青',
+      ko: '만년필로 쓴 첫 페이지, 손가락이 새파래짐',
     },
   },
   {
@@ -1030,6 +1200,8 @@ export const SCHOOL_LIKE: readonly Draft[] = [
         ar: 'معلمتي الأولى',
         fr: 'ma maîtresse de cp',
         es: 'mi primera maestra',
+        ja: 'はじめての先生',
+        ko: '나의 첫 선생님',
       },
     },
     caption: {
@@ -1039,6 +1211,8 @@ export const SCHOOL_LIKE: readonly Draft[] = [
       ar: 'زرت معلمتي الأولى بعد 15 عامًا',
       fr: 'revu ma maîtresse de cp, 15 ans après',
       es: 'visité a mi primera maestra 15 años después',
+      ja: '15年ぶりに小1の担任に会いに行った',
+      ko: '15년 만에 1학년 담임 선생님을 찾아감',
     },
   },
   // Photo dumps
@@ -1053,6 +1227,8 @@ export const SCHOOL_LIKE: readonly Draft[] = [
       ar: 'أسبوع الامتحانات: 12 قهوة، 3 ليالٍ بلا نوم، وانتهينا!!',
       fr: "semaine d'exams : 12 cafés, 3 nuits blanches, fini !!",
       es: 'semana de exámenes: 12 cafés, 3 noches en vela, ¡¡terminé!!',
+      ja: '期末まとめ：コーヒー12杯、徹夜3回、終わった！！',
+      ko: '기말고사 주간: 커피 12잔, 밤샘 3번, 끝!!',
     },
   },
   {
@@ -1066,6 +1242,8 @@ export const SCHOOL_LIKE: readonly Draft[] = [
       ar: 'آخر يوم في المدرسة: توقيعات على القمصان، ودموع في العيون',
       fr: 'dernier jour de cours : t-shirts signés, larmes aux yeux',
       es: 'último día de clases: camisetas firmadas, ojos llorosos',
+      ja: '最終登校日：シャツに寄せ書き、うれし涙',
+      ko: '마지막 등교: 셔츠에 사인, 눈물 글썽',
     },
   },
   {
@@ -1079,6 +1257,8 @@ export const SCHOOL_LIKE: readonly Draft[] = [
       ar: 'رحلة المدرسة: أجمل ما فيها أغاني الحافلة',
       fr: "sortie scolaire : le mieux, c'était les chansons du car",
       es: 'excursión escolar: lo mejor fueron las canciones en el bus',
+      ja: '遠足まとめ：最高だったのはバスカラオケ',
+      ko: '현장학습 모음: 최고는 버스에서 떼창',
     },
   },
 ];
@@ -1095,6 +1275,8 @@ export const SCHOOL_HOLD: readonly Draft[] = [
       ar: 'لحظة نادرة: المعلم أنهى الحصة قبل موعدها بعشر دقائق',
       fr: 'Moment rare : le cours finit 10 minutes plus tôt',
       es: 'Momento único: la clase terminó 10 minutos antes',
+      ja: 'レアな瞬間：授業が10分早く終わった',
+      ko: '희귀한 순간: 수업이 10분 일찍 끝남',
     },
   },
   {
@@ -1108,6 +1290,8 @@ export const SCHOOL_HOLD: readonly Draft[] = [
       ar: 'عبارة أسطورية: «لا واجبات هذا الأسبوع»',
       fr: 'Phrase légendaire : « Pas de devoirs cette semaine. »',
       es: 'Frase legendaria: “Esta semana no hay tarea”.',
+      ja: '伝説の一言：「今週は宿題なし」',
+      ko: '전설의 한마디: “이번 주 숙제 없음.”',
     },
   },
   {
@@ -1121,6 +1305,8 @@ export const SCHOOL_HOLD: readonly Draft[] = [
       ar: 'لا يُصدَّق! جاء في الامتحان ما ذاكرته بالضبط',
       fr: "Incroyable ! L'exam tombe pile sur tes révisions",
       es: '¡Increíble! En el examen vino justo lo que estudiaste',
+      ja: '信じられない！勉強したところだけが出た',
+      ko: '대박! 공부한 데서만 시험이 나옴',
     },
   },
   {
@@ -1134,6 +1320,8 @@ export const SCHOOL_HOLD: readonly Draft[] = [
       ar: 'السادسة والنصف صباحًا: إجازة بسبب الثلج!',
       fr: "6 h 30 : pas d'école, il a neigé !",
       es: '¡Son las 6:30 y suspenden las clases por nieve!',
+      ja: '朝6:30：大雪で休校決定！',
+      ko: '오전 6:30: 폭설 휴교 발표!',
     },
   },
   {
@@ -1147,6 +1335,8 @@ export const SCHOOL_HOLD: readonly Draft[] = [
       ar: 'طاولة المكتبة بجانب المقبس شاغرة!',
       fr: 'À la BU, la table près de la prise est libre !',
       es: '¡La mesa junto al enchufe de la biblioteca está libre!',
+      ja: '図書館のコンセント横の席が空いてる！',
+      ko: '도서관 콘센트 옆자리가 비었다!',
     },
   },
   {
@@ -1160,6 +1350,8 @@ export const SCHOOL_HOLD: readonly Draft[] = [
       ar: 'نجمة ذهبية على واجبك… ومن النوع اللامع!',
       fr: 'Une étoile dorée sur ton devoir. La brillante !',
       es: '¡Estrella dorada en tu tarea! De las brillantes.',
+      ja: '宿題に金の星シール！しかもキラキラのやつ',
+      ko: '숙제에 금별 스티커! 그것도 반짝이는 걸로',
     },
   },
   {
@@ -1173,6 +1365,8 @@ export const SCHOOL_HOLD: readonly Draft[] = [
       ar: 'آخر جرس في العام! اترك إصبعك لحظة يرنّ',
       fr: "La dernière sonnerie de l'année ! Lâche quand elle sonne",
       es: '¡Último timbre del año! Suelta en cuanto suene',
+      ja: '今年最後のチャイム！鳴った瞬間に離して',
+      ko: '올해 마지막 종! 울리는 순간 손 떼기',
     },
   },
 ];
@@ -1191,6 +1385,8 @@ export const SCHOOL_FREEZE: readonly Draft[] = [
         ar: 'المختبر',
         fr: 'LABORATOIRE',
         es: 'LABORATORIO',
+        ja: '実験室',
+        ko: '실험실',
       },
       small: {
         tr: 'DENEY SÜRÜYOR · DOKUNMAYIN',
@@ -1199,6 +1395,8 @@ export const SCHOOL_FREEZE: readonly Draft[] = [
         ar: 'تجربة جارية · لا تلمس',
         fr: 'EXPÉRIENCE EN COURS',
         es: 'EXPERIMENTO EN CURSO',
+        ja: '実験中・さわらないで',
+        ko: '실험 중 · 만지지 마시오',
       },
     },
     caption: HANDS_OFF,
@@ -1209,6 +1407,8 @@ export const SCHOOL_FREEZE: readonly Draft[] = [
       ar: 'بدأت التجربة تفور',
       fr: "L'expérience commence à mousser",
       es: 'El experimento empezó a hacer espuma',
+      ja: '実験が泡立ち始めた',
+      ko: '실험에서 거품이 나기 시작함',
     },
   },
   {
@@ -1223,6 +1423,8 @@ export const SCHOOL_FREEZE: readonly Draft[] = [
         ar: 'يجفّ',
         fr: 'ÇA SÈCHE',
         es: 'SECANDO',
+        ja: '乾燥中',
+        ko: '건조 중',
       },
       small: {
         tr: 'MAKET ÖDEVİ · DOKUNMAYIN',
@@ -1231,6 +1433,8 @@ export const SCHOOL_FREEZE: readonly Draft[] = [
         ar: 'مشروع مدرسي · لا تلمس',
         fr: 'MAQUETTE · NE PAS TOUCHER',
         es: 'MAQUETA · NO TOCAR',
+        ja: '工作の宿題・さわらないで',
+        ko: '만들기 숙제 · 만지지 마시오',
       },
     },
     caption: {
@@ -1240,6 +1444,8 @@ export const SCHOOL_FREEZE: readonly Draft[] = [
       ar: 'لا تتحرك حتى يثبت الغراء.',
       fr: 'Bouge pas tant que la colle a pas pris.',
       es: 'No te muevas hasta que pegue.',
+      ja: '接着剤が乾くまで動かないで。',
+      ko: '풀이 마를 때까지 움직이지 마세요.',
     },
     headline: {
       tr: 'Maket ödevin hâlâ kuruyor',
@@ -1248,6 +1454,8 @@ export const SCHOOL_FREEZE: readonly Draft[] = [
       ar: 'مشروعك المدرسي ما زال يجف',
       fr: "Ta maquette n'a pas fini de sécher",
       es: 'Tu maqueta todavía se está secando',
+      ja: '工作の宿題がまだ乾いてない',
+      ko: '만들기 숙제가 아직 마르는 중',
     },
   },
   {
@@ -1262,6 +1470,8 @@ export const SCHOOL_FREEZE: readonly Draft[] = [
         ar: 'انتهى الوقت',
         fr: 'TERMINÉ',
         es: 'SE ACABÓ',
+        ja: '時間切れ',
+        ko: '시간 종료',
       },
       small: {
         tr: 'KALEMLERİ BIRAKIN',
@@ -1270,6 +1480,8 @@ export const SCHOOL_FREEZE: readonly Draft[] = [
         ar: 'ضعوا الأقلام',
         fr: 'POSEZ VOS STYLOS',
         es: 'DEJEN LOS LÁPICES',
+        ja: '筆記用具を置いて',
+        ko: '펜을 내려놓으시오',
       },
     },
     caption: {
@@ -1279,6 +1491,8 @@ export const SCHOOL_FREEZE: readonly Draft[] = [
       ar: 'ولا حرفًا واحدًا بعد.',
       fr: 'Pas une lettre de plus.',
       es: 'Ni una letra más.',
+      ja: 'あと一文字も書かないで。',
+      ko: '한 글자도 더 쓰지 마세요.',
     },
     headline: {
       tr: 'Hoca “kalemler masaya” dedi',
@@ -1287,6 +1501,8 @@ export const SCHOOL_FREEZE: readonly Draft[] = [
       ar: 'المعلم: «ضعوا الأقلام!»',
       fr: 'Le prof : « Posez vos stylos ! »',
       es: 'El profe: “¡Lápices abajo!”',
+      ja: '先生「ペンを置いて」',
+      ko: '선생님: “펜 내려놓으세요”',
     },
   },
   {
@@ -1301,6 +1517,8 @@ export const SCHOOL_FREEZE: readonly Draft[] = [
         ar: 'المسرح',
         fr: 'SCÈNE',
         es: 'ESCENARIO',
+        ja: 'ステージ',
+        ko: '무대',
       },
       small: {
         tr: 'GÖSTERİ BAŞLADI',
@@ -1309,6 +1527,8 @@ export const SCHOOL_FREEZE: readonly Draft[] = [
         ar: 'العرض بدأ',
         fr: 'SPECTACLE EN COURS',
         es: 'FUNCIÓN EN CURSO',
+        ja: '上演中',
+        ko: '공연 중',
       },
     },
     caption: {
@@ -1318,6 +1538,8 @@ export const SCHOOL_FREEZE: readonly Draft[] = [
       ar: 'الأشجار لا تتحرك.',
       fr: 'Un arbre, ça bouge pas.',
       es: 'Los árboles no se mueven.',
+      ja: '木は動かない。',
+      ko: '나무는 움직이지 않아요.',
     },
     headline: {
       tr: 'Okul oyununda ağaç rolündesin',
@@ -1326,6 +1548,8 @@ export const SCHOOL_FREEZE: readonly Draft[] = [
       ar: 'دورك في مسرحية المدرسة: شجرة',
       fr: "Pièce de l'école : tu joues un arbre",
       es: 'Eres un árbol en la obra de la escuela',
+      ja: '学芸会で木の役を演じてる',
+      ko: '학예회에서 나무 역할 중',
     },
   },
   // Security cameras
@@ -1341,6 +1565,8 @@ export const SCHOOL_FREEZE: readonly Draft[] = [
         ar: 'الصف 9 ب',
         fr: 'SALLE 9B',
         es: 'AULA 9B',
+        ja: '1年B組',
+        ko: '1학년 2반',
       },
     },
     caption: {
@@ -1350,6 +1576,8 @@ export const SCHOOL_FREEZE: readonly Draft[] = [
       ar: 'هاتفك في يدك. لا تتحرك.',
       fr: 'Le tien est dans ta main. Bouge pas.',
       es: 'El tuyo está en tu mano. Quieto.',
+      ja: 'あなたのスマホは手の中。動かないで。',
+      ko: '폰은 아직 손에 있어요. 움직이지 마세요.',
     },
     headline: {
       tr: 'Hoca telefonları topluyor',
@@ -1358,6 +1586,8 @@ export const SCHOOL_FREEZE: readonly Draft[] = [
       ar: 'المعلم يجمع الهواتف',
       fr: 'La prof ramasse les portables',
       es: 'El profe está recogiendo los teléfonos',
+      ja: '先生がスマホを回収中',
+      ko: '선생님이 휴대폰을 걷는 중',
     },
   },
   {
@@ -1372,6 +1602,8 @@ export const SCHOOL_FREEZE: readonly Draft[] = [
         ar: 'حصة الرياضيات',
         fr: 'COURS DE MATHS',
         es: 'MATEMÁTICAS',
+        ja: '数学の授業',
+        ko: '수학 시간',
       },
     },
     caption: {
@@ -1381,6 +1613,8 @@ export const SCHOOL_FREEZE: readonly Draft[] = [
       ar: 'تظاهر بأنك تقرأ دفترك.',
       fr: 'Fais semblant de lire ton cahier.',
       es: 'Haz como que lees tu cuaderno.',
+      ja: 'ノートを読んでるふりをして。',
+      ko: '공책 보는 척하세요.',
     },
     headline: {
       tr: 'Hoca tahtaya kaldıracak birini arıyor',
@@ -1389,6 +1623,8 @@ export const SCHOOL_FREEZE: readonly Draft[] = [
       ar: 'المعلم يبحث عمّن يخرج إلى السبورة',
       fr: 'Le prof cherche qui envoyer au tableau',
       es: 'El profe busca quién pase a la pizarra',
+      ja: '先生が黒板に当てる人を探してる',
+      ko: '선생님이 발표할 사람을 고르는 중',
     },
   },
   {
@@ -1403,6 +1639,8 @@ export const SCHOOL_FREEZE: readonly Draft[] = [
         ar: 'غرفة المعلمين',
         fr: 'SALLE DES PROFS',
         es: 'SALA DE PROFESORES',
+        ja: '職員室',
+        ko: '교무실',
       },
     },
     caption: {
@@ -1412,6 +1650,8 @@ export const SCHOOL_FREEZE: readonly Draft[] = [
       ar: 'ابتسم فقط. لا تتحرك.',
       fr: 'Souris. Et bouge pas.',
       es: 'Solo sonríe. No te muevas.',
+      ja: '笑顔で。動かないで。',
+      ko: '웃기만 하세요. 움직이지 마세요.',
     },
     headline: {
       tr: 'Öğretmenin annenle konuşuyor',
@@ -1420,6 +1660,8 @@ export const SCHOOL_FREEZE: readonly Draft[] = [
       ar: 'معلمتك تتحدث مع أمك',
       fr: 'Ta prof parle avec ta mère',
       es: 'Tu profe está hablando con tu mamá',
+      ja: '担任がお母さんと話してる',
+      ko: '선생님이 엄마랑 이야기하는 중',
     },
   },
   {
@@ -1434,6 +1676,8 @@ export const SCHOOL_FREEZE: readonly Draft[] = [
         ar: 'قاعة الامتحان',
         fr: "SALLE D'EXAMEN",
         es: 'SALA DE EXAMEN',
+        ja: '試験会場',
+        ko: '시험장',
       },
     },
     caption: {
@@ -1443,6 +1687,8 @@ export const SCHOOL_FREEZE: readonly Draft[] = [
       ar: 'لم تفعل شيئًا، لكن لا تتحرك.',
       fr: "T'as rien fait. Bouge pas quand même.",
       es: 'No hiciste nada. Igual, no te muevas.',
+      ja: '何もしてない。それでも動かないで。',
+      ko: '아무것도 안 했어요. 그래도 움직이지 마세요.',
     },
     headline: {
       tr: 'Gözetmen tam arkanda durdu',
@@ -1451,6 +1697,8 @@ export const SCHOOL_FREEZE: readonly Draft[] = [
       ar: 'المراقب توقّف خلفك تمامًا',
       fr: "Le surveillant s'arrête derrière toi",
       es: 'El vigilante se detuvo detrás de ti',
+      ja: '試験監督が真後ろで止まった',
+      ko: '감독관이 바로 뒤에 멈췄다',
     },
   },
 ];

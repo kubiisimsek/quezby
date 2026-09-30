@@ -14,6 +14,8 @@ export const LIKE_SCENE: readonly Draft[] = [
       ar: 'كنت أحيك وشاحًا… فصار قاعدة كوب',
       fr: "je tricotais une écharpe, c'est un sous-verre",
       es: 'iba a tejer una bufanda y salió un posavasos',
+      ja: 'マフラー編んでたらコースターができた',
+      ko: '목도리 뜨다가 컵받침이 됨',
     },
   },
   {
@@ -27,6 +29,8 @@ export const LIKE_SCENE: readonly Draft[] = [
       ar: 'أنهيت أول جري لي لمسافة 5 كم!!',
       fr: "j'ai couru mes premiers 5 km !!",
       es: '¡¡terminé mis primeros 5 km!!',
+      ja: '初めての5km完走！！',
+      ko: '첫 5km 완주!!',
     },
   },
   {
@@ -40,6 +44,8 @@ export const LIKE_SCENE: readonly Draft[] = [
       ar: 'وصفة جدتي… بيديّ أنا',
       fr: 'la recette de mamie, faite par moi',
       es: 'receta de la abuela, hecha con mis manos',
+      ja: 'おばあちゃんのレシピ、私の手',
+      ko: '할머니 레시피, 내 손',
     },
   },
   {
@@ -53,6 +59,8 @@ export const LIKE_SCENE: readonly Draft[] = [
       ar: 'أخيرًا تعلمت ركوب الدراجة، صفّقوا لي',
       fr: "j'ai enfin appris le vélo, applaudissez",
       es: 'por fin aprendí a andar en bici, aplausos',
+      ja: 'やっと自転車に乗れた、拍手ください',
+      ko: '드디어 자전거 배웠다, 박수 좀',
     },
   },
   {
@@ -66,6 +74,8 @@ export const LIKE_SCENE: readonly Draft[] = [
       ar: 'وصلت إلى القمة، والمنظر يستحق كل خطوة',
       fr: 'arrivé au sommet, ça valait chaque pas',
       es: 'llegué a la cima, valió cada paso',
+      ja: '山頂到着、一歩一歩の価値あり',
+      ko: '정상 도착, 한 걸음 한 걸음이 아깝지 않았다',
     },
   },
   {
@@ -79,6 +89,8 @@ export const LIKE_SCENE: readonly Draft[] = [
       ar: 'تفتّحت أول زهرة دوّار شمس في شرفتي',
       fr: 'mon premier tournesol a fleuri sur le balcon',
       es: 'floreció mi primer girasol en el balcón',
+      ja: 'ベランダで初めてのひまわりが咲いた',
+      ko: '베란다에서 첫 해바라기가 피었다',
     },
   },
   {
@@ -92,6 +104,8 @@ export const LIKE_SCENE: readonly Draft[] = [
       ar: 'تجاوزت المرحلة التي علقت فيها 3 سنوات',
       fr: 'passé le niveau qui me bloquait depuis 3 ans',
       es: 'pasé el nivel en el que llevaba 3 años atascado',
+      ja: '3年間クリアできなかったステージをクリア',
+      ko: '3년 동안 못 깬 판을 드디어 깼다',
     },
   },
   {
@@ -105,6 +119,8 @@ export const LIKE_SCENE: readonly Draft[] = [
       ar: 'سلحفاتي أتمّت 20 عامًا اليوم',
       fr: "ma tortue a 20 ans aujourd'hui",
       es: 'mi tortuga cumple 20 años hoy',
+      ja: 'うちのカメ、今日で20歳',
+      ko: '우리 거북이 오늘 20살',
     },
   },
   {
@@ -118,6 +134,8 @@ export const LIKE_SCENE: readonly Draft[] = [
       ar: 'أنهيت أحجية من 1000 قطعة… وتنقصها قطعة',
       fr: 'puzzle de 1000 pièces fini. il en manque 1.',
       es: 'rompecabezas de 1000 piezas listo. falta 1.',
+      ja: '1000ピースのパズル完成。1ピース足りない。',
+      ko: '1000피스 퍼즐 완성. 1개 없음.',
     },
   },
   {
@@ -131,6 +149,8 @@ export const LIKE_SCENE: readonly Draft[] = [
       ar: 'حصلت على رخصة القيادة! (من المحاولة الرابعة)',
       fr: 'permis en poche ! (4e tentative)',
       es: '¡aprobé el examen de conducir! (al 4.º intento)',
+      ja: '免許取った！（4回目で）',
+      ko: '면허 땄다! (4번째 도전)',
     },
   },
   {
@@ -144,6 +164,8 @@ export const LIKE_SCENE: readonly Draft[] = [
       ar: 'استيقظت في السادسة صباحًا من أجل هذا فقط',
       fr: 'debout à 6 h rien que pour ça',
       es: 'me levanté a las 6 solo por esto',
+      ja: 'これのためだけに朝6時に起きた',
+      ko: '이거 보려고 아침 6시에 일어남',
     },
   },
   {
@@ -157,6 +179,8 @@ export const LIKE_SCENE: readonly Draft[] = [
       ar: 'بعت أول لوحة لي!!',
       fr: "j'ai vendu mon premier tableau !!",
       es: '¡¡vendí mi primer cuadro!!',
+      ja: '初めて絵が売れた！！',
+      ko: '처음으로 그림 팔았다!!',
     },
   },
 ];

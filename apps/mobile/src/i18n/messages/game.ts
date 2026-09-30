@@ -404,4 +404,120 @@ const es: GameMessages = {
   },
 };
 
-export const game: Record<Locale, GameMessages> = { tr, en, de, ar, fr, es };
+const ja: GameMessages = {
+  verdicts: {
+    hit: '',
+    perfect: 'パーフェクト！',
+    timeout: '時間切れ！',
+    wrong: '操作ミス',
+    holdEarly: '早すぎ',
+    holdLate: '遅すぎ',
+    caught: 'つかまった！',
+    drained: 'ドーパミン切れ',
+  },
+  feedback: {
+    combo: (combo) => `${combo} コンボ`,
+    bonus: (toast, points) => `${toast} +${points}`,
+    blind: '見てないでしょ！',
+    penalty: (times) => `ペナルティ x${times}`,
+  },
+  hud: {
+    meter: 'ドーパミン',
+    level: (level) => `レベル${level}`,
+    close: 'ゲームをやめる',
+  },
+  post: {
+    share: 'シェア',
+    holdMeter: '長押し · 緑で離す',
+    online: 'オンライン',
+    poll: 'アンケート',
+    votes: (count) => `${groupDigits(count, 'ja')}票`,
+    receipt: (number) => `レシート No.${number}`,
+    total: '合計',
+    didYouKnow: '知ってた？',
+    ago: (minutes) =>
+      minutes === 0 ? 'たった今' : minutes < 60 ? `${minutes}分前` : `${Math.floor(minutes / 60)}時間前`,
+    days: ['月', '火', '水', '木', '金', '土', '日'],
+    months: ['1月', '2月', '3月', '4月', '5月', '6月'],
+    rec: 'REC',
+    camera: (n) => `カメラ${n}`,
+  },
+  coach: {
+    ribbon: (step, of) => `新しい投稿 · ${step}/${of}`,
+    start: 'わかった',
+  },
+  screen: {
+    preparing: 'フィードを準備中…',
+    verifying: 'スコアを確認中…',
+    getReady: '親指をスタンバイ',
+    dailyPlayed: '今日のフィードはプレイ済みです',
+    cannotStart: 'プレイを開始できませんでした',
+    unreachable: 'サーバーにつながりませんでした。',
+    retry: 'もう一度試す',
+    offline: 'オフライン練習',
+    cancel: 'キャンセル',
+  },
+  actions: {
+    dailyBoard: '今日のランキング',
+  },
+};
+
+const ko: GameMessages = {
+  verdicts: {
+    hit: '',
+    perfect: '퍼펙트!',
+    timeout: '시간 초과!',
+    wrong: '잘못된 동작',
+    holdEarly: '너무 빨라요',
+    holdLate: '너무 늦었어요',
+    caught: '걸렸어요!',
+    drained: '도파민 고갈',
+  },
+  feedback: {
+    combo: (combo) => `${combo} 콤보`,
+    bonus: (toast, points) => `${toast} +${points}`,
+    blind: '안 보고 했죠!',
+    penalty: (times) => `페널티 x${times}`,
+  },
+  hud: {
+    meter: '도파민',
+    level: (level) => `레벨 ${level}`,
+    close: '게임 나가기',
+  },
+  post: {
+    share: '공유',
+    holdMeter: '길게 누르기 · 초록색에서 떼기',
+    online: '온라인',
+    poll: '투표',
+    votes: (count) => `${groupDigits(count, 'ko')}표`,
+    receipt: (number) => `영수증 No.${number}`,
+    total: '합계',
+    didYouKnow: '알고 있었나요?',
+    ago: (minutes) =>
+      minutes === 0 ? '방금' : minutes < 60 ? `${minutes}분 전` : `${Math.floor(minutes / 60)}시간 전`,
+    days: ['월', '화', '수', '목', '금', '토', '일'],
+    months: ['1월', '2월', '3월', '4월', '5월', '6월'],
+    rec: 'REC',
+    camera: (n) => `카메라 ${n}`,
+  },
+  coach: {
+    ribbon: (step, of) => `새 게시물 · ${step}/${of}`,
+    start: '알겠어요',
+  },
+  screen: {
+    preparing: '피드를 준비하고 있어요…',
+    verifying: '점수 확인 중…',
+    getReady: '엄지를 준비하세요',
+    dailyPlayed: '오늘의 피드를 이미 플레이했어요',
+    cannotStart: '게임을 시작할 수 없어요',
+    unreachable: '서버에 연결할 수 없어요.',
+    retry: '다시 시도',
+    offline: '오프라인 연습',
+    cancel: '취소',
+  },
+  actions: {
+    dailyBoard: '오늘의 랭킹',
+  },
+};
+
+export const game: Record<Locale, GameMessages> = { tr, en, de, ar, fr, es, ja, ko };

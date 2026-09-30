@@ -1,8 +1,8 @@
 <?php
 
 /*
-| Messages for the rules the API uses — in Turkish, the source of the six
-| languages (`lang/{tr,en,de,ar,fr,es}`, one set of keys: `LangParityTest`).
+| Messages for the rules the API uses — in Turkish, the source of the eight
+| languages (`lang/{tr,en,de,ar,fr,es,ja,ko}`, one set of keys: `LangParityTest`).
 | They reach the player through `error.fields` in the request's language
 | (`ResolveLocale`); the admin panel always reads the Turkish. A field's name
 | lives here under `attributes`, never in a FormRequest, so every language

@@ -1,11 +1,11 @@
 import type { Locale } from '@quezby/types';
 
 /**
- * The six languages the game speaks, in the order the language picker lists
+ * The eight languages the game speaks, in the order the language picker lists
  * them. The API's twin is `App\Enums\Locale`, tested against
  * `fixtures/locales.json` (`tests/Unit/LocaleParityTest.php`).
  */
-export const LOCALES: readonly Locale[] = ['tr', 'en', 'de', 'ar', 'fr', 'es'];
+export const LOCALES: readonly Locale[] = ['tr', 'en', 'de', 'ar', 'fr', 'es', 'ja', 'ko'];
 
 /** Each language in its own words — how the picker names it, whatever the game speaks. */
 export const LOCALE_NAMES: Readonly<Record<Locale, string>> = {
@@ -15,6 +15,8 @@ export const LOCALE_NAMES: Readonly<Record<Locale, string>> = {
   ar: 'العربية',
   fr: 'Français',
   es: 'Español',
+  ja: '日本語',
+  ko: '한국어',
 };
 
 /** Arabic is the one language read right to left. */
@@ -42,7 +44,7 @@ export function bestLocale(tags: readonly string[]): Locale | null {
 /**
  * What separates groups of three digits. French takes a no-break space
  * (U+00A0 — the narrow one, U+202F, is not in the game's fonts); Arabic
- * writes Latin digits, grouped with a comma.
+ * writes Latin digits, grouped with a comma, as Japanese and Korean do.
  */
 const GROUP: Readonly<Record<Locale, string>> = {
   tr: '.',
@@ -51,6 +53,8 @@ const GROUP: Readonly<Record<Locale, string>> = {
   ar: ',',
   fr: ' ',
   es: '.',
+  ja: ',',
+  ko: ',',
 };
 
 /** Spanish leaves four digits whole (`1234`) and groups from five (`12.345`). */
@@ -61,9 +65,11 @@ const MIN_GROUPED_DIGITS: Readonly<Record<Locale, number>> = {
   ar: 4,
   fr: 4,
   es: 5,
+  ja: 4,
+  ko: 4,
 };
 
-/** The decimal mark: a comma in tr, de, fr and es, a point in en and ar. */
+/** The decimal mark: a comma in tr, de, fr and es, a point in en, ar, ja and ko. */
 const DECIMAL: Readonly<Record<Locale, string>> = {
   tr: ',',
   en: '.',
@@ -71,6 +77,8 @@ const DECIMAL: Readonly<Record<Locale, string>> = {
   ar: '.',
   fr: ',',
   es: ',',
+  ja: '.',
+  ko: '.',
 };
 
 export function decimalMark(locale: Locale): string {
@@ -120,5 +128,9 @@ export function pluralCategory(locale: Locale, count: number): PluralCategory {
     case 'en':
     case 'de':
       return n === 1 ? 'one' : 'other';
+    // Japanese and Korean say a count the same way whatever it is.
+    case 'ja':
+    case 'ko':
+      return 'other';
   }
 }

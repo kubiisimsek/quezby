@@ -20,6 +20,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
       ar: 'حوّلت الريح مظلتي إلى طبق استقبال فضائي',
       fr: 'Le vent a changé mon parapluie en antenne parabolique',
       es: 'El viento convirtió mi paraguas en antena parabólica',
+      ja: '風で傘がパラボラアンテナになった',
+      ko: '바람 때문에 우산이 위성 안테나가 됨',
     },
   },
   {
@@ -33,6 +35,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
       ar: 'جمعت الأوراق المتساقطة… فطلبت الشجرة جولة إعادة',
       fr: "Feuilles ratissées. L'arbre veut sa revanche.",
       es: 'Barrí las hojas. El árbol pide la revancha.',
+      ja: '落ち葉を掃いた。木がリベンジを要求してる。',
+      ko: '낙엽 쓸었더니 나무가 재대결 신청함',
     },
   },
   {
@@ -46,6 +50,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
       ar: 'راقبت النجوم… وأسطع ثلاثة منها كانت طائرات',
       fr: 'Les trois étoiles les plus brillantes ? Des avions.',
       es: 'Miré las estrellas. Las tres más brillantes eran aviones.',
+      ja: '星を見に行った。いちばん明るい3つは飛行機だった。',
+      ko: '별 보러 감. 제일 밝은 세 개는 비행기였음.',
     },
   },
   {
@@ -59,6 +65,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
       ar: 'واقي الشمس أولًا ثم الرمل… صرت جاهزًا للقلي',
       fr: 'Crème solaire, puis sable. Me voilà pané.',
       es: 'Protector solar y luego arena. Listo para freír.',
+      ja: '日焼け止めの上に砂。完全にフライの衣。',
+      ko: '선크림 바르고 모래 위로. 튀김옷 완성.',
     },
   },
   {
@@ -72,6 +80,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
       ar: 'نزلت إلى البحر لأتبرّد… فوجدته حساءً ساخنًا',
       fr: 'Un plongeon pour me rafraîchir. La mer ? Une soupe.',
       es: 'Entré al mar a refrescarme. El agua parecía caldo.',
+      ja: '涼みに海に入ったら、海がスープだった',
+      ko: '더위 식히러 바다 갔는데 바다가 온탕임',
     },
   },
   {
@@ -85,6 +95,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
       ar: 'استلقيت على عشب الحديقة… فانطلقت مرشّات الري',
       fr: 'Sieste sur la pelouse du parc. Arrosage automatique.',
       es: 'Siesta en el césped del parque. Riego automático.',
+      ja: '公園の芝生に寝転んだ。スプリンクラーが作動した。',
+      ko: '공원 잔디에 누웠더니 스프링클러가 켜짐',
     },
   },
   {
@@ -98,6 +110,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
       ar: 'غائم جزئيًا… والجزء الغائم من نصيبي دائمًا',
       fr: "Partiellement nuageux. Le nuage, c'est pour moi.",
       es: 'Parcialmente nublado. La parte nublada siempre es la mía.',
+      ja: '晴れ時々くもり。くもりはいつも私の上。',
+      ko: '구름 조금. 그 조금이 늘 내 머리 위.',
     },
   },
   {
@@ -105,7 +119,7 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
     user: ACCOUNTS.screens,
     body: {
       format: 'chat',
-      contact: { tr: 'Annem', en: 'Mom', de: 'Mama', ar: 'أمي', fr: 'Maman', es: 'Mamá' },
+      contact: { tr: 'Annem', en: 'Mom', de: 'Mama', ar: 'أمي', fr: 'Maman', es: 'Mamá', ja: 'お母さん', ko: '엄마' },
       lines: [
         {
           from: 'them',
@@ -116,11 +130,13 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
             ar: 'كيف كانت رحلة المشي؟ هل المنظر جميل؟',
             fr: "c'était bien, la rando ? belle vue ?",
             es: '¿qué tal la caminata? ¿buena vista?',
+            ja: '山登りどうだった？景色きれいだった？',
+            ko: '등산 어땠어? 경치 좋았어?',
           },
         },
         {
           from: 'me',
-          text: { tr: 'bilmiyorum', en: 'no idea', de: 'keine Ahnung', ar: 'لا أعرف', fr: 'aucune idée', es: 'ni idea' },
+          text: { tr: 'bilmiyorum', en: 'no idea', de: 'keine Ahnung', ar: 'لا أعرف', fr: 'aucune idée', es: 'ni idea', ja: 'わかんない', ko: '몰라' },
         },
         {
           from: 'me',
@@ -131,6 +147,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
             ar: '5 ساعات وأنا أحدّق في حقيبة من أمامي',
             fr: '5 heures à fixer le sac à dos devant moi',
             es: 'pasé 5 horas mirando una mochila',
+            ja: '5時間ずっと前の人のリュック見てた',
+            ko: '5시간 내내 앞사람 배낭만 봤어',
           },
         },
       ],
@@ -142,6 +160,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
       ar: 'المنظر: حقيبة ظهر حمراء',
       fr: 'La vue : un sac à dos rouge',
       es: 'La vista: una mochila roja',
+      ja: '景色：赤いリュック1つ',
+      ko: '경치: 빨간 배낭 하나',
     },
   },
   {
@@ -149,7 +169,7 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
     user: ACCOUNTS.weather,
     body: {
       format: 'chat',
-      contact: { tr: 'Babam', en: 'Dad', de: 'Papa', ar: 'أبي', fr: 'Papa', es: 'Papá' },
+      contact: { tr: 'Babam', en: 'Dad', de: 'Papa', ar: 'أبي', fr: 'Papa', es: 'Papá', ja: 'お父さん', ko: '아빠' },
       lines: [
         {
           from: 'me',
@@ -160,6 +180,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
             ar: 'أبي، هل ستمطر غدًا؟',
             fr: 'papa, il va pleuvoir demain ?',
             es: 'papá, ¿va a llover mañana?',
+            ja: 'お父さん、明日雨降る？',
+            ko: '아빠 내일 비 와?',
           },
         },
         {
@@ -171,11 +193,13 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
             ar: 'التطبيق يقول 50%',
             fr: "l'appli dit 50 %",
             es: 'la app dice 50 %',
+            ja: 'アプリだと50%だな',
+            ko: '앱에서 50%래',
           },
         },
         {
           from: 'me',
-          text: { tr: 'yani?', en: 'meaning?', de: 'heißt?', ar: 'يعني؟', fr: "c'est-à-dire ?", es: '¿o sea?' },
+          text: { tr: 'yani?', en: 'meaning?', de: 'heißt?', ar: 'يعني؟', fr: "c'est-à-dire ?", es: '¿o sea?', ja: 'つまり？', ko: '그러니까?' },
         },
         {
           from: 'them',
@@ -186,6 +210,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
             ar: 'إما أن تمطر أو لا تمطر',
             fr: 'soit il pleut, soit il pleut pas',
             es: 'o llueve o no llueve',
+            ja: '降るか降らないかだ',
+            ko: '오거나 안 오거나',
           },
         },
       ],
@@ -197,6 +223,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
       ar: 'أبي فكّ لغز الأرصاد الجوية',
       fr: 'Papa a percé le secret de la météo',
       es: 'Papá descifró la meteorología',
+      ja: '父、天気予報を解き明かす',
+      ko: '아빠가 일기 예보를 해독함',
     },
   },
   {
@@ -204,7 +232,7 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
     user: ACCOUNTS.screens,
     body: {
       format: 'chat',
-      contact: { tr: 'Kardeşim', en: 'Sis', de: 'Schwesterherz', ar: 'أختي', fr: 'Sœurette', es: 'Hermanita' },
+      contact: { tr: 'Kardeşim', en: 'Sis', de: 'Schwesterherz', ar: 'أختي', fr: 'Sœurette', es: 'Hermanita', ja: '妹', ko: '동생' },
       lines: [
         {
           from: 'them',
@@ -215,6 +243,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
             ar: 'إنها تثلج!! ❄️',
             fr: 'il neige !! ❄️',
             es: '¡¡está nevando!! ❄️',
+            ja: '雪降ってる！！ ❄️',
+            ko: '눈 온다!! ❄️',
           },
         },
         {
@@ -226,6 +256,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
             ar: 'جهّزت الجزرة لرجل الثلج ⛄',
             fr: 'carotte prête pour le bonhomme ⛄',
             es: 'ya tengo la zanahoria para el muñeco ⛄',
+            ja: 'ニンジン確保、雪だるま作るよ ⛄',
+            ko: '당근 챙겼다, 눈사람 만들자 ⛄',
           },
         },
         {
@@ -237,6 +269,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
             ar: 'الثلج بالكاد يكفي لفأر ثلج',
             fr: 'y a de quoi faire une souris de neige',
             es: 'solo alcanza para un ratón de nieve',
+            ja: '雪うさぎ1匹分しかないよ',
+            ko: '눈오리 하나 만들 정도밖에 없어',
           },
         },
       ],
@@ -248,6 +282,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
       ar: 'فأر الثلج بداية أيضًا',
       fr: "Une souris de neige, c'est un début",
       es: 'Un ratón de nieve también es un comienzo',
+      ja: '雪うさぎだって立派な一歩',
+      ko: '눈오리도 시작은 시작',
     },
   },
   {
@@ -262,6 +298,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
         ar: 'صديقي',
         fr: 'Mon pote',
         es: 'Mi mejor amigo',
+        ja: '親友',
+        ko: '절친',
       },
       lines: [
         {
@@ -273,6 +311,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
             ar: 'كيف الطقس اليوم؟',
             fr: "il fait quel temps aujourd'hui ?",
             es: '¿cómo está el clima hoy?',
+            ja: '今日の天気どう？',
+            ko: '오늘 날씨 어때?',
           },
         },
         {
@@ -284,6 +324,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
             ar: '8 درجات في الصباح و24 عند الظهر',
             fr: '8 degrés le matin, 24 à midi',
             es: '8 grados temprano, 24 al mediodía',
+            ja: '朝8度、昼24度',
+            ko: '아침 8도, 낮 24도',
           },
         },
         {
@@ -295,6 +337,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
             ar: 'حسنًا، سألبس كل ما عندي',
             fr: 'ok, je mets tout sur moi',
             es: 'ok, me pongo todo lo que tengo',
+            ja: 'OK、全部着ていく',
+            ko: '오케이, 있는 옷 다 입고 감',
           },
         },
       ],
@@ -306,6 +350,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
       ar: 'موضة الخريف: طبقات مثل البصلة',
       fr: "Mode d'automne : s'habiller en oignon",
       es: 'Moda de otoño: capas como una cebolla',
+      ja: '秋のファッション：玉ねぎみたいに重ね着',
+      ko: '가을 패션: 양파처럼 겹겹이',
     },
   },
   {
@@ -320,6 +366,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
         ar: 'لأول مرة هذا العام 18 درجة. ماذا تفعل؟',
         fr: 'Premier jour à 18 degrés. Toi :',
         es: 'Primer día de 18 grados del año. Tú:',
+        ja: '今年初めての18度。あなたは：',
+        ko: '올해 처음으로 18도. 당신은:',
       },
       options: [
         {
@@ -329,6 +377,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
           ar: 'أبقى بالمعطف',
           fr: 'Je garde mon manteau',
           es: 'Sigo con abrigo',
+          ja: 'コートは着たまま',
+          ko: '외투는 입는다',
         },
         {
           tr: 'Şort ve terlik',
@@ -337,6 +387,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
           ar: 'شورت وصندل',
           fr: 'Short et tongs',
           es: 'Short y chanclas',
+          ja: '短パンとサンダル',
+          ko: '반바지에 슬리퍼',
         },
       ],
       winner: 1,
@@ -348,6 +400,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
       ar: 'في المساء صارت 9 درجات… وندمت',
       fr: 'Le soir, 9 degrés. Je regrette.',
       es: 'Por la noche, 9 grados. Me arrepiento.',
+      ja: '夜は9度。後悔してる。',
+      ko: '저녁엔 9도. 후회 중.',
     },
   },
   {
@@ -362,6 +416,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
         ar: 'كيف تنزل إلى البحر؟',
         fr: 'Tu entres dans la mer comment ?',
         es: '¿Cómo entras al mar?',
+        ja: '海にはどうやって入る？',
+        ko: '바다에 어떻게 들어가요?',
       },
       options: [
         {
@@ -371,6 +427,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
           ar: 'أركض وأقفز',
           fr: 'Je cours et je plonge',
           es: 'Corro y me lanzo',
+          ja: '走って飛び込む',
+          ko: '뛰어서 풍덩',
         },
         {
           tr: 'Santim santim, 20 dk',
@@ -379,6 +437,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
           ar: 'شبرًا شبرًا، 20 دقيقة',
           fr: 'Tout doucement, 20 min',
           es: 'Poco a poco, 20 min',
+          ja: '少しずつ、20分',
+          ko: '조금씩, 20분',
         },
       ],
       winner: 1,
@@ -390,6 +450,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
       ar: 'وصل الماء إلى خصري… استراحة أخرى',
       fr: "Jusqu'à la taille. Nouvelle pause.",
       es: 'Me llega a la cintura. Otra pausa.',
+      ja: '腰まで来た。あと10分休憩。',
+      ko: '물이 허리까지 옴. 10분 더 휴식.',
     },
   },
   {
@@ -404,6 +466,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
         ar: 'كومة أوراق جافة في طريقك. ماذا تفعل؟',
         fr: 'Un tas de feuilles mortes sur ta route. Toi :',
         es: 'Hay hojas secas en el camino. Tú:',
+        ja: '道に落ち葉の山がある。あなたは：',
+        ko: '길에 낙엽 더미가 있다. 당신은:',
       },
       options: [
         {
@@ -413,6 +477,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
           ar: 'أمشي بجانبها',
           fr: 'Je contourne',
           es: 'Las esquivo',
+          ja: 'よけて通る',
+          ko: '피해서 간다',
         },
         {
           tr: 'Hepsine basarım',
@@ -421,6 +487,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
           ar: 'أدوس عليها كلها',
           fr: 'Je saute dedans',
           es: 'Las piso todas',
+          ja: '全部踏む',
+          ko: '다 밟는다',
         },
       ],
       winner: 1,
@@ -432,6 +500,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
       ar: 'لن أفوّت ورقة واحدة',
       fr: "Je n'en rate pas une",
       es: 'No me salto ni una',
+      ja: '1枚たりとも見逃さない',
+      ko: '하나도 빠짐없이 밟음',
     },
   },
   {
@@ -446,8 +516,10 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
         ar: 'بُعدي عن المروحة',
         fr: 'MA DISTANCE AU VENTILO',
         es: 'DISTANCIA AL VENTILADOR',
+        ja: '扇風機との距離',
+        ko: '선풍기와의 거리',
       },
-      value: { tr: '3 cm', en: '3 cm', de: '3 cm', ar: '3 سم', fr: '3 cm', es: '3 cm' },
+      value: { tr: '3 cm', en: '3 cm', de: '3 cm', ar: '3 سم', fr: '3 cm', es: '3 cm', ja: '3cm', ko: '3cm' },
       shape: 'fall',
       axis: 'days',
     },
@@ -458,6 +530,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
       ar: 'في أغسطس صرت أنا والمروحة شيئًا واحدًا',
       fr: "En août, le ventilo et moi, on ne fait qu'un",
       es: 'En agosto, el ventilador y yo éramos uno',
+      ja: '8月、扇風機と一心同体になった',
+      ko: '8월엔 선풍기와 한 몸이 됨',
     },
   },
   {
@@ -472,8 +546,10 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
         ar: 'مرات فتح تطبيق الطقس',
         fr: "COUPS D'ŒIL À LA MÉTÉO",
         es: 'CONSULTAS DEL CLIMA',
+        ja: '天気予報チェック',
+        ko: '날씨 앱 확인 횟수',
       },
-      value: { tr: '×23', en: '×23', de: '×23', ar: '×23', fr: '×23', es: '×23' },
+      value: { tr: '×23', en: '×23', de: '×23', ar: '×23', fr: '×23', es: '×23', ja: '×23', ko: '×23' },
       shape: 'spike',
       axis: 'hours',
     },
@@ -484,6 +560,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
       ar: 'الليلة التي تسبق النزهة',
       fr: 'La veille du pique-nique',
       es: 'La noche antes del pícnic',
+      ja: 'ピクニック前夜',
+      ko: '소풍 전날 밤',
     },
   },
   {
@@ -491,7 +569,7 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
     user: ACCOUNTS.receipts,
     body: {
       format: 'receipt',
-      store: { tr: 'FİDANLIK', en: 'GARDEN CENTER', de: 'GARTENCENTER', ar: 'مشتل', fr: 'JARDINERIE', es: 'VIVERO' },
+      store: { tr: 'FİDANLIK', en: 'GARDEN CENTER', de: 'GARTENCENTER', ar: 'مشتل', fr: 'JARDINERIE', es: 'VIVERO', ja: '園芸店', ko: '화원' },
       items: [
         {
           tr: 'DOMATES FİDESİ (1)',
@@ -500,6 +578,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
           ar: 'شتلة طماطم (1)',
           fr: 'PLANT DE TOMATE (1)',
           es: 'PLANTA DE TOMATE (1)',
+          ja: 'トマトの苗（1）',
+          ko: '토마토 모종 (1)',
         },
         {
           tr: 'SAKSI, TOPRAK, GÜBRE',
@@ -508,6 +588,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
           ar: 'أصيص وتربة وسماد',
           fr: 'POT, TERREAU, ENGRAIS',
           es: 'MACETA, TIERRA, ABONO',
+          ja: '鉢・土・肥料',
+          ko: '화분, 흙, 비료',
         },
       ],
     },
@@ -518,6 +600,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
       ar: 'الحصاد: حبة طماطم واحدة. التكلفة: لا تسأل.',
       fr: 'Récolte : 1 tomate. Prix : ne demande pas.',
       es: 'Cosecha: 1 tomate. Precio: ni preguntes.',
+      ja: '収穫：トマト1個。費用：聞かないで。',
+      ko: '수확: 토마토 1개. 비용: 묻지 마.',
     },
   },
   {
@@ -532,6 +616,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
         ar: 'متجر رياضي',
         fr: 'MAGASIN DE SPORT',
         es: 'TIENDA DE DEPORTES',
+        ja: 'スポーツ用品店',
+        ko: '스포츠 용품점',
       },
       items: [
         {
@@ -541,6 +627,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
           ar: 'زلاجة لشخصين',
           fr: 'LUGE 2 PLACES',
           es: 'TRINEO PARA 2',
+          ja: 'そり（2人乗り）',
+          ko: '썰매 (2인용)',
         },
       ],
     },
@@ -551,6 +639,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
       ar: 'اشتريت الزلاجة… فذاب الثلج في الصباح التالي',
       fr: 'Luge achetée. La neige a fondu le lendemain.',
       es: 'Compré el trineo. La nieve se derritió al día siguiente.',
+      ja: 'そりを買った。翌朝、雪は溶けた。',
+      ko: '썰매를 샀다. 다음 날 아침 눈이 녹았다.',
     },
   },
   {
@@ -565,8 +655,10 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
         ar: 'إحصائية الشاطئ',
         fr: 'STATS DE PLAGE',
         es: 'DATOS DE PLAYA',
+        ja: 'ビーチ統計',
+        ko: '해변 통계',
       },
-      big: { tr: '6', en: '6', de: '6', ar: '6', fr: '6', es: '6' },
+      big: { tr: '6', en: '6', de: '6', ar: '6', fr: '6', es: '6', ja: '6', ko: '6' },
       text: {
         tr: 'kez havlunu gölgeye taşıdın; gölge yine kaçtı',
         en: 'times you moved your towel to the shade. The shade moved too.',
@@ -574,6 +666,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
         ar: 'مرات نقلت فيها منشفتك إلى الظل… فهرب الظل مجددًا',
         fr: "fois où tu as mis ta serviette à l'ombre. L'ombre a bougé.",
         es: 'veces moviste la toalla a la sombra. La sombra se fue otra vez.',
+        ja: '回、タオルを日陰に移動。日陰もまた移動。',
+        ko: '번 수건을 그늘로 옮김. 그늘은 또 도망감.',
       },
     },
     caption: {
@@ -583,6 +677,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
       ar: 'الأرض تدور… وأنت تدور معها',
       fr: 'La Terre tourne, et toi avec',
       es: 'La Tierra gira y tú con ella',
+      ja: '地球が回れば、あなたも回る',
+      ko: '지구가 돌면 당신도 돈다',
     },
   },
   {
@@ -597,8 +693,10 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
         ar: 'تقرير موجة الحر',
         fr: 'BULLETIN CANICULE',
         es: 'INFORME DE CALOR',
+        ja: '猛暑レポート',
+        ko: '폭염 리포트',
       },
-      big: { tr: '9', en: '9', de: '9', ar: '9', fr: '9', es: '9' },
+      big: { tr: '9', en: '9', de: '9', ar: '9', fr: '9', es: '9', ja: '9', ko: '9' },
       text: {
         tr: 'kez buzdolabını sırf serinlemek için açtın',
         en: 'times you opened the fridge just to cool off',
@@ -606,6 +704,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
         ar: 'مرات فتحت فيها الثلاجة لتتبرّد فقط',
         fr: 'fois où tu as ouvert le frigo juste pour avoir frais',
         es: 'veces abriste el refrigerador solo para refrescarte',
+        ja: '回、涼むためだけに冷蔵庫を開けた',
+        ko: '번, 오직 시원해지려고 냉장고를 열었음',
       },
     },
     caption: {
@@ -615,6 +715,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
       ar: 'وأدخلت رأسك أيضًا… نحن نعرف',
       fr: 'Et tu as mis la tête dedans. On sait.',
       es: 'Y metiste la cabeza. Lo sabemos.',
+      ja: '頭も突っ込んだよね。知ってる。',
+      ko: '머리도 넣었죠. 다 알아요.',
     },
   },
   {
@@ -623,7 +725,7 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
     body: {
       format: 'fact',
       eyebrow: null,
-      big: { tr: '47', en: '47', de: '47', ar: '47', fr: '47', es: '47' },
+      big: { tr: '47', en: '47', de: '47', ar: '47', fr: '47', es: '47', ja: '47', ko: '47' },
       text: {
         tr: 'kez aynı gün batımını çektin; hiçbirini silemiyorsun',
         en: "photos of the same sunset. You can't delete a single one.",
@@ -631,6 +733,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
         ar: 'صورة للغروب نفسه… ولا تستطيع حذف أي منها',
         fr: "photos du même coucher de soleil. Tu n'en supprimes aucune.",
         es: 'fotos del mismo atardecer. No puedes borrar ninguna.',
+        ja: '枚、同じ夕日を撮った。1枚も消せない。',
+        ko: '장, 같은 노을 사진. 하나도 못 지움.',
       },
     },
     caption: {
@@ -640,6 +744,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
       ar: 'ربما تكون الصورة 48 هي الأجمل',
       fr: 'La 48e sera peut-être la bonne',
       es: 'Quizá la 48 sea la buena',
+      ja: '48枚目こそ最高かも',
+      ko: '48번째 사진이 제일 잘 나올지도',
     },
   },
   {
@@ -654,6 +760,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
         ar: 'تصنيف النزهة',
         fr: 'TIER LIST DU PIQUE-NIQUE',
         es: 'TIER LIST DE PÍCNIC',
+        ja: 'ピクニックTier表',
+        ko: '소풍 티어표',
       },
       rows: [['🍉', '🌽'], ['🥪', '🧃'], ['🥗', '🥚'], ['💨']],
     },
@@ -664,6 +772,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
       ar: 'الدخان في المرتبة الأخيرة… يلاحقني أينما جلست',
       fr: 'La fumée est en C : elle me suit partout.',
       es: 'El humo va en C: me encuentra donde me siente.',
+      ja: '煙はC。どこに座っても私を追ってくる',
+      ko: '연기는 C. 어디 앉든 나만 따라옴',
     },
   },
   {
@@ -678,6 +788,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
         ar: 'تصنيف التخييم',
         fr: 'TIER LIST DU CAMPING',
         es: 'TIER LIST DE CAMPAMENTO',
+        ja: 'キャンプTier表',
+        ko: '캠핑 티어표',
       },
       rows: [['🔥', '🌌'], ['⛺', '🍫'], ['🎒', '🌙'], ['🔦']],
     },
@@ -688,6 +800,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
       ar: 'المصباح في المرتبة الأخيرة: بطاريته تنفد في أول ليلة',
       fr: 'Lampe torche en C : à plat dès la 1re nuit',
       es: 'Linterna en C: se queda sin pilas la primera noche',
+      ja: '懐中電灯はC。毎回初日の夜に電池切れ',
+      ko: '손전등은 C. 첫날 밤에 꼭 배터리 나감',
     },
   },
   {
@@ -704,6 +818,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
           ar: 'مؤشر حبوب اللقاح',
           fr: 'Alerte pollen',
           es: 'Alerta de polen',
+          ja: '花粉情報',
+          ko: '꽃가루 알림',
         },
         text: {
           tr: 'Bugünkü polen seviyesi: EFSANEVİ',
@@ -712,6 +828,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
           ar: 'مستوى حبوب اللقاح اليوم: أسطوري',
           fr: 'Niveau de pollen du jour : LÉGENDAIRE',
           es: 'Nivel de polen hoy: LEGENDARIO',
+          ja: '今日の花粉レベル：伝説級',
+          ko: '오늘의 꽃가루 농도: 전설급',
         },
       },
     },
@@ -722,6 +840,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
       ar: 'مخزون المناديل: حرج',
       fr: 'Stock de mouchoirs : critique',
       es: 'Reserva de pañuelos: crítica',
+      ja: 'ティッシュ残量：危険',
+      ko: '휴지 재고: 위험',
     },
   },
   {
@@ -731,7 +851,7 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
       format: 'notifications',
       first: {
         icon: '🌡️',
-        app: { tr: 'Hava durumu', en: 'Weather', de: 'Wetter', ar: 'الطقس', fr: 'Météo', es: 'Clima' },
+        app: { tr: 'Hava durumu', en: 'Weather', de: 'Wetter', ar: 'الطقس', fr: 'Météo', es: 'Clima', ja: '天気', ko: '날씨' },
         text: {
           tr: 'Yarın 26°, perşembe kar yağışı',
           en: 'Tomorrow 79°, snow on Thursday',
@@ -739,6 +859,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
           ar: 'غدًا 26°، والخميس ثلوج',
           fr: 'Demain 26°, neige jeudi',
           es: 'Mañana 26°, el jueves nieve',
+          ja: '明日26°、木曜は雪',
+          ko: '내일 26°, 목요일엔 눈',
         },
       },
     },
@@ -749,6 +871,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
       ar: 'حتى الفصل متردد مثلي',
       fr: 'Le printemps est aussi indécis que moi',
       es: 'La primavera es tan indecisa como yo',
+      ja: '季節も私と同じくらい優柔不断',
+      ko: '계절도 나만큼 우유부단함',
     },
   },
   {
@@ -763,6 +887,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
         ar: 'لا تتشابه ندفتان من الثلج أبدًا… لكنها كلها تدخل من ياقتك معًا.',
         fr: 'Chaque flocon est unique. Et tous finissent dans ton col.',
         es: 'No hay dos copos de nieve iguales. Todos se meten por tu cuello.',
+        ja: '同じ雪の結晶は二つとない。でも全部同時に襟元に入ってくる。',
+        ko: '똑같은 눈송이는 없다. 하지만 전부 동시에 옷깃 속으로 들어온다.',
       },
     },
     caption: {
@@ -772,6 +898,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
       ar: 'ولا ينفع الوشاح أيضًا',
       fr: "Même l'écharpe n'y peut rien",
       es: 'Ni la bufanda ayuda',
+      ja: 'マフラーも役に立たない',
+      ko: '목도리도 소용없음',
     },
   },
   {
@@ -786,6 +914,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
         ar: 'الشمس تشرق للجميع… لكنها تزور شرفتي 15 دقيقة فقط.',
         fr: 'Le soleil se lève pour tous. Il passe sur mon balcon 15 minutes.',
         es: 'El sol sale para todos. A mi balcón viene 15 minutos.',
+        ja: '太陽は誰にでも昇る。うちのベランダには15分だけ寄る。',
+        ko: '해는 모두에게 뜬다. 우리 집 베란다엔 15분만 들른다.',
       },
     },
     caption: {
@@ -795,6 +925,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
       ar: 'جهّزت الكرسي… فرحلت',
       fr: 'Transat installé. Il était parti.',
       es: 'Armé la tumbona. Ya se había ido.',
+      ja: 'デッキチェアを出した。太陽は帰った。',
+      ko: '선베드 펼쳤더니 해가 가 버림',
     },
   },
   {
@@ -809,6 +941,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
         ar: 'من يتسلق الجبل يستحق المنظر… ومن يركب التلفريك أيضًا.',
         fr: 'Qui gravit la montagne mérite la vue. Qui prend le téléphérique aussi.',
         es: 'Quien escala merece la vista. Quien toma el teleférico, también.',
+        ja: '山頂まで登った者は絶景に値する。ロープウェイで来た者も。',
+        ko: '정상에 오른 자는 경치를 누릴 자격이 있다. 케이블카를 탄 자도.',
       },
     },
     caption: {
@@ -818,6 +952,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
       ar: 'المنظر نفسه، بلا قطرة عرق',
       fr: 'Même vue, zéro sueur',
       es: 'Misma vista, cero sudor',
+      ja: '同じ景色、汗はゼロ',
+      ko: '같은 경치, 땀은 0',
     },
   },
   {
@@ -832,6 +968,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
         ar: 'من يمشي عكس الريح يزداد قوة… أما شعره فلا يعود كما كان.',
         fr: "Marcher face au vent rend fort. Ta coiffure, elle, ne s'en remet pas.",
         es: 'Caminar contra el viento te hace fuerte. Tu peinado no se recupera.',
+        ja: '向かい風を歩く者は強くなる。髪型は二度と戻らない。',
+        ko: '맞바람을 걷는 자는 강해진다. 머리 스타일은 다시는 돌아오지 않는다.',
       },
     },
     caption: {
@@ -841,6 +979,8 @@ export const OUTDOORS_SKIP: readonly Draft[] = [
       ar: 'قوة أكثر، وتسريحة أقل',
       fr: 'Plus de force, moins de brushing',
       es: 'Más fuerza, cero peinado',
+      ja: '力はついた、髪型は消えた',
+      ko: '힘은 늘고 머리는 망함',
     },
   },
 ];
@@ -856,6 +996,8 @@ export const OUTDOORS_LIKE: readonly Draft[] = [
       ar: 'بنيت قلعة رملية… ودامت مملكتي 6 دقائق',
       fr: 'château de sable terminé, mon royaume a tenu 6 minutes',
       es: 'hice un castillo de arena y mi reino duró 6 minutos',
+      ja: '砂のお城を作った。王国は6分で滅んだ',
+      ko: '모래성 쌓음. 내 왕국은 6분 갔음',
     },
   },
   {
@@ -869,6 +1011,8 @@ export const OUTDOORS_LIKE: readonly Draft[] = [
       ar: 'نصبت الخيمة وحدي! استغرق الأمر ساعتين فقط',
       fr: "j'ai monté la tente tout seul ! ça n'a pris que 2 h",
       es: '¡armé la tienda de campaña yo solo! solo 2 horas',
+      ja: 'テントを一人で張った！たった2時間で',
+      ko: '텐트 혼자 쳤다! 겨우 2시간 걸림',
     },
   },
   {
@@ -882,6 +1026,8 @@ export const OUTDOORS_LIKE: readonly Draft[] = [
       ar: 'تسلّقت شجرة بعد سنوات!! لا تسألوا عن النزول',
       fr: "j'ai regrimpé à un arbre !! la descente, on en parle pas",
       es: '¡¡volví a subirme a un árbol!! no pregunten cómo bajé',
+      ja: '何年ぶりかに木登り！！降り方は聞かないで',
+      ko: '몇 년 만에 나무 탔다!! 내려온 건 묻지 마',
     },
   },
   {
@@ -895,6 +1041,8 @@ export const OUTDOORS_LIKE: readonly Draft[] = [
       ar: 'التقطت أول ندفة ثلج هذا العام بلساني',
       fr: "premier flocon de l'année attrapé avec la langue",
       es: 'atrapé el primer copo de nieve del año con la lengua',
+      ja: '今年最初の雪を舌でキャッチした',
+      ko: '올해 첫눈을 혀로 받았다',
     },
   },
   {
@@ -909,6 +1057,8 @@ export const OUTDOORS_LIKE: readonly Draft[] = [
         ar: 'كانت أجمل وهي مبللة',
         fr: 'ils brillaient mouillés',
         es: 'mojadas brillaban más',
+        ja: '濡れてた時はきれいだった',
+        ko: '젖었을 땐 예뻤는데',
       },
     },
     caption: {
@@ -918,6 +1068,8 @@ export const OUTDOORS_LIKE: readonly Draft[] = [
       ar: 'جمعت حصى ملونة من الشاطئ… وحين جفّت صارت رمادية',
       fr: "j'ai ramassé des galets colorés, secs ils sont tous gris",
       es: 'recogí piedras de colores en la playa, secas son grises',
+      ja: '浜辺でカラフルな石を拾った。乾いたら全部グレー',
+      ko: '해변에서 알록달록한 돌 주움, 마르니까 전부 회색',
     },
   },
   {
@@ -932,6 +1084,8 @@ export const OUTDOORS_LIKE: readonly Draft[] = [
         ar: 'أرشيف الخريف',
         fr: "archives d'automne",
         es: 'archivo de otoño',
+        ja: '秋のアーカイブ',
+        ko: '가을 아카이브',
       },
     },
     caption: {
@@ -941,6 +1095,8 @@ export const OUTDOORS_LIKE: readonly Draft[] = [
       ar: 'خبّأت شيئًا من الخريف بين صفحات كتاب',
       fr: "j'ai glissé un peu d'automne entre deux pages",
       es: 'guardé un poco de otoño entre las páginas de un libro',
+      ja: '本のあいだに秋をしまった',
+      ko: '책 사이에 가을을 끼워 뒀다',
     },
   },
   {
@@ -955,6 +1111,8 @@ export const OUTDOORS_LIKE: readonly Draft[] = [
         ar: 'بالعين المجردة!!',
         fr: "à l'œil nu !!",
         es: '¡¡a simple vista!!',
+        ja: '肉眼で！！',
+        ko: '맨눈으로!!',
       },
     },
     caption: {
@@ -964,6 +1122,8 @@ export const OUTDOORS_LIKE: readonly Draft[] = [
       ar: 'رأيت درب التبانة لأول مرة… وبقي فمي مفتوحًا',
       fr: 'première fois que je vois la voie lactée, bouche bée',
       es: 'vi la vía láctea por primera vez y me quedé boquiabierto',
+      ja: '初めて天の川を見た。口が開きっぱなし',
+      ko: '처음으로 은하수 봤다, 입이 떡 벌어짐',
     },
   },
   {
@@ -978,6 +1138,8 @@ export const OUTDOORS_LIKE: readonly Draft[] = [
         ar: 'بانتظار الريح',
         fr: 'en attente de vent',
         es: 'esperando al viento',
+        ja: '風待ち中',
+        ko: '바람 기다리는 중',
       },
     },
     caption: {
@@ -987,6 +1149,8 @@ export const OUTDOORS_LIKE: readonly Draft[] = [
       ar: 'علّقت جرس ريح في الشرفة… ولا صوت منذ أسبوع',
       fr: 'carillon à vent sur le balcon, une semaine sans un bruit',
       es: 'colgué un carillón en el balcón y lleva una semana mudo',
+      ja: 'ベランダに風鈴をつけた。1週間ずっと無音',
+      ko: '베란다에 풍경 달았는데 일주일째 조용함',
     },
   },
   {
@@ -1000,6 +1164,8 @@ export const OUTDOORS_LIKE: readonly Draft[] = [
       ar: 'يوم الشاطئ: أخذت كتابًا واحدًا وقرأت 0 صفحة',
       fr: 'dump plage : 1 livre emporté, 0 page lue',
       es: 'día de playa: llevé 1 libro, leí 0 páginas',
+      ja: 'ビーチまとめ：本を1冊持っていって、0ページ読んだ',
+      ko: '해변 모음: 책 1권 챙김, 0쪽 읽음',
     },
   },
   {
@@ -1013,6 +1179,8 @@ export const OUTDOORS_LIKE: readonly Draft[] = [
       ar: 'صور الربيع: تفتّحت الأزهار… وأنا عطست',
       fr: "dump printemps : les fleurs ont éclos, moi j'éternue",
       es: 'resumen de primavera: todo floreció y yo estornudé',
+      ja: '春のまとめ：花が咲いた、私はくしゃみした',
+      ko: '봄 모음: 꽃이 폈고 나는 재채기함',
     },
   },
   {
@@ -1026,6 +1194,8 @@ export const OUTDOORS_LIKE: readonly Draft[] = [
       ar: 'بعد المطر: قفزت في كل بركة ماء… وأنا سعيد جدًا',
       fr: 'après la pluie : sauté dans chaque flaque, trop heureux',
       es: 'después de la lluvia: salté en todos los charcos, feliz',
+      ja: '雨上がり：水たまりを全部踏んだ。最高に幸せ',
+      ko: '비 온 뒤: 웅덩이 전부 밟음, 너무 행복함',
     },
   },
   {
@@ -1039,6 +1209,8 @@ export const OUTDOORS_LIKE: readonly Draft[] = [
       ar: 'حقل دوّار الشمس: كلها تنظر إلى الشمس… وأنا إلى الكاميرا',
       fr: "dump tournesols : eux vers le soleil, moi vers l'objectif",
       es: 'campo de girasoles: ellos miran al sol, yo a la cámara',
+      ja: 'ひまわり畑まとめ：花は太陽を、私はカメラを向いた',
+      ko: '해바라기밭 모음: 꽃은 해를, 나는 카메라를 봄',
     },
   },
 ];
@@ -1054,6 +1226,8 @@ export const OUTDOORS_HOLD: readonly Draft[] = [
       ar: 'حدث نادر: صدقت توقعات عطلة نهاية الأسبوع',
       fr: 'Événement rare : la météo du week-end avait raison',
       es: 'Evento raro: el pronóstico del fin de semana acertó',
+      ja: 'レアな出来事：週末の天気予報が当たった',
+      ko: '희귀한 일: 주말 일기 예보가 맞음',
     },
   },
   {
@@ -1067,6 +1241,8 @@ export const OUTDOORS_HOLD: readonly Draft[] = [
       ar: 'أول حبة كرز ناضجة على الشجرة… ولم تجدها الطيور بعد',
       fr: "Première cerise mûre de l'arbre. Les oiseaux l'ont ratée.",
       es: 'La primera cereza madura. Los pájaros aún no la encuentran.',
+      ja: '最初に熟したサクランボ。鳥にはまだバレてない。',
+      ko: '나무에서 처음 익은 체리. 새들은 아직 모름.',
     },
   },
   {
@@ -1080,6 +1256,8 @@ export const OUTDOORS_HOLD: readonly Draft[] = [
       ar: 'ذلك اليوم الوحيد في السنة: لا حر ولا برد',
       fr: "Le seul jour de l'année ni trop chaud, ni trop froid",
       es: 'Ese único día del año: ni calor ni frío',
+      ja: '年に一度のあの日：暑くも寒くもない',
+      ko: '1년에 딱 하루: 덥지도 춥지도 않음',
     },
   },
   {
@@ -1093,6 +1271,8 @@ export const OUTDOORS_HOLD: readonly Draft[] = [
       ar: 'صدفة سليمة بلا عيب… واحدة من كل ألف',
       fr: 'Un coquillage intact et parfait. Un sur mille.',
       es: 'Una concha entera y perfecta. Una entre mil.',
+      ja: '欠けてない完璧な貝殻。千に一つ。',
+      ko: '깨진 데 없는 완벽한 조개껍데기. 천 개 중 하나.',
     },
   },
   {
@@ -1106,6 +1286,8 @@ export const OUTDOORS_HOLD: readonly Draft[] = [
       ar: 'حجر مثالي لرميه فوق الماء… اتركه الآن!',
       fr: 'Galet parfait pour les ricochets… lâche maintenant !',
       es: 'La piedra plana perfecta para rebotar… ¡suéltala ya!',
+      ja: '完璧な水切り石。低く構えて…今、離して！',
+      ko: '완벽한 물수제비 돌. 낮게 조준하고… 지금 손 떼기!',
     },
   },
   {
@@ -1119,6 +1301,8 @@ export const OUTDOORS_HOLD: readonly Draft[] = [
       ar: 'حظك جميل: بدأ المطر لحظة دخولك البيت',
       fr: 'Coup de chance : la pluie tombe pile à ton arrivée',
       es: 'Qué suerte: empezó a llover justo al llegar a casa',
+      ja: 'ツイてる：家に着いた瞬間に雨が降り出した',
+      ko: '운 좋네: 집에 들어온 순간 비가 시작됨',
     },
   },
   {
@@ -1132,6 +1316,8 @@ export const OUTDOORS_HOLD: readonly Draft[] = [
       ar: 'ليلة بلا غيوم ولا قمر: كل النجوم على المسرح',
       fr: 'Ni nuage ni lune : toutes les étoiles en scène',
       es: 'Sin nubes ni luna: todas las estrellas en escena',
+      ja: '雲なし月なしの夜：星が全員ステージに',
+      ko: '구름도 달도 없는 밤: 모든 별이 무대 위에',
     },
   },
 ];
@@ -1141,7 +1327,7 @@ export const OUTDOORS_FREEZE: readonly Draft[] = [
     user: ACCOUNTS.signs,
     body: {
       format: 'sign',
-      sign: { tr: 'BUZLANMA', en: 'ICY', de: 'GLATTEIS', ar: 'جليد', fr: 'VERGLAS', es: 'HIELO' },
+      sign: { tr: 'BUZLANMA', en: 'ICY', de: 'GLATTEIS', ar: 'جليد', fr: 'VERGLAS', es: 'HIELO', ja: '路面凍結', ko: '빙판 주의' },
       small: {
         tr: 'YAVAŞ VE DİKKATLİ YÜRÜYÜN',
         en: 'WALK SLOWLY, WATCH YOUR STEP',
@@ -1149,6 +1335,8 @@ export const OUTDOORS_FREEZE: readonly Draft[] = [
         ar: 'امشِ ببطء وحذر',
         fr: 'AVANCEZ LENTEMENT',
         es: 'CAMINE CON PRECAUCIÓN',
+        ja: '足元注意・ゆっくり歩こう',
+        ko: '천천히, 발밑 조심',
       },
     },
     caption: {
@@ -1158,6 +1346,8 @@ export const OUTDOORS_FREEZE: readonly Draft[] = [
       ar: 'لا تخطُ خطوة واحدة.',
       fr: 'Pas un seul pas.',
       es: 'Ni un solo paso.',
+      ja: '一歩も動かないで。',
+      ko: '한 발짝도 떼지 마세요.',
     },
     headline: {
       tr: 'Kaldırım buz pisti oldu',
@@ -1166,6 +1356,8 @@ export const OUTDOORS_FREEZE: readonly Draft[] = [
       ar: 'الرصيف صار حلبة تزلج',
       fr: 'Le trottoir est devenu une patinoire',
       es: 'La acera se volvió pista de hielo',
+      ja: '歩道がスケートリンクになった',
+      ko: '보도가 스케이트장이 됨',
     },
   },
   {
@@ -1180,6 +1372,8 @@ export const OUTDOORS_FREEZE: readonly Draft[] = [
         ar: 'مرصد فلكي',
         fr: 'OBSERVATOIRE',
         es: 'OBSERVATORIO',
+        ja: '天文台',
+        ko: '천문대',
       },
       small: {
         tr: 'TELESKOBA DOKUNMAYIN',
@@ -1188,6 +1382,8 @@ export const OUTDOORS_FREEZE: readonly Draft[] = [
         ar: 'ممنوع لمس التلسكوب',
         fr: 'NE TOUCHEZ PAS AU TÉLESCOPE',
         es: 'NO TOCAR EL TELESCOPIO',
+        ja: '望遠鏡にさわらないで',
+        ko: '망원경에 손대지 마시오',
       },
     },
     caption: {
@@ -1197,6 +1393,8 @@ export const OUTDOORS_FREEZE: readonly Draft[] = [
       ar: 'لمسة واحدة ويضيع زحل.',
       fr: 'Une pichenette, et adieu Saturne.',
       es: 'Un toque y adiós, Saturno.',
+      ja: 'ちょっと触れたら土星が消える。',
+      ko: '한 번 건드리면 토성이 사라져요.',
     },
     headline: {
       tr: 'Teleskop tam Satürn’e odaklandı',
@@ -1205,6 +1403,8 @@ export const OUTDOORS_FREEZE: readonly Draft[] = [
       ar: 'التلسكوب مصوَّب نحو زحل تمامًا',
       fr: 'Le télescope vise pile Saturne',
       es: 'El telescopio apunta justo a Saturno',
+      ja: '望遠鏡がぴったり土星をとらえた',
+      ko: '망원경 초점이 딱 토성에 맞춰짐',
     },
   },
   {
@@ -1212,7 +1412,7 @@ export const OUTDOORS_FREEZE: readonly Draft[] = [
     user: ACCOUNTS.signs,
     body: {
       format: 'sign',
-      sign: { tr: 'DİKKAT', en: 'CAUTION', de: 'ACHTUNG', ar: 'تنبيه', fr: 'ATTENTION', es: 'ATENCIÓN' },
+      sign: { tr: 'DİKKAT', en: 'CAUTION', de: 'ACHTUNG', ar: 'تنبيه', fr: 'ATTENTION', es: 'ATENCIÓN', ja: '注意', ko: '주의' },
       small: {
         tr: 'ARILAR ÇALIŞIYOR',
         en: 'BEES AT WORK',
@@ -1220,6 +1420,8 @@ export const OUTDOORS_FREEZE: readonly Draft[] = [
         ar: 'النحل يعمل هنا',
         fr: 'ABEILLES AU TRAVAIL',
         es: 'ABEJAS TRABAJANDO',
+        ja: 'ミツバチ作業中',
+        ko: '꿀벌 작업 중',
       },
     },
     caption: {
@@ -1229,6 +1431,8 @@ export const OUTDOORS_FREEZE: readonly Draft[] = [
       ar: 'دعها تشرب… وانتظر.',
       fr: 'Laisse-la boire. Toi, attends.',
       es: 'Déjala beber. Tú espera.',
+      ja: 'ハチが飲み終わるまで待って。',
+      ko: '벌이 다 마실 때까지 기다려요.',
     },
     headline: {
       tr: 'Limonatanın kenarına bir arı kondu',
@@ -1237,6 +1441,8 @@ export const OUTDOORS_FREEZE: readonly Draft[] = [
       ar: 'حطّت نحلة على كوب الليموناضة',
       fr: "Une abeille s'est posée sur ta limonade",
       es: 'Una abeja se posó en tu limonada',
+      ja: 'レモネードのふちにハチがとまった',
+      ko: '레모네이드 컵에 벌이 앉았다',
     },
   },
   {
@@ -1251,6 +1457,8 @@ export const OUTDOORS_FREEZE: readonly Draft[] = [
         ar: 'سطح ساخن',
         fr: 'SURFACE CHAUDE',
         es: 'MUY CALIENTE',
+        ja: '高温注意',
+        ko: '뜨거움 주의',
       },
       small: {
         tr: 'ÖĞLEN SAATLERİNDE KAYMAYIN',
@@ -1259,6 +1467,8 @@ export const OUTDOORS_FREEZE: readonly Draft[] = [
         ar: 'ممنوع التزحلق وقت الظهيرة',
         fr: 'PAS DE GLISSADE À MIDI',
         es: 'NO DESLIZARSE AL MEDIODÍA',
+        ja: '昼間はすべらないで',
+        ko: '한낮엔 타지 마시오',
       },
     },
     caption: HANDS_OFF,
@@ -1269,6 +1479,8 @@ export const OUTDOORS_FREEZE: readonly Draft[] = [
       ar: 'الزحليقة تحت الشمس منذ الظهر',
       fr: 'Le toboggan cuit au soleil depuis midi',
       es: 'El tobogán lleva todo el día al sol',
+      ja: 'すべり台が昼からずっと日なた',
+      ko: '미끄럼틀이 정오부터 땡볕 아래',
     },
   },
   {
@@ -1276,7 +1488,7 @@ export const OUTDOORS_FREEZE: readonly Draft[] = [
     user: ACCOUNTS.cctv,
     body: {
       format: 'cctv',
-      place: { tr: 'BAHÇE', en: 'FRONT YARD', de: 'VORGARTEN', ar: 'الفناء الأمامي', fr: 'JARDIN', es: 'PATIO' },
+      place: { tr: 'BAHÇE', en: 'FRONT YARD', de: 'VORGARTEN', ar: 'الفناء الأمامي', fr: 'JARDIN', es: 'PATIO', ja: '庭', ko: '마당' },
     },
     caption: {
       tr: 'Görmezse atamaz.',
@@ -1285,6 +1497,8 @@ export const OUTDOORS_FREEZE: readonly Draft[] = [
       ar: 'إن لم يرَك فلن يرمي.',
       fr: "S'il te voit pas, il tire pas.",
       es: 'Si no te ve, no te la lanza.',
+      ja: '見つからなければ投げられない。',
+      ko: '못 보면 못 던져요.',
     },
     headline: {
       tr: 'Kardeşin elinde kartopuyla pusuda',
@@ -1293,6 +1507,8 @@ export const OUTDOORS_FREEZE: readonly Draft[] = [
       ar: 'أخوك يترصّدك بكرة ثلج',
       fr: 'Ton frère cache une boule de neige',
       es: 'Tu hermano acecha con una bola de nieve',
+      ja: '弟が雪玉を持って待ち伏せ中',
+      ko: '동생이 눈덩이 들고 매복 중',
     },
   },
   {
@@ -1300,7 +1516,7 @@ export const OUTDOORS_FREEZE: readonly Draft[] = [
     user: ACCOUNTS.live,
     body: {
       format: 'cctv',
-      place: { tr: 'PARK', en: 'CITY PARK', de: 'STADTPARK', ar: 'الحديقة العامة', fr: 'PARC', es: 'PARQUE' },
+      place: { tr: 'PARK', en: 'CITY PARK', de: 'STADTPARK', ar: 'الحديقة العامة', fr: 'PARC', es: 'PARQUE', ja: '公園', ko: '공원' },
     },
     caption: {
       tr: 'Belki başkası vurur. Kıpırdama.',
@@ -1309,6 +1525,8 @@ export const OUTDOORS_FREEZE: readonly Draft[] = [
       ar: 'ربما يركلها غيرك… لا تتحرك.',
       fr: "Quelqu'un d'autre va peut-être tirer. Bouge pas.",
       es: 'Quizá la patee otro. No te muevas.',
+      ja: '誰かが蹴ってくれるかも。動かないで。',
+      ko: '다른 사람이 찰지도 몰라요. 움직이지 마세요.',
     },
     headline: {
       tr: 'Top ayağına geldi, bütün park bakıyor',
@@ -1317,6 +1535,8 @@ export const OUTDOORS_FREEZE: readonly Draft[] = [
       ar: 'الكرة عند قدميك… والحديقة كلها تنظر',
       fr: 'Ballon à tes pieds, tout le parc regarde',
       es: 'La pelota llegó a ti. Todos miran.',
+      ja: '足元にボール。公園中が見てる',
+      ko: '공이 발 앞에, 공원 전체가 주목',
     },
   },
   {
@@ -1324,7 +1544,7 @@ export const OUTDOORS_FREEZE: readonly Draft[] = [
     user: ACCOUNTS.cctv,
     body: {
       format: 'cctv',
-      place: { tr: 'PLAJ', en: 'BEACH', de: 'STRAND', ar: 'الشاطئ', fr: 'PLAGE', es: 'PLAYA' },
+      place: { tr: 'PLAJ', en: 'BEACH', de: 'STRAND', ar: 'الشاطئ', fr: 'PLAGE', es: 'PLAYA', ja: 'ビーチ', ko: '해변' },
     },
     caption: {
       tr: 'Kıpırdama, gölge senin.',
@@ -1333,6 +1553,8 @@ export const OUTDOORS_FREEZE: readonly Draft[] = [
       ar: 'لا تتحرك… الظل لك.',
       fr: "Bouge pas, l'ombre est à toi.",
       es: 'No te muevas. La sombra es tuya.',
+      ja: '動かないで。日陰はあなたのもの。',
+      ko: '움직이지 마세요. 그늘은 당신 거예요.',
     },
     headline: {
       tr: 'Tek bulut tam üstüne geliyor',
@@ -1341,6 +1563,8 @@ export const OUTDOORS_FREEZE: readonly Draft[] = [
       ar: 'الغيمة الوحيدة تتجه نحوك تمامًا',
       fr: "L'unique nuage arrive pile sur toi",
       es: 'La única nube va justo hacia ti',
+      ja: '唯一の雲がちょうど真上に来る',
+      ko: '하나뿐인 구름이 딱 머리 위로 옴',
     },
   },
 ];

@@ -102,15 +102,15 @@ screens/
                      last 14 days, each row's league under the name, no posts, no countdown
                      and no floor card (your row after a break when you are below the list)
   league/            "LİG": your league's emblem big between the leagues below and above, its
-                     name, your Elo in gold, a notched `Meter` through the league (quarters)
-                     with "Platin'e 660 Elo" ("Tavanı yok" in MasterClass), tags for the
+                     name, your qb in gold by its coin, a notched `Meter` through the league (quarters)
+                     with "Platin'e 660 qb" ("Tavanı yok" in MasterClass), tags for the
                      next target, a shield, the peak; while placing, "Yerleşme 2/3" and a
                      gold "Dereceli oyna"; while Dereceli is shut, a lock, "Dereceli’ye N oyun
                      kaldı", a `Meter` and a gold "Normal oyna". Under
                      it: SON DEĞİŞİMLER (the rating's latest moves), then LİG SIRALAMASI —
                      the league's players by Elo (`GET /ratings?scope=league`), never reset,
                      each a `ClimbRow` with `unit="elo"`, your floor pinned (`FloorCard`
-                     `unit="elo"`: "Sen · 2.340 Elo", "@deniz'e 40 Elo"; Geç onu plays
+                     `unit="elo"`: "Sen · 2.340 qb", "@deniz'e 40 qb"; Geç onu plays
                      rated); before placement, "Lig sıralaması Dereceli oyuncularının" with
                      no button (the stage holds the way in); placed but not on it (no rated
                      run in 14 days), a gold "Dereceli oyna"
@@ -220,9 +220,9 @@ game/
   FeedbackLayer.tsx  points rising in Rubik, heart burst, a miss slammed on a red slab and shaken,
                      named combos stamped in as tilted gold ribbons
   RankedStage.tsx    a counted rated run's own top instead of the score's: the player in their
-                     league's frame, the league named in its metal, the Elo counting from where
-                     it stood ("2.500 Elo") with the move on a big green or red slab ("+42"),
-                     the league's bar running with it and "Platin'e 158 Elo", "Skor … · Hedef …"
+                     league's frame, the league named in its metal, the qb counting from where
+                     it stood ("2.500" by the qb coin) with the move on a big green or red slab ("+42"),
+                     the league's bar running with it and "Platin'e 158 qb", "Skor … · Hedef …"
                      with "Hedefi geçtin" / "Hedefin altında" and the difficulty tags. A new
                      league: the bar fills, the old frame flashes and goes, the new one slams in
                      over turning rays, "YÜKSELDİN!" in gold, the burst and a buzz. A fall: the
@@ -345,7 +345,7 @@ A new shape goes into the family it belongs to and into that list.
 | `Podium` | A board's top three on 3D pedestals in their metals, with portraits (`avatarUrl`) and coins, a crown dropping on #1; 2-1-3; rises once |
 | `Spotlight` | Rays of light behind a winner or a tier's emblem, drawn once in the colour given |
 | `ClimbRow` | A board row from #4 down as a tile: rank, portrait (`avatarUrl`), name, score and "▲ 1.240" to pass the row above; yours in magenta; `detail` (a league); `unit` `elo` reads the numbers aloud as Elo (so does `Podium`'s) |
-| `FloorCard` | "Senin katın" — your floor pinned under a board: rank in gold, who to pass and how far, "Geç onu"; `unit="elo"` on an Elo board ("Sen · 2.340 Elo", "@deniz'e 40 Elo") |
+| `FloorCard` | "Senin katın" — your floor pinned under a board: rank in gold, who to pass and how far, "Geç onu"; `unit="elo"` on the qb board ("Sen · 2.340 qb", "@deniz'e 40 qb") |
 | `BonusChip` | A named combo as a pill with its gem: Kusursuz seviye, Şimşek, Soğukkanlı, Geri dönüş, `×count`, `+points` |
 | `ShareGrid` | The server's emoji share grid, one square to a cell |
 | `LobbyCard` | A door: a gem, its capital name over a Rubik title, live state on the right, an arrow slab when it opens something; sinks under the thumb — the profile's İSTATİSTİKLER and GEÇMİŞ OYUNLAR |
@@ -397,7 +397,7 @@ which takes a tint.
 
 | Component | Role |
 | --- | --- |
-| `LanguageSheet` | The six languages, each in its own words and its own script (Cairo for Arabic, whatever the game speaks), its name in the language on screen under it; a language read the other way (to or from Arabic) asks first — the game reloads to turn around |
+| `LanguageSheet` | The eight languages, each in its own words and its own script (Cairo for Arabic, M PLUS Rounded 1c for Japanese, Gothic A1 for Korean, whatever the game speaks), its name in the language on screen under it; a language read the other way (to or from Arabic), or one in other faces (between Latin, Japanese and Korean), asks first — the game reloads |
 | `UsernameField` | The username input everywhere: lower case as typed, three rules ticking off under it (length, characters, a letter; a misplaced dot or star is only said when typed), availability in the trailing slot |
 | `PlayerSheet` | A player's card from any row: portrait, tier, what you are to each other as a tag (Arkadaşın, İstek gönderildi, Seni eklemek istiyor, Engelledin), their friends count — a neutral slab that opens the list (once the card has left the screen) on your own card and a friend's, plain words on anyone else's, season best in gold, weekly and all-time place, a few lifetime counts — then the one main action the relation allows: "Arkadaş ekle"; "Kabul et" / "Reddet"; "Geri al"; "VS at" and "Sohbet" for a friend (no "Sohbet" when opened from the conversation); "Engeli kaldır". "Diğer" opens an `ActionList` in place: "Arkadaşlıktan çıkar" (a friend), "Engelle", "Fotoğrafı bildir" (when there is a photo), "Kullanıcı adını bildir". The VS sheet or the conversation opens once the card has left the screen |
 | `QbHistorySheet` | qb hareketleri, from the league stage's corner coin (`IconButton icon="qb"`, shown once Dereceli is open): the qb now on its coin, then every move newest first — a gem by kind (a run up green, down red; a placement's flag; a forfeit; a run taken back; an owner's Düzeltme), when, the run's score against its target, the move in green or red and the qb it left. The league screen lists no moves itself |

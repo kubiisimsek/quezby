@@ -283,4 +283,94 @@ const es: DailyMessages = {
   },
 };
 
-export const daily: Record<Locale, DailyMessages> = { tr, en, de, ar, fr, es };
+const ja: DailyMessages = {
+  name: '今日のフィード',
+  ribbon: '今日のフィード',
+  numbered: (day) => `今日のフィード #${day}`,
+  rule: 'みんな同じフィード · チャンスは1回',
+  nextIn: '次のフィードまで',
+  share: 'シェア',
+  loadFailed: '今日のフィードを読み込めませんでした',
+  stage: {
+    label: 'フィード',
+    day: (day) => `#${day}`,
+    waiting: '今日のフィードが待っています',
+  },
+  attempt: {
+    unfinished: {
+      title: 'プレイが途中で終わりました',
+      body: '今日の挑戦を始めましたが、プレイが終わっていません。結果がサーバーに届けば、ここに表示されます。',
+    },
+    review: {
+      title: 'スコアを確認しています',
+      body: 'ランキングに入る前に、このスコアを確認しています。承認されるとここに表示されます。',
+    },
+    flagged: {
+      title: 'スコアがランキングに入りませんでした',
+      body: 'プレイを確認できなかったため、今日のランキングには入りませんでした。明日は新しいフィードが待っています。',
+    },
+    void: {
+      title: 'プレイがカウントされませんでした',
+      body: 'プレイが途中で終わったか時間切れになったため、ランキングには入りませんでした。明日は新しいフィードが待っています。',
+    },
+  },
+  ranked: {
+    score: 'スコア',
+    scoreA11y: 'あなたのスコア',
+    rank: '順位',
+    rankA11y: 'あなたの順位',
+  },
+  summit: {
+    ribbon: '今日のトップ',
+    loadFailed: 'ランキングを読み込めませんでした',
+    emptyTitle: '今日のトップはまだ空っぽ',
+    emptyHint: '最初のスコアが届くと、ここにランキングができていきます。',
+  },
+};
+
+const ko: DailyMessages = {
+  name: '오늘의 피드',
+  ribbon: '오늘의 피드',
+  numbered: (day) => `오늘의 피드 #${day}`,
+  rule: '모두 같은 피드 · 기회는 한 번',
+  nextIn: '다음 피드까지',
+  share: '공유',
+  loadFailed: '오늘의 피드를 불러오지 못했어요',
+  stage: {
+    label: '피드',
+    day: (day) => `#${day}`,
+    waiting: '오늘의 피드가 기다리고 있어요',
+  },
+  attempt: {
+    unfinished: {
+      title: '게임이 중간에 끊겼어요',
+      body: '오늘의 기회를 시작했지만 게임이 끝나지 않았어요. 결과가 서버에 도착하면 여기에 표시돼요.',
+    },
+    review: {
+      title: '점수를 검토하고 있어요',
+      body: '랭킹에 올리기 전에 이 점수를 확인하고 있어요. 승인되면 여기에 표시돼요.',
+    },
+    flagged: {
+      title: '점수가 랭킹에 오르지 못했어요',
+      body: '게임을 확인할 수 없어서 오늘의 랭킹에 기록되지 않았어요. 내일 새 피드가 기다리고 있어요.',
+    },
+    void: {
+      title: '게임이 인정되지 않았어요',
+      body: '게임이 중간에 끊겼거나 시간이 다 되어 랭킹에 오르지 못했어요. 내일 새 피드가 기다리고 있어요.',
+    },
+  },
+  ranked: {
+    score: '내 점수',
+    scoreA11y: '내 점수',
+    rank: '내 순위',
+    rankA11y: '내 순위',
+  },
+  summit: {
+    ribbon: '오늘의 정상',
+    loadFailed: '랭킹을 불러오지 못했어요',
+    emptyTitle: '오늘의 정상이 비어 있어요',
+    emptyHint: '첫 점수가 들어오면 여기에 정상이 만들어져요.',
+  },
+};
+
+export const daily: Record<Locale, DailyMessages> = { tr, en, de, ar, fr, es, ja, ko };

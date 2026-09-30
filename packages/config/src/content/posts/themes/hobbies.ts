@@ -19,6 +19,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'اشتركت لمدة سنة، وتحمّست لمدة شهر',
       fr: 'Abonné pour un an, motivé pour un mois',
       es: 'Inscrito por un año, motivado por un mes',
+      ja: 'ジムは年間契約、やる気は月額制だった',
+      ko: '회원권은 1년, 의욕은 한 달짜리였다',
     },
   },
   {
@@ -32,6 +34,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'قطعت 20 كم على دراجة التمارين… وما زلت في الصالة',
       fr: "20 km sur le vélo d'appart. Toujours dans le salon.",
       es: '20 km en la bici estática. Sigo en la sala.',
+      ja: 'エアロバイクで20km走った。まだリビングにいる。',
+      ko: '실내 자전거로 20km 달렸다. 아직 거실이다.',
     },
   },
   {
@@ -45,6 +49,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'سمعت الهدف من الجيران قبل أن أراه',
       fr: "J'ai entendu le but chez le voisin avant de le voir",
       es: 'Oí el gol en casa del vecino antes de verlo',
+      ja: 'ゴールは画面より先に隣の家から聞こえた',
+      ko: '골은 보기 전에 옆집 함성으로 먼저 들었다',
     },
   },
   {
@@ -58,6 +64,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'أفضل وضعية أتقنها في اليوغا: الاستلقاء في النهاية',
       fr: "Ma meilleure posture de yoga : celle où on s'allonge",
       es: 'Mi mejor postura de yoga: acostarme al final',
+      ja: 'ヨガの得意ポーズ：最後の屍のポーズ',
+      ko: '요가 특기: 마지막 송장 자세',
     },
   },
   {
@@ -71,6 +79,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'سبحت 10 دقائق، وارتداء قبعة السباحة استغرق 20',
       fr: "J'ai nagé 10 minutes. Le bonnet m'en a pris 20.",
       es: 'Nadé 10 minutos. Ponerme el gorro me llevó 20.',
+      ja: '泳いだのは10分。水泳帽をかぶるのに20分。',
+      ko: '수영 10분, 수모 쓰는 데 20분',
     },
   },
   {
@@ -84,6 +94,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'حيلة رسم: الأيدي صعبة؟ ضعها في الجيوب.',
       fr: 'Astuce dessin : les mains, trop dures ? Dans les poches.',
       es: 'Truco de dibujo: ¿las manos, difíciles? Al bolsillo.',
+      ja: 'お絵かき裏ワザ：手が描けない？ポケットに入れよう。',
+      ko: '그림 꿀팁: 손 그리기 어렵다고? 주머니에 넣자.',
     },
   },
   {
@@ -98,6 +110,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
         ar: 'مجموعة الكرة',
         fr: 'Foot du samedi',
         es: 'Fútbol del sábado',
+        ja: 'フットサル仲間',
+        ko: '풋살 모임',
       },
       lines: [
         {
@@ -109,6 +123,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
             ar: 'بالمناسبة، الهدف الثالث أمس كان تسللًا',
             fr: "au fait, le 3e but d'hier était hors-jeu",
             es: 'el 3.er gol de ayer fue fuera de juego',
+            ja: 'ちなみに昨日の3点目、オフサイドだった',
+            ko: '근데 어제 3번째 골 오프사이드였음',
           },
         },
         {
@@ -120,6 +136,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
             ar: 'يا صديقي، المباراة انتهت أمس',
             fr: "mec, le match, c'était hier",
             es: 'amigo, el partido fue ayer',
+            ja: 'いや、試合は昨日終わったから',
+            ko: '야 경기 어제 끝났어',
           },
         },
         {
@@ -131,6 +149,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
             ar: 'صوّرت اللقطة، شاهد',
             fr: "j'ai filmé, regarde",
             es: 'lo grabé, mira',
+            ja: '動画撮ったから見て',
+            ko: '영상 찍었어, 봐 봐',
           },
         },
         {
@@ -142,6 +162,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
             ar: 'تحليل مدته 11 دقيقة 📹',
             fr: "11 minutes d'analyse 📹",
             es: 'análisis de 11 minutos 📹',
+            ja: '11分の解説動画 📹',
+            ko: '11분짜리 분석 📹',
           },
         },
       ],
@@ -153,6 +175,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'المباراة ساعة، والجدل حول التسلل 3 أيام',
       fr: 'Match : 1 heure. Débat sur le hors-jeu : 3 jours.',
       es: 'Partido: 1 hora. Debate del fuera de juego: 3 días.',
+      ja: '試合は1時間、オフサイド論争は3日間',
+      ko: '경기는 1시간, 오프사이드 논쟁은 3일',
     },
   },
   {
@@ -160,7 +184,7 @@ export const HOBBIES_SKIP: readonly Draft[] = [
     user: ACCOUNTS.games,
     body: {
       format: 'chat',
-      contact: { tr: 'Annem', en: 'Mom', de: 'Mama', ar: 'أمي', fr: 'Maman', es: 'Mamá' },
+      contact: { tr: 'Annem', en: 'Mom', de: 'Mama', ar: 'أمي', fr: 'Maman', es: 'Mamá', ja: 'お母さん', ko: '엄마' },
       lines: [
         {
           from: 'them',
@@ -171,6 +195,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
             ar: 'الطعام جاهز!',
             fr: 'à table !',
             es: '¡la comida está lista!',
+            ja: 'ごはんできたよ！',
+            ko: '밥 먹어!',
           },
         },
         {
@@ -182,6 +208,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
             ar: 'قادم بعد 5 دقائق',
             fr: "j'arrive dans 5 min",
             es: 'voy en 5 minutos',
+            ja: '5分で行く',
+            ko: '5분 뒤에 갈게',
           },
         },
         {
@@ -193,6 +221,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
             ar: 'قلت هذا قبل 40 دقيقة',
             fr: 'tu disais ça il y a 40 minutes',
             es: 'eso dijiste hace 40 minutos',
+            ja: '40分前もそう言ってた',
+            ko: '40분 전에도 그랬잖아',
           },
         },
         {
@@ -204,6 +234,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
             ar: 'أمي، لا أستطيع الإيقاف، اللعب عبر الإنترنت!',
             fr: "maman, pas de pause, c'est en ligne !",
             es: 'mamá, no puedo pausar, ¡es en línea!',
+            ja: 'オンラインだから止められないの！',
+            ko: '엄마 온라인이라 일시 정지가 안 돼!',
           },
         },
       ],
@@ -215,6 +247,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'اللعب عبر الإنترنت لا يُشرح للأمهات',
       fr: "Le jeu en ligne, ça s'explique pas à maman",
       es: 'Los juegos en línea no se le explican a mamá',
+      ja: 'オンラインゲームは母には説明できない',
+      ko: '온라인 게임은 엄마한테 설명이 안 된다',
     },
   },
   {
@@ -229,6 +263,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
         ar: 'ليلة الألعاب',
         fr: 'Soirée jeux',
         es: 'Noche de juegos',
+        ja: 'ゲーム会',
+        ko: '보드게임 모임',
       },
       lines: [
         {
@@ -240,6 +276,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
             ar: 'اشتريت لعبة لوحية جديدة!!',
             fr: "j'ai un nouveau jeu de société !!",
             es: '¡¡compré un juego de mesa nuevo!!',
+            ja: '新しいボードゲーム買った！！',
+            ko: '새 보드게임 샀어!!',
           },
         },
         {
@@ -251,6 +289,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
             ar: 'رائع! هل قواعدها طويلة؟',
             fr: 'cool ! les règles sont longues ?',
             es: '¡genial! ¿las reglas son largas?',
+            ja: 'いいね！ルール長い？',
+            ko: '좋다! 규칙 길어?',
           },
         },
         {
@@ -262,6 +302,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
             ar: 'لا، قصيرة جدًا',
             fr: 'non, super courtes',
             es: 'no, cortitas',
+            ja: 'ううん、すごく短い',
+            ko: '아니, 완전 짧아',
           },
         },
         {
@@ -273,6 +315,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
             ar: '48 صفحة',
             fr: '48 pages',
             es: '48 páginas',
+            ja: '48ページ',
+            ko: '48페이지',
           },
         },
       ],
@@ -284,6 +328,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'ليست ليلة ألعاب، بل ليلة قراءة',
       fr: 'Pas une soirée jeux : une soirée lecture',
       es: 'No es noche de juegos, es noche de lectura',
+      ja: 'ゲーム会じゃなくて読書会',
+      ko: '게임의 밤이 아니라 독서의 밤',
     },
   },
   {
@@ -298,6 +344,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
         ar: 'مجموعة الدراجات',
         fr: 'Groupe vélo',
         es: 'Grupo de ciclismo',
+        ja: '自転車仲間',
+        ko: '자전거 모임',
       },
       lines: [
         {
@@ -309,6 +357,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
             ar: 'جولة 60 كم يوم الأحد، هل أنت معنا؟',
             fr: 'sortie de 60 km dimanche, partant ?',
             es: 'vuelta de 60 km el domingo, ¿vienes?',
+            ja: '日曜に60km走るけど、来る？',
+            ko: '일요일 60km 라이딩, 올래?',
           },
         },
         {
@@ -320,6 +370,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
             ar: 'أنا معكم! كم استراحة؟',
             fr: 'partant ! combien de pauses ?',
             es: '¡voy! ¿cuántas paradas?',
+            ja: '行く！休憩は何回？',
+            ko: '갈게! 쉬는 시간 몇 번?',
           },
         },
         {
@@ -331,6 +383,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
             ar: 'لا استراحات',
             fr: 'aucune',
             es: 'ninguna',
+            ja: '休憩なし',
+            ko: '없어',
           },
         },
         {
@@ -342,6 +396,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
             ar: 'إذن سألحق بكم بالسيارة',
             fr: 'alors je vous suis en voiture',
             es: 'entonces los sigo en auto',
+            ja: 'じゃあ車で後ろからついてくね',
+            ko: '그럼 난 차로 뒤따라갈게',
           },
         },
       ],
@@ -353,6 +409,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'كل فريق يحتاج إلى سيارة دعم',
       fr: "Toute équipe a besoin d'une voiture-balai",
       es: 'Todo equipo necesita un auto de apoyo',
+      ja: 'どのチームにもサポートカーは必要',
+      ko: '모든 팀에는 지원 차량이 필요하다',
     },
   },
   {
@@ -367,6 +425,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
         ar: 'دخلت النادي. ما أول ما تفعله؟',
         fr: "Tu arrives à la salle. D'abord :",
         es: 'Llegas al gimnasio. Lo primero:',
+        ja: 'ジムに着いた。まずやることは？',
+        ko: '헬스장 도착. 제일 먼저 하는 건?',
       },
       options: [
         {
@@ -376,6 +436,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
           ar: 'أقوم بالإحماء',
           fr: "Je m'échauffe",
           es: 'Caliento',
+          ja: 'ウォームアップ',
+          ko: '몸풀기',
         },
         {
           tr: 'Wi-Fi şifresi sorarım',
@@ -384,6 +446,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
           ar: 'أسأل عن الواي فاي',
           fr: 'Je demande le wifi',
           es: 'Pido la clave del wifi',
+          ja: 'Wi-Fiを聞く',
+          ko: '와이파이 비번 묻기',
         },
       ],
       winner: 1,
@@ -395,6 +459,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'بين كل مجموعة وأخرى: 20 دقيقة تمرير',
       fr: 'Entre deux séries : 20 minutes de scroll',
       es: 'Entre series: 20 minutos de scroll',
+      ja: 'セット間のスクロール、20分',
+      ko: '세트 사이 쉬는 시간: 스크롤 20분',
     },
   },
   {
@@ -409,9 +475,11 @@ export const HOBBIES_SKIP: readonly Draft[] = [
         ar: 'وصلت المباراة إلى ركلات الترجيح. ماذا تفعل؟',
         fr: 'Séance de tirs au but. Toi :',
         es: 'El partido se va a penales. Tú:',
+        ja: '試合がPK戦に突入。あなたは？',
+        ko: '경기가 승부차기로 간다. 나는?',
       },
       options: [
-        { tr: 'İzlerim', en: 'Watch', de: 'Hinschauen', ar: 'أشاهد', fr: 'Je regarde', es: 'Miro' },
+        { tr: 'İzlerim', en: 'Watch', de: 'Hinschauen', ar: 'أشاهد', fr: 'Je regarde', es: 'Miro', ja: '見る', ko: '본다' },
         {
           tr: 'Odadan çıkarım',
           en: 'Leave the room',
@@ -419,6 +487,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
           ar: 'أخرج من الغرفة',
           fr: 'Je sors de la pièce',
           es: 'Salgo del cuarto',
+          ja: '部屋を出る',
+          ko: '방을 나간다',
         },
         {
           tr: 'Gözümü kapatırım',
@@ -427,6 +497,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
           ar: 'أغمض عينيّ',
           fr: 'Je ferme les yeux',
           es: 'Cierro los ojos',
+          ja: '目を閉じる',
+          ko: '눈을 감는다',
         },
       ],
       winner: 1,
@@ -438,6 +510,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'إن شاهدتُ أضاعوها',
       fr: 'Si je regarde, ils ratent',
       es: 'Si miro, fallan',
+      ja: '私が見ると外すから',
+      ko: '내가 보면 꼭 실축한다',
     },
   },
   {
@@ -452,6 +526,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
         ar: 'ستبدأ هواية جديدة. ما الخطوة الأولى؟',
         fr: 'Nouveau hobby. Première étape ?',
         es: 'Empiezas un pasatiempo. ¿Primer paso?',
+        ja: '新しい趣味を始める。最初にやることは？',
+        ko: '새 취미 시작. 첫 단계는?',
       },
       options: [
         {
@@ -461,6 +537,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
           ar: 'أبدأ التعلّم',
           fr: "Je m'y mets",
           es: 'Empiezo a practicar',
+          ja: '練習を始める',
+          ko: '배우기 시작',
         },
         {
           tr: 'Tüm malzemeyi alırım',
@@ -469,6 +547,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
           ar: 'أشتري كل المعدات',
           fr: "J'achète tout le matos",
           es: 'Compro todo el equipo',
+          ja: '道具を全部そろえる',
+          ko: '장비부터 싹 산다',
         },
       ],
       winner: 1,
@@ -480,6 +560,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'المعدات ما زالت في علبتها',
       fr: 'Le matos dort encore dans son carton',
       es: 'Todo sigue en la caja',
+      ja: '道具はまだ箱の中',
+      ko: '장비는 아직 박스 안에 있다',
     },
   },
   {
@@ -494,6 +576,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
         ar: 'سرعتي في الجري',
         fr: 'MA VITESSE DE COURSE',
         es: 'MI RITMO AL CORRER',
+        ja: '私のランニングペース',
+        ko: '내 달리기 속도',
       },
       value: null,
       shape: 'fall',
@@ -506,6 +590,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'كنت أسطورة في أول 200 متر',
       fr: "J'étais une légende sur les 200 premiers mètres",
       es: 'Fui una leyenda los primeros 200 metros',
+      ja: '最初の200mだけは伝説だった',
+      ko: '처음 200m까지는 전설이었다',
     },
   },
   {
@@ -520,6 +606,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
         ar: 'مزاجي أثناء المباراة',
         fr: 'MORAL PENDANT LE MATCH',
         es: 'MI ÁNIMO EN EL PARTIDO',
+        ja: '試合中のテンション',
+        ko: '경기 중 내 기분',
       },
       value: null,
       shape: 'zigzag',
@@ -532,6 +620,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'في 90 دقيقة يئست 6 مرات، وعدت 6 مرات',
       fr: 'En 90 minutes : 6 fois abandonné, 6 fois revenu',
       es: 'En 90 minutos me rendí 6 veces y volví 6 veces',
+      ja: '90分で6回すねて、6回立ち直った',
+      ko: '90분 동안 6번 삐지고 6번 화해했다',
     },
   },
   {
@@ -546,6 +636,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
         ar: 'تقدّمي في اللعبة',
         fr: 'MA PROGRESSION EN JEU',
         es: 'MI PROGRESO EN EL JUEGO',
+        ja: 'ゲームの進行度',
+        ko: '게임 진행도',
       },
       value: null,
       shape: 'crash',
@@ -558,6 +650,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'آخر حفظ: قبل 3 ساعات',
       fr: 'Dernière sauvegarde : il y a 3 heures',
       es: 'Último guardado: hace 3 horas',
+      ja: '最後のセーブ：3時間前',
+      ko: '마지막 저장: 3시간 전',
     },
   },
   {
@@ -572,6 +666,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
         ar: 'متجر الرياضة',
         fr: 'MAGASIN DE SPORT',
         es: 'TIENDA DE DEPORTES',
+        ja: 'スポーツ用品店',
+        ko: '스포츠 용품점',
       },
       items: [
         {
@@ -581,6 +677,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
           ar: 'كرات قدم (4)',
           fr: 'BALLONS DE FOOT (4)',
           es: 'BALONES DE FÚTBOL (4)',
+          ja: 'サッカーボール 4個',
+          ko: '축구공 (4개)',
         },
       ],
     },
@@ -591,6 +689,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'ثلاث لحديقة الجيران، وواحدة لنا',
       fr: 'Trois pour le jardin du voisin, un pour nous',
       es: 'Tres para el patio del vecino, uno para nosotros',
+      ja: '3個はお隣の庭用、1個はうち用',
+      ko: '3개는 옆집 마당용, 1개는 우리 거',
     },
   },
   {
@@ -605,6 +705,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
         ar: 'متجر الموسيقى',
         fr: 'MAGASIN DE MUSIQUE',
         es: 'TIENDA DE MÚSICA',
+        ja: '楽器店',
+        ko: '악기점',
       },
       items: [
         {
@@ -614,6 +716,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
           ar: 'ريش غيتار (50 قطعة)',
           fr: 'MÉDIATORS (50)',
           es: 'PÚAS DE GUITARRA (50)',
+          ja: 'ギターピック 50枚',
+          ko: '기타 피크 (50개)',
         },
       ],
     },
@@ -624,6 +728,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'بعد أسبوع بقيت 3. إلى أين تختفي؟',
       fr: 'Une semaine après, il en reste 3. Ils vont où ?',
       es: 'Una semana después quedan 3. ¿Adónde se van?',
+      ja: '1週間で残り3枚。みんなどこへ行くの？',
+      ko: '일주일 만에 3개 남음. 다들 어디 가는 거야?',
     },
   },
   {
@@ -638,6 +744,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
         ar: 'مستلزمات السباحة',
         fr: 'ARTICLES DE NATATION',
         es: 'TODO PARA NATACIÓN',
+        ja: '水泳用品店',
+        ko: '수영용품점',
       },
       items: [
         {
@@ -647,6 +755,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
           ar: 'نظارة مضادة للضباب',
           fr: 'LUNETTES ANTIBUÉE',
           es: 'GAFAS ANTIEMPAÑO',
+          ja: 'くもり止めゴーグル',
+          ko: '김서림 방지 수경',
         },
       ],
     },
@@ -657,6 +767,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'تكوّن عليها الضباب خلال 10 ثوانٍ.',
       fr: 'Buée au bout de 10 secondes.',
       es: 'Se empañaron en 10 segundos.',
+      ja: 'くもった。10秒で。',
+      ko: '김 서렸다. 10초 만에.',
     },
   },
   {
@@ -671,8 +783,10 @@ export const HOBBIES_SKIP: readonly Draft[] = [
         ar: 'هذا الأسبوع',
         fr: 'CETTE SEMAINE',
         es: 'ESTA SEMANA',
+        ja: '今週',
+        ko: '이번 주',
       },
-      big: { tr: '3', en: '3', de: '3', ar: '3', fr: '3', es: '3' },
+      big: { tr: '3', en: '3', de: '3', ar: '3', fr: '3', es: '3', ja: '3', ko: '3' },
       text: {
         tr: 'saat ip çözdün; 10 dakika ördün',
         en: 'hours untangling yarn. 10 minutes knitting.',
@@ -680,6 +794,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
         ar: 'ساعات في فك تشابك الخيوط، و10 دقائق في الحياكة',
         fr: 'heures à démêler la laine, 10 minutes à tricoter',
         es: 'horas desenredando lana, 10 minutos tejiendo',
+        ja: '時間、毛糸をほどいてた。編んだのは10分。',
+        ko: '시간 동안 실 풀기. 뜨개질은 10분.',
       },
     },
     caption: {
@@ -689,6 +805,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'عُقد أكثر من الحياكة',
       fr: 'Plus de nœuds que de mailles',
       es: 'Más nudos que puntos',
+      ja: '編み物というより、ほどき物',
+      ko: '뜨개질이 아니라 매듭질',
     },
   },
   {
@@ -697,7 +815,7 @@ export const HOBBIES_SKIP: readonly Draft[] = [
     body: {
       format: 'fact',
       eyebrow: null,
-      big: { tr: '400', en: '400', de: '400', ar: '400', fr: '400', es: '400' },
+      big: { tr: '400', en: '400', de: '400', ar: '400', fr: '400', es: '400', ja: '400', ko: '400' },
       text: {
         tr: 'parça gökyüzü; hepsi aynı mavi',
         en: 'pieces of sky. All the exact same blue.',
@@ -705,6 +823,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
         ar: 'قطعة من السماء، وكلها بالأزرق نفسه',
         fr: 'pièces de ciel. Toutes exactement du même bleu.',
         es: 'piezas de cielo. Todas del mismo azul.',
+        ja: 'ピースの空。全部まったく同じ青。',
+        ko: '조각이 전부 하늘. 모두 똑같은 파란색.',
       },
     },
     caption: {
@@ -714,6 +834,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'كان عليك شراء التي فيها غيوم',
       fr: 'Fallait prendre celui avec des nuages',
       es: 'Debiste comprar el que tenía nubes',
+      ja: '雲があるやつにすればよかった',
+      ko: '구름 있는 걸 살 걸 그랬다',
     },
   },
   {
@@ -728,8 +850,10 @@ export const HOBBIES_SKIP: readonly Draft[] = [
         ar: 'هذا الشهر',
         fr: 'CE MOIS-CI',
         es: 'ESTE MES',
+        ja: '今月',
+        ko: '이번 달',
       },
-      big: { tr: '200', en: '200', de: '200', ar: '200', fr: '200', es: '200' },
+      big: { tr: '200', en: '200', de: '200', ar: '200', fr: '200', es: '200', ja: '200', ko: '200' },
       text: {
         tr: 'saat oyundaki evini döşedin; gerçek odan hâlâ dağınık',
         en: 'hours decorating your game house. Your real room: still a mess.',
@@ -737,6 +861,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
         ar: 'ساعة في تزيين بيتك داخل اللعبة… وغرفتك الحقيقية ما زالت فوضى',
         fr: 'heures à décorer ta maison dans le jeu. Ta chambre : le bazar.',
         es: 'horas decorando tu casa del juego. Tu cuarto: un desastre.',
+        ja: '時間、ゲームの家を飾った。本当の部屋はまだ散らかってる。',
+        ko: '시간 동안 게임 속 집을 꾸몄어요. 진짜 방은 아직 난장판.',
       },
     },
     caption: {
@@ -746,6 +872,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'البيت الافتراضي: 5 نجوم. الحقيقي: لا تسأل.',
       fr: 'Maison virtuelle : 5 étoiles. La vraie : sans commentaire.',
       es: 'Casa virtual: 5 estrellas. La real: ni preguntes.',
+      ja: 'ゲームの家：星5つ。現実の家：聞かないで。',
+      ko: '게임 속 집: 별 5개. 진짜 집: 묻지 마.',
     },
   },
   {
@@ -760,6 +888,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
         ar: 'هواياتي التي لم تكتمل',
         fr: 'MES HOBBIES ABANDONNÉS',
         es: 'MIS PASATIEMPOS A MEDIAS',
+        ja: '途中でやめた趣味',
+        ko: '하다 만 취미들',
       },
       rows: [['🎸', '🎨'], ['🧶', '📷'], ['🎹', '🛼'], ['🪕']],
     },
@@ -770,6 +900,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'كلها شبه جديدة، وكلها للبيع',
       fr: 'Tout est comme neuf. Tout est à vendre.',
       es: 'Todo casi sin usar. Todo a la venta.',
+      ja: 'どれもほぼ未使用。全部売ります。',
+      ko: '전부 거의 새것. 전부 팝니다.',
     },
   },
   {
@@ -784,6 +916,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
         ar: 'تصنيف الرياضات',
         fr: 'TIER LIST DES SPORTS',
         es: 'TIER LIST DE DEPORTES',
+        ja: 'スポーツTier表',
+        ko: '스포츠 티어표',
       },
       rows: [['🎣', '🎯', '🏎️'], ['🎳', '🎱'], ['🏊', '🏐'], ['🏃', '🧗']],
     },
@@ -794,6 +928,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'ما يُمارَس جلوسًا يأتي في المقدمة',
       fr: "Si ça se fait assis, c'est S",
       es: 'Si se hace sentado, es S',
+      ja: '座ってできるならS',
+      ko: '앉아서 할 수 있으면 S',
     },
   },
   {
@@ -810,6 +946,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
           ar: 'اللعبة',
           fr: 'Jeu',
           es: 'Juego',
+          ja: 'ゲーム',
+          ko: '게임',
         },
         text: {
           tr: 'Enerjin doldu! Oynamaya hazırsın',
@@ -818,6 +956,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
           ar: 'طاقتك ممتلئة! أنت جاهز للعب',
           fr: 'Ton énergie est pleine ! Prêt à jouer',
           es: '¡Tu energía está llena! A jugar',
+          ja: 'スタミナ全回復！遊ぶ準備OK',
+          ko: '에너지 충전 완료! 플레이 준비 끝',
         },
       },
     },
@@ -828,6 +968,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'طاقة اللعبة ربما، أما طاقتي فعند 3%',
       fr: 'Celle du jeu, peut-être. La mienne : 3 %.',
       es: 'La del juego, quizá. La mía: 3 %.',
+      ja: 'ゲームのはね。私のは残り3%。',
+      ko: '게임 에너지는 찼지. 내 건 아직 3%.',
     },
   },
   {
@@ -844,6 +986,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
           ar: 'متتبّع الجري',
           fr: 'Suivi de course',
           es: 'Mis carreras',
+          ja: 'ランニング記録',
+          ko: '러닝 기록',
         },
         text: {
           tr: 'Kişisel rekor! 400 m, 65 saniye',
@@ -852,6 +996,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
           ar: 'رقم شخصي جديد! 400 م في 65 ثانية',
           fr: 'Record perso ! 400 m en 65 secondes',
           es: '¡Récord personal! 400 m en 65 segundos',
+          ja: '自己ベスト！400mを65秒',
+          ko: '개인 최고 기록! 400m 65초',
         },
       },
     },
@@ -862,6 +1008,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'كنت أركض خلف الحافلة',
       fr: 'Je courais après le bus',
       es: 'Iba corriendo detrás del bus',
+      ja: 'バスに乗り遅れそうだっただけ',
+      ko: '버스 잡으려고 뛰었을 뿐',
     },
   },
   {
@@ -876,6 +1024,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
         ar: 'يومًا ما أم اليوم الأول؟ أنا في اليوم الأول منذ 3 سنوات.',
         fr: 'Un jour ou jour un ? Moi, je suis au jour un depuis 3 ans.',
         es: '¿Algún día o día uno? Llevo 3 años en el día uno.',
+        ja: '「いつか」じゃなく「今日から」。私は3年間ずっと「今日から」。',
+        ko: '언젠가가 아니라 오늘부터. 나는 3년째 오늘부터다.',
       },
     },
     caption: {
@@ -885,6 +1035,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'أعود إلى الرياضة كل يوم اثنين من جديد',
       fr: 'Je reprends le sport chaque lundi',
       es: 'Retomo el gimnasio cada lunes',
+      ja: '毎週月曜にジムを再開してる',
+      ko: '운동은 매주 월요일마다 다시 시작한다',
     },
   },
   {
@@ -899,6 +1051,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
         ar: 'إن كنت تتعرّق فأنت على الطريق الصحيح. — شخص جالس في الساونا',
         fr: "Si tu transpires, t'es sur la bonne voie. — Moi, au sauna",
         es: 'Si sudas, vas por buen camino. — Yo, en la sauna',
+        ja: '汗をかいているなら、正しい道を進んでいる。— サウナにいる私',
+        ko: '땀이 난다면 제대로 가고 있는 것이다. — 사우나에 앉은 나',
       },
     },
     caption: {
@@ -908,6 +1062,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'تمرين اليوم: اكتمل.',
       fr: 'Séance du jour : terminée.',
       es: 'Entrenamiento de hoy: listo.',
+      ja: '本日のトレーニング、完了。',
+      ko: '오늘 운동 완료.',
     },
   },
   {
@@ -922,6 +1078,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
         ar: 'فكّر جيدًا قبل كل نقلة. — أنا بعد 20 دقيقة أحرّك أي بيدق',
         fr: 'Réfléchis bien. — Moi, qui joue un pion au hasard après 20 minutes',
         es: 'Piensa bien cada jugada. — Yo, moviendo un peón al azar tras 20 minutos',
+        ja: '一手一手よく考えよ。— 20分考えて適当にポーンを動かす私',
+        ko: '한 수 한 수 신중하게 두어라. — 20분 고민하고 아무 말이나 옮기는 나',
       },
     },
     caption: {
@@ -931,6 +1089,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'خصمي شرب كوبين من الشاي في الأثناء',
       fr: "Pendant ce temps, l'adversaire a bu deux thés",
       es: 'Mientras, mi rival se tomó dos tés',
+      ja: 'その間に相手はお茶を2杯飲んだ',
+      ko: '그동안 상대는 차를 두 잔 마셨다',
     },
   },
   {
@@ -945,6 +1105,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
         ar: 'منافسك الوحيد هو أنت بالأمس. وأنا بالأمس كنت كسولًا، ففزت بسهولة.',
         fr: "Ton seul rival, c'est toi hier. Et hier, j'étais flemmard : facile.",
         es: 'Tu único rival eres tú ayer. Y ayer yo era perezoso: fácil.',
+        ja: '唯一のライバルは昨日の自分。昨日の私は怠け者だった。楽勝。',
+        ko: '유일한 라이벌은 어제의 나. 어제의 나는 게을렀다. 쉽게 이김.',
       },
     },
     caption: {
@@ -954,6 +1116,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'تمرينا ضغط اليوم: رقم قياسي جديد',
       fr: "2 pompes aujourd'hui. Nouveau record.",
       es: 'Hoy 2 flexiones: nuevo récord.',
+      ja: '今日は腕立て2回。自己新記録。',
+      ko: '오늘 팔굽혀펴기 2개. 신기록.',
     },
   },
   {
@@ -968,6 +1132,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
         ar: 'المهم ليس الفوز بل المشاركة. أنا من يقول هذا دائمًا.',
         fr: "L'important, c'est de participer. C'est toujours moi qui le dis.",
         es: 'Lo importante no es ganar, sino participar. Siempre lo digo yo.',
+        ja: '大切なのは勝つことではなく、参加することだ。私はこれをよく言う。',
+        ko: '중요한 건 이기는 게 아니라 참가하는 것. 내가 자주 하는 말이다.',
       },
     },
     caption: {
@@ -977,6 +1143,8 @@ export const HOBBIES_SKIP: readonly Draft[] = [
       ar: 'سجلّي في ليالي الألعاب: 0 انتصارات',
       fr: 'Mon bilan en soirée jeux : 0 victoire',
       es: 'Mi récord en noches de juegos: 0 victorias',
+      ja: 'ゲーム会の戦績：0勝',
+      ko: '게임의 밤 전적: 0승',
     },
   },
 ];
@@ -993,6 +1161,8 @@ export const HOBBIES_LIKE: readonly Draft[] = [
       ar: 'أتعلّم التزلج على اللوح في الثلاثين، وصفّق لي الأطفال',
       fr: 'skate à 30 ans : les enfants du parc ont applaudi',
       es: 'aprendo skate a los 30 y los niños del parque aplaudieron',
+      ja: '30歳でスケボー練習中。公園の子どもたちが拍手してくれた',
+      ko: '30살에 보드 배우는 중. 공원 꼬마들이 박수 쳐 줌',
     },
   },
   {
@@ -1006,6 +1176,8 @@ export const HOBBIES_LIKE: readonly Draft[] = [
       ar: 'أخيرًا وقفت على يديّ! (بمساعدة صغيرة من الجدار)',
       fr: "enfin réussi l'équilibre sur les mains ! (merci le mur)",
       es: '¡por fin hice una parada de manos! (la pared ayudó)',
+      ja: 'ついに逆立ちできた！（壁にちょっと手伝ってもらった）',
+      ko: '드디어 물구나무 성공! (벽이 좀 도와줌)',
     },
   },
   {
@@ -1019,6 +1191,8 @@ export const HOBBIES_LIKE: readonly Draft[] = [
       ar: 'سجّلت أول هدف لي!! (كان الحارس يشرب الماء)',
       fr: "mon premier but !! (le gardien buvait de l'eau)",
       es: '¡¡metí mi primer gol!! (el portero estaba tomando agua)',
+      ja: '初ゴール決めた！！（キーパーは水飲んでた）',
+      ko: '첫 골 넣음!! (골키퍼 물 마시는 중이었음)',
     },
   },
   {
@@ -1032,6 +1206,8 @@ export const HOBBIES_LIKE: readonly Draft[] = [
       ar: 'في درس السالسا لم أدُس على قدم أحد لأول مرة!!',
       fr: "cours de salsa : j'ai marché sur les pieds de personne !!",
       es: '¡¡en salsa no le pisé el pie a nadie por primera vez!!',
+      ja: 'サルサ教室で初めて誰の足も踏まなかった！！',
+      ko: '살사 수업에서 처음으로 아무 발도 안 밟음!!',
     },
   },
   {
@@ -1046,6 +1222,8 @@ export const HOBBIES_LIKE: readonly Draft[] = [
         ar: 'اليوم 1 ← اليوم 30',
         fr: 'jour 1 → jour 30',
         es: 'día 1 → día 30',
+        ja: '1日目 → 30日目',
+        ko: '1일 차 → 30일 차',
       },
     },
     caption: {
@@ -1055,6 +1233,8 @@ export const HOBBIES_LIKE: readonly Draft[] = [
       ar: 'رسمت كل يوم لمدة 30 يومًا، انظروا إلى الفرق',
       fr: '30 jours de dessin, regardez la différence',
       es: 'dibujé 30 días seguidos, miren la diferencia',
+      ja: '30日間毎日描いた。この差を見て',
+      ko: '30일 동안 매일 그렸음, 차이 좀 봐',
     },
   },
   {
@@ -1069,6 +1249,8 @@ export const HOBBIES_LIKE: readonly Draft[] = [
         ar: 'أوضح لقطة',
         fr: 'la plus nette',
         es: 'la más nítida',
+        ja: 'いちばんくっきり',
+        ko: '제일 선명한 컷',
       },
     },
     caption: {
@@ -1078,6 +1260,8 @@ export const HOBBIES_LIKE: readonly Draft[] = [
       ar: 'طُبع أول فيلم تصوير لي: 4 صور واضحة من 36',
       fr: 'ma première pellicule : 4 photos nettes sur 36',
       es: 'revelé mi primer rollo: 4 de 36 fotos nítidas',
+      ja: '初フィルム現像：36枚中ピントが合ったのは4枚',
+      ko: '첫 필름 현상 완료: 36장 중 4장 초점 맞음',
     },
   },
   {
@@ -1092,6 +1276,8 @@ export const HOBBIES_LIKE: readonly Draft[] = [
         ar: 'حفلتي الأولى',
         fr: 'premier concert',
         es: 'mi primer concierto',
+        ja: '初ライブ',
+        ko: '첫 공연',
       },
     },
     caption: {
@@ -1101,6 +1287,8 @@ export const HOBBIES_LIKE: readonly Draft[] = [
       ar: 'عزفت لأمي أول أغنية، فبكت (من الفرح، أتمنى)',
       fr: 'premier morceau pour maman, elle a pleuré (de joie ?)',
       es: 'mi primera canción para mamá: lloró (de emoción, espero)',
+      ja: '母に初めての曲を弾いたら泣いた（感動でだといいな）',
+      ko: '엄마한테 첫 곡 들려 드렸더니 우심 (감동이겠지?)',
     },
   },
   {
@@ -1115,6 +1303,8 @@ export const HOBBIES_LIKE: readonly Draft[] = [
         ar: 'البرونزية لي',
         fr: 'le bronze est à moi',
         es: 'el bronce es mío',
+        ja: 'ブロンズは私のもの',
+        ko: '동메달은 내 거',
       },
     },
     caption: {
@@ -1124,6 +1314,8 @@ export const HOBBIES_LIKE: readonly Draft[] = [
       ar: 'حللتُ في المركز الثالث في مسابقة التسلق!! (كنا 3 فقط)',
       fr: "3e au concours d'escalade !! (on était 3)",
       es: '¡¡quedé en 3.er lugar en el torneo de escalada!! (éramos 3)',
+      ja: 'クライミング大会で3位！！（参加者3人）',
+      ko: '클라이밍 대회 3등 함!! (3명 나갔음)',
     },
   },
   {
@@ -1137,6 +1329,8 @@ export const HOBBIES_LIKE: readonly Draft[] = [
       ar: 'يوم المباراة: خسرنا، وصوتي ما زال مبحوحًا',
       fr: 'jour de match : on a perdu, et moi, ma voix',
       es: 'día de partido: perdimos y sigo sin voz',
+      ja: '試合の日まとめ：負けたし、声はまだ出ない',
+      ko: '경기 날 덤프: 졌고, 목은 아직도 쉬어 있음',
     },
   },
   {
@@ -1150,6 +1344,8 @@ export const HOBBIES_LIKE: readonly Draft[] = [
       ar: 'الغولف المصغّر: 18 حفرة، 94 ضربة، والكرة في البركة مرتين',
       fr: 'mini-golf : 18 trous, 94 coups, 2 plongeons dans la mare',
       es: 'minigolf: 18 hoyos, 94 golpes, la pelota 2 veces al agua',
+      ja: 'パターゴルフまとめ：18ホール94打、池ポチャ2回',
+      ko: '미니 골프 덤프: 18홀, 94타, 공 2번 연못행',
     },
   },
   {
@@ -1163,6 +1359,8 @@ export const HOBBIES_LIKE: readonly Draft[] = [
       ar: 'ورشة الفخار: صنعت كوبًا واحدًا، ونصف الطين عليّ',
       fr: "atelier poterie : 1 tasse, et la moitié de l'argile sur moi",
       es: 'cerámica: hice 1 taza y tengo la mitad del barro encima',
+      ja: '陶芸教室：マグ1個完成、粘土の半分は私の服に',
+      ko: '도예 공방: 머그 1개 완성, 흙 절반은 내 옷에',
     },
   },
   {
@@ -1176,6 +1374,8 @@ export const HOBBIES_LIKE: readonly Draft[] = [
       ar: 'مجموعة أسطواناتي وصلت إلى 50!! ولا أملك مشغّلًا بعد',
       fr: '50 vinyles dans ma collection !! pas encore de platine',
       es: '¡¡50 vinilos en mi colección!! aún sin tocadiscos',
+      ja: 'レコードが50枚になった！！プレーヤーはまだない',
+      ko: 'LP 컬렉션 50장 됨!! 턴테이블은 아직 없음',
     },
   },
 ];
@@ -1192,6 +1392,8 @@ export const HOBBIES_HOLD: readonly Draft[] = [
       ar: 'الكرة في الهواء والوقت ينفد… انتظر اللحظة المناسبة',
       fr: "Ballon en l'air, le chrono tourne… attends le bon moment",
       es: 'Balón en el aire, el reloj corre… espera el momento',
+      ja: 'ボールは空中、時間切れ間近…その瞬間を待て',
+      ko: '공은 공중에, 시간은 끝나 간다… 그 순간을 기다려요',
     },
   },
   {
@@ -1205,6 +1407,8 @@ export const HOBBIES_HOLD: readonly Draft[] = [
       ar: 'ستة وستة للمرة الثالثة على التوالي. صمت حول الطاولة.',
       fr: "Troisième double six d'affilée. Silence autour de la table.",
       es: 'Tercer doble seis seguido. Silencio en la mesa.',
+      ja: '3回連続で6のゾロ目。卓が静まり返った。',
+      ko: '3번 연속 더블 식스. 테이블에 정적.',
     },
   },
   {
@@ -1218,6 +1422,8 @@ export const HOBBIES_HOLD: readonly Draft[] = [
       ar: 'وزير الخصم مكشوف! فرصة لن تتكرر.',
       fr: "La dame adverse est en prise ! Ça n'arrivera plus jamais.",
       es: '¡Te dejaron la reina servida! Oportunidad única.',
+      ja: '相手のクイーンががら空き！このチャンスは二度とない。',
+      ko: '상대 퀸이 무방비! 이런 기회는 다시 안 와요.',
     },
   },
   {
@@ -1231,6 +1437,8 @@ export const HOBBIES_HOLD: readonly Draft[] = [
       ar: 'طابع بخطأ طباعي! لا يوجد منه في العالم سوى 3',
       fr: 'Un timbre mal imprimé ! Il en existe 3 au monde',
       es: '¡Un sello con error de impresión! Solo hay 3 en el mundo',
+      ja: 'エラー切手！世界に3枚しかない',
+      ko: '오류 인쇄 우표! 세상에 딱 3장뿐',
     },
   },
   {
@@ -1244,6 +1452,8 @@ export const HOBBIES_HOLD: readonly Draft[] = [
       ar: 'آخر ملصق في الألبوم! انتهى بحث دام 3 سنوات',
       fr: "La dernière vignette de l'album ! 3 ans de chasse terminés",
       es: '¡El último sticker del álbum! 3 años buscándolo',
+      ja: 'アルバム最後のシール！3年間の捜索が終わった',
+      ko: '앨범의 마지막 스티커! 3년의 추적이 끝났다',
     },
   },
   {
@@ -1257,6 +1467,8 @@ export const HOBBIES_HOLD: readonly Draft[] = [
       ar: 'تبادل 99 ضربة! والضربة المئة لك.',
       fr: 'Un échange de 99 coups ! Le 100e est pour toi.',
       es: '¡Un peloteo de 99 golpes! El número 100 es tuyo.',
+      ja: '99回続くラリー！100回目はあなたが打つ。',
+      ko: '99번 이어진 랠리! 100번째는 당신 차례.',
     },
   },
   {
@@ -1270,6 +1482,8 @@ export const HOBBIES_HOLD: readonly Draft[] = [
       ar: 'حياة إضافية! وأنت في آخر حياة لديك',
       fr: "Vie bonus ! Pile quand t'étais à ta dernière",
       es: '¡Vida extra! Justo cuando te quedaba la última',
+      ja: '1UP！しかも残機ラスト1のときに',
+      ko: '추가 목숨! 그것도 마지막 목숨일 때',
     },
   },
   {
@@ -1283,6 +1497,8 @@ export const HOBBIES_HOLD: readonly Draft[] = [
       ar: 'لحظة أسطورية: أحدهم أعاد الأوزان إلى مكانها',
       fr: "Scène légendaire : quelqu'un a rangé les haltères",
       es: 'Momento legendario: alguien devolvió las pesas a su lugar',
+      ja: '伝説の目撃情報：誰かがダンベルを元に戻した',
+      ko: '전설의 목격담: 누군가 덤벨을 제자리에 놓았다',
     },
   },
 ];
@@ -1300,6 +1516,8 @@ export const HOBBIES_FREEZE: readonly Draft[] = [
         ar: 'لا تلمس',
         fr: 'NE TOUCHE PAS',
         es: 'NO TOQUES',
+        ja: 'さわらないで',
+        ko: '손대지 마세요',
       },
       small: {
         tr: 'DOKUNULAN TAŞ OYNANIR',
@@ -1308,6 +1526,8 @@ export const HOBBIES_FREEZE: readonly Draft[] = [
         ar: 'القطعة التي تلمسها تحرّكها',
         fr: 'PIÈCE TOUCHÉE, PIÈCE JOUÉE',
         es: 'PIEZA TOCADA, PIEZA MOVIDA',
+        ja: 'さわった駒は動かすこと',
+        ko: '만진 말은 둬야 함',
       },
     },
     caption: {
@@ -1317,6 +1537,8 @@ export const HOBBIES_FREEZE: readonly Draft[] = [
       ar: 'أبعد يدك عن الرقعة.',
       fr: "Pas touche à l'échiquier.",
       es: 'Quita la mano del tablero.',
+      ja: '盤から手を離して。',
+      ko: '판에서 손 떼세요.',
     },
     headline: {
       tr: 'Sıra sende ama henüz emin değilsin',
@@ -1325,6 +1547,8 @@ export const HOBBIES_FREEZE: readonly Draft[] = [
       ar: 'دورك الآن، ولست متأكدًا بعد',
       fr: "À toi de jouer. T'es pas encore sûr.",
       es: 'Te toca mover. Aún no estás seguro.',
+      ja: 'あなたの番。でもまだ迷ってる',
+      ko: '차례가 왔지만 아직 확신이 없어요',
     },
   },
   {
@@ -1339,6 +1563,8 @@ export const HOBBIES_FREEZE: readonly Draft[] = [
         ar: 'نقطة المباراة',
         fr: 'BALLE DE MATCH',
         es: 'MATCH POINT',
+        ja: 'マッチポイント',
+        ko: '매치 포인트',
       },
       small: {
         tr: 'SESSİZLİK LÜTFEN',
@@ -1347,6 +1573,8 @@ export const HOBBIES_FREEZE: readonly Draft[] = [
         ar: 'الهدوء من فضلك',
         fr: "SILENCE, S'IL VOUS PLAÎT",
         es: 'SILENCIO, POR FAVOR',
+        ja: 'お静かに',
+        ko: '정숙해 주세요',
       },
     },
     caption: {
@@ -1356,6 +1584,8 @@ export const HOBBIES_FREEZE: readonly Draft[] = [
       ar: 'احبس أنفاسك مع الجمهور.',
       fr: 'Retiens ton souffle avec le public.',
       es: 'Contén el aliento con el público.',
+      ja: '観客と一緒に息をのんで。',
+      ko: '관중과 함께 숨을 참으세요.',
     },
     headline: {
       tr: 'Servis atılmak üzere, tribün sustu',
@@ -1364,6 +1594,8 @@ export const HOBBIES_FREEZE: readonly Draft[] = [
       ar: 'الإرسال بعد لحظة، والمدرجات صامتة',
       fr: 'Le service arrive. Silence total.',
       es: 'Viene el saque. Silencio total.',
+      ja: 'サーブ直前、会場が静まり返った',
+      ko: '서브 직전, 관중석이 조용해졌어요',
     },
   },
   {
@@ -1378,6 +1610,8 @@ export const HOBBIES_FREEZE: readonly Draft[] = [
         ar: 'جلسة رسم',
         fr: 'SÉANCE DE POSE',
         es: 'MODELO POSANDO',
+        ja: 'ポーズ中',
+        ko: '모델 포즈 중',
       },
       small: {
         tr: 'RESİM KURSU DEVAM EDİYOR',
@@ -1386,6 +1620,8 @@ export const HOBBIES_FREEZE: readonly Draft[] = [
         ar: 'درس الرسم مستمر',
         fr: 'ATELIER DE DESSIN EN COURS',
         es: 'CLASE DE DIBUJO EN CURSO',
+        ja: 'デッサン教室 開催中',
+        ko: '미술 수업 진행 중',
       },
     },
     caption: {
@@ -1395,6 +1631,8 @@ export const HOBBIES_FREEZE: readonly Draft[] = [
       ar: 'حتى لو حكّك أنفك.',
       fr: 'Même si ton nez te gratte.',
       es: 'Aunque te pique la nariz.',
+      ja: '鼻がかゆくても。',
+      ko: '코가 간지러워도요.',
     },
     headline: {
       tr: 'Resim kursunda model sensin',
@@ -1403,6 +1641,8 @@ export const HOBBIES_FREEZE: readonly Draft[] = [
       ar: 'أنت الموديل في درس الرسم',
       fr: "C'est toi le modèle au cours de dessin",
       es: 'Eres el modelo de la clase de dibujo',
+      ja: 'デッサン教室のモデルはあなた',
+      ko: '오늘 미술 수업 모델이 됐어요',
     },
   },
   {
@@ -1417,6 +1657,8 @@ export const HOBBIES_FREEZE: readonly Draft[] = [
         ar: 'المكان المحظوظ',
         fr: 'PLACE FÉTICHE',
         es: 'ZONA DE SUERTE',
+        ja: '縁起のいい席',
+        ko: '행운의 자리',
       },
       small: {
         tr: 'MAÇ BİTENE KADAR KALKMAYIN',
@@ -1425,6 +1667,8 @@ export const HOBBIES_FREEZE: readonly Draft[] = [
         ar: 'لا تتحرك حتى نهاية المباراة',
         fr: 'PAS BOUGER AVANT LA FIN',
         es: 'NO TE MUEVAS HASTA EL FINAL',
+        ja: '試合終了まで立たないこと',
+        ko: '경기 끝까지 일어나지 마시오',
       },
     },
     caption: {
@@ -1434,6 +1678,8 @@ export const HOBBIES_FREEZE: readonly Draft[] = [
       ar: 'لا تغيّر جلستك.',
       fr: 'Change surtout pas de position.',
       es: 'No cambies de postura.',
+      ja: 'その姿勢をキープ。',
+      ko: '그 자세 그대로.',
     },
     headline: {
       tr: 'Sen böyle oturunca gol geliyor',
@@ -1442,6 +1688,8 @@ export const HOBBIES_FREEZE: readonly Draft[] = [
       ar: 'كلما جلست هكذا سجّلوا هدفًا',
       fr: "Quand tu t'assois comme ça, ils marquent",
       es: 'Cuando te sientas así, meten gol',
+      ja: 'あなたがこう座るとゴールが決まる',
+      ko: '이렇게 앉으면 골이 들어가요',
     },
   },
   {
@@ -1456,6 +1704,8 @@ export const HOBBIES_FREEZE: readonly Draft[] = [
         ar: 'رصيف الصيد',
         fr: 'PONTON DE PÊCHE',
         es: 'MUELLE DE PESCA',
+        ja: '釣り桟橋',
+        ko: '낚시 부두',
       },
     },
     caption: {
@@ -1465,6 +1715,8 @@ export const HOBBIES_FREEZE: readonly Draft[] = [
       ar: 'لا تحرّك الصنارة.',
       fr: 'Bouge pas la canne.',
       es: 'No muevas la caña.',
+      ja: '竿を動かさないで。',
+      ko: '낚싯대 움직이지 마세요.',
     },
     headline: {
       tr: 'Balık yeme yaklaşıyor',
@@ -1473,6 +1725,8 @@ export const HOBBIES_FREEZE: readonly Draft[] = [
       ar: 'سمكة تقترب من الطُّعم',
       fr: "Un poisson tourne autour de l'appât",
       es: 'Un pez se acerca al anzuelo',
+      ja: '魚がエサをつついてる',
+      ko: '물고기가 미끼를 건드리고 있어요',
     },
   },
   {
@@ -1487,6 +1741,8 @@ export const HOBBIES_FREEZE: readonly Draft[] = [
         ar: 'قاعة التأمل',
         fr: 'SALLE ZEN',
         es: 'SALA DE MEDITACIÓN',
+        ja: '瞑想ルーム',
+        ko: '명상실',
       },
     },
     caption: {
@@ -1496,6 +1752,8 @@ export const HOBBIES_FREEZE: readonly Draft[] = [
       ar: 'أغمض عينيك. لا تتحرك.',
       fr: 'Ferme les yeux. Bouge pas.',
       es: 'Cierra los ojos. No te muevas.',
+      ja: '目を閉じて。動かないで。',
+      ko: '눈 감고, 움직이지 마세요.',
     },
     headline: {
       tr: 'Hoca, meditasyonda kıpırdayanı arıyor',
@@ -1504,6 +1762,8 @@ export const HOBBIES_FREEZE: readonly Draft[] = [
       ar: 'المدربة تبحث عمّن يتململ',
       fr: 'La prof guette qui gigote',
       es: 'La profe busca quién se mueve',
+      ja: '先生が動いてる人を探してる',
+      ko: '선생님이 움직이는 사람을 찾고 있어요',
     },
   },
   {
@@ -1518,6 +1778,8 @@ export const HOBBIES_FREEZE: readonly Draft[] = [
         ar: 'بروفة الأوركسترا',
         fr: 'RÉPÉTITION',
         es: 'ENSAYO DE ORQUESTA',
+        ja: 'オーケストラ練習',
+        ko: '오케스트라 연습',
       },
     },
     caption: {
@@ -1527,6 +1789,8 @@ export const HOBBIES_FREEZE: readonly Draft[] = [
       ar: 'القوس ثابت، والوجه بريء.',
       fr: 'Archet immobile, air innocent.',
       es: 'Arco quieto, cara de inocente.',
+      ja: '弓は空中で止めて、しれっとした顔で。',
+      ko: '활은 멈추고, 표정은 태연하게.',
     },
     headline: {
       tr: 'Şef, yanlış notanın sahibini arıyor',
@@ -1535,6 +1799,8 @@ export const HOBBIES_FREEZE: readonly Draft[] = [
       ar: 'المايسترو يبحث عن صاحب النغمة الخاطئة',
       fr: 'Le chef traque la fausse note',
       es: 'El director busca al de la nota falsa',
+      ja: '指揮者が音を外した犯人を探してる',
+      ko: '지휘자가 틀린 음의 주인을 찾고 있어요',
     },
   },
 ];

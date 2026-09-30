@@ -142,8 +142,21 @@ every line is a third taller (`lh()`: Cairo's letters climb and hang
 further). The language picker writes each language's name in its own face,
 whatever the game speaks.
 
+**Japanese and Korean** have letters neither Rubik nor Nunito draws, so each
+brings its own rounded, heavy faces (OFL): Japanese is **M PLUS Rounded 1c**
+(Black where Rubik Black stands, ExtraBold, Bold, Medium for body), Korean
+**Jua** for the display roles and **Gothic A1** (Black, ExtraBold, Bold,
+SemiBold) for the rest (`JAPANESE_FONT`, `KOREAN_FONT` in `ui/theme.ts`).
+Styles are built when their modules load, so the faces are picked once, when
+the app starts, from the language it opens in (`SCRIPT`), and moving between
+Latin, Japanese and Korean reloads the app, as Arabic does. Their letters do
+not join, so `label` keeps its letter-spacing; lines are a little taller
+(`lh()`: ×1.15 Japanese, ×1.1 Korean). The files are subsets cut to the
+letters the game writes (`pnpm fonts:cjk`).
+
 **Capitals** are allowed for ribbons and tile names only, **typed in capitals
-in each language's line** — the Turkish İ, the German SS; Arabic has none.
+in each language's line** — the Turkish İ, the German SS; Arabic, Japanese
+and Korean have none.
 Never `textTransform: 'uppercase'`: it knows no Turkish and turns "i" into
 "I". Everything else is sentence case.
 

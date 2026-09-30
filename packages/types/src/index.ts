@@ -15,11 +15,11 @@ export type Platform = 'ios' | 'android';
 export type SocialProvider = 'apple' | 'google';
 
 /**
- * The six languages the game speaks (`LOCALES` in `@quezby/config`, in this
+ * The eight languages the game speaks (`LOCALES` in `@quezby/config`, in this
  * order). A request says which one it wants in `Accept-Language`; the API
  * answers its messages and share texts in it.
  */
-export type Locale = 'tr' | 'en' | 'de' | 'ar' | 'fr' | 'es';
+export type Locale = 'tr' | 'en' | 'de' | 'ar' | 'fr' | 'es' | 'ja' | 'ko';
 
 export type UserSettings = {
   haptics: boolean;

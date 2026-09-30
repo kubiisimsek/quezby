@@ -16,15 +16,15 @@ import type { Localized, Notice } from './types';
  * capitals). Short — a line holds about 18 letters.
  */
 export const RECEIPT_ITEMS: readonly Localized[] = [
-  { tr: 'ÇİKOLATA', en: 'CHOCOLATE', de: 'SCHOKOLADE', ar: 'شوكولاتة', fr: 'CHOCOLAT', es: 'CHOCOLATE' },
-  { tr: 'CİPS', en: 'CHIPS', de: 'CHIPS', ar: 'رقائق بطاطس', fr: 'CHIPS', es: 'PATATAS FRITAS' },
-  { tr: 'EKMEK', en: 'BREAD', de: 'BROT', ar: 'خبز', fr: 'PAIN', es: 'PAN' },
-  { tr: 'SÜT', en: 'MILK', de: 'MILCH', ar: 'حليب', fr: 'LAIT', es: 'LECHE' },
-  { tr: 'YUMURTA', en: 'EGGS', de: 'EIER', ar: 'بيض', fr: 'OEUFS', es: 'HUEVOS' },
-  { tr: 'PEYNİR', en: 'CHEESE', de: 'KÄSE', ar: 'جبنة', fr: 'FROMAGE', es: 'QUESO' },
-  { tr: 'YOĞURT', en: 'YOGURT', de: 'JOGHURT', ar: 'زبادي', fr: 'YAOURT', es: 'YOGUR' },
-  { tr: 'TEREYAĞI', en: 'BUTTER', de: 'BUTTER', ar: 'زبدة', fr: 'BEURRE', es: 'MANTEQUILLA' },
-  { tr: 'ÇAY', en: 'TEA', de: 'TEE', ar: 'شاي', fr: 'THÉ', es: 'TÉ' },
+  { tr: 'ÇİKOLATA', en: 'CHOCOLATE', de: 'SCHOKOLADE', ar: 'شوكولاتة', fr: 'CHOCOLAT', es: 'CHOCOLATE', ja: 'チョコレート', ko: '초콜릿' },
+  { tr: 'CİPS', en: 'CHIPS', de: 'CHIPS', ar: 'رقائق بطاطس', fr: 'CHIPS', es: 'PATATAS FRITAS', ja: 'ポテトチップス', ko: '감자칩' },
+  { tr: 'EKMEK', en: 'BREAD', de: 'BROT', ar: 'خبز', fr: 'PAIN', es: 'PAN', ja: '食パン', ko: '식빵' },
+  { tr: 'SÜT', en: 'MILK', de: 'MILCH', ar: 'حليب', fr: 'LAIT', es: 'LECHE', ja: '牛乳', ko: '우유' },
+  { tr: 'YUMURTA', en: 'EGGS', de: 'EIER', ar: 'بيض', fr: 'OEUFS', es: 'HUEVOS', ja: '卵', ko: '달걀' },
+  { tr: 'PEYNİR', en: 'CHEESE', de: 'KÄSE', ar: 'جبنة', fr: 'FROMAGE', es: 'QUESO', ja: 'チーズ', ko: '치즈' },
+  { tr: 'YOĞURT', en: 'YOGURT', de: 'JOGHURT', ar: 'زبادي', fr: 'YAOURT', es: 'YOGUR', ja: 'ヨーグルト', ko: '요거트' },
+  { tr: 'TEREYAĞI', en: 'BUTTER', de: 'BUTTER', ar: 'زبدة', fr: 'BEURRE', es: 'MANTEQUILLA', ja: 'バター', ko: '버터' },
+  { tr: 'ÇAY', en: 'TEA', de: 'TEE', ar: 'شاي', fr: 'THÉ', es: 'TÉ', ja: '紅茶', ko: '홍차' },
   {
     tr: 'FİLTRE KAHVE',
     en: 'GROUND COFFEE',
@@ -32,11 +32,13 @@ export const RECEIPT_ITEMS: readonly Localized[] = [
     ar: 'بن مطحون',
     fr: 'CAFÉ MOULU',
     es: 'CAFÉ MOLIDO',
+    ja: 'レギュラーコーヒー',
+    ko: '분쇄 커피',
   },
-  { tr: 'MAKARNA', en: 'PASTA', de: 'NUDELN', ar: 'معكرونة', fr: 'PÂTES', es: 'PASTA' },
-  { tr: 'PİRİNÇ', en: 'RICE', de: 'REIS', ar: 'أرز', fr: 'RIZ', es: 'ARROZ' },
-  { tr: 'UN', en: 'FLOUR', de: 'MEHL', ar: 'طحين', fr: 'FARINE', es: 'HARINA' },
-  { tr: 'BAL', en: 'HONEY', de: 'HONIG', ar: 'عسل', fr: 'MIEL', es: 'MIEL' },
+  { tr: 'MAKARNA', en: 'PASTA', de: 'NUDELN', ar: 'معكرونة', fr: 'PÂTES', es: 'PASTA', ja: 'パスタ', ko: '파스타' },
+  { tr: 'PİRİNÇ', en: 'RICE', de: 'REIS', ar: 'أرز', fr: 'RIZ', es: 'ARROZ', ja: 'お米', ko: '쌀' },
+  { tr: 'UN', en: 'FLOUR', de: 'MEHL', ar: 'طحين', fr: 'FARINE', es: 'HARINA', ja: '小麦粉', ko: '밀가루' },
+  { tr: 'BAL', en: 'HONEY', de: 'HONIG', ar: 'عسل', fr: 'MIEL', es: 'MIEL', ja: 'はちみつ', ko: '꿀' },
   {
     tr: 'ÇİLEK REÇELİ',
     en: 'STRAWBERRY JAM',
@@ -44,16 +46,18 @@ export const RECEIPT_ITEMS: readonly Localized[] = [
     ar: 'مربى الفراولة',
     fr: 'CONFITURE FRAISE',
     es: 'MERMELADA DE FRESA',
+    ja: 'いちごジャム',
+    ko: '딸기잼',
   },
-  { tr: 'ZEYTİN', en: 'OLIVES', de: 'OLIVEN', ar: 'زيتون', fr: 'OLIVES', es: 'ACEITUNAS' },
-  { tr: 'DOMATES', en: 'TOMATOES', de: 'TOMATEN', ar: 'طماطم', fr: 'TOMATES', es: 'TOMATES' },
-  { tr: 'SALATALIK', en: 'CUCUMBERS', de: 'GURKEN', ar: 'خيار', fr: 'CONCOMBRES', es: 'PEPINOS' },
-  { tr: 'SOĞAN', en: 'ONIONS', de: 'ZWIEBELN', ar: 'بصل', fr: 'OIGNONS', es: 'CEBOLLAS' },
-  { tr: 'LİMON', en: 'LEMONS', de: 'ZITRONEN', ar: 'ليمون', fr: 'CITRONS', es: 'LIMONES' },
-  { tr: 'ELMA', en: 'APPLES', de: 'ÄPFEL', ar: 'تفاح', fr: 'POMMES', es: 'MANZANAS' },
-  { tr: 'MUZ', en: 'BANANAS', de: 'BANANEN', ar: 'موز', fr: 'BANANES', es: 'PLÁTANOS' },
-  { tr: 'SAKIZ', en: 'GUM', de: 'KAUGUMMI', ar: 'علكة', fr: 'CHEWING-GUM', es: 'CHICLE' },
-  { tr: 'BİSKÜVİ', en: 'COOKIES', de: 'KEKSE', ar: 'بسكويت', fr: 'BISCUITS', es: 'GALLETAS' },
+  { tr: 'ZEYTİN', en: 'OLIVES', de: 'OLIVEN', ar: 'زيتون', fr: 'OLIVES', es: 'ACEITUNAS', ja: 'オリーブ', ko: '올리브' },
+  { tr: 'DOMATES', en: 'TOMATOES', de: 'TOMATEN', ar: 'طماطم', fr: 'TOMATES', es: 'TOMATES', ja: 'トマト', ko: '토마토' },
+  { tr: 'SALATALIK', en: 'CUCUMBERS', de: 'GURKEN', ar: 'خيار', fr: 'CONCOMBRES', es: 'PEPINOS', ja: 'きゅうり', ko: '오이' },
+  { tr: 'SOĞAN', en: 'ONIONS', de: 'ZWIEBELN', ar: 'بصل', fr: 'OIGNONS', es: 'CEBOLLAS', ja: '玉ねぎ', ko: '양파' },
+  { tr: 'LİMON', en: 'LEMONS', de: 'ZITRONEN', ar: 'ليمون', fr: 'CITRONS', es: 'LIMONES', ja: 'レモン', ko: '레몬' },
+  { tr: 'ELMA', en: 'APPLES', de: 'ÄPFEL', ar: 'تفاح', fr: 'POMMES', es: 'MANZANAS', ja: 'りんご', ko: '사과' },
+  { tr: 'MUZ', en: 'BANANAS', de: 'BANANEN', ar: 'موز', fr: 'BANANES', es: 'PLÁTANOS', ja: 'バナナ', ko: '바나나' },
+  { tr: 'SAKIZ', en: 'GUM', de: 'KAUGUMMI', ar: 'علكة', fr: 'CHEWING-GUM', es: 'CHICLE', ja: 'ガム', ko: '껌' },
+  { tr: 'BİSKÜVİ', en: 'COOKIES', de: 'KEKSE', ar: 'بسكويت', fr: 'BISCUITS', es: 'GALLETAS', ja: 'クッキー', ko: '쿠키' },
   {
     tr: 'KRAKER',
     en: 'CRACKERS',
@@ -61,6 +65,8 @@ export const RECEIPT_ITEMS: readonly Localized[] = [
     ar: 'بسكويت مالح',
     fr: 'CRACKERS',
     es: 'GALLETAS SALADAS',
+    ja: 'クラッカー',
+    ko: '크래커',
   },
   {
     tr: 'AY ÇEKİRDEĞİ',
@@ -69,9 +75,11 @@ export const RECEIPT_ITEMS: readonly Localized[] = [
     ar: 'بذور عباد الشمس',
     fr: 'GRAINES TOURNESOL',
     es: 'SEMILLAS GIRASOL',
+    ja: 'ひまわりの種',
+    ko: '해바라기씨',
   },
-  { tr: 'DONDURMA', en: 'ICE CREAM', de: 'EISCREME', ar: 'آيس كريم', fr: 'GLACE', es: 'HELADO' },
-  { tr: 'LİMONATA', en: 'LEMONADE', de: 'LIMONADE', ar: 'عصير ليمون', fr: 'LIMONADE', es: 'LIMONADA' },
+  { tr: 'DONDURMA', en: 'ICE CREAM', de: 'EISCREME', ar: 'آيس كريم', fr: 'GLACE', es: 'HELADO', ja: 'アイスクリーム', ko: '아이스크림' },
+  { tr: 'LİMONATA', en: 'LEMONADE', de: 'LIMONADE', ar: 'عصير ليمون', fr: 'LIMONADE', es: 'LIMONADA', ja: 'レモネード', ko: '레모네이드' },
   {
     tr: 'MADEN SUYU',
     en: 'SPARKLING WATER',
@@ -79,6 +87,8 @@ export const RECEIPT_ITEMS: readonly Localized[] = [
     ar: 'مياه معدنية',
     fr: 'EAU GAZEUSE',
     es: 'AGUA MINERAL',
+    ja: '炭酸水',
+    ko: '탄산수',
   },
   {
     tr: 'ALÜMİNYUM FOLYO',
@@ -87,6 +97,8 @@ export const RECEIPT_ITEMS: readonly Localized[] = [
     ar: 'ورق ألمنيوم',
     fr: 'PAPIER ALU',
     es: 'PAPEL DE ALUMINIO',
+    ja: 'アルミホイル',
+    ko: '쿠킹포일',
   },
   {
     tr: 'PEÇETE',
@@ -95,6 +107,8 @@ export const RECEIPT_ITEMS: readonly Localized[] = [
     ar: 'مناديل مائدة',
     fr: 'SERVIETTES PAPIER',
     es: 'SERVILLETAS',
+    ja: '紙ナプキン',
+    ko: '냅킨',
   },
   {
     tr: 'ISLAK MENDİL',
@@ -103,6 +117,8 @@ export const RECEIPT_ITEMS: readonly Localized[] = [
     ar: 'مناديل مبللة',
     fr: 'LINGETTES',
     es: 'TOALLITAS HÚMEDAS',
+    ja: 'ウェットティッシュ',
+    ko: '물티슈',
   },
   {
     tr: 'KAĞIT HAVLU',
@@ -111,6 +127,8 @@ export const RECEIPT_ITEMS: readonly Localized[] = [
     ar: 'مناديل مطبخ',
     fr: 'ESSUIE-TOUT',
     es: 'PAPEL DE COCINA',
+    ja: 'キッチンペーパー',
+    ko: '키친타월',
   },
   {
     tr: 'TUVALET KAĞIDI',
@@ -119,6 +137,8 @@ export const RECEIPT_ITEMS: readonly Localized[] = [
     ar: 'ورق تواليت',
     fr: 'PAPIER TOILETTE',
     es: 'PAPEL HIGIÉNICO',
+    ja: 'トイレットペーパー',
+    ko: '화장지',
   },
   {
     tr: 'BULAŞIK DETERJANI',
@@ -127,8 +147,10 @@ export const RECEIPT_ITEMS: readonly Localized[] = [
     ar: 'سائل غسيل الصحون',
     fr: 'LIQUIDE VAISSELLE',
     es: 'JABÓN PARA PLATOS',
+    ja: '食器用洗剤',
+    ko: '주방세제',
   },
-  { tr: 'SÜNGER', en: 'SPONGES', de: 'SCHWÄMME', ar: 'إسفنج', fr: 'ÉPONGES', es: 'ESPONJAS' },
+  { tr: 'SÜNGER', en: 'SPONGES', de: 'SCHWÄMME', ar: 'إسفنج', fr: 'ÉPONGES', es: 'ESPONJAS', ja: 'スポンジ', ko: '수세미' },
   {
     tr: 'DİŞ MACUNU',
     en: 'TOOTHPASTE',
@@ -136,6 +158,8 @@ export const RECEIPT_ITEMS: readonly Localized[] = [
     ar: 'معجون أسنان',
     fr: 'DENTIFRICE',
     es: 'PASTA DE DIENTES',
+    ja: '歯みがき粉',
+    ko: '치약',
   },
   {
     tr: 'KOKULU MUM',
@@ -144,6 +168,8 @@ export const RECEIPT_ITEMS: readonly Localized[] = [
     ar: 'شمعة معطرة',
     fr: 'BOUGIE PARFUMÉE',
     es: 'VELA AROMÁTICA',
+    ja: 'アロマキャンドル',
+    ko: '향초',
   },
   {
     tr: 'KEDİ MAMASI',
@@ -152,6 +178,8 @@ export const RECEIPT_ITEMS: readonly Localized[] = [
     ar: 'طعام قطط',
     fr: 'CROQUETTES CHAT',
     es: 'COMIDA PARA GATO',
+    ja: 'キャットフード',
+    ko: '고양이 사료',
   },
   {
     tr: 'DOĞUM GÜNÜ BALONU',
@@ -160,37 +188,39 @@ export const RECEIPT_ITEMS: readonly Localized[] = [
     ar: 'بالون عيد ميلاد',
     fr: "BALLON D'ANNIV",
     es: 'GLOBO CUMPLEAÑOS',
+    ja: '誕生日の風船',
+    ko: '생일 풍선',
   },
-  { tr: 'PORTAKAL', en: 'ORANGES', de: 'ORANGEN', ar: 'برتقال', fr: 'ORANGES', es: 'NARANJAS' },
-  { tr: 'HAVUÇ', en: 'CARROTS', de: 'KAROTTEN', ar: 'جزر', fr: 'CAROTTES', es: 'ZANAHORIAS' },
-  { tr: 'MARUL', en: 'LETTUCE', de: 'KOPFSALAT', ar: 'خس', fr: 'LAITUE', es: 'LECHUGA' },
-  { tr: 'MERCİMEK', en: 'LENTILS', de: 'LINSEN', ar: 'عدس', fr: 'LENTILLES', es: 'LENTEJAS' },
-  { tr: 'NOHUT', en: 'CHICKPEAS', de: 'KICHERERBSEN', ar: 'حمص', fr: 'POIS CHICHES', es: 'GARBANZOS' },
-  { tr: 'ŞEKER', en: 'SUGAR', de: 'ZUCKER', ar: 'سكر', fr: 'SUCRE', es: 'AZÚCAR' },
-  { tr: 'TUZ', en: 'SALT', de: 'SALZ', ar: 'ملح', fr: 'SEL', es: 'SAL' },
-  { tr: 'KARABİBER', en: 'BLACK PEPPER', de: 'SCHWARZER PFEFFER', ar: 'فلفل أسود', fr: 'POIVRE NOIR', es: 'PIMIENTA NEGRA' },
-  { tr: 'ZEYTİNYAĞI', en: 'OLIVE OIL', de: 'OLIVENÖL', ar: 'زيت زيتون', fr: "HUILE D'OLIVE", es: 'ACEITE DE OLIVA' },
-  { tr: 'MISIR GEVREĞİ', en: 'CEREAL', de: 'FRÜHSTÜCKSFLOCKEN', ar: 'رقائق الذرة', fr: 'CÉRÉALES', es: 'CEREALES' },
-  { tr: 'YULAF EZMESİ', en: 'OATMEAL', de: 'HAFERFLOCKEN', ar: 'شوفان', fr: "FLOCONS D'AVOINE", es: 'AVENA' },
-  { tr: 'KURU ÜZÜM', en: 'RAISINS', de: 'ROSINEN', ar: 'زبيب', fr: 'RAISINS SECS', es: 'PASAS' },
-  { tr: 'FINDIK', en: 'HAZELNUTS', de: 'HASELNÜSSE', ar: 'بندق', fr: 'NOISETTES', es: 'AVELLANAS' },
-  { tr: 'CEVİZ', en: 'WALNUTS', de: 'WALNÜSSE', ar: 'جوز', fr: 'NOIX', es: 'NUECES' },
-  { tr: 'KEK', en: 'SNACK CAKE', de: 'RÜHRKUCHEN', ar: 'كعكة', fr: 'GÂTEAU', es: 'BIZCOCHO' },
-  { tr: 'KARPUZ', en: 'WATERMELON', de: 'WASSERMELONE', ar: 'بطيخ', fr: 'PASTÈQUE', es: 'SANDÍA' },
-  { tr: 'ARMUT', en: 'PEARS', de: 'BIRNEN', ar: 'كمثرى', fr: 'POIRES', es: 'PERAS' },
-  { tr: 'KİVİ', en: 'KIWIS', de: 'KIWIS', ar: 'كيوي', fr: 'KIWIS', es: 'KIWIS' },
-  { tr: 'MANTAR', en: 'MUSHROOMS', de: 'PILZE', ar: 'فطر', fr: 'CHAMPIGNONS', es: 'CHAMPIÑONES' },
-  { tr: 'BİBER', en: 'BELL PEPPERS', de: 'PAPRIKA', ar: 'فلفل رومي', fr: 'POIVRONS', es: 'PIMIENTOS' },
-  { tr: 'KİRAZ', en: 'CHERRIES', de: 'KIRSCHEN', ar: 'كرز', fr: 'CERISES', es: 'CEREZAS' },
-  { tr: 'ŞAMPUAN', en: 'SHAMPOO', de: 'SHAMPOO', ar: 'شامبو', fr: 'SHAMPOING', es: 'CHAMPÚ' },
-  { tr: 'SABUN', en: 'SOAP', de: 'SEIFE', ar: 'صابون', fr: 'SAVON', es: 'JABÓN' },
-  { tr: 'DİŞ FIRÇASI', en: 'TOOTHBRUSH', de: 'ZAHNBÜRSTE', ar: 'فرشاة أسنان', fr: 'BROSSE À DENTS', es: 'CEPILLO DE DIENTES' },
-  { tr: 'ÇAMAŞIR DETERJANI', en: 'LAUNDRY DETERGENT', de: 'WASCHMITTEL', ar: 'مسحوق غسيل', fr: 'LESSIVE', es: 'DETERGENTE' },
-  { tr: 'ÇÖP TORBASI', en: 'TRASH BAGS', de: 'MÜLLBEUTEL', ar: 'أكياس قمامة', fr: 'SACS POUBELLE', es: 'BOLSAS DE BASURA' },
-  { tr: 'BANT', en: 'TAPE', de: 'KLEBEBAND', ar: 'شريط لاصق', fr: 'RUBAN ADHÉSIF', es: 'CINTA ADHESIVA' },
-  { tr: 'DEFTER', en: 'NOTEBOOK', de: 'NOTIZBUCH', ar: 'دفتر', fr: 'CAHIER', es: 'CUADERNO' },
-  { tr: 'HAZIR ÇORBA', en: 'INSTANT SOUP', de: 'TÜTENSUPPE', ar: 'حساء سريع', fr: 'SOUPE INSTANTANÉE', es: 'SOPA INSTANTÁNEA' },
-  { tr: 'PUDİNG', en: 'PUDDING CUPS', de: 'PUDDING', ar: 'مهلبية', fr: 'CRÈME DESSERT', es: 'PUDÍN' },
+  { tr: 'PORTAKAL', en: 'ORANGES', de: 'ORANGEN', ar: 'برتقال', fr: 'ORANGES', es: 'NARANJAS', ja: 'オレンジ', ko: '오렌지' },
+  { tr: 'HAVUÇ', en: 'CARROTS', de: 'KAROTTEN', ar: 'جزر', fr: 'CAROTTES', es: 'ZANAHORIAS', ja: 'にんじん', ko: '당근' },
+  { tr: 'MARUL', en: 'LETTUCE', de: 'KOPFSALAT', ar: 'خس', fr: 'LAITUE', es: 'LECHUGA', ja: 'レタス', ko: '양상추' },
+  { tr: 'MERCİMEK', en: 'LENTILS', de: 'LINSEN', ar: 'عدس', fr: 'LENTILLES', es: 'LENTEJAS', ja: 'レンズ豆', ko: '렌틸콩' },
+  { tr: 'NOHUT', en: 'CHICKPEAS', de: 'KICHERERBSEN', ar: 'حمص', fr: 'POIS CHICHES', es: 'GARBANZOS', ja: 'ひよこ豆', ko: '병아리콩' },
+  { tr: 'ŞEKER', en: 'SUGAR', de: 'ZUCKER', ar: 'سكر', fr: 'SUCRE', es: 'AZÚCAR', ja: '砂糖', ko: '설탕' },
+  { tr: 'TUZ', en: 'SALT', de: 'SALZ', ar: 'ملح', fr: 'SEL', es: 'SAL', ja: '塩', ko: '소금' },
+  { tr: 'KARABİBER', en: 'BLACK PEPPER', de: 'SCHWARZER PFEFFER', ar: 'فلفل أسود', fr: 'POIVRE NOIR', es: 'PIMIENTA NEGRA', ja: '黒こしょう', ko: '후추' },
+  { tr: 'ZEYTİNYAĞI', en: 'OLIVE OIL', de: 'OLIVENÖL', ar: 'زيت زيتون', fr: "HUILE D'OLIVE", es: 'ACEITE DE OLIVA', ja: 'オリーブオイル', ko: '올리브유' },
+  { tr: 'MISIR GEVREĞİ', en: 'CEREAL', de: 'FRÜHSTÜCKSFLOCKEN', ar: 'رقائق الذرة', fr: 'CÉRÉALES', es: 'CEREALES', ja: 'シリアル', ko: '시리얼' },
+  { tr: 'YULAF EZMESİ', en: 'OATMEAL', de: 'HAFERFLOCKEN', ar: 'شوفان', fr: "FLOCONS D'AVOINE", es: 'AVENA', ja: 'オートミール', ko: '오트밀' },
+  { tr: 'KURU ÜZÜM', en: 'RAISINS', de: 'ROSINEN', ar: 'زبيب', fr: 'RAISINS SECS', es: 'PASAS', ja: 'レーズン', ko: '건포도' },
+  { tr: 'FINDIK', en: 'HAZELNUTS', de: 'HASELNÜSSE', ar: 'بندق', fr: 'NOISETTES', es: 'AVELLANAS', ja: 'ヘーゼルナッツ', ko: '헤이즐넛' },
+  { tr: 'CEVİZ', en: 'WALNUTS', de: 'WALNÜSSE', ar: 'جوز', fr: 'NOIX', es: 'NUECES', ja: 'くるみ', ko: '호두' },
+  { tr: 'KEK', en: 'SNACK CAKE', de: 'RÜHRKUCHEN', ar: 'كعكة', fr: 'GÂTEAU', es: 'BIZCOCHO', ja: 'パウンドケーキ', ko: '카스텔라' },
+  { tr: 'KARPUZ', en: 'WATERMELON', de: 'WASSERMELONE', ar: 'بطيخ', fr: 'PASTÈQUE', es: 'SANDÍA', ja: 'スイカ', ko: '수박' },
+  { tr: 'ARMUT', en: 'PEARS', de: 'BIRNEN', ar: 'كمثرى', fr: 'POIRES', es: 'PERAS', ja: '梨', ko: '배' },
+  { tr: 'KİVİ', en: 'KIWIS', de: 'KIWIS', ar: 'كيوي', fr: 'KIWIS', es: 'KIWIS', ja: 'キウイ', ko: '키위' },
+  { tr: 'MANTAR', en: 'MUSHROOMS', de: 'PILZE', ar: 'فطر', fr: 'CHAMPIGNONS', es: 'CHAMPIÑONES', ja: 'きのこ', ko: '버섯' },
+  { tr: 'BİBER', en: 'BELL PEPPERS', de: 'PAPRIKA', ar: 'فلفل رومي', fr: 'POIVRONS', es: 'PIMIENTOS', ja: 'ピーマン', ko: '파프리카' },
+  { tr: 'KİRAZ', en: 'CHERRIES', de: 'KIRSCHEN', ar: 'كرز', fr: 'CERISES', es: 'CEREZAS', ja: 'さくらんぼ', ko: '체리' },
+  { tr: 'ŞAMPUAN', en: 'SHAMPOO', de: 'SHAMPOO', ar: 'شامبو', fr: 'SHAMPOING', es: 'CHAMPÚ', ja: 'シャンプー', ko: '샴푸' },
+  { tr: 'SABUN', en: 'SOAP', de: 'SEIFE', ar: 'صابون', fr: 'SAVON', es: 'JABÓN', ja: 'せっけん', ko: '비누' },
+  { tr: 'DİŞ FIRÇASI', en: 'TOOTHBRUSH', de: 'ZAHNBÜRSTE', ar: 'فرشاة أسنان', fr: 'BROSSE À DENTS', es: 'CEPILLO DE DIENTES', ja: '歯ブラシ', ko: '칫솔' },
+  { tr: 'ÇAMAŞIR DETERJANI', en: 'LAUNDRY DETERGENT', de: 'WASCHMITTEL', ar: 'مسحوق غسيل', fr: 'LESSIVE', es: 'DETERGENTE', ja: '洗濯洗剤', ko: '세탁세제' },
+  { tr: 'ÇÖP TORBASI', en: 'TRASH BAGS', de: 'MÜLLBEUTEL', ar: 'أكياس قمامة', fr: 'SACS POUBELLE', es: 'BOLSAS DE BASURA', ja: 'ゴミ袋', ko: '쓰레기봉투' },
+  { tr: 'BANT', en: 'TAPE', de: 'KLEBEBAND', ar: 'شريط لاصق', fr: 'RUBAN ADHÉSIF', es: 'CINTA ADHESIVA', ja: 'セロハンテープ', ko: '테이프' },
+  { tr: 'DEFTER', en: 'NOTEBOOK', de: 'NOTIZBUCH', ar: 'دفتر', fr: 'CAHIER', es: 'CUADERNO', ja: 'ノート', ko: '공책' },
+  { tr: 'HAZIR ÇORBA', en: 'INSTANT SOUP', de: 'TÜTENSUPPE', ar: 'حساء سريع', fr: 'SOUPE INSTANTANÉE', es: 'SOPA INSTANTÁNEA', ja: 'インスタントスープ', ko: '즉석 수프' },
+  { tr: 'PUDİNG', en: 'PUDDING CUPS', de: 'PUDDING', ar: 'مهلبية', fr: 'CRÈME DESSERT', es: 'PUDÍN', ja: 'プリン', ko: '푸딩' },
 ];
 
 /**
@@ -201,7 +231,7 @@ export const RECEIPT_ITEMS: readonly Localized[] = [
 export const NOTICES: readonly Notice[] = [
   {
     icon: '🔋',
-    app: { tr: 'Pil', en: 'Battery', de: 'Akku', ar: 'البطارية', fr: 'Batterie', es: 'Batería' },
+    app: { tr: 'Pil', en: 'Battery', de: 'Akku', ar: 'البطارية', fr: 'Batterie', es: 'Batería', ja: 'バッテリー', ko: '배터리' },
     text: {
       tr: '%3 kaldı',
       en: '3% left',
@@ -209,6 +239,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'متبقٍ 3%',
       fr: 'Plus que 3 %',
       es: 'Queda un 3 %',
+      ja: '残り3%',
+      ko: '3% 남음',
     },
   },
   {
@@ -220,6 +252,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'الطقس',
       fr: 'Météo',
       es: 'Pronóstico',
+      ja: '天気',
+      ko: '날씨',
     },
     text: {
       tr: 'Bugün güneşli, en yüksek 24°',
@@ -228,6 +262,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'مشمس اليوم، والعظمى 24°',
       fr: "Soleil aujourd'hui, jusqu'à 24°",
       es: 'Soleado hoy, máxima de 24°',
+      ja: '今日は晴れ、最高気温24°',
+      ko: '오늘은 맑음, 최고 기온 24°',
     },
   },
   {
@@ -239,6 +275,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'التقويم',
       fr: 'Agenda',
       es: 'Calendario',
+      ja: 'カレンダー',
+      ko: '캘린더',
     },
     text: {
       tr: 'Yarın 10.00 · Kuaför',
@@ -247,6 +285,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'غدًا 10:00 · موعد الحلاق',
       fr: 'Demain 10 h · Coiffeur',
       es: 'Mañana 10:00 · Peluquería',
+      ja: '明日10:00・美容院',
+      ko: '내일 10:00 · 미용실',
     },
   },
   {
@@ -258,6 +298,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'الشحن',
       fr: 'Colis',
       es: 'Envíos',
+      ja: '宅配便',
+      ko: '택배',
     },
     text: {
       tr: 'Paketin yola çıktı, yarın kapında',
@@ -266,11 +308,13 @@ export const NOTICES: readonly Notice[] = [
       ar: 'طردك في الطريق إليك',
       fr: 'Ton colis est en route',
       es: 'Tu paquete va en camino',
+      ja: '荷物を発送しました。明日お届け予定',
+      ko: '택배가 출발했어요. 내일 도착 예정',
     },
   },
   {
     icon: '⏰',
-    app: { tr: 'Alarm', en: 'Alarm', de: 'Wecker', ar: 'المنبه', fr: 'Réveil', es: 'Alarma' },
+    app: { tr: 'Alarm', en: 'Alarm', de: 'Wecker', ar: 'المنبه', fr: 'Réveil', es: 'Alarma', ja: 'アラーム', ko: '알람' },
     text: {
       tr: 'Günaydın! Saat 07.30',
       en: "Good morning! It's 7:30",
@@ -278,11 +322,13 @@ export const NOTICES: readonly Notice[] = [
       ar: 'صباح الخير! الساعة 7:30',
       fr: 'Bonjour ! Il est 7 h 30',
       es: '¡Buenos días! Son las 7:30',
+      ja: 'おはよう！7:30です',
+      ko: '좋은 아침이에요! 7:30이에요',
     },
   },
   {
     icon: '🖼️',
-    app: { tr: 'Fotoğraflar', en: 'Photos', de: 'Fotos', ar: 'الصور', fr: 'Photos', es: 'Fotos' },
+    app: { tr: 'Fotoğraflar', en: 'Photos', de: 'Fotos', ar: 'الصور', fr: 'Photos', es: 'Fotos', ja: '写真', ko: '사진' },
     text: {
       tr: 'Anılar: 3 yıl önce bugün',
       en: 'Memories: 3 years ago today',
@@ -290,6 +336,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'ذكريات: في مثل هذا اليوم قبل 3 سنوات',
       fr: 'Souvenirs : il y a 3 ans jour pour jour',
       es: 'Recuerdos: hace 3 años, un día como hoy',
+      ja: '思い出：3年前の今日',
+      ko: '추억: 3년 전 오늘',
     },
   },
   {
@@ -301,6 +349,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'عداد الخطوات',
       fr: 'Podomètre',
       es: 'Podómetro',
+      ja: '歩数計',
+      ko: '만보기',
     },
     text: {
       tr: 'Günlük hedefinin yarısındasın!',
@@ -309,6 +359,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'وصلت إلى نصف هدفك اليومي!',
       fr: 'Tu es à mi-chemin de ton objectif !',
       es: '¡Vas a la mitad de tu meta diaria!',
+      ja: '今日の目標まであと半分！',
+      ko: '오늘 목표의 절반을 달성했어요!',
     },
   },
   {
@@ -320,6 +372,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'الإعدادات',
       fr: 'Réglages',
       es: 'Ajustes',
+      ja: '設定',
+      ko: '설정',
     },
     text: {
       tr: 'Depolama alanı neredeyse dolu',
@@ -328,6 +382,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'مساحة التخزين شبه ممتلئة',
       fr: 'Stockage presque plein',
       es: 'Almacenamiento casi lleno',
+      ja: 'ストレージがほぼいっぱいです',
+      ko: '저장 공간이 거의 가득 찼어요',
     },
   },
   {
@@ -339,6 +395,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'تحديث النظام',
       fr: 'Mise à jour',
       es: 'Actualización',
+      ja: 'ソフトウェア更新',
+      ko: '시스템 업데이트',
     },
     text: {
       tr: 'Bu gece otomatik yüklenecek',
@@ -347,6 +405,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'سيُثبَّت تلقائيًا الليلة',
       fr: 'Installation automatique cette nuit',
       es: 'Se instalará sola esta noche',
+      ja: '今夜、自動でインストールされます',
+      ko: '오늘 밤 자동으로 설치돼요',
     },
   },
   {
@@ -358,6 +418,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'بودكاست',
       fr: 'Podcasts',
       es: 'Podcasts',
+      ja: 'ポッドキャスト',
+      ko: '팟캐스트',
     },
     text: {
       tr: 'Kaldığın yerden devam edelim mi?',
@@ -366,6 +428,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'هل تتابع من حيث توقفت؟',
       fr: "Reprendre là où tu t'es arrêté ?",
       es: '¿Seguir donde te quedaste?',
+      ja: '続きから再生しますか？',
+      ko: '이어서 들을까요?',
     },
   },
   {
@@ -377,6 +441,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'تذكير الماء',
       fr: 'Hydratation',
       es: 'Hidratación',
+      ja: '水分補給',
+      ko: '물 마시기',
     },
     text: {
       tr: 'Bir bardak su içme vakti',
@@ -385,6 +451,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'حان وقت شرب كوب ماء',
       fr: "C'est l'heure d'un verre d'eau",
       es: 'Hora de tomar un vaso de agua',
+      ja: 'コップ1杯の水を飲む時間です',
+      ko: '물 한 잔 마실 시간이에요',
     },
   },
   {
@@ -396,8 +464,10 @@ export const NOTICES: readonly Notice[] = [
       ar: 'صديقي',
       fr: 'Mon pote',
       es: 'Mi mejor amigo',
+      ja: '親友',
+      ko: '절친',
     },
-    text: { tr: '😂😂', en: '😂😂', de: '😂😂', ar: '😂😂', fr: '😂😂', es: '😂😂' },
+    text: { tr: '😂😂', en: '😂😂', de: '😂😂', ar: '😂😂', fr: '😂😂', es: '😂😂', ja: '😂😂', ko: '😂😂' },
   },
   {
     icon: '👪',
@@ -408,6 +478,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'مجموعة العائلة',
       fr: 'Groupe famille',
       es: 'Grupo familiar',
+      ja: '家族グループ',
+      ko: '가족 단톡방',
     },
     text: {
       tr: '12 yeni mesaj',
@@ -416,6 +488,8 @@ export const NOTICES: readonly Notice[] = [
       ar: '12 رسالة جديدة',
       fr: '12 nouveaux messages',
       es: '12 mensajes nuevos',
+      ja: '新着メッセージ12件',
+      ko: '새 메시지 12개',
     },
   },
   {
@@ -427,6 +501,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'أعياد الميلاد',
       fr: 'Anniversaires',
       es: 'Cumpleaños',
+      ja: '誕生日',
+      ko: '생일',
     },
     text: {
       tr: 'Yarın bir arkadaşının doğum günü',
@@ -435,11 +511,13 @@ export const NOTICES: readonly Notice[] = [
       ar: 'غدًا عيد ميلاد أحد أصدقائك',
       fr: "Demain, c'est l'anniv d'un ami",
       es: 'Mañana cumple años un amigo',
+      ja: '明日は友だちの誕生日です',
+      ko: '내일은 친구 생일이에요',
     },
   },
   {
     icon: '🌙',
-    app: { tr: 'Uyku', en: 'Sleep', de: 'Schlaf', ar: 'النوم', fr: 'Sommeil', es: 'Sueño' },
+    app: { tr: 'Uyku', en: 'Sleep', de: 'Schlaf', ar: 'النوم', fr: 'Sommeil', es: 'Sueño', ja: '睡眠', ko: '수면' },
     text: {
       tr: 'Yatma saatine 30 dakika var',
       en: 'Bedtime in 30 minutes',
@@ -447,11 +525,13 @@ export const NOTICES: readonly Notice[] = [
       ar: 'بقيت 30 دقيقة على موعد النوم',
       fr: 'Au lit dans 30 minutes',
       es: 'Faltan 30 minutos para dormir',
+      ja: '就寝時刻まであと30分',
+      ko: '취침 시간까지 30분 남았어요',
     },
   },
   {
     icon: '🎵',
-    app: { tr: 'Müzik', en: 'Music', de: 'Musik', ar: 'الموسيقى', fr: 'Musique', es: 'Música' },
+    app: { tr: 'Müzik', en: 'Music', de: 'Musik', ar: 'الموسيقى', fr: 'Musique', es: 'Música', ja: 'ミュージック', ko: '음악' },
     text: {
       tr: 'Haftalık karışık listen hazır',
       en: 'Your weekly mix is ready',
@@ -459,6 +539,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'قائمة أغانيك الأسبوعية جاهزة',
       fr: 'Ton mix de la semaine est prêt',
       es: 'Tu mix semanal está listo',
+      ja: '今週のミックスができました',
+      ko: '이번 주 믹스가 준비됐어요',
     },
   },
   {
@@ -470,6 +552,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'قائمة المشتريات',
       fr: 'Liste de courses',
       es: 'Lista de compras',
+      ja: '買い物リスト',
+      ko: '장보기 목록',
     },
     text: {
       tr: 'Domates, peynir, deterjan',
@@ -478,6 +562,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'طماطم، جبن، سائل جلي',
       fr: 'Tomates, fromage, liquide vaisselle',
       es: 'Tomates, queso y detergente',
+      ja: 'トマト、チーズ、食器用洗剤',
+      ko: '토마토, 치즈, 주방세제',
     },
   },
   {
@@ -489,6 +575,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'الغسالة',
       fr: 'Lave-linge',
       es: 'Lavadora',
+      ja: '洗濯機',
+      ko: '세탁기',
     },
     text: {
       tr: 'Yıkama bitti, asmayı unutma',
@@ -497,6 +585,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'انتهى الغسيل، لا تنسَ نشره',
       fr: "Lessive terminée, pense à l'étendre",
       es: 'Terminó el lavado',
+      ja: '洗濯が終わりました。干すのを忘れずに',
+      ko: '세탁이 끝났어요. 잊지 말고 널어 주세요',
     },
   },
   {
@@ -508,6 +598,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'النقل العام',
       fr: 'Transports',
       es: 'Transporte',
+      ja: '交通情報',
+      ko: '대중교통',
     },
     text: {
       tr: 'Otobüsün 4 dakika sonra durakta',
@@ -516,6 +608,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'حافلتك تصل بعد 4 دقائق',
       fr: 'Ton bus arrive dans 4 min',
       es: 'Tu bus llega en 4 min',
+      ja: 'バスがあと4分で到着します',
+      ko: '버스가 4분 후에 도착해요',
     },
   },
   {
@@ -527,6 +621,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'المكتبة',
       fr: 'Bibliothèque',
       es: 'Biblioteca',
+      ja: '図書館',
+      ko: '도서관',
     },
     text: {
       tr: 'Kitabının iade tarihi yarın',
@@ -535,6 +631,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'موعد إعادة كتابك غدًا',
       fr: 'Ton livre est à rendre demain',
       es: 'Mañana vence el préstamo de tu libro',
+      ja: '本の返却期限は明日です',
+      ko: '책 반납일이 내일이에요',
     },
   },
   {
@@ -546,6 +644,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'توصيل الطعام',
       fr: 'Livraison repas',
       es: 'Comida a domicilio',
+      ja: 'フードデリバリー',
+      ko: '음식 배달',
     },
     text: {
       tr: 'Siparişin hazırlanıyor',
@@ -554,11 +654,13 @@ export const NOTICES: readonly Notice[] = [
       ar: 'طلبك قيد التحضير',
       fr: 'Ta commande est en préparation',
       es: 'Tu pedido se está preparando',
+      ja: 'ご注文の料理を準備中です',
+      ko: '주문하신 음식을 준비 중이에요',
     },
   },
   {
     icon: '🌷',
-    app: { tr: 'Annem', en: 'Mom', de: 'Mama', ar: 'أمي', fr: 'Maman', es: 'Mamá' },
+    app: { tr: 'Annem', en: 'Mom', de: 'Mama', ar: 'أمي', fr: 'Maman', es: 'Mamá', ja: 'お母さん', ko: '엄마' },
     text: {
       tr: 'Akşam yemeğe gelir misin?',
       en: 'Coming over for dinner tonight?',
@@ -566,6 +668,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'هل ستأتي على العشاء الليلة؟',
       fr: 'Tu viens dîner ce soir ?',
       es: '¿Vienes a cenar esta noche?',
+      ja: '今夜ごはん食べに来る？',
+      ko: '오늘 저녁 먹으러 올래?',
     },
   },
   {
@@ -577,6 +681,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'استراحة',
       fr: 'Pause',
       es: 'Pausa',
+      ja: 'マインドフルネス',
+      ko: '마음챙김',
     },
     text: {
       tr: '1 dakikalık nefes molasına ne dersin?',
@@ -585,11 +691,13 @@ export const NOTICES: readonly Notice[] = [
       ar: 'ما رأيك في استراحة تنفّس لدقيقة؟',
       fr: "Une pause respiration d'une minute ?",
       es: '¿Una pausa de un minuto para respirar?',
+      ja: '1分だけ深呼吸しませんか？',
+      ko: '1분 호흡 휴식 어때요?',
     },
   },
   {
     icon: '✉️',
-    app: { tr: 'E-posta', en: 'Mail', de: 'E-Mail', ar: 'البريد', fr: 'E-mail', es: 'Correo' },
+    app: { tr: 'E-posta', en: 'Mail', de: 'E-Mail', ar: 'البريد', fr: 'E-mail', es: 'Correo', ja: 'メール', ko: '메일' },
     text: {
       tr: '3 yeni e-posta',
       en: '3 new emails',
@@ -597,6 +705,8 @@ export const NOTICES: readonly Notice[] = [
       ar: '3 رسائل بريد جديدة',
       fr: '3 nouveaux e-mails',
       es: '3 correos nuevos',
+      ja: '新着メール3件',
+      ko: '새 메일 3개',
     },
   },
   {
@@ -608,6 +718,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'رعاية النباتات',
       fr: 'Mes plantes',
       es: 'Mis plantas',
+      ja: '植物のお世話',
+      ko: '식물 관리',
     },
     text: {
       tr: 'Bitkileri sulama günü',
@@ -616,11 +728,13 @@ export const NOTICES: readonly Notice[] = [
       ar: 'حان وقت سقي النباتات',
       fr: "C'est le jour d'arroser les plantes",
       es: 'Hora de regar las plantas',
+      ja: '植物に水をあげる日です',
+      ko: '식물에 물 주는 날이에요',
     },
   },
   {
     icon: '💪',
-    app: { tr: 'Spor', en: 'Fitness', de: 'Fitness', ar: 'اللياقة', fr: 'Sport', es: 'Ejercicio' },
+    app: { tr: 'Spor', en: 'Fitness', de: 'Fitness', ar: 'اللياقة', fr: 'Sport', es: 'Ejercicio', ja: 'フィットネス', ko: '운동' },
     text: {
       tr: 'Bu hafta 2 antrenman, süpersin!',
       en: '2 workouts this week, nice work!',
@@ -628,6 +742,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'تمرينان هذا الأسبوع، أحسنت!',
       fr: '2 séances cette semaine, bravo !',
       es: '¡Bien! 2 entrenamientos esta semana',
+      ja: '今週はトレーニング2回、すごい！',
+      ko: '이번 주 운동 2회, 최고예요!',
     },
   },
   {
@@ -639,6 +755,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'الجارة',
       fr: 'Voisine',
       es: 'Vecina',
+      ja: 'お隣さん',
+      ko: '이웃',
     },
     text: {
       tr: 'Kargonu ben teslim aldım',
@@ -647,6 +765,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'استلمتُ طردك نيابةً عنك',
       fr: "J'ai récupéré ton colis",
       es: 'Recibí tu paquete, lo tengo yo',
+      ja: '荷物、代わりに受け取っておいたよ',
+      ko: '택배 제가 대신 받아 뒀어요',
     },
   },
   {
@@ -658,6 +778,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'المسلسلات',
       fr: 'Séries',
       es: 'Series',
+      ja: 'ドラマ',
+      ko: '드라마',
     },
     text: {
       tr: 'Yeni bölüm yayında!',
@@ -666,6 +788,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'حلقة جديدة متاحة الآن!',
       fr: 'Nouvel épisode dispo !',
       es: '¡Ya salió el nuevo episodio!',
+      ja: '最新話が配信されました！',
+      ko: '새 에피소드가 공개됐어요!',
     },
   },
   {
@@ -677,6 +801,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'الملاحة',
       fr: 'Itinéraire',
       es: 'Navegación',
+      ja: 'ナビ',
+      ko: '내비게이션',
     },
     text: {
       tr: 'Eve 12 dakika, yollar açık',
@@ -685,6 +811,8 @@ export const NOTICES: readonly Notice[] = [
       ar: '12 دقيقة إلى المنزل، الطريق سالك',
       fr: 'Maison à 12 min, ça roule',
       es: '12 min a casa, tráfico fluido',
+      ja: '自宅まで12分、道路は空いています',
+      ko: '집까지 12분, 교통 원활',
     },
   },
   {
@@ -696,6 +824,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'التواصل الاجتماعي',
       fr: 'Réseaux sociaux',
       es: 'Redes sociales',
+      ja: 'SNS',
+      ko: 'SNS',
     },
     text: {
       tr: '3 arkadaşın yeni gönderi paylaştı',
@@ -704,6 +834,8 @@ export const NOTICES: readonly Notice[] = [
       ar: '3 من أصدقائك نشروا منشورات جديدة',
       fr: '3 amis ont publié de nouveaux posts',
       es: '3 amigos publicaron algo nuevo',
+      ja: '友だち3人が新しく投稿しました',
+      ko: '친구 3명이 새 게시물을 올렸어요',
     },
   },
   {
@@ -715,6 +847,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'العد التنازلي',
       fr: 'Compte à rebours',
       es: 'Cuenta regresiva',
+      ja: 'カウントダウン',
+      ko: '카운트다운',
     },
     text: {
       tr: 'Tatile 23 gün kaldı!',
@@ -723,6 +857,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'بقي 23 يومًا على الإجازة!',
       fr: 'Plus que 23 jours avant les vacances !',
       es: '¡Faltan 23 días para las vacaciones!',
+      ja: '休みまであと23日！',
+      ko: '휴가까지 23일 남았어요!',
     },
   },
   {
@@ -734,6 +870,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'الحيوان الأليف',
       fr: 'Mon animal',
       es: 'Mascota',
+      ja: 'ペットケア',
+      ko: '반려동물',
     },
     text: {
       tr: 'Kedinin mama saati geldi',
@@ -742,6 +880,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'حان موعد إطعام القطة',
       fr: "C'est l'heure de nourrir le chat",
       es: 'Hora de darle de comer al gato',
+      ja: '猫のごはんの時間です',
+      ko: '고양이 밥 줄 시간이에요',
     },
   },
   {
@@ -753,6 +893,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'المكنسة الذكية',
       fr: 'Robot aspirateur',
       es: 'Robot aspiradora',
+      ja: 'ロボット掃除機',
+      ko: '로봇청소기',
     },
     text: {
       tr: 'Salon temizliği tamamlandı',
@@ -761,6 +903,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'اكتمل تنظيف غرفة المعيشة',
       fr: 'Salon nettoyé',
       es: 'Limpieza de la sala terminada',
+      ja: 'リビングの掃除が完了しました',
+      ko: '거실 청소를 마쳤어요',
     },
   },
   {
@@ -772,6 +916,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'وصفات',
       fr: 'Recettes',
       es: 'Recetas',
+      ja: 'レシピ',
+      ko: '레시피',
     },
     text: {
       tr: 'Günün tarifi: Fırında sebze',
@@ -780,11 +926,13 @@ export const NOTICES: readonly Notice[] = [
       ar: 'وصفة اليوم: خضار في الفرن',
       fr: 'Recette du jour : légumes rôtis',
       es: 'Receta del día: verduras al horno',
+      ja: '今日のレシピ：焼き野菜',
+      ko: '오늘의 레시피: 구운 채소',
     },
   },
   {
     icon: '🏖️',
-    app: { tr: 'Kuzenim', en: 'Cousin', de: 'Cousine', ar: 'ابنة عمي', fr: 'Cousine', es: 'Prima' },
+    app: { tr: 'Kuzenim', en: 'Cousin', de: 'Cousine', ar: 'ابنة عمي', fr: 'Cousine', es: 'Prima', ja: 'いとこ', ko: '사촌' },
     text: {
       tr: 'Tatil fotoğraflarını attım',
       en: 'Sent you the vacation pics',
@@ -792,6 +940,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'أرسلت لك صور الإجازة',
       fr: "Je t'ai envoyé les photos de vacances",
       es: 'Te mandé las fotos del viaje',
+      ja: '旅行の写真、送ったよ',
+      ko: '휴가 사진 보냈어',
     },
   },
   {
@@ -803,6 +953,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'التذكيرات',
       fr: 'Rappels',
       es: 'Recordatorios',
+      ja: 'リマインダー',
+      ko: '미리 알림',
     },
     text: {
       tr: 'Çöpü çıkarmayı unutma',
@@ -811,6 +963,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'لا تنسَ إخراج القمامة',
       fr: 'Pense à sortir les poubelles',
       es: 'No olvides sacar la basura',
+      ja: 'ゴミ出しを忘れずに',
+      ko: '쓰레기 버리는 거 잊지 마세요',
     },
   },
   {
@@ -822,6 +976,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'السماعات',
       fr: 'Écouteurs',
       es: 'Auriculares',
+      ja: 'イヤホン',
+      ko: '이어폰',
     },
     text: {
       tr: 'Kulaklık bağlandı',
@@ -830,11 +986,13 @@ export const NOTICES: readonly Notice[] = [
       ar: 'تم توصيل السماعات',
       fr: 'Écouteurs connectés',
       es: 'Auriculares conectados',
+      ja: 'イヤホンが接続されました',
+      ko: '이어폰이 연결됐어요',
     },
   },
   {
     icon: '☕️',
-    app: { tr: 'Kafe', en: 'Coffee shop', de: 'Café', ar: 'المقهى', fr: 'Café', es: 'Cafetería' },
+    app: { tr: 'Kafe', en: 'Coffee shop', de: 'Café', ar: 'المقهى', fr: 'Café', es: 'Cafetería', ja: 'カフェ', ko: '카페' },
     text: {
       tr: 'Kahven hazır, tezgâhta seni bekliyor',
       en: 'Your coffee is ready at the counter',
@@ -842,11 +1000,13 @@ export const NOTICES: readonly Notice[] = [
       ar: 'قهوتك جاهزة عند المنضدة',
       fr: "Ton café t'attend au comptoir",
       es: 'Tu café está listo en la barra',
+      ja: 'コーヒーができました。カウンターへどうぞ',
+      ko: '커피가 나왔어요. 카운터로 와 주세요',
     },
   },
   {
     icon: '🍿',
-    app: { tr: 'Sinema', en: 'Movies', de: 'Kino', ar: 'السينما', fr: 'Cinéma', es: 'Cine' },
+    app: { tr: 'Sinema', en: 'Movies', de: 'Kino', ar: 'السينما', fr: 'Cinéma', es: 'Cine', ja: '映画', ko: '영화' },
     text: {
       tr: 'Biletin hazır: Salon 3, koltuk 7',
       en: 'Your ticket: Theater 3, seat 7',
@@ -854,6 +1014,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'تذكرتك جاهزة: القاعة 3، المقعد 7',
       fr: 'Ton billet : salle 3, siège 7',
       es: 'Tu entrada: sala 3, asiento 7',
+      ja: 'チケット：スクリーン3、7番席',
+      ko: '티켓: 3관, 7번 좌석',
     },
   },
   {
@@ -865,6 +1027,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'الكتب الإلكترونية',
       fr: 'Liseuse',
       es: 'Libros',
+      ja: '電子書籍',
+      ko: '전자책',
     },
     text: {
       tr: 'Bugün 10 sayfa okudun, harika!',
@@ -873,11 +1037,13 @@ export const NOTICES: readonly Notice[] = [
       ar: 'قرأت 10 صفحات اليوم، رائع!',
       fr: "10 pages lues aujourd'hui, bravo !",
       es: '¡Hoy leíste 10 páginas, genial!',
+      ja: '今日は10ページ読みました。すごい！',
+      ko: '오늘 10페이지 읽었어요. 멋져요!',
     },
   },
   {
     icon: '🏃',
-    app: { tr: 'Koşu', en: 'Running', de: 'Laufen', ar: 'الجري', fr: 'Course', es: 'Carrera' },
+    app: { tr: 'Koşu', en: 'Running', de: 'Laufen', ar: 'الجري', fr: 'Course', es: 'Carrera', ja: 'ランニング', ko: '러닝' },
     text: {
       tr: '3 km’lik koşun kaydedildi',
       en: 'Your 2-mile run is saved',
@@ -885,11 +1051,13 @@ export const NOTICES: readonly Notice[] = [
       ar: 'تم حفظ جريك لمسافة 3 كم',
       fr: 'Ta course de 3 km est enregistrée',
       es: 'Tu carrera de 3 km quedó guardada',
+      ja: '3kmのランを記録しました',
+      ko: '3km 러닝이 기록됐어요',
     },
   },
   {
     icon: '🎮',
-    app: { tr: 'Oyun', en: 'Games', de: 'Spiele', ar: 'الألعاب', fr: 'Jeux', es: 'Juegos' },
+    app: { tr: 'Oyun', en: 'Games', de: 'Spiele', ar: 'الألعاب', fr: 'Jeux', es: 'Juegos', ja: 'ゲーム', ko: '게임' },
     text: {
       tr: 'Günlük görevler yenilendi',
       en: 'Daily quests have been refreshed',
@@ -897,6 +1065,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'تم تجديد المهام اليومية',
       fr: 'Nouvelles quêtes du jour dispo',
       es: 'Se renovaron las misiones diarias',
+      ja: 'デイリーミッションが更新されました',
+      ko: '일일 퀘스트가 초기화됐어요',
     },
   },
   {
@@ -908,6 +1078,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'زميل السكن',
       fr: 'Coloc',
       es: 'Compañero de casa',
+      ja: 'ルームメイト',
+      ko: '룸메이트',
     },
     text: {
       tr: 'Pizza söylüyorum, ister misin?',
@@ -916,6 +1088,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'سأطلب بيتزا، هل تريد؟',
       fr: "Je commande une pizza, t'en veux ?",
       es: 'Voy a pedir pizza, ¿quieres?',
+      ja: 'ピザ頼むけど、いる？',
+      ko: '피자 시킬 건데, 먹을래?',
     },
   },
   {
@@ -927,6 +1101,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'موقف السيارات',
       fr: 'Parking',
       es: 'Estacionamiento',
+      ja: '駐車場',
+      ko: '주차장',
     },
     text: {
       tr: 'Aracın 2. katta, B bölümünde',
@@ -935,6 +1111,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'سيارتك في الطابق الثاني',
       fr: 'Ta voiture est au niveau 2, zone B',
       es: 'Tu vehículo está en el nivel 2, zona B',
+      ja: 'お車は2階のBエリアです',
+      ko: '차량 위치: 2층 B구역',
     },
   },
   {
@@ -946,6 +1124,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'منظم الحرارة',
       fr: 'Thermostat',
       es: 'Termostato',
+      ja: 'エアコン',
+      ko: '보일러',
     },
     text: {
       tr: 'Ev 22 dereceye ısındı',
@@ -954,6 +1134,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'وصلت حرارة البيت إلى 22 درجة',
       fr: 'La maison est à 22 degrés',
       es: 'La casa ya está a 22 grados',
+      ja: '室温が22°になりました',
+      ko: '집이 22도로 따뜻해졌어요',
     },
   },
   {
@@ -965,6 +1147,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'التذكيرات',
       fr: 'Rappels',
       es: 'Recordatorios',
+      ja: 'リマインダー',
+      ko: '미리 알림',
     },
     text: {
       tr: 'Parti için balon almayı unutma',
@@ -973,6 +1157,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'لا تنسَ شراء البالونات للحفلة',
       fr: 'Pense aux ballons pour la fête',
       es: 'No olvides los globos para la fiesta',
+      ja: 'パーティー用の風船を忘れずに',
+      ko: '파티용 풍선 사는 거 잊지 마세요',
     },
   },
   {
@@ -984,6 +1170,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'جليسة الكلب',
       fr: 'Promeneur de chien',
       es: 'Paseador de perros',
+      ja: 'ドッグシッター',
+      ko: '펫시터',
     },
     text: {
       tr: 'Köpeğin parkta çok eğlendi!',
@@ -992,11 +1180,13 @@ export const NOTICES: readonly Notice[] = [
       ar: 'استمتع كلبك كثيرًا في الحديقة!',
       fr: 'Ton chien a adoré le parc !',
       es: '¡Tu perro disfrutó mucho del parque!',
+      ja: 'ワンちゃん、公園で大はしゃぎでした！',
+      ko: '강아지가 공원에서 신나게 놀았어요!',
     },
   },
   {
     icon: '📻',
-    app: { tr: 'Radyo', en: 'Radio', de: 'Radio', ar: 'الراديو', fr: 'Radio', es: 'Radio' },
+    app: { tr: 'Radyo', en: 'Radio', de: 'Radio', ar: 'الراديو', fr: 'Radio', es: 'Radio', ja: 'ラジオ', ko: '라디오' },
     text: {
       tr: 'En sevdiğin program başladı',
       en: 'Your favorite show just started',
@@ -1004,6 +1194,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'بدأ برنامجك المفضل',
       fr: 'Ton émission préférée commence',
       es: 'Empezó tu programa favorito',
+      ja: 'お気に入りの番組が始まりました',
+      ko: '좋아하는 프로그램이 시작됐어요',
     },
   },
   {
@@ -1015,6 +1207,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'الألغاز',
       fr: 'Casse-tête',
       es: 'Crucigrama',
+      ja: 'パズル',
+      ko: '퍼즐',
     },
     text: {
       tr: 'Günün bulmacası hazır',
@@ -1023,6 +1217,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'لغز اليوم جاهز',
       fr: 'Le casse-tête du jour est prêt',
       es: 'El crucigrama del día está listo',
+      ja: '今日のパズルが届きました',
+      ko: '오늘의 퍼즐이 준비됐어요',
     },
   },
   {
@@ -1034,6 +1230,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'المنزل الذكي',
       fr: 'Maison connectée',
       es: 'Casa inteligente',
+      ja: 'スマートホーム',
+      ko: '스마트홈',
     },
     text: {
       tr: 'Balkon ışıkları 19.00’da yandı',
@@ -1042,11 +1240,13 @@ export const NOTICES: readonly Notice[] = [
       ar: 'أُضيئت أنوار الشرفة في السابعة مساءً',
       fr: 'Lumières du balcon allumées à 19 h',
       es: 'Luces del balcón encendidas a las 19:00',
+      ja: 'ベランダの照明が19:00に点灯しました',
+      ko: '발코니 조명이 19:00에 켜졌어요',
     },
   },
   {
     icon: '⚽️',
-    app: { tr: 'Maç', en: 'Soccer', de: 'Fußball', ar: 'المباراة', fr: 'Match', es: 'Partido' },
+    app: { tr: 'Maç', en: 'Soccer', de: 'Fußball', ar: 'المباراة', fr: 'Match', es: 'Partido', ja: 'サッカー', ko: '축구' },
     text: {
       tr: 'Maç 20.00’de başlıyor',
       en: 'Kickoff at 8 PM',
@@ -1054,6 +1254,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'تبدأ المباراة في الثامنة مساءً',
       fr: "Coup d'envoi à 20 h",
       es: 'El partido empieza a las 20:00',
+      ja: '試合は20:00キックオフ',
+      ko: '경기가 20:00에 시작해요',
     },
   },
   {
@@ -1065,6 +1267,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'دورة الرسم',
       fr: 'Cours de dessin',
       es: 'Clase de pintura',
+      ja: '絵画教室',
+      ko: '미술 학원',
     },
     text: {
       tr: 'Ders yarın 18.00’de, fırçanı unutma',
@@ -1073,11 +1277,13 @@ export const NOTICES: readonly Notice[] = [
       ar: 'الدرس غدًا في السادسة، لا تنسَ فرشاتك',
       fr: 'Cours demain à 18 h, pense au pinceau',
       es: 'Clase mañana a las 18:00, trae tu pincel',
+      ja: '明日18:00から。筆を忘れずに',
+      ko: '내일 18:00 수업, 붓 챙기세요',
     },
   },
   {
     icon: '🧶',
-    app: { tr: 'Anneannem', en: 'Grandma', de: 'Oma', ar: 'جدتي', fr: 'Mamie', es: 'Abuela' },
+    app: { tr: 'Anneannem', en: 'Grandma', de: 'Oma', ar: 'جدتي', fr: 'Mamie', es: 'Abuela', ja: 'おばあちゃん', ko: '할머니' },
     text: {
       tr: 'Sana yeni bir atkı örüyorum',
       en: "I'm knitting you a new scarf",
@@ -1085,11 +1291,13 @@ export const NOTICES: readonly Notice[] = [
       ar: 'أحيك لك وشاحًا جديدًا',
       fr: 'Je te tricote une nouvelle écharpe',
       es: 'Te estoy tejiendo una bufanda nueva',
+      ja: '新しいマフラー、編んでるからね',
+      ko: '새 목도리 떠 주고 있단다',
     },
   },
   {
     icon: '🌻',
-    app: { tr: 'Teyzem', en: 'Auntie', de: 'Tante', ar: 'خالتي', fr: 'Tatie', es: 'Tía' },
+    app: { tr: 'Teyzem', en: 'Auntie', de: 'Tante', ar: 'خالتي', fr: 'Tatie', es: 'Tía', ja: 'おばさん', ko: '이모' },
     text: {
       tr: 'Bahçeden domates gönderdim',
       en: 'Sent you tomatoes from the garden',
@@ -1097,11 +1305,13 @@ export const NOTICES: readonly Notice[] = [
       ar: 'أرسلت لك طماطم من الحديقة',
       fr: "Je t'ai envoyé des tomates du jardin",
       es: 'Te mandé tomates de la huerta',
+      ja: '畑のトマト、送ったよ',
+      ko: '텃밭에서 딴 토마토 보냈어',
     },
   },
   {
     icon: '🚕',
-    app: { tr: 'Taksi', en: 'Taxi', de: 'Taxi', ar: 'سيارة الأجرة', fr: 'Taxi', es: 'Taxi' },
+    app: { tr: 'Taksi', en: 'Taxi', de: 'Taxi', ar: 'سيارة الأجرة', fr: 'Taxi', es: 'Taxi', ja: 'タクシー', ko: '택시' },
     text: {
       tr: 'Taksin kapıda',
       en: 'Your taxi is outside',
@@ -1109,6 +1319,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'سيارة الأجرة عند الباب',
       fr: 'Ton taxi est devant la porte',
       es: 'Tu taxi está en la puerta',
+      ja: 'タクシーが到着しました',
+      ko: '택시가 도착했어요',
     },
   },
   {
@@ -1120,6 +1332,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'الطابعة',
       fr: 'Imprimante',
       es: 'Impresora',
+      ja: 'プリンター',
+      ko: '프린터',
     },
     text: {
       tr: 'Belgen yazdırıldı (3 sayfa)',
@@ -1128,6 +1342,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'تمت طباعة مستندك (3 صفحات)',
       fr: 'Document imprimé (3 pages)',
       es: 'Documento impreso (3 páginas)',
+      ja: '印刷が完了しました（3ページ）',
+      ko: '문서 인쇄 완료 (3페이지)',
     },
   },
   {
@@ -1139,6 +1355,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'غسالة الصحون',
       fr: 'Lave-vaisselle',
       es: 'Lavavajillas',
+      ja: '食洗機',
+      ko: '식기세척기',
     },
     text: {
       tr: 'Yıkama bitti, tabaklar pırıl pırıl',
@@ -1147,6 +1365,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'انتهى الغسيل، والصحون تلمع',
       fr: 'Lavage terminé, tout brille',
       es: 'Lavado listo, los platos relucen',
+      ja: '洗浄完了、お皿がピカピカです',
+      ko: '세척 완료, 그릇이 반짝반짝해요',
     },
   },
   {
@@ -1158,6 +1378,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'مجموعة الأصدقاء',
       fr: 'Groupe des potes',
       es: 'Grupo de amigos',
+      ja: '友だちグループ',
+      ko: '친구 단톡방',
     },
     text: {
       tr: 'Cuma akşamı herkes bizde!',
@@ -1166,6 +1388,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'مساء الجمعة، الجميع عندنا!',
       fr: 'Vendredi soir, tous chez nous !',
       es: '¡El viernes, todos a mi casa!',
+      ja: '金曜の夜はみんなうちに集合！',
+      ko: '금요일 밤, 다들 우리 집으로!',
     },
   },
   {
@@ -1177,6 +1401,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'نادي الكتاب',
       fr: 'Club de lecture',
       es: 'Club de lectura',
+      ja: '読書会',
+      ko: '독서 모임',
     },
     text: {
       tr: 'Bu ayın kitabı seçildi',
@@ -1185,6 +1411,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'تم اختيار كتاب هذا الشهر',
       fr: 'Le livre du mois est choisi',
       es: 'Ya se eligió el libro del mes',
+      ja: '今月の本が決まりました',
+      ko: '이번 달 책이 정해졌어요',
     },
   },
   {
@@ -1196,6 +1424,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'الطقس',
       fr: 'Météo',
       es: 'Pronóstico',
+      ja: '天気',
+      ko: '날씨',
     },
     text: {
       tr: 'Akşama gökkuşağı çıkabilir',
@@ -1204,6 +1434,8 @@ export const NOTICES: readonly Notice[] = [
       ar: 'قد يظهر قوس قزح مساءً',
       fr: 'Arc-en-ciel possible ce soir',
       es: 'Posible arcoíris esta tarde',
+      ja: '夕方、虹が見られるかも',
+      ko: '저녁에 무지개가 뜰 수도 있어요',
     },
   },
 ];

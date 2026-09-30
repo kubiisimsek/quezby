@@ -19,6 +19,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'حمامة سكنت شرفتي… ولا تدفع الإيجار',
       fr: 'Un pigeon squatte mon balcon. Zéro loyer.',
       es: 'Una paloma se mudó a mi balcón. No paga alquiler.',
+      ja: 'ベランダにハトが住みついた。家賃は払わない。',
+      ko: '베란다에 비둘기가 이사 왔다. 월세는 안 낸다.',
     },
   },
   {
@@ -32,6 +34,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'أسقطت فتاتة واحدة… فجاء 400 ضيف',
       fr: 'Une miette tombée, 400 invités débarquent',
       es: 'Se me cayó una miga y llegaron 400 invitados',
+      ja: 'パンくず1つ落としたら400名様ご来店',
+      ko: '빵부스러기 하나 흘렸더니 손님 400명 입장',
     },
   },
   {
@@ -45,6 +49,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'سيلفي مع زرافة: أنا وساقان',
       fr: 'Selfie avec une girafe : moi et deux pattes',
       es: 'Selfie con una jirafa: yo y dos patas',
+      ja: 'キリンと自撮り。写ったのは私と脚2本',
+      ko: '기린이랑 셀카: 나랑 다리 두 개',
     },
   },
   {
@@ -58,6 +64,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'سباق القطة في الثالثة فجرًا… والمضمار أنا',
       fr: 'Sprint du chat à 3 h du mat. La piste : moi.',
       es: 'Carrera gatuna a las 3 de la mañana. La pista: yo.',
+      ja: '深夜3時、猫の大運動会。コースは私。',
+      ko: '새벽 3시 고양이 우다다. 트랙은 나.',
     },
   },
   {
@@ -71,6 +79,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'سمكتي تتكلم… وأنا أهزّ رأسي فقط',
       fr: 'Mon poisson parle. Moi, je hoche la tête.',
       es: 'Mi pez habla y yo le digo que sí con la cabeza.',
+      ja: '金魚が何か話してる。とりあえずうなずいてる。',
+      ko: '물고기가 말을 건다. 난 고개만 끄덕인다.',
     },
   },
   {
@@ -84,6 +94,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'صرصور الليل: صوته في كل مكان ولا أثر له',
       fr: "Le grillon : on l'entend partout, on le voit nulle part",
       es: 'El grillo: se oye en todas partes y no está en ninguna',
+      ja: 'コオロギ：声はすれども姿は見えず',
+      ko: '귀뚜라미: 소리는 사방에, 모습은 어디에도 없음',
     },
   },
   {
@@ -97,6 +109,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'الأبقار حدّقت بي ساعة كاملة… أعلى مشاهدات لي',
       fr: "Les vaches m'ont fixé une heure. Record d'audience.",
       es: 'Las vacas me miraron una hora. Récord de audiencia.',
+      ja: '牛に1時間ガン見された。過去最高の視聴数。',
+      ko: '소들이 1시간 동안 날 쳐다봤다. 역대 최고 조회수.',
     },
   },
   {
@@ -104,7 +118,7 @@ export const ANIMALS_SKIP: readonly Draft[] = [
     user: ACCOUNTS.screens,
     body: {
       format: 'chat',
-      contact: { tr: 'Annem', en: 'Mom', de: 'Mama', ar: 'أمي', fr: 'Maman', es: 'Mamá' },
+      contact: { tr: 'Annem', en: 'Mom', de: 'Mama', ar: 'أمي', fr: 'Maman', es: 'Mamá', ja: 'お母さん', ko: '엄마' },
       lines: [
         {
           from: 'them',
@@ -115,6 +129,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
             ar: 'عصفورك يقلّد رنين الهاتف مجددًا',
             fr: 'ton oiseau refait la sonnerie',
             es: 'tu pájaro imita otra vez el teléfono',
+            ja: 'またあんたの鳥が着信音のマネしてる',
+            ko: '네 새가 또 전화벨 소리 흉내 내',
           },
         },
         {
@@ -126,6 +142,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
             ar: 'هل ركضتِ لتردّي؟ 😂',
             fr: "t'as couru répondre ? 😂",
             es: '¿corriste a contestar? 😂',
+            ja: '電話に出ようと走った？ 😂',
+            ko: '받으러 뛰어갔어? 😂',
           },
         },
         {
@@ -137,6 +155,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
             ar: 'نعم. ثم قال: «ألو؟»',
             fr: 'oui. et là, il a dit « allô ? »',
             es: 'sí. y luego dijo “¿hola?”',
+            ja: '走った。そしたら「もしもし？」だって',
+            ko: '뛰어갔지. 그랬더니 “여보세요?” 하더라',
           },
         },
       ],
@@ -148,6 +168,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'أفضل مقلّد في البيت وزنه 30 غرامًا',
       fr: 'Meilleur imitateur de la maison : 30 grammes',
       es: 'El mejor imitador de la casa pesa 30 gramos',
+      ja: '我が家いちばんのモノマネ芸人、体重30グラム',
+      ko: '우리 집 최고의 성대모사 달인, 30그램',
     },
   },
   {
@@ -155,7 +177,16 @@ export const ANIMALS_SKIP: readonly Draft[] = [
     user: ACCOUNTS.pets,
     body: {
       format: 'chat',
-      contact: { tr: 'Komşu', en: 'Neighbor', de: 'Nachbarin', ar: 'الجارة', fr: 'Voisine', es: 'Vecina' },
+      contact: {
+        tr: 'Komşu',
+        en: 'Neighbor',
+        de: 'Nachbarin',
+        ar: 'الجارة',
+        fr: 'Voisine',
+        es: 'Vecina',
+        ja: 'お隣さん',
+        ko: '옆집',
+      },
       lines: [
         {
           from: 'them',
@@ -166,6 +197,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
             ar: 'قطتكم عندنا مرة أخرى 🐈',
             fr: 'votre chat est encore chez nous 🐈',
             es: 'su gato está otra vez en nuestra casa 🐈',
+            ja: 'お宅の猫ちゃん、またうちに来てますよ 🐈',
+            ko: '댁의 고양이가 또 저희 집에 왔어요 🐈',
           },
         },
         {
@@ -177,6 +210,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
             ar: 'آسف جدًا، سآتي لأخذها حالًا',
             fr: 'désolé, je viens le chercher',
             es: 'perdón, ya voy por él',
+            ja: 'すみません、すぐ迎えに行きます',
+            ko: '정말 죄송해요, 바로 데리러 갈게요',
           },
         },
         {
@@ -188,6 +223,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
             ar: 'لا داعي للعجلة، أكلت وهي نائمة',
             fr: 'rien ne presse, il a mangé, il dort',
             es: 'sin prisa, ya comió y está durmiendo',
+            ja: 'ごゆっくり。ごはん食べて寝てますから',
+            ko: '천천히 오세요, 밥 먹고 자고 있어요',
           },
         },
         {
@@ -199,6 +236,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
             ar: 'وبالمناسبة، غيّرنا اسمها',
             fr: "au fait, on l'a rebaptisé",
             es: 'por cierto, le cambiamos el nombre',
+            ja: 'ちなみに名前、変えちゃいました',
+            ko: '참, 이름도 새로 지어 줬어요',
           },
         },
       ],
@@ -210,6 +249,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'لقطتي عائلة ثانية',
       fr: 'Mon chat a une deuxième famille',
       es: 'Mi gato tiene una segunda familia',
+      ja: 'うちの猫、もうひとつ家族がいた',
+      ko: '우리 고양이에게 두 번째 가족이 있었다',
     },
   },
   {
@@ -224,6 +265,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
         ar: 'أخي',
         fr: 'Frérot',
         es: 'Hermanito',
+        ja: '弟',
+        ko: '남동생',
       },
       lines: [
         {
@@ -235,11 +278,13 @@ export const ANIMALS_SKIP: readonly Draft[] = [
             ar: 'هل أطعمت القطة؟',
             fr: "t'as nourri le chat ?",
             es: '¿le diste de comer al gato?',
+            ja: '猫にごはんあげた？',
+            ko: '고양이 밥 줬어?',
           },
         },
         {
           from: 'them',
-          text: { tr: 'verdim', en: 'yep', de: 'jep', ar: 'نعم', fr: 'ouais', es: 'sí' },
+          text: { tr: 'verdim', en: 'yep', de: 'jep', ar: 'نعم', fr: 'ouais', es: 'sí', ja: 'あげた', ko: '줬어' },
         },
         {
           from: 'me',
@@ -250,6 +295,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
             ar: 'وأنا أيضًا 😳',
             fr: 'moi aussi 😳',
             es: 'yo también 😳',
+            ja: '私もあげた 😳',
+            ko: '나도 줬는데 😳',
           },
         },
         {
@@ -261,6 +308,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
             ar: 'وأمي أيضًا… وأبي كذلك',
             fr: 'maman aussi. et papa.',
             es: 'mamá también. y papá.',
+            ja: 'お母さんもあげたって。お父さんも。',
+            ko: '엄마도 줬대. 아빠도.',
           },
         },
       ],
@@ -272,6 +321,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'مثّلت دور الجائعة على كل واحد منا',
       fr: 'Il nous a tous eus avec son air affamé',
       es: 'Se hizo el hambriento con cada uno',
+      ja: '全員に「おなかすいた」の演技をしてた',
+      ko: '한 명씩 돌아가며 배고픈 척을 했다',
     },
   },
   {
@@ -279,7 +330,7 @@ export const ANIMALS_SKIP: readonly Draft[] = [
     user: ACCOUNTS.family,
     body: {
       format: 'chat',
-      contact: { tr: 'Babam', en: 'Dad', de: 'Papa', ar: 'أبي', fr: 'Papa', es: 'Papá' },
+      contact: { tr: 'Babam', en: 'Dad', de: 'Papa', ar: 'أبي', fr: 'Papa', es: 'Papá', ja: 'お父さん', ko: '아빠' },
       lines: [
         {
           from: 'them',
@@ -290,6 +341,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
             ar: 'في الحديقة مع الكلب 🥰',
             fr: 'au parc avec le chien 🥰',
             es: 'en el parque con el perro 🥰',
+            ja: '犬と公園に来たよ 🥰',
+            ko: '강아지랑 공원 왔어 🥰',
           },
         },
         {
@@ -301,6 +354,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
             ar: 'ألم تقل إن هذا البيت لا يدخله كلب؟',
             fr: "c'était pas « jamais de chien ici » ?",
             es: '¿no decías que aquí no entraban perros?',
+            ja: '「うちに犬は入れない」んじゃなかった？',
+            ko: '우리 집엔 개 안 들인다며?',
           },
         },
         {
@@ -312,6 +367,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
             ar: 'هذا مختلف، إنه ولدنا',
             fr: "c'est pas pareil. c'est notre fiston.",
             es: 'eso es distinto. es nuestro niño.',
+            ja: 'それとこれとは別。うちの息子だから。',
+            ko: '그건 다르지. 얘는 우리 아들이야.',
           },
         },
       ],
@@ -323,6 +380,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'أصرم قاعدة في البيت صمدت أسبوعًا',
       fr: "La règle d'or de la maison a tenu une semaine",
       es: 'La regla más estricta de la casa duró una semana',
+      ja: '我が家いちばん厳しいルール、1週間で崩壊',
+      ko: '우리 집 제일 엄격한 규칙, 일주일 만에 무너짐',
     },
   },
   {
@@ -337,6 +396,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
         ar: 'صوتك عندما تتحدث إلى حيوانك الأليف:',
         fr: 'Ta voix quand tu parles à ton animal :',
         es: 'Tu voz cuando le hablas a tu mascota:',
+        ja: 'ペットに話しかけるときの声：',
+        ko: '반려동물한테 말할 때 내 목소리:',
       },
       options: [
         {
@@ -346,6 +407,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
           ar: 'صوتي العادي',
           fr: 'Ma voix normale',
           es: 'Mi voz normal',
+          ja: 'いつもの声',
+          ko: '평소 목소리',
         },
         {
           tr: '3 oktav daha ince',
@@ -354,6 +417,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
           ar: 'أعلى بثلاث طبقات',
           fr: '3 octaves plus haut',
           es: 'Tres octavas más aguda',
+          ja: '3オクターブ高い',
+          ko: '3옥타브 위',
         },
       ],
       winner: 1,
@@ -365,6 +430,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'سمعني الجار… ولا مجال للتراجع',
       fr: 'Le voisin a entendu. Pas de retour en arrière.',
       es: 'El vecino me oyó. Ya no hay vuelta atrás.',
+      ja: 'お隣さんに聞かれた。もう後戻りできない。',
+      ko: '옆집에서 들었다. 이제 돌이킬 수 없다.',
     },
   },
   {
@@ -379,10 +446,12 @@ export const ANIMALS_SKIP: readonly Draft[] = [
         ar: 'ما اسم قطة الحي؟',
         fr: "Comment s'appelle le chat du quartier ?",
         es: '¿Cómo se llama el gato del barrio?',
+        ja: '近所の野良猫の名前は？',
+        ko: '동네 고양이 이름은?',
       },
       options: [
-        { tr: 'Paşa', en: 'Tiger', de: 'Minka', ar: 'مشمش', fr: 'Minou', es: 'Michi' },
-        { tr: 'Duman', en: 'Smokey', de: 'Tiger', ar: 'سمسم', fr: 'Caramel', es: 'Pelusa' },
+        { tr: 'Paşa', en: 'Tiger', de: 'Minka', ar: 'مشمش', fr: 'Minou', es: 'Michi', ja: 'タマ', ko: '나비' },
+        { tr: 'Duman', en: 'Smokey', de: 'Tiger', ar: 'سمسم', fr: 'Caramel', es: 'Pelusa', ja: 'ミケ', ko: '치즈' },
         {
           tr: 'Hepsi',
           en: 'All of the above',
@@ -390,6 +459,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
           ar: 'كلها',
           fr: 'Tous ces noms',
           es: 'Todos esos',
+          ja: '全部',
+          ko: '전부 다',
         },
       ],
       winner: 2,
@@ -401,6 +472,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'لها سبعة أسماء ولا تلتفت لأيٍّ منها',
       fr: 'Sept noms. Il ne répond à aucun.',
       es: 'Siete nombres y no responde a ninguno',
+      ja: '名前が7つある。どれにも振り向かない。',
+      ko: '이름이 7개인데 어느 이름에도 안 돌아본다',
     },
   },
   {
@@ -415,6 +488,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
         ar: 'هل رأيت الأسد في حديقة الحيوان؟',
         fr: "T'as vu le lion au zoo ?",
         es: '¿Viste al león en el zoológico?',
+        ja: '動物園でライオン見た？',
+        ko: '동물원에서 사자 봤어?',
       },
       options: [
         {
@@ -424,6 +499,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
           ar: 'نعم، وزأر!',
           fr: 'Oui, il a rugi !',
           es: '¡Sí, rugió!',
+          ja: '見た！吠えた！',
+          ko: '봤어, 포효했어!',
         },
         {
           tr: 'Uyuyan bir sırt gördüm',
@@ -432,6 +509,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
           ar: 'رأيت ظهرًا نائمًا',
           fr: 'Un dos qui dort',
           es: 'Vi una espalda dormida',
+          ja: '寝てる背中だけ',
+          ko: '자는 등만 봤어',
         },
       ],
       winner: 1,
@@ -443,6 +522,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'انتظرت ساعتين… فحرّك أذنه مرة واحدة',
       fr: "2 h d'attente. Une oreille a bougé.",
       es: 'Esperé 2 horas. Movió una oreja.',
+      ja: '2時間待って、耳が1回ピクッとしただけ',
+      ko: '2시간 기다렸는데 귀 한 번 움찔했다',
     },
   },
   {
@@ -457,8 +538,10 @@ export const ANIMALS_SKIP: readonly Draft[] = [
         ar: 'جري الهامستر ليلًا',
         fr: 'HAMSTER EN ROUE LIBRE',
         es: 'MARATÓN DEL HÁMSTER',
+        ja: 'ハムスターの夜ラン',
+        ko: '햄스터의 야간 러닝',
       },
-      value: { tr: '9 km', en: '9 km', de: '9 km', ar: '9 كم', fr: '9 km', es: '9 km' },
+      value: { tr: '9 km', en: '9 km', de: '9 km', ar: '9 كم', fr: '9 km', es: '9 km', ja: '9 km', ko: '9 km' },
       shape: 'rise',
       axis: 'hours',
     },
@@ -469,6 +552,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'هو على عجلته وأنا على الخلاصة… ولا نتقدم خطوة',
       fr: 'Lui dans sa roue, moi dans mon fil : du surplace.',
       es: 'Él en su rueda, yo en el feed. Ninguno avanza.',
+      ja: 'あいつは回し車、私はフィード。どっちも前に進まない。',
+      ko: '걔는 쳇바퀴, 나는 피드. 둘 다 제자리걸음.',
     },
   },
   {
@@ -483,6 +568,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
         ar: 'فرحة كلبي',
         fr: 'LA JOIE DE MON CHIEN',
         es: 'LA ALEGRÍA DE MI PERRO',
+        ja: 'うちの犬のよろこび度',
+        ko: '우리 개 기쁨 지수',
       },
       value: null,
       shape: 'spike',
@@ -495,6 +582,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'أخرجت القمامة وعدت… فاستقبلني كأنني غبت 10 سنوات',
       fr: "Poubelle sortie. Accueil digne de 10 ans d'absence.",
       es: 'Saqué la basura y me recibió como tras 10 años',
+      ja: 'ゴミ出しから戻ったら、10年ぶりの再会みたいな歓迎',
+      ko: '쓰레기 버리고 왔더니 10년 만에 만난 듯 반김',
     },
   },
   {
@@ -509,6 +598,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
         ar: 'متجر الحيوانات',
         fr: 'ANIMALERIE',
         es: 'TIENDA DE MASCOTAS',
+        ja: 'ペットショップ',
+        ko: '펫숍',
       },
       items: [
         {
@@ -518,6 +609,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
           ar: 'بكرات إزالة الوبر (12)',
           fr: 'ROULEAUX ADHÉSIFS ×12',
           es: 'QUITAPELUSAS (12)',
+          ja: 'コロコロ 12個',
+          ko: '돌돌이 (12개)',
         },
       ],
     },
@@ -528,6 +621,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'اشتريت كنزة سوداء… فصارت بنقشة قطط',
       fr: 'Pull noir acheté. Il est à motif chat, maintenant.',
       es: 'Me compré un suéter negro. Ahora es estampado de gato.',
+      ja: '黒いセーターを買ったら、猫柄になった',
+      ko: '검은 스웨터를 샀는데 고양이 무늬가 됐다',
     },
   },
   {
@@ -542,6 +637,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
         ar: 'سوبرماركت',
         fr: 'SUPÉRETTE',
         es: 'SUPERMERCADO',
+        ja: 'スーパー',
+        ko: '마트',
       },
       items: [
         {
@@ -551,6 +648,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
           ar: 'حبوب للطيور (5 كغ)',
           fr: 'GRAINES OISEAUX (5 KG)',
           es: 'ALPISTE (5 KG)',
+          ja: '鳥のエサ 5kg',
+          ko: '새 모이 (5kg)',
         },
       ],
     },
@@ -561,6 +660,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'كان عصفور واحد يزور شرفتي… صاروا 40',
       fr: 'Avant, un moineau au balcon. Maintenant, 40.',
       es: 'Antes venía un gorrión al balcón. Ahora vienen 40.',
+      ja: 'ベランダに来るスズメは1羽だった。今は40羽。',
+      ko: '베란다에 참새 1마리가 오곤 했다. 이제는 40마리.',
     },
   },
   {
@@ -575,6 +676,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
         ar: 'متجر الأحياء المائية',
         fr: "MAGASIN D'AQUARIUMS",
         es: 'TIENDA DE ACUARIOS',
+        ja: '熱帯魚ショップ',
+        ko: '수족관 용품점',
       },
       items: [
         {
@@ -584,6 +687,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
           ar: 'قلعة لحوض السمك',
           fr: "CHÂTEAU D'AQUARIUM",
           es: 'CASTILLO PARA PECERA',
+          ja: '水槽用のお城',
+          ko: '어항용 성',
         },
         {
           tr: 'MİNİ BATIK GEMİ',
@@ -592,6 +697,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
           ar: 'سفينة غارقة صغيرة',
           fr: 'MINI ÉPAVE',
           es: 'MINI BARCO HUNDIDO',
+          ja: 'ミニ沈没船',
+          ko: '미니 난파선',
         },
       ],
     },
@@ -602,6 +709,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'بيت سمكتي أفخم من بيتي',
       fr: 'Mon poisson est mieux logé que moi',
       es: 'Mi pez vive mejor que yo',
+      ja: '金魚の家のほうが私の部屋よりおしゃれ',
+      ko: '내 집보다 물고기 집이 더 멋지다',
     },
   },
   {
@@ -616,8 +725,10 @@ export const ANIMALS_SKIP: readonly Draft[] = [
         ar: 'تقرير الحيوان الأليف',
         fr: 'RAPPORT ANIMAL',
         es: 'INFORME DE MASCOTA',
+        ja: 'ペットレポート',
+        ko: '반려동물 리포트',
       },
-      big: { tr: '23', en: '23', de: '23', ar: '23', fr: '23', es: '23' },
+      big: { tr: '23', en: '23', de: '23', ar: '23', fr: '23', es: '23', ja: '23', ko: '23' },
       text: {
         tr: 'farklı lakap taktın kedine. Asıl adını unuttun bile.',
         en: 'different nicknames for your cat. You forgot her real name.',
@@ -625,6 +736,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
         ar: 'لقبًا أطلقته على قطتك… ونسيت اسمها الحقيقي',
         fr: 'surnoms pour ton chat. Tu as oublié son vrai nom.',
         es: 'apodos para tu gata. Ya olvidaste su nombre real.',
+        ja: '種類のあだ名を猫につけた。本名はもう忘れてる。',
+        ko: '가지 별명을 고양이에게 지어 줬어요. 진짜 이름은 잊었고요.',
       },
     },
     caption: {
@@ -634,6 +747,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'مشمش، مشمشة، بطاطا، يا قمر…',
       fr: 'Minou, Minouche, Patate, Boule de poils…',
       es: 'Michi, Michita, Papita, Bolita…',
+      ja: 'ミケ、ミケちゃん、おいも、もふ様…',
+      ko: '나비, 나비야, 감자, 털뭉치 님…',
     },
   },
   {
@@ -648,8 +763,10 @@ export const ANIMALS_SKIP: readonly Draft[] = [
         ar: 'قوة كلبك الخارقة',
         fr: 'SUPERPOUVOIR CANIN',
         es: 'SUPERPODER CANINO',
+        ja: '犬の超能力',
+        ko: '강아지의 초능력',
       },
-      big: { tr: '3', en: '3', de: '3', ar: '3', fr: '3', es: '3' },
+      big: { tr: '3', en: '3', de: '3', ar: '3', fr: '3', es: '3', ja: '3', ko: '3' },
       text: {
         tr: 'oda öteden peynir paketinin sesini duydu. Adını duymadı.',
         en: 'rooms away, he heard the cheese wrapper. Not his name, though.',
@@ -657,6 +774,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
         ar: 'غرف تفصله عن كيس الجبن وقد سمعه… أما اسمه فلا',
         fr: 'pièces plus loin, il entend le sachet de fromage. Pas son nom.',
         es: 'habitaciones más allá oye el paquete de queso. Su nombre, no.',
+        ja: '部屋先のチーズの袋の音は聞こえる。名前は聞こえない。',
+        ko: '방 너머 치즈 봉지 소리는 들었다. 자기 이름은 못 들었다.',
       },
     },
     caption: {
@@ -666,6 +785,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'سمع انتقائي، مستوى متقدم',
       fr: 'Audition sélective, niveau expert',
       es: 'Oído selectivo, nivel experto',
+      ja: '都合のいい耳、上級者レベル',
+      ko: '선택적 청각, 고수 레벨',
     },
   },
   {
@@ -680,8 +801,10 @@ export const ANIMALS_SKIP: readonly Draft[] = [
         ar: 'نزهة اليوم',
         fr: 'LA BALADE DU JOUR',
         es: 'EL PASEO DE HOY',
+        ja: '今日のお散歩',
+        ko: '오늘의 산책',
       },
-      big: { tr: '6.214', en: '6,214', de: '6.214', ar: '6,214', fr: '6 214', es: '6214' },
+      big: { tr: '6.214', en: '6,214', de: '6.214', ar: '6,214', fr: '6 214', es: '6214', ja: '6,214', ko: '6,214' },
       text: {
         tr: 'adım attın. Rotayı köpeğin çizdi, sen sadece tasmayı tuttun.',
         en: 'steps today. Your dog picked the route; you held the leash.',
@@ -689,6 +812,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
         ar: 'خطوة اليوم. كلبك اختار الطريق وأنت أمسكت المقود فقط',
         fr: "pas aujourd'hui. Ton chien a choisi la route, toi la laisse.",
         es: 'pasos hoy. La ruta la eligió tu perro; tú, la correa.',
+        ja: '歩。ルートは犬が決めて、きみはリードを持っただけ。',
+        ko: '걸음 걸었어요. 코스는 강아지가 정하고, 목줄만 잡았죠.',
       },
     },
     caption: {
@@ -698,6 +823,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'من يأخذ من في نزهة؟',
       fr: 'Qui promène qui, au juste ?',
       es: '¿Quién pasea a quién?',
+      ja: '散歩されてるのはどっち？',
+      ko: '누가 누구를 산책시키는 걸까',
     },
   },
   {
@@ -712,8 +839,10 @@ export const ANIMALS_SKIP: readonly Draft[] = [
         ar: 'مسلسل الأسبوع',
         fr: 'LA SÉRIE DE LA SEMAINE',
         es: 'LA SERIE DE LA SEMANA',
+        ja: '今週のドラマ',
+        ko: '이번 주 드라마',
       },
-      big: { tr: '40', en: '40', de: '40', ar: '40', fr: '40', es: '40' },
+      big: { tr: '40', en: '40', de: '40', ar: '40', fr: '40', es: '40', ja: '40', ko: '40' },
       text: {
         tr: 'dakika balkondaki salyangozu izledin. Hiç kaydırmadın.',
         en: 'minutes watching a snail cross the balcony. Zero scrolling.',
@@ -721,6 +850,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
         ar: 'دقيقة تتابع حلزونًا يعبر الشرفة… دون أي تمرير',
         fr: 'minutes à regarder un escargot sur le balcon. Zéro scroll.',
         es: 'minutos viendo un caracol cruzar el balcón. Cero scroll.',
+        ja: '分、ベランダのカタツムリを見てた。スクロールは一度もなし。',
+        ko: '분 동안 베란다 달팽이를 봤어요. 스크롤은 한 번도 안 했어요.',
       },
     },
     caption: {
@@ -730,6 +861,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'أكثر عمل مشوّق هذا العام',
       fr: "La production la plus haletante de l'année",
       es: 'La producción más emocionante del año',
+      ja: '今年いちばん目が離せない作品',
+      ko: '올해 가장 몰입감 있는 작품',
     },
   },
   {
@@ -744,6 +877,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
         ar: 'تصنيف ضيوف الشرفة',
         fr: 'TIER LIST DU BALCON',
         es: 'TIER LIST DEL BALCÓN',
+        ja: 'ベランダ来客Tier表',
+        ko: '베란다 손님 티어표',
       },
       rows: [['🐝', '🦋'], ['🐞', '🐦'], ['🐛', '🐜'], ['🦟', '🪰']],
     },
@@ -754,6 +889,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'البعوضة في الأخير: لا تزور إلا بعد إطفاء النور',
       fr: "Moustique en C : il attend que la lumière s'éteigne",
       es: 'Mosquito en C: solo viene con la luz apagada',
+      ja: '蚊はC。電気を消した瞬間に来る客。',
+      ko: '모기는 C: 불 끄면 찾아오는 손님',
     },
   },
   {
@@ -768,6 +905,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
         ar: 'تصنيف حيوانات المزرعة',
         fr: 'TIER LIST DE LA FERME',
         es: 'TIER LIST DE LA GRANJA',
+        ja: '牧場の動物Tier表',
+        ko: '농장 동물 티어표',
       },
       rows: [['🐐', '🐑'], ['🐄', '🐴'], ['🦆', '🐔'], ['🐓']],
     },
@@ -778,6 +917,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'الديك في الأخير: ساعته معطّلة ويصيح ظهرًا',
       fr: 'Le coq en C : il chante à 14 h',
       es: 'Gallo en C: canta a las 2 de la tarde',
+      ja: 'オンドリはC：体内時計が狂って昼2時に鳴く',
+      ko: '수탉은 C: 시계 고장 나서 오후 2시에 운다',
     },
   },
   {
@@ -794,6 +935,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
           ar: 'كاميرا الحيوان',
           fr: 'Caméra animaux',
           es: 'Cámara mascota',
+          ja: 'ペットカメラ',
+          ko: '펫캠',
         },
         text: {
           tr: 'Hareket algılandı: köpek yine kanepede',
@@ -802,6 +945,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
           ar: 'رُصدت حركة: الكلب على الأريكة مجددًا',
           fr: 'Mouvement : chien sur le canapé (encore)',
           es: 'Movimiento: el perro otra vez en el sofá',
+          ja: '動きを検知：犬がまたソファにいます',
+          ko: '움직임 감지: 강아지가 또 소파에',
         },
       },
     },
@@ -812,6 +957,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'نظر إلى الكاميرا… ولم ينزل',
       fr: 'Il a regardé la caméra. Il est resté.',
       es: 'Miró a la cámara. No se bajó.',
+      ja: 'カメラをじっと見た。降りなかった。',
+      ko: '카메라를 똑바로 봤다. 안 내려왔다.',
     },
   },
   {
@@ -828,6 +975,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
           ar: 'صالون الحيوانات',
           fr: 'Toiletteur',
           es: 'Peluquería canina',
+          ja: 'ペットサロン',
+          ko: '애견 미용실',
         },
         text: {
           tr: 'Köpeğiniz hazır. Tanımayabilirsiniz.',
@@ -836,6 +985,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
           ar: 'كلبك جاهز… وقد لا تتعرّف عليه',
           fr: 'Il est prêt. Méconnaissable !',
           es: 'Tu perro está listo. ¿Lo reconocerás?',
+          ja: 'お迎えどうぞ。見違えるかもしれません',
+          ko: '준비됐어요. 못 알아보실 수도 있어요.',
         },
       },
     },
@@ -846,6 +997,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'هذا ليس الكلب الذي تركته عندهم',
       fr: "C'est pas le chien que j'ai déposé",
       es: 'Ese no es el perro que dejé',
+      ja: '預けたのはこの犬じゃない',
+      ko: '내가 맡긴 개는 이 개가 아닌데',
     },
   },
   {
@@ -860,6 +1013,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
         ar: 'قطتي لم تمسك النقطة الحمراء يومًا… ولم تستسلم يومًا.',
         fr: "Mon chat n'a jamais attrapé le point rouge. Il n'a jamais abandonné.",
         es: 'Mi gata nunca atrapó el punto rojo. Nunca se rindió.',
+        ja: '猫は赤い点を一度も捕まえられなかった。一日もあきらめなかった。',
+        ko: '고양이는 빨간 점을 한 번도 못 잡았다. 그래도 하루도 포기하지 않았다.',
       },
     },
     caption: {
@@ -869,6 +1024,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'أنا كنت سأستسلم من أول محاولة',
       fr: "Moi, j'aurais lâché au premier essai",
       es: 'Yo me habría rendido al primer intento',
+      ja: '私なら1回目でやめてた',
+      ko: '나였으면 첫 시도에 포기했다',
     },
   },
   {
@@ -883,6 +1040,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
         ar: 'امشِ في الشارع نفسه كل يوم كأنك تراه لأول مرة.',
         fr: 'Parcours la même rue chaque jour comme si elle était neuve.',
         es: 'Recorre la misma calle cada día como si fuera nueva.',
+        ja: '毎日同じ道を、初めて見るように歩こう。',
+        ko: '매일 같은 길을 처음 보는 것처럼 걸어라.',
       },
     },
     caption: {
@@ -892,6 +1051,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'كلبي يكتشف الشارع نفسه منذ 5 سنوات',
       fr: 'Mon chien découvre la même rue depuis 5 ans',
       es: 'Mi perro lleva 5 años descubriendo la misma calle',
+      ja: 'うちの犬、5年間同じ道を新発見し続けてる',
+      ko: '우리 개는 5년째 같은 골목을 탐험 중이다',
     },
   },
   {
@@ -906,6 +1067,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
         ar: 'طارد أحلامك، حتى لو كانت ذيلك.',
         fr: "Poursuis tes rêves. Même s'ils tournent en rond.",
         es: 'Persigue tus sueños, aunque den vueltas en círculo.',
+        ja: '夢を追いかけよう。それが自分のしっぽでも。',
+        ko: '꿈을 쫓아라. 그게 자기 꼬리일지라도.',
       },
     },
     caption: {
@@ -915,6 +1078,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'كلبي يطارد هذا الهدف منذ 10 دقائق',
       fr: 'Mon chien poursuit ce rêve depuis 10 minutes',
       es: 'Mi perro lleva 10 minutos tras esta meta',
+      ja: 'うちの犬、この夢を10分間追いかけてる',
+      ko: '우리 개가 10분째 이 꿈을 쫓는 중',
     },
   },
   {
@@ -929,6 +1094,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
         ar: 'كن كالقطة: اجلس حيث تشاء ولا تبرّر لأحد.',
         fr: 'Sois comme un chat : assieds-toi où tu veux, sans te justifier.',
         es: 'Sé como un gato: siéntate donde quieras y no expliques nada.',
+        ja: '猫のように生きよう。好きな所に座り、言い訳はしない。',
+        ko: '고양이처럼 살아라: 앉고 싶은 곳에 앉고, 설명하지 마라.',
       },
     },
     caption: {
@@ -938,6 +1105,8 @@ export const ANIMALS_SKIP: readonly Draft[] = [
       ar: 'حتى فوق الحاسوب',
       fr: 'Clavier compris',
       es: 'Incluido el teclado',
+      ja: 'ノートパソコンの上も含めて',
+      ko: '노트북 위도 포함',
     },
   },
 ];
@@ -954,6 +1123,8 @@ export const ANIMALS_LIKE: readonly Draft[] = [
       ar: 'تبنّيت قطة من الشارع… وهي تبنّت سريري',
       fr: "j'ai adopté un chat des rues, il a adopté mon lit",
       es: 'adopté una gata callejera y ella adoptó mi cama',
+      ja: '野良猫を引き取ったら、ベッドを引き取られた',
+      ko: '길냥이 입양함. 걔는 내 침대를 입양함',
     },
   },
   {
@@ -967,6 +1138,8 @@ export const ANIMALS_LIKE: readonly Draft[] = [
       ar: 'كلبي رأى البحر لأول مرة… وبدأ يجادل الأمواج',
       fr: '1re fois à la mer : mon chien se dispute avec les vagues',
       es: 'mi perro vio el mar por primera vez y discutió con las olas',
+      ja: 'うちの犬、初めての海で波とケンカしてる',
+      ko: '우리 개 바다 처음 봄. 파도랑 싸우는 중',
     },
   },
   {
@@ -980,6 +1153,8 @@ export const ANIMALS_LIKE: readonly Draft[] = [
       ar: 'فقست الكتاكيت… وأحدها يظنني أمه',
       fr: "les poussins sont nés, l'un d'eux me prend pour sa mère",
       es: 'nacieron los pollitos y uno cree que soy su mamá',
+      ja: 'ひよこが生まれて、1羽が私をママだと思ってる',
+      ko: '병아리 부화함. 한 마리가 날 엄마인 줄 앎',
     },
   },
   {
@@ -993,6 +1168,8 @@ export const ANIMALS_LIKE: readonly Draft[] = [
       ar: 'بنيت متاهة لهامستري في 3 ساعات… فحلّها في 4 ثوانٍ',
       fr: "j'ai mis 3 h à faire un labyrinthe. mon hamster, 4 s.",
       es: '3 horas de laberinto y mi hámster salió en 4 segundos',
+      ja: 'ハムスターに3時間かけて迷路を作った。4秒で解かれた',
+      ko: '햄스터 미로 3시간 걸려 만듦. 4초 만에 탈출함',
     },
   },
   {
@@ -1007,6 +1184,8 @@ export const ANIMALS_LIKE: readonly Draft[] = [
         ar: 'مكانه المفضّل',
         fr: 'son endroit préféré',
         es: 'su lugar favorito',
+        ja: 'お気に入りスポット',
+        ko: '최애 장소',
       },
     },
     caption: {
@@ -1016,6 +1195,8 @@ export const ANIMALS_LIKE: readonly Draft[] = [
       ar: 'أخذ مكافأة عند البيطري… والآن يجرّني إليه كل يوم',
       fr: 'friandise chez le véto : il veut y aller tous les jours',
       es: 'premio en el veterinario: ahora quiere ir todos los días',
+      ja: '動物病院でおやつをもらって以来、毎日そっちに引っぱられる',
+      ko: '동물병원에서 간식 받더니 매일 그쪽으로 끌고 감',
     },
   },
   {
@@ -1030,6 +1211,8 @@ export const ANIMALS_LIKE: readonly Draft[] = [
         ar: 'أنا ومدرّباتي',
         fr: 'moi et mes profs',
         es: 'yo y mis maestros',
+        ja: '私と師匠たち',
+        ko: '나와 스승님들',
       },
     },
     caption: {
@@ -1039,6 +1222,8 @@ export const ANIMALS_LIKE: readonly Draft[] = [
       ar: 'نفس وقفة طيور النحام… صمدت ثانيتين فقط',
       fr: "même pose que les flamants roses (j'ai tenu 2 secondes)",
       es: 'misma pose que los flamencos (aguanté 2 segundos)',
+      ja: 'フラミンゴと同じポーズ（私は2秒でギブ）',
+      ko: '플라밍고랑 같은 포즈 (난 2초 버팀)',
     },
   },
   {
@@ -1053,6 +1238,8 @@ export const ANIMALS_LIKE: readonly Draft[] = [
         ar: 'القيادة له',
         fr: "c'est lui qui conduit",
         es: 'él lleva las riendas',
+        ja: '運転は彼',
+        ko: '운전은 얘가',
       },
     },
     caption: {
@@ -1062,6 +1249,8 @@ export const ANIMALS_LIKE: readonly Draft[] = [
       ar: 'أول درس ركوب خيل: حيث يذهب الحصان أذهب',
       fr: "1er cours d'équitation : là où va le cheval, je vais",
       es: 'primera clase de equitación: voy a donde quiere el caballo',
+      ja: '初めての乗馬レッスン：馬が行く方へ私も行く',
+      ko: '첫 승마 수업: 말 가는 대로 나도 감',
     },
   },
   {
@@ -1076,6 +1265,8 @@ export const ANIMALS_LIKE: readonly Draft[] = [
         ar: 'صاحبة العيد 🎂',
         fr: 'reine du jour 🎂',
         es: 'la cumpleañera 🎂',
+        ja: '今日の主役 🎂',
+        ko: '생일 주인공 🎂',
       },
     },
     caption: {
@@ -1085,6 +1276,8 @@ export const ANIMALS_LIKE: readonly Draft[] = [
       ar: 'قطتي لبست قبعة الحفلة ثانية واحدة… والتقطتها!',
       fr: 'ma minette a gardé le chapeau 1 seconde. photo prise !',
       es: 'mi gata aguantó el gorrito 1 segundo y lo capturé',
+      ja: '猫がパーティー帽を被ったのは1秒だけ。その1秒を撮った',
+      ko: '고양이가 고깔모자 1초 씀. 그 1초를 찍음',
     },
   },
   {
@@ -1099,6 +1292,8 @@ export const ANIMALS_LIKE: readonly Draft[] = [
         ar: 'إطلالة متطابقة',
         fr: 'tenue assortie',
         es: 'conjunto a juego',
+        ja: 'おそろいコーデ',
+        ko: '커플룩',
       },
     },
     caption: {
@@ -1108,6 +1303,8 @@ export const ANIMALS_LIKE: readonly Draft[] = [
       ar: 'بيجامة مطابقة لي ولكلبي… وهي عليه أجمل',
       fr: 'pyjama assorti avec mon chien. ça lui va mieux',
       es: 'pijama a juego con mi perro. a él le queda mejor',
+      ja: '犬とおそろいのパジャマを買った。犬のほうが似合う',
+      ko: '강아지랑 커플 잠옷 삼. 걔가 더 잘 어울림',
     },
   },
   {
@@ -1121,6 +1318,8 @@ export const ANIMALS_LIKE: readonly Draft[] = [
       ar: 'رحلة حديقة الحيوان: معظم صوري للحمام',
       fr: "dump du zoo : la plupart de mes photos, c'est des pigeons",
       es: 'día en el zoológico: la mayoría de mis fotos son palomas',
+      ja: '動物園の写真まとめ：ほぼハトしか撮ってない',
+      ko: '동물원 사진 덤프: 거의 다 비둘기임',
     },
   },
   {
@@ -1134,6 +1333,8 @@ export const ANIMALS_LIKE: readonly Draft[] = [
       ar: 'أسبوع الجرو الأول: خفّان، ووسادة، وحب لا ينتهي',
       fr: '1re semaine du chiot : 2 chaussons, 1 coussin, amour infini',
       es: 'cachorro, semana 1: 2 pantuflas, 1 cojín, amor infinito',
+      ja: '子犬の1週目：スリッパ2足、クッション1個、愛情たっぷり',
+      ko: '강아지 첫 주: 슬리퍼 2개, 방석 1개, 사랑 가득',
     },
   },
   {
@@ -1147,6 +1348,8 @@ export const ANIMALS_LIKE: readonly Draft[] = [
       ar: 'مراقبة الطيور: 6 ساعات، عصفور واحد، وسعادة كبيرة',
       fr: 'sortie ornitho : 6 h, 1 moineau, trop heureux',
       es: 'observando aves: 6 horas, 1 gorrión y mucha felicidad',
+      ja: 'バードウォッチング：6時間でスズメ1羽。大満足',
+      ko: '탐조 6시간, 참새 1마리, 너무 행복함',
     },
   },
 ];
@@ -1163,6 +1366,8 @@ export const ANIMALS_HOLD: readonly Draft[] = [
       ar: 'لحظة نادرة: أحضر الكلب الكرة… وتركها!',
       fr: 'Moment rare : le chien rapporte la balle ET la lâche',
       es: 'Momento único: el perro trajo la pelota Y la soltó',
+      ja: 'レアな瞬間：犬がボールを持ってきて、しかも離した',
+      ko: '희귀한 순간: 강아지가 공을 가져와서 놓기까지 했다',
     },
   },
   {
@@ -1176,6 +1381,8 @@ export const ANIMALS_HOLD: readonly Draft[] = [
       ar: 'الطاووس فرد ذيله… من أجلك وحدك',
       fr: 'Le paon fait la roue. Rien que pour toi.',
       es: 'El pavo real abrió la cola. Solo para ti.',
+      ja: 'クジャクが羽を広げた。あなただけのために。',
+      ko: '공작새가 꼬리를 펼쳤어요. 오직 당신만을 위해.',
     },
   },
   {
@@ -1189,6 +1396,8 @@ export const ANIMALS_HOLD: readonly Draft[] = [
       ar: 'دلفين بجانب العبّارة! سيغوص بعد 3 ثوانٍ',
       fr: 'Un dauphin près du ferry ! Il replonge dans 3 secondes',
       es: '¡Un delfín junto al barco! Se sumerge en 3 segundos',
+      ja: 'フェリーの横にイルカ！3秒後にまた潜る',
+      ko: '여객선 옆에 돌고래! 3초 뒤에 다시 잠수함',
     },
   },
   {
@@ -1202,6 +1411,8 @@ export const ANIMALS_HOLD: readonly Draft[] = [
       ar: 'عُثر على الكنز المفقود: مخبأ عظام الكلب السري',
       fr: "Trésor retrouvé : la réserve secrète d'os du chien",
       es: 'Tesoro encontrado: el escondite secreto de huesos del perro',
+      ja: '幻の財宝を発見：犬がへそくりしてた骨',
+      ko: '잃어버린 보물 발견: 강아지의 비밀 뼈다귀 창고',
     },
   },
   {
@@ -1215,6 +1426,8 @@ export const ANIMALS_HOLD: readonly Draft[] = [
       ar: 'بومة مستيقظة في عزّ النهار… واحدة في المليون',
       fr: 'Une chouette réveillée à midi. Une sur un million.',
       es: 'Un búho despierto al mediodía. Uno en un millón.',
+      ja: '真っ昼間に起きてるフクロウ。100万分の1。',
+      ko: '대낮에 깨어 있는 부엉이. 백만 분의 일.',
     },
   },
   {
@@ -1228,6 +1441,8 @@ export const ANIMALS_HOLD: readonly Draft[] = [
       ar: 'السمكة التي لا تغادر قلعتها خرجت أخيرًا',
       fr: 'Le poisson qui ne quitte jamais son château est sorti',
       es: 'El pez que nunca sale de su castillo por fin salió',
+      ja: 'お城から出てこない魚が、ついに出てきた',
+      ko: '성 밖으로 절대 안 나오던 물고기가 드디어 나왔다',
     },
   },
   {
@@ -1241,6 +1456,8 @@ export const ANIMALS_HOLD: readonly Draft[] = [
       ar: 'لقطة أسطورية: الحيوانات الثلاثة تنظر إلى الكاميرا',
       fr: "Photo légendaire : les 3 animaux regardent l'objectif",
       es: 'Foto legendaria: las 3 mascotas mirando a la cámara',
+      ja: '伝説の1枚：3匹全員がカメラ目線',
+      ko: '전설의 한 컷: 3마리 모두 카메라 정면',
     },
   },
 ];
@@ -1251,7 +1468,16 @@ export const ANIMALS_FREEZE: readonly Draft[] = [
     user: ACCOUNTS.live,
     body: {
       format: 'sign',
-      sign: { tr: 'MEŞGUL', en: 'OCCUPIED', de: 'BESETZT', ar: 'مشغول', fr: 'OCCUPÉ', es: 'OCUPADO' },
+      sign: {
+        tr: 'MEŞGUL',
+        en: 'OCCUPIED',
+        de: 'BESETZT',
+        ar: 'مشغول',
+        fr: 'OCCUPÉ',
+        es: 'OCUPADO',
+        ja: '使用中',
+        ko: '사용 중',
+      },
       small: {
         tr: 'KEDİ KUCAKTA UYUYOR',
         en: 'CAT ASLEEP ON LAP',
@@ -1259,6 +1485,8 @@ export const ANIMALS_FREEZE: readonly Draft[] = [
         ar: 'القطة نائمة في الحضن',
         fr: 'CHAT ENDORMI SUR LES GENOUX',
         es: 'GATO DORMIDO EN LAS PIERNAS',
+        ja: 'ひざの上で猫が睡眠中',
+        ko: '무릎 위 고양이 취침 중',
       },
     },
     caption: {
@@ -1268,6 +1496,8 @@ export const ANIMALS_FREEZE: readonly Draft[] = [
       ar: 'أنت تسكن هنا الآن.',
       fr: 'Tu habites ici, maintenant.',
       es: 'Ahora vives aquí.',
+      ja: 'もう、ここに住むしかない。',
+      ko: '이제 여기서 사셔야 해요.',
     },
     headline: {
       tr: 'Kedi kucağında uyuyakaldı',
@@ -1276,6 +1506,8 @@ export const ANIMALS_FREEZE: readonly Draft[] = [
       ar: 'القطة نامت في حضنك',
       fr: "Le chat s'est endormi sur toi",
       es: 'El gato se durmió en tus piernas',
+      ja: '猫がひざの上で寝ちゃった',
+      ko: '고양이가 무릎에서 잠들었어요',
     },
   },
   {
@@ -1283,7 +1515,16 @@ export const ANIMALS_FREEZE: readonly Draft[] = [
     user: ACCOUNTS.alert,
     body: {
       format: 'sign',
-      sign: { tr: 'DİKKAT', en: 'CAUTION', de: 'ACHTUNG', ar: 'انتبه', fr: 'ATTENTION', es: 'PRECAUCIÓN' },
+      sign: {
+        tr: 'DİKKAT',
+        en: 'CAUTION',
+        de: 'ACHTUNG',
+        ar: 'انتبه',
+        fr: 'ATTENTION',
+        es: 'PRECAUCIÓN',
+        ja: '注意',
+        ko: '주의',
+      },
       small: {
         tr: 'GEYİK ÇIKABİLİR',
         en: 'DEER CROSSING',
@@ -1291,6 +1532,8 @@ export const ANIMALS_FREEZE: readonly Draft[] = [
         ar: 'منطقة عبور غزلان',
         fr: 'PASSAGE DE CERFS',
         es: 'CRUCE DE CIERVOS',
+        ja: 'シカ飛び出し注意',
+        ko: '사슴 출몰 지역',
       },
     },
     caption: {
@@ -1300,6 +1543,8 @@ export const ANIMALS_FREEZE: readonly Draft[] = [
       ar: 'أول من يتحرك يخسر.',
       fr: 'Le premier qui bouge a perdu.',
       es: 'El primero que se mueva pierde.',
+      ja: '先に動いたほうが負け。',
+      ko: '먼저 움직이는 쪽이 지는 거예요.',
     },
     headline: {
       tr: 'Bir geyikle göz göze geldin',
@@ -1308,6 +1553,8 @@ export const ANIMALS_FREEZE: readonly Draft[] = [
       ar: 'التقت عيناك بعيني غزال',
       fr: 'Toi et un cerf, les yeux dans les yeux',
       es: 'Un ciervo te mira fijo a los ojos',
+      ja: 'シカと目が合った',
+      ko: '사슴과 눈이 마주쳤어요',
     },
   },
   {
@@ -1322,6 +1569,8 @@ export const ANIMALS_FREEZE: readonly Draft[] = [
         ar: 'ممنوع الفلاش',
         fr: 'PAS DE FLASH',
         es: 'SIN FLASH',
+        ja: 'フラッシュ禁止',
+        ko: '플래시 금지',
       },
       small: {
         tr: 'BAYKUŞLAR UYUYOR',
@@ -1330,6 +1579,8 @@ export const ANIMALS_FREEZE: readonly Draft[] = [
         ar: 'البوم نائم',
         fr: 'CHOUETTES ENDORMIES',
         es: 'BÚHOS DURMIENDO',
+        ja: 'フクロウ睡眠中',
+        ko: '부엉이 자는 중',
       },
     },
     caption: {
@@ -1339,6 +1590,8 @@ export const ANIMALS_FREEZE: readonly Draft[] = [
       ar: 'لقد رأتك. لا تتحرك.',
       fr: "Elle t'a vu. Bouge pas.",
       es: 'Te vio. No te muevas.',
+      ja: '見られてる。動かないで。',
+      ko: '들켰어요. 움직이지 마세요.',
     },
     headline: {
       tr: 'Baykuş tek gözünü açtı',
@@ -1347,6 +1600,8 @@ export const ANIMALS_FREEZE: readonly Draft[] = [
       ar: 'البومة فتحت عينًا واحدة',
       fr: 'La chouette a ouvert un œil',
       es: 'El búho abrió un ojo',
+      ja: 'フクロウが片目を開けた',
+      ko: '부엉이가 한쪽 눈을 떴어요',
     },
   },
   {
@@ -1361,6 +1616,8 @@ export const ANIMALS_FREEZE: readonly Draft[] = [
         ar: 'تحذير',
         fr: 'AVERTISSEMENT',
         es: 'ADVERTENCIA',
+        ja: '警告',
+        ko: '경고',
       },
       small: {
         tr: 'MAYMUNLAR TAKLİT EDER',
@@ -1369,6 +1626,8 @@ export const ANIMALS_FREEZE: readonly Draft[] = [
         ar: 'القرود تقلّد كل شيء',
         fr: 'LES SINGES IMITENT TOUT',
         es: 'LOS MONOS IMITAN TODO',
+        ja: 'サルが動きをマネします',
+        ko: '원숭이가 행동을 따라 합니다',
       },
     },
     caption: {
@@ -1378,6 +1637,8 @@ export const ANIMALS_FREEZE: readonly Draft[] = [
       ar: 'توقّف كي يتوقف هو أيضًا.',
       fr: "Arrête-toi, il s'arrêtera aussi.",
       es: 'Quédate quieto y él también.',
+      ja: 'あなたが止まれば、サルも止まる。',
+      ko: '멈추면 원숭이도 멈춰요.',
     },
     headline: {
       tr: 'Maymun her hareketini taklit ediyor',
@@ -1386,6 +1647,8 @@ export const ANIMALS_FREEZE: readonly Draft[] = [
       ar: 'قرد يقلّد كل حركة تقوم بها',
       fr: 'Un singe imite tous tes gestes',
       es: 'Un mono imita cada movimiento tuyo',
+      ja: 'サルがあなたの動きを全部マネしてる',
+      ko: '원숭이가 모든 동작을 따라 해요',
     },
   },
   {
@@ -1393,7 +1656,7 @@ export const ANIMALS_FREEZE: readonly Draft[] = [
     user: ACCOUNTS.cctv,
     body: {
       format: 'cctv',
-      place: { tr: 'KORİDOR', en: 'HALLWAY', de: 'FLUR', ar: 'الممر', fr: 'COULOIR', es: 'PASILLO' },
+      place: { tr: 'KORİDOR', en: 'HALLWAY', de: 'FLUR', ar: 'الممر', fr: 'COULOIR', es: 'PASILLO', ja: '廊下', ko: '복도' },
     },
     caption: {
       tr: 'Bir adım at, ayaklarına atlar.',
@@ -1402,6 +1665,8 @@ export const ANIMALS_FREEZE: readonly Draft[] = [
       ar: 'خطوة واحدة وتنقضّ على قدميك.',
       fr: 'Un pas, et il bondit.',
       es: 'Da un paso y se lanza.',
+      ja: '一歩でも動けば飛びかかってくる。',
+      ko: '한 발짝만 떼면 달려들어요.',
     },
     headline: {
       tr: 'Kedi pusuda, ayaklarını izliyor',
@@ -1410,6 +1675,8 @@ export const ANIMALS_FREEZE: readonly Draft[] = [
       ar: 'القطة تكمن لك… وهدفها قدماك',
       fr: "Le chat est à l'affût. Cible : tes pieds",
       es: 'El gato acecha. Objetivo: tus pies',
+      ja: '猫が待ち伏せ中。狙いはあなたの足',
+      ko: '고양이 매복 중. 목표물은 발이에요.',
     },
   },
   {
@@ -1424,6 +1691,8 @@ export const ANIMALS_FREEZE: readonly Draft[] = [
         ar: 'عتبة الباب',
         fr: 'PAS DE LA PORTE',
         es: 'ENTRADA',
+        ja: '玄関前',
+        ko: '현관 앞',
       },
     },
     caption: {
@@ -1433,6 +1702,8 @@ export const ANIMALS_FREEZE: readonly Draft[] = [
       ar: 'اقتربت… احبس أنفاسك.',
       fr: 'Presque. Retiens ton souffle.',
       es: 'Ya casi. Aguanta la respiración.',
+      ja: 'あと少し。息を止めて。',
+      ko: '조금만 더. 숨 참으세요.',
     },
     headline: {
       tr: 'Ürkek sokak kedisi ilk kez yaklaşıyor',
@@ -1441,6 +1712,8 @@ export const ANIMALS_FREEZE: readonly Draft[] = [
       ar: 'قطة الشارع الخجولة تقترب لأول مرة',
       fr: "Le chat errant timide s'approche enfin",
       es: 'La gata callejera tímida se acerca',
+      ja: '人見知りの野良猫が初めて近づいてきた',
+      ko: '겁 많은 길고양이가 처음으로 다가와요',
     },
   },
   {
@@ -1448,7 +1721,7 @@ export const ANIMALS_FREEZE: readonly Draft[] = [
     user: ACCOUNTS.cctv,
     body: {
       format: 'cctv',
-      place: { tr: 'BAHÇE', en: 'BACKYARD', de: 'GARTEN', ar: 'الحديقة', fr: 'JARDIN', es: 'JARDÍN' },
+      place: { tr: 'BAHÇE', en: 'BACKYARD', de: 'GARTEN', ar: 'الحديقة', fr: 'JARDIN', es: 'JARDÍN', ja: '庭', ko: '뒷마당' },
     },
     caption: {
       tr: 'Ses çıkarma, top olur.',
@@ -1457,6 +1730,8 @@ export const ANIMALS_FREEZE: readonly Draft[] = [
       ar: 'صوت واحد ويتكوّر.',
       fr: 'Un bruit, et il se roule en boule.',
       es: 'Un ruido y se hace bolita.',
+      ja: '音を立てたら、丸まっちゃう。',
+      ko: '소리 한 번이면 공처럼 말려요.',
     },
     headline: {
       tr: 'Kirpi bahçeye çıktı, seni fark etmedi',
@@ -1465,6 +1740,8 @@ export const ANIMALS_FREEZE: readonly Draft[] = [
       ar: 'قنفذ في الحديقة ولم يلاحظك بعد',
       fr: "Un hérisson sort. Il ne t'a pas vu.",
       es: 'Salió un erizo y no te ha visto',
+      ja: 'ハリネズミ登場。まだ気づかれてない',
+      ko: '고슴도치가 나왔어요. 아직 안 들켰어요',
     },
   },
   {
@@ -1479,6 +1756,8 @@ export const ANIMALS_FREEZE: readonly Draft[] = [
         ar: 'الحمّام',
         fr: 'SALLE DE BAIN',
         es: 'BAÑO',
+        ja: '浴室',
+        ko: '욕실',
       },
     },
     caption: {
@@ -1488,6 +1767,8 @@ export const ANIMALS_FREEZE: readonly Draft[] = [
       ar: 'حركة واحدة ويختبئ تحت السرير.',
       fr: 'Un geste, et il file sous le lit.',
       es: 'Un movimiento y se esconde bajo la cama.',
+      ja: 'ちょっとでも動けば、ベッドの下に逃げる。',
+      ko: '움직이는 순간 침대 밑으로 도망가요.',
     },
     headline: {
       tr: 'Köpek banyo suyunu duydu, seni izliyor',
@@ -1496,6 +1777,8 @@ export const ANIMALS_FREEZE: readonly Draft[] = [
       ar: 'الكلب سمع ماء الحمّام… وهو يراقبك',
       fr: 'Le chien a entendu le bain couler',
       es: 'El perro oyó el agua del baño',
+      ja: '犬がお風呂の音を聞いた。見られてる',
+      ko: '강아지가 목욕물 소리를 들었어요',
     },
   },
 ];

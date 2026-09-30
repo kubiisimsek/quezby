@@ -32,6 +32,7 @@
     "engine:simulate": "pnpm --filter @quezby/engine simulate",
     "engine:lock": "pnpm --filter @quezby/engine lock",
     "tokens": "node scripts/sync-design-tokens.mjs",
+    "fonts:cjk": "node scripts/cjk-fonts.mjs",
     "api:package:staging": "./scripts/package-api.sh staging",
     "api:package:production": "./scripts/package-api.sh production",
     "admin:package:staging": "node scripts/package-admin.mjs staging",
@@ -43,6 +44,7 @@
     "eslint": "^10.8.1",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.9.6",
+    "subset-font": "^2.9.0",
     "turbo": "^2.10.11",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.67.0"

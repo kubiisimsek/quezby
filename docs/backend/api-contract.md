@@ -19,11 +19,11 @@ A contract change is one commit: `packages/types` → Laravel request/resource �
   milliseconds. Boards and a VS that count down also send `serverTime`: the
   app counts from the server's clock, never the phone's.
 - Auth is a Sanctum personal access token: `Authorization: Bearer <token>`.
-- **Language.** The API speaks the game's six languages — `tr`, `en`, `de`,
-  `ar`, `fr`, `es` (`Locale` in `packages/types`) — and the app names the one
+- **Language.** The API speaks the game's eight languages — `tr`, `en`, `de`,
+  `ar`, `fr`, `es`, `ja`, `ko` (`Locale` in `packages/types`) — and the app names the one
   it speaks in `Accept-Language` on every call. A player route answers in the
-  first of the six the header names, by the primary subtag in the header's
-  order of preference (`de-AT` → `de`, `ja, fr;q=0.8` → `fr`); when it names
+  first of the eight the header names, by the primary subtag in the header's
+  order of preference (`de-AT` → `de`, `zh, fr;q=0.8` → `fr`); when it names
   none of them (or is empty), in the signed-in player's own language
   (`Me.locale`); else in Turkish. Every error `message` (401s and 429s
   included), every validation line in `fields`, and the share texts follow it.
@@ -251,9 +251,9 @@ gives back an automatic name and with it one more pick.
 ### `PUT /me/locale`
 
 `{ "locale": "de" }` → `{ "user": Me }` — the same shape as `PUT /me/username`.
-One of the six (`UpdateLocaleRequest`), else `422 validation_failed` on
+One of the eight (`UpdateLocaleRequest`), else `422 validation_failed` on
 `locale`. The app sends it when the player picks a language (**Dil**). The API
-answers in it whenever a request names none of the six.
+answers in it whenever a request names none of the eight.
 
 ### `POST /me/credentials` · `POST /me/credentials/resend` · `POST /me/credentials/verify`
 

@@ -135,4 +135,44 @@ const es: UsernameMessages = {
   },
 };
 
-export const username: Record<Locale, UsernameMessages> = { tr, en, de, ar, fr, es };
+const ja: UsernameMessages = {
+  onboardingTitle: 'なんて呼べばいい？',
+  title: 'ランキングでの名前は？',
+  autoName: (name) =>
+    `トップとリーグではこの名前で表示されます。選んだ名前はあとから変更できません。今は${handle(name)}です。あとでプロフィールから選べます。`,
+  rules: 'ほかの人と同じ名前は使えず、あとから変更もできません。英字、数字、ドット、アスタリスクが使えます。',
+  pickFirst: '先にユーザー名を選んでください。',
+  save: '保存',
+  skip: 'あとで',
+  continue: '続ける',
+  field: {
+    label: 'ユーザー名',
+    placeholder: 'yamada.taro',
+    available: (name) => `${handle(name)}は使えます。`,
+    current: '今の名前です。',
+    unknown: '今は使えるか確認できませんでした。保存するときにもう一度確認します。',
+    idle: 'ランキングでは、みんなにこの名前で表示されます。',
+  },
+};
+
+const ko: UsernameMessages = {
+  onboardingTitle: '뭐라고 부를까요?',
+  title: '랭킹에서 어떤 이름을 쓸까요?',
+  autoName: (name) =>
+    `정상과 리그에서 보일 이름이에요. 고른 이름은 다시 바꿀 수 없어요. 지금은 ${handle(name)} 이름으로 표시되고, 나중에 프로필에서 고를 수 있어요.`,
+  rules: '다른 사람과 겹치지 않아야 하고, 한 번 정하면 바꿀 수 없어요. 영문자, 숫자, 점, 별표를 쓸 수 있어요.',
+  pickFirst: '먼저 사용자 이름을 고르세요.',
+  save: '저장',
+  skip: '나중에 하기',
+  continue: '계속',
+  field: {
+    label: '사용자 이름',
+    placeholder: 'hong.gildong',
+    available: (name) => `${handle(name)}, 사용할 수 있어요.`,
+    current: '지금 쓰는 이름이에요.',
+    unknown: '지금은 사용 가능 여부를 확인할 수 없어요. 저장할 때 다시 확인할게요.',
+    idle: '랭킹에서 모두가 이 이름으로 보게 돼요.',
+  },
+};
+
+export const username: Record<Locale, UsernameMessages> = { tr, en, de, ar, fr, es, ja, ko };

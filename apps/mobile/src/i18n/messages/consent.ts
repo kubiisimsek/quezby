@@ -62,4 +62,22 @@ const es: ConsentMessages = {
   allow: 'Permitir',
 };
 
-export const consent: Record<Locale, ConsentMessages> = { tr, en, de, ar, fr, es };
+const ja: ConsentMessages = {
+  ribbon: 'あなたが決める',
+  title: '一緒にゲームをよくしませんか？',
+  body: '許可すると、開いた画面とプレイ時間をカウントして、ゲームの改善に役立てます。名前、メールアドレス、位置情報が送られることはありません。',
+  later: 'あとからいつでも設定で変更できます。',
+  deny: '許可しない',
+  allow: '許可する',
+};
+
+const ko: ConsentMessages = {
+  ribbon: '당신의 선택',
+  title: '함께 게임을 더 좋게 만들어 볼까요?',
+  body: '허용하면 어떤 화면을 여는지, 얼마나 플레이하는지 세어서 게임을 더 좋게 만드는 데 써요. 이름, 이메일, 위치는 절대 전송되지 않아요.',
+  later: '설정에서 언제든지 바꿀 수 있어요.',
+  deny: '허용 안 함',
+  allow: '허용',
+};
+
+export const consent: Record<Locale, ConsentMessages> = { tr, en, de, ar, fr, es, ja, ko };

@@ -51,6 +51,8 @@ const UNITS: Record<Locale, Units> = {
   },
   es: { day: (n) => `${n} d`, hour: (n) => `${n} h`, minute: (n) => `${n} min`, second: (n) => `${n} s` },
   ar: { day: (n) => `${n} ي`, hour: (n) => `${n} س`, minute: (n) => `${n} د`, second: (n) => `${n} ث` },
+  ja: { day: (n) => `${n}日`, hour: (n) => `${n}時間`, minute: (n) => `${n}分`, second: (n) => `${n}秒` },
+  ko: { day: (n) => `${n}일`, hour: (n) => `${n}시간`, minute: (n) => `${n}분`, second: (n) => `${n}초` },
 };
 
 /** The months, as a date in running text names them. */
@@ -61,9 +63,11 @@ const MONTHS: Record<Locale, readonly string[]> = {
   fr: ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
   es: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
   ar: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'],
+  ja: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+  ko: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
 };
 
-/** A day of a month the language's way: `24 Eylül`, `24. September`, `24 de septiembre`. */
+/** A day of a month the language's way: `24 Eylül`, `24. September`, `24 de septiembre`, `9月24日`, `9월 24일`. */
 const DAY_OF_MONTH: Record<Locale, (day: number, month: string) => string> = {
   tr: (day, month) => `${day} ${month}`,
   en: (day, month) => `${day} ${month}`,
@@ -71,6 +75,8 @@ const DAY_OF_MONTH: Record<Locale, (day: number, month: string) => string> = {
   fr: (day, month) => `${day}${NBSP}${month}`,
   es: (day, month) => `${day} de ${month}`,
   ar: (day, month) => `${day} ${month}`,
+  ja: (day, month) => `${month}${day}日`,
+  ko: (day, month) => `${month} ${day}일`,
 };
 
 /** What just happened is called. */
@@ -81,16 +87,20 @@ const NOW: Record<Locale, string> = {
   fr: 'maintenant',
   es: 'ahora',
   ar: 'الآن',
+  ja: 'たった今',
+  ko: '방금',
 };
 
-/** How a sentence joins the last two of a list. */
-const CONJUNCTIONS: Record<Locale, { and: string; or: string; comma: string }> = {
+/** How a sentence joins the last two of a list; `spaced` false where the words run together (Japanese). */
+const CONJUNCTIONS: Record<Locale, { and: string; or: string; comma: string; spaced?: false }> = {
   tr: { and: 've', or: 'ya da', comma: ', ' },
   en: { and: 'and', or: 'or', comma: ', ' },
   de: { and: 'und', or: 'oder', comma: ', ' },
   fr: { and: 'et', or: 'ou', comma: ', ' },
   es: { and: 'y', or: 'o', comma: ', ' },
   ar: { and: 'و', or: 'أو', comma: '، ' },
+  ja: { and: 'と', or: 'または', comma: '、', spaced: false },
+  ko: { and: '및', or: '또는', comma: ', ' },
 };
 
 /** `new` on a board the player was not on before. */
@@ -101,6 +111,8 @@ const NEW_ON_BOARD: Record<Locale, string> = {
   fr: 'nouveau',
   es: 'nuevo',
   ar: 'جديد',
+  ja: '初登場',
+  ko: '신규',
 };
 
 /** A like count over a thousand, the way each language shortens it. */
@@ -111,6 +123,8 @@ const THOUSANDS: Record<Locale, (n: string) => string> = {
   fr: (n) => `${n}${NBSP}k`,
   es: (n) => `${n} mil`,
   ar: (n) => `${n} ألف`,
+  ja: (n) => `${n}千`,
+  ko: (n) => `${n}천`,
 };
 
 /** A per cent, where each language puts the sign. */
@@ -121,6 +135,8 @@ const PERCENT: Record<Locale, (n: string) => string> = {
   fr: (n) => `${n}${NBSP}%`,
   es: (n) => `${n}${NBSP}%`,
   ar: (n) => `${n}%`,
+  ja: (n) => `${n}%`,
+  ko: (n) => `${n}%`,
 };
 
 export type Formats = {
@@ -213,7 +229,8 @@ export function formatsFor(locale: Locale): Formats {
       const last = items[items.length - 1] ?? '';
       const word =
         locale === 'es' ? spanishConjunction(words[conjunction], last) : words[conjunction];
-      return `${items.slice(0, -1).join(words.comma)} ${word} ${last}`;
+      const gap = words.spaced === false ? '' : ' ';
+      return `${items.slice(0, -1).join(words.comma)}${gap}${word}${gap}${last}`;
     },
     rankChange: (before, after) => {
       if (after === null) return '';

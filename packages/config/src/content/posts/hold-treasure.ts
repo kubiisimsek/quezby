@@ -14,6 +14,8 @@ export const HOLD_TREASURE: readonly Draft[] = [
       ar: 'غرض أسطوري: شاحن يصل سلكه إلى السرير',
       fr: 'Objet légendaire : un chargeur qui atteint le lit',
       es: 'Objeto legendario: un cargador que llega a la cama',
+      ja: '伝説のアイテム：ベッドまで届く充電ケーブル',
+      ko: '전설의 아이템: 침대까지 닿는 충전 케이블',
     },
   },
   {
@@ -27,6 +29,8 @@ export const HOLD_TREASURE: readonly Draft[] = [
       ar: 'آخر قطعة… لك. لم يأخذها أحد.',
       fr: "La dernière part. À toi. Personne l'a prise.",
       es: 'La última porción. Tuya. Nadie la tocó.',
+      ja: '最後の1切れ。あなたの分。誰も取らなかった。',
+      ko: '마지막 한 조각. 네 거야. 아무도 안 가져갔어.',
     },
   },
   {
@@ -40,6 +44,8 @@ export const HOLD_TREASURE: readonly Draft[] = [
       ar: 'خريطة الكنز: علامة X تحت إصبعك تمامًا',
       fr: 'Carte au trésor : le X est sous ton pouce',
       es: 'Mapa del tesoro: la X está justo bajo tu dedo',
+      ja: '宝の地図：Xは親指の真下',
+      ko: '보물 지도: X는 바로 네 엄지 아래',
     },
   },
   {
@@ -53,6 +59,8 @@ export const HOLD_TREASURE: readonly Draft[] = [
       ar: 'بيضة ذهبية. واحدة فقط كل يوم.',
       fr: "Un œuf d'or. Un seul par jour.",
       es: 'Un huevo de oro. Solo uno al día.',
+      ja: '金の卵。1日1個だけ。',
+      ko: '황금알. 하루에 딱 하나.',
     },
   },
   {
@@ -66,6 +74,8 @@ export const HOLD_TREASURE: readonly Draft[] = [
       ar: 'شهاب! أمامك ثانية واحدة لتتمنى',
       fr: 'Étoile filante ! Une seconde pour faire un vœu',
       es: '¡Estrella fugaz! Tienes un segundo para pedir un deseo',
+      ja: '流れ星！願いごとは1秒以内に',
+      ko: '별똥별이다! 소원 빌 시간은 1초',
     },
   },
   {
@@ -79,6 +89,8 @@ export const HOLD_TREASURE: readonly Draft[] = [
       ar: 'وجدته في جيب معطف الشتاء الماضي',
       fr: "Trouvé dans la poche du manteau de l'hiver dernier",
       es: 'Apareció en el bolsillo del abrigo del invierno pasado',
+      ja: '去年の冬のコートのポケットから出てきた',
+      ko: '작년 겨울 코트 주머니에서 나옴',
     },
   },
   {
@@ -92,6 +104,8 @@ export const HOLD_TREASURE: readonly Draft[] = [
       ar: 'وجدناها: الزاوية الوحيدة ذات الإشارة الكاملة',
       fr: 'Trouvé : le seul coin où ça capte à fond',
       es: 'Encontrado: el único rincón con señal completa',
+      ja: '発見：家で唯一電波がフルに立つ場所',
+      ko: '발견: 집에서 유일하게 신호 빵빵한 구석',
     },
   },
   {
@@ -105,6 +119,8 @@ export const HOLD_TREASURE: readonly Draft[] = [
       ar: 'بطولة الإبهام: الميدالية الذهبية لك',
       fr: "Championnat du pouce : l'or est pour toi",
       es: 'Campeonato de pulgares: el oro es tuyo',
+      ja: '親指選手権：金メダルはあなたに',
+      ko: '엄지 챔피언십: 금메달은 너에게',
     },
   },
   {
@@ -118,6 +134,8 @@ export const HOLD_TREASURE: readonly Draft[] = [
       ar: 'شهود عيان يؤكدون: حصان وحيد القرن حقيقي',
       fr: 'Des témoins le confirment : une vraie licorne',
       es: 'Testigos lo confirman: un unicornio de verdad',
+      ja: '目撃者多数：本物のユニコーン',
+      ko: '목격자들 증언: 진짜 유니콘',
     },
   },
   {
@@ -131,6 +149,8 @@ export const HOLD_TREASURE: readonly Draft[] = [
       ar: 'وصل الطرد وكنت في البيت!',
       fr: 'Le colis est arrivé, et tu étais là !',
       es: '¡Llegó el paquete y estabas en casa!',
+      ja: '荷物が届いた、しかも家にいた！',
+      ko: '택배 왔는데 마침 집에 있었다!',
     },
   },
   {
@@ -144,6 +164,8 @@ export const HOLD_TREASURE: readonly Draft[] = [
       ar: 'عُثر على المفتاح الضائع… ولا أحد يعرف ماذا يفتح',
       fr: "Clé perdue retrouvée. Personne ne sait ce qu'elle ouvre.",
       es: 'Apareció la llave perdida. Nadie sabe qué abre.',
+      ja: 'なくした鍵発見。何の鍵かは誰も知らない。',
+      ko: '잃어버린 열쇠 찾음. 뭘 여는 건지는 아무도 모름.',
     },
   },
   {
@@ -157,6 +179,8 @@ export const HOLD_TREASURE: readonly Draft[] = [
       ar: 'هنا ينتهي قوس قزح، والذهب هنا أيضًا',
       fr: "Le bout de l'arc-en-ciel. L'or est juste là.",
       es: 'El final del arcoíris. El oro está aquí.',
+      ja: '虹のふもとはここ。金貨もここ。',
+      ko: '무지개 끝이 여기야. 금도 여기 있어.',
     },
   },
   {
@@ -170,6 +194,8 @@ export const HOLD_TREASURE: readonly Draft[] = [
       ar: 'مشهد نادر: البطارية 100% عند منتصف الليل',
       fr: 'Vision rare : 100 % de batterie à minuit',
       es: 'Rareza: batería al 100 % a medianoche',
+      ja: '激レア：深夜0時にバッテリー100%',
+      ko: '희귀 장면: 자정에 배터리 100%',
     },
   },
   {
@@ -183,6 +209,8 @@ export const HOLD_TREASURE: readonly Draft[] = [
       ar: 'قطعة بطاطس إضافية مختبئة في قاع الكيس',
       fr: 'Une frite bonus au fond du sachet',
       es: 'Una patata frita extra al fondo de la bolsa',
+      ja: '袋の底にボーナスポテト1本',
+      ko: '봉투 바닥에 숨은 감자튀김 하나 더',
     },
   },
   {
@@ -196,6 +224,8 @@ export const HOLD_TREASURE: readonly Draft[] = [
       ar: 'خرج سلك السماعات بلا أي عقدة',
       fr: "Câble d'écouteurs sorti sans un seul nœud",
       es: 'El cable de los auriculares salió sin nudos',
+      ja: 'イヤホンのコードが一切絡まってなかった',
+      ko: '이어폰 줄이 하나도 안 엉킨 채로 나옴',
     },
   },
   {
@@ -209,6 +239,8 @@ export const HOLD_TREASURE: readonly Draft[] = [
       ar: 'ألمع منشور اليوم (نعم، هذا بالذات)',
       fr: 'Le post le plus brillant du jour (oui, lui)',
       es: 'El post más brillante del día (sí, este)',
+      ja: '今日いちばん輝く投稿（そう、これ）',
+      ko: '오늘 가장 빛나는 게시물 (응, 이거)',
     },
   },
   {
@@ -222,6 +254,8 @@ export const HOLD_TREASURE: readonly Draft[] = [
       ar: 'الكرة البلورية تقول: ليس بعد… الآن!',
       fr: 'La boule de cristal dit : pas encore… maintenant !',
       es: 'La bola de cristal dice: todavía no… ¡ahora!',
+      ja: '水晶玉のお告げ：まだ…今だ！',
+      ko: '수정 구슬이 말하길: 아직… 지금이야!',
     },
   },
   {
@@ -235,6 +269,8 @@ export const HOLD_TREASURE: readonly Draft[] = [
       ar: 'اخترت بطيخة حلوة من أول مرة',
       fr: 'Une pastèque bien sucrée du premier coup',
       es: 'Elegiste una sandía dulce a la primera',
+      ja: '一発で甘いスイカを選べた',
+      ko: '한 번에 달콤한 수박 골랐다',
     },
   },
   {
@@ -248,6 +284,8 @@ export const HOLD_TREASURE: readonly Draft[] = [
       ar: 'أفضل مكان على الكنبة ما زال فارغًا!',
       fr: 'La meilleure place du canapé est libre !',
       es: '¡El mejor lugar del sofá está libre!',
+      ja: 'ソファの特等席が空いてる！',
+      ko: '소파 명당자리가 비어 있다!',
     },
   },
   {
@@ -261,6 +299,8 @@ export const HOLD_TREASURE: readonly Draft[] = [
       ar: 'مكافأة سرية: 5 دقائق نوم إضافية',
       fr: 'Récompense secrète : +5 minutes de sommeil',
       es: 'Premio secreto: +5 minutos de sueño',
+      ja: '隠しごほうび：睡眠+5分',
+      ko: '숨은 보상: 잠 +5분',
     },
   },
   {
@@ -274,6 +314,8 @@ export const HOLD_TREASURE: readonly Draft[] = [
       ar: 'الخوارزمية أظهرت هذا لك وحدك',
       fr: "L'algorithme n'a montré ça qu'à toi",
       es: 'El algoritmo solo te mostró esto a ti',
+      ja: 'アルゴリズムがあなただけに見せた投稿',
+      ko: '알고리즘이 너한테만 보여준 게시물',
     },
   },
   {
@@ -287,6 +329,8 @@ export const HOLD_TREASURE: readonly Draft[] = [
       ar: 'لا طابور عند الصندوق. ولا شخص واحد.',
       fr: 'Personne à la caisse. Personne.',
       es: 'Nadie en la fila de la caja. Nadie.',
+      ja: 'レジに行列ゼロ。誰もいない。',
+      ko: '계산대 줄 없음. 한 명도.',
     },
   },
   {
@@ -300,6 +344,8 @@ export const HOLD_TREASURE: readonly Draft[] = [
       ar: 'الطريق إلى دوري الماس يمرّ من هنا',
       fr: 'La route vers la Ligue Diamant passe par ici',
       es: 'El camino a la Liga Diamante pasa por aquí',
+      ja: 'ダイヤモンドリーグへの道はこの投稿から',
+      ko: '다이아몬드 리그로 가는 길은 이 게시물에서 시작',
     },
   },
   {
@@ -313,6 +359,8 @@ export const HOLD_TREASURE: readonly Draft[] = [
       ar: 'ليست ميدالية مشاركة… بل ميدالية حقيقية',
       fr: 'Pas une médaille de participation. Une vraie.',
       es: 'No es de participación. Es una medalla de verdad.',
+      ja: '参加賞じゃない。本物のメダル。',
+      ko: '참가상 아님. 진짜 메달.',
     },
   },
   {
@@ -326,6 +374,8 @@ export const HOLD_TREASURE: readonly Draft[] = [
       ar: 'عصا سحرية حوّلت هذا المنشور إلى ذهب',
       fr: 'Une baguette magique a changé ce post en or',
       es: 'Una varita mágica volvió de oro este post',
+      ja: '魔法の杖でこの投稿が金色に',
+      ko: '요술봉이 이 게시물을 황금으로 바꿨다',
     },
   },
   {
@@ -339,6 +389,8 @@ export const HOLD_TREASURE: readonly Draft[] = [
       ar: 'يظهر مرة واحدة كل ألف مباراة',
       fr: 'Tombe une fois toutes les mille parties',
       es: 'Sale una vez cada mil partidas',
+      ja: '1000ゲームに1回しか出ない投稿',
+      ko: '1000판에 한 번 나오는 게시물',
     },
   },
 ];

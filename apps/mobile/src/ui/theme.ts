@@ -1,6 +1,7 @@
 import type { TextStyle, ViewStyle } from 'react-native';
 
 import { IS_RTL } from '@/i18n/native';
+import { startedScript, type Script } from '@/i18n/script';
 import { arena, type Palette } from '@/ui/tokens';
 
 /**
@@ -67,19 +68,59 @@ export const ARABIC_FONT: Record<keyof typeof LATIN_FONT, string> = {
 };
 
 /**
- * The faces the game speaks in. Arabic is the one language read right to
- * left, and turning around reloads the app, so the direction the app started
- * in tells which faces every style sheet is built with.
+ * Japanese in M PLUS Rounded 1c, rounded like Nunito: Black where Rubik Black
+ * stands, down to Medium for reading. The files carry only the characters the
+ * game says (`pnpm fonts:cjk`).
  */
-export const FONT: Record<keyof typeof LATIN_FONT, string> = IS_RTL ? ARABIC_FONT : LATIN_FONT;
+export const JAPANESE_FONT: Record<keyof typeof LATIN_FONT, string> = {
+  display: 'RoundedMplus1c-Black',
+  displayBold: 'RoundedMplus1c-ExtraBold',
+  regular: 'RoundedMplus1c-Medium',
+  medium: 'RoundedMplus1c-Bold',
+  semibold: 'RoundedMplus1c-ExtraBold',
+  bold: 'RoundedMplus1c-Black',
+};
 
 /**
- * A line height for the language on screen. Arabic's letters climb and hang
- * further than Latin ones (Cairo's ascender and descender are half again
- * Rubik's), so its lines get more room or the tops and tails are cut off.
+ * Korean in Jua for what is read at a glance — one heavy, round weight — and
+ * Gothic A1 for reading, SemiBold to Black (`pnpm fonts:cjk`).
  */
+export const KOREAN_FONT: Record<keyof typeof LATIN_FONT, string> = {
+  display: 'Jua-Regular',
+  displayBold: 'Jua-Regular',
+  regular: 'GothicA1-SemiBold',
+  medium: 'GothicA1-Bold',
+  semibold: 'GothicA1-ExtraBold',
+  bold: 'GothicA1-Black',
+};
+
+export const FACES: Record<Script, Record<keyof typeof LATIN_FONT, string>> = {
+  latin: LATIN_FONT,
+  arabic: ARABIC_FONT,
+  japanese: JAPANESE_FONT,
+  korean: KOREAN_FONT,
+};
+
+/**
+ * The script this launch is set in: Arabic when the app reads right to left —
+ * turning around reloads it — else the one of the language it started in
+ * (`startIn`). Every style sheet is built with its faces.
+ */
+export const SCRIPT: Script = IS_RTL ? 'arabic' : startedScript() === 'arabic' ? 'latin' : startedScript();
+
+/** The faces the game speaks in, for this launch. */
+export const FONT: Record<keyof typeof LATIN_FONT, string> = FACES[SCRIPT];
+
+/**
+ * How much taller than a Latin line a line of each script is set. Arabic's
+ * letters climb and hang further (Cairo's ascender and descender are half
+ * again Rubik's); Japanese and Korean glyphs fill their square to the edges.
+ */
+const LINE: Record<Script, number> = { latin: 1, arabic: 1.3, japanese: 1.15, korean: 1.1 };
+
+/** A line height for the language on screen: more room where the letters need it, or tops and tails are cut off. */
 export function lh(height: number): number {
-  return IS_RTL ? Math.round(height * 1.3) : height;
+  return Math.round(height * LINE[SCRIPT]);
 }
 
 /**

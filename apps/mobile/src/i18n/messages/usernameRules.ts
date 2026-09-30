@@ -140,4 +140,48 @@ const es: UsernameRuleMessages = {
   },
 };
 
-export const usernameRules: Record<Locale, UsernameRuleMessages> = { tr, en, de, ar, fr, es };
+const ja: UsernameRuleMessages = {
+  taken: 'このユーザー名はすでに使われています。',
+  problems: {
+    required: 'ユーザー名を入力してください。',
+    too_short: '3文字以上にしてください。',
+    too_long: '20文字以内にしてください。',
+    turkish_char: 'ş、ı、ü、ç などの文字は使えません。s、i、u、c を使ってください。',
+    invalid_char: '使えるのは英字（a〜z）、数字、ドット（.）、アスタリスク（*）だけです。',
+    bad_start: '最初の文字は英字か数字にしてください。',
+    bad_end: '最後の文字は英字か数字にしてください。',
+    consecutive_symbols: 'ドットとアスタリスクは続けて使えません。',
+    no_letter: '英字を1文字以上入れてください。',
+    reserved: 'このユーザー名は予約されています。別の名前を試してください。',
+    blocked: 'このユーザー名は使えません。',
+  },
+  rules: {
+    length: (min, max) => `${min}〜${max}文字`,
+    charset: '英字（a〜z）、数字、ドット（.）、アスタリスク（*）のみ',
+    letter: '英字を1文字以上',
+  },
+};
+
+const ko: UsernameRuleMessages = {
+  taken: '이미 사용 중인 사용자 이름이에요.',
+  problems: {
+    required: '사용자 이름을 입력하세요.',
+    too_short: '3자 이상이어야 해요.',
+    too_long: '20자 이하여야 해요.',
+    turkish_char: 'ş, ı, ü, ç 같은 문자는 쓸 수 없어요. s, i, u, c로 써 주세요.',
+    invalid_char: '영문자(a–z), 숫자, 점(.), 별표(*)만 쓸 수 있어요.',
+    bad_start: '영문자나 숫자로 시작해야 해요.',
+    bad_end: '영문자나 숫자로 끝나야 해요.',
+    consecutive_symbols: '점과 별표는 연달아 쓸 수 없어요.',
+    no_letter: '영문자가 하나 이상 있어야 해요.',
+    reserved: '예약된 사용자 이름이에요. 다른 이름을 써 보세요.',
+    blocked: '사용할 수 없는 사용자 이름이에요.',
+  },
+  rules: {
+    length: (min, max) => `${min}–${max}자`,
+    charset: '영문자(a–z), 숫자, 점(.), 별표(*)만',
+    letter: '영문자 하나 이상',
+  },
+};
+
+export const usernameRules: Record<Locale, UsernameRuleMessages> = { tr, en, de, ar, fr, es, ja, ko };

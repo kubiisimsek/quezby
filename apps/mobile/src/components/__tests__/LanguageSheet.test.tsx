@@ -18,11 +18,11 @@ describe('LanguageSheet', () => {
     jest.restoreAllMocks();
   });
 
-  it('lists the six languages in their own words, with their names in the one on screen', async () => {
+  it('lists the eight languages in their own words, with their names in the one on screen', async () => {
     await renderWithProviders(<LanguageSheet open onClose={() => undefined} />);
 
     expect(screen.getByText('Dil')).toBeOnTheScreen();
-    for (const name of ['Türkçe', 'English', 'Deutsch', 'العربية', 'Français', 'Español']) {
+    for (const name of ['Türkçe', 'English', 'Deutsch', 'العربية', 'Français', 'Español', '日本語', '한국어']) {
       expect(screen.getByText(name)).toBeOnTheScreen();
     }
     expect(screen.getByText('Almanca')).toBeOnTheScreen();
@@ -52,6 +52,21 @@ describe('LanguageSheet', () => {
 
     expect(I18nManager.forceRTL).toHaveBeenCalledWith(true);
     expect(RNRestart.restart).toHaveBeenCalledTimes(1);
+  });
+
+  it('asks before Japanese or Korean, which reload the game into faces of their own', async () => {
+    await renderWithProviders(<LanguageSheet open onClose={() => undefined} />);
+
+    expect(screen.getByRole('radio', { name: '日本語, Japonca' })).not.toBeChecked();
+    await fireEvent.press(screen.getByRole('radio', { name: '한국어, Korece' }));
+
+    expect(screen.getByText('Oyun Korece için kapanıp yeniden açılır.')).toBeOnTheScreen();
+    expect(RNRestart.restart).not.toHaveBeenCalled();
+
+    await fireEvent.press(screen.getByText('Yeniden başlat'));
+
+    expect(RNRestart.restart).toHaveBeenCalledWith('faces:ko');
+    expect(I18nManager.forceRTL).not.toHaveBeenCalled();
   });
 
   it('goes back to the list when the player changes their mind', async () => {

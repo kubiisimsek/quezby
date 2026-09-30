@@ -18,6 +18,8 @@ export const CLASSIC_SKIP: readonly Draft[] = [
       ar: 'مزاجي صباح أول يوم دوام',
       fr: 'POV : lundi matin',
       es: 'POV: lunes por la mañana',
+      ja: 'POV：月曜の朝',
+      ko: 'POV: 월요일 아침',
     },
   },
   {
@@ -31,6 +33,8 @@ export const CLASSIC_SKIP: readonly Draft[] = [
       ar: 'ماذا أكلت اليوم؟ معكرونة. مجددًا.',
       fr: 'Mon repas du jour ? Des pâtes. Encore.',
       es: '¿Qué comí hoy? Pasta. Otra vez.',
+      ja: '今日の食事：パスタ。また。',
+      ko: '오늘 뭐 먹었냐면: 파스타. 또.',
     },
   },
   {
@@ -44,6 +48,8 @@ export const CLASSIC_SKIP: readonly Draft[] = [
       ar: 'لم يسأل أحد، لكن قهوتي بردت',
       fr: "Personne n'a demandé, mais mon café a refroidi",
       es: 'Nadie preguntó, pero se me enfrió el café',
+      ja: '誰も聞いてないけど、コーヒーが冷めた',
+      ko: '아무도 안 물어봤지만 커피가 식었어요',
     },
   },
   {
@@ -57,6 +63,8 @@ export const CLASSIC_SKIP: readonly Draft[] = [
       ar: 'روتيني: أستيقظ، أتصفح، أنام',
       fr: 'Ma routine : réveil, scroll, dodo',
       es: 'Mi rutina: despertar, deslizar, dormir',
+      ja: 'ルーティン：起きる、スクロール、寝る',
+      ko: '내 루틴: 기상, 스크롤, 취침',
     },
   },
   {
@@ -70,6 +78,8 @@ export const CLASSIC_SKIP: readonly Draft[] = [
       ar: 'حيلة في 5 دقائق (4 منها إعلانات)',
       fr: 'Astuce en 5 minutes (dont 4 de pub)',
       es: 'Truco de 5 minutos (4 son anuncios)',
+      ja: '5分でできるライフハック（うち広告4分）',
+      ko: '5분 생활 꿀팁 (광고 4분)',
     },
   },
   {
@@ -83,6 +93,8 @@ export const CLASSIC_SKIP: readonly Draft[] = [
       ar: '97% ممن شاهدوا هذا تجاوزوه',
       fr: '97 % des gens ont zappé ce post',
       es: 'El 97 % de la gente siguió deslizando',
+      ja: 'これを見た人の97%がスクロールした',
+      ko: '이 영상 본 사람의 97%가 넘겼어요',
     },
   },
   {
@@ -96,6 +108,8 @@ export const CLASSIC_SKIP: readonly Draft[] = [
       ar: 'تحدي مطابقة الجوارب، الجزء 3',
       fr: 'Challenge chaussettes orphelines #3',
       es: 'Reto: emparejar calcetines #3',
+      ja: '靴下ペア探しチャレンジ #3',
+      ko: '양말 짝 맞추기 챌린지 #3',
     },
   },
   {
@@ -109,6 +123,8 @@ export const CLASSIC_SKIP: readonly Draft[] = [
       ar: 'يوميات: الحافلة لم تأتِ مجددًا',
       fr: "Le bus n'est toujours pas là, vlog",
       es: 'El bus no vino otra vez, vlog',
+      ja: 'バスがまた来なかったvlog',
+      ko: '버스 또 안 옴 브이로그',
     },
   },
   {
@@ -122,6 +138,8 @@ export const CLASSIC_SKIP: readonly Draft[] = [
       ar: 'فتحت الثلاجة ثم أغلقتها',
       fr: 'Frigo ouvert. Frigo fermé.',
       es: 'Abrí la nevera. La cerré.',
+      ja: '冷蔵庫を開けて、閉めた',
+      ko: '냉장고 열었다가 닫음',
     },
   },
   {
@@ -135,6 +153,8 @@ export const CLASSIC_SKIP: readonly Draft[] = [
       ar: 'ترشيح مسلسل: لا يوجد',
       fr: 'Série à voir : aucune',
       es: 'Serie recomendada: ninguna',
+      ja: 'おすすめドラマ：なし',
+      ko: '드라마 추천: 없음',
     },
   },
   {
@@ -148,6 +168,8 @@ export const CLASSIC_SKIP: readonly Draft[] = [
       ar: 'هذا الصوت سيصبح ترندًا (لن يصبح)',
       fr: 'Ce son va buzzer (ou pas)',
       es: 'Este audio será tendencia (no lo será)',
+      ja: 'この音源、流行る（流行らない）',
+      ko: '이 음원 뜬다 (안 뜸)',
     },
   },
   {
@@ -161,6 +183,8 @@ export const CLASSIC_SKIP: readonly Draft[] = [
       ar: 'التحفيز: سأبدأ غدًا',
       fr: 'Motivation : je commence demain',
       es: 'Motivación: mañana empiezo',
+      ja: 'やる気：明日から本気出す',
+      ko: '동기부여: 내일부터 시작',
     },
   },
   {
@@ -175,8 +199,10 @@ export const CLASSIC_SKIP: readonly Draft[] = [
         ar: 'البقالة',
         fr: 'SUPÉRETTE',
         es: 'SUPERMERCADO',
+        ja: 'スーパー',
+        ko: '마트',
       },
-      items: [{ tr: 'POŞET', en: 'BAG', de: 'TÜTE', ar: 'كيس', fr: 'SAC', es: 'BOLSA' }],
+      items: [{ tr: 'POŞET', en: 'BAG', de: 'TÜTE', ar: 'كيس', fr: 'SAC', es: 'BOLSA', ja: 'レジ袋', ko: '봉투' }],
     },
     caption: {
       tr: 'Market fişi ASMR',
@@ -185,6 +211,8 @@ export const CLASSIC_SKIP: readonly Draft[] = [
       ar: 'أصوات مريحة: فاتورة البقالة',
       fr: 'ASMR ticket de caisse',
       es: 'ASMR con el ticket del súper',
+      ja: 'スーパーのレシートASMR',
+      ko: '마트 영수증 ASMR',
     },
   },
   {
@@ -198,6 +226,8 @@ export const CLASSIC_SKIP: readonly Draft[] = [
       ar: 'صوت المطر، 10 ساعات',
       fr: 'Bruit de pluie, 10 heures',
       es: 'Sonido de lluvia, 10 horas',
+      ja: '雨の音、10時間',
+      ko: '빗소리 10시간',
     },
   },
   {
@@ -211,6 +241,8 @@ export const CLASSIC_SKIP: readonly Draft[] = [
       ar: 'مراجعة شاملة لصانعة الساندويتش',
       fr: "Test complet de l'appareil à croque",
       es: 'Reseña a fondo de la sandwichera',
+      ja: 'ホットサンドメーカー徹底レビュー',
+      ko: '토스트기 심층 리뷰',
     },
   },
   {
@@ -224,6 +256,8 @@ export const CLASSIC_SKIP: readonly Draft[] = [
       ar: 'ترتيب المكتب، لكن بصمت',
       fr: 'Rangement de bureau, mais en silence',
       es: 'Ordenando el escritorio, pero en silencio',
+      ja: '無言でデスク整理',
+      ko: '말없이 책상 정리',
     },
   },
   {
@@ -237,6 +271,8 @@ export const CLASSIC_SKIP: readonly Draft[] = [
       ar: 'صباح الخير (الساعة 3 عصرًا)',
       fr: 'Réveil en douceur (il est 15 h)',
       es: 'Buenos días (son las 3 de la tarde)',
+      ja: 'おはよう（午後2時）',
+      ko: '좋은 아침 (오후 2시)',
     },
   },
   {
@@ -250,6 +286,8 @@ export const CLASSIC_SKIP: readonly Draft[] = [
       ar: 'لحظات قطتي اللطيفة (ليس لديّ قطة)',
       fr: "Mon chat trop mignon (j'ai pas de chat)",
       es: 'Mi gato siendo muy gato (no tengo gato)',
+      ja: '猫動画（猫は飼ってない）',
+      ko: '고양이 콘텐츠 (고양이 없음)',
     },
   },
 ];
@@ -268,6 +306,8 @@ export const CLASSIC_LIKE: readonly Draft[] = [
         ar: 'تلك النظرة…',
         fr: 'ce regard…',
         es: 'esa mirada…',
+        ja: 'あの目つき…',
+        ko: '저 눈빛…',
       },
     },
     caption: {
@@ -277,6 +317,8 @@ export const CLASSIC_LIKE: readonly Draft[] = [
       ar: 'قطتي تنظر إليّ بازدراء مجددًا',
       fr: 'mon chat me juge encore',
       es: 'mi gato me está juzgando otra vez',
+      ja: 'うちの猫にまた裁かれてる',
+      ko: '우리 고양이가 또 나를 심판 중',
     },
   },
   {
@@ -290,6 +332,8 @@ export const CLASSIC_LIKE: readonly Draft[] = [
       ar: 'كان عيد ميلادي… لا إعجاب؟ لا صداقة',
       fr: "c'était mon anniv, pas de like = je boude",
       es: 'fue mi cumple, sin like no hay amistad',
+      ja: '誕生日でした、いいねしない人とは絶交',
+      ko: '내 생일이었음, 좋아요 안 누르면 절교',
     },
   },
   {
@@ -304,6 +348,8 @@ export const CLASSIC_LIKE: readonly Draft[] = [
         ar: 'المحاولة الأولى',
         fr: 'premier essai',
         es: 'primer intento',
+        ja: '初挑戦',
+        ko: '첫 도전',
       },
     },
     caption: {
@@ -313,6 +359,8 @@ export const CLASSIC_LIKE: readonly Draft[] = [
       ar: 'أول طبخة لي، بلا تعليقات',
       fr: 'mon premier plat, pas de commentaires',
       es: 'mi primera receta, sin comentarios',
+      ja: '初めての手料理、コメント禁止',
+      ko: '첫 요리, 댓글 금지',
     },
   },
   {
@@ -326,6 +374,8 @@ export const CLASSIC_LIKE: readonly Draft[] = [
       ar: 'صورة من الإجازة (أخيرًا)',
       fr: 'photo de vacances (enfin)',
       es: 'foto de vacaciones (por fin)',
+      ja: '旅行の写真（やっと）',
+      ko: '휴가 사진 (드디어)',
     },
   },
   {
@@ -340,6 +390,8 @@ export const CLASSIC_LIKE: readonly Draft[] = [
         ar: 'خرّيج 🎓',
         fr: 'diplômé 🎓',
         es: 'graduado 🎓',
+        ja: '卒業 🎓',
+        ko: '졸업 🎓',
       },
     },
     caption: {
@@ -349,6 +401,8 @@ export const CLASSIC_LIKE: readonly Draft[] = [
       ar: 'كلبي تخرّج',
       fr: 'mon chien a eu son diplôme',
       es: 'mi perro se graduó',
+      ja: 'うちの犬が卒業しました',
+      ko: '우리 강아지 졸업했어요',
     },
   },
   {
@@ -362,6 +416,8 @@ export const CLASSIC_LIKE: readonly Draft[] = [
       ar: 'قصة شعر جديدة، كونوا صريحين',
       fr: 'nouvelle coupe, soyez honnêtes',
       es: 'corte nuevo, sean sinceros',
+      ja: '髪切った、正直に言って',
+      ko: '새 머리, 솔직하게 말해 줘',
     },
   },
   {
@@ -375,6 +431,8 @@ export const CLASSIC_LIKE: readonly Draft[] = [
       ar: 'حضرت الحفلة!!!',
       fr: "j'étais au concert !!!",
       es: '¡¡¡fui al concierto!!!',
+      ja: 'ライブ行ってきた！！！',
+      ko: '콘서트 다녀왔다!!!',
     },
   },
   {
@@ -388,6 +446,8 @@ export const CLASSIC_LIKE: readonly Draft[] = [
       ar: 'سمبوسة أمي لا يُعلى عليها',
       fr: 'les raviolis de maman >>>',
       es: 'las empanadas de mi mamá >>>',
+      ja: '母の手作り餃子 >>>',
+      ko: '엄마표 만두 >>>',
     },
   },
   {
@@ -402,6 +462,8 @@ export const CLASSIC_LIKE: readonly Draft[] = [
         ar: 'جزرة 🥕',
         fr: 'Carotte 🥕',
         es: 'Zanahoria 🥕',
+        ja: 'にんじん 🥕',
+        ko: '당근 🥕',
       },
     },
     caption: {
@@ -411,6 +473,8 @@ export const CLASSIC_LIKE: readonly Draft[] = [
       ar: 'أرنبي اسمه جزرة',
       fr: "mon lapin s'appelle Carotte",
       es: 'mi conejo se llama Zanahoria',
+      ja: 'うちのうさぎの名前は「にんじん」',
+      ko: '우리 토끼 이름은 당근',
     },
   },
   {
@@ -424,6 +488,8 @@ export const CLASSIC_LIKE: readonly Draft[] = [
       ar: 'حيواني المفضل، ولا نقاش',
       fr: 'mon animal préféré, point final',
       es: 'mi animal favorito, no se discute',
+      ja: '一番好きな動物、異論は認めない',
+      ko: '제일 좋아하는 동물, 반박 불가',
     },
   },
 ];
@@ -440,6 +506,8 @@ export const CLASSIC_HOLD: readonly Draft[] = [
       ar: 'من يشاهد حتى النهاية يفوز',
       fr: "Regarde jusqu'au bout pour gagner",
       es: 'Míralo hasta el final y gana',
+      ja: '最後まで見た人の勝ち',
+      ko: '끝까지 보는 사람이 승리',
     },
   },
   {
@@ -453,6 +521,8 @@ export const CLASSIC_HOLD: readonly Draft[] = [
       ar: 'محتوى نادر، لا تفوّته',
       fr: 'Contenu rare, ne le rate pas',
       es: 'Contenido exclusivo, no te lo pierdas',
+      ja: 'レアな動画、見逃すな',
+      ko: '희귀 영상, 놓치지 마세요',
     },
   },
   {
@@ -466,6 +536,8 @@ export const CLASSIC_HOLD: readonly Draft[] = [
       ar: 'محظوظ! لا يرى هذا المنشور إلا 1% من الناس',
       fr: 'Post réservé aux 1 % les plus chanceux',
       es: 'Solo el 1 % más afortunado ve este post',
+      ja: 'この投稿はラッキーな1%にしか出ない',
+      ko: '이 게시물은 운 좋은 1%에게만 보여요',
     },
   },
   {
@@ -479,6 +551,8 @@ export const CLASSIC_HOLD: readonly Draft[] = [
       ar: 'صندوق الكنز يُفتح الآن',
       fr: "Le coffre au trésor s'ouvre",
       es: 'Se abre el cofre del tesoro',
+      ja: '宝箱が開きます',
+      ko: '보물 상자가 열리는 중',
     },
   },
   {
@@ -492,6 +566,8 @@ export const CLASSIC_HOLD: readonly Draft[] = [
       ar: 'من يرفع إصبعه في اللحظة المناسبة يفوز',
       fr: 'Relâche au bon moment pour gagner',
       es: 'Gana quien suelta en el momento justo',
+      ja: 'ちょうどいいタイミングで離した人の勝ち',
+      ko: '딱 맞춰 손 떼는 사람이 승리',
     },
   },
   {
@@ -505,6 +581,8 @@ export const CLASSIC_HOLD: readonly Draft[] = [
       ar: 'لحظة ذهبية، في الثانية المناسبة',
       fr: 'Moment en or, seconde parfaite',
       es: 'Momento dorado, segundo exacto',
+      ja: '黄金の瞬間、完璧なタイミング',
+      ko: '황금의 순간, 완벽한 타이밍',
     },
   },
 ];
@@ -517,6 +595,8 @@ export const HANDS_OFF: Localized = {
   ar: 'لا تتحرك. لا تلمس.',
   fr: 'Bouge pas. Touche pas.',
   es: 'No te muevas. No toques.',
+  ja: '動かないで。さわらないで。',
+  ko: '움직이지 마세요. 건드리지 마세요.',
 };
 
 export const CLASSIC_FREEZE: readonly Draft[] = [
@@ -532,6 +612,8 @@ export const CLASSIC_FREEZE: readonly Draft[] = [
         ar: 'غرفة المعيشة',
         fr: 'SALON',
         es: 'SALA',
+        ja: 'リビング',
+        ko: '거실',
       },
     },
     caption: HANDS_OFF,
@@ -542,6 +624,8 @@ export const CLASSIC_FREEZE: readonly Draft[] = [
       ar: 'أمك دخلت الغرفة',
       fr: 'Maman entre dans la pièce',
       es: 'Tu madre acaba de entrar',
+      ja: 'お母さんが部屋に入ってきた',
+      ko: '엄마가 방에 들어왔다',
     },
   },
   {
@@ -556,6 +640,8 @@ export const CLASSIC_FREEZE: readonly Draft[] = [
         ar: 'المكتب',
         fr: 'BUREAU',
         es: 'OFICINA',
+        ja: 'オフィス',
+        ko: '사무실',
       },
     },
     caption: HANDS_OFF,
@@ -566,6 +652,8 @@ export const CLASSIC_FREEZE: readonly Draft[] = [
       ar: 'المدير خلفك مباشرة',
       fr: 'Le patron est derrière toi',
       es: 'Tu jefe está detrás de ti',
+      ja: '上司が真後ろにいる',
+      ko: '팀장님이 바로 뒤에 있다',
     },
   },
   {
@@ -580,6 +668,8 @@ export const CLASSIC_FREEZE: readonly Draft[] = [
         ar: 'الصف',
         fr: 'CLASSE',
         es: 'AULA',
+        ja: '教室',
+        ko: '교실',
       },
     },
     caption: HANDS_OFF,
@@ -590,6 +680,8 @@ export const CLASSIC_FREEZE: readonly Draft[] = [
       ar: 'المعلمة تنظر إليك',
       fr: 'La prof te regarde',
       es: 'La profe te está mirando',
+      ja: '先生が見てる',
+      ko: '선생님이 보고 있다',
     },
   },
   {
@@ -604,6 +696,8 @@ export const CLASSIC_FREEZE: readonly Draft[] = [
         ar: 'الممر',
         fr: 'COULOIR',
         es: 'PASILLO',
+        ja: '廊下',
+        ko: '복도',
       },
     },
     caption: HANDS_OFF,
@@ -614,6 +708,8 @@ export const CLASSIC_FREEZE: readonly Draft[] = [
       ar: 'وقع خطوات أبيك',
       fr: "Papa monte l'escalier",
       es: 'Los pasos de tu padre',
+      ja: 'お父さんの足音',
+      ko: '아빠 발소리',
     },
   },
   {
@@ -628,6 +724,8 @@ export const CLASSIC_FREEZE: readonly Draft[] = [
         ar: 'تحذير',
         fr: 'ATTENTION',
         es: 'ATENCIÓN',
+        ja: '警告',
+        ko: '경고',
       },
       small: {
         tr: 'EKRAN SÜRESİ DOLDU',
@@ -636,6 +734,8 @@ export const CLASSIC_FREEZE: readonly Draft[] = [
         ar: 'انتهى وقت الشاشة',
         fr: "TEMPS D'ÉCRAN FINI",
         es: 'SE ACABÓ EL TIEMPO',
+        ja: 'スクリーンタイム終了',
+        ko: '스크린 타임 종료',
       },
     },
     caption: HANDS_OFF,
@@ -646,6 +746,8 @@ export const CLASSIC_FREEZE: readonly Draft[] = [
       ar: 'تنبيه وقت الشاشة',
       fr: "Alerte temps d'écran",
       es: 'Alerta de tiempo de pantalla',
+      ja: 'スクリーンタイムの警告',
+      ko: '스크린 타임 경고',
     },
   },
 ];

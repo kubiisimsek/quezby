@@ -19,6 +19,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'الحبوب في الثلاجة، والحليب في الخزانة. صباح الخير!',
       fr: 'Céréales au frigo, lait dans le placard. Bonjour !',
       es: 'Cereal en la nevera, leche en la alacena. ¡Buenos días!',
+      ja: 'シリアルを冷蔵庫に、牛乳を棚にしまった。朝だ。',
+      ko: '시리얼은 냉장고에, 우유는 찬장에 넣었다. 아침이다.',
     },
   },
   {
@@ -32,6 +34,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'ارتديت القميص مقلوبًا حتى الظهر، ولم ينبّهني أحد',
       fr: "T-shirt à l'envers jusqu'à midi. Personne n'a rien dit.",
       es: 'Camiseta al revés hasta el mediodía. Nadie dijo nada.',
+      ja: '昼までTシャツが裏返し。誰も言ってくれなかった。',
+      ko: '점심까지 티셔츠를 뒤집어 입었는데 아무도 말 안 해 줌',
     },
   },
   {
@@ -45,6 +49,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'عدت إلى النوم لأكمل الحلم… فتغيّرت القناة',
       fr: 'Je me rendors pour la suite du rêve. Autre chaîne.',
       es: 'Volví a dormir para seguir el sueño. Otro canal.',
+      ja: '夢の続きを見に戻ったら、チャンネルが変わってた',
+      ko: '꿈 이어 보려고 다시 잤는데 채널이 바뀌었다',
     },
   },
   {
@@ -58,6 +64,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'حلمت أن لديّ امتحانًا… وقد تخرّجت قبل 12 عامًا',
       fr: "J'ai rêvé d'un exam. J'ai fini l'école il y a 12 ans.",
       es: 'Soñé que tenía un examen. Me gradué hace 12 años.',
+      ja: '夢に試験が出てきた。卒業して12年たつのに。',
+      ko: '꿈에 시험이 나왔다. 졸업한 지 12년인데.',
     },
   },
   {
@@ -71,6 +79,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'عصير برتقال بعد تنظيف الأسنان مباشرة. خطأ فادح.',
       fr: "Jus d'orange juste après le dentifrice. Erreur.",
       es: 'Jugo de naranja tras cepillarme los dientes. Error.',
+      ja: '歯みがきの後にオレンジジュース。失敗。',
+      ko: '양치 직후 오렌지 주스. 실수였다.',
     },
   },
   {
@@ -84,6 +94,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'أخطأت في عدّ الخراف، فبدأت من جديد',
       fr: 'Perdu le compte des moutons. On recommence.',
       es: 'Perdí la cuenta de las ovejas. Vuelvo a empezar.',
+      ja: '羊を数えてたら途中でわからなくなった。最初から。',
+      ko: '양 세다가 헷갈려서 처음부터 다시',
     },
   },
   {
@@ -97,6 +109,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'وجدت وضعية النوم المثالية… فإذا بالصباح قد حلّ',
       fr: "Trouvé la position parfaite pour dormir. C'était le matin.",
       es: 'Encontré la postura perfecta para dormir. Ya era de día.',
+      ja: '完璧な寝る姿勢を見つけた。朝だった。',
+      ko: '완벽한 수면 자세를 찾았다. 아침이었다.',
     },
   },
   {
@@ -111,6 +125,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
         ar: 'زميل السكن',
         fr: 'Coloc',
         es: 'Compañero de casa',
+        ja: 'ルームメイト',
+        ko: '룸메이트',
       },
       lines: [
         {
@@ -122,6 +138,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
             ar: 'صرخت وأنت نائم ليلة أمس',
             fr: "t'as crié en dormant cette nuit",
             es: 'anoche gritaste en sueños',
+            ja: '昨日の夜、寝言で叫んでたよ',
+            ko: '어젯밤에 너 잠꼬대로 소리 질렀어',
           },
         },
         {
@@ -133,6 +151,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
             ar: 'ماذا قلت؟ 😳',
             fr: "j'ai dit quoi ? 😳",
             es: '¿qué dije? 😳',
+            ja: '何て言った？😳',
+            ko: '내가 뭐라고 했는데? 😳',
           },
         },
         {
@@ -144,6 +164,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
             ar: '«لا أحد يلمس فطائري!»',
             fr: '« PERSONNE NE TOUCHE À MES CRÊPES ! »',
             es: '“¡NADIE TOCA MIS GALLETAS!”',
+            ja: '「そのプリンは私の！さわるな！」',
+            ko: '“그 치킨 내 거야, 아무도 손대지 마!”',
           },
         },
       ],
@@ -155,6 +177,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'أحمي طعامي حتى في أحلامي',
       fr: 'Je défends ma bouffe même en rêve',
       es: 'Defiendo mi comida hasta en sueños',
+      ja: '夢の中でも食べ物は守る',
+      ko: '꿈속에서도 내 음식은 지킨다',
     },
   },
   {
@@ -169,6 +193,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
         ar: 'أنا ليلة أمس',
         fr: "Moi d'hier soir",
         es: 'Yo de anoche',
+        ja: '昨夜の自分',
+        ko: '어젯밤의 나',
       },
       lines: [
         {
@@ -180,6 +206,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
             ar: 'غدًا في السادسة: جري، يوغا، عصير أخضر ✨',
             fr: 'demain 6 h : footing, yoga, smoothie vert ✨',
             es: 'mañana 6:00: correr, yoga, batido verde ✨',
+            ja: '明日は6時起き：ラン、ヨガ、スムージー✨',
+            ko: '내일 6시: 러닝, 요가, 그린 스무디 ✨',
           },
         },
         {
@@ -191,6 +219,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
             ar: 'هذه المرة أنا جاد 💪',
             fr: "cette fois c'est sérieux 💪",
             es: 'esta vez va en serio 💪',
+            ja: '今度こそ本気💪',
+            ko: '이번엔 진짜야 💪',
           },
         },
         {
@@ -202,6 +232,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
             ar: 'عذرًا، من معي؟',
             fr: "pardon, c'est qui ?",
             es: 'perdón, ¿quién eres?',
+            ja: 'すみません、どちら様？',
+            ko: '죄송한데 누구세요?',
           },
         },
       ],
@@ -213,6 +245,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'أنا ليلًا أخطط، وأنا صباحًا أرفض',
       fr: 'Moi le soir : des plans. Moi le matin : non.',
       es: 'El yo de la noche planea. El de la mañana, no.',
+      ja: '夜の私が計画して、朝の私が却下する',
+      ko: '밤의 나는 계획하고, 아침의 나는 거절한다',
     },
   },
   {
@@ -220,7 +254,7 @@ export const SLEEP_SKIP: readonly Draft[] = [
     user: ACCOUNTS.screens,
     body: {
       format: 'chat',
-      contact: { tr: 'Annem', en: 'Mom', de: 'Mama', ar: 'أمي', fr: 'Maman', es: 'Mamá' },
+      contact: { tr: 'Annem', en: 'Mom', de: 'Mama', ar: 'أمي', fr: 'Maman', es: 'Mamá', ja: 'お母さん', ko: '엄마' },
       lines: [
         {
           from: 'them',
@@ -231,6 +265,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
             ar: 'هل أيقظتك؟',
             fr: 'je te réveille ?',
             es: '¿te desperté?',
+            ja: '起こしちゃった？',
+            ko: '깨웠니?',
           },
         },
         {
@@ -242,6 +278,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
             ar: 'لا يا أمي، استيظقت منذ ساعات',
             fr: 'non, jsuis debout dpuis des heurs',
             es: 'no, mamá, me levnaté hace hroas',
+            ja: 'ううん、とっくにおちてるよ',
+            ko: '아니 엄먀, 진작 일러낫어',
           },
         },
         {
@@ -253,6 +291,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
             ar: 'واضح من كتابتك 🙂',
             fr: 'ça se voit 🙂',
             es: 'se nota 🙂',
+            ja: '文字でわかるよ🙂',
+            ko: '맞춤법 보니 알겠네 🙂',
           },
         },
       ],
@@ -264,6 +304,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'لا شيء يخفى على أمي',
       fr: 'On ne ment pas à une maman',
       es: 'A una mamá no se le escapa nada',
+      ja: '母には何も隠せない',
+      ko: '엄마한테는 아무것도 못 숨긴다',
     },
   },
   {
@@ -278,6 +320,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
         ar: 'صديقي الصباحي',
         fr: 'Pote lève-tôt',
         es: 'Amigo madrugador',
+        ja: '朝型の友だち',
+        ko: '아침형 친구',
       },
       lines: [
         {
@@ -289,6 +333,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
             ar: 'صباح الخيرررر ☀️ الشمس تشرق، انهض!',
             fr: 'bonjouuur ☀️ le soleil se lève, debout !',
             es: '¡buenos díaaas ☀️ sale el sol, arriba!',
+            ja: 'おはよーー☀️ 日の出だよ、起きて！',
+            ko: '좋은 아침~ ☀️ 해 뜬다, 일어나!',
           },
         },
         {
@@ -300,6 +346,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
             ar: 'كم الساعة؟',
             fr: 'il est quelle heure ?',
             es: '¿qué hora es?',
+            ja: '今何時？',
+            ko: '지금 몇 시야?',
           },
         },
         {
@@ -311,6 +359,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
             ar: '5:47 😊',
             fr: '5 h 47 😊',
             es: '5:47 😊',
+            ja: '5時47分😊',
+            ko: '5시 47분 😊',
           },
         },
         {
@@ -322,6 +372,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
             ar: 'بلّغ الشمس سلامي',
             fr: 'passe le bonjour au soleil',
             es: 'salúdame al sol',
+            ja: '太陽によろしく',
+            ko: '해한테 안부 전해 줘',
           },
         },
       ],
@@ -333,6 +385,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'في كل مجموعة شخص صباحي واحد',
       fr: 'Chaque bande a son lève-tôt',
       es: 'Todo grupo tiene un madrugador',
+      ja: 'どのグループにも朝型が一人いる',
+      ko: '어느 단톡방에나 아침형 인간 한 명은 있다',
     },
   },
   {
@@ -347,6 +401,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
         ar: 'هل أنت صباحي أم ليلي؟',
         fr: 'Plutôt du matin ou du soir ?',
         es: '¿Eres más de mañana o de noche?',
+        ja: '朝型？夜型？',
+        ko: '아침형 인간이에요, 올빼미형이에요?',
       },
       options: [
         {
@@ -356,6 +412,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
           ar: 'صباحي ☀️',
           fr: 'Du matin ☀️',
           es: 'De mañana ☀️',
+          ja: '朝型☀️',
+          ko: '아침형 ☀️',
         },
         {
           tr: 'Gece kuşu 🦉',
@@ -364,6 +422,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
           ar: 'ليلي 🦉',
           fr: 'Du soir 🦉',
           es: 'De noche 🦉',
+          ja: '夜型🦉',
+          ko: '올빼미형 🦉',
         },
         {
           tr: 'Hiçbiri, yorgunum',
@@ -372,6 +432,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
           ar: 'لا هذا ولا ذاك، متعب',
           fr: 'Aucun, juste KO',
           es: 'Ninguno, tengo sueño',
+          ja: 'どっちでもない、眠い',
+          ko: '둘 다 아님, 피곤함',
         },
       ],
       winner: 2,
@@ -383,6 +445,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'ساعتي المنتجة: من 2:00 إلى 2:15 ظهرًا',
       fr: 'Mon pic de forme : de 14 h à 14 h 15',
       es: 'Mi hora productiva: de 14:00 a 14:15',
+      ja: '一番はかどる時間：14時〜14時15分',
+      ko: '가장 생산적인 시간: 오후 2시~2시 15분',
     },
   },
   {
@@ -397,6 +461,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
         ar: 'ما أول كلمة تقولها في الصباح؟',
         fr: 'Ton premier mot le matin ?',
         es: '¿Tu primera palabra por la mañana?',
+        ja: '朝の第一声は？',
+        ko: '아침 첫마디는 보통 뭐예요?',
       },
       options: [
         {
@@ -406,8 +472,10 @@ export const SLEEP_SKIP: readonly Draft[] = [
           ar: 'صباح الخير!',
           fr: 'Bonjour !',
           es: '¡Buenos días!',
+          ja: 'おはよう！',
+          ko: '좋은 아침!',
         },
-        { tr: 'Hıı?', en: 'Huh?', de: 'Hä?', ar: 'هاه؟', fr: 'Hein ?', es: '¿Eh?' },
+        { tr: 'Hıı?', en: 'Huh?', de: 'Hä?', ar: 'هاه؟', fr: 'Hein ?', es: '¿Eh?', ja: 'んあ？', ko: '으응?' },
       ],
       winner: 1,
     },
@@ -418,6 +486,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'أول جملة كاملة تصل قرب الظهر',
       fr: 'Première phrase complète : vers midi',
       es: 'Mi primera frase completa llega al mediodía',
+      ja: 'まともな文が出るのは昼ごろ',
+      ko: '제대로 된 첫 문장은 점심쯤 나온다',
     },
   },
   {
@@ -432,6 +502,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
         ar: 'كيف تنهض من السرير صباحًا؟',
         fr: 'Tu sors du lit comment, le matin ?',
         es: '¿Cómo te levantas de la cama?',
+        ja: '朝、どうやってベッドから出る？',
+        ko: '아침에 침대에서 어떻게 나와요?',
       },
       options: [
         {
@@ -441,6 +513,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
           ar: 'بقفزة واحدة',
           fr: "D'un bond",
           es: 'De un salto',
+          ja: '一発で飛び起きる',
+          ko: '한 번에 벌떡',
         },
         {
           tr: 'Yuvarlanarak, yavaşça',
@@ -449,6 +523,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
           ar: 'أتدحرج ببطء',
           fr: 'En roulant, lentement',
           es: 'Rodando, muy despacio',
+          ja: 'ゴロゴロ転がって',
+          ko: '데굴데굴 굴러서',
         },
       ],
       winner: 1,
@@ -460,6 +536,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'أهبط على الأرض كجذع شجرة. بمنتهى الأناقة.',
       fr: "J'atterris comme une bûche. Tout en grâce.",
       es: 'Aterrizo en el suelo como un tronco. Muy elegante.',
+      ja: '丸太みたいに床に着地。とても優雅。',
+      ko: '통나무처럼 바닥에 착지한다. 아주 우아하다.',
     },
   },
   {
@@ -474,6 +552,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
         ar: 'ما بقي من حلمي',
         fr: 'SOUVENIR DU RÊVE',
         es: 'RECUERDO DEL SUEÑO',
+        ja: '夢の記憶',
+        ko: '꿈 기억률',
       },
       value: {
         tr: '%3',
@@ -482,6 +562,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
         ar: '3%',
         fr: '3 %',
         es: '3 %',
+        ja: '3%',
+        ko: '3%',
       },
       shape: 'fall',
       axis: 'hours',
@@ -493,6 +575,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'عند الظهر لم يبقَ إلا: كانت هناك زرافة، على ما أظن',
       fr: 'À midi, il reste : il y avait une girafe, je crois',
       es: 'Al mediodía solo queda: había una jirafa, creo',
+      ja: '昼に残ってるのは「キリンがいた気がする」だけ',
+      ko: '점심때 남은 기억: 기린이 있었던 것 같다',
     },
   },
   {
@@ -507,6 +591,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
         ar: 'مزاجي في آخر العطلة',
         fr: 'MON MORAL DU DIMANCHE',
         es: 'MI HUMOR DEL DOMINGO',
+        ja: '日曜の気分',
+        ko: '일요일 기분',
       },
       value: null,
       shape: 'crash',
@@ -519,6 +605,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'في السادسة مساءً تذكّرت أن غدًا يوم عمل',
       fr: "À 18 h, j'ai pensé à lundi",
       es: 'A las 6 de la tarde me acordé del lunes',
+      ja: '18時に月曜日を思い出した',
+      ko: '저녁 6시에 월요일이 떠올랐다',
     },
   },
   {
@@ -533,6 +621,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
         ar: 'مدة فطوري',
         fr: 'DURÉE DE MON PETIT-DÉJ',
         es: 'MI TIEMPO DE DESAYUNO',
+        ja: '朝ごはんの時間',
+        ko: '아침 식사 시간',
       },
       value: null,
       shape: 'rise',
@@ -545,6 +635,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'أيام العمل: 40 ثانية. العطلة: 3 ساعات.',
       fr: 'En semaine : 40 secondes. Le week-end : 3 heures.',
       es: 'Entre semana, 40 segundos. Fin de semana, 3 horas.',
+      ja: '平日40秒、週末3時間',
+      ko: '평일 40초, 주말 3시간',
     },
   },
   {
@@ -559,6 +651,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
         ar: 'الأدوات المنزلية',
         fr: 'ARTS DE LA TABLE',
         es: 'TIENDA DE HOGAR',
+        ja: '雑貨店',
+        ko: '생활용품점',
       },
       items: [
         {
@@ -568,6 +662,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
           ar: 'كوب عملاق (1 لتر)',
           fr: 'MUG GÉANT (1 LITRE)',
           es: 'TAZA GIGANTE (1 LITRO)',
+          ja: '特大マグ（1リットル）',
+          ko: '대형 머그 (1리터)',
         },
       ],
     },
@@ -578,6 +674,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'قاعدتي: كوب قهوة واحد في اليوم. تقنيًا.',
       fr: 'Un seul café par jour. Techniquement.',
       es: 'Un solo café al día. Técnicamente.',
+      ja: 'コーヒーは1日1杯。一応。',
+      ko: '커피는 하루 한 잔. 엄밀히 말하면.',
     },
   },
   {
@@ -592,6 +690,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
         ar: 'متجر الإنارة',
         fr: 'LUMINAIRES',
         es: 'ILUMINACIÓN',
+        ja: '照明店',
+        ko: '조명 가게',
       },
       items: [
         {
@@ -601,6 +701,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
           ar: 'مصباح شروق الشمس',
           fr: 'LAMPE LEVER DE SOLEIL',
           es: 'LÁMPARA AMANECER',
+          ja: '目覚ましライト',
+          ko: '일출 램프',
         },
       ],
     },
@@ -611,6 +713,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'أشرق المصباح. أما أنا فلا.',
       fr: "La lampe s'est levée. Moi, non.",
       es: 'La lámpara amaneció. Yo no.',
+      ja: 'ライトは昇った。私は起きなかった。',
+      ko: '램프는 떴다. 나는 안 일어났다.',
     },
   },
   {
@@ -625,8 +729,10 @@ export const SLEEP_SKIP: readonly Draft[] = [
         ar: 'هذا الصباح',
         fr: 'CE MATIN',
         es: 'ESTA MAÑANA',
+        ja: '今朝',
+        ko: '오늘 아침',
       },
-      big: { tr: '12', en: '12', de: '12', ar: '12', fr: '12', es: '12' },
+      big: { tr: '12', en: '12', de: '12', ar: '12', fr: '12', es: '12', ja: '12', ko: '12' },
       text: {
         tr: 'dakika duşta öylece durdun; uyanmayı bekledin',
         en: 'minutes standing in the shower, waiting to wake up',
@@ -634,6 +740,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
         ar: 'دقيقة وقفت تحت الدش تنتظر أن تستيقظ',
         fr: 'minutes sous la douche sans bouger, à attendre le réveil',
         es: 'minutos bajo la ducha sin moverte, esperando despertar',
+        ja: '分間、シャワーの下で目が覚めるのを待った',
+        ko: '분 동안 샤워기 아래 서서 잠이 깨길 기다렸다',
       },
     },
     caption: {
@@ -643,6 +751,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'القيلولة واقفًا تبقى قيلولة',
       fr: 'Une sieste debout reste une sieste',
       es: 'Una siesta de pie sigue siendo siesta',
+      ja: '立ったままの昼寝も昼寝',
+      ko: '서서 자는 것도 낮잠이다',
     },
   },
   {
@@ -657,8 +767,10 @@ export const SLEEP_SKIP: readonly Draft[] = [
         ar: 'في خزانتك',
         fr: 'DANS TON PLACARD',
         es: 'EN TU ARMARIO',
+        ja: 'クローゼットに',
+        ko: '옷장 속에',
       },
-      big: { tr: '143', en: '143', de: '143', ar: '143', fr: '143', es: '143' },
+      big: { tr: '143', en: '143', de: '143', ar: '143', fr: '143', es: '143', ja: '143', ko: '143' },
       text: {
         tr: 'parça kıyafetin var; giyecek hiçbir şeyin yok',
         en: 'pieces of clothing, and nothing to wear',
@@ -666,6 +778,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
         ar: 'قطعة ملابس… ولا شيء ترتديه',
         fr: 'vêtements, et rien à te mettre',
         es: 'prendas de ropa, y nada que ponerte',
+        ja: '着の服があるのに、着る服がない',
+        ko: '벌의 옷이 있는데 입을 옷이 없다',
       },
     },
     caption: {
@@ -675,6 +789,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'السترة الرمادية نفسها مجددًا',
       fr: 'Encore le pull gris',
       es: 'Otra vez el suéter gris',
+      ja: '結局またあのグレーのセーター',
+      ko: '오늘도 그 회색 니트',
     },
   },
   {
@@ -689,8 +805,10 @@ export const SLEEP_SKIP: readonly Draft[] = [
         ar: 'الآن',
         fr: 'EN CE MOMENT',
         es: 'AHORA MISMO',
+        ja: '今',
+        ko: '지금',
       },
-      big: { tr: '1', en: '1', de: '1', ar: '1', fr: '1', es: '1' },
+      big: { tr: '1', en: '1', de: '1', ar: '1', fr: '1', es: '1', ja: '1', ko: '1' },
       text: {
         tr: 'kez esnedin; sadece bunu okuduğun için',
         en: 'yawn, just from reading this',
@@ -698,6 +816,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
         ar: 'تثاؤب، فقط لأنك تقرأ هذا',
         fr: "bâillement, rien qu'en lisant ça",
         es: 'bostezo, solo por leer esto',
+        ja: '回あくびした。これを読んだだけで。',
+        ko: '번 하품했다. 이걸 읽었을 뿐인데.',
       },
     },
     caption: {
@@ -707,6 +827,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'انظر، من بجانبك تثاءب أيضًا',
       fr: 'Regarde, ton voisin bâille aussi',
       es: 'Mira, el de al lado también bostezó',
+      ja: 'ほら、隣の人もあくびした',
+      ko: '봐, 옆 사람도 하품했다',
     },
   },
   {
@@ -721,6 +843,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
         ar: 'تصنيف وضعيات النوم',
         fr: 'TIER LIST POSITIONS DODO',
         es: 'POSTURAS PARA DORMIR',
+        ja: '寝相ティアリスト',
+        ko: '수면 자세 티어 리스트',
       },
       rows: [['🌯', '🥐'], ['⭐️'], ['🪵'], ['🦇']],
     },
@@ -731,6 +855,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'جرّبت وضعية الخفاش، لا أنصح بها',
       fr: "J'ai testé la chauve-souris. Je déconseille.",
       es: 'Probé la postura murciélago. No la recomiendo.',
+      ja: 'コウモリ寝を試した。おすすめしない。',
+      ko: '박쥐 자세 해 봤다. 비추.',
     },
   },
   {
@@ -745,6 +871,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
         ar: 'تصنيف ما قبل النوم',
         fr: 'TIER LIST AVANT DODO',
         es: 'TIER LIST ANTES DE DORMIR',
+        ja: '寝る前ティアリスト',
+        ko: '자기 전 티어 리스트',
       },
       rows: [['🌧️', '📖'], ['🍵', '🕯️'], ['🐑'], ['🧠']],
     },
@@ -755,6 +883,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'كل ليلة يعيد دماغي ذلك الموقف المحرج من 2014',
       fr: 'Chaque nuit, mon cerveau rejoue ce truc de 2014',
       es: 'Cada noche mi cerebro repite aquello de 2014',
+      ja: '毎晩、脳が2014年のあの記憶を再生する',
+      ko: '매일 밤 뇌가 2014년의 그 흑역사를 재생한다',
     },
   },
   {
@@ -771,6 +901,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
           ar: 'متتبّع النوم',
           fr: 'Suivi du sommeil',
           es: 'Monitor de sueño',
+          ja: '睡眠記録',
+          ko: '수면 기록',
         },
         text: {
           tr: 'Dün gece yatakta 47 kez döndün',
@@ -779,6 +911,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
           ar: 'تقلّبت في السرير 47 مرة الليلة الماضية',
           fr: 'Cette nuit : 47 demi-tours dans le lit',
           es: 'Anoche diste 47 vueltas en la cama',
+          ja: '昨夜、47回寝返りを打ちました',
+          ko: '어젯밤 47번 뒤척였어요',
         },
       },
     },
@@ -789,6 +923,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'صرت مثل سيخ الشاورما',
       fr: 'Un vrai poulet rôti',
       es: 'Soy un pollo asado girando',
+      ja: 'ほぼケバブの肉',
+      ko: '사실상 전기구이 통닭',
     },
   },
   {
@@ -805,6 +941,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
           ar: 'تتبّع العادات',
           fr: 'Habitudes',
           es: 'Hábitos',
+          ja: '習慣アプリ',
+          ko: '습관 기록',
         },
         text: {
           tr: 'Bugünkü hedef: 10 dakika meditasyon',
@@ -813,6 +951,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
           ar: 'هدف اليوم: 10 دقائق من التأمل',
           fr: 'Objectif du jour : 10 min de méditation',
           es: 'Meta de hoy: 10 minutos de meditación',
+          ja: '今日の目標：瞑想10分',
+          ko: '오늘의 목표: 명상 10분',
         },
       },
     },
@@ -823,6 +963,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'في 10 دقائق تذكّرت 47 مهمة',
       fr: 'En 10 minutes, 47 choses à faire me sont revenues',
       es: 'En 10 minutos recordé 47 pendientes',
+      ja: '10分で47個のやることを思い出した',
+      ko: '10분 동안 할 일이 47개 떠올랐다',
     },
   },
   {
@@ -832,7 +974,7 @@ export const SLEEP_SKIP: readonly Draft[] = [
       format: 'notifications',
       first: {
         icon: '🛏️',
-        app: { tr: 'Yatağın', en: 'Your bed', de: 'Dein Bett', ar: 'سريرك', fr: 'Ton lit', es: 'Tu cama' },
+        app: { tr: 'Yatağın', en: 'Your bed', de: 'Dein Bett', ar: 'سريرك', fr: 'Ton lit', es: 'Tu cama', ja: 'きみのベッド', ko: '너의 침대' },
         text: {
           tr: 'Neredesin? Seni özledim 🥺',
           en: 'Where are you? I miss you 🥺',
@@ -840,6 +982,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
           ar: 'أين أنت؟ اشتقت إليك 🥺',
           fr: "T'es où ? Tu me manques 🥺",
           es: '¿Dónde estás? Te extraño 🥺',
+          ja: 'どこにいるの？会いたい🥺',
+          ko: '어디야? 보고 싶어 🥺',
         },
       },
     },
@@ -850,6 +994,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'الساعة الثامنة والنصف فقط، لكنه محق',
       fr: "Il n'est que 20 h 30, mais il a raison",
       es: 'Son apenas las 20:30, pero tiene razón',
+      ja: 'まだ20時半だけど、一理ある',
+      ko: '아직 저녁 8시 반이지만 맞는 말이다',
     },
   },
   {
@@ -864,6 +1010,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
         ar: 'الطائر المبكر يلتقط الدودة. ولحسن الحظ، لا أريد دودة.',
         fr: "L'avenir est à ceux qui se lèvent tôt. Je le prendrai à midi.",
         es: 'Pájaro que madruga atrapa el gusano. Por suerte, no quiero gusanos.',
+        ja: '早起きは三文の徳。でも三文いらない。',
+        ko: '일찍 일어나는 새가 벌레를 잡는다. 난 벌레 싫은데.',
       },
     },
     caption: {
@@ -873,6 +1021,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'منطق لا يُردّ',
       fr: 'Logique imparable',
       es: 'Lógica impecable',
+      ja: '完璧な理論',
+      ko: '완벽한 논리',
     },
   },
   {
@@ -887,6 +1037,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
         ar: 'ابتسم كل صباح. أو افتح عينيك على الأقل.',
         fr: 'Souris chaque matin. Ou ouvre au moins les yeux.',
         es: 'Sonríe cada mañana. O al menos abre los ojos.',
+        ja: '朝は笑顔で。せめて目は開けて。',
+        ko: '아침엔 웃으세요. 아니면 눈이라도 뜨세요.',
       },
     },
     caption: {
@@ -896,6 +1048,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'خطوة خطوة',
       fr: 'Petit à petit',
       es: 'Paso a paso',
+      ja: '一歩ずつ',
+      ko: '한 걸음씩',
     },
   },
   {
@@ -910,6 +1064,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
         ar: 'الراحة إنتاجية أيضًا. وكان يومي منتجًا جدًا.',
         fr: "Se reposer, c'est productif aussi. Journée très productive.",
         es: 'Descansar también es productivo. Hoy rendí muchísimo.',
+        ja: '休むのも生産性。今日はとても生産的だった。',
+        ko: '쉬는 것도 생산성이다. 오늘은 아주 생산적이었다.',
       },
     },
     caption: {
@@ -919,6 +1075,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'أنقل لكم مباشرة من الأريكة',
       fr: 'En direct du canapé',
       es: 'En vivo desde el sofá',
+      ja: 'ソファから中継です',
+      ko: '소파에서 전해 드립니다',
     },
   },
   {
@@ -933,6 +1091,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
         ar: 'استثمر في نفسك. في وسادة جيدة مثلًا.',
         fr: 'Investis en toi-même. Par exemple, dans un bon oreiller.',
         es: 'Invierte en ti. Por ejemplo, en una buena almohada.',
+        ja: '自分に投資しよう。たとえば良い枕に。',
+        ko: '자신에게 투자하라. 예를 들면 좋은 베개에.',
       },
     },
     caption: {
@@ -942,6 +1102,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'محفظتي الاستثمارية: 7 وسائد',
       fr: 'Mon portefeuille : 7 oreillers',
       es: 'Mi portafolio: 7 almohadas',
+      ja: 'ポートフォリオ：枕7個',
+      ko: '내 포트폴리오: 베개 7개',
     },
   },
   {
@@ -956,6 +1118,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
         ar: 'قالوا: احتفظ بمذكرات. فاحتفظت بالدفتر… فارغًا.',
         fr: "Tiens un journal, qu'ils disaient. Je le tiens. Toujours vide.",
         es: 'Lleva un diario, me dijeron. Lo llevo a todas partes. Vacío.',
+        ja: '日記をつけなさいと言われた。ノートは買った。まだ白紙。',
+        ko: '일기를 쓰라길래 일기장을 샀다. 아직 새것이다.',
       },
     },
     caption: {
@@ -965,6 +1129,8 @@ export const SLEEP_SKIP: readonly Draft[] = [
       ar: 'لكنني اشتريت الأقلام الملوّنة',
       fr: "J'ai quand même acheté les jolis stylos",
       es: 'Pero sí compré los bolígrafos bonitos',
+      ja: 'ペンもちゃんと買ったのに',
+      ko: '펜도 샀는데 말이지',
     },
   },
 ];
@@ -981,6 +1147,8 @@ export const SLEEP_LIKE: readonly Draft[] = [
       ar: 'بنيت قلعة من الوسائد، والدخول بكلمة سر',
       fr: 'fort en coussins terminé. entrée sur mot de passe.',
       es: 'hice un fuerte de almohadas. se entra con contraseña.',
+      ja: '枕で城を作った。入るには合言葉。',
+      ko: '베개로 성을 쌓았다. 입장은 암호로.',
     },
   },
   {
@@ -994,6 +1162,8 @@ export const SLEEP_LIKE: readonly Draft[] = [
       ar: 'غنّيت لأخي الصغير تهويدة… فنمت أنا أولًا',
       fr: "berceuse pour mon petit frère. c'est moi qui ai dormi",
       es: 'le canté para que durmiera y me dormí yo',
+      ja: '弟に子守唄を歌ったら、先に私が寝た',
+      ko: '동생한테 자장가 불러 줬는데 내가 먼저 잠듦',
     },
   },
   {
@@ -1007,6 +1177,8 @@ export const SLEEP_LIKE: readonly Draft[] = [
       ar: 'طرت في حلمي، ورسمته قبل أن أنساه',
       fr: "j'ai volé en rêve, dessiné avant d'oublier",
       es: 'volé en un sueño y lo dibujé antes de olvidarlo',
+      ja: '夢で空を飛んだ。忘れる前に描いた',
+      ko: '꿈에서 날았다. 까먹기 전에 그렸다',
     },
   },
   {
@@ -1021,6 +1193,8 @@ export const SLEEP_LIKE: readonly Draft[] = [
         ar: 'كما استيقظت تمامًا',
         fr: 'au saut du lit',
         es: 'al despertar',
+        ja: '起きたて',
+        ko: '방금 일어남',
       },
     },
     caption: {
@@ -1030,6 +1204,8 @@ export const SLEEP_LIKE: readonly Draft[] = [
       ar: 'شعري يتخذ قراراته بنفسه اليوم',
       fr: 'mes cheveux prennent leurs propres décisions',
       es: 'mi pelo hoy toma sus propias decisiones',
+      ja: '今朝の髪は自分の意思で動いてる',
+      ko: '오늘 아침 머리는 자기 마음대로다',
     },
   },
   {
@@ -1044,6 +1220,8 @@ export const SLEEP_LIKE: readonly Draft[] = [
         ar: 'قناع نومي الجديد',
         fr: 'nouveau masque de nuit',
         es: 'antifaz nuevo',
+        ja: '新しいアイマスク',
+        ko: '새 수면 안대',
       },
     },
     caption: {
@@ -1053,6 +1231,8 @@ export const SLEEP_LIKE: readonly Draft[] = [
       ar: 'عليه حاجبان… أبدو مصدومًا حتى وأنا نائم',
       fr: 'il a des sourcils : je dors avec un air étonné',
       es: 'tiene cejas: duermo con cara de sorpresa',
+      ja: '眉毛つき。寝てても驚いてる顔。',
+      ko: '눈썹이 그려져 있어서 자면서도 놀란 얼굴',
     },
   },
   {
@@ -1067,6 +1247,8 @@ export const SLEEP_LIKE: readonly Draft[] = [
         ar: 'من صنع جدتي',
         fr: 'tricotée par mamie',
         es: 'tejida por la abuela',
+        ja: 'おばあちゃん作',
+        ko: '할머니 작품',
       },
     },
     caption: {
@@ -1076,6 +1258,8 @@ export const SLEEP_LIKE: readonly Draft[] = [
       ar: 'بطانية عمرها 20 عامًا، وما زالت الأدفأ',
       fr: '20 ans et toujours la couverture la plus chaude',
       es: '20 años y sigue siendo la manta más calentita',
+      ja: '20年ものの毛布、今も一番あったかい',
+      ko: '20년 된 담요, 아직도 제일 따뜻하다',
     },
   },
   {
@@ -1090,6 +1274,8 @@ export const SLEEP_LIKE: readonly Draft[] = [
         ar: 'أول كوب في اليوم',
         fr: 'première tasse du jour',
         es: 'primera taza del día',
+        ja: '今日最初のお茶',
+        ko: '하루의 첫 차',
       },
     },
     caption: {
@@ -1099,6 +1285,8 @@ export const SLEEP_LIKE: readonly Draft[] = [
       ar: '5 دقائق من الهدوء في الشرفة، ثم بدأ اليوم',
       fr: '5 minutes de calme au balcon, puis la journée a commencé',
       es: '5 minutos de calma en el balcón y luego empezó el día',
+      ja: 'ベランダで5分の平和、そして一日が始まった',
+      ko: '베란다에서 5분의 평화, 그리고 하루 시작',
     },
   },
   {
@@ -1112,6 +1300,8 @@ export const SLEEP_LIKE: readonly Draft[] = [
       ar: 'ملخص العطلة: غادرت السرير 3 مرات (مرتان إلى المطبخ)',
       fr: 'dimanche : 3 sorties du lit (dont 2 vers le frigo)',
       es: 'resumen del domingo: salí de la cama 3 veces (2 a la cocina)',
+      ja: '日曜のまとめ：ベッドを出たのは3回（2回は台所）',
+      ko: '일요일 요약: 침대 밖으로 3번 나감 (2번은 부엌)',
     },
   },
   {
@@ -1125,6 +1315,8 @@ export const SLEEP_LIKE: readonly Draft[] = [
       ar: 'جرّبت روتين الخامسة فجرًا: الصور رائعة وأنا منهك',
       fr: 'routine de 5 h testée : photos top, moi KO',
       es: 'rutina de las 5 a. m.: fotos geniales, yo sin pilas',
+      ja: '朝5時起きに挑戦：写真は映え、私はボロボロ',
+      ko: '새벽 5시 기상 도전: 사진은 예쁨, 나는 너덜너덜',
     },
   },
   {
@@ -1138,6 +1330,8 @@ export const SLEEP_LIKE: readonly Draft[] = [
       ar: 'مفرش سريري الجديد مليء بالنجوم… صرت أنام في السماء',
       fr: 'housse de couette étoilée : je dors dans le ciel',
       es: 'sábanas nuevas con estrellas: ahora duermo en el cielo',
+      ja: '新しい布団カバーは星柄。もう夜空で寝てる。',
+      ko: '새 이불이 별무늬라 이제 밤하늘에서 잔다',
     },
   },
 ];
@@ -1154,6 +1348,8 @@ export const SLEEP_HOLD: readonly Draft[] = [
       ar: 'الجانب البارد من الوسادة. أسرع قبل أن يسخن!',
       fr: "Le côté frais de l'oreiller. Vite, avant qu'il chauffe !",
       es: 'El lado fresco de la almohada. ¡Rápido, que se calienta!',
+      ja: '枕のひんやり面。温まる前に早く！',
+      ko: '베개의 시원한 쪽. 데워지기 전에 얼른!',
     },
   },
   {
@@ -1167,6 +1363,8 @@ export const SLEEP_HOLD: readonly Draft[] = [
       ar: 'ظننته يوم عمل… إنه يوم العطلة!',
       fr: "Tu croyais qu'on était lundi. C'est samedi !",
       es: 'Creías que era lunes. ¡Es sábado!',
+      ja: '月曜だと思った。土曜日だった！',
+      ko: '월요일인 줄 알았는데 토요일이다!',
     },
   },
   {
@@ -1180,6 +1378,8 @@ export const SLEEP_HOLD: readonly Draft[] = [
       ar: 'أول رشفة في الصباح: أغلى 3 ثوانٍ في اليوم',
       fr: 'Première gorgée du matin : les 3 meilleures secondes',
       es: 'El primer sorbo del día: los 3 mejores segundos',
+      ja: '朝の最初のひと口：一日で最高の3秒',
+      ko: '아침 첫 모금: 하루 중 가장 귀한 3초',
     },
   },
   {
@@ -1193,6 +1393,8 @@ export const SLEEP_HOLD: readonly Draft[] = [
       ar: 'الجورب المفقود ظهر في اللحاف بعد 3 أشهر',
       fr: 'La chaussette perdue, retrouvée dans la couette après 3 mois',
       es: 'El calcetín perdido apareció en el edredón tras 3 meses',
+      ja: 'なくした靴下が3か月ぶりに布団から出てきた',
+      ko: '잃어버린 양말 한 짝이 3개월 만에 이불에서 나왔다',
     },
   },
   {
@@ -1206,6 +1408,8 @@ export const SLEEP_HOLD: readonly Draft[] = [
       ar: 'اللحاف دافئ تمامًا. لا تتركه!',
       fr: 'La couette est pile à la bonne température. Tiens bon !',
       es: 'La manta está en su punto. ¡No la sueltes!',
+      ja: '布団がちょうどいい温かさ。離さないで！',
+      ko: '이불이 딱 알맞게 따뜻해졌다. 놓지 마세요!',
     },
   },
   {
@@ -1219,6 +1423,8 @@ export const SLEEP_HOLD: readonly Draft[] = [
       ar: 'موهبة أسطورية: النوم لحظة ملامسة رأسك للوسادة',
       fr: 'Talent légendaire : dormir dès la tête posée',
       es: 'Talento legendario: dormirte al tocar la almohada',
+      ja: '伝説のスキル：枕に頭がついた瞬間に寝る',
+      ko: '전설의 기술: 베개에 머리 닿자마자 잠들기',
     },
   },
   {
@@ -1232,6 +1438,8 @@ export const SLEEP_HOLD: readonly Draft[] = [
       ar: 'توقّف الشخير! نَم الآن، إنها فرصتك',
       fr: "Les ronflements ont cessé ! Dors vite, c'est le moment",
       es: '¡Paró el ronquido! Duérmete ya, es tu oportunidad',
+      ja: 'いびきが止まった！今のうちに寝て',
+      ko: '코골이가 멈췄다! 지금이 기회, 얼른 자요',
     },
   },
 ];
@@ -1249,6 +1457,8 @@ export const SLEEP_FREEZE: readonly Draft[] = [
         ar: 'خطر',
         fr: 'DANGER',
         es: 'PELIGRO',
+        ja: '危険',
+        ko: '위험',
       },
       small: {
         tr: 'HENÜZ KAHVESİNİ İÇMEDİ',
@@ -1257,6 +1467,8 @@ export const SLEEP_FREEZE: readonly Draft[] = [
         ar: 'لم يشرب قهوته بعد',
         fr: "N'A PAS ENCORE BU SON CAFÉ",
         es: 'AÚN NO TOMÓ SU CAFÉ',
+        ja: 'まだコーヒーを飲んでいない',
+        ko: '아직 커피 안 마심',
       },
     },
     caption: {
@@ -1266,6 +1478,8 @@ export const SLEEP_FREEZE: readonly Draft[] = [
       ar: 'ولا تقل صباح الخير حتى.',
       fr: 'Même pas un bonjour.',
       es: 'Ni le digas buenos días.',
+      ja: 'おはようも言わないで。',
+      ko: '좋은 아침이라는 말도 하지 마세요.',
     },
     headline: {
       tr: 'Kahvesiz biri mutfakta dolaşıyor',
@@ -1274,6 +1488,8 @@ export const SLEEP_FREEZE: readonly Draft[] = [
       ar: 'شخص بلا قهوة يتجوّل في المطبخ',
       fr: "Quelqu'un sans café rôde dans la cuisine",
       es: 'Alguien sin café anda por la cocina',
+      ja: 'コーヒー前の人が台所をうろついてる',
+      ko: '커피 안 마신 사람이 부엌을 돌아다녀요',
     },
   },
   {
@@ -1288,6 +1504,8 @@ export const SLEEP_FREEZE: readonly Draft[] = [
         ar: 'ممنوع الضحك',
         fr: 'NE PAS RIRE',
         es: 'PROHIBIDO REÍR',
+        ja: '笑い禁止',
+        ko: '웃음 금지',
       },
       small: {
         tr: 'YÜZ MASKESİ KURUYOR',
@@ -1296,6 +1514,8 @@ export const SLEEP_FREEZE: readonly Draft[] = [
         ar: 'قناع الوجه يجف',
         fr: 'MASQUE EN TRAIN DE SÉCHER',
         es: 'MASCARILLA SECÁNDOSE',
+        ja: 'パック乾燥中',
+        ko: '팩 마르는 중',
       },
     },
     caption: {
@@ -1305,6 +1525,8 @@ export const SLEEP_FREEZE: readonly Draft[] = [
       ar: 'إن ضحكت تشقّق. حافظ على ملامحك.',
       fr: 'Un sourire et ça craque. Reste impassible.',
       es: 'Si te ríes, se agrieta. Cara seria.',
+      ja: '笑ったらひび割れる。表情ひとつ変えないで。',
+      ko: '웃으면 갈라져요. 표정 하나도 바꾸지 마세요.',
     },
     headline: {
       tr: 'Yüz maskesi tam kurumak üzere',
@@ -1313,6 +1535,8 @@ export const SLEEP_FREEZE: readonly Draft[] = [
       ar: 'قناع وجهك على وشك أن يجف',
       fr: 'Ton masque est presque sec',
       es: 'Tu mascarilla está casi seca',
+      ja: 'パックがもうすぐ乾く',
+      ko: '팩이 거의 다 말랐어요',
     },
   },
   {
@@ -1327,6 +1551,8 @@ export const SLEEP_FREEZE: readonly Draft[] = [
         ar: 'بداية الأسبوع',
         fr: 'LUNDI',
         es: 'LUNES',
+        ja: '月曜日',
+        ko: '월요일',
       },
       small: {
         tr: 'ANİ HAREKET YAPMAYIN',
@@ -1335,6 +1561,8 @@ export const SLEEP_FREEZE: readonly Draft[] = [
         ar: 'لا حركات مفاجئة',
         fr: 'PAS DE GESTES BRUSQUES',
         es: 'NADA DE MOVIMIENTOS BRUSCOS',
+        ja: '急に動かないこと',
+        ko: '갑자기 움직이지 마세요',
       },
     },
     caption: {
@@ -1344,6 +1572,8 @@ export const SLEEP_FREEZE: readonly Draft[] = [
       ar: 'لا تتحرك، ربما لا يراك.',
       fr: 'Bouge pas, il te verra peut-être pas.',
       es: 'No te muevas. Quizá no te vea.',
+      ja: '動かなければ、気づかれないかも。',
+      ko: '가만있으면 못 볼지도 몰라요.',
     },
     headline: {
       tr: 'Pazartesi sabahı yaklaşıyor',
@@ -1352,6 +1582,8 @@ export const SLEEP_FREEZE: readonly Draft[] = [
       ar: 'صباح أول يوم عمل يقترب',
       fr: 'Lundi matin approche',
       es: 'El lunes por la mañana se acerca',
+      ja: '月曜の朝が近づいている',
+      ko: '월요일 아침이 다가오고 있어요',
     },
   },
   {
@@ -1366,6 +1598,8 @@ export const SLEEP_FREEZE: readonly Draft[] = [
         ar: 'غرفة النوم',
         fr: 'CHAMBRE',
         es: 'DORMITORIO',
+        ja: '寝室',
+        ko: '침실',
       },
     },
     caption: {
@@ -1375,6 +1609,8 @@ export const SLEEP_FREEZE: readonly Draft[] = [
       ar: 'أغمض عينيك بقوة.',
       fr: 'Ferme les yeux très fort.',
       es: 'Cierra los ojos bien fuerte.',
+      ja: '目をぎゅっとつぶって。',
+      ko: '눈을 꼭 감으세요.',
     },
     headline: {
       tr: 'Annen perdeleri açmak üzere',
@@ -1383,6 +1619,8 @@ export const SLEEP_FREEZE: readonly Draft[] = [
       ar: 'أمك على وشك فتح الستائر',
       fr: 'Maman va ouvrir grand les rideaux',
       es: 'Mamá va a abrir las cortinas',
+      ja: 'お母さんがカーテンを開けようとしてる',
+      ko: '엄마가 커튼을 걷으려고 해요',
     },
   },
   {
@@ -1397,6 +1635,8 @@ export const SLEEP_FREEZE: readonly Draft[] = [
         ar: 'غرفتك',
         fr: 'TA CHAMBRE',
         es: 'TU CUARTO',
+        ja: 'あなたの部屋',
+        ko: '내 방',
       },
     },
     caption: {
@@ -1406,6 +1646,8 @@ export const SLEEP_FREEZE: readonly Draft[] = [
       ar: 'ملأ الكوب حتى الحافة. لا تتحرك.',
       fr: 'Tasse remplie à ras bord. Bouge pas.',
       es: 'Llenó la taza hasta el borde. No te muevas.',
+      ja: 'お茶がなみなみ。動かないで。',
+      ko: '차를 넘치기 직전까지 채웠다. 움직이지 마세요.',
     },
     headline: {
       tr: 'Kardeşin yatağa kahvaltı getirdi',
@@ -1414,6 +1656,8 @@ export const SLEEP_FREEZE: readonly Draft[] = [
       ar: 'أخوك الصغير أحضر لك الفطور إلى السرير',
       fr: 'Petit-déj au lit, servi par ton frère',
       es: 'Tu hermanito te trajo desayuno a la cama',
+      ja: '弟がベッドに朝ごはんを持ってきた',
+      ko: '동생이 침대로 아침을 가져왔어요',
     },
   },
   {
@@ -1428,6 +1672,8 @@ export const SLEEP_FREEZE: readonly Draft[] = [
         ar: 'المطبخ',
         fr: 'CUISINE',
         es: 'COCINA',
+        ja: 'キッチン',
+        ko: '부엌',
       },
     },
     caption: {
@@ -1437,6 +1683,8 @@ export const SLEEP_FREEZE: readonly Draft[] = [
       ar: 'في يدك خبز بالمربى. لا تُسقط قطرة واحدة.',
       fr: 'Tartine de confiture en main. Pas une goutte.',
       es: 'Pan con mermelada en la mano. Ni una gota.',
+      ja: 'ジャムトーストを手に。一滴も落とさないで。',
+      ko: '손에 잼 바른 빵. 한 방울도 떨어뜨리지 마세요.',
     },
     headline: {
       tr: 'Baban ütülediği gömleğine bakıyor',
@@ -1445,6 +1693,8 @@ export const SLEEP_FREEZE: readonly Draft[] = [
       ar: 'أبوك ينظر إلى القميص الذي كواه للتو',
       fr: 'Papa inspecte ta chemise repassée',
       es: 'Papá revisa tu camisa recién planchada',
+      ja: 'お父さんがアイロンしたシャツを見てる',
+      ko: '아빠가 다린 셔츠를 보고 있어요',
     },
   },
   {
@@ -1459,6 +1709,8 @@ export const SLEEP_FREEZE: readonly Draft[] = [
         ar: 'غرفة الأطفال',
         fr: "CHAMBRE D'ENFANT",
         es: 'CUARTO DE NIÑOS',
+        ja: '子ども部屋',
+        ko: '아이 방',
       },
     },
     caption: {
@@ -1468,6 +1720,8 @@ export const SLEEP_FREEZE: readonly Draft[] = [
       ar: 'البطانية درعك. ابقَ تحتها.',
       fr: 'La couette est ton bouclier. Reste dessous.',
       es: 'La manta es tu escudo. Quédate debajo.',
+      ja: '布団は盾。外に出ないで。',
+      ko: '이불은 방패다. 밖으로 나오지 마세요.',
     },
     headline: {
       tr: 'Yatağın altından bir tıkırtı geldi',
@@ -1476,6 +1730,8 @@ export const SLEEP_FREEZE: readonly Draft[] = [
       ar: 'صدر صوت من تحت السرير',
       fr: 'Un bruit sous le lit',
       es: 'Algo sonó debajo de la cama',
+      ja: 'ベッドの下からカタッと音がした',
+      ko: '침대 밑에서 달그락 소리가 났어요',
     },
   },
 ];

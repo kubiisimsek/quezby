@@ -1,5 +1,65 @@
 # Changelog
 
+## 2026-09-30 — qb in every word a player reads
+
+The owner found "Elo" still in the store texts and screenshots after the
+rating became qb: in every language the player reads qb, with the qb coin or
+icon, never Elo.
+
+- The French screen reader still said "Elo" on the qb board (`board.row`);
+  it says qb now. `catalog.test.ts` fails on "Elo" (or إيلو) in any line of
+  any language, and checks the board row in all eight.
+- `docs/design/ui-writing.md` and the design system's quoted lines say qb
+  ("Altın'a 158 qb", "@deniz'e 40 qb", "İlk 3 dereceli oyunun qb’ni
+  belirler."); the glossary's rating column is qb in all eight languages.
+- Store (git-ignored): every listing text and `google-play-bulk.json` say qb
+  (no "(レート)" or "(레이팅)" gloss either); the rated-result and league
+  captions say qb, and those two frames were shot again in Turkish, English,
+  German, Spanish, French and Arabic with the qb coin (they still showed
+  "ELO" and "2.644 Elo").
+
+## 2026-09-30 — Japanese and Korean
+
+The owner asked for Japanese, then Korean, in the game, with their store
+texts and store images, and chose to embed game-looking fonts for them.
+
+- **Eight languages** (`Locale`: `… es, ja, ko`): every catalog of
+  `src/i18n/messages`, the feed's 1,000 posts, pools and accounts
+  (`packages/config/src/content`), the API's `lang/ja` and `lang/ko` (errors,
+  validation, mail, username rules, share text, push, phrases), iOS
+  `ja.lproj` / `ko.lproj` and `CFBundleLocalizations`, Android `values-ja` /
+  `values-ko` and `locales_config.xml`, the panel's language labels (Japonca,
+  Korece). Japanese speaks in polite, friendly です/ます, Korean in 해요체.
+  Neither has plurals (`other`); digits group with commas (`12,345`); times,
+  dates, lists and "now" have their own forms in `t.fmt`.
+- **Their own faces:** Japanese is M PLUS Rounded 1c (Medium to Black),
+  Korean Jua for the display roles and Gothic A1 (SemiBold to Black) for the
+  rest, all OFL (`JAPANESE_FONT`, `KOREAN_FONT`, `FACES` in `ui/theme.ts`;
+  taller lines through `lh()`). The language picker writes 日本語 and 한국어 in
+  them whatever the game speaks.
+- **Faces are fixed per launch.** Styles are built when their modules load,
+  so `Boot` (`src/Boot.tsx`, now the registered root) reads the language
+  before importing `App` and `startIn` sets the script. Moving between Latin,
+  Japanese and Korean asks first and reloads, as Arabic does
+  (`needsNewFaces`, `restartApp('faces:<locale>')`); an account whose
+  language needs other faces reloads at sign-in too.
+- **Subset fonts:** `pnpm fonts:cjk` (`scripts/cjk-fonts.mjs`, `subset-font`
+  at the root) cuts each face from a pinned google/fonts commit to the kana,
+  kanji and hangul the game writes, plus Latin, and writes
+  `assets/fonts/cjk-fonts.json`. A test fails when a Japanese or Korean line
+  brings a letter the files lack, or when the iOS and Android copies differ.
+  The nine files take about 3.8 MB installed.
+- **Content rules** know the scripts: a Japanese or Korean character counts
+  two columns toward a post's length (`widthOf`), Japanese uses full-width
+  punctuation, Korean ASCII punctuation.
+- **Store:** App Store and Google Play texts in Japanese and Korean, the
+  other languages' "languages" line now names eight, `google-play-bulk.json`
+  carries both; eight screenshots per store, the feature graphic and the icon
+  rendered for each (`store-screenshots/`, git-ignored; `kaynak/render.py`
+  sets them in the same faces).
+- The translations have not been read by native speakers yet
+  (`docs/product/localization.md`).
+
 ## 2026-09-30 — qb: the rating's new name, its coin, and a quieter Dereceli
 
 The owner asked for Elo to be called qb, for a qb logo, for the difficulty
@@ -31,6 +91,15 @@ record, to test leagues on staging.
   and "qb için oyna" before there is one. The result still sets the run's
   score against its target. The game still gets harder; the help screen
   still says how.
+- **Every league frame fits the box it is given.** MasterClass's crown and
+  its gems rose past the top of the 120 canvas, its wings past both sides
+  and its turning rays past the corners, so a 100 × 100 frame came out
+  clipped; Elmas's tiara and wings and Platin's wings did the same, a little.
+  The art now stays two units inside the canvas (`emblemArt.ts`): the wings
+  still widen league by league over a tighter range (13 → 17 → 19 → 20 →
+  20.4), the tiara's and the crown's points sit lower, the rays turn inside a
+  radius of 58. `LeagueFrame.test.tsx` checks every shape and sparkle of
+  every league against the canvas.
 - **The profile's badges are one kind** (`Chip`, `LeagueChip`, `QbChip`,
   `WarnChip` in `ui/kit/chips.tsx`): the league, the qb and "Misafir hesap"
   were an emblem with loose text beside two small pills; now each is an

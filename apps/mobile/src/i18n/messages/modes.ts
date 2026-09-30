@@ -199,4 +199,48 @@ const es: ModeMessages = {
   playNormal: 'Jugar Normal',
 };
 
-export const modes: Record<Locale, ModeMessages> = { tr, en, de, ar, fr, es };
+const ja: ModeMessages = {
+  sheet: 'モードを選ぶ',
+  names: { daily: 'デイリー', free: 'ノーマル', rated: 'ランク戦' },
+  lines: {
+    free: 'スコアがトップに載ります',
+    dailyPlayed: '今日の1回はプレイ済み',
+    rated: 'qbをかけてプレイ',
+    ratedMin: (score) => `${score}ポイント以上`,
+  },
+  lockedLabel: (remaining) => `ランク戦、ロック中：あと${remaining}ゲーム`,
+  hud: 'ランク戦',
+  ribbon: 'ランク戦',
+  lockedTitle: (remaining) => `ランク戦まであと${remaining}ゲーム`,
+  lockedBody: (required) => `ランク戦は、ノーマルかデイリーを${required}回プレイすると開放されます。`,
+  opened: {
+    title: 'ランク戦解禁！',
+    body: (required) => `最初の${required}回のランク戦で、あなたのqbが決まります。`,
+  },
+  play: 'ランク戦をプレイ',
+  playNormal: 'ノーマルをプレイ',
+};
+
+const ko: ModeMessages = {
+  sheet: '모드 선택',
+  names: { daily: '데일리', free: '일반', rated: '랭크전' },
+  lines: {
+    free: '점수가 정상에 기록돼요',
+    dailyPlayed: '오늘의 기회를 사용했어요',
+    rated: 'qb를 걸고 플레이',
+    ratedMin: (score) => `최소 ${score}점`,
+  },
+  lockedLabel: (remaining) => `랭크전, 잠김: ${remaining}판 남음`,
+  hud: '랭크전',
+  ribbon: '랭크전',
+  lockedTitle: (remaining) => `랭크전까지 ${remaining}판 남았어요`,
+  lockedBody: (required) => `랭크전은 일반 또는 데일리 게임을 ${required}판 하면 열려요.`,
+  opened: {
+    title: '랭크전 오픈!',
+    body: (required) => `처음 ${required}판의 랭크전으로 내 qb가 정해져요.`,
+  },
+  play: '랭크전 플레이',
+  playNormal: '일반 플레이',
+};
+
+export const modes: Record<Locale, ModeMessages> = { tr, en, de, ar, fr, es, ja, ko };

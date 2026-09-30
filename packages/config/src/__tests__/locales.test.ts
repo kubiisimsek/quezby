@@ -16,8 +16,8 @@ import {
 } from '../locales';
 
 describe('languages', () => {
-  it('lists the six in the picker order, each named in its own words', () => {
-    expect(LOCALES).toEqual(['tr', 'en', 'de', 'ar', 'fr', 'es']);
+  it('lists the eight in the picker order, each named in its own words', () => {
+    expect(LOCALES).toEqual(['tr', 'en', 'de', 'ar', 'fr', 'es', 'ja', 'ko']);
     expect(LOCALE_NAMES).toEqual({
       tr: 'Türkçe',
       en: 'English',
@@ -25,6 +25,8 @@ describe('languages', () => {
       ar: 'العربية',
       fr: 'Français',
       es: 'Español',
+      ja: '日本語',
+      ko: '한국어',
     });
   });
 
@@ -48,7 +50,9 @@ describe('bestLocale', () => {
     [['EN'], 'en'],
     [['zh-Hant-TW', 'fr-CA'], 'fr'],
     [['pt-BR', 'es-419'], 'es'],
-    [['ja-JP'], null],
+    [['ja-JP'], 'ja'],
+    [['ko_KR', 'en-US'], 'ko'],
+    [['zh-CN'], null],
     [[], null],
   ])('%j → %s', (tags, expected) => {
     expect(bestLocale(tags)).toBe(expected);
@@ -68,12 +72,14 @@ describe('groupDigits', () => {
     ['es', 12345, '12.345'],
     ['en', -12345, '-12,345'],
     ['tr', 1234.6, '1.235'],
+    ['ja', 12345, '12,345'],
+    ['ko', 1234, '1,234'],
   ] as const)('%s %d → %s', (locale, value, expected) => {
     expect(groupDigits(value, locale)).toBe(expected);
   });
 
-  it('marks decimals with a comma except in English and Arabic', () => {
-    expect(LOCALES.map(decimalMark)).toEqual([',', '.', ',', '.', ',', ',']);
+  it('marks decimals with a comma except in English, Arabic, Japanese and Korean', () => {
+    expect(LOCALES.map(decimalMark)).toEqual([',', '.', ',', '.', ',', ',', '.', '.']);
   });
 });
 
@@ -83,6 +89,14 @@ describe('pluralCategory', () => {
       expect(pluralCategory(locale, 1)).toBe('one');
       expect(pluralCategory(locale, 0)).toBe('other');
       expect(pluralCategory(locale, 2)).toBe('other');
+    }
+  });
+
+  it('says every count the same way in Japanese and Korean', () => {
+    for (const locale of ['ja', 'ko'] as const) {
+      expect([0, 1, 2, 11, 1_000_000].map((count) => pluralCategory(locale, count))).toEqual(
+        Array(5).fill('other'),
+      );
     }
   });
 

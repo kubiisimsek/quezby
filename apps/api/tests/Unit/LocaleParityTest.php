@@ -5,7 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Translation\MessageSelector;
 
 /*
-| The six languages are one list on each side — `App\Enums\Locale`, the
+| The eight languages are one list on each side — `App\Enums\Locale`, the
 | `Locale` union of `packages/types` and `LOCALES` in `@quezby/config` —
 | and the API groups digits, counts and reads a phone's languages the way
 | the app does: the vectors of `packages/config/fixtures/locales.json`.
@@ -77,7 +77,7 @@ it('picks the language a phone asks for the way the app does', function (array $
 ));
 
 it('passes over a language it does not speak for one further down', function () {
-    expect(Locale::fromHeader(requestAccepting(['ja-JP', 'pt-BR;q=0.9', 'ar;q=0.8', 'de;q=0.7'])))->toBe(Locale::Ar)
+    expect(Locale::fromHeader(requestAccepting(['zh-CN', 'pt-BR;q=0.9', 'ar;q=0.8', 'de;q=0.7'])))->toBe(Locale::Ar)
         ->and(Locale::fromHeader(requestAccepting(['*'])))->toBeNull();
 });
 
@@ -92,5 +92,8 @@ it('speaks Turkish outside a request that says otherwise', function () {
     expect(Locale::current())->toBe(Locale::Ar);
 
     app()->setLocale('ja');
+    expect(Locale::current())->toBe(Locale::Ja);
+
+    app()->setLocale('zh');
     expect(Locale::current())->toBe(Locale::Tr);
 });

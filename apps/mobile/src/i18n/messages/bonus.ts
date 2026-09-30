@@ -150,4 +150,50 @@ const es: BonusMessages = {
   },
 };
 
-export const bonus: Record<Locale, BonusMessages> = { tr, en, de, ar, fr, es };
+const ja: BonusMessages = {
+  flawless: {
+    name: 'ノーミスクリア',
+    toast: 'ノーミスクリア！',
+    body: (posts) => `レベル内の投稿${posts}個を、1つもミスせずにクリアしよう。`,
+  },
+  lightning: {
+    name: '電光石火',
+    toast: '電光石火！',
+    body: (run) => `すばやいスワイプかいいねを${run}回連続で。`,
+  },
+  coolHead: {
+    name: '冷静沈着',
+    toast: '冷静沈着！',
+    body: 'いいねやゴールド投稿のすぐあとに来る赤い投稿では、指を離そう。',
+  },
+  comeback: {
+    name: '大逆転',
+    toast: '大逆転！',
+    body: (low, high) => `ドーパミンが${low}%を切ったあと、${high}%まで戻そう。`,
+  },
+};
+
+const ko: BonusMessages = {
+  flawless: {
+    name: '무결점 레벨',
+    toast: '무결점 레벨!',
+    body: (posts) => `한 레벨의 게시물 ${posts}개를 실수 없이 끝내세요.`,
+  },
+  lightning: {
+    name: '번개',
+    toast: '번개!',
+    body: (run) => `빠른 스와이프나 좋아요 ${run}번 연속.`,
+  },
+  coolHead: {
+    name: '평정심',
+    toast: '평정심!',
+    body: '좋아요나 골드 게시물 바로 다음에 오는 빨간 게시물에서는 손을 떼세요.',
+  },
+  comeback: {
+    name: '대역전',
+    toast: '대역전!',
+    body: (low, high) => `도파민이 ${low}% 아래로 떨어진 뒤 ${high}%까지 다시 올리세요.`,
+  },
+};
+
+export const bonus: Record<Locale, BonusMessages> = { tr, en, de, ar, fr, es, ja, ko };
