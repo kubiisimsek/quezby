@@ -1,21 +1,23 @@
 import type { RatingResponse } from '@quezby/types';
-import { useCallback, useRef } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { useCallback, useRef, type ReactNode } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { useSession } from '@/auth/session';
 import { useT } from '@/i18n';
 import type { PlayMode } from '@/i18n/messages/modes';
 import type { IconName } from '@/ui/icons';
-import { IconChip, Meter, Txt, type TagTone } from '@/ui/kit';
+import { FramedAvatar, IconChip, Meter, Txt, type TagTone } from '@/ui/kit';
 import { ArrowNub } from '@/ui/kit/rows';
 import { Sheet } from '@/ui/sheet';
-import { DEPTH, RADIUS, SPACE, useTheme } from '@/ui/theme';
+import { DEPTH, FONT, RADIUS, SPACE, embossed, lh, useTheme } from '@/ui/theme';
 
 /**
  * What the lobby's Oyna opens: the three ways to play, one tile each —
  * Günlük (the day's feed, or the day's board once its shot is used), Normal,
- * and Dereceli with what it plays for now: the next target, the placement
- * count, or, while it is shut, a lock and how far it is. The game starts once
- * the sheet is off the screen.
+ * and Dereceli with what it plays for now: once placed, the player in their
+ * league's frame with their league and Elo in gold, and the next target and
+ * difficulty under it; the placement count; or, while it is shut, a lock and
+ * how far it is. The game starts once the sheet is off the screen.
  */
 export function ModeSheet({
   open,
@@ -33,6 +35,7 @@ export function ModeSheet({
 }) {
   const t = useT();
   const words = t.modes;
+  const user = useSession((state) => state.user);
   const picked = useRef<PlayMode | null>(null);
 
   /** Starts the picked mode once, whichever of the two signals comes first. */
@@ -59,6 +62,10 @@ export function ModeSheet({
   else if (rating?.difficulty)
     ratedLine = words.lines.ratedAt(t.fmt.score(rating.difficulty), t.fmt.score(rating.target ?? 0));
   else ratedLine = words.lines.rated(t.fmt.score(rating?.target ?? 0));
+  const league =
+    rating?.placed && rating.tier && rating.rating !== null && !unlock
+      ? { tier: rating.tier, line: t.home.league.rated(t.tiers.league(rating.tier), t.rating.elo(t.fmt.score(rating.rating))) }
+      : null;
 
   return (
     <Sheet open={open} onClose={onClose} onClosed={start} title={words.sheet}>
@@ -80,7 +87,20 @@ export function ModeSheet({
         <ModeTile
           icon={unlock ? 'lock' : 'shield'}
           tone={unlock ? 'neutral' : 'secondary'}
+          lead={
+            league ? (
+              <FramedAvatar
+                tier={league.tier}
+                name={user?.username ?? ''}
+                src={user?.avatarUrl}
+                size={72}
+                tone="primary"
+                animated
+              />
+            ) : undefined
+          }
           name={words.names.rated}
+          headline={league?.line}
           line={rating ? ratedLine : ''}
           said={unlock ? words.lockedLabel(unlock.remaining) : undefined}
           progress={unlock ? (unlock.required - unlock.remaining) / unlock.required : undefined}
@@ -92,11 +112,17 @@ export function ModeSheet({
   );
 }
 
-/** One way to play: its gem, its name, what it plays for; a shut one shows how far it is instead of an arrow. */
+/**
+ * One way to play: its gem (or `lead`, Dereceli's framed player), its name,
+ * a gold `headline` when there is one, what it plays for; a shut one shows
+ * how far it is instead of an arrow.
+ */
 function ModeTile({
   icon,
   tone,
+  lead,
   name,
+  headline,
   line,
   said,
   progress,
@@ -105,7 +131,9 @@ function ModeTile({
 }: {
   icon: IconName;
   tone: TagTone;
+  lead?: ReactNode;
   name: string;
+  headline?: string;
   line: string;
   said?: string;
   progress?: number;
@@ -117,7 +145,7 @@ function ModeTile({
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={said ?? name}
-      accessibilityHint={said ? undefined : line}
+      accessibilityHint={said ? undefined : headline ? `${headline}. ${line}` : line}
       accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={onPress}
@@ -131,9 +159,14 @@ function ModeTile({
         },
       ]}
     >
-      <IconChip icon={icon} tone={tone} size="lg" />
+      {lead ?? <IconChip icon={icon} tone={tone} size="lg" />}
       <View style={styles.text}>
         <Txt variant="title">{name}</Txt>
+        {headline ? (
+          <Text style={[styles.headline, { color: theme.gold }, embossed(2)]} numberOfLines={1}>
+            {headline}
+          </Text>
+        ) : null}
         {line ? (
           <Txt variant="meta" tone="muted" numberOfLines={2}>
             {line}
@@ -158,4 +191,5 @@ const styles = StyleSheet.create({
     padding: SPACE.lg,
   },
   text: { flex: 1, gap: SPACE.xxs },
+  headline: { fontFamily: FONT.display, fontSize: 17, lineHeight: lh(21) },
 });

@@ -133,6 +133,73 @@ export const roles = {
 };
 
 /**
+ * The league emblems' metals, gems and glows (`LeagueEmblem`): per tier a
+ * highlight, the rim, the face, its shade and deep, the mark's accent, a gem
+ * with its highlight, and the glow round it. Content, not chrome.
+ */
+export const emblem = {
+  bronzeHi: 'oklch(0.88 0.08 70)',
+  bronzeRim: 'oklch(0.72 0.13 55)',
+  bronzeFace: 'oklch(0.62 0.13 48)',
+  bronzeShade: 'oklch(0.5 0.12 42)',
+  bronzeDeep: 'oklch(0.34 0.08 38)',
+  bronzeAccent: 'oklch(0.95 0.06 78)',
+  bronzeGem: 'oklch(0.62 0.2 30)',
+  bronzeGemHi: 'oklch(0.8 0.14 35)',
+  bronzeGlow: 'oklch(0.72 0.13 55)',
+
+  silverHi: 'oklch(0.98 0.008 250)',
+  silverRim: 'oklch(0.86 0.025 258)',
+  silverFace: 'oklch(0.74 0.035 260)',
+  silverShade: 'oklch(0.6 0.04 262)',
+  silverDeep: 'oklch(0.4 0.045 266)',
+  silverAccent: 'oklch(0.99 0.005 250)',
+  silverGem: 'oklch(0.66 0.15 252)',
+  silverGemHi: 'oklch(0.88 0.07 240)',
+  silverGlow: 'oklch(0.86 0.03 258)',
+
+  goldHi: 'oklch(0.97 0.11 102)',
+  goldRim: 'oklch(0.87 0.16 90)',
+  goldFace: 'oklch(0.79 0.16 80)',
+  goldShade: 'oklch(0.67 0.15 68)',
+  goldDeep: 'oklch(0.46 0.11 58)',
+  goldAccent: 'oklch(0.98 0.07 102)',
+  goldGem: 'oklch(0.6 0.22 22)',
+  goldGemHi: 'oklch(0.8 0.14 20)',
+  goldGlow: 'oklch(0.87 0.16 90)',
+
+  platinumHi: 'oklch(0.97 0.04 185)',
+  platinumRim: 'oklch(0.86 0.08 188)',
+  platinumFace: 'oklch(0.74 0.09 194)',
+  platinumShade: 'oklch(0.6 0.09 200)',
+  platinumDeep: 'oklch(0.4 0.07 208)',
+  platinumAccent: 'oklch(0.98 0.03 180)',
+  platinumGem: 'oklch(0.74 0.16 160)',
+  platinumGemHi: 'oklch(0.92 0.08 165)',
+  platinumGlow: 'oklch(0.86 0.08 188)',
+
+  diamondHi: 'oklch(0.96 0.05 225)',
+  diamondRim: 'oklch(0.8 0.13 236)',
+  diamondFace: 'oklch(0.68 0.15 245)',
+  diamondShade: 'oklch(0.54 0.17 253)',
+  diamondDeep: 'oklch(0.36 0.13 262)',
+  diamondAccent: 'oklch(0.98 0.03 220)',
+  diamondGem: 'oklch(0.86 0.1 212)',
+  diamondGemHi: 'oklch(0.98 0.03 205)',
+  diamondGlow: 'oklch(0.8 0.13 236)',
+
+  masterHi: 'oklch(0.9 0.1 322)',
+  masterRim: 'oklch(0.72 0.2 322)',
+  masterFace: 'oklch(0.58 0.22 318)',
+  masterShade: 'oklch(0.46 0.2 312)',
+  masterDeep: 'oklch(0.3 0.14 300)',
+  masterAccent: 'oklch(0.9 0.15 88)',
+  masterGem: 'oklch(0.82 0.12 200)',
+  masterGemHi: 'oklch(0.96 0.04 200)',
+  masterGlow: 'oklch(0.72 0.2 322)',
+};
+
+/**
  * The Google "G", in Google's own colours. Hex on purpose — see above — and
  * drawn only by `GoogleMark`.
  */

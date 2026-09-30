@@ -44,6 +44,25 @@ describe('juice', () => {
     jest.useRealTimers();
   });
 
+  it('counts from where a number stood, down as well as up', async () => {
+    jest.useFakeTimers();
+    await render(<CountUp value={2_031} from={1_990} format={formatScore} />);
+
+    expect(screen.getByText('1.990')).toBeOnTheScreen();
+    expect(screen.getByLabelText('2.031')).toBeOnTheScreen();
+    await act(async () => {
+      jest.advanceTimersByTime(2_000);
+    });
+    expect(screen.getByText('2.031')).toBeOnTheScreen();
+
+    await screen.rerender(<CountUp value={1_950} from={2_010} format={formatScore} />);
+    await act(async () => {
+      jest.advanceTimersByTime(2_000);
+    });
+    expect(screen.getByText('1.950')).toBeOnTheScreen();
+    jest.useRealTimers();
+  });
+
   it('shows the number straight away for a player who reduces motion', async () => {
     jest.mocked(useReducedMotion).mockReturnValue(true);
     await render(<CountUp value={1_018_520} format={formatScore} />);

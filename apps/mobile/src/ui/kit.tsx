@@ -42,6 +42,7 @@ export { EmptyState, Loading, Skeleton, SkeletonList } from '@/ui/kit/loading';
 export { Segmented } from '@/ui/kit/segmented';
 export { Meter } from '@/ui/kit/meter';
 export { MedalBadge, TierBadge, type MedalRank } from '@/ui/kit/badges';
+export { FramedAvatar, LeagueFrame, metalOf } from '@/ui/kit/frame';
 export { CountdownChip } from '@/ui/kit/countdown';
 export { Podium, Spotlight, type PodiumEntry } from '@/ui/kit/podium';
 export { ClimbRow, FloorCard } from '@/ui/kit/climb';

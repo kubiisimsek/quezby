@@ -191,7 +191,9 @@ describe('ResultView', () => {
       'rated',
     ).render();
 
-    expect(screen.getByText('ELO')).toBeTruthy();
+    // Dereceli's own ceremony, not the score's stage and the Elo tile.
+    expect(screen.queryByText('ELO')).toBeNull();
+    expect(screen.getByLabelText('Gümüş lig')).toBeTruthy();
     expect(screen.getByText('Zorluk 9')).toBeTruthy();
     expect(screen.getByText('Sıradaki zorluk 10')).toBeTruthy();
     expect(screen.queryByLabelText(/^Hafta: /)).toBeNull();

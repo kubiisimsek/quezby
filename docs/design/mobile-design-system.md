@@ -219,9 +219,20 @@ game/
                      "Dereceli" pill with the shield
   FeedbackLayer.tsx  points rising in Rubik, heart burst, a miss slammed on a red slab and shaken,
                      named combos stamped in as tilted gold ribbons
+  RankedStage.tsx    a counted rated run's own top instead of the score's: the player in their
+                     league's frame, the league named in its metal, the Elo counting from where
+                     it stood ("2.500 Elo") with the move on a big green or red slab ("+42"),
+                     the league's bar running with it and "Platin'e 158 Elo", "Skor … · Hedef …"
+                     with "Hedefi geçtin" / "Hedefin altında" and the difficulty tags. A new
+                     league: the bar fills, the old frame flashes and goes, the new one slams in
+                     over turning rays, "YÜKSELDİN!" in gold, the burst and a buzz. A fall: the
+                     bar drains, a shake, the lower frame drops in under a red "DÜŞTÜN". The run
+                     that places: "YERLEŞME" over a bare portrait, then the first frame and
+                     "YERLEŞTİN!". Still placing: "Yerleşme 2/3" and its notched bar
   ResultView.tsx     the run's end, drawn only from the API's answer: a stage with the score
-                     slammed in and counting up ("YENİ REKOR!" banner and confetti on a record),
-                     then the Elo tile (the emblem, the rating counting up, "+42" / "−18"
+                     slammed in and counting up ("YENİ REKOR!" banner and confetti on a record)
+                     — a counted rated run opens on `RankedStage` instead —
+                     then, for a held or not-counted rated run, the Elo tile (the emblem, the rating counting up, "+42" / "−18"
                      slammed in green or red, "Skor … · Hedef …", "Sıradaki hedef …"; a new
                      league in gold with the burst, a fall in red with a shake; placement's
                      count; held, forfeit and not-counted runs said as such), bonuses
@@ -324,7 +335,10 @@ A new shape goes into the family it belongs to and into that list.
 | `Segmented` | A tab strip: the chosen view raised as a magenta slab out of a dark groove; an option's `said` replaces its label for a screen reader (a lock's reason) |
 | `Loading`, `Skeleton`, `SkeletonList`, `EmptyState` | Waiting (gold spinner, dark skeleton tiles) and nothing-yet (a gem, a title, the fix) |
 | `MedalBadge` | A coin in its metal on its rim — a crown for first, a medal for the others; `sm/md/lg` |
-| `TierBadge` | A league emblem in the tier's metal, outlined, its mark cut in — six leagues, MasterClass's a crown; `showLabel`; `sm/md/lg/xl` |
+| `LeagueFrame` | A league as a frame (`ui/kit/frame.tsx`, shapes in `emblemArt.ts`): a bezel in the league's metal round a window, a plate with the league's mark, and its ornaments — wings from Gümüş that spread every league, a spike, a tiara, a crown with a halo and rays; `animated` sweeps a shine across the bezel, twinkles the sparkles, breathes the glow and turns MasterClass's rays (still under reduced motion); read aloud only with a `label` |
+| `FramedAvatar` | A player's portrait (photo or initials on their tone's card) in their league's frame; no league yet — the plain card in a bezel of their tone. The lobby's player, the league screen's hero, the profile and a player's card (`Portrait tier`), the mode sheet's Dereceli |
+| `TierBadge` | A league on its own: its frame with the mark in the window — six leagues; `showLabel`; `sm/md/lg/xl`; `animated` |
+| `StageBanner` | A result's big moment on a banner with folded tails — "YENİ REKOR!" and a new league in gold, a fall in red |
 | `CountdownChip` | Time left, in cyan on a dark pill, counted on the server's clock (`endsAt` + `serverTime`) |
 | `Podium` | A board's top three on 3D pedestals in their metals, with portraits (`avatarUrl`) and coins, a crown dropping on #1; 2-1-3; rises once |
 | `Spotlight` | Rays of light behind a winner or a tier's emblem, drawn once in the colour given |

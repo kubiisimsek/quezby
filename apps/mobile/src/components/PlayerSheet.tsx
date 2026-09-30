@@ -116,7 +116,13 @@ export function PlayerSheet({
           <View style={styles.body}>
             <View style={styles.identity}>
               <Stamp from={1.25}>
-                <Portrait name={card.username} src={card.avatarUrl} isMe={card.isMe} size="md" />
+                <Portrait
+                  name={card.username}
+                  src={card.avatarUrl}
+                  isMe={card.isMe}
+                  size="md"
+                  tier={rating ? card.league : null}
+                />
               </Stamp>
               <View style={styles.who}>
                 {rating && card.league ? (

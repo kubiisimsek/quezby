@@ -32,6 +32,7 @@ const HEX_GROUPS = new Set(['marks']);
 /** The doc comment over each fixed group in the output. */
 const NOTES = {
   reel: "The feed's own colours — content, not chrome.",
+  emblem: "The league emblems' metals, gems and glows — content, not chrome.",
   marks:
     "Other companies' logo colours, copied exactly — never themed, never tuned.",
 };

@@ -324,6 +324,7 @@ function PlayerHero({
             name={user.username ?? '?'}
             src={user.avatarUrl}
             isMe
+            tier={tier}
             onEdit={onPhoto}
             editLabel={user.avatarUrl ? t.profile.photo.change : t.profile.photo.add}
           />

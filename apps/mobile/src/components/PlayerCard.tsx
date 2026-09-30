@@ -1,10 +1,10 @@
-import type { BestScore } from '@quezby/types';
+import type { BestScore, LeagueTier } from '@quezby/types';
 import { Image, StyleSheet, Text, View } from 'react-native';
 
 import { useT } from '@/i18n';
 import { initialsOf } from '@/lib/format';
 import { Icon } from '@/ui/icons';
-import { IconButton, Stamp, Txt, gemColors } from '@/ui/kit';
+import { FramedAvatar, IconButton, Stamp, Txt, gemColors } from '@/ui/kit';
 import { DEPTH, FONT, RADIUS, SPACE, embossed, lh, useTheme, withAlpha } from '@/ui/theme';
 
 /**
@@ -25,6 +25,7 @@ export function Portrait({
   src,
   isMe = false,
   size = 'lg',
+  tier = null,
   onEdit,
   editLabel,
 }: {
@@ -33,6 +34,8 @@ export function Portrait({
   src?: string | null;
   isMe?: boolean;
   size?: 'md' | 'lg';
+  /** Their league: the portrait sits in its frame, alive (`FramedAvatar`). */
+  tier?: LeagueTier | null;
   onEdit?: () => void;
   /** What the camera slab does, as a screen reader says it. */
   editLabel?: string;
@@ -40,6 +43,24 @@ export function Portrait({
   const theme = useTheme();
   const colors = gemColors(theme, isMe ? 'primary' : 'secondary');
   const lg = size === 'lg';
+
+  if (tier) {
+    return (
+      <View>
+        <FramedAvatar
+          tier={tier}
+          name={name}
+          src={src}
+          size={lg ? FRAMED.lg : FRAMED.md}
+          tone={isMe ? 'primary' : 'secondary'}
+          animated
+        />
+        {onEdit ? (
+          <IconButton icon="camera" label={editLabel ?? ''} onPress={onEdit} style={styles.editFramed} />
+        ) : null}
+      </View>
+    );
+  }
 
   return (
     <View>
@@ -143,6 +164,9 @@ export function SeasonBest({
   );
 }
 
+/** A framed portrait's box: the frame's ornaments take room round the picture. */
+const FRAMED = { md: 128, lg: 176 } as const;
+
 const PORTRAIT = {
   md: { box: 72, frame: 4, radius: 22 },
   lg: { box: 92, frame: 5, radius: 28 },
@@ -188,4 +212,5 @@ const styles = StyleSheet.create({
   },
   bestHead: { alignItems: 'center', flexDirection: 'row', gap: SPACE.xs },
   edit: { bottom: -SPACE.sm, end: -SPACE.md, position: 'absolute' },
+  editFramed: { bottom: SPACE.lg, end: SPACE.xs, position: 'absolute' },
 });

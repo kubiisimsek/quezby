@@ -22,6 +22,7 @@ import {
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useSession } from '@/auth/session';
 import { track } from '@/analytics/track';
 import { BoardStage, useArrival } from '@/components/BoardStage';
 import { FloorDock } from '@/components/FloorDock';
@@ -48,6 +49,7 @@ import {
   Spotlight,
   Stamp,
   Tag,
+  FramedAvatar,
   TierBadge,
   Txt,
 } from '@/ui/kit';
@@ -437,17 +439,20 @@ function PlacementHero({
   );
 }
 
-/** The emblem's room on the ladder, and how big its light is. */
-const EMBLEM = 92;
-const EMBLEM_GLOW = 168;
+/** Your frame's room on the ladder, and how big its light is. */
+const EMBLEM = 118;
+const EMBLEM_GLOW = 210;
 
 /**
- * Your league's emblem, big and lit, between the two under it and the two
- * over it — the ones above dimmed until they are reached. Only your own
- * emblem is read aloud; the ladder is the title's picture.
+ * You in your league's frame, big, lit and alive, between the two leagues
+ * under it and the two over it — the ones above dimmed until they are
+ * reached. Only your own league is read aloud; the ladder is the title's
+ * picture.
  */
 function TierLadder({ tier }: { tier: LeagueTier }) {
   const theme = useTheme();
+  const t = useT();
+  const user = useSession((state) => state.user);
   const at = TIERS.indexOf(tier);
   const step = (offset: number) => TIERS[at + offset] ?? null;
 
@@ -466,7 +471,16 @@ function TierLadder({ tier }: { tier: LeagueTier }) {
       </View>
       <View style={styles.emblem}>
         <Stamp from={1.7} delay={160}>
-          <TierBadge tier={tier} size="xl" />
+          <View accessible accessibilityRole="image" accessibilityLabel={t.tiers.league(tier)}>
+            <FramedAvatar
+              tier={tier}
+              name={user?.username ?? ''}
+              src={user?.avatarUrl}
+              size={EMBLEM}
+              tone="primary"
+              animated
+            />
+          </View>
         </Stamp>
       </View>
       <View
@@ -582,8 +596,8 @@ const styles = StyleSheet.create({
     marginTop: SPACE.xs,
   },
   rungs: { alignItems: 'center', flexDirection: 'row', gap: SPACE.ms },
-  rungNear: { alignItems: 'center', justifyContent: 'center', width: 44 },
-  rungFar: { alignItems: 'center', justifyContent: 'center', width: 30 },
+  rungNear: { alignItems: 'center', justifyContent: 'center', width: 56 },
+  rungFar: { alignItems: 'center', justifyContent: 'center', width: 38 },
   emblem: {
     alignItems: 'center',
     height: EMBLEM,

@@ -368,6 +368,11 @@ describe('HomeScreen', () => {
       expect(screen.getByRole('button', { name: 'Günlük' })).toBeOnTheScreen();
       expect(screen.getByText('Skorun Zirve’ye yazılır')).toBeOnTheScreen();
       expect(screen.getByText('Zorluk 3 · Hedef 72.400')).toBeOnTheScreen();
+      // Dereceli wears the player's league: their frame, and their league and Elo in gold.
+      expect(screen.getAllByText('Gümüş lig · 1.640 Elo')).toHaveLength(2);
+      expect(
+        screen.getAllByTestId('league-frame-silver', { includeHiddenElements: true }).length,
+      ).toBeGreaterThanOrEqual(2);
 
       await pick('Normal');
       await waitFor(() => expect(navigate).toHaveBeenCalledWith('Game', { mode: 'free' }));

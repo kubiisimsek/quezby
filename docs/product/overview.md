@@ -87,9 +87,14 @@ kaldığı adıma döner, başka bir hesaba giren görmez.
    sayılarını gösterir: skor, Elo (yeni reyting, ±değişim, hedef; yeni ligde
    konfeti), puanın nereden geldiği, sıra değişimi, bu hafta geçtiklerin,
    Dereceli'ye kalan oyun (açıldığı turda "Dereceli açıldı!" ve konfeti),
-   günlükse paylaşım kartı. Dereceli turda sıra, rekor ve "geçtiklerin"
-   yoktur; Elo kutusu turun oynandığı zorluğu ("Zorluk 9") ve değiştiyse
-   sıradakini ("Sıradaki zorluk 10") gösterir. Bir VS turunda sıra ve
+   günlükse paylaşım kartı. Dereceli turun kendi töreni vardır: skorun
+   yerine oyuncu, liginin çerçevesi içinde; Elo eski yerinden yenisine sayar,
+   değişim büyük yeşil ya da kırmızı bir levhada ("+42"), ligin barı onunla
+   akar ("Platin'e 158 Elo"), altında "Skor … · Hedef …", "Hedefi geçtin" ya da
+   "Hedefin altında" ve zorluk etiketleri. Yeni ligde bar dolar, eski çerçeve
+   parlayıp gider, yenisi dönen ışınların önüne iner, "YÜKSELDİN!", konfeti ve
+   titreşim; düşüşte kırmızı "DÜŞTÜN" ve sarsıntı; yerleşen turda ilk çerçeve
+   açılır ("YERLEŞTİN!"). Dereceli turda sıra, rekor ve "geçtiklerin" yoktur. Bir VS turunda sıra ve
    paylaşım yoktur; VS'in kendisi vardır: gönderildi, ya da kazandın,
    kaybettin, berabere.
 
@@ -128,7 +133,12 @@ yalnız o besler, hiçbir skor tablosuna yazılmaz.
   başına bir seviye (🟩 hatasız, 🟨 bir-iki hata, 🟥 daha fazla, ⬛ bittiği yer).
   Metni sunucu yazar.
 - **Lig = Elo:** Bronz · Gümüş · Altın · Platin · Elmas · **MasterClass**, her
-  biri 1000 Elo (MasterClass 5000 ve üstü). Her dereceli turun bir **hedef
+  biri 1000 Elo (MasterClass 5000 ve üstü). Lig bir **profil çerçevesidir**:
+  oyuncunun portresi liginin çerçevesinde durur (lobide, lig ekranında,
+  profilde, oyuncu kartında, "Mod seç"in Dereceli kutusunda). Çerçeve lig
+  yükseldikçe süslenir: sade Bronz, küçük kanatlı Gümüş, büyüyen kanatlar,
+  Platin'in sivri tepesi, Elmas'ın tacı, MasterClass'ın taç, hale ve ışınları;
+  lig ekranında ve sonuçta parlar, ışıldar. Her dereceli turun bir **hedef
   skoru** var: geçen Elo kazanır, altında kalan kaybeder, bir tur en fazla ±100.
   İlk 3 dereceli tur yerleşmedir, herkes Gümüş'te başlar; "Mod seç"teki
   Dereceli kutusu ve lobideki lig kartı bir sonraki turun hedefini ve

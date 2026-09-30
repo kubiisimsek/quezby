@@ -62,6 +62,11 @@ const tr = {
     pending: 'Skorun incelenince Elo’ya yazılır',
     next: (target: string) => `Sıradaki hedef ${target}`,
     nextDifficulty: (value: string) => `Sıradaki zorluk ${value}`,
+    /** Dereceli's result: the score alone before a target, the move read aloud, the verdict, the banners. */
+    score: (score: string) => `Skor ${score}`,
+    deltaLabel: (delta: string) => `${delta} Elo`,
+    verdict: { beat: 'Hedefi geçtin', short: 'Hedefin altında', even: 'Hedefi tutturdun' },
+    banner: { up: 'YÜKSELDİN!', down: 'DÜŞTÜN', placed: 'YERLEŞTİN!' },
   },
   history: {
     title: 'SON DEĞİŞİMLER',
@@ -106,6 +111,10 @@ const en: RatingMessages = {
     pending: 'Your Elo updates once your score is checked',
     next: (target) => `Next target ${target}`,
     nextDifficulty: (value) => `Next difficulty ${value}`,
+    score: (score) => `Score ${score}`,
+    deltaLabel: (delta) => `${delta} Elo`,
+    verdict: { beat: 'Target beaten', short: 'Short of the target', even: 'Right on target' },
+    banner: { up: 'PROMOTED!', down: 'DEMOTED', placed: 'PLACED!' },
   },
   history: {
     title: 'LATEST CHANGES',
@@ -148,6 +157,10 @@ const de: RatingMessages = {
     pending: 'Dein Elo zählt, sobald dein Score geprüft ist',
     next: (target) => `Nächstes Ziel ${target}`,
     nextDifficulty: (value) => `Nächste Schwierigkeit ${value}`,
+    score: (score) => `Punkte ${score}`,
+    deltaLabel: (delta) => `${delta} Elo`,
+    verdict: { beat: 'Ziel geschafft', short: 'Unter dem Ziel', even: 'Ziel genau getroffen' },
+    banner: { up: 'AUFGESTIEGEN!', down: 'ABGESTIEGEN', placed: 'EINGESTUFT!' },
   },
   history: {
     title: 'LETZTE ÄNDERUNGEN',
@@ -204,6 +217,10 @@ const ar: RatingMessages = {
     pending: 'يُحدَّث تصنيفك بعد مراجعة نتيجتك',
     next: (target) => `الهدف التالي ${iso(target)}`,
     nextDifficulty: (value) => `الصعوبة التالية ${iso(value)}`,
+    score: (score) => `النتيجة ${iso(score)}`,
+    deltaLabel: (delta) => `${iso(delta)} إيلو`,
+    verdict: { beat: 'تجاوزت الهدف', short: 'دون الهدف', even: 'أصبت الهدف تمامًا' },
+    banner: { up: 'ترقّيت!', down: 'هبطت', placed: 'تم تصنيفك!' },
   },
   history: {
     title: 'آخر التغييرات',
@@ -246,6 +263,10 @@ const fr: RatingMessages = {
     pending: 'Ton Elo sera mis à jour une fois ton score vérifié',
     next: (target) => `Prochain objectif ${target}`,
     nextDifficulty: (value) => `Difficulté suivante ${value}`,
+    score: (score) => `Score ${score}`,
+    deltaLabel: (delta) => `${delta} Elo`,
+    verdict: { beat: 'Objectif dépassé', short: 'Sous l’objectif', even: 'Objectif atteint pile' },
+    banner: { up: 'PROMU !', down: 'RÉTROGRADÉ', placed: 'CLASSÉ !' },
   },
   history: {
     title: 'DERNIERS CHANGEMENTS',
@@ -288,6 +309,10 @@ const es: RatingMessages = {
     pending: 'Tu Elo se actualiza cuando se revise tu puntuación',
     next: (target) => `Siguiente objetivo ${target}`,
     nextDifficulty: (value) => `Siguiente dificultad ${value}`,
+    score: (score) => `Puntuación ${score}`,
+    deltaLabel: (delta) => `${delta} Elo`,
+    verdict: { beat: 'Objetivo superado', short: 'Por debajo del objetivo', even: 'Objetivo clavado' },
+    banner: { up: '¡ASCENDISTE!', down: 'DESCENDISTE', placed: '¡CLASIFICADO!' },
   },
   history: {
     title: 'ÚLTIMOS CAMBIOS',

@@ -61,12 +61,14 @@ export function Stamp({
 }
 
 /**
- * A number that counts up to `value` — fast at first, easing into the last
- * digits — in fixed-width figures so it does not wobble as it climbs. What a
- * screen reader hears is the final number, straight away.
+ * A number that counts up to `value` — from `from`, 0 unless given, and down
+ * when `from` is higher — fast at first, easing into the last digits, in
+ * fixed-width figures so it does not wobble as it climbs. What a screen
+ * reader hears is the final number, straight away.
  */
 export function CountUp({
   value,
+  from = 0,
   format,
   duration = 900,
   delay = 0,
@@ -74,6 +76,7 @@ export function CountUp({
   onDone,
 }: {
   value: number;
+  from?: number;
   format: (value: number) => string;
   duration?: number;
   delay?: number;
@@ -81,7 +84,7 @@ export function CountUp({
   onDone?: () => void;
 }) {
   const reduced = useReducedMotion();
-  const [shown, setShown] = useState(reduced ? value : 0);
+  const [shown, setShown] = useState(reduced ? value : from);
   const done = useRef(onDone);
   done.current = onDone;
 
@@ -98,7 +101,7 @@ export function CountUp({
         if (start === 0) start = now;
         const t = Math.min(1, (now - start) / duration);
         const eased = 1 - (1 - t) ** 3;
-        setShown(Math.round(value * eased));
+        setShown(Math.round(from + (value - from) * eased));
         if (t < 1) frame = requestAnimationFrame(tick);
         else done.current?.();
       };
@@ -108,7 +111,7 @@ export function CountUp({
       clearTimeout(wait);
       cancelAnimationFrame(frame);
     };
-  }, [delay, duration, reduced, value]);
+  }, [delay, duration, from, reduced, value]);
 
   return (
     <Text

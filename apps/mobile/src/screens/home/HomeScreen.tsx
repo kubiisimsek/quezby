@@ -47,6 +47,7 @@ import { type IconName } from '@/ui/icons';
 import {
   Arena,
   Avatar,
+  FramedAvatar,
   Button,
   ConsentCard,
   CountdownChip,
@@ -57,7 +58,6 @@ import {
   Skeleton,
   SwipePlay,
   Tag,
-  TierBadge,
   Txt,
   type TagTone,
 } from '@/ui/kit';
@@ -179,14 +179,11 @@ export function HomeScreen({ navigation }: Props) {
         }
       >
         <Animated.View style={[styles.player, strip]}>
-          <View>
+          {tier ? (
+            <FramedAvatar tier={tier} name={user?.username ?? '?'} src={user?.avatarUrl} size={84} tone="primary" />
+          ) : (
             <Avatar name={user?.username ?? '?'} src={user?.avatarUrl} tone="primary" size="lg" />
-            {tier ? (
-              <View style={styles.tierPin}>
-                <TierBadge tier={tier} size="sm" />
-              </View>
-            ) : null}
-          </View>
+          )}
           <View style={styles.playerText}>
             <Txt variant="title" numberOfLines={1}>
               {user?.username ? handle(user.username) : null}
@@ -625,7 +622,6 @@ function LeagueNotice({
           </View>
         )
       }
-      right={<TierBadge tier={data.tier} size="md" />}
       onPress={onPress}
     />
   );
@@ -662,7 +658,6 @@ const styles = StyleSheet.create({
   scroll: { gap: SPACE.md, paddingBottom: SPACE.xl, paddingHorizontal: SPACE.lg },
   player: { alignItems: 'center', flexDirection: 'row', gap: SPACE.md },
   playerText: { flex: 1, gap: 1 },
-  tierPin: { bottom: -8, position: 'absolute', right: -8 },
   leagueTags: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACE.xs },
   clock: { gap: SPACE.md, paddingBottom: SPACE.sm, paddingTop: SPACE.lg },
   clockFace: { alignItems: 'center', gap: SPACE.xxs },

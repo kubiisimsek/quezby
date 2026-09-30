@@ -1,12 +1,77 @@
 import type { BonusKind } from '@quezby/types';
 import { StyleSheet, Text, View } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 
 import { ltr, useT } from '@/i18n';
-import { type IconName } from '@/ui/icons';
+import { IS_RTL } from '@/i18n/native';
+import { Icon, type IconName } from '@/ui/icons';
 import { IconChip, gemColors } from '@/ui/kit/identity';
+import { Shine } from '@/ui/kit/surfaces';
 import { Txt } from '@/ui/kit/text';
 import { type TagTone } from '@/ui/kit/tones';
-import { DEPTH, FONT, RADIUS, SPACE, embossed, lh, useTheme, withAlpha } from '@/ui/theme';
+import { DEPTH, FONT, RADIUS, SPACE, embossed, lh, tracking, useTheme, withAlpha } from '@/ui/theme';
+
+const TAIL_LEFT = 'M30 2H2l10 16L2 34h28z';
+const TAIL_RIGHT = 'M2 2h28L20 18l10 16H2z';
+
+/**
+ * A result's big moment on a banner with folded tails — "YENİ REKOR!" and a
+ * new league in gold, a fall in red. A tail's fold points outwards, so in
+ * Arabic, where the tails swap sides, each draws the other's.
+ */
+export function StageBanner({
+  label,
+  accessibilityLabel,
+  tone,
+  icon,
+}: {
+  label: string;
+  accessibilityLabel: string;
+  tone: 'gold' | 'bad';
+  icon: IconName;
+}) {
+  const theme = useTheme();
+  const colors =
+    tone === 'gold'
+      ? { face: theme.gold, lip: theme.goldLip, ink: theme.goldInk, shine: theme.goldHi }
+      : { face: theme.bad, lip: theme.badLip, ink: theme.onBrand, shine: theme.badHi };
+  const tail = (d: string, side: 'left' | 'right') => (
+    <Svg width={32} height={36} viewBox="0 0 32 36" style={[banner.tail, side === 'left' ? banner.left : banner.right]}>
+      <Path d={d} fill={colors.lip} stroke={theme.outline} strokeWidth={DEPTH.outline} strokeLinejoin="round" />
+    </Svg>
+  );
+  return (
+    <View accessible accessibilityLabel={accessibilityLabel} style={banner.box}>
+      {tail(IS_RTL ? TAIL_RIGHT : TAIL_LEFT, 'left')}
+      {tail(IS_RTL ? TAIL_LEFT : TAIL_RIGHT, 'right')}
+      <View style={[banner.face, { backgroundColor: colors.face, borderColor: theme.outline }]}>
+        <Shine color={colors.shine} radius={12} height="50%" />
+        <Icon name={icon} size={22} color={colors.ink} strokeWidth={2.8} />
+        <Text style={[banner.text, { color: colors.ink }]}>{label}</Text>
+      </View>
+    </View>
+  );
+}
+
+const banner = StyleSheet.create({
+  box: { alignItems: 'center', justifyContent: 'center', paddingHorizontal: 22 },
+  tail: { position: 'absolute', top: 12 },
+  left: { left: 0 },
+  right: { right: 0 },
+  face: {
+    alignItems: 'center',
+    borderBottomWidth: DEPTH.outline + 4,
+    borderRadius: 12,
+    borderWidth: DEPTH.outline,
+    flexDirection: 'row',
+    gap: SPACE.sm,
+    overflow: 'hidden',
+    paddingBottom: 6,
+    paddingHorizontal: SPACE.xl,
+    paddingTop: 7,
+  },
+  text: { fontFamily: FONT.display, fontSize: 23, letterSpacing: tracking(1), lineHeight: lh(28) },
+});
 
 
 const BONUS_LOOK: Record<BonusKind, { icon: IconName; tone: TagTone }> = {

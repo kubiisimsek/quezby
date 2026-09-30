@@ -1,5 +1,44 @@
 # Changelog
 
+## 2026-09-30 — Leagues as profile frames, and Dereceli's own ending
+
+The owner asked for a rated run to end like real ranked play — the Elo move
+big, the league in sight, a new league animated — for league icons that
+people would play for, researched on the web, and then for those icons to
+be profile frames.
+
+- **A league is a frame round the player's portrait** (`LeagueFrame`,
+  `FramedAvatar`, shapes in `ui/kit/emblemArt.ts`, metals in the new
+  `emblem` palette group): a bezel in the league's metal and a plate with its
+  mark. The silhouette climbs — a bare bezel in Bronz, small wings in Gümüş
+  that grow a feather and spread every league, a spike on Platin, a tiara on
+  Elmas, a crown, a halo and turning rays on MasterClass — and so does the
+  mark. Alive where the league is the point (a shine sweeping the bezel,
+  sparkles, a breathing glow, MasterClass's rays); still under reduced motion.
+  `TierBadge` now draws the frame with the mark in its window.
+- **Where it shows:** the lobby's player, the league screen's hero (you in
+  your frame between the leagues around it), the profile and a player's card
+  (`Portrait tier`), and the mode sheet's Dereceli, which also says your
+  league and Elo in gold over the target and difficulty. The lobby's league
+  card lost its badge (its title had shrunk to fit).
+- **Dereceli's own result** (`game/RankedStage.tsx`), in place of the score's
+  stage for a counted rated run: the player in their frame, the league named
+  in its metal, the Elo counting from where it stood, the move on a big green
+  or red slab, the league's bar running with it, the score against the target
+  with "Hedefi geçtin" / "Hedefin altında", the difficulty tags. A new league:
+  the bar fills, the old frame flashes and goes, the new one slams in over
+  turning rays, "YÜKSELDİN!" in gold, the burst and a buzz (`feel('rankUp')`).
+  A fall: a red "DÜŞTÜN", a shake, `feel('rankDown')`. The placing run reveals
+  the first frame ("YERLEŞTİN!"); a run still placing shows "Yerleşme 2/3". A
+  held or not-counted rated run keeps the Elo tile. The result's banner is
+  now the kit's `StageBanner` (gold or red); `CountUp` counts from `from`.
+- Copy in six languages (`rating.result`: `score`, `deltaLabel`, `verdict`,
+  `banner`). Research: tier emblems read at a glance by silhouette and grow
+  ornament with rank (Riot's ranked emblem notes); a reveal lands harder
+  after a build-up and a pause (bar fill, flash, then the new frame).
+- The design language sanctions the frame's loops and the rays behind a new
+  league; `design-language.md`, `mobile-design-system.md`, `overview.md`.
+
 ## 2026-09-30 — Dereceli gets harder with Elo, and leaves the score boards
 
 The owner asked for ranked play to get harder as the rating climbs (Bronz as

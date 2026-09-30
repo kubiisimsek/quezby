@@ -61,7 +61,7 @@ lanes across it, so the dark reads as a place. Nothing on it is white.
 | **Red** `bad*` | Bad: a miss, demotion, a door that takes something away — and the count of what waits for you, a number on a dock slot or a button. |
 
 A colour never carries meaning alone — a status is a tag with a glyph, a
-zone is a banner with an arrow and a word, a tier's emblem changes shape.
+zone is a banner with an arrow and a word, a league's frame changes shape.
 
 A player's **photo** is theirs, not the arena's: it fills the inside of
 their portrait, and the frame round it keeps the colour — magenta for you,
@@ -71,10 +71,17 @@ With no photo, the portrait shows their initials in Rubik.
 ### Medals, tiers, sign-in
 
 `medalGold/Silver/Bronze` each with `Soft`, `Ink` and `Lip` make the podium's
-coins and pedestals. `tierBronze … tierDiamond`, `tierMaster` (+ `Soft`) draw
-the league emblems, whose mark climbs with the tier (one chevron, two, a star,
-a spark, a gem, a crown). MasterClass is an orchid of its own, past the
-diamond's blue — neither the brand's magenta nor the quiet violet. `appleBg/Ink` and `googleBg/Ink/Line` are the two companies' dark-screen
+coins and pedestals. A **league is a frame** round the player's portrait, the
+way a game dresses a picture for its rank (`LeagueFrame`, `FramedAvatar`): a
+bezel in the league's metal and a plate under it with the league's mark. Its
+silhouette climbs before its colour does — a bare bezel in Bronz, small wings
+in Gümüş that grow a feather and spread every league, a spike on Platin, a
+tiara on Elmas, a crown, a halo and turning rays on MasterClass — and so does
+the mark (one chevron, two, a star, a cut gem, a diamond, a crown). The metals
+are the `emblem` group (per league a highlight, rim, face, shade, deep, the
+mark's accent, a gem and a glow); `tierBronze … tierMaster` (+ `Soft`) name a
+league in text. MasterClass is an orchid of its own, past the diamond's blue
+— neither the brand's magenta nor the quiet violet. `appleBg/Ink` and `googleBg/Ink/Line` are the two companies' dark-screen
 buttons; the Google "G" keeps its colours in `marks`.
 
 ### The feed — `reel`
@@ -194,7 +201,11 @@ sheet.
 4. **What loops:** a playing reel (it is live), the lobby's play slab — it
    breathes 1 → 1.04 → 1, 1.6 s each way, a glint crosses it every few
    seconds and the unlock chevrons over it climb on the same breath, because
-   the game is waiting — and nothing else. Loops pause while
+   the game is waiting — and a league frame where the league is the point of
+   the screen (the league screen, the profile, a player's card, the mode
+   sheet's Dereceli, a rated result): a band of light sweeps its bezel every
+   few seconds, its sparkles twinkle, its glow breathes and MasterClass's rays
+   turn, as do the rays behind a new league on the result. Nothing else. Loops pause while
    covered: a reel under a coach card holds still, since it is not live yet.
    The coach card's hand acts its move out **twice** and rests on the last
    frame — a demonstration, not a loop.

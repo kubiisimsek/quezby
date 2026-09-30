@@ -36,16 +36,16 @@ import Animated, {
   type WithTimingConfig,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Svg, { Path } from 'react-native-svg';
 
 import { track } from '@/analytics/track';
 import { useSession } from '@/auth/session';
 import { PushNudge } from '@/components/PushNudge';
 import { APP_PLATFORM } from '@/config/env';
 import { BONUS_ORDER, deviceFailed, reelGuide } from '@/game/howTo';
+import { RankedStage, rankedTimeline } from '@/game/RankedStage';
 import type { Outcome } from '@/game/useGame';
 import { handle, ltr, useT, type Messages } from '@/i18n';
-import { IS_RTL, SHRINK_TO_FIT } from '@/i18n/native';
+import { SHRINK_TO_FIT } from '@/i18n/native';
 import { tierMove } from '@/lib/tiers';
 import { Icon, type IconName } from '@/ui/icons';
 import {
@@ -71,12 +71,12 @@ import {
   Tag,
   TierBadge,
   Txt,
-  Shine,
   gemColors,
   useShake,
   type ButtonTone,
   type StatItem,
 } from '@/ui/kit';
+import { StageBanner } from '@/ui/kit/result';
 import { SPRING_POP } from '@/ui/motion';
 import {
   DEPTH,
@@ -157,15 +157,17 @@ type Plan = {
 /**
  * When each part of this result arrives. Only what is shown takes a beat.
  * The burst goes off for a record as it lands, or — without one — as the
- * tile of a party lands: a new league, or Dereceli opening.
+ * tile of a party lands: a new league, or Dereceli opening. A rated run's
+ * ceremony (`opening`) sets its own length and its own burst.
  */
 function choreograph(
   shown: readonly Section[],
   counting: boolean,
   record: boolean,
   party: 'rating' | 'league' | null = null,
+  opening: { end: number; burst: number | null } | null = null,
 ): Plan {
-  const crown = BEAT.score + (counting ? BEAT.count : 0) + BEAT.crown;
+  const crown = opening ? opening.end : BEAT.score + (counting ? BEAT.count : 0) + BEAT.crown;
   const at: Record<Section, number> = {
     status: 0,
     vs: 0,
@@ -186,11 +188,22 @@ function choreograph(
   const dock = clock + BEAT.dock;
   return {
     crown,
-    burst: record ? crown + BEAT.burst : party ? at[party] + BEAT.hop : null,
+    burst: record ? crown + BEAT.burst : (opening?.burst ?? (party ? at[party] + BEAT.hop : null)),
     at,
     dock,
     end: dock + BEAT.settle,
   };
+}
+
+/**
+ * A counted rated run's rating — the one that opens on Dereceli's own
+ * ceremony (`RankedStage`) instead of the score; null for any other result,
+ * and for a held run or one that did not count, which keep the Elo tile.
+ */
+function ceremonyOf(response: FinishRunResponse): RunRating | null {
+  const rating = response.rating;
+  if (response.run.mode !== 'rated' || rating === null) return null;
+  return rating.kind === 'pending' || rating.kind === 'void' ? null : rating;
 }
 
 type Note = { tone: 'info' | 'warn' | 'bad'; title: string; body: string };
@@ -288,18 +301,19 @@ export function ResultView({
   const note = noteFor(outcome, t);
 
   const duel = verified?.duel ?? null;
+  const rating = verified?.rating ?? null;
+  const ceremony = verified ? ceremonyOf(verified) : null;
   const shown: Section[] = [];
   if (note) shown.push('status');
   if (duel) shown.push('vs');
   if (verified?.daily) shown.push('daily');
-  if (verified?.rating) shown.push('rating');
+  if (rating && !ceremony) shown.push('rating');
   if (verified) shown.push('breakdown');
   if (verified || practice) shown.push('stats');
   if (unseen.length > 0) shown.push('unseen');
   if (verified && boards) shown.push('ranks');
   if (verified && verified.passed.length > 0) shown.push('passed');
   if (verified?.leagueUnlock) shown.push('league');
-  const rating = verified?.rating ?? null;
   const promotion =
     rating !== null &&
     rating.after !== null &&
@@ -309,7 +323,8 @@ export function ResultView({
     shown,
     score !== null,
     record,
-    promotion ? 'rating' : opened ? 'league' : null,
+    promotion && !ceremony ? 'rating' : opened ? 'league' : null,
+    ceremony ? rankedTimeline(ceremony) : null,
   );
 
   const [skipped, setSkipped] = useState(reduced);
@@ -369,16 +384,26 @@ export function ResultView({
           contentContainerStyle={{ paddingBottom: dockHeight + SPACE.xl }}
           showsVerticalScrollIndicator={false}
         >
-          <Stage
-            top={insets.top}
-            endedBy={endedBy}
-            score={score}
-            practice={practice === null ? null : tutorial ? 'tutorial' : 'practice'}
-            record={record}
-            best={run?.mode === 'rated' ? null : (verified?.best?.score ?? null)}
-            crownAt={plan.crown}
-            skipped={skipped}
-          />
+          {ceremony && score !== null ? (
+            <RankedStage
+              top={insets.top}
+              endedBy={endedBy}
+              score={score}
+              rating={ceremony}
+              skipped={skipped}
+            />
+          ) : (
+            <Stage
+              top={insets.top}
+              endedBy={endedBy}
+              score={score}
+              practice={practice === null ? null : tutorial ? 'tutorial' : 'practice'}
+              record={record}
+              best={run?.mode === 'rated' ? null : (verified?.best?.score ?? null)}
+              crownAt={plan.crown}
+              skipped={skipped}
+            />
+          )}
 
           <View style={styles.body}>
             {note ? (
@@ -641,59 +666,16 @@ function Stage({
   );
 }
 
-const TAIL_LEFT = 'M30 2H2l10 16L2 34h28z';
-const TAIL_RIGHT = 'M2 2h28L20 18l10 16H2z';
-
-/**
- * "YENİ REKOR!" on a gold banner with folded tails. A tail's fold points
- * outwards, so in Arabic, where the tails swap sides, each draws the other's.
- */
+/** "YENİ REKOR!" on the kit's gold banner. */
 function RecordBanner() {
-  const theme = useTheme();
   const t = useT();
   return (
-    <View accessible accessibilityLabel={t.result.stage.recordLabel} style={styles.banner}>
-      <Svg
-        width={32}
-        height={36}
-        viewBox="0 0 32 36"
-        style={[styles.tail, styles.tailLeft]}
-      >
-        <Path
-          d={IS_RTL ? TAIL_RIGHT : TAIL_LEFT}
-          fill={theme.goldLip}
-          stroke={theme.outline}
-          strokeWidth={DEPTH.outline}
-          strokeLinejoin="round"
-        />
-      </Svg>
-      <Svg
-        width={32}
-        height={36}
-        viewBox="0 0 32 36"
-        style={[styles.tail, styles.tailRight]}
-      >
-        <Path
-          d={IS_RTL ? TAIL_LEFT : TAIL_RIGHT}
-          fill={theme.goldLip}
-          stroke={theme.outline}
-          strokeWidth={DEPTH.outline}
-          strokeLinejoin="round"
-        />
-      </Svg>
-      <View
-        style={[
-          styles.bannerFace,
-          { backgroundColor: theme.gold, borderColor: theme.outline },
-        ]}
-      >
-        <Shine color={theme.goldHi} radius={12} height="50%" />
-        <Icon name="crown" size={22} color={theme.goldInk} strokeWidth={2.8} />
-        <Text style={[styles.bannerText, { color: theme.goldInk }]}>
-          {t.result.stage.record}
-        </Text>
-      </View>
-    </View>
+    <StageBanner
+      label={t.result.stage.record}
+      accessibilityLabel={t.result.stage.recordLabel}
+      tone="gold"
+      icon="crown"
+    />
   );
 }
 
@@ -746,7 +728,7 @@ function Verified({
         </Rise>
       ) : null}
 
-      {response.rating ? (
+      {response.rating && !ceremonyOf(response) ? (
         <Rise at={plan.at.rating} skipped={skipped}>
           <RatingTile rating={response.rating} score={run.score} at={plan.at.rating} skipped={skipped} />
         </Rise>
@@ -1569,32 +1551,6 @@ const styles = StyleSheet.create({
   },
   unsent: { alignItems: 'center', gap: SPACE.sm, marginTop: SPACE.sm },
   crown: { marginTop: SPACE.sm },
-  banner: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 22,
-  },
-  tail: { position: 'absolute', top: 12 },
-  tailLeft: { left: 0 },
-  tailRight: { right: 0 },
-  bannerFace: {
-    alignItems: 'center',
-    borderBottomWidth: DEPTH.outline + 4,
-    borderRadius: 12,
-    borderWidth: DEPTH.outline,
-    flexDirection: 'row',
-    gap: SPACE.sm,
-    overflow: 'hidden',
-    paddingBottom: 6,
-    paddingHorizontal: SPACE.xl,
-    paddingTop: 7,
-  },
-  bannerText: {
-    fontFamily: FONT.display,
-    fontSize: 23,
-    letterSpacing: tracking(1),
-    lineHeight: lh(28),
-  },
   best: {
     alignItems: 'center',
     borderRadius: RADIUS.pill,

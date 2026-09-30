@@ -1,8 +1,7 @@
 import type { LeagueTier } from '@quezby/types';
 import { StyleSheet, Text, View } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
-
 import { useT } from '@/i18n';
+import { LeagueFrame } from '@/ui/kit/frame';
 import { Icon } from '@/ui/icons';
 import { FONT, RADIUS, SPACE, embossed, useTheme, withAlpha, type Theme } from '@/ui/theme';
 
@@ -118,88 +117,26 @@ function tierColors(
   }
 }
 
-const EMBLEM = 'M12 2.4 20.3 7.2v9.6L12 21.6l-8.3-4.8V7.2L12 2.4Z';
-/** The lit upper face of the emblem. */
-const EMBLEM_INNER = 'M12 3.9 19 7.9v3.6H5V7.9L12 3.9Z';
+const TIER_SIZE = { sm: 26, md: 38, lg: 56, xl: 96 } as const;
 
 /**
- * What sits inside each emblem. Colour is never the only signal: the climb
- * reads in the shape too — one chevron, two, a star, a spark, a gem, a crown.
- */
-function TierMark({ tier, color }: { tier: LeagueTier; color: string }) {
-  const stroke = {
-    stroke: color,
-    strokeLinecap: 'round' as const,
-    strokeLinejoin: 'round' as const,
-    fill: 'none',
-  };
-  switch (tier) {
-    case 'bronze':
-      return <Path d="M8.4 13.8 12 10.2l3.6 3.6" strokeWidth={2.6} {...stroke} />;
-    case 'silver':
-      return (
-        <Path
-          d="M8.4 11.6 12 8l3.6 3.6M8.4 15.6 12 12l3.6 3.6"
-          strokeWidth={2.4}
-          {...stroke}
-        />
-      );
-    case 'gold':
-      return (
-        <Path
-          d="m12 7.4 1.35 2.75 3.05.45-2.2 2.15.52 3.03L12 14.35l-2.72 1.43.52-3.03-2.2-2.15 3.05-.45L12 7.4Z"
-          fill={color}
-          stroke={color}
-          strokeWidth={1}
-          strokeLinejoin="round"
-        />
-      );
-    case 'platinum':
-      return (
-        <Path
-          d="M12 6.9c.5 2.7 2.4 4.6 5.1 5.1-2.7.5-4.6 2.4-5.1 5.1-.5-2.7-2.4-4.6-5.1-5.1 2.7-.5 4.6-2.4 5.1-5.1Z"
-          fill={color}
-        />
-      );
-    case 'diamond':
-      return (
-        <Path
-          d="M8.3 10.6 10.1 8h3.8l1.8 2.6L12 16.4l-3.7-5.8ZM8.3 10.6h7.4M10.9 10.6 12 16.4l1.1-5.8"
-          strokeWidth={1.8}
-          {...stroke}
-        />
-      );
-    default:
-      return (
-        <Path
-          d="M7.7 15.6h8.6l.9-6.3-3.2 2.5L12 7.8l-2 4-3.2-2.5.9 6.3Z"
-          fill={color}
-          stroke={color}
-          strokeWidth={1.2}
-          strokeLinejoin="round"
-        />
-      );
-  }
-}
-
-const TIER_SIZE = { sm: 22, md: 30, lg: 44, xl: 76 } as const;
-
-/**
- * A league tier as an emblem: a shield in the tier's metal with the outline
- * round it and its mark cut into it — and its name beside it when there is
- * room.
+ * A league on its own: its frame (`LeagueFrame`) with the league's mark in
+ * the window — and its name beside it when there is room. `animated` sets
+ * the frame alive where the league is the point of the screen.
  */
 export function TierBadge({
   tier,
   size = 'md',
   showLabel = false,
+  animated = false,
 }: {
   tier: LeagueTier;
   size?: 'sm' | 'md' | 'lg' | 'xl';
   showLabel?: boolean;
+  animated?: boolean;
 }) {
-  const theme = useTheme();
   const t = useT();
+  const theme = useTheme();
   const colors = tierColors(theme, tier);
   const box = TIER_SIZE[size];
   const label = t.tiers.names[tier];
@@ -211,20 +148,7 @@ export function TierBadge({
       accessibilityLabel={t.tiers.league(tier)}
       style={styles.tier}
     >
-      <Svg width={box} height={box} viewBox="0 0 24 24">
-        <Path
-          d={EMBLEM}
-          fill={colors.solid}
-          stroke={theme.outline}
-          strokeWidth={2.2}
-          strokeLinejoin="round"
-        />
-        <Path
-          d={EMBLEM_INNER}
-          fill={withAlpha(theme.onBrand, 0.28)}
-        />
-        <TierMark tier={tier} color={theme.outline} />
-      </Svg>
+      <LeagueFrame tier={tier} size={box} animated={animated} />
       {showLabel ? (
         <Text
           style={[
