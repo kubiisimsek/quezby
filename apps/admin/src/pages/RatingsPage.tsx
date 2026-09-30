@@ -148,7 +148,7 @@ function Rules({ rules }: { rules: AdminRatingsResponse['rules'] }) {
     <Panel title="Kurallar" description="config/quezby.php › rating" icon={<BookOpen />} tone="secondary">
       <Facts
         facts={[
-          { label: 'Tek turda en fazla', value: `±${formatNumber(rules.maxDelta)} Elo` },
+          { label: 'Tek turda en fazla', value: `±${formatNumber(rules.maxDelta)} qb` },
           {
             label: 'Genişlik',
             value: formatNumber(rules.width),
@@ -166,7 +166,7 @@ function Rules({ rules }: { rules: AdminRatingsResponse['rules'] }) {
           {
             label: 'Zorluk',
             value: `0–${formatNumber(rules.maxDifficulty)}`,
-            hint: `${formatNumber(rules.difficultyFrom)} Elo’dan sonra her ${formatNumber(rules.difficultyStep)} Elo’da bir artar · tablo ${formatNumber(rules.difficultyVersion)}`,
+            hint: `${formatNumber(rules.difficultyFrom)} qb’den sonra her ${formatNumber(rules.difficultyStep)} qb’de bir artar · tablo ${formatNumber(rules.difficultyVersion)}`,
           },
         ]}
       />

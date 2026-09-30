@@ -19,7 +19,8 @@ use App\Enums\PlayerMilestone;
  */
 function adminContractUnion(string $name): array
 {
-    $types = (string) file_get_contents(dirname(__DIR__, 4).'/packages/types/src/admin.ts');
+    // Doc comments may hold a `;` or a quoted word of their own: only the code counts.
+    $types = (string) preg_replace('~/\*.*?\*/|//[^\n]*~s', '', (string) file_get_contents(dirname(__DIR__, 4).'/packages/types/src/admin.ts'));
     preg_match('/export type '.$name.' =(.*?);/s', $types, $union);
     preg_match_all("/'([a-z_.-]+)'/", $union[1] ?? '', $members);
 

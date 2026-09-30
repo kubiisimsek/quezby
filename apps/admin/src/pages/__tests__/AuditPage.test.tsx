@@ -24,6 +24,21 @@ describe('AuditPage', () => {
     expect(within(table).getByText('10.0.0.9')).toBeInTheDocument();
   });
 
+  it('names an owner setting a qb by hand', async () => {
+    const api = fakeApi();
+    api.audit.list.mockResolvedValue(
+      page([auditEntry({ action: 'player.rating', reason: 'Lig testi', details: { from: 2450, to: 3250, tierFrom: 'gold', tierTo: 'platinum' } })]),
+    );
+    const { user } = renderApp({ path: '/audit', api });
+
+    expect(await screen.findByText('qb’yi değiştirdi')).toBeInTheDocument();
+    expect(within(screen.getByRole('table')).getByText('Lig testi')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('combobox', { name: 'İşlem' }));
+    await user.click(await screen.findByRole('option', { name: 'qb’yi değiştirdi' }));
+    await waitFor(() => expect(api.audit.list).toHaveBeenLastCalledWith(expect.objectContaining({ action: 'player.rating' })));
+  });
+
   it('keeps the address column from anyone but an owner', async () => {
     const api = fakeApi();
     api.audit.list.mockResolvedValue(page([auditEntry()]));

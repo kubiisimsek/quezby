@@ -101,6 +101,7 @@ return [
         'passwordConfirmation' => 'password confirmation',
         'perPage' => 'page size',
         'player' => 'player',
+        'rating' => 'qb',
         'reason' => 'reason',
         'role' => 'role',
         'search' => 'search',

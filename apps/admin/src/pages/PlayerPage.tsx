@@ -25,6 +25,7 @@ import {
   Milestone,
   MonitorSmartphone,
   MoreHorizontal,
+  PencilLine,
   RotateCcw,
   Route,
   ScrollText,
@@ -54,6 +55,7 @@ import {
   DismissReportsDialog,
   RemoveAvatarDialog,
   RenamePlayerDialog,
+  SetRatingDialog,
   SignOutPlayerDialog,
   UnbanPlayerDialog,
 } from '@/components/moderation/player-dialogs';
@@ -95,7 +97,7 @@ import { can } from '@/lib/permissions';
 import { useSession } from '@/stores/session';
 
 type Tab = 'summary' | 'activity' | 'devices' | 'log';
-type Dialog = 'ban' | 'unban' | 'rename' | 'signOut' | 'avatar' | 'dismiss' | 'delete' | null;
+type Dialog = 'ban' | 'unban' | 'rename' | 'signOut' | 'avatar' | 'dismiss' | 'rating' | 'delete' | null;
 
 const REASONS = Object.keys(REPORT_REASON) as ReportReason[];
 
@@ -244,6 +246,7 @@ export function PlayerPage() {
   const me = data.player;
   const banned = me.bannedAt !== null;
   const moderator = can(role, 'moderate');
+  const setsRatings = can(role, 'setRatings');
   const flaggedRuns = (data.runs.flagged ?? 0) + (data.runs.review ?? 0) + (data.runs.rejected ?? 0);
   const openReports = data.openReports.photo + data.openReports.name;
 
@@ -274,6 +277,9 @@ export function PlayerPage() {
           onSelect: () => setDialog('signOut'),
           disabled: me.isGuest,
         },
+        ...(setsRatings
+          ? [{ label: 'qb’yi değiştir', hint: 'Elle; ligi de değişir', icon: <PencilLine />, onSelect: () => setDialog('rating') } satisfies MenuItem]
+          : []),
         ...(can(role, 'deletePlayers')
           ? (['separator', { label: 'Hesabı sil', hint: 'Geri alınamaz', icon: <Trash2 />, onSelect: () => setDialog('delete'), tone: 'danger' }] as MenuItem[])
           : []),
@@ -338,7 +344,7 @@ export function PlayerPage() {
         </Callout>
       ) : null}
 
-      {tab === 'summary' ? <Summary data={data} moderator={moderator} onDialog={setDialog} /> : null}
+      {tab === 'summary' ? <Summary data={data} moderator={moderator} setsRatings={setsRatings} onDialog={setDialog} /> : null}
       {tab === 'activity' ? <ActivityTab playerId={me.id} /> : null}
       {tab === 'devices' ? (
         <div className="space-y-6">
@@ -385,6 +391,12 @@ export function PlayerPage() {
       <SignOutPlayerDialog player={me} open={dialog === 'signOut'} onOpenChange={(open) => setDialog(open ? 'signOut' : null)} />
       <RemoveAvatarDialog player={me} open={dialog === 'avatar'} onOpenChange={(open) => setDialog(open ? 'avatar' : null)} />
       <DismissReportsDialog player={me} open={dialog === 'dismiss'} onOpenChange={(open) => setDialog(open ? 'dismiss' : null)} />
+      <SetRatingDialog
+        player={me}
+        rating={data.rating?.rating ?? null}
+        open={dialog === 'rating'}
+        onOpenChange={(open) => setDialog(open ? 'rating' : null)}
+      />
       <DeletePlayerDialog
         player={me}
         open={dialog === 'delete'}
@@ -398,12 +410,15 @@ export function PlayerPage() {
 function Summary({
   data,
   moderator,
+  setsRatings,
   onDialog,
 }: {
   data: AdminPlayerResponse;
   /** Whether the admin may act on the player: the photo and the reports get their buttons. */
   moderator: boolean;
-  onDialog: (dialog: 'avatar' | 'dismiss') => void;
+  /** Whether the admin may set the player's qb by hand: an owner. */
+  setsRatings: boolean;
+  onDialog: (dialog: 'avatar' | 'dismiss' | 'rating') => void;
 }) {
   const me = data.player;
   const ways = [...(me.email ? [`E-posta (${me.email})`] : []), ...me.identityDetails.map((identity) => PROVIDER[identity.provider])];
@@ -538,7 +553,7 @@ function Summary({
           />
         </Panel>
 
-        <RatingPanel rating={data.rating} />
+        <RatingPanel rating={data.rating} onSet={setsRatings ? () => onDialog('rating') : undefined} />
 
         <Panel title={`Oyun · sezon ${data.season}`} icon={<Trophy />}>
           <Facts
@@ -586,18 +601,25 @@ function Summary({
 /**
  * Where the player's rating stands: their league and next target once
  * placed, the placement runs until then, and what still speeds or shields it.
+ * An owner can set it by hand from here (`onSet`).
  */
-function RatingPanel({ rating }: { rating: AdminPlayerRating | null }) {
+function RatingPanel({ rating, onSet }: { rating: AdminPlayerRating | null; onSet?: () => void }) {
+  const set = onSet ? (
+    <Button size="sm" tone="ghost" icon={<PencilLine />} onClick={onSet}>
+      qb’yi değiştir
+    </Button>
+  ) : null;
+
   if (!rating) {
     return (
-      <Panel title="Reyting" icon={<Gauge />} tone="secondary" flush>
+      <Panel title="Reyting" icon={<Gauge />} tone="secondary" actions={set} flush>
         <EmptyState icon={<Gauge />} title="Henüz reyting yok" hint="İlk sayılan turuyla yerleşmeye başlar." />
       </Panel>
     );
   }
 
   return (
-    <Panel title="Reyting" icon={<Gauge />} tone="secondary">
+    <Panel title="Reyting" icon={<Gauge />} tone="secondary" actions={set}>
       <Facts
         facts={[
           {

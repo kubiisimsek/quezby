@@ -68,6 +68,7 @@ import {
   ShareGrid,
   Stamp,
   StatGrid,
+  QbCoin,
   Tag,
   TierBadge,
   Txt,
@@ -944,6 +945,7 @@ function RatingTile({
           <View style={styles.leagueText}>
             <Text style={[TYPE.label, { color: theme.inkMuted }]}>{words.ribbon}</Text>
             <View style={styles.ratingRow}>
+              <QbCoin size={26} style={styles.ratingCoin} />
               <CountUp
                 value={rating.after}
                 format={(value) => t.fmt.score(Math.round(value))}
@@ -974,19 +976,6 @@ function RatingTile({
         <View style={styles.ratingTags}>
           {rating.kind === 'forfeit' ? <Tag label={words.forfeit} tone="bad" icon="close" /> : null}
           {rating.shielded ? <Tag label={words.shielded} tone="secondary" icon="shield" /> : null}
-          {rating.nextTarget !== null ? (
-            <Tag label={words.next(t.fmt.score(rating.nextTarget))} tone="neutral" icon="target" />
-          ) : null}
-          {rating.difficulty > 0 ? (
-            <Tag label={t.rating.difficulty(t.fmt.score(rating.difficulty))} tone="secondary" icon="flame" />
-          ) : null}
-          {rating.nextDifficulty !== null && rating.nextDifficulty !== rating.difficulty ? (
-            <Tag
-              label={words.nextDifficulty(t.fmt.score(rating.nextDifficulty))}
-              tone={rating.nextDifficulty > rating.difficulty ? 'warn' : 'neutral'}
-              icon={rating.nextDifficulty > rating.difficulty ? 'trendUp' : 'trendDown'}
-            />
-          ) : null}
         </View>
       </Panel>
     </Animated.View>
@@ -1629,6 +1618,7 @@ const styles = StyleSheet.create({
   unlock: { gap: SPACE.md },
   rating: { gap: SPACE.sm },
   ratingRow: { alignItems: 'baseline', flexDirection: 'row', flexWrap: 'wrap', gap: SPACE.sm },
+  ratingCoin: { alignSelf: 'center' },
   ratingValue: { fontFamily: FONT.display, fontSize: 30, lineHeight: lh(36) },
   ratingDelta: { fontFamily: FONT.display, fontSize: 22, lineHeight: lh(27) },
   ratingTags: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACE.xs },

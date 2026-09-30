@@ -109,6 +109,7 @@ pnpm lint && pnpm typecheck && pnpm test && pnpm test:api
 pnpm engine:simulate | engine:fixtures | tokens
 pnpm api:package:staging | api:package:production
 pnpm admin:package:staging | admin:package:production
+pnpm android:bundle:staging | android:bundle:production   # Play .aab, upload-key signed
 ```
 
 ## Definition of done

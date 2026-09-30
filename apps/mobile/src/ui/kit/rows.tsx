@@ -11,6 +11,7 @@ import Animated, {
 import { handle, useT } from '@/i18n';
 import { IS_RTL } from '@/i18n/native';
 import { TierBadge } from '@/ui/kit/badges';
+import { FramedAvatar } from '@/ui/kit/frame';
 import { Avatar } from '@/ui/kit/identity';
 import { AnimatedPressable, common } from '@/ui/kit/shared';
 import { Txt } from '@/ui/kit/text';
@@ -180,9 +181,13 @@ export function Toggle({
   );
 }
 
+/** A row's framed portrait: its window is about the plain `sm` avatar. */
+const ROW_FRAME = 60;
+
 /**
- * A player in a list — a search result, a friend request: who they are,
- * their league and season best, and one action on the right. The player and
+ * A player in a list — a search result, a friend request: who they are, in
+ * their league's frame once they have one, their league and season best, and
+ * one action on the right. The player and
  * the action are two targets side by side, so a tap on the button never
  * opens the card and a screen reader reaches both.
  */
@@ -222,7 +227,21 @@ export function PlayerRow({
 
   const who = (
     <>
-      <Avatar name={username} src={src} tone={isMe ? 'primary' : 'neutral'} size="sm" />
+      {tier ? (
+        <View style={styles.framed}>
+          <FramedAvatar
+            tier={tier}
+            name={username}
+            src={src}
+            tone={isMe ? 'primary' : 'neutral'}
+            size={ROW_FRAME}
+          />
+        </View>
+      ) : (
+        <View style={styles.plain}>
+          <Avatar name={username} src={src} tone={isMe ? 'primary' : 'neutral'} size="sm" />
+        </View>
+      )}
       <View style={styles.playerText}>
         <Txt variant="heading" numberOfLines={1}>
           {isMe ? words.me(name) : name}
@@ -298,6 +317,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: SPACE.md,
   },
+  // The frame's ornaments reach into the row's padding, not its height.
+  framed: { marginStart: -SPACE.xs, marginVertical: -SPACE.sm },
+  // A plain portrait takes the frame's place, so every name starts in line.
+  plain: { alignItems: 'center', width: ROW_FRAME - SPACE.xs },
   playerText: { flex: 1, gap: SPACE.xxs },
   playerMeta: {
     alignItems: 'center',

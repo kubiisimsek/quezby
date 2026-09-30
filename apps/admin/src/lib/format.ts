@@ -257,6 +257,7 @@ export const AUDIT_ACTION: Record<AdminAuditAction, Label> = {
   'player.delete': { tone: 'bad', label: 'Hesabı sildi' },
   'player.avatar_remove': { tone: 'warn', label: 'Fotoğrafı kaldırdı' },
   'player.reports_dismiss': { tone: 'neutral', label: 'Bildirimleri kapattı' },
+  'player.rating': { tone: 'warn', label: 'qb’yi değiştirdi' },
   'run.approve': { tone: 'ok', label: 'Turu onayladı' },
   'run.reject': { tone: 'bad', label: 'Turu reddetti' },
   'admin.create': { tone: 'secondary', label: 'Yönetici ekledi' },
@@ -298,6 +299,7 @@ export const RATING_KIND: Record<RatingChangeKind, Label & { hint: string }> = {
   forfeit: { tone: 'bad', label: 'Hükmen', hint: 'Bayrak alan bir oyunla bitti: tam kayıp sayıldı.' },
   void: { tone: 'neutral', label: 'Sayılmadı', hint: 'Yasaklıyken, güvenilmeyen bir telefonda ya da geri sayımda bırakılan tur: reytinge dokunmadı.' },
   reversal: { tone: 'warn', label: 'Geri alındı', hint: 'Bir moderatör turu reddetti; tur ne getirdiyse geri alındı.' },
+  adjust: { tone: 'warn', label: 'Düzeltme', hint: 'Bir sahip qb’yi panelden elle değiştirdi; sebebi denetim kaydında.' },
 };
 
 /** The four kinds of post, as the game calls them, and the move each one asks for. */

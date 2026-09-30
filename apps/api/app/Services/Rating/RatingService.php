@@ -40,6 +40,10 @@ use Illuminate\Support\Facades\DB;
  * - a banned player's, a failed device's, one from a past season, one given
  *   up in the countdown → nothing
  * - a free run, the day's, a VS → nothing, ever
+ *
+ * Beyond what runs do, and a reject takes back, a rating moves only by an
+ * owner's hand from the panel (`adjust`), on the player's history and in the
+ * audit log.
  */
 final class RatingService
 {
@@ -258,6 +262,46 @@ final class RatingService
             ]);
 
             return $after - $before;
+        });
+    }
+
+    /**
+     * Sets a player's rating by hand — an owner's call from the panel
+     * (`PlayerActions::setRating`), which writes the audit entry. A player
+     * not placed yet is placed with it: the rating row opens Dereceli, the
+     * placement ends, and the provisional runs a placement gives start. No
+     * run was played, so the runs counted and when the last one counted stay
+     * as they are; the rating moved now, so of two equal ratings the other
+     * one ranks first. A shield keeps the league a run promoted the player
+     * into, so it goes when the rating leaves that league. Null when the
+     * rating is `$rating` already — nothing written.
+     *
+     * @return array{from: int|null, to: int, tierFrom: string|null, tierTo: string}|null
+     */
+    public function adjust(User $player, int $rating): ?array
+    {
+        return $this->write($player, function (PlayerRating $row) use ($rating): ?array {
+            $before = $row->rating;
+            if ($before === $rating) {
+                return null;
+            }
+            if (! $row->isPlaced()) {
+                $row->provisional_left = (int) $this->config['provisional_runs'];
+            }
+            $this->move($row, $rating, now());
+            if ($row->shield_tier !== null && $row->shield_tier !== $row->tier) {
+                $row->shield_tier = null;
+                $row->shield_left = 0;
+            }
+            $row->save();
+            $this->record($row, RatingKind::Adjust, $before);
+
+            return [
+                'from' => $before,
+                'to' => $rating,
+                'tierFrom' => $before === null ? null : LeagueTier::fromRating($before)->slug(),
+                'tierTo' => LeagueTier::fromRating($rating)->slug(),
+            ];
         });
     }
 

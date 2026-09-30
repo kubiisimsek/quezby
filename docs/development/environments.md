@@ -83,7 +83,7 @@ Release are the only configurations, and either can talk to any API.
 | Platform | Run on a simulator / device | Store build |
 | --- | --- | --- |
 | iOS | `pnpm ios` (Debug) | switch, then Xcode → scheme **Quezby** → Product → Archive (Release) |
-| Android | `pnpm android` (debug) | switch, then `cd apps/mobile/android && ./gradlew bundleRelease` |
+| Android | `pnpm android` (debug) | `pnpm android:bundle:staging` / `android:bundle:production` (`scripts/package-android.mjs`: checks the upload key, raises `versionCode` past both platforms, switches, typechecks, `./gradlew bundleRelease`, checks the signature, puts `.env` back → `dist-deploy/*.aab`) |
 
 There is one app in App Store Connect and one in Google Play. Staging builds
 go to TestFlight / Play internal testing, production builds to the stores —

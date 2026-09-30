@@ -4,10 +4,12 @@ namespace App\Services\Admin;
 
 use App\Enums\AuditAction;
 use App\Enums\ErrorCode;
+use App\Enums\LeagueTier;
 use App\Exceptions\ApiException;
 use App\Models\User;
 use App\Services\AccountDeletion;
 use App\Services\Identity\GuestNames;
+use App\Services\Rating\RatingService;
 use App\Services\Social\ReportService;
 use App\Support\Actor;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -15,8 +17,8 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * What the admin panel does to a player beyond bans (`ModerationService`):
- * take a name off the boards, end their sessions, delete the account.
- * Every one is audited.
+ * take a name off the boards, end their sessions, set their rating by hand,
+ * delete the account. Every one is audited.
  */
 final class PlayerActions
 {
@@ -25,6 +27,7 @@ final class PlayerActions
         private readonly AccountDeletion $deletion,
         private readonly AuditLog $audit,
         private readonly ReportService $reports,
+        private readonly RatingService $ratings,
     ) {}
 
     /**
@@ -73,6 +76,29 @@ final class PlayerActions
 
             return $ended;
         });
+    }
+
+    /**
+     * Sets the player's rating (qb) by hand — an owner's call, to test the
+     * leagues or put a rating right (`RatingService::adjust`): on the
+     * player's history as `adjust`, and in the audit log with where it was
+     * and where it went. The rating it has already changes nothing and
+     * records nothing.
+     *
+     * @return array{changed: bool, rating: int, tier: string}
+     */
+    public function setRating(User $player, int $rating, string $reason, Actor $actor): array
+    {
+        $moved = DB::transaction(function () use ($player, $rating, $reason, $actor) {
+            $moved = $this->ratings->adjust($player, $rating);
+            if ($moved !== null) {
+                $this->audit->record($actor, AuditAction::PlayerRating, $player, $reason, $moved);
+            }
+
+            return $moved;
+        });
+
+        return ['changed' => $moved !== null, 'rating' => $rating, 'tier' => LeagueTier::fromRating($rating)->slug()];
     }
 
     /** Deletes the account for good — runs, board rows, sessions — and keeps the audit line. */

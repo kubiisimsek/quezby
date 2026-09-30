@@ -102,6 +102,7 @@ return [
         'passwordConfirmation' => 'confirmación de la contraseña',
         'perPage' => 'tamaño de página',
         'player' => 'jugador',
+        'rating' => 'qb',
         'reason' => 'motivo',
         'role' => 'rol',
         'search' => 'búsqueda',

@@ -230,6 +230,13 @@ describe('GameScreen', () => {
       expect(screen.getByText('Dereceli')).toBeTruthy();
     });
 
+    it('marks a harder rated run just as Dereceli, never with its difficulty', async () => {
+      await setup(controller({ phase: 'playing', difficulty: 12 }), 'rated').render();
+
+      expect(screen.getByText('Dereceli')).toBeTruthy();
+      expect(screen.queryByText(/Zorluk/)).toBeNull();
+    });
+
     it('never offers offline practice for a rated run', async () => {
       await setup(controller({ phase: 'error' }), 'rated').render();
 

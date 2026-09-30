@@ -23,10 +23,16 @@
   `AuditEntry` (with an `AuditAction` added on both sides of the contract) in
   the same transaction as the change. The audit log is never updated or deleted.
 - **Moderation says why.** Banning, renaming, removing a photo, dismissing
-  reports, rejecting and deleting take a reason (3–191 characters), and each is
-  audited with it — a photo taken down as `player.avatar_remove`, reports let
-  go as `player.reports_dismiss`; deleting a player also takes their username
-  typed out.
+  reports, rejecting, setting a rating and deleting take a reason (3–191
+  characters), and each is audited with it — a photo taken down as
+  `player.avatar_remove`, reports let go as `player.reports_dismiss`, a rating
+  (qb) set by hand as `player.rating` with its `from` and `to`; deleting a
+  player also takes their username typed out.
+- **Only an owner moves a rating by hand.** A rating otherwise moves only
+  through Dereceli runs and a reject; `POST /players/{id}/rating` is
+  `admin.role:owner` and goes through `RatingService::adjust` (the rating row
+  locked, the change on the player's history as `adjust`), never a write to
+  `player_ratings` of the panel's own.
 - **A report never names its reporter.** The game promises it ("kimin
   bildirdiği söylenmez"): `AdminReportRow` carries none, and the panel asks
   for none.

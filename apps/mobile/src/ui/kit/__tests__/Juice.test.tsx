@@ -44,6 +44,15 @@ describe('juice', () => {
     jest.useRealTimers();
   });
 
+  it('lets a screen reader hear the unit a picture beside it carries', async () => {
+    jest.mocked(useReducedMotion).mockReturnValue(true);
+    await render(<CountUp value={2_031} format={formatScore} said={(value) => `${formatScore(value)} qb`} />);
+
+    expect(screen.getByText('2.031')).toBeOnTheScreen();
+    expect(screen.getByLabelText('2.031 qb')).toBeOnTheScreen();
+    jest.mocked(useReducedMotion).mockReturnValue(false);
+  });
+
   it('counts from where a number stood, down as well as up', async () => {
     jest.useFakeTimers();
     await render(<CountUp value={2_031} from={1_990} format={formatScore} />);

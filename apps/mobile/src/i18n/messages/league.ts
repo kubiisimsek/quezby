@@ -2,7 +2,7 @@ import type { Locale } from '@quezby/types';
 
 /**
  * The league screen: the league a player's rating puts them in (its words
- * are `rating`'s), and under it that league's players by Elo — a ranking that
+ * are `rating`'s), and under it that league's players by qb — a ranking that
  * never resets. Before placement, and for a player who has not played rated
  * lately, what it takes to be on it. Tier names are `tiers`'s.
  */
@@ -10,7 +10,6 @@ const tr = {
   ribbon: 'LİG',
   /** Over the league's ranking. */
   board: 'LİG SIRALAMASI',
-  rule: 'Son 14 günde dereceli oynayanlar, Elo sırasıyla',
   failed: 'Lig sıralaması yüklenemedi',
   retry: 'Tekrar dene',
   /** Before placement: Dereceli still shut, or its first games still to play. */
@@ -31,7 +30,6 @@ export type LeagueMessages = typeof tr;
 const en: LeagueMessages = {
   ribbon: 'LEAGUE',
   board: 'LEAGUE RANKING',
-  rule: 'Ranked players of the last 14 days, by Elo',
   failed: "Couldn't load the league ranking",
   retry: 'Try again',
   closed: {
@@ -48,7 +46,6 @@ const en: LeagueMessages = {
 const de: LeagueMessages = {
   ribbon: 'LIGA',
   board: 'LIGA-RANGLISTE',
-  rule: 'Gewertete Spieler der letzten 14 Tage, nach Elo',
   failed: 'Die Liga-Rangliste konnte nicht geladen werden',
   retry: 'Noch mal versuchen',
   closed: {
@@ -65,7 +62,6 @@ const de: LeagueMessages = {
 const ar: LeagueMessages = {
   ribbon: 'الدوري',
   board: 'ترتيب الدوري',
-  rule: 'لاعبو المصنَّف في آخر 14 يومًا، حسب الإيلو',
   failed: 'تعذّر تحميل ترتيب الدوري',
   retry: 'حاول مجددًا',
   closed: {
@@ -82,7 +78,6 @@ const ar: LeagueMessages = {
 const fr: LeagueMessages = {
   ribbon: 'LIGUE',
   board: 'CLASSEMENT DE LA LIGUE',
-  rule: 'Joueurs classés des 14 derniers jours, par Elo',
   failed: 'Impossible de charger le classement de la ligue',
   retry: 'Réessayer',
   closed: {
@@ -99,7 +94,6 @@ const fr: LeagueMessages = {
 const es: LeagueMessages = {
   ribbon: 'LIGA',
   board: 'TABLA DE LA LIGA',
-  rule: 'Jugadores de Competitivo de los últimos 14 días, por Elo',
   failed: 'No se pudo cargar la tabla de la liga',
   retry: 'Reintentar',
   closed: {

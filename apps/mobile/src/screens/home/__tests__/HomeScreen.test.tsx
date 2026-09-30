@@ -367,9 +367,11 @@ describe('HomeScreen', () => {
 
       expect(screen.getByRole('button', { name: 'Günlük' })).toBeOnTheScreen();
       expect(screen.getByText('Skorun Zirve’ye yazılır')).toBeOnTheScreen();
-      expect(screen.getByText('Zorluk 3 · Hedef 72.400')).toBeOnTheScreen();
-      // Dereceli wears the player's league: their frame, and their league and Elo in gold.
-      expect(screen.getAllByText('Gümüş lig · 1.640 Elo')).toHaveLength(2);
+      // Dereceli says the least the next run must score, and nothing of difficulty.
+      expect(screen.getByText('En az 72.400 puan')).toBeOnTheScreen();
+      expect(screen.queryByText(/Zorluk|Hedef/)).not.toBeOnTheScreen();
+      // Dereceli wears the player's league: their frame, and their league and qb in gold.
+      expect(screen.getAllByText('Gümüş lig · 1.640 qb')).toHaveLength(2);
       expect(
         screen.getAllByTestId('league-frame-silver', { includeHiddenElements: true }).length,
       ).toBeGreaterThanOrEqual(2);
@@ -378,13 +380,22 @@ describe('HomeScreen', () => {
       await waitFor(() => expect(navigate).toHaveBeenCalledWith('Game', { mode: 'free' }));
     });
 
-    it('says Dereceli plays for Elo while the rating has not made it harder yet', async () => {
-      mocked.rating.current.mockResolvedValue(buildRating({ rating: 940, tier: 'bronze', target: 29_100, difficulty: 0 }));
+    it('says the least a rated run must score however hard it plays, never the difficulty', async () => {
+      mocked.rating.current.mockResolvedValue(buildRating({ rating: 4_810, tier: 'diamond', target: 380_000, difficulty: 16 }));
       await renderLobby();
       await openModes();
 
-      expect(await screen.findByText('Elo için oyna · Hedef 29.100')).toBeOnTheScreen();
-      expect(screen.queryByText(/^Zorluk/)).not.toBeOnTheScreen();
+      expect(await screen.findByText('En az 380.000 puan')).toBeOnTheScreen();
+      expect(screen.queryByText(/Zorluk/)).not.toBeOnTheScreen();
+    });
+
+    it('says Dereceli plays for qb when there is no score to beat yet', async () => {
+      mocked.rating.current.mockResolvedValue(buildRating({ target: null }));
+      await renderLobby();
+      await openModes();
+
+      expect(await screen.findByText('qb için oyna')).toBeOnTheScreen();
+      expect(screen.queryByText(/^En az/)).not.toBeOnTheScreen();
     });
 
     it('plays the day’s feed from Günlük', async () => {
@@ -411,7 +422,7 @@ describe('HomeScreen', () => {
       expect(navigate).not.toHaveBeenCalledWith('Game', { mode: 'daily' });
     });
 
-    it('plays Dereceli for Elo, with the score to beat', async () => {
+    it('plays Dereceli for qb, with the score to beat', async () => {
       await renderLobby();
       await openModes();
 
@@ -420,7 +431,7 @@ describe('HomeScreen', () => {
       await waitFor(() => expect(navigate).toHaveBeenCalledWith('Game', { mode: 'rated' }));
     });
 
-    it('counts the placement games on Dereceli before there is an Elo', async () => {
+    it('counts the placement games on Dereceli before there is an qb', async () => {
       mocked.rating.current.mockResolvedValue(buildPlacing(1));
       await renderLobby();
       await openModes();
@@ -458,7 +469,7 @@ describe('HomeScreen', () => {
       await renderLobby();
 
       expect(await screen.findByText('DERECELİ')).toBeOnTheScreen();
-      expect(screen.queryByText(/Elo$/)).not.toBeOnTheScreen();
+      expect(screen.queryByText(/qb$/)).not.toBeOnTheScreen();
 
       await fireEvent.press(screen.getByText('Dereceli’ye 12 oyun kaldı'));
       expect(navigate).toHaveBeenCalledWith('League');
@@ -520,15 +531,15 @@ describe('HomeScreen', () => {
   });
 
   describe('the league', () => {
-    it('shows your league, your Elo and the score your next run has to beat', async () => {
+    it('shows your league, your qb and your best', async () => {
       await renderLobby();
 
-      expect(await screen.findByText('Gümüş lig · 1.640 Elo')).toBeOnTheScreen();
-      expect(screen.getByText('Hedef 72.400')).toBeOnTheScreen();
-      expect(screen.getByText('Zorluk 3')).toBeOnTheScreen();
+      expect(await screen.findByText('Gümüş lig · 1.640 qb')).toBeOnTheScreen();
+      expect(screen.getByText('En yüksek 1.702')).toBeOnTheScreen();
+      expect(screen.queryByText(/Zorluk|Hedef/)).not.toBeOnTheScreen();
       expect(screen.getByText('LİG')).toBeOnTheScreen();
 
-      await fireEvent.press(screen.getByText('Gümüş lig · 1.640 Elo'));
+      await fireEvent.press(screen.getByText('Gümüş lig · 1.640 qb'));
       expect(navigate).toHaveBeenCalledWith('League');
     });
 
@@ -546,16 +557,15 @@ describe('HomeScreen', () => {
       mocked.rating.current.mockResolvedValue(buildRating({ rating: 5_210, tier: 'master', ceil: null, progress: null, target: 862_000 }));
       await renderLobby();
 
-      expect(await screen.findByText('MasterClass lig · 5.210 Elo')).toBeOnTheScreen();
-      expect(screen.getByText('Hedef 862.000')).toBeOnTheScreen();
+      expect(await screen.findByText('MasterClass lig · 5.210 qb')).toBeOnTheScreen();
     });
 
-    it('shows the difficulty the rating has reached', async () => {
+    it('never shows the difficulty or the target, however high the qb', async () => {
       mocked.rating.current.mockResolvedValue(buildRating({ rating: 4_810, tier: 'diamond', target: 380_000, difficulty: 16 }));
       await renderLobby();
 
-      expect(await screen.findByText('Zorluk 16')).toBeOnTheScreen();
-      expect(screen.getByText('Hedef 380.000')).toBeOnTheScreen();
+      expect(await screen.findByText('Elmas lig · 4.810 qb')).toBeOnTheScreen();
+      expect(screen.queryByText(/Zorluk|Hedef/)).not.toBeOnTheScreen();
     });
   });
 
@@ -756,9 +766,9 @@ describe('HomeScreen', () => {
       expect(screen.getByRole('button', { name: 'Play the Daily Feed' })).toBeOnTheScreen();
 
       expect(screen.getByText('LEAGUE')).toBeOnTheScreen();
-      expect(await screen.findByText('Silver league · 1,640 Elo')).toBeOnTheScreen();
+      expect(await screen.findByText('Silver league · 1,640 qb')).toBeOnTheScreen();
       expect(screen.getByText('Silver league')).toBeOnTheScreen();
-      expect(screen.getByText('Target 72,400')).toBeOnTheScreen();
+      expect(screen.getByText('Best 1,702')).toBeOnTheScreen();
 
       expect(screen.getByText('YOUR TARGET · THIS WEEK')).toBeOnTheScreen();
       expect(screen.getByText('1,001 points to pass @deniz')).toBeOnTheScreen();
@@ -839,8 +849,8 @@ describe('HomeScreen', () => {
       expect(screen.getByText(`${iso('#12')} / 1,204 لاعبين`)).toBeOnTheScreen();
       expect(screen.getByText('الخلاصة التالية بعد 11 س 0 د')).toBeOnTheScreen();
 
-      expect(await screen.findByText(`دوري الذهب · ${iso('2,340')} إيلو`)).toBeOnTheScreen();
-      expect(screen.getByText(`الهدف ${iso('150,800')}`)).toBeOnTheScreen();
+      expect(await screen.findByText(`دوري الذهب · ${iso('2,340')} qb`)).toBeOnTheScreen();
+      expect(screen.queryByText(/الهدف/)).not.toBeOnTheScreen();
 
       expect(screen.getByText(`1,001 نقطة لتجاوز ${iso('@deniz')}`)).toBeOnTheScreen();
       expect(screen.getByText(`يسبقك ${iso('@deniz')} مباشرةً في ترتيب الأسبوع.`)).toBeOnTheScreen();

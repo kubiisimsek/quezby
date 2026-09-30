@@ -1,6 +1,6 @@
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useEffect } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -18,6 +18,15 @@ import { Count } from '@/ui/kit/social';
 import { Shine } from '@/ui/kit/surfaces';
 import { SPRING, SPRING_POP } from '@/ui/motion';
 import { DEPTH, FONT, RADIUS, SPACE, embossed, lh, useTheme, withAlpha } from '@/ui/theme';
+
+/**
+ * Room under the dock's labels. An iPhone's home indicator sits low in its
+ * inset, so the labels may dip a little into it; Android's gesture line or
+ * buttons fill theirs, so the labels stay clear of all of it and a gap more.
+ */
+export function dockBottom(inset: number, os: typeof Platform.OS = Platform.OS): number {
+  return os === 'android' ? inset + SPACE.md : Math.max(inset - 6, SPACE.sm);
+}
 
 /** The lobby: the dock's middle slot, drawn as the game's play slab. */
 const CENTRE = 'Home';
@@ -41,7 +50,7 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
         {
           backgroundColor: theme.rail,
           borderColor: theme.outline,
-          paddingBottom: Math.max(insets.bottom - 6, SPACE.sm),
+          paddingBottom: dockBottom(insets.bottom),
         },
       ]}
     >

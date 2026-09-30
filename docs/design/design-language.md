@@ -81,7 +81,17 @@ the mark (one chevron, two, a star, a cut gem, a diamond, a crown). The metals
 are the `emblem` group (per league a highlight, rim, face, shade, deep, the
 mark's accent, a gem and a glow); `tierBronze … tierMaster` (+ `Soft`) name a
 league in text. MasterClass is an orchid of its own, past the diamond's blue
-— neither the brand's magenta nor the quiet violet. `appleBg/Ink` and `googleBg/Ink/Line` are the two companies' dark-screen
+— neither the brand's magenta nor the quiet violet. **qb** — the players'
+name for the rating — is a **coin** (`QbCoin`): a gold rim standing on its
+lip, beaded when there is room, the brand's magenta-to-violet face, and the
+qb monogram raised on it in gold — q and b, the same stroke turned half round.
+It sits by a qb amount where the amount is the point (the league's hero, the
+result, qb hareketleri); a tag carries its one-colour twin (the `qb` icon).
+By the coin or the glyph the number stands alone — "2.140", never
+"2.140 qb" — and the word goes to the screen reader (`Tag said`, `CountUp
+said`, `accessibilityLabel`); without either, the text says "2.140 qb".
+The rim is the `emblem` group's gold, the face `brandFrom`/`brandTo`.
+`appleBg/Ink` and `googleBg/Ink/Line` are the two companies' dark-screen
 buttons; the Google "G" keeps its colours in `marks`.
 
 ### The feed — `reel`

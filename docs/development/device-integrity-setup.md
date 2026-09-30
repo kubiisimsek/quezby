@@ -165,10 +165,16 @@ Google ile girişin Android istemcisi bu anahtarın SHA-1'ini ister:
    `versionCode`):
 
    ```bash
-   pnpm switch-staging                 # iç test staging API'ye bağlansın
-   cd apps/mobile/android && ./gradlew bundleRelease
-   # → app/build/outputs/bundle/release/app-release.aab
+   pnpm android:bundle:staging         # iç test staging API'ye bağlansın
+   # → dist-deploy/quezby-android-staging-<sürüm>-<versionCode>-<zaman>.aab
    ```
+
+   Betik yükleme anahtarını kontrol eder (yoksa derlemez), `versionCode`'u
+   iki platformun da üstüne çıkarır (`--version-code N` ile elle), imzanın
+   debug değil yükleme anahtarı olduğunu doğrular ve `.env`'i eski haline
+   getirir. Elle: `pnpm switch-staging`, sonra
+   `cd apps/mobile/android && ./gradlew bundleRelease`
+   (→ `app/build/outputs/bundle/release/app-release.aab`).
 
 3. **Test and release → Testing → Internal testing** → *Create new release*
    → `.aab`'yi yükle. Paket adı ilk yüklemede `com.kubisimsek.game.quezby`

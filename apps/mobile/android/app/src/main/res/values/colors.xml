@@ -2,6 +2,9 @@
     <!-- canvas in apps/mobile/design/palette.mjs: the arena's first frame. Android 12+
          shows the adaptive launcher icon on it while the app starts. -->
     <color name="brand">#240554</color>
+    <!-- nightDeep in apps/mobile/design/palette.mjs: the arena's floor, under the
+         system bars, so Android never paints a white bar under the game. -->
+    <color name="system_bars">#10022f</color>
     <!-- primary in apps/mobile/design/palette.mjs: a push's icon and accent. -->
     <color name="notification">#e31d92</color>
 </resources>

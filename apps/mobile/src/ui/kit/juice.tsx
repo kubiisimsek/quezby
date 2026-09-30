@@ -64,12 +64,14 @@ export function Stamp({
  * A number that counts up to `value` — from `from`, 0 unless given, and down
  * when `from` is higher — fast at first, easing into the last digits, in
  * fixed-width figures so it does not wobble as it climbs. What a screen
- * reader hears is the final number, straight away.
+ * reader hears is the final number, straight away — `said`'s words for it
+ * when a picture beside it carries its unit.
  */
 export function CountUp({
   value,
   from = 0,
   format,
+  said,
   duration = 900,
   delay = 0,
   style,
@@ -78,6 +80,7 @@ export function CountUp({
   value: number;
   from?: number;
   format: (value: number) => string;
+  said?: (value: number) => string;
   duration?: number;
   delay?: number;
   style?: StyleProp<TextStyle>;
@@ -115,7 +118,7 @@ export function CountUp({
 
   return (
     <Text
-      accessibilityLabel={format(value)}
+      accessibilityLabel={(said ?? format)(value)}
       style={[styles.digits, style]}
     >
       {format(shown)}

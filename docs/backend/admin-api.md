@@ -28,7 +28,7 @@ comes from here; `apps/admin` may not import `@quezby/engine` (lint).
   | --- | --- | --- |
   | İzleyici | `viewer` | read every page |
   | Moderatör | `moderator` | ban and unban, reset a name, take a photo down, dismiss reports, sign a player out, approve and reject runs |
-  | Sahip | `owner` | delete a player's account, manage admins, run the system chores, see IP addresses in the audit log |
+  | Sahip | `owner` | set a player's rating (qb) by hand, delete a player's account, manage admins, run the system chores, see IP addresses in the audit log |
 
   Every admin route but the login carries `admin.role:<least role>`
   (`EnsureAdminRole`); `RolesTest` lists every route with its least role and
@@ -104,7 +104,7 @@ this season's best and ranks, lifetime stats, `rating`
 (`AdminPlayerRating`: rating, league (the rating's tier), peak, next target,
 placement or provisional runs left, shield, counted runs, when the last one
 counted, and the last 30 changes (`placement`, `run`, `forfeit`, `void`,
-`reversal`), the runs that did not count too, `counted: false`; null for a
+`reversal`, `adjust`), the runs that did not count too, `counted: false`; null for a
 player never rated), runs by status, the ten latest runs, the flag codes of the last
 30 days, device checks (20 latest), other accounts on the same install,
 `installs` — the phones the player used, from the device registry, each with
@@ -161,6 +161,31 @@ upload a new photo. A player with no photo: `changed: false`, nothing recorded.
 — they close as `dismissed`, the photo and the name stay as they are —
 recorded as `player.reports_dismiss` with how many in the details. None open:
 `changed: false`, nothing recorded.
+
+### `POST /players/{id}/rating` — owner
+
+`AdminSetRatingRequest` `{ "rating", "reason" }` — `rating` a whole number
+0–9999, `reason` 3–191 characters — → `AdminSetRatingResponse`
+`{ "changed": true, "rating": 3250, "tier": "platinum" }`. Sets the player's
+rating (qb) by hand, to test the leagues or put one right, through
+`RatingService::adjust` with the rating row locked:
+
+- the league (`tier`), the peak and `changed_at` follow it — it moved now, so
+  of two equal ratings the one reached first still ranks first;
+- a player not placed yet is placed: their rating row opens Dereceli
+  (`GET /rating` answers `placed: true`, `unlock: null`), the placement ends
+  and the provisional runs a placement gives start;
+- no run was played: the counted runs (`ratedRuns`) and `ratedAt` stay, so a
+  player with no counted run in the last `rules.activeDays` joins the qb board
+  with their next rated run;
+- a promotion's shield goes when the new rating leaves its league;
+- the player sees it in their history as `adjust` ("Düzeltme"; no score,
+  target or run), and the panel as a counted change.
+
+Recorded as `player.rating` with `details` `{ from, to, tierFrom, tierTo }`
+(`from` and `tierFrom` null when it placed the player), in the same
+transaction. The rating the player has already: `changed: false`, nothing
+written. Only an owner: it changes competitive standings.
 
 ### `POST /players/{id}/delete` — owner
 
@@ -343,9 +368,10 @@ day, whatever became of them), with today first even before anyone played it.
 
 ## Ratings
 
-The panel shows ratings; it never changes one (a rating moves only through
-Dereceli runs and moderation). A player's league is their rating's tier,
-ranked by Elo and never reset.
+The panel shows ratings; it changes one only when an owner sets it by hand
+(`POST /players/{id}/rating`) — otherwise a rating moves only through
+Dereceli runs and moderation. A player's league is their rating's tier,
+ranked by Elo (qb, as players call it) and never reset.
 
 ### `GET /ratings` — viewer
 
@@ -393,7 +419,7 @@ subject { type, id, label }, reason, details, ip` — `ip` only for an owner.
   (`/ops/moderate`, `/ops/admins`) or `system`.
 - `action`: `auth.login`, `auth.password_changed`, `player.ban`,
   `player.unban`, `player.rename`, `player.sign_out`, `player.delete`,
-  `player.avatar_remove`, `player.reports_dismiss`,
+  `player.avatar_remove`, `player.reports_dismiss`, `player.rating`,
   `run.approve`, `run.reject`, `admin.create`, `admin.update`,
   `admin.reset_password`, `system.migrate`, `system.optimize`,
   `system.expire_runs`, `system.analytics_prune`.

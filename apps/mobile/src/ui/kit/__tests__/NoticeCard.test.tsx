@@ -20,6 +20,18 @@ describe('NoticeCard', () => {
     expect(screen.queryByRole('button')).not.toBeOnTheScreen();
   });
 
+  it('shrinks a long title onto its line, unless the title always fits', async () => {
+    await render(
+      <>
+        <NoticeCard eyebrow="GÜNÜN AKIŞI #17" title="Herkes aynı akışı oynar · tek hak" icon="calendar" />
+        <NoticeCard eyebrow="LİG" title="Gümüş lig · 1.100 Elo" icon="shield" fit={false} />
+      </>,
+    );
+
+    expect(screen.getByText('Herkes aynı akışı oynar · tek hak').props.adjustsFontSizeToFit).toBe(true);
+    expect(screen.getByText('Gümüş lig · 1.100 Elo').props.adjustsFontSizeToFit).toBe(false);
+  });
+
   it('keeps its body and its answers two targets: ✓ never opens the body', async () => {
     const open = jest.fn();
     const accept = jest.fn();

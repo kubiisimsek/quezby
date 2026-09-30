@@ -149,7 +149,7 @@ export function RunPage() {
         <Callout tone="warn" title="Bu tur incelemede">
           <p>
             {me.mode === 'rated'
-              ? 'Yumuşak bir sinyali var ve oyuncuyu Elo tablosunun zirvesine taşıyacak. Onaylanana kadar reytinge sayılmaz.'
+              ? 'Yumuşak bir sinyali var ve oyuncuyu qb tablosunun zirvesine taşıyacak. Onaylanana kadar reytinge sayılmaz.'
               : 'Yumuşak bir sinyali var ve skoru sezonun ya da haftanın zirvesine girecek. Onaylanana kadar hiçbir tabloda görünmez.'}
           </p>
         </Callout>

@@ -97,7 +97,7 @@ export function MedalBadge({
 }
 
 
-function tierColors(
+export function tierColors(
   theme: Theme,
   tier: LeagueTier,
 ): { solid: string; soft: string } {

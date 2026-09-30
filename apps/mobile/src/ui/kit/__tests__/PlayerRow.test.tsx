@@ -16,11 +16,19 @@ describe('PlayerRow', () => {
     ).toBeOnTheScreen();
   });
 
-  it('says when there is no league or record yet', async () => {
+  it('shows the player in their league frame', async () => {
+    await render(<PlayerRow username="ekin" tier="gold" best={41_200} />);
+
+    // The row's portrait, and the league badge beside the record.
+    expect(screen.getAllByTestId('league-frame-gold', { includeHiddenElements: true })).toHaveLength(2);
+  });
+
+  it('says when there is no league or record yet, and draws no frame', async () => {
     await render(<PlayerRow username="oya" tier={null} best={null} />);
 
     expect(screen.getByText('Henüz rekor yok')).toBeOnTheScreen();
     expect(screen.queryByRole('image')).not.toBeOnTheScreen();
+    expect(screen.queryByTestId(/^league-frame-/, { includeHiddenElements: true })).not.toBeOnTheScreen();
   });
 
   it('opens the card from the player and acts from the button, separately', async () => {

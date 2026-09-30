@@ -1,13 +1,7 @@
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { CompositeScreenProps } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type {
-  LeagueTier,
-  LeagueUnlock,
-  RatingChange,
-  RatingEntry,
-  RatingResponse,
-} from '@quezby/types';
+import type { LeagueTier, LeagueUnlock, RatingEntry, RatingResponse } from '@quezby/types';
 import type { UseQueryResult } from '@tanstack/react-query';
 import { useCallback, useState, type ReactNode } from 'react';
 import {
@@ -27,6 +21,7 @@ import { track } from '@/analytics/track';
 import { BoardStage, useArrival } from '@/components/BoardStage';
 import { FloorDock } from '@/components/FloorDock';
 import { PlayerSheet } from '@/components/PlayerSheet';
+import { QbHistorySheet } from '@/components/QbHistorySheet';
 import { useRating, useRatingBoard } from '@/hooks/useBoards';
 import { useT } from '@/i18n';
 import { messageFor } from '@/lib/errors';
@@ -40,9 +35,10 @@ import {
   EmptyState,
   Eyebrow,
   FloorCard,
+  IconButton,
   IconChip,
   Meter,
-  Panel,
+  QbCoin,
   Ribbon,
   Screen,
   SkeletonList,
@@ -56,7 +52,6 @@ import {
 import {
   FONT,
   SPACE,
-  TYPE,
   embossed,
   lh,
   useTheme,
@@ -69,17 +64,14 @@ type Props = CompositeScreenProps<
   NativeStackScreenProps<RootStackParamList>
 >;
 
-/** How many of the latest rating changes the screen lists. */
-const HISTORY_ROWS = 6;
-
 /**
- * The league — the one your Elo puts you in. On the stage: its emblem
- * glowing between the leagues under and over it, your Elo in gold, how far
- * into the league you are and how far the next one is, and the score your
- * next run has to beat. Before it: how far Dereceli is, then the placement
- * games. Under it, your latest changes, then the league's players by Elo —
- * a ranking that never resets — with your floor pinned over the dock: the
- * Elo to pass the player right above you.
+ * The league — the one your qb puts you in. On the stage: you in its frame
+ * between the leagues under and over it, your qb in gold on its coin, how
+ * far into the league you are, your best. The
+ * coin in the stage's corner opens your qb moves. Before it: how far
+ * Dereceli is, then the placement games. Under it, the league's players by
+ * qb — a ranking that never resets — with your floor pinned over the dock:
+ * the qb to pass the player right above you.
  */
 export function LeagueScreen({ navigation }: Props) {
   const rating = useRating();
@@ -90,6 +82,7 @@ export function LeagueScreen({ navigation }: Props) {
   const [selected, setSelected] = useState<string | null>(null);
   const [floorHeight, setFloorHeight] = useState(0);
   const [pulling, setPulling] = useState(false);
+  const [moves, setMoves] = useState(false);
 
   const play = useCallback(
     (mode: 'free' | 'rated' = 'rated') => navigation.navigate('Game', { mode }),
@@ -115,7 +108,6 @@ export function LeagueScreen({ navigation }: Props) {
   const data = placed ? board.data : undefined;
   const me = data?.me ?? null;
   const above = me ? (data?.entries.find((entry) => entry.rank === me.rank - 1) ?? null) : null;
-  const history = rating.data?.history.slice(0, HISTORY_ROWS) ?? [];
 
   let ranking: ReactNode;
   if (!rating.data) {
@@ -198,16 +190,10 @@ export function LeagueScreen({ navigation }: Props) {
         }
         showsVerticalScrollIndicator={false}
       >
-        <LeagueStage rating={rating} onPlay={play} />
+        <LeagueStage rating={rating} onPlay={play} onMoves={() => setMoves(true)} />
         <View style={[styles.body, styles.stack]}>
-          {history.length > 0 ? <History changes={history} /> : null}
           <View style={styles.stack}>
             <Eyebrow icon="podium">{t.league.board}</Eyebrow>
-            {placed ? (
-              <Txt variant="meta" tone="muted">
-                {t.league.rule}
-              </Txt>
-            ) : null}
             {ranking}
           </View>
         </View>
@@ -227,6 +213,12 @@ export function LeagueScreen({ navigation }: Props) {
       ) : null}
 
       <PlayerSheet username={selected} onClose={() => setSelected(null)} />
+      <QbHistorySheet
+        open={moves}
+        onClose={() => setMoves(false)}
+        changes={rating.data?.history ?? []}
+        current={rating.data?.placed ? rating.data.rating : null}
+      />
     </Screen>
   );
 }
@@ -250,18 +242,20 @@ function tierColor(theme: Theme, tier: LeagueTier): string {
 }
 
 /**
- * The stage: the league your Elo puts you in, on its ladder. Before it, the
+ * The stage: the league your qb puts you in, on its ladder. Before it, the
  * way there: while Dereceli is shut, how many Normal or Günlük games open it;
- * then the placement games that set the Elo, each with its gold way in. A
+ * then the placement games that set the qb, each with its gold way in. A
  * spinner holds the room while it loads; an empty emblem when it could not
- * be loaded.
+ * be loaded. Once Dereceli is open, the coin in the corner opens the qb moves.
  */
 function LeagueStage({
   rating,
   onPlay,
+  onMoves,
 }: {
   rating: UseQueryResult<RatingResponse>;
   onPlay: (mode: 'free' | 'rated') => void;
+  onMoves: () => void;
 }) {
   const theme = useTheme();
   const t = useT();
@@ -299,7 +293,18 @@ function LeagueStage({
 
   return (
     <BoardStage style={[styles.stage, { paddingTop: insets.top + SPACE.md }]}>
-      <Ribbon label={t.league.ribbon} />
+      <View style={styles.top}>
+        <Ribbon label={t.league.ribbon} />
+        {data && !data.unlock ? (
+          <IconButton
+            icon="qb"
+            label={t.rating.history.open}
+            tone="onBrand"
+            onPress={onMoves}
+            style={styles.moves}
+          />
+        ) : null}
+      </View>
       {hero}
     </BoardStage>
   );
@@ -317,7 +322,6 @@ function TierHero({
   const theme = useTheme();
   const t = useT();
   const intro = useArrival(0, 12);
-  const next = TIERS[TIERS.indexOf(tier) + 1] ?? null;
 
   return (
     <Animated.View style={[styles.hero, intro]}>
@@ -325,49 +329,34 @@ function TierHero({
       <Txt variant="hero" align="center">
         {t.tiers.league(tier)}
       </Txt>
-      <Text
-        accessibilityLabel={t.rating.elo(t.fmt.score(value))}
-        style={[styles.elo, { color: theme.gold }, embossed(3)]}
-      >
-        {t.rating.elo(t.fmt.score(value))}
-      </Text>
-      <View style={styles.bar}>
-        {rating.progress !== null ? (
+      <View style={styles.qb}>
+        <QbCoin size={38} />
+        <Text
+          accessibilityLabel={t.rating.elo(t.fmt.score(value))}
+          style={[styles.elo, { color: theme.gold }, embossed(3)]}
+        >
+          {t.fmt.score(value)}
+        </Text>
+      </View>
+      {rating.progress !== null ? (
+        <View style={styles.bar}>
           <Meter value={rating.progress / 1000} tone="warn" notches={4} />
-        ) : null}
-        <Txt variant="meta" tone="onSolid" align="center">
-          {next !== null && rating.ceil !== null
-            ? t.rating.toNext(next, t.fmt.score(rating.ceil - value))
-            : t.rating.noCeiling}
-        </Txt>
-      </View>
-      <View style={styles.tags}>
-        {rating.target !== null ? (
-          <Tag
-            label={t.rating.target(t.fmt.score(rating.target))}
-            tone="warn"
-            icon="target"
-          />
-        ) : null}
-        {rating.difficulty ? (
-          <Tag label={t.rating.difficulty(t.fmt.score(rating.difficulty))} tone="secondary" icon="flame" />
-        ) : null}
-        {rating.shield ? (
-          <Tag label={t.rating.shield(rating.shield.runs)} tone="secondary" icon="shield" />
-        ) : null}
-        {rating.peak !== null ? (
-          <Tag label={t.rating.peak(t.fmt.score(rating.peak))} tone="neutral" icon="trophy" />
-        ) : null}
-      </View>
-      {rating.target !== null ? (
-        <Txt variant="micro" tone="onSolid" align="center">
-          {t.rating.targetHint}
-        </Txt>
+        </View>
       ) : null}
-      {rating.difficulty ? (
-        <Txt variant="micro" tone="onSolid" align="center">
-          {t.rating.difficultyHint}
-        </Txt>
+      {rating.shield || rating.peak !== null ? (
+        <View style={styles.tags}>
+          {rating.shield ? (
+            <Tag label={t.rating.shield(rating.shield.runs)} tone="secondary" icon="shield" />
+          ) : null}
+          {rating.peak !== null ? (
+            <Tag
+              label={t.rating.peak(t.fmt.score(rating.peak))}
+              said={t.rating.peak(t.rating.elo(t.fmt.score(rating.peak)))}
+              tone="neutral"
+              icon="qb"
+            />
+          ) : null}
+        </View>
       ) : null}
     </Animated.View>
   );
@@ -515,60 +504,11 @@ function Rung({
   );
 }
 
-/** A change that set the rating rather than moved it: it shows the rating it set. */
-function placing(change: RatingChange): boolean {
-  return change.before === null && (change.kind === 'placement' || change.kind === 'forfeit');
-}
-
-/** The latest moves of the rating, newest first: why, and by how much — or, for a placement, where it set it. */
-function History({ changes }: { changes: RatingChange[] }) {
-  const theme = useTheme();
-  const t = useT();
-  const words = t.rating.history;
-
-  return (
-    <Panel style={styles.history}>
-      <Text style={[TYPE.label, { color: theme.inkMuted }]}>{words.title}</Text>
-      {changes.map((change, index) => (
-        <View key={`${change.at}-${index}`} style={styles.change}>
-          <View style={styles.changeText}>
-            <Txt variant="heading" numberOfLines={1}>
-              {words.kinds[change.kind]}
-            </Txt>
-            {change.score !== null && change.target !== null ? (
-              <Txt variant="micro" tone="muted" numberOfLines={1}>
-                {words.run(t.fmt.score(change.score), t.fmt.score(change.target))}
-              </Txt>
-            ) : null}
-          </View>
-          <Text
-            style={[
-              styles.changeDelta,
-              {
-                color: placing(change)
-                  ? theme.ink
-                  : change.delta > 0
-                    ? theme.ok
-                    : change.delta < 0
-                      ? theme.bad
-                      : theme.inkMuted,
-              },
-              embossed(1.5),
-            ]}
-          >
-            {placing(change) && change.after !== null
-              ? t.fmt.score(change.after)
-              : t.rating.delta(change.delta)}
-          </Text>
-        </View>
-      ))}
-    </Panel>
-  );
-}
-
 const styles = StyleSheet.create({
   content: { flexGrow: 1 },
   stage: { gap: SPACE.md, paddingBottom: SPACE.xl },
+  top: { alignItems: 'center', alignSelf: 'stretch', justifyContent: 'center', minHeight: 42 },
+  moves: { end: SPACE.lg, position: 'absolute' },
   waiting: {
     alignItems: 'center',
     gap: SPACE.md,
@@ -578,6 +518,7 @@ const styles = StyleSheet.create({
   },
   hero: { alignItems: 'center', gap: SPACE.sm, paddingHorizontal: SPACE.xl },
   heroPlay: { alignSelf: 'stretch', marginTop: SPACE.sm, paddingHorizontal: SPACE.xl },
+  qb: { alignItems: 'center', flexDirection: 'row', gap: SPACE.sm },
   elo: { fontFamily: FONT.display, fontSize: 34, lineHeight: lh(40), textAlign: 'center' },
   bar: { alignSelf: 'stretch', gap: SPACE.xs, paddingHorizontal: SPACE.xl },
   tags: {
@@ -616,9 +557,5 @@ const styles = StyleSheet.create({
   },
   body: { padding: SPACE.xl },
   stack: { gap: SPACE.lg },
-  history: { gap: SPACE.sm },
-  change: { alignItems: 'center', flexDirection: 'row', gap: SPACE.md },
-  changeText: { flex: 1, gap: SPACE.xxs },
-  changeDelta: { fontFamily: FONT.display, fontSize: 18, lineHeight: lh(22) },
   rows: { gap: SPACE.sm },
 });

@@ -15,11 +15,12 @@ import type { RootStackParamList } from '@/navigation/types';
 import {
   Button,
   Callout,
+  LeagueChip,
+  QbChip,
   SkeletonList,
   Stamp,
   StatGrid,
   Tag,
-  TierBadge,
   Txt,
   type TagTone,
 } from '@/ui/kit';
@@ -37,8 +38,9 @@ type Then =
 
 /**
  * A player's card, over whatever board or list it was opened from: their
- * portrait, league and Elo, their best this season in gold, their places and a
- * few lifetime numbers — then what the two of you can do, by what you are to
+ * portrait in their league's frame, their league and Elo, their best this
+ * season in gold, their places and a few lifetime numbers — then what the two
+ * of you can do, by what you are to
  * each other: ask to be friends, answer their request, send a VS or open the
  * conversation, lift a block. The rarer actions — ending the friendship,
  * blocking, reporting a photo or a name — wait under "Diğer".
@@ -54,7 +56,10 @@ export function PlayerSheet({
   onClose: () => void;
   /** Opened from the conversation itself: no way into it. */
   inThread?: boolean;
-  /** The player's league and Elo; Zirve, the score boards' screen, shows neither. */
+  /**
+   * The player's league badge and Elo; Zirve, the score boards' screen, shows
+   * neither. Their frame is everyone's to see, from every screen.
+   */
   rating?: boolean;
 }) {
   const t = useT();
@@ -121,16 +126,14 @@ export function PlayerSheet({
                   src={card.avatarUrl}
                   isMe={card.isMe}
                   size="md"
-                  tier={rating ? card.league : null}
+                  tier={card.league}
                 />
               </Stamp>
               <View style={styles.who}>
                 {rating && card.league ? (
                   <View style={styles.league}>
-                    <TierBadge tier={card.league} size="md" showLabel />
-                    {card.rating !== null ? (
-                      <Tag label={t.rating.elo(t.fmt.score(card.rating))} tone="warn" icon="trophy" />
-                    ) : null}
+                    <LeagueChip tier={card.league} />
+                    {card.rating !== null ? <QbChip value={card.rating} /> : null}
                   </View>
                 ) : null}
                 <RelationTag card={card} />

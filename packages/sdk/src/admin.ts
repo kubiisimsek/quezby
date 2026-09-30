@@ -34,6 +34,8 @@ import type {
   AdminRunsQuery,
   AdminRunsResponse,
   AdminSession,
+  AdminSetRatingRequest,
+  AdminSetRatingResponse,
   AdminSuspectsQuery,
   AdminSuspectsResponse,
   AdminSystem,
@@ -106,6 +108,9 @@ export function createAdminClient(options: AdminClientOptions) {
       /** Lets the player's open reports go. */
       dismissReports: (playerId: string, input: AdminReasonRequest) =>
         request<AdminActionResponse>(`/players/${id(playerId)}/reports/dismiss`, { method: 'POST', body: input }),
+      /** Sets the player's rating (qb) by hand, placing them if they are not yet. Owner only. */
+      setRating: (playerId: string, input: AdminSetRatingRequest) =>
+        request<AdminSetRatingResponse>(`/players/${id(playerId)}/rating`, { method: 'POST', body: input }),
       /** Owner only. */
       remove: (playerId: string, input: AdminDeletePlayerRequest) =>
         request<void>(`/players/${id(playerId)}/delete`, { method: 'POST', body: input }),

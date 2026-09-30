@@ -96,7 +96,7 @@ export function TierTag({ tier }: { tier: LeagueTier }) {
 export function EloDelta({ value, unit = false }: { value: number; unit?: boolean }) {
   return (
     <span className={cn('whitespace-nowrap font-semibold tabular', value > 0 ? 'text-ok-text' : value < 0 ? 'text-bad-text' : 'text-ink-muted')}>
-      {unit ? `${formatDelta(value)} Elo` : formatDelta(value)}
+      {unit ? `${formatDelta(value)} qb` : formatDelta(value)}
     </span>
   );
 }

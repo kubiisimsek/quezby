@@ -40,7 +40,7 @@ const tr = {
   },
   league: {
     title: 'Lig',
-    /** Your league and rating: "Altın lig · 2.340 Elo". */
+    /** Your league and rating: "Altın lig · 2.340 qb". */
     rated: (league: string, elo: string) => `${league} · ${elo}`,
   },
   rival: {

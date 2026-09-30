@@ -151,11 +151,18 @@ export function NoticeCard({
   onPress,
   accessibilityLabel,
   fresh = false,
+  fit = true,
   style,
 }: {
   /** What kind of notice — "GÜNÜN AKIŞI #17", typed in capitals. */
   eyebrow: string;
   title: string;
+  /**
+   * Shrinks a long title onto its one line. Off for a title that always
+   * fits: iOS (Fabric) sometimes draws a shrink-to-fit line a few points
+   * tall, past minimumFontScale.
+   */
+  fit?: boolean;
   /** One live line: a countdown, a meter, a tag or a few words. */
   meta?: ReactNode;
   icon?: IconName;
@@ -187,7 +194,7 @@ export function NoticeCard({
         </Text>
         <Text
           numberOfLines={1}
-          adjustsFontSizeToFit={SHRINK_TO_FIT}
+          adjustsFontSizeToFit={fit && SHRINK_TO_FIT}
           minimumFontScale={0.8}
           style={[TYPE.heading, { color: theme.ink }]}
         >
@@ -566,6 +573,16 @@ function Counter({ item }: { item: CounterItem }) {
 }
 
 /**
+ * A place's type size, by its length — "#12" and "—" big, "#12.345" smaller
+ * — so it fits its well. Not iOS's shrink-to-fit: on the profile it drew "—"
+ * a few points tall.
+ */
+export function rankSize(text: string): { fontSize: number; lineHeight: number } {
+  const size = text.length <= 6 ? 19 : text.length <= 8 ? 16 : 14;
+  return { fontSize: size, lineHeight: lh(size + 4) };
+}
+
+/**
  * Where you stand on each board — today, this week, this month, all time:
  * one well per board, the place in gold over its name, "—" where you have not
  * placed. The ranks are the API's; nothing here counts.
@@ -595,9 +612,9 @@ export function RankChips({
         >
           <Text
             numberOfLines={1}
-            adjustsFontSizeToFit={SHRINK_TO_FIT}
             style={[
               styles.rankValue,
+              rankSize(t.fmt.rank(item.rank)),
               { color: item.rank ? theme.gold : theme.inkFaint },
             ]}
           >
@@ -669,5 +686,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACE.xs,
     paddingVertical: SPACE.ms,
   },
-  rankValue: { fontFamily: FONT.display, fontSize: 19, lineHeight: lh(23) },
+  rankValue: { fontFamily: FONT.display },
 });

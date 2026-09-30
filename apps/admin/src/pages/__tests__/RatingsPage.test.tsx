@@ -68,7 +68,7 @@ describe('RatingsPage', () => {
     renderApp({ path: '/ratings', api: withRatings() });
 
     const rules = (await screen.findByRole('heading', { name: 'Kurallar' })).closest('section') as HTMLElement;
-    expect(within(rules).getByText('±100 Elo')).toBeInTheDocument();
+    expect(within(rules).getByText('±100 qb')).toBeInTheDocument();
     expect(within(rules).getByText('Geçici dönemde 400: değişimler daha büyük')).toBeInTheDocument();
     expect(within(rules).getByText('1.200 ile 1.800 arasına')).toBeInTheDocument();
     expect(within(rules).getByText('%50')).toBeInTheDocument();
@@ -79,7 +79,7 @@ describe('RatingsPage', () => {
 
     const difficulty = within(rules).getByText('Zorluk', { selector: 'dt' }).parentElement as HTMLElement;
     expect(difficulty).toHaveTextContent('0–16');
-    expect(difficulty).toHaveTextContent('1.000 Elo’dan sonra her 250 Elo’da bir artar · tablo 1');
+    expect(difficulty).toHaveTextContent('1.000 qb’den sonra her 250 qb’de bir artar · tablo 1');
 
     // The targets of the difficulty table: what a placed player's run is measured with.
     const targets = screen.getByRole('heading', { name: 'Hedef tablosu' }).closest('section') as HTMLElement;

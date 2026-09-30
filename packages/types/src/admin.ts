@@ -226,6 +226,15 @@ export type AdminPlayerResponse = {
 
 export type AdminRenameResponse = AdminActionResponse & { username: string };
 
+/**
+ * `POST /admin/players/{id}/rating`: sets the player's rating (qb) by hand.
+ * It places a player not placed yet and opens Dereceli to them; the player
+ * sees it as an `adjust` in their history.
+ */
+export type AdminSetRatingRequest = AdminReasonRequest & { rating: number };
+
+export type AdminSetRatingResponse = AdminActionResponse & { rating: number; tier: LeagueTier };
+
 /** `confirm` is the player's username, typed out. */
 export type AdminDeletePlayerRequest = AdminReasonRequest & { confirm: string };
 
@@ -664,6 +673,8 @@ export type AdminAuditAction =
   | 'player.avatar_remove'
   /** A moderator let a player's open reports go. */
   | 'player.reports_dismiss'
+  /** An owner set a player's rating (qb) by hand; `details` holds `from`, `to` and the leagues. */
+  | 'player.rating'
   | 'run.approve'
   | 'run.reject'
   | 'admin.create'

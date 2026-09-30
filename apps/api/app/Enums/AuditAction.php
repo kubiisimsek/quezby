@@ -14,6 +14,8 @@ enum AuditAction: string
     case PlayerDelete = 'player.delete';
     case AvatarRemove = 'player.avatar_remove';
     case ReportsDismiss = 'player.reports_dismiss';
+    /** An owner set a player's rating (qb) by hand; `details` holds `from`, `to`, `tierFrom` and `tierTo`. */
+    case PlayerRating = 'player.rating';
     case RunApprove = 'run.approve';
     case RunReject = 'run.reject';
     case AdminCreate = 'admin.create';

@@ -83,6 +83,14 @@ const CALLS: Call[] = [
     body: { reason: 'Sorun yok' },
     auth: true,
   },
+  {
+    name: 'players.setRating',
+    call: (api) => api.players.setRating(PLAYER, { rating: 3250, reason: 'Lig testi' }),
+    method: 'POST',
+    url: `/players/${PLAYER}/rating`,
+    body: { rating: 3250, reason: 'Lig testi' },
+    auth: true,
+  },
   { name: 'reports.list', call: (api) => api.reports.list({ status: 'open', page: 2 }), method: 'GET', url: '/reports?status=open&page=2', auth: true },
   {
     name: 'players.remove',

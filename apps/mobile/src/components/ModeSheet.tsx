@@ -59,9 +59,8 @@ export function ModeSheet({
   let ratedLine: string;
   if (unlock) ratedLine = words.lockedTitle(unlock.remaining);
   else if (placement) ratedLine = t.rating.placement.title(placement.played, placement.required);
-  else if (rating?.difficulty)
-    ratedLine = words.lines.ratedAt(t.fmt.score(rating.difficulty), t.fmt.score(rating.target ?? 0));
-  else ratedLine = words.lines.rated(t.fmt.score(rating?.target ?? 0));
+  else if (rating?.placed && rating.target !== null) ratedLine = words.lines.ratedMin(t.fmt.score(rating.target));
+  else ratedLine = words.lines.rated;
   const league =
     rating?.placed && rating.tier && rating.rating !== null && !unlock
       ? { tier: rating.tier, line: t.home.league.rated(t.tiers.league(rating.tier), t.rating.elo(t.fmt.score(rating.rating))) }

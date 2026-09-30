@@ -79,12 +79,12 @@ describe('RunPage', () => {
     expect(await screen.findByText('Tur onaylandı')).toBeInTheDocument();
   });
 
-  it('says a held rated run waits for the Elo board, counts on the rating alone, and was played at its difficulty', async () => {
+  it('says a held rated run waits for the qb board, counts on the rating alone, and was played at its difficulty', async () => {
     const api = fakeApi();
     api.runs.get.mockResolvedValue(runResponse({}, { status: 'review', mode: 'rated', difficulty: 12, difficultyVersion: 1 }));
     const { user } = renderApp({ path: `/runs/${ID}`, api, session: adminSession({ role: 'moderator' }) });
 
-    expect(await screen.findByText(/oyuncuyu Elo tablosunun zirvesine taşıyacak/)).toBeInTheDocument();
+    expect(await screen.findByText(/oyuncuyu qb tablosunun zirvesine taşıyacak/)).toBeInTheDocument();
     const difficulty = screen.getByText('Zorluk', { selector: 'dt' }).parentElement as HTMLElement;
     expect(difficulty).toHaveTextContent('12');
     expect(difficulty).toHaveTextContent('Zorluk tablosu 1; tur bu zorlukla tekrar oynatıldı');
@@ -197,7 +197,7 @@ describe('RunPage', () => {
 
     const card = await ratingCard();
     expect(within(fact(card, 'Ne oldu')).getByText('Tur')).toBeInTheDocument();
-    expect(within(fact(card, 'Değişim')).getByText('+42 Elo')).toHaveClass('text-ok-text');
+    expect(within(fact(card, 'Değişim')).getByText('+42 qb')).toHaveClass('text-ok-text');
     expect(fact(card, 'Reyting')).toHaveTextContent('2.408 → 2.450');
     expect(within(fact(card, 'Lig')).getByText('Altın')).toBeInTheDocument();
     expect(fact(card, 'Skor')).toHaveTextContent('140.000');
@@ -217,7 +217,7 @@ describe('RunPage', () => {
 
     const card = await ratingCard();
     expect(within(card).getByText('Moderatör geri aldı: −55')).toBeInTheDocument();
-    expect(within(fact(card, 'Değişim')).getByText('+55 Elo')).toBeInTheDocument();
+    expect(within(fact(card, 'Değişim')).getByText('+55 qb')).toBeInTheDocument();
     expect(fact(card, 'Terfi kalkanı')).toHaveTextContent('Tuttu');
   });
 

@@ -15,4 +15,6 @@ enum RatingKind: string
     case Void = 'void';
     /** A gain taken back after a moderator threw its run out. */
     case Reversal = 'reversal';
+    /** An owner set the rating by hand from the panel (`POST /admin/players/{id}/rating`); it places a player not placed yet. */
+    case Adjust = 'adjust';
 }

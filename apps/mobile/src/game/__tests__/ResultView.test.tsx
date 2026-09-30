@@ -159,18 +159,20 @@ describe('ResultView', () => {
     expect(screen.queryByText(/lig · #/)).toBeNull();
   });
 
-  it('shows what the run did to the Elo: where it stands, the move, the target and the next one', async () => {
+  it('shows what the run did to the qb: where it stands on its coin, the move, the score against the target', async () => {
     await view({ mode: 'verified', response: response({ rating: buildRunRating() }) }).render();
 
-    expect(screen.getByText('ELO')).toBeTruthy();
+    expect(screen.getByText('QB')).toBeTruthy();
     expect(screen.getByText('1.640')).toBeTruthy();
+    expect(screen.getAllByTestId('qb-coin', { includeHiddenElements: true }).length).toBeGreaterThan(0);
     expect(screen.getByTestId('rating-delta')).toHaveTextContent('+42');
     expect(screen.getByText('Skor 104.560 · Hedef 66.100')).toBeTruthy();
-    expect(screen.getByText('Sıradaki hedef 72.400')).toBeTruthy();
+    // What the next run plays against stays unsaid.
+    expect(screen.queryByText(/^Sıradaki/)).toBeNull();
     expect(screen.queryByText(/yükseldin|düştün/)).toBeNull();
   });
 
-  it('shows a rated run’s Elo and the difficulty it was played at, and nothing of the boards', async () => {
+  it('shows a rated run’s qb, never the difficulty it was played at, and nothing of the boards', async () => {
     const run = response().run;
     await view(
       {
@@ -191,22 +193,21 @@ describe('ResultView', () => {
       'rated',
     ).render();
 
-    // Dereceli's own ceremony, not the score's stage and the Elo tile.
-    expect(screen.queryByText('ELO')).toBeNull();
+    // Dereceli's own ceremony, not the score's stage and the qb tile.
+    expect(screen.queryByText('QB')).toBeNull();
     expect(screen.getByLabelText('Gümüş lig')).toBeTruthy();
-    expect(screen.getByText('Zorluk 9')).toBeTruthy();
-    expect(screen.getByText('Sıradaki zorluk 10')).toBeTruthy();
+    expect(screen.queryByText(/Zorluk|^Sıradaki/)).toBeNull();
     expect(screen.queryByLabelText(/^Hafta: /)).toBeNull();
     expect(screen.queryByText('#12')).toBeNull();
     expect(screen.queryByText('YENİ REKOR!')).toBeNull();
     expect(screen.queryByText(/^Sezon rekorun/)).toBeNull();
   });
 
-  it('says nothing of the next difficulty when the run left it where it was', async () => {
-    await view({ mode: 'verified', response: response({ rating: buildRunRating({ difficulty: 7, nextDifficulty: 7 }) }) }).render();
+  it('says nothing of difficulty on the qb tile either', async () => {
+    await view({ mode: 'verified', response: response({ rating: buildRunRating({ difficulty: 7, nextDifficulty: 8 }) }) }).render();
 
-    expect(screen.getByText('Zorluk 7')).toBeTruthy();
-    expect(screen.queryByText(/^Sıradaki zorluk/)).toBeNull();
+    expect(screen.getByText('QB')).toBeTruthy();
+    expect(screen.queryByText(/Zorluk|^Sıradaki/)).toBeNull();
   });
 
   it('says a new league in gold', async () => {
@@ -286,13 +287,13 @@ describe('ResultView', () => {
   it('says a held run counts once it is checked', async () => {
     await view({ mode: 'verified', response: response({ rating: buildRunRating({ kind: 'pending' }) }) }).render();
 
-    expect(screen.getByText('Skorun incelenince Elo’ya yazılır')).toBeTruthy();
+    expect(screen.getByText('Skorun incelenince qb’ye yazılır')).toBeTruthy();
   });
 
   it('says a run that did not count', async () => {
     await view({ mode: 'verified', response: response({ rating: buildRunRating({ kind: 'void' }) }) }).render();
 
-    expect(screen.getByText('Bu tur Elo’ya sayılmadı')).toBeTruthy();
+    expect(screen.getByText('Bu tur qb’ye sayılmadı')).toBeTruthy();
   });
 
   it('reads each board’s place and its move aloud in words', async () => {
@@ -531,7 +532,7 @@ describe('ResultView', () => {
     }).render();
 
     expect(screen.getByText('Dereceli açıldı!')).toBeTruthy();
-    expect(screen.getByText('İlk 3 dereceli oyunun Elo’nu belirler.')).toBeTruthy();
+    expect(screen.getByText('İlk 3 dereceli oyunun qb’ni belirler.')).toBeTruthy();
     expect(screen.queryByText(/oyun kaldı/)).toBeNull();
   });
 

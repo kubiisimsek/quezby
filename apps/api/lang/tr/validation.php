@@ -106,6 +106,7 @@ return [
         'passwordConfirmation' => 'şifre tekrarı',
         'perPage' => 'sayfa boyutu',
         'player' => 'oyuncu',
+        'rating' => 'qb',
         'reason' => 'sebep',
         'role' => 'rol',
         'search' => 'arama',

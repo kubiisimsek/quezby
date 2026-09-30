@@ -1,5 +1,5 @@
 import type { AdminPlayerRef } from '@quezby/types';
-import { Ban, FlagOff, ImageOff, KeyRound, LogOut, RotateCcw, ShieldCheck, Trash2 } from 'lucide-react';
+import { Ban, FlagOff, Gauge, ImageOff, KeyRound, LogOut, RotateCcw, ShieldCheck, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -9,7 +9,7 @@ import { ConfirmModal } from '@/components/patterns/confirm-modal';
 import { FormModal } from '@/components/patterns/form-modal';
 import { usePlayerActions } from '@/hooks/api/players';
 import { errorMessage, fieldErrors } from '@/lib/errors';
-import { playerName } from '@/lib/format';
+import { formatNumber, LEAGUE_TIER, playerName } from '@/lib/format';
 
 type DialogProps = {
   player: AdminPlayerRef;
@@ -191,6 +191,70 @@ export function DismissReportsDialog({ player, open, onOpenChange, onDone }: Dia
       }
     >
       <ReasonField error={fields.reason} placeholder="Ör. fotoğrafta kural dışı bir şey yok" />
+    </FormModal>
+  );
+}
+
+/**
+ * An owner sets a player's qb by hand — to try a league on staging, or to put
+ * a rating right. The API places a player not placed yet, and keeps the old
+ * and the new value in the audit log.
+ */
+export function SetRatingDialog({ player, rating, open, onOpenChange, onDone }: DialogProps & { rating: number | null }) {
+  const { setRating } = usePlayerActions(player.id);
+  const fields = fieldErrors(setRating.error);
+  const [blank, setBlank] = useState(false);
+  const ratingError = blank ? 'Yeni qb’yi yaz.' : fields.rating;
+
+  return (
+    <FormModal
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) {
+          setRating.reset();
+          setBlank(false);
+        }
+        onOpenChange(next);
+      }}
+      title={`${playerName(player.username)} qb’si değiştirilsin mi?`}
+      description="qb ve lig hemen değişir; oyuncu bunu geçmişinde “Düzeltme” olarak görür. Henüz yerleşmediyse yerleşir ve Dereceli açılır. Eski ve yeni değer denetim kaydında kalır."
+      icon={<Gauge />}
+      tone="warn"
+      submitLabel="qb’yi değiştir"
+      loading={setRating.isPending}
+      error={setRating.error && !fields.reason && !fields.rating ? errorMessage(setRating.error) : null}
+      onSubmit={(data) => {
+        const typed = String(data.get('rating') ?? '').trim();
+        setBlank(typed === '');
+        if (typed === '') return;
+        setRating.mutate(
+          { rating: Number(typed), reason: reasonOf(data) },
+          {
+            onSuccess: ({ changed, rating: now, tier }) => {
+              if (changed) toast.success('qb değişti', { description: `Yeni qb: ${formatNumber(now)} · ${LEAGUE_TIER[tier]}` });
+              else toast.info('Değişen bir şey yok: qb zaten bu.');
+              onOpenChange(false);
+              onDone?.();
+            },
+          },
+        );
+      }}
+    >
+      <TextField
+        label="Yeni qb"
+        name="rating"
+        type="number"
+        inputMode="numeric"
+        min={0}
+        max={9999}
+        step={1}
+        icon={<Gauge />}
+        defaultValue={rating ?? ''}
+        hint="0 ile 9.999 arası bir tam sayı. Her 1.000 qb bir lig; 5.000 ve üstü MasterClass."
+        error={ratingError}
+        required
+      />
+      <ReasonField error={fields.reason} placeholder="Ör. staging’de Elmas ligini denemek için" />
     </FormModal>
   );
 }

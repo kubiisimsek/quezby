@@ -35,7 +35,9 @@
     "api:package:staging": "./scripts/package-api.sh staging",
     "api:package:production": "./scripts/package-api.sh production",
     "admin:package:staging": "node scripts/package-admin.mjs staging",
-    "admin:package:production": "node scripts/package-admin.mjs production"
+    "admin:package:production": "node scripts/package-admin.mjs production",
+    "android:bundle:staging": "node scripts/package-android.mjs staging",
+    "android:bundle:production": "node scripts/package-android.mjs production"
   },
   "devDependencies": {
     "eslint": "^10.8.1",

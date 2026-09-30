@@ -16,22 +16,28 @@ import { DEPTH, FONT, RADIUS, SPACE, TYPE, embossed, lh, useTheme } from '@/ui/t
 
 /**
  * A status on a pill: a glyph (or a dot) and a few words, in the tone's colour
- * on its dark wash. Never colour alone.
+ * on its dark wash. Never colour alone. `said` is what a screen reader says
+ * when the glyph carries a word the pill does not write — "2.450" by the qb
+ * glyph is "2.450 qb".
  */
 export function Tag({
   label,
   tone = 'neutral',
   icon,
+  said,
 }: {
   label: string;
   tone?: TagTone;
   icon?: IconName;
+  said?: string;
 }) {
   const theme = useTheme();
   const colors = tagPalette(theme)[tone];
 
   return (
     <View
+      accessible={said !== undefined}
+      accessibilityLabel={said}
       style={[
         styles.tag,
         { backgroundColor: colors.bg, borderColor: colors.border },
@@ -264,14 +270,14 @@ const styles = StyleSheet.create({
   tagDot: { borderRadius: RADIUS.pill, height: 6, width: 6 },
   tagText: { fontFamily: FONT.bold, fontSize: 12, lineHeight: lh(15) },
   callout: {
-    alignItems: 'flex-start',
+    alignItems: 'center',
     borderRadius: RADIUS.control,
     borderWidth: 2,
     flexDirection: 'row',
     gap: SPACE.md,
     padding: SPACE.md,
   },
-  calloutText: { gap: 2, paddingTop: 1 },
+  calloutText: { gap: 2 },
   stat: {
     alignItems: 'center',
     borderBottomWidth: DEPTH.outline + DEPTH.lipSm,

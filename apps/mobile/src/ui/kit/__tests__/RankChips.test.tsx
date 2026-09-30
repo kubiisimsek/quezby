@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react-native';
 import { iso } from '@/i18n';
 import { useLanguage } from '@/i18n/language';
 import { RankChips } from '@/ui/kit';
+import { rankSize } from '@/ui/kit/lobby';
 import { arena } from '@/ui/tokens';
 
 describe('RankChips', () => {
@@ -78,5 +79,15 @@ describe('RankChips', () => {
 
     expect(screen.getByLabelText(`اليوم: ${iso('#44')}`)).toBeOnTheScreen();
     expect(screen.getByLabelText('الأسبوع: لست في الترتيب')).toBeOnTheScreen();
+  });
+
+  it('sizes a place by its length, never by shrinking it to fit', async () => {
+    expect(rankSize('—').fontSize).toBe(19);
+    expect(rankSize('#1.204').fontSize).toBe(19);
+    expect(rankSize('#12.345').fontSize).toBe(16);
+    expect(rankSize('#1.234.567').fontSize).toBe(14);
+
+    await render(<RankChips items={[{ label: 'Hafta', rank: null }]} />);
+    expect(screen.getByText('—').props.adjustsFontSizeToFit).toBeFalsy();
   });
 });

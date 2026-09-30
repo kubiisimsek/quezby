@@ -14,6 +14,8 @@ describe('permissions', () => {
     expect(can('viewer', 'moderate')).toBe(false);
     expect(can('moderator', 'moderate')).toBe(true);
     expect(can('moderator', 'deletePlayers')).toBe(false);
+    expect(can('moderator', 'setRatings')).toBe(false);
+    expect(can('owner', 'setRatings')).toBe(true);
     expect(can('moderator', 'manageAdmins')).toBe(false);
     expect(can('owner', 'manageSystem')).toBe(true);
     expect(can('owner', 'seeIps')).toBe(true);

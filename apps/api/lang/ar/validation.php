@@ -104,6 +104,7 @@ return [
         'passwordConfirmation' => 'تأكيد كلمة المرور',
         'perPage' => 'حجم الصفحة',
         'player' => 'اللاعب',
+        'rating' => 'qb',
         'reason' => 'السبب',
         'role' => 'الدور',
         'search' => 'البحث',

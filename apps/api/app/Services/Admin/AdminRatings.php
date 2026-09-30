@@ -15,9 +15,9 @@ use App\Support\Timestamp;
 use Illuminate\Container\Attributes\Config;
 
 /**
- * The ratings as the admin panel shows them — never changed from here: how
- * many sit in each league, the highest, one player's rating and its history,
- * what one run did to it.
+ * The ratings as the admin panel shows them — read only; an owner sets one by
+ * hand through `PlayerActions::setRating`: how many sit in each league, the
+ * highest, one player's rating and its history, what one run did to it.
  */
 final class AdminRatings
 {

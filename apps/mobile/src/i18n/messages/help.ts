@@ -57,15 +57,15 @@ const tr = {
   },
   leagues: {
     title: 'Ligler',
-    lead: 'Üç mod var: Günlük, Normal ve Dereceli. Elo’nu yalnız Dereceli değiştirir. Dereceli, 20 Normal ya da Günlük oyundan sonra açılır; ilk 3 dereceli oyunun Elo’nu belirler ve herkes Gümüş’te başlar.',
+    lead: 'Üç mod var: Günlük, Normal ve Dereceli. qb’ni yalnız Dereceli değiştirir. Dereceli, 20 Normal ya da Günlük oyundan sonra açılır; ilk 3 dereceli oyunun qb’ni belirler ve herkes Gümüş’te başlar.',
     more: [
-      'Altı lig var: Bronz, Gümüş, Altın, Platin, Elmas ve MasterClass. Her lig 1.000 Elo, MasterClass 5.000 ve üstü.',
-      'Her dereceli oyunun bir hedef skoru var. Geçersen Elo’n artar, altında kalırsan düşer; ne kadar farkla, o kadar çok. Bir oyun en fazla 100 Elo değiştirir.',
+      'Altı lig var: Bronz, Gümüş, Altın, Platin, Elmas ve MasterClass. Her lig 1.000 qb, MasterClass 5.000 ve üstü.',
+      'Her dereceli oyunun bir hedef skoru var. Geçersen qb’n artar, altında kalırsan düşer; ne kadar farkla, o kadar çok. Bir oyun en fazla 100 qb değiştirir.',
       'Dereceli oyundan çıkarsan oyun o anki skorunla sayılır. Yarım bırakılan dereceli oyun ise en düşük sonuç sayılır.',
       'Yeni bir lige çıkınca 3 oyun boyunca ondan düşmezsin. Bronz’da kayıplar yarıdır.',
-      'Lig sıralaması hiç sıfırlanmaz: ligindeki, son 14 günde dereceli oynamış oyuncular Elo’ya göre sıralanır.',
-      'Elo’n arttıkça Dereceli zorlaşır: engeller sıklaşır, hatalar daha çok dopamin götürür ve dopamin daha hızlı biter. Zorluk 1.000 Elo’da başlar ve her 250 Elo’da bir artar.',
-      'Dereceli yalnızca Elo için oynanır. Skorun Bu hafta, Bu ay ve Tüm zamanlar sıralamalarına yazılmaz.',
+      'Lig sıralaması hiç sıfırlanmaz: ligindeki, son 14 günde dereceli oynamış oyuncular qb’ye göre sıralanır.',
+      'qb’n arttıkça Dereceli zorlaşır: engeller sıklaşır, hatalar daha çok dopamin götürür ve dopamin daha hızlı biter. Zorluk 1.000 qb’de başlar ve her 250 qb’de bir artar.',
+      'Dereceli yalnızca qb için oynanır. Skorun Bu hafta, Bu ay ve Tüm zamanlar sıralamalarına yazılmaz.',
     ],
   },
   boards: {
@@ -73,7 +73,7 @@ const tr = {
     lead: 'Üç sıralama var: Bu hafta, Bu ay ve Tüm zamanlar. Her birinde o dönemdeki en iyi turun tek satır olarak durur.',
     more: [
       'Gün gece yarısı, hafta pazartesi, ay ayın biriyle başlar; hepsi Europe/Istanbul saatiyle.',
-      'Sıralamalara Normal ve Günlük oyunların yazılır. Dereceli oyunlar yalnızca Elo’nu değiştirir.',
+      'Sıralamalara Normal ve Günlük oyunların yazılır. Dereceli oyunlar yalnızca qb’ni değiştirir.',
       'Skorlar eşitse o skora önce ulaşan önde.',
       'Oyunun kuralları değişince yeni bir sezon başlar; sıralamalar ve sezon rekorun sıfırdan başlar.',
     ],
@@ -112,7 +112,7 @@ const tr = {
       {
         question: 'Ligde nasıl yükselirim?',
         answer:
-          'Dereceli oyna ve hedef skorunu geç: hedefin üstüne çıktıkça Elo’n artar ve 1.000 Elo’da bir üst lige geçersin.',
+          'Dereceli oyna ve hedef skorunu geç: hedefin üstüne çıktıkça qb’n artar ve 1.000 qb’de bir üst lige geçersin.',
       },
       {
         question: 'Arkadaşlarımla nasıl yarışırım?',
@@ -190,15 +190,15 @@ const en: HelpMessages = {
   },
   leagues: {
     title: 'Leagues',
-    lead: 'There are three modes: Daily, Normal and Ranked. Only Ranked changes your Elo. Ranked opens after 20 Normal or Daily games; your first 3 ranked games set your Elo, and everyone starts in Silver.',
+    lead: 'There are three modes: Daily, Normal and Ranked. Only Ranked changes your qb. Ranked opens after 20 Normal or Daily games; your first 3 ranked games set your qb, and everyone starts in Silver.',
     more: [
-      'There are six leagues: Bronze, Silver, Gold, Platinum, Diamond and MasterClass. Each league is 1,000 Elo; MasterClass is 5,000 and up.',
-      'Every ranked game has a target score. Beat it and your Elo goes up, fall short and it goes down; the bigger the gap, the bigger the move. One game changes it by 100 Elo at most.',
+      'There are six leagues: Bronze, Silver, Gold, Platinum, Diamond and MasterClass. Each league is 1,000 qb; MasterClass is 5,000 and up.',
+      'Every ranked game has a target score. Beat it and your qb goes up, fall short and it goes down; the bigger the gap, the bigger the move. One game changes it by 100 qb at most.',
       'If you quit a ranked game, it counts with your score so far. A ranked game left unfinished counts as the lowest result.',
       "When you move up a league, you can't drop out of it for 3 games. Losses in Bronze are halved.",
-      'The league ranking never resets: the players of your league who played Ranked in the last 14 days, by Elo.',
-      'The higher your Elo, the harder Ranked gets: more obstacles, mistakes cost more dopamine and your dopamine drains faster. Difficulty starts at 1,000 Elo and goes up every 250 Elo.',
-      'Ranked is played for Elo only. Its scores never go on the This week, This month or All time rankings.',
+      'The league ranking never resets: the players of your league who played Ranked in the last 14 days, by qb.',
+      'The higher your qb, the harder Ranked gets: more obstacles, mistakes cost more dopamine and your dopamine drains faster. Difficulty starts at 1,000 qb and goes up every 250 qb.',
+      'Ranked is played for qb only. Its scores never go on the This week, This month or All time rankings.',
     ],
   },
   boards: {
@@ -206,7 +206,7 @@ const en: HelpMessages = {
     lead: 'There are three rankings: This week, This month and All time. Each one holds your best run of that period as a single row.',
     more: [
       'The day starts at midnight, the week on Monday and the month on the 1st, all on Istanbul time.',
-      'Your Normal and Daily games go on the rankings. Ranked games only change your Elo.',
+      'Your Normal and Daily games go on the rankings. Ranked games only change your qb.',
       'When scores tie, whoever reached that score first is ahead.',
       "When the game's rules change, a new season begins; the rankings and your season record start from zero.",
     ],
@@ -244,7 +244,7 @@ const en: HelpMessages = {
       {
         question: 'How do I move up in the league?',
         answer:
-          'Play Ranked and beat your target score: every game above it raises your Elo, and every 1,000 Elo is a league up.',
+          'Play Ranked and beat your target score: every game above it raises your qb, and every 1,000 qb is a league up.',
       },
       {
         question: 'How do I compete with my friends?',
@@ -322,15 +322,15 @@ const de: HelpMessages = {
   },
   leagues: {
     title: 'Ligen',
-    lead: 'Es gibt drei Modi: Täglich, Normal und Gewertet. Nur Gewertet ändert dein Elo. Gewertet öffnet sich nach 20 normalen oder täglichen Spielen; deine ersten 3 gewerteten Spiele bestimmen dein Elo, und alle starten in Silber.',
+    lead: 'Es gibt drei Modi: Täglich, Normal und Gewertet. Nur Gewertet ändert dein qb. Gewertet öffnet sich nach 20 normalen oder täglichen Spielen; deine ersten 3 gewerteten Spiele bestimmen dein qb, und alle starten in Silber.',
     more: [
-      'Es gibt sechs Ligen: Bronze, Silber, Gold, Platin, Diamant und MasterClass. Jede Liga umfasst 1.000 Elo, MasterClass beginnt bei 5.000.',
-      'Jedes gewertete Spiel hat einen Ziel-Score. Schlägst du ihn, steigt dein Elo, bleibst du darunter, sinkt es; je größer der Abstand, desto mehr. Ein Spiel ändert es um höchstens 100 Elo.',
+      'Es gibt sechs Ligen: Bronze, Silber, Gold, Platin, Diamant und MasterClass. Jede Liga umfasst 1.000 qb, MasterClass beginnt bei 5.000.',
+      'Jedes gewertete Spiel hat einen Ziel-Score. Schlägst du ihn, steigt dein qb, bleibst du darunter, sinkt es; je größer der Abstand, desto mehr. Ein Spiel ändert es um höchstens 100 qb.',
       'Brichst du ein gewertetes Spiel ab, zählt es mit deinem Score bis dahin. Ein liegen gelassenes gewertetes Spiel zählt als schlechtestes Ergebnis.',
       'Nach einem Aufstieg kannst du 3 Spiele lang nicht aus der neuen Liga fallen. In Bronze zählen Verluste nur zur Hälfte.',
-      'Die Liga-Rangliste wird nie zurückgesetzt: die Spieler deiner Liga, die in den letzten 14 Tagen gewertet gespielt haben, nach Elo.',
-      'Je höher dein Elo, desto schwerer wird Gewertet: mehr Hindernisse, Fehler kosten mehr Dopamin und dein Dopamin sinkt schneller. Die Schwierigkeit beginnt bei 1.000 Elo und steigt alle 250 Elo.',
-      'Gewertet spielst du nur um Elo. Die Scores kommen nicht in die Ranglisten Diese Woche, Dieser Monat und Allzeit.',
+      'Die Liga-Rangliste wird nie zurückgesetzt: die Spieler deiner Liga, die in den letzten 14 Tagen gewertet gespielt haben, nach qb.',
+      'Je höher dein qb, desto schwerer wird Gewertet: mehr Hindernisse, Fehler kosten mehr Dopamin und dein Dopamin sinkt schneller. Die Schwierigkeit beginnt bei 1.000 qb und steigt alle 250 qb.',
+      'Gewertet spielst du nur um qb. Die Scores kommen nicht in die Ranglisten Diese Woche, Dieser Monat und Allzeit.',
     ],
   },
   boards: {
@@ -338,7 +338,7 @@ const de: HelpMessages = {
     lead: 'Es gibt drei Ranglisten: Diese Woche, Dieser Monat und Allzeit. In jeder steht deine beste Runde aus diesem Zeitraum als eine Zeile.',
     more: [
       'Der Tag beginnt um Mitternacht, die Woche am Montag, der Monat am Ersten – alles nach Istanbuler Zeit.',
-      'In die Ranglisten kommen deine normalen und täglichen Spiele. Gewertete Spiele ändern nur dein Elo.',
+      'In die Ranglisten kommen deine normalen und täglichen Spiele. Gewertete Spiele ändern nur dein qb.',
       'Bei gleichem Score liegt vorn, wer ihn zuerst erreicht hat.',
       'Ändern sich die Spielregeln, beginnt eine neue Saison; die Ranglisten und dein Saisonrekord fangen bei null an.',
     ],
@@ -376,7 +376,7 @@ const de: HelpMessages = {
       {
         question: 'Wie steige ich in der Liga auf?',
         answer:
-          'Spiel Gewertet und schlag deinen Ziel-Score: Jedes Spiel darüber hebt dein Elo, und alle 1.000 Elo geht es eine Liga hoch.',
+          'Spiel Gewertet und schlag deinen Ziel-Score: Jedes Spiel darüber hebt dein qb, und alle 1.000 qb geht es eine Liga hoch.',
       },
       {
         question: 'Wie trete ich gegen meine Freunde an?',
@@ -458,15 +458,15 @@ const ar: HelpMessages = {
   },
   leagues: {
     title: 'الدوريات',
-    lead: 'هناك ثلاثة أنماط: يومي وعادي ومصنَّف. وحده المصنَّف يغيّر تصنيفك (إيلو). يُفتح المصنَّف بعد 20 مباراة عادية أو يومية، وأول 3 مباريات مصنَّفة لك تحدد تصنيفك، والجميع يبدأ في الفضة.',
+    lead: 'هناك ثلاثة أنماط: يومي وعادي ومصنَّف. وحده المصنَّف يغيّر تصنيفك (qb). يُفتح المصنَّف بعد 20 مباراة عادية أو يومية، وأول 3 مباريات مصنَّفة لك تحدد تصنيفك، والجميع يبدأ في الفضة.',
     more: [
-      'هناك ستة دوريات: البرونز والفضة والذهب والبلاتين والماس وماستر كلاس. كل دوري ‎1000‎ إيلو، وماستر كلاس من ‎5000‎ فما فوق.',
-      'لكل مباراة مصنَّفة نتيجة هدف. إن تجاوزتها ارتفع تصنيفك، وإن بقيت دونها انخفض، وكلما كبر الفارق كبر التغيير. لا تغيّر المباراة الواحدة أكثر من 100 إيلو.',
+      'هناك ستة دوريات: البرونز والفضة والذهب والبلاتين والماس وماستر كلاس. كل دوري ‎1000‎ qb، وماستر كلاس من ‎5000‎ فما فوق.',
+      'لكل مباراة مصنَّفة نتيجة هدف. إن تجاوزتها ارتفع تصنيفك، وإن بقيت دونها انخفض، وكلما كبر الفارق كبر التغيير. لا تغيّر المباراة الواحدة أكثر من 100 qb.',
       'إن خرجت من مباراة مصنَّفة تُحسب بنتيجتك حتى تلك اللحظة. أما المباراة المصنَّفة المتروكة دون إنهاء فتُحسب أدنى نتيجة.',
       'عندما تصعد إلى دوري جديد لا تهبط منه طوال 3 مباريات. وفي البرونز تُحسب الخسارة بالنصف.',
-      'ترتيب الدوري لا يُصفَّر أبدًا: لاعبو دوريك الذين لعبوا مصنَّفًا في آخر 14 يومًا، حسب الإيلو.',
-      'كلما ارتفع تصنيفك صار المصنَّف أصعب: عقبات أكثر، والأخطاء تكلّف دوبامين أكثر، والدوبامين ينفد أسرع. تبدأ الصعوبة عند 1.000 إيلو وتزداد كل 250 إيلو.',
-      'المصنَّف للإيلو فقط. نتائجه لا تُكتب في ترتيبات هذا الأسبوع وهذا الشهر وكل الأوقات.',
+      'ترتيب الدوري لا يُصفَّر أبدًا: لاعبو دوريك الذين لعبوا مصنَّفًا في آخر 14 يومًا، حسب qb.',
+      'كلما ارتفع تصنيفك صار المصنَّف أصعب: عقبات أكثر، والأخطاء تكلّف دوبامين أكثر، والدوبامين ينفد أسرع. تبدأ الصعوبة عند 1.000 qb وتزداد كل 250 qb.',
+      'المصنَّف من أجل qb فقط. نتائجه لا تُكتب في ترتيبات هذا الأسبوع وهذا الشهر وكل الأوقات.',
     ],
   },
   boards: {
@@ -512,7 +512,7 @@ const ar: HelpMessages = {
       {
         question: 'كيف أصعد في الدوري؟',
         answer:
-          'العب مصنَّفًا وتجاوز نتيجة هدفك: كل مباراة فوقه ترفع تصنيفك، وكل ‎1000‎ إيلو تعني دوريًا أعلى.',
+          'العب مصنَّفًا وتجاوز نتيجة هدفك: كل مباراة فوقه ترفع تصنيفك، وكل ‎1000‎ qb تعني دوريًا أعلى.',
       },
       {
         question: 'كيف أنافس أصدقائي؟',
@@ -589,15 +589,15 @@ const fr: HelpMessages = {
   },
   leagues: {
     title: 'Ligues',
-    lead: "Il y a trois modes : Quotidien, Normal et Classé. Seul le mode classé change ton Elo. Il s'ouvre après 20 parties normales ou quotidiennes ; tes 3 premières parties classées fixent ton Elo, et tout le monde commence en Argent.",
+    lead: "Il y a trois modes : Quotidien, Normal et Classé. Seul le mode classé change ton qb. Il s'ouvre après 20 parties normales ou quotidiennes ; tes 3 premières parties classées fixent ton qb, et tout le monde commence en Argent.",
     more: [
-      'Il y a six ligues : Bronze, Argent, Or, Platine, Diamant et MasterClass. Chaque ligue fait 1 000 Elo, MasterClass commence à 5 000.',
-      "Chaque partie classée a un score objectif. Dépasse-le et ton Elo monte, reste en dessous et il baisse ; plus l'écart est grand, plus il bouge. Une partie le change de 100 Elo au plus.",
+      'Il y a six ligues : Bronze, Argent, Or, Platine, Diamant et MasterClass. Chaque ligue fait 1 000 qb, MasterClass commence à 5 000.',
+      "Chaque partie classée a un score objectif. Dépasse-le et ton qb monte, reste en dessous et il baisse ; plus l'écart est grand, plus il bouge. Une partie le change de 100 qb au plus.",
       'Si tu quittes une partie classée, elle compte avec ton score du moment. Une partie classée laissée en plan compte comme le plus mauvais résultat.',
       'Quand tu montes de ligue, tu ne peux pas en redescendre pendant 3 parties. En Bronze, les pertes sont divisées par deux.',
-      'Le classement de la ligue ne repart jamais de zéro : les joueurs de ta ligue qui ont joué en classé ces 14 derniers jours, par Elo.',
-      'Plus ton Elo monte, plus le mode classé devient dur : plus d’obstacles, les erreurs coûtent plus de dopamine et ta dopamine baisse plus vite. La difficulté commence à 1 000 Elo et augmente tous les 250 Elo.',
-      'Le mode classé se joue pour l’Elo uniquement. Ses scores ne vont pas dans les classements Cette semaine, Ce mois-ci et Depuis toujours.',
+      'Le classement de la ligue ne repart jamais de zéro : les joueurs de ta ligue qui ont joué en classé ces 14 derniers jours, par qb.',
+      'Plus ton qb monte, plus le mode classé devient dur : plus d’obstacles, les erreurs coûtent plus de dopamine et ta dopamine baisse plus vite. La difficulté commence à 1 000 qb et augmente tous les 250 qb.',
+      'Le mode classé se joue pour le qb uniquement. Ses scores ne vont pas dans les classements Cette semaine, Ce mois-ci et Depuis toujours.',
     ],
   },
   boards: {
@@ -605,7 +605,7 @@ const fr: HelpMessages = {
     lead: 'Il y a trois classements : Cette semaine, Ce mois-ci et Depuis toujours. Dans chacun, ta meilleure partie de la période tient sur une seule ligne.',
     more: [
       "Le jour commence à minuit, la semaine le lundi et le mois le 1er, tous à l'heure d'Istanbul.",
-      'Tes parties normales et quotidiennes vont dans les classements. Les parties classées ne changent que ton Elo.',
+      'Tes parties normales et quotidiennes vont dans les classements. Les parties classées ne changent que ton qb.',
       "À score égal, celui qui l'a atteint en premier passe devant.",
       'Quand les règles du jeu changent, une nouvelle saison commence ; les classements et ton record de la saison repartent de zéro.',
     ],
@@ -643,7 +643,7 @@ const fr: HelpMessages = {
       {
         question: 'Comment monter en ligue ?',
         answer:
-          "Joue en classé et dépasse ton score objectif : chaque partie au-dessus fait monter ton Elo, et tous les 1 000 Elo tu montes d'une ligue.",
+          "Joue en classé et dépasse ton score objectif : chaque partie au-dessus fait monter ton qb, et tous les 1 000 qb tu montes d'une ligue.",
       },
       {
         question: 'Comment affronter mes amis ?',
@@ -721,15 +721,15 @@ const es: HelpMessages = {
   },
   leagues: {
     title: 'Ligas',
-    lead: 'Hay tres modos: Diario, Normal y Competitivo. Solo Competitivo cambia tu Elo. Se abre después de 20 partidas normales o diarias; tus primeras 3 partidas competitivas fijan tu Elo y todos empiezan en Plata.',
+    lead: 'Hay tres modos: Diario, Normal y Competitivo. Solo Competitivo cambia tu qb. Se abre después de 20 partidas normales o diarias; tus primeras 3 partidas competitivas fijan tu qb y todos empiezan en Plata.',
     more: [
-      'Hay seis ligas: Bronce, Plata, Oro, Platino, Diamante y MasterClass. Cada liga son 1.000 Elo y MasterClass empieza en 5.000.',
-      'Cada partida competitiva tiene una puntuación objetivo. Si la superas, tu Elo sube; si te quedas por debajo, baja; cuanto mayor la diferencia, mayor el cambio. Una partida lo cambia 100 Elo como mucho.',
+      'Hay seis ligas: Bronce, Plata, Oro, Platino, Diamante y MasterClass. Cada liga son 1.000 qb y MasterClass empieza en 5.000.',
+      'Cada partida competitiva tiene una puntuación objetivo. Si la superas, tu qb sube; si te quedas por debajo, baja; cuanto mayor la diferencia, mayor el cambio. Una partida lo cambia 100 qb como mucho.',
       'Si sales de una partida competitiva, cuenta con la puntuación que llevabas. Una partida competitiva abandonada cuenta como el peor resultado.',
       'Al subir de liga, no puedes caer de ella durante 3 partidas. En Bronce, las pérdidas son la mitad.',
-      'La tabla de la liga nunca se reinicia: los jugadores de tu liga que jugaron Competitivo en los últimos 14 días, por Elo.',
-      'Cuanto más Elo tienes, más difícil es Competitivo: más obstáculos, los errores cuestan más dopamina y tu dopamina baja más rápido. La dificultad empieza en 1.000 Elo y sube cada 250 Elo.',
-      'Competitivo se juega solo por Elo. Sus puntuaciones no entran en Esta semana, Este mes ni Histórico.',
+      'La tabla de la liga nunca se reinicia: los jugadores de tu liga que jugaron Competitivo en los últimos 14 días, por qb.',
+      'Cuanto más qb tienes, más difícil es Competitivo: más obstáculos, los errores cuestan más dopamina y tu dopamina baja más rápido. La dificultad empieza en 1.000 qb y sube cada 250 qb.',
+      'Competitivo se juega solo por qb. Sus puntuaciones no entran en Esta semana, Este mes ni Histórico.',
     ],
   },
   boards: {
@@ -737,7 +737,7 @@ const es: HelpMessages = {
     lead: 'Hay tres clasificaciones: Esta semana, Este mes e Histórico. En cada una, tu mejor partida de ese periodo aparece en una sola fila.',
     more: [
       'El día empieza a medianoche, la semana el lunes y el mes el día 1; todo en hora de Estambul.',
-      'En las clasificaciones entran tus partidas normales y diarias. Las competitivas solo cambian tu Elo.',
+      'En las clasificaciones entran tus partidas normales y diarias. Las competitivas solo cambian tu qb.',
       'Si hay empate, va delante quien llegó antes a esa puntuación.',
       'Cuando cambian las reglas del juego, empieza una nueva temporada; las clasificaciones y tu récord de la temporada empiezan de cero.',
     ],
@@ -775,7 +775,7 @@ const es: HelpMessages = {
       {
         question: '¿Cómo subo en la liga?',
         answer:
-          'Juega Competitivo y supera tu puntuación objetivo: cada partida por encima sube tu Elo, y cada 1.000 Elo es una liga más.',
+          'Juega Competitivo y supera tu puntuación objetivo: cada partida por encima sube tu qb, y cada 1.000 qb es una liga más.',
       },
       {
         question: '¿Cómo compito con mis amigos?',

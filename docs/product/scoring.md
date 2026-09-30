@@ -314,6 +314,15 @@ vazgeçilen turu iptal eder.
 kez; `reversal`); kaybettirdiği ve hükmen kayıplar kalır. Yasaklı oyuncunun
 reytingi donar ve Elo tabelasında görünmez.
 
+**Elle düzeltme:** yalnızca bir sahip, yönetim panelinden bir oyuncunun
+reytingini (qb) sebebiyle birlikte elle koyabilir (`adjust`, oyuncunun
+geçmişinde "Düzeltme"; denetim kaydında `player.rating`, eski ve yeni
+değerle). Yerleşmemiş oyuncu yerleşir ve Dereceli ona açılır; yerleşmeden
+sonraki geçici dönem başlar. Tur oynanmadığı için sayılan tur ve son sayılan
+tur anı değişmez — Elo tabelasına bir sonraki dereceli turuyla girer. Reyting
+o an değiştiği için eşitlikte o reytinge önce ulaşan önde kalır; yeni lig
+terfi kalkanının ligi değilse kalkan düşer.
+
 **Lig sıralaması** (lig ekranı): satrançtaki gibi, ligin kendisi Elo'nun
 kademesidir ve sıralaması **hiç sıfırlanmaz**. Haftalık grup, hafta kapanışı
 ve Elo bonusu yoktur. Lig ekranı, oyuncunun liginde son 14 günde dereceli

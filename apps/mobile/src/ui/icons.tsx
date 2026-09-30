@@ -53,6 +53,8 @@ export type IconName =
   | 'hourglass'
   // the game
   | 'trophy'
+  /** qb, the rating: its coin and monogram (`QbCoin` is the full-colour one). */
+  | 'qb'
   | 'crown'
   | 'medal'
   | 'flame'
@@ -298,6 +300,15 @@ const GLYPHS: Record<IconName, (s: Stroke, color: string) => ReactNode> = {
         {...s}
       />
       <Path d="M12 13.8v3.4M8.4 20.4h7.2M9.8 20.4l.4-3.2h3.6l.4 3.2" {...s} />
+    </>
+  ),
+  qb: (s) => (
+    <>
+      <Circle cx={12} cy={12} r={9.6} {...s} />
+      <Path
+        d="M10.6 12.6a2.2 2.2 0 1 1-4.4 0a2.2 2.2 0 1 1 4.4 0M10.6 10.2V17M13.4 11.4a2.2 2.2 0 1 0 4.4 0a2.2 2.2 0 1 0-4.4 0M13.4 7v6.8"
+        {...s}
+      />
     </>
   ),
   crown: (s) => (

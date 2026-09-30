@@ -29,4 +29,12 @@ describe('Icon', () => {
       expect(JSON.stringify(await svgStyle(<Icon name={name} color="#000000" />))).not.toContain('scaleX');
     }
   });
+
+  it('draws qb, the rating, as its coin and monogram', async () => {
+    const { Icon } = jest.requireActual('@/ui/icons') as typeof import('@/ui/icons');
+    const view = await render(<Icon name="qb" color="#000000" />);
+    const drawing = JSON.stringify(view.toJSON());
+    expect(drawing).toContain('9.6');
+    expect(drawing).toContain('M10.6 12.6');
+  });
 });

@@ -168,7 +168,7 @@ describe('ProfileScreen', () => {
 
       expect(screen.getByText('@ekin')).toBeOnTheScreen();
       expect(await screen.findByLabelText('Altın lig')).toBeOnTheScreen();
-      expect(screen.getByText('2.450 Elo')).toBeOnTheScreen();
+      expect(screen.getByLabelText('2.450 qb')).toBeOnTheScreen();
       expect(screen.getByText('Misafir hesap')).toBeOnTheScreen();
       expect(screen.getByLabelText('12.345 Rekor')).toBeOnTheScreen();
       expect(await screen.findByLabelText('12 arkadaş')).toBeOnTheScreen();
@@ -202,7 +202,7 @@ describe('ProfileScreen', () => {
       expect(screen.getByLabelText('Hafta: sıralamada değilsin')).toBeOnTheScreen();
     });
 
-    it('names no league and no Elo while the player is still placing', async () => {
+    it('names no league and no qb while the player is still placing', async () => {
       mocked.rating.current.mockResolvedValue(buildPlacing(2));
       await renderProfile();
       // The rating's answer has landed and been drawn.
@@ -214,7 +214,7 @@ describe('ProfileScreen', () => {
       });
 
       expect(screen.queryByLabelText(/ lig$/)).not.toBeOnTheScreen();
-      expect(screen.queryByText(/Elo$/)).not.toBeOnTheScreen();
+      expect(screen.queryByText(/qb$/)).not.toBeOnTheScreen();
     });
 
     it('keeps how the account is kept for Hesap bilgileri', async () => {

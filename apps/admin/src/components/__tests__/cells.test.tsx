@@ -120,7 +120,7 @@ describe('EloDelta', () => {
     expect(screen.getByText('+42')).toHaveClass('text-ok-text');
     expect(screen.getByText('−18')).toHaveClass('text-bad-text');
     expect(screen.getByText('0')).toHaveClass('text-ink-muted');
-    expect(screen.getByText('+50 Elo')).toHaveClass('text-ok-text');
+    expect(screen.getByText('+50 qb')).toHaveClass('text-ok-text');
   });
 });
 

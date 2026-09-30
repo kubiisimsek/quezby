@@ -27,6 +27,7 @@ import {
   Ribbon,
   Spotlight,
   Stamp,
+  QbCoin,
   Tag,
   Txt,
   gemColors,
@@ -256,10 +257,12 @@ export function RankedStage({
         ) : null}
 
         <View style={styles.eloRow}>
+          <QbCoin size={44} />
           <CountUp
             value={after}
             from={story === 'reveal' ? 0 : before}
-            format={(value) => t.rating.elo(t.fmt.score(Math.round(value)))}
+            format={(value) => t.fmt.score(Math.round(value))}
+            said={(value) => t.rating.elo(t.fmt.score(value))}
             delay={skipped ? 0 : T.count}
             duration={skipped ? 0 : T.countMs}
             style={[styles.elo, { color: theme.gold }, embossed(4)]}
@@ -291,19 +294,6 @@ export function RankedStage({
                 <Verdict score={score} target={rating.target} />
               ) : null}
               {rating.shielded ? <Tag label={words.shielded} tone="secondary" icon="shield" /> : null}
-              {rating.difficulty > 0 ? (
-                <Tag label={t.rating.difficulty(t.fmt.score(rating.difficulty))} tone="secondary" icon="flame" />
-              ) : null}
-              {rating.nextDifficulty !== null && rating.nextDifficulty !== rating.difficulty ? (
-                <Tag
-                  label={words.nextDifficulty(t.fmt.score(rating.nextDifficulty))}
-                  tone={rating.nextDifficulty > rating.difficulty ? 'warn' : 'neutral'}
-                  icon={rating.nextDifficulty > rating.difficulty ? 'trendUp' : 'trendDown'}
-                />
-              ) : null}
-              {rating.nextTarget !== null ? (
-                <Tag label={words.next(t.fmt.score(rating.nextTarget))} tone="neutral" icon="target" />
-              ) : null}
             </View>
           </View>
         </Stamp>
@@ -468,7 +458,7 @@ const styles = StyleSheet.create({
   rays: { height: RAYS, left: (FRAME - RAYS) / 2, position: 'absolute', top: (FRAME - RAYS) / 2, width: RAYS },
   flash: { borderRadius: FRAME, height: FRAME, position: 'absolute', width: FRAME },
   league: { fontFamily: FONT.display, fontSize: 30, lineHeight: lh(36), textAlign: 'center' },
-  eloRow: { alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap', gap: SPACE.md, justifyContent: 'center' },
+  eloRow: { alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap', gap: SPACE.sm, justifyContent: 'center' },
   elo: { fontFamily: FONT.display, fontSize: 46, lineHeight: lh(54) },
   delta: {
     alignItems: 'center',

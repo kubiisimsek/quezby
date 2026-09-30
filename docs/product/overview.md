@@ -90,8 +90,8 @@ kaldığı adıma döner, başka bir hesaba giren görmez.
    günlükse paylaşım kartı. Dereceli turun kendi töreni vardır: skorun
    yerine oyuncu, liginin çerçevesi içinde; Elo eski yerinden yenisine sayar,
    değişim büyük yeşil ya da kırmızı bir levhada ("+42"), ligin barı onunla
-   akar ("Platin'e 158 Elo"), altında "Skor … · Hedef …", "Hedefi geçtin" ya da
-   "Hedefin altında" ve zorluk etiketleri. Yeni ligde bar dolar, eski çerçeve
+   akar ("Platin'e 158 qb"), altında "Skor … · Hedef …", "Hedefi geçtin" ya da
+   "Hedefin altında". Zorluk ve sıradaki hedef yazılmaz. Yeni ligde bar dolar, eski çerçeve
    parlayıp gider, yenisi dönen ışınların önüne iner, "YÜKSELDİN!", konfeti ve
    titreşim; düşüşte kırmızı "DÜŞTÜN" ve sarsıntı; yerleşen turda ilk çerçeve
    açılır ("YERLEŞTİN!"). Dereceli turda sıra, rekor ve "geçtiklerin" yoktur. Bir VS turunda sıra ve
@@ -133,18 +133,40 @@ yalnız o besler, hiçbir skor tablosuna yazılmaz.
   başına bir seviye (🟩 hatasız, 🟨 bir-iki hata, 🟥 daha fazla, ⬛ bittiği yer).
   Metni sunucu yazar.
 - **Lig = Elo:** Bronz · Gümüş · Altın · Platin · Elmas · **MasterClass**, her
-  biri 1000 Elo (MasterClass 5000 ve üstü). Lig bir **profil çerçevesidir**:
-  oyuncunun portresi liginin çerçevesinde durur (lobide, lig ekranında,
-  profilde, oyuncu kartında, "Mod seç"in Dereceli kutusunda). Çerçeve lig
+  biri 1000 Elo (MasterClass 5000 ve üstü). Lig bir **profil çerçevesidir**
+  ve herkese açıktır: oyuncunun portresi liginin çerçevesinde durur. Lobide,
+  lig ekranında, profilde, her ekrandan açılan oyuncu kartında, arkadaş
+  listesinde, aramada ve "Mod seç"in Dereceli kutusunda. Zirve'den açılan
+  kartta da çerçeve görünür, lig adı ve Elo görünmez. Çerçeve lig
   yükseldikçe süslenir: sade Bronz, küçük kanatlı Gümüş, büyüyen kanatlar,
   Platin'in sivri tepesi, Elmas'ın tacı, MasterClass'ın taç, hale ve ışınları;
   lig ekranında ve sonuçta parlar, ışıldar. Her dereceli turun bir **hedef
   skoru** var: geçen Elo kazanır, altında kalan kaybeder, bir tur en fazla ±100.
-  İlk 3 dereceli tur yerleşmedir, herkes Gümüş'te başlar; "Mod seç"teki
-  Dereceli kutusu ve lobideki lig kartı bir sonraki turun hedefini ve
-  zorluğunu gösterir ("Zorluk 7 · Hedef 88.400"; Bronz'da "Elo için oyna ·
-  Hedef 21.400"). Oyun sırasında HUD'daki rozet de zorluğu söyler.
-  Yarım bırakılan dereceli tur hükmen kayıptır.
+  İlk 3 dereceli tur yerleşmedir, herkes Gümüş'te başlar. Hedef ve zorluk
+  oyuncuya gösterilmez (aşağıda). Yarım bırakılan dereceli tur hükmen
+  kayıptır.
+- **Oyuncu Elo'yu "qb" diye görür** (2026-09-30): her dilde "2.340 qb",
+  "Altın'a 158 qb"; sistem altta Elo'dur. qb'nin logosu bir **para**dır
+  (`QbCoin`): altın, boncuklu bir kenar, markanın magentadan menekşeye yüzü ve
+  üstünde kabartma altın "qb" monogramı (q, b'nin yarım tur dönmüşü). Etiketler
+  aynı çizimin tek renklisini (`qb` ikonu) kullanır.
+- **Dereceli ekranları zorluğu ve hedefi söylemez** (2026-09-30): Lig
+  ekranında, lobideki lig kartında, "Mod seç"in Dereceli kutusunda ve HUD'da
+  zorluk ve hedef rozeti, "Bu skoru geçersen…" gibi açıklamalar yoktur; lig
+  ekranı ve kart yalnız **En yüksek**'i (ve varsa kalkanı) gösterir, HUD
+  "Dereceli" der. Hedef yalnız girişte görünür: "Mod seç"in Dereceli kutusu
+  sıradaki turun en az kaç puan yapması gerektiğini söyler ("En az 81.700
+  puan"; hedef yokken "qb için oyna"). Lig ekranında barın altında "Platin'e
+  … qb" satırı, lig sıralamasının altında kural satırı yoktur. Oyun yine
+  zorlaşır; kurallar "?" yardımında yazar. Sonuç ekranı turun skorunu hedefle yan yana gösterir
+  ("Skor … · Hedef …", "Hedefi geçtin"), sıradakini söylemez.
+- **qb hareketleri:** Lig ekranının sağ üst köşesindeki qb parası, qb'nin
+  hareketlerini bir sayfada açar: üstte bugünkü qb, altında en yeniden eskiye
+  her hareket (tur, yerleşme, hükmen, geri alındı, **Düzeltme**), ne zaman,
+  turun skoru ve hedefi, yeşil ya da kırmızı değişim ve bıraktığı qb. Lig
+  ekranında ayrıca liste yoktur. **Düzeltme**, sahibin (owner) panelden
+  oyuncunun qb'sini elle değiştirmesidir; denetim günlüğüne yazılır
+  ([admin-api.md](../backend/admin-api.md)).
   Ayrıntılar: [scoring.md → Elo](./scoring.md#elo).
 - **Lig sıralaması hiç sıfırlanmaz:** satrançtaki gibi ligin Elo'nun
   kademesidir; Lig ekranı ligindeki oyuncuları (son 14 günde dereceli

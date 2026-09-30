@@ -7,6 +7,7 @@ use App\Exceptions\ApiException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\DeletePlayerRequest;
 use App\Http\Requests\Admin\ReasonRequest;
+use App\Http\Requests\Admin\SetRatingRequest;
 use App\Models\Admin;
 use App\Models\User;
 use App\Services\Admin\PlayerActions;
@@ -20,8 +21,9 @@ use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
 
 /**
- * What a moderator (and, for deleting, an owner) does to a player from the
- * panel. Each answers `{ changed }` — false when there was nothing to do.
+ * What a moderator (and, for setting a rating and deleting, an owner) does to
+ * a player from the panel. Each answers `{ changed }` — false when there was
+ * nothing to do.
  */
 class PlayerActionController extends Controller
 {
@@ -62,6 +64,12 @@ class PlayerActionController extends Controller
     public function signOut(Request $request, string $player, #[CurrentUser('admin')] Admin $admin): JsonResponse
     {
         return response()->json(['changed' => $this->actions->signOut($this->player($player), Actor::panel($admin, $request)) > 0]);
+    }
+
+    /** Sets a player's rating (qb) by hand: `{ changed, rating, tier }`. Owner only. */
+    public function rating(SetRatingRequest $request, string $player, #[CurrentUser('admin')] Admin $admin): JsonResponse
+    {
+        return response()->json($this->actions->setRating($this->player($player), $request->rating(), $request->reason(), Actor::panel($admin, $request)));
     }
 
     public function destroy(DeletePlayerRequest $request, string $player, #[CurrentUser('admin')] Admin $admin): Response

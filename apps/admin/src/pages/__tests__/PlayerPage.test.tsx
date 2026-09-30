@@ -145,6 +145,131 @@ describe('PlayerPage', () => {
     expect(screen.queryByRole('button', { name: 'İşlemler' })).not.toBeInTheDocument();
   });
 
+  it('lets an owner set the qb by hand, from the current one, with a reason', async () => {
+    const api = withPlayer();
+    api.players.setRating.mockResolvedValue({ changed: true, rating: 3250, tier: 'platinum' });
+    const { user } = renderApp({ path: `/players/${ID}`, api });
+
+    await user.click(await screen.findByRole('button', { name: 'İşlemler' }));
+    await user.click(await screen.findByRole('menuitem', { name: /qb’yi değiştir/ }));
+    const dialog = await screen.findByRole('dialog', { name: '@kerem.35 qb’si değiştirilsin mi?' });
+    expect(within(dialog).getByText(/Henüz yerleşmediyse yerleşir ve Dereceli açılır\./)).toBeInTheDocument();
+    const rating = within(dialog).getByLabelText('Yeni qb');
+    expect(rating).toHaveValue(2450);
+    expect(within(dialog).getByLabelText('Sebep')).toBeRequired();
+    await user.clear(rating);
+    await user.type(rating, '3250');
+    await user.type(within(dialog).getByLabelText('Sebep'), 'Platin ligini dene');
+    await user.click(within(dialog).getByRole('button', { name: 'qb’yi değiştir' }));
+
+    await waitFor(() => expect(api.players.setRating).toHaveBeenCalledWith(ID, { rating: 3250, reason: 'Platin ligini dene' }));
+    expect(await screen.findByText('qb değişti')).toBeInTheDocument();
+    expect(screen.getByText('Yeni qb: 3.250 · Platin')).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(api.players.get).toHaveBeenCalledTimes(2));
+  });
+
+  it('places a player never rated from the rating card, starting from an empty field', async () => {
+    const api = withPlayer(playerResponse({ rating: null }));
+    api.players.setRating.mockResolvedValue({ changed: true, rating: 1000, tier: 'silver' });
+    const { user } = renderApp({ path: `/players/${ID}`, api });
+
+    const rating = await card('Reyting');
+    await user.click(within(rating).getByRole('button', { name: 'qb’yi değiştir' }));
+    const dialog = await screen.findByRole('dialog', { name: '@kerem.35 qb’si değiştirilsin mi?' });
+    expect(within(dialog).getByLabelText('Yeni qb')).toHaveValue(null);
+    await user.type(within(dialog).getByLabelText('Yeni qb'), '1000');
+    await user.type(within(dialog).getByLabelText('Sebep'), 'Dereceli testi');
+    await user.click(within(dialog).getByRole('button', { name: 'qb’yi değiştir' }));
+
+    await waitFor(() => expect(api.players.setRating).toHaveBeenCalledWith(ID, { rating: 1000, reason: 'Dereceli testi' }));
+  });
+
+  it('sends no qb it was not given, and says what is missing', async () => {
+    const api = withPlayer();
+    const { user } = renderApp({ path: `/players/${ID}`, api });
+
+    await user.click(within(await card('Reyting')).getByRole('button', { name: 'qb’yi değiştir' }));
+    const dialog = await screen.findByRole('dialog');
+    await user.clear(within(dialog).getByLabelText('Yeni qb'));
+    await user.type(within(dialog).getByLabelText('Sebep'), 'Lig testi');
+    await user.click(within(dialog).getByRole('button', { name: 'qb’yi değiştir' }));
+
+    expect(await within(dialog).findByText('Yeni qb’yi yaz.')).toBeInTheDocument();
+    expect(api.players.setRating).not.toHaveBeenCalled();
+  });
+
+  it('shows the API\'s word on the qb under it, and any other problem above the fields', async () => {
+    const api = withPlayer();
+    api.players.setRating
+      .mockRejectedValueOnce(new ApiError(422, 'validation_failed', 'x', { rating: ['Qb en fazla 9999 olabilir.'] }))
+      .mockRejectedValueOnce(new ApiError(404, 'not_found', 'Aradığın şey bulunamadı.'));
+    const { user } = renderApp({ path: `/players/${ID}`, api });
+
+    await user.click(within(await card('Reyting')).getByRole('button', { name: 'qb’yi değiştir' }));
+    const dialog = await screen.findByRole('dialog');
+    await user.clear(within(dialog).getByLabelText('Yeni qb'));
+    await user.type(within(dialog).getByLabelText('Yeni qb'), '12000');
+    await user.type(within(dialog).getByLabelText('Sebep'), 'Lig testi');
+    await user.click(within(dialog).getByRole('button', { name: 'qb’yi değiştir' }));
+
+    expect(await within(dialog).findByText('Qb en fazla 9999 olabilir.')).toBeInTheDocument();
+    expect(api.players.setRating).toHaveBeenCalledWith(ID, { rating: 12000, reason: 'Lig testi' });
+
+    await user.click(within(dialog).getByRole('button', { name: 'qb’yi değiştir' }));
+    expect(await within(dialog).findByText('Aradığın şey bulunamadı.')).toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: '@kerem.35 qb’si değiştirilsin mi?' })).toBeInTheDocument();
+  });
+
+  it('says so when the qb was that already', async () => {
+    const api = withPlayer();
+    api.players.setRating.mockResolvedValue({ changed: false, rating: 2450, tier: 'gold' });
+    const { user } = renderApp({ path: `/players/${ID}`, api });
+
+    await user.click(within(await card('Reyting')).getByRole('button', { name: 'qb’yi değiştir' }));
+    const dialog = await screen.findByRole('dialog');
+    await user.type(within(dialog).getByLabelText('Sebep'), 'Aynı değer');
+    await user.click(within(dialog).getByRole('button', { name: 'qb’yi değiştir' }));
+
+    await waitFor(() => expect(api.players.setRating).toHaveBeenCalledWith(ID, { rating: 2450, reason: 'Aynı değer' }));
+    expect(await screen.findByText('Değişen bir şey yok: qb zaten bu.')).toBeInTheDocument();
+  });
+
+  it('offers the qb only to an owner: not to a moderator, nor a viewer', async () => {
+    const { unmount, user } = renderApp({ path: `/players/${ID}`, api: withPlayer(), session: adminSession({ role: 'moderator' }) });
+    await user.click(await screen.findByRole('button', { name: 'İşlemler' }));
+    expect(await screen.findByRole('menuitem', { name: /Yasakla/ })).toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: /qb’yi değiştir/ })).not.toBeInTheDocument();
+    await user.keyboard('{Escape}');
+    expect(within(await card('Reyting')).queryByRole('button', { name: 'qb’yi değiştir' })).not.toBeInTheDocument();
+    unmount();
+
+    renderApp({ path: `/players/${ID}`, api: withPlayer(), session: adminSession({ role: 'viewer' }) });
+    expect(within(await card('Reyting')).queryByRole('button', { name: 'qb’yi değiştir' })).not.toBeInTheDocument();
+  });
+
+  it('calls a qb set by hand a correction in the history', async () => {
+    renderApp({
+      path: `/players/${ID}`,
+      api: withPlayer(
+        playerResponse({
+          rating: playerRating({
+            rating: 3250,
+            tier: 'platinum',
+            history: [ratingChange({ kind: 'adjust', delta: 800, before: 2450, after: 3250, score: null, target: null, tier: 'platinum', runId: null, performance: null, width: null, engineVersion: null })],
+          }),
+        }),
+      ),
+    });
+
+    const history = await card('Reyting geçmişi');
+    const row = within(history).getAllByRole('row')[1] as HTMLElement;
+    expect(within(row).getByTitle('Bir sahip qb’yi panelden elle değiştirdi; sebebi denetim kaydında.')).toHaveTextContent('Düzeltme');
+    expect(within(row).getByText('+800')).toHaveClass('text-ok-text');
+    expect(within(row).getByText('2.450 → 3.250')).toBeInTheDocument();
+    expect(within(row).queryByRole('link')).not.toBeInTheDocument();
+  });
+
   it('says so when there is no such player', async () => {
     const api = fakeApi();
     api.players.get.mockRejectedValue(new ApiError(404, 'not_found', 'Aradığın şey bulunamadı.'));

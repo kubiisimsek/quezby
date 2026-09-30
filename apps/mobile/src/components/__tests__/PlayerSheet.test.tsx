@@ -75,7 +75,10 @@ describe('PlayerSheet', () => {
     expect(screen.getByLabelText('Sezon rekoru: 41.200')).toBeTruthy();
     expect(screen.getByText('210 post')).toBeTruthy();
     expect(screen.getByLabelText('Altın lig')).toBeTruthy();
-    expect(screen.getByText('2.450 Elo')).toBeTruthy();
+    // The qb glyph carries the word: the pill writes the number, a reader says both.
+    expect(screen.getByLabelText('2.450 qb')).toBeTruthy();
+    expect(screen.getByText('2.450')).toBeTruthy();
+    expect(screen.queryByText('2.450 qb')).toBeNull();
     expect(screen.getByText('#12')).toBeTruthy();
     expect(screen.getByText('#311')).toBeTruthy();
     expect(screen.getByText('5.200')).toBeTruthy();
@@ -91,17 +94,29 @@ describe('PlayerSheet', () => {
 
     expect(await screen.findByLabelText('Sezon rekoru: —')).toBeTruthy();
     expect(screen.queryByLabelText(/ lig$/)).toBeNull();
-    expect(screen.queryByText(/Elo$/)).toBeNull();
+    expect(screen.queryByText(/qb$/)).toBeNull();
+    expect(screen.queryByTestId(/^league-frame-/, { includeHiddenElements: true })).toBeNull();
   });
 
-  it('leaves the league and the Elo out when the screen asks it to, as Zirve does', async () => {
+  it('puts the portrait in the player’s league frame, from every screen', async () => {
+    mocked.users.get.mockResolvedValue(card());
+
+    await renderWithProviders(<PlayerSheet username="ekin" onClose={jest.fn()} />);
+
+    // The portrait's frame, and the league badge beside it.
+    expect(await screen.findAllByTestId('league-frame-gold', { includeHiddenElements: true })).toHaveLength(2);
+  });
+
+  it('leaves the league and the qb out when the screen asks it to, as Zirve does, but not the frame', async () => {
     mocked.users.get.mockResolvedValue(card());
 
     await renderWithProviders(<PlayerSheet username="ekin" onClose={jest.fn()} rating={false} />);
 
     expect(await screen.findByLabelText('Sezon rekoru: 41.200')).toBeTruthy();
     expect(screen.queryByLabelText('Altın lig')).toBeNull();
-    expect(screen.queryByText('2.450 Elo')).toBeNull();
+    expect(screen.queryByLabelText('2.450 qb')).toBeNull();
+    // The portrait's frame alone.
+    expect(screen.getAllByTestId('league-frame-gold', { includeHiddenElements: true })).toHaveLength(1);
   });
 
   it('shows a stranger’s friend count, and no way into the list', async () => {

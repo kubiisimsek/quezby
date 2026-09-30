@@ -154,19 +154,19 @@ describe('HelpScreen', () => {
     }
   });
 
-  it('lays out the modes and the league rules: Dereceli, six leagues from Elo, the target, a ranking that never resets', async () => {
+  it('lays out the modes and the league rules: Dereceli, six leagues from qb, the target, a ranking that never resets', async () => {
     await renderWithProviders(<HelpScreen {...props} />);
 
     for (const tier of ['Bronz', 'Gümüş', 'Altın', 'Platin', 'Elmas', 'MasterClass']) {
       expect(screen.getByText(tier)).toBeOnTheScreen();
     }
     expect(screen.getByText(/Üç mod var: Günlük, Normal ve Dereceli/)).toBeOnTheScreen();
-    expect(screen.getByText(/Elo’nu yalnız Dereceli değiştirir/)).toBeOnTheScreen();
+    expect(screen.getByText(/qb’ni yalnız Dereceli değiştirir/)).toBeOnTheScreen();
     expect(screen.getByText(/Dereceli, 20 Normal ya da Günlük oyundan sonra açılır/)).toBeOnTheScreen();
-    expect(screen.getByText(/ilk 3 dereceli oyunun Elo’nu belirler/)).toBeOnTheScreen();
+    expect(screen.getByText(/ilk 3 dereceli oyunun qb’ni belirler/)).toBeOnTheScreen();
     expect(screen.getByText(/Altı lig var/)).toBeOnTheScreen();
     expect(screen.getByText(/Her dereceli oyunun bir hedef skoru var/)).toBeOnTheScreen();
-    expect(screen.getByText(/en fazla 100 Elo/)).toBeOnTheScreen();
+    expect(screen.getByText(/en fazla 100 qb/)).toBeOnTheScreen();
     expect(screen.getByText(/Yarım bırakılan dereceli oyun ise en düşük sonuç sayılır/)).toBeOnTheScreen();
     expect(screen.getByText(/Lig sıralaması hiç sıfırlanmaz/)).toBeOnTheScreen();
     expect(screen.queryByText(/Haftalık grup|\+50, \+30 ve \+15/)).not.toBeOnTheScreen();

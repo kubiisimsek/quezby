@@ -10,10 +10,10 @@ export type PlayMode = 'daily' | 'free' | 'rated';
 
 /**
  * The game's modes: Günlük (the day's feed), Normal (play as much as you
- * like) and Dereceli — the only one that plays for Elo, open once enough
+ * like) and Dereceli — the only one that plays for qb, open once enough
  * Normal and Günlük games are played. The sheet the lobby's Oyna opens, its
  * tiles' lines, the HUD's pill, the way in and the moment it opens. The day's
- * rule is `t.daily.rule`; Elo's words are `t.rating`.
+ * rule is `t.daily.rule`; qb's words are `t.rating`.
  */
 const tr = {
   /** The sheet Oyna opens. */
@@ -23,9 +23,9 @@ const tr = {
   lines: {
     free: 'Skorun Zirve’ye yazılır',
     dailyPlayed: 'Bugünkü hakkını kullandın',
-    rated: (target: string) => `Elo için oyna · Hedef ${target}`,
-    /** Once the rating has made Dereceli harder. */
-    ratedAt: (difficulty: string, target: string) => `Zorluk ${difficulty} · Hedef ${target}`,
+    rated: 'qb için oyna',
+    /** A placed player's next rated run: the score it takes not to lose qb. */
+    ratedMin: (score: string) => `En az ${score} puan`,
   },
   /** The locked tile, read aloud. */
   lockedLabel: (remaining: number) => `Dereceli, kilitli: ${remaining} oyun kaldı`,
@@ -37,7 +37,7 @@ const tr = {
   lockedBody: (required: number) => `Dereceli, ${required} Normal ya da Günlük oyundan sonra açılır.`,
   opened: {
     title: 'Dereceli açıldı!',
-    body: (required: number) => `İlk ${required} dereceli oyunun Elo’nu belirler.`,
+    body: (required: number) => `İlk ${required} dereceli oyunun qb’ni belirler.`,
   },
   play: 'Dereceli oyna',
   playNormal: 'Normal oyna',
@@ -51,8 +51,8 @@ const en: ModeMessages = {
   lines: {
     free: 'Your score goes on the Summit',
     dailyPlayed: "You've used today's shot",
-    rated: (target) => `Play for Elo · Target ${target}`,
-    ratedAt: (difficulty, target) => `Difficulty ${difficulty} · Target ${target}`,
+    rated: 'Play for qb',
+    ratedMin: (score) => `Score at least ${score}`,
   },
   lockedLabel: (remaining) =>
     plural('en', remaining, { one: 'Ranked, locked: 1 game to go', other: `Ranked, locked: ${remaining} games to go` }),
@@ -63,7 +63,7 @@ const en: ModeMessages = {
   lockedBody: (required) => `Ranked opens after ${required} Normal or Daily games.`,
   opened: {
     title: 'Ranked is open!',
-    body: (required) => `Your first ${required} ranked games set your Elo.`,
+    body: (required) => `Your first ${required} ranked games set your qb.`,
   },
   play: 'Play Ranked',
   playNormal: 'Play Normal',
@@ -75,8 +75,8 @@ const de: ModeMessages = {
   lines: {
     free: 'Dein Score kommt auf den Gipfel',
     dailyPlayed: 'Dein Versuch für heute ist verbraucht',
-    rated: (target) => `Spiel um Elo · Ziel ${target}`,
-    ratedAt: (difficulty, target) => `Schwierigkeit ${difficulty} · Ziel ${target}`,
+    rated: 'Spiel um qb',
+    ratedMin: (score) => `Mindestens ${score} Punkte`,
   },
   lockedLabel: (remaining) =>
     plural('de', remaining, {
@@ -90,7 +90,7 @@ const de: ModeMessages = {
   lockedBody: (required) => `Gewertet öffnet sich nach ${required} normalen oder täglichen Spielen.`,
   opened: {
     title: 'Gewertet ist offen!',
-    body: (required) => `Deine ersten ${required} gewerteten Spiele bestimmen dein Elo.`,
+    body: (required) => `Deine ersten ${required} gewerteten Spiele bestimmen dein qb.`,
   },
   play: 'Gewertet spielen',
   playNormal: 'Normal spielen',
@@ -102,8 +102,8 @@ const ar: ModeMessages = {
   lines: {
     free: 'تُسجَّل نتيجتك في القمة',
     dailyPlayed: 'استخدمت محاولة اليوم',
-    rated: (target) => `العب من أجل إيلو · الهدف ${iso(target)}`,
-    ratedAt: (difficulty, target) => `الصعوبة ${iso(difficulty)} · الهدف ${iso(target)}`,
+    rated: `العب من أجل ${iso('qb')}`,
+    ratedMin: (score) => `${iso(score)} نقطة على الأقل`,
   },
   lockedLabel: (remaining) =>
     plural('ar', remaining, {
@@ -145,8 +145,8 @@ const fr: ModeMessages = {
   lines: {
     free: 'Ton score va au Sommet',
     dailyPlayed: 'Tu as utilisé ton essai du jour',
-    rated: (target) => `Joue pour l’Elo · Objectif ${target}`,
-    ratedAt: (difficulty, target) => `Difficulté ${difficulty} · Objectif ${target}`,
+    rated: 'Joue pour le qb',
+    ratedMin: (score) => `Au moins ${score}${NBSP}points`,
   },
   lockedLabel: (remaining) =>
     plural('fr', remaining, {
@@ -163,7 +163,7 @@ const fr: ModeMessages = {
   lockedBody: (required) => `Le mode classé s’ouvre après ${required} parties normales ou quotidiennes.`,
   opened: {
     title: `Le mode classé est ouvert${NBSP}!`,
-    body: (required) => `Tes ${required} premières parties classées fixent ton Elo.`,
+    body: (required) => `Tes ${required} premières parties classées fixent ton qb.`,
   },
   play: 'Jouer en classé',
   playNormal: 'Jouer en normal',
@@ -175,8 +175,8 @@ const es: ModeMessages = {
   lines: {
     free: 'Tu puntuación va a la Cumbre',
     dailyPlayed: 'Ya usaste tu intento de hoy',
-    rated: (target) => `Juega por Elo · Objetivo ${target}`,
-    ratedAt: (difficulty, target) => `Dificultad ${difficulty} · Objetivo ${target}`,
+    rated: 'Juega por qb',
+    ratedMin: (score) => `Al menos ${score} puntos`,
   },
   lockedLabel: (remaining) =>
     plural('es', remaining, {
@@ -193,7 +193,7 @@ const es: ModeMessages = {
   lockedBody: (required) => `Competitivo se abre después de ${required} partidas normales o diarias.`,
   opened: {
     title: '¡Competitivo abierto!',
-    body: (required) => `Tus primeras ${required} partidas competitivas fijan tu Elo.`,
+    body: (required) => `Tus primeras ${required} partidas competitivas fijan tu qb.`,
   },
   play: 'Jugar Competitivo',
   playNormal: 'Jugar Normal',

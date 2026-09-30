@@ -369,8 +369,11 @@ export type RunRating = {
   nextDifficulty: number | null;
 };
 
-/** Why the rating moved: a run, a placement, a forfeit, or a moderator's reversal. */
-export type RatingChangeKind = 'placement' | 'run' | 'forfeit' | 'void' | 'reversal';
+/**
+ * Why the rating moved: a run, a placement, a forfeit, a moderator's
+ * reversal, or an owner setting it by hand from the panel (`adjust`).
+ */
+export type RatingChangeKind = 'placement' | 'run' | 'forfeit' | 'void' | 'reversal' | 'adjust';
 
 export type RatingChange = {
   kind: RatingChangeKind;

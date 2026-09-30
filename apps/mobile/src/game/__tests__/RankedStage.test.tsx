@@ -110,18 +110,29 @@ describe('Dereceli result', () => {
     jest.useRealTimers();
   });
 
-  it('puts the player in their league’s frame with the Elo, the move big, and the score against the target', async () => {
+  it('never names the difficulty or what the next run plays against', async () => {
+    await show(buildRunRating({ difficulty: 9, nextDifficulty: 10, nextTarget: 72_400 }));
+
+    expect(screen.getByLabelText('1.640 qb')).toBeTruthy();
+    expect(screen.queryByText(/Zorluk|^Sıradaki/)).toBeNull();
+  });
+
+  it('puts the player in their league’s frame with the qb, the move big, and the score against the target', async () => {
     await show(buildRunRating());
 
     expect(frame('silver')).toBeTruthy();
     expect(screen.getByLabelText('Gümüş lig')).toBeTruthy();
-    expect(screen.getByText('1.640 Elo')).toBeTruthy();
+    expect(screen.getByLabelText('1.640 qb')).toBeTruthy();
+    // By the coin, the number alone.
+    expect(screen.getByText('1.640')).toBeTruthy();
+    expect(screen.queryByText('1.640 qb')).toBeNull();
     expect(screen.getByTestId('rating-delta')).toHaveTextContent('+42');
-    expect(screen.getByLabelText('+42 Elo')).toBeTruthy();
+    expect(screen.getByLabelText('+42 qb')).toBeTruthy();
     expect(screen.getByText('Skor 104.560 · Hedef 66.100')).toBeTruthy();
     expect(screen.getByText('Hedefi geçtin')).toBeTruthy();
-    expect(screen.getByText("Altın'a 360 Elo")).toBeTruthy();
+    expect(screen.getByText("Altın'a 360 qb")).toBeTruthy();
     expect(screen.getByTestId('league-bar')).toBeTruthy();
+    expect(screen.getAllByTestId('qb-coin', { includeHiddenElements: true }).length).toBeGreaterThan(0);
     // The score's own stage is not here: no count to 104.560 in big type, no record.
     expect(screen.queryByText('puan')).toBeNull();
     expect(screen.queryByText('YENİ REKOR!')).toBeNull();
@@ -165,7 +176,7 @@ describe('Dereceli result', () => {
 
     expect(frame('silver')).toBeTruthy();
     expect(screen.getByText('YERLEŞTİN!')).toBeTruthy();
-    expect(screen.getByText('1.500 Elo')).toBeTruthy();
+    expect(screen.getByLabelText('1.500 qb')).toBeTruthy();
     expect(screen.queryByTestId('rating-delta')).toBeNull();
     expect(screen.getByText('Skor 104.560')).toBeTruthy();
   });
@@ -190,10 +201,10 @@ describe('Dereceli result', () => {
     expect(screen.getAllByTestId('meter-notch')).toHaveLength(2);
   });
 
-  it('keeps the Elo tile for a run held for review', async () => {
+  it('keeps the qb tile for a run held for review', async () => {
     await show(buildRunRating({ kind: 'pending', after: 1_598, delta: 0, target: null }));
 
-    expect(screen.getByText('Skorun incelenince Elo’ya yazılır')).toBeTruthy();
+    expect(screen.getByText('Skorun incelenince qb’ye yazılır')).toBeTruthy();
     expect(screen.queryByTestId('league-bar')).toBeNull();
   });
 
@@ -205,7 +216,7 @@ describe('Dereceli result', () => {
 
     expect(screen.getByText('PROMOTED!')).toBeTruthy();
     expect(screen.getByLabelText('Gold league')).toBeTruthy();
-    expect(screen.getByText('2,031 Elo')).toBeTruthy();
+    expect(screen.getByLabelText('2,031 qb')).toBeTruthy();
     expect(screen.getByText('Target beaten')).toBeTruthy();
     await act(async () => {
       useLanguage.setState({ locale: 'tr' });
@@ -222,7 +233,7 @@ describe('Dereceli result', () => {
 
       expect(frame('silver')).toBeTruthy();
       expect(screen.queryByText('YÜKSELDİN!')).toBeNull();
-      expect(screen.getByText('1.990 Elo')).toBeTruthy();
+      expect(screen.getByText('1.990')).toBeTruthy();
 
       await act(async () => {
         jest.advanceTimersByTime(1_600);
@@ -236,7 +247,7 @@ describe('Dereceli result', () => {
       });
       expect(screen.getByText('YÜKSELDİN!')).toBeTruthy();
       expect(screen.getByTestId('confetti')).toBeTruthy();
-      expect(screen.getByText('2.031 Elo')).toBeTruthy();
+      expect(screen.getByText('2.031')).toBeTruthy();
     });
 
     it('warns on a fall, with no burst', async () => {

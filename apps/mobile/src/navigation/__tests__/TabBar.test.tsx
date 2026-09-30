@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { tab } from '@/navigation/options';
-import { TabBar } from '@/navigation/TabBar';
+import { TabBar, dockBottom } from '@/navigation/TabBar';
 
 const ROUTES = [
   { key: 'Leaderboard-1', name: 'Leaderboard', options: tab('Zirve', 'mountain') },
@@ -85,5 +85,14 @@ describe('TabBar — the dock', () => {
 
     expect(screen.getByRole('tab', { name: 'Mesajlar' })).toBeOnTheScreen();
     expect(screen.getByRole('tab', { name: 'Profil' })).toBeOnTheScreen();
+  });
+});
+
+describe('dockBottom', () => {
+  it('lets the labels dip into an iPhone’s home indicator, and keeps them clear of Android’s gesture line', () => {
+    expect(dockBottom(34, 'ios')).toBe(28);
+    expect(dockBottom(0, 'ios')).toBe(6);
+    expect(dockBottom(24, 'android')).toBe(36);
+    expect(dockBottom(0, 'android')).toBe(12);
   });
 });

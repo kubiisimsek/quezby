@@ -1,5 +1,103 @@
 # Changelog
 
+## 2026-09-30 — qb: the rating's new name, its coin, and a quieter Dereceli
+
+The owner asked for Elo to be called qb, for a qb logo, for the difficulty
+and target badges and their "Bu skoru geçersen…" lines to leave the Dereceli
+screens (the best stays), for the latest changes to move behind a corner
+button as qb moves, and for a way to set a player's qb from the panel, on
+record, to test leagues on staging.
+
+- **Elo is qb to players, in all six languages** ("2.340 qb", "Altın'a 158
+  qb", "qb için oyna", the help screen's rules; Turkish suffixes follow the
+  sound: qb'ye, qb'n, qb'de). The panel says qb too. The system underneath is
+  still the Elo rating; code names are unchanged.
+- **The qb coin** (`QbCoin`, `ui/kit/qb.tsx`): a gold rim on its lip, beaded
+  from 28 pt, the brand's magenta-to-violet face, and the qb monogram raised
+  in gold — q and b, one stroke turned half round. By the league hero's qb,
+  on the ranked result and the result's qb tile, in qb hareketleri; tags carry
+  its one-colour twin, the new `qb` icon (En yüksek, the qb tags on the
+  profile and a player's card). By the coin or the glyph the number stands
+  alone ("2.140"); a screen reader still hears "2.140 qb" (`Tag` and
+  `CountUp` take `said`). Where there is no coin — the lobby's league card,
+  the floor, the rows — the text keeps "qb".
+- **Dereceli stops naming its difficulty and target:** gone from the league
+  stage (with "Bu skoru geçersen qb'n artar." and the difficulty line), the
+  lobby's league card, the HUD (now always "Dereceli") and the result
+  screens' "Sıradaki hedef/zorluk" and difficulty tags. The league stage and
+  card keep **En yüksek** (and a fresh shield). The one place the target
+  stays is the way in: "Mod seç"'s Dereceli tile says the least the next run
+  must score, "En az 81.700 puan" (`modes.lines.ratedMin`, six languages),
+  and "qb için oyna" before there is one. The result still sets the run's
+  score against its target. The game still gets harder; the help screen
+  still says how.
+- **The profile's badges are one kind** (`Chip`, `LeagueChip`, `QbChip`,
+  `WarnChip` in `ui/kit/chips.tsx`): the league, the qb and "Misafir hesap"
+  were an emblem with loose text beside two small pills; now each is an
+  outlined pill on its lip with its picture a size up over its start — the
+  league's frame, the qb coin, a warning gem. A player's card wears the same
+  league and qb chips. `RankChips` sizes a place by its length (`rankSize`)
+  instead of iOS shrink-to-fit, which drew the profile's "—" a few points
+  tall.
+- **The league stage is quieter still:** no "Platin'e 860 qb" (nor
+  MasterClass's "Tavanı yok") under the bar, and no "Son 14 günde dereceli
+  oynayanlar, qb sırasıyla" under LİG SIRALAMASI (`league.rule` removed).
+- **qb hareketleri** (`QbHistorySheet`): the coin in the league stage's top
+  right corner, once Dereceli is open, opens the moves — the qb now on its
+  coin, then each move by kind with a gem, when, the run's score and target,
+  the change in green or red and the qb it left. The league screen no longer
+  lists changes itself.
+- **Admin: an owner sets a player's qb by hand.**
+  `POST /api/v1/admin/players/{id}/rating` (owner only) takes
+  `{ rating: 0–9999, reason }` and answers `{ changed, rating, tier }`,
+  through `RatingService::adjust` with the rating row locked: the league, the
+  peak and `changed_at` follow the new rating; an unplaced player is placed,
+  Dereceli opens to them and the provisional runs start; the counted runs and
+  `ratedAt` stay (so the league ranking lists them after their next rated
+  run); a promotion shield outside the new league is dropped. The player sees
+  it as `adjust` ("Düzeltme") in their qb moves; the audit log records
+  `player.rating` with `{ from, to, tierFrom, tierTo }`. Setting the qb a
+  player already has writes nothing (`changed: false`). `RatingChangeKind`
+  gains `adjust`, `AdminAuditAction` `player.rating`; the SDK
+  `players.setRating`. In the panel, "qb'yi değiştir" sits in the player's
+  actions and on the Reyting card, for owners only.
+- Tests: the league screen (coin, En yüksek, no target or difficulty, the qb
+  moves sheet with Düzeltme, no button while Dereceli is shut), the lobby, the
+  mode sheet, the HUD, both result screens, `QbCoin`, the `qb` icon; API
+  `PlayerRatingTest` (22), `RolesTest`; SDK; the panel's player page, audit
+  log and formats.
+
+## 2026-09-30 — The league frame is everyone's to see
+
+The owner's frame showed on their own profile but not when a card was opened
+from elsewhere: a frame is public and belongs on every profile.
+
+- **A player's card shows their frame from every screen.** Zirve opened the
+  card with `rating={false}`, which dropped the frame along with the league
+  and the Elo; now it drops only those two (Zirve still says nothing about
+  Elo), and the portrait keeps its frame.
+- **`PlayerRow` — the friend list, search, requests — puts the portrait in
+  the player's league frame** (`FramedAvatar`, 60 pt, its ornaments reaching
+  into the row's padding). A plain portrait takes the frame's width, so the
+  names line up. The API already sent `league` on `PlayerSummary`.
+- **The lobby's league card no longer draws "Gümüş lig · 1.100 Elo" a few
+  points tall:** iOS (Fabric) shrink-to-fit did it past `minimumFontScale`.
+  `NoticeCard` takes `fit={false}` for a title that always fits, and the
+  league card uses it.
+- Tests: `PlayerSheet` (the frame from every screen, Zirve without league and
+  Elo), `PlayerRow` (framed with a league, no frame without), `NoticeCard`
+  (`fit`).
+
+## 2026-09-30 — Android bundle in one command
+
+- `pnpm android:bundle:staging` / `android:bundle:production`
+  (`scripts/package-android.mjs`, tests in `package-android.test.mjs`): refuses
+  without Node 22 or without the upload key in `~/.gradle/gradle.properties`,
+  raises `versionCode` one past both Android's and iOS's build number (or to
+  `--version-code N`), points `.env` at the environment, typechecks, runs
+  `./gradlew bundleRelease`, checks with `keytool` that the bundle is not
+  debug-signed, copies it to `dist-deploy/` and puts `.env` back.
+
 ## 2026-09-30 — Leagues as profile frames, and Dereceli's own ending
 
 The owner asked for a rated run to end like real ranked play — the Elo move

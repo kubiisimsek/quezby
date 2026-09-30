@@ -198,6 +198,7 @@ describe('ratings', () => {
       forfeit: 'Hükmen',
       void: 'Sayılmadı',
       reversal: 'Geri alındı',
+      adjust: 'Düzeltme',
     });
     for (const kind of Object.values(RATING_KIND)) {
       expect(kind.hint).not.toBe('');
@@ -205,5 +206,10 @@ describe('ratings', () => {
     }
     expect(RATING_KIND.forfeit.tone).toBe('bad');
     expect(RATING_KIND.reversal.tone).toBe('warn');
+    expect(RATING_KIND.adjust.tone).toBe('warn');
+  });
+
+  it('has words for an owner setting a rating by hand', () => {
+    expect(AUDIT_ACTION['player.rating']).toEqual({ tone: 'warn', label: 'qb’yi değiştirdi' });
   });
 });

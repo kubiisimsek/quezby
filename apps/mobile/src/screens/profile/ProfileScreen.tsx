@@ -37,17 +37,18 @@ import {
   Counters,
   IconButton,
   IconChip,
+  LeagueChip,
   LitEdge,
   LobbyCard,
   Panel,
+  QbChip,
   RankChips,
   Ribbon,
   Screen,
   Skeleton,
   Stamp,
-  Tag,
-  TierBadge,
   Txt,
+  WarnChip,
   innerRadius,
 } from '@/ui/kit';
 import { ActionSheet } from '@/ui/sheet';
@@ -339,11 +340,9 @@ function PlayerHero({
         </Text>
         {tier || user.isGuest ? (
           <View style={styles.badges}>
-            {tier ? <TierBadge tier={tier} size="md" showLabel /> : null}
-            {elo !== null ? (
-              <Tag label={t.rating.elo(t.fmt.score(elo))} tone="warn" icon="trophy" />
-            ) : null}
-            {user.isGuest ? <Tag label={words.guest} tone="warn" icon="alert" /> : null}
+            {tier ? <LeagueChip tier={tier} /> : null}
+            {elo !== null ? <QbChip value={elo} /> : null}
+            {user.isGuest ? <WarnChip label={words.guest} /> : null}
           </View>
         ) : null}
         <View style={styles.stretch}>{counters}</View>

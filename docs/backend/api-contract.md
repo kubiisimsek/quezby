@@ -694,8 +694,11 @@ hundred — the typical score of the rating at its own difficulty;
 after 30 idle days); `shield` — a fresh promotion's runs left. `history` is the
 last 20 changes that set or moved the rating, newest first — runs that did
 not count and the placement runs before the last are left out; `kind` is
-`placement`, `run`, `forfeit` or `reversal` (a moderator took a gain back).
-Only rated runs place a player. See [scoring.md → Elo](../product/scoring.md#elo).
+`placement`, `run`, `forfeit`, `reversal` (a moderator took a gain back) or
+`adjust` (an owner set the rating by hand from the admin panel — `score`,
+`target` and `runId` null; `before` null when it placed the player).
+Only rated runs place a player — or an owner's `adjust`, which also opens
+Dereceli (`unlock` null). See [scoring.md → Elo](../product/scoring.md#elo).
 
 ### `GET /ratings?scope=everyone|friends|league`
 

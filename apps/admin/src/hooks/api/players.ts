@@ -1,4 +1,4 @@
-import type { AdminDeletePlayerRequest, AdminPlayersQuery } from '@quezby/types';
+import type { AdminDeletePlayerRequest, AdminPlayersQuery, AdminSetRatingRequest } from '@quezby/types';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { afterModeration } from '@/hooks/api/invalidate';
@@ -16,8 +16,8 @@ export function usePlayer(id: string) {
 }
 
 /**
- * Ban, unban, rename, sign out, take a photo down, let reports go and
- * delete — every one refreshes what it touched.
+ * Ban, unban, rename, sign out, take a photo down, let reports go, set the
+ * qb and delete — every one refreshes what it touched.
  */
 export function usePlayerActions(id: string) {
   const api = useApi();
@@ -31,6 +31,7 @@ export function usePlayerActions(id: string) {
     signOut: useMutation({ mutationFn: () => api.players.signOut(id), onSuccess }),
     removeAvatar: useMutation({ mutationFn: (reason: string) => api.players.removeAvatar(id, { reason }), onSuccess }),
     dismissReports: useMutation({ mutationFn: (reason: string) => api.players.dismissReports(id, { reason }), onSuccess }),
+    setRating: useMutation({ mutationFn: (input: AdminSetRatingRequest) => api.players.setRating(id, input), onSuccess }),
     remove: useMutation({
       mutationFn: (input: AdminDeletePlayerRequest) => api.players.remove(id, input),
       onSuccess: () => {

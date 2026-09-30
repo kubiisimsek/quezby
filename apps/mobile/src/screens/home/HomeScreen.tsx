@@ -608,18 +608,18 @@ function LeagueNotice({
     <NoticeCard
       eyebrow={eyebrow}
       title={t.home.league.rated(t.tiers.league(data.tier), t.rating.elo(t.fmt.score(data.rating)))}
+      // "Gümüş lig · 1.100 Elo" fits in every language.
+      fit={false}
       icon="shield"
       tone="secondary"
       meta={
-        data.target === null && !data.difficulty ? undefined : (
-          <View style={styles.leagueTags}>
-            {data.target === null ? null : (
-              <Tag label={t.rating.target(t.fmt.score(data.target))} tone="secondary" icon="target" />
-            )}
-            {data.difficulty ? (
-              <Tag label={t.rating.difficulty(t.fmt.score(data.difficulty))} tone="secondary" icon="flame" />
-            ) : null}
-          </View>
+        data.peak === null ? undefined : (
+          <Tag
+            label={t.rating.peak(t.fmt.score(data.peak))}
+            said={t.rating.peak(t.rating.elo(t.fmt.score(data.peak)))}
+            tone="secondary"
+            icon="qb"
+          />
         )
       }
       onPress={onPress}
@@ -658,7 +658,6 @@ const styles = StyleSheet.create({
   scroll: { gap: SPACE.md, paddingBottom: SPACE.xl, paddingHorizontal: SPACE.lg },
   player: { alignItems: 'center', flexDirection: 'row', gap: SPACE.md },
   playerText: { flex: 1, gap: 1 },
-  leagueTags: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACE.xs },
   clock: { gap: SPACE.md, paddingBottom: SPACE.sm, paddingTop: SPACE.lg },
   clockFace: { alignItems: 'center', gap: SPACE.xxs },
   record: { fontFamily: FONT.display, fontSize: 64, lineHeight: lh(72) },
