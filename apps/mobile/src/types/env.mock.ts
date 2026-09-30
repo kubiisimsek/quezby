@@ -6,8 +6,8 @@
  */
 export const QUEZBY_ENV = 'local';
 export const API_URL_LOCAL = 'http://localhost:8000';
-export const API_URL_STAGING = 'https://staging-api.quezby.com';
-export const API_URL_PRODUCTION = 'https://api.quezby.com';
+export const API_URL_STAGING = 'https://quezby.kubisimsek.com';
+export const API_URL_PRODUCTION = 'https://quezby.com';
 export const GOOGLE_WEB_CLIENT_ID = '';
 export const GOOGLE_IOS_CLIENT_ID = '';
 export const GOOGLE_CLOUD_PROJECT_NUMBER = '';

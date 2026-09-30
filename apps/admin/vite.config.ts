@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import path from 'node:path';
 import { defineConfig, loadEnv, type Plugin } from 'vite';
 
-import { apiOriginFor } from './deploy/environments.mjs';
+import { adminBaseFor, apiOriginFor } from './deploy/environments.mjs';
 import { renderHtaccess } from './deploy/htaccess.mjs';
 
 /**
@@ -11,17 +11,18 @@ import { renderHtaccess } from './deploy/htaccess.mjs';
  *
  * - `pnpm dev:admin` serves it on :5180 and proxies `/api` to the Laravel dev
  *   server on :8000, so the panel and the API share an origin locally.
- * - `vite build` builds for production, `vite build --mode staging` for
- *   staging (`deploy/environments.mjs`); `scripts/package-admin.mjs` zips it.
+ * - `vite build` builds for production (served at quezby.com/panel/),
+ *   `vite build --mode staging` for staging (`deploy/environments.mjs`);
+ *   `scripts/package-admin.mjs` zips it.
  */
 
-/** Writes the panel's `.htaccess` next to `index.html`, naming the API in its CSP. */
-function htaccess(apiOrigin: string): Plugin {
+/** Writes the panel's `.htaccess` next to `index.html`, naming the API in its CSP and the folder it sits in. */
+function htaccess(apiOrigin: string, base: string): Plugin {
   return {
     name: 'quezby-admin-htaccess',
     apply: 'build',
     generateBundle() {
-      this.emitFile({ type: 'asset', fileName: '.htaccess', source: renderHtaccess({ apiOrigin }) });
+      this.emitFile({ type: 'asset', fileName: '.htaccess', source: renderHtaccess({ apiOrigin, base }) });
     },
   };
 }
@@ -29,6 +30,7 @@ function htaccess(apiOrigin: string): Plugin {
 export default defineConfig(({ mode }) => {
   const here = import.meta.dirname;
   const apiOrigin = apiOriginFor(mode, loadEnv(mode, here, 'VITE_'));
+  const base = adminBaseFor(mode);
   const server = {
     port: 5180,
     // A taken port is an error, not a quiet move to the next one.
@@ -37,7 +39,8 @@ export default defineConfig(({ mode }) => {
   };
 
   return {
-    plugins: [react(), tailwindcss(), htaccess(apiOrigin)],
+    base,
+    plugins: [react(), tailwindcss(), htaccess(apiOrigin, base)],
     resolve: { alias: { '@': path.resolve(here, 'src') } },
     define: { __API_ORIGIN__: JSON.stringify(apiOrigin) },
     server,

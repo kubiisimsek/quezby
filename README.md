@@ -44,8 +44,8 @@ API'ye bağlanacağını `apps/mobile/.env` içindeki `QUEZBY_ENV` belirler:
 | Ortam | Geçiş | Telefondaki ad | API |
 | --- | --- | --- | --- |
 | Local | `pnpm switch-local` | Quezby Local | `http://localhost:8000` |
-| Staging | `pnpm switch-staging` | Quezby Staging | `https://staging-api.quezby.com` |
-| Production | `pnpm switch-production` | Quezby | `https://api.quezby.com` |
+| Staging | `pnpm switch-staging` | Quezby Staging | `https://quezby.kubisimsek.com` |
+| Production | `pnpm switch-production` | Quezby | `https://quezby.com` (API: `/api`) |
 
 Geçişten sonra `pnpm ios` / `pnpm android` (Metro açıksa yeniden başlat).
 Mağaza derlemesi: geçiş → Xcode'da `Quezby` → Archive · `./gradlew bundleRelease`
@@ -59,7 +59,7 @@ Oyuncular, yasaklar, şüpheliler, turlar, sıralamalar, günün akışı, ligle
 içerik, yöneticiler ve sistem — `apps/admin`. Yerelde `pnpm dev:admin`
 (`http://localhost:5180`), ilk hesap `php artisan quezby:admin:create
 sen@ornek.com`; hostinge `pnpm admin:package:production` →
-`admin.quezby.com`. Roller Sahip, Moderatör, İzleyici; her işlem denetim
+`quezby.com/panel`. Roller Sahip, Moderatör, İzleyici; her işlem denetim
 kaydına geçer. API: [docs/backend/admin-api.md](docs/backend/admin-api.md) ·
 tasarım: [docs/design/admin-design-system.md](docs/design/admin-design-system.md).
 

@@ -53,8 +53,8 @@ function metroHost(): string | null {
 
 const URLS: Record<AppEnvironment, string> = {
   local: value(RAW_API_URL_LOCAL, 'http://localhost:8000'),
-  staging: value(RAW_API_URL_STAGING, 'https://staging-api.quezby.com'),
-  production: value(RAW_API_URL_PRODUCTION, 'https://api.quezby.com'),
+  staging: value(RAW_API_URL_STAGING, 'https://quezby.kubisimsek.com'),
+  production: value(RAW_API_URL_PRODUCTION, 'https://quezby.com'),
 };
 
 /** Where this build finds the API — the origin, without `/api`. */

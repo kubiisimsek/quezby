@@ -3,6 +3,8 @@
  * (see `vite.config.ts`). Apache on shared hosting serves the panel as plain
  * files; this makes it an app:
  *
+ * - the panel may sit in a folder (`/panel/` in production): `RewriteBase`
+ *   names it, so the rules below stay relative to it;
  * - every path that is not a file is a page of the panel (`index.html`),
  *   except under `assets/`, where a missing file is a 404 — never HTML
  *   parsed as JavaScript after a deploy;
@@ -38,10 +40,10 @@ export function contentSecurityPolicy({ apiOrigin }) {
 }
 
 /**
- * @param {{ apiOrigin: string }} options
+ * @param {{ apiOrigin: string; base?: string }} options
  * @returns {string}
  */
-export function renderHtaccess({ apiOrigin }) {
+export function renderHtaccess({ apiOrigin, base = '/' }) {
   return `# Quezby admin panel — written by apps/admin/deploy/htaccess.mjs at build time.
 # Edit that file, not this one.
 
@@ -50,6 +52,7 @@ DirectoryIndex index.html
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
+  RewriteBase ${base}
 
   # Files and folders that exist are served as they are.
   RewriteCond %{REQUEST_FILENAME} -f [OR]

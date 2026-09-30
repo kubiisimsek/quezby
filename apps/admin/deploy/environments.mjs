@@ -1,24 +1,30 @@
 /**
- * Where the admin panel finds the API in each environment. Every value here
- * ships in the bundle and is public — nothing secret belongs in this file or
- * in any `VITE_*` variable.
+ * Where the admin panel lives and finds the API in each environment. Every
+ * value here ships in the bundle and is public — nothing secret belongs in
+ * this file or in any `VITE_*` variable.
  *
  * Local development talks to `/api` on its own origin, which the Vite dev
  * server proxies to `php artisan serve` on :8000 — no CORS in the way.
+ *
+ * Production shares one origin: the panel at quezby.com/panel, the API at
+ * quezby.com/api (docs/deployment/shared-hosting.md). `adminBase` is the path
+ * the panel is served under — Vite's `base` and the router's basename.
  */
 
 /** @typedef {'local' | 'staging' | 'production'} Environment */
 
-/** @type {Readonly<Record<Environment, { apiOrigin: string; adminOrigin: string }>>} */
+/** @type {Readonly<Record<Environment, { apiOrigin: string; adminOrigin: string; adminBase: string }>>} */
 export const ENVIRONMENTS = Object.freeze({
-  local: { apiOrigin: '', adminOrigin: 'http://localhost:5180' },
+  local: { apiOrigin: '', adminOrigin: 'http://localhost:5180', adminBase: '/' },
   staging: {
-    apiOrigin: 'https://staging-api.quezby.com',
-    adminOrigin: 'https://staging-admin.quezby.com',
+    apiOrigin: 'https://quezby.kubisimsek.com',
+    adminOrigin: 'https://quezby-admin.kubisimsek.com',
+    adminBase: '/',
   },
   production: {
-    apiOrigin: 'https://api.quezby.com',
-    adminOrigin: 'https://admin.quezby.com',
+    apiOrigin: 'https://quezby.com',
+    adminOrigin: 'https://quezby.com',
+    adminBase: '/panel/',
   },
 });
 
@@ -46,4 +52,14 @@ export function apiOriginFor(mode, env = {}) {
   const override = env.VITE_API_ORIGIN?.trim();
   if (override) return override.replace(/\/$/, '');
   return ENVIRONMENTS[environmentFor(mode)].apiOrigin;
+}
+
+/**
+ * The path a build is served under: `/panel/` in production, `/` elsewhere.
+ *
+ * @param {string} mode
+ * @returns {string}
+ */
+export function adminBaseFor(mode) {
+  return ENVIRONMENTS[environmentFor(mode)].adminBase;
 }

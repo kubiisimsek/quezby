@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /**
  * Builds the admin panel as one zip for shared hosting, where it is uploaded
- * and extracted by hand into its own subdomain's folder (see
- * docs/deployment/shared-hosting.md → "Yönetim paneli"):
+ * and extracted by hand (see docs/deployment/shared-hosting.md → "Yönetim
+ * paneli"):
  *
- *   pnpm admin:package:staging      # → talks to https://staging-api.quezby.com
- *   pnpm admin:package:production   # → talks to https://api.quezby.com
+ *   pnpm admin:package:staging      # → quezby-admin.kubisimsek.com, talks to https://quezby.kubisimsek.com
+ *   pnpm admin:package:production   # → quezby.com/panel (public_html/panel), talks to https://quezby.com/api
  *
  * → dist-deploy/quezby-admin-<env>-<timestamp>.zip: index.html, assets/,
  * .htaccess (routing, caching, CSP), robots.txt and the favicon — static
@@ -110,8 +110,9 @@ async function main(argv) {
 
   const { ENVIRONMENTS: ORIGINS } = await import(pathToFileURL(join(ADMIN, 'deploy/environments.mjs')).href);
   console.log(`\n✓ dist-deploy/${name}`);
-  console.log(`  Upload it to the document root of ${ORIGINS[environment].adminOrigin} and extract it there.`);
-  console.log(`  It talks to ${ORIGINS[environment].apiOrigin}.`);
+  const { adminOrigin, adminBase, apiOrigin } = ORIGINS[environment];
+  console.log(`  Extract it where ${adminOrigin}${adminBase} is served from${adminBase === '/' ? ' (the document root)' : ` (public_html${adminBase.replace(/\/$/, '')})`}.`);
+  console.log(`  It talks to ${apiOrigin}/api.`);
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {

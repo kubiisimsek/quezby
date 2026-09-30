@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { apiOriginFor, environmentFor, ENVIRONMENTS } from './environments.mjs';
+import { adminBaseFor, apiOriginFor, environmentFor, ENVIRONMENTS } from './environments.mjs';
 import { contentSecurityPolicy, renderHtaccess } from './htaccess.mjs';
 
 describe('renderHtaccess', () => {
-  const file = renderHtaccess({ apiOrigin: 'https://api.quezby.com' });
+  const file = renderHtaccess({ apiOrigin: 'https://quezby.com', base: '/panel/' });
 
   it('sends every path that is not a file to the panel, but never a missing asset', () => {
     expect(file).toContain('RewriteRule ^assets/ - [R=404,L]');
@@ -25,17 +25,26 @@ describe('renderHtaccess', () => {
   });
 
   it('lets the panel talk to its own API and nothing else', () => {
-    expect(file).toContain("connect-src 'self' https://api.quezby.com;");
+    expect(file).toContain("connect-src 'self' https://quezby.com;");
   });
 
   it('shows players\' photos from its own API, and images from nowhere else', () => {
-    expect(file).toContain("img-src 'self' data: https://api.quezby.com;");
+    expect(file).toContain("img-src 'self' data: https://quezby.com;");
+  });
+
+  it('keeps its rules inside the folder the panel is served from', () => {
+    expect(file).toContain('RewriteBase /panel/');
+    expect(file.indexOf('RewriteBase')).toBeLessThan(file.indexOf('^ index.html'));
+  });
+
+  it('sits at the document root when no folder is given', () => {
+    expect(renderHtaccess({ apiOrigin: 'https://quezby.kubisimsek.com' })).toContain('RewriteBase /\n');
   });
 });
 
 describe('contentSecurityPolicy', () => {
   it('runs only the panel\'s own scripts', () => {
-    const policy = contentSecurityPolicy({ apiOrigin: 'https://staging-api.quezby.com' });
+    const policy = contentSecurityPolicy({ apiOrigin: 'https://quezby.kubisimsek.com' });
 
     expect(policy).toContain("script-src 'self';");
     expect(policy).not.toMatch(/script-src[^;]*unsafe/);
@@ -51,7 +60,7 @@ describe('contentSecurityPolicy', () => {
   });
 
   it('takes photos from the API of the environment it was built for', () => {
-    expect(contentSecurityPolicy({ apiOrigin: 'https://staging-api.quezby.com' })).toContain("img-src 'self' data: https://staging-api.quezby.com;");
+    expect(contentSecurityPolicy({ apiOrigin: 'https://quezby.kubisimsek.com' })).toContain("img-src 'self' data: https://quezby.kubisimsek.com;");
   });
 });
 
@@ -64,14 +73,21 @@ describe('environments', () => {
   });
 
   it('points each environment at its API', () => {
-    expect(apiOriginFor('production')).toBe('https://api.quezby.com');
-    expect(apiOriginFor('staging')).toBe('https://staging-api.quezby.com');
+    expect(apiOriginFor('production')).toBe('https://quezby.com');
+    expect(apiOriginFor('staging')).toBe('https://quezby.kubisimsek.com');
     expect(apiOriginFor('development')).toBe('');
   });
 
+  it('serves production at quezby.com/panel and everything else at the root', () => {
+    expect(adminBaseFor('production')).toBe('/panel/');
+    expect(ENVIRONMENTS.production.adminOrigin).toBe(ENVIRONMENTS.production.apiOrigin);
+    expect(adminBaseFor('staging')).toBe('/');
+    expect(adminBaseFor('development')).toBe('/');
+  });
+
   it('lets VITE_API_ORIGIN point a panel elsewhere', () => {
-    expect(apiOriginFor('development', { VITE_API_ORIGIN: 'https://staging-api.quezby.com/' })).toBe(
-      'https://staging-api.quezby.com',
+    expect(apiOriginFor('development', { VITE_API_ORIGIN: 'https://quezby.kubisimsek.com/' })).toBe(
+      'https://quezby.kubisimsek.com',
     );
     expect(apiOriginFor('production', { VITE_API_ORIGIN: '  ' })).toBe(ENVIRONMENTS.production.apiOrigin);
   });

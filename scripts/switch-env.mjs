@@ -48,8 +48,8 @@ export const DISPLAY_NAMES = {
 /** Where each API is when .env does not say — as src/config/env.ts. */
 const DEFAULT_API_URLS = {
   local: 'http://localhost:8000',
-  staging: 'https://staging-api.quezby.com',
-  production: 'https://api.quezby.com',
+  staging: 'https://quezby.kubisimsek.com',
+  production: 'https://quezby.com',
 };
 
 /** Info.plist needs some URL scheme until Google's is known; this one leads nowhere. */

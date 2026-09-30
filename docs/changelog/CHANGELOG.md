@@ -1,5 +1,75 @@
 # Changelog
 
+## 2026-09-30 — One-button deploy from GitHub Actions
+
+The owner wanted to deploy the API and the panel with one button.
+
+- **`.github/workflows/deploy.yml`:** Actions → Deploy → Run workflow, with
+  three choices:
+  - environment: `staging` or `production`;
+  - target: `all`, `api` or `admin`;
+  - dry run.
+- **Tests first:** lint, typecheck, `pnpm test` and `pnpm test:api` run
+  first. Nothing is built unless they pass.
+- **Production** deploys only from `main`.
+- **`scripts/deploy.mjs`:**
+  - Builds with the existing `package-api.sh` and `package-admin.mjs`, then
+    uploads over SSH with rsync.
+  - The API goes first, then `migrate --force` + `optimize`, then
+    `/api/v1/health`. After that the panel goes up.
+  - `storage/` (players' photos, keys) and the host's `error_log` are never
+    deleted.
+  - A folder that is not empty and has no `artisan` / `index.html` is
+    refused. So are the home folder, `public_html` itself and paths with
+    `..`.
+- **Secrets:** GitHub environments `staging` and `production` hold them:
+  - `API_ENV_FILE` (the whole `.env`), `SSH_PRIVATE_KEY` and
+    `SSH_KNOWN_HOSTS`;
+  - the folders and the SSH host are variables.
+- The manual zip route stays as it was.
+
+## 2026-09-30 — Production on one domain: quezby.com/api, /panel, /privacy-policy
+
+The owner wanted production on one domain: the API at quezby.com/api, the
+admin panel at quezby.com/panel and the privacy policy at
+quezby.com/privacy-policy, in the visitor's language.
+
+- **API:**
+  - The production zip is extracted into `public_html/api`.
+  - Its root `.htaccess` hands requests to `public/`, and routes stay
+    `/api/v1/…`. `SubfolderHostingTest` proves it, and also that copying
+    only `public/` there would lose every route.
+  - The same `.htaccess` now drops a trailing slash itself. Before, the
+    redirect named `/public/` in the address.
+  - `.env.production.example` has `APP_URL=https://quezby.com`.
+- **Staging hosts:** `quezby.kubisimsek.com` (API) and
+  `quezby-admin.kubisimsek.com` (panel). These are the repo's defaults now:
+  the mobile env, `switch-env`, the admin environments, the `.env` examples
+  and the docs. Local stays on its ports (`:8000`, `:5180`).
+- **Panel:**
+  - Production builds for `/panel/`: Vite `base`, the router's basename and
+    `RewriteBase` in its `.htaccess` (`deploy/environments.mjs` →
+    `adminBase`).
+  - It shares the API's origin `https://quezby.com`, so there is no CORS
+    preflight.
+  - Staging keeps its own host.
+- **App:** production talks to `https://quezby.com`: the `.env.example`,
+  `config/env.ts` and `switch-env` defaults.
+- **Site:** the site zip is built by `store-screenshots/kaynak/privacy.py`
+  (git-ignored, with the eight privacy-policy texts). It holds:
+  - the root `.htaccess`: https, no `www`, `/privacy-policy` routing;
+  - `robots.txt`;
+  - `legal/privacy-policy.php`, which picks the language from
+    `Accept-Language`, falls back to English, and keeps the address
+    unchanged.
+- **Tested** on a local Apache 2.4 with php-fpm, with the same layout as
+  `public_html`:
+  - API routes work, and `.env`, `vendor/` and `storage/` answer 403;
+  - panel deep links work, and a missing asset is a 404;
+  - the language negotiation works, and `legal/` answers 404.
+- **Docs:** `docs/deployment/shared-hosting.md` → "Production: tek alan adı"
+  and `docs/development/environments.md`.
+
 ## 2026-09-30 — qb in every word a player reads
 
 The owner found "Elo" still in the store texts and screenshots after the

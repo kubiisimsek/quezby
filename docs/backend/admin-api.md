@@ -481,6 +481,8 @@ The panel has no sign-up. The first owner is made where the API runs:
 ## Throttles and CORS
 
 Admin routes share `admin`: 240 requests a minute per admin. The login is
-`admin-login` (above). The panel lives on its own origin
-(`admin.quezby.com`), so every call starts with a preflight; `config/cors.php`
-lets the browser remember its answer for two hours. No cookies cross origins.
+`admin-login` (above). In production the panel shares the API's origin
+(`quezby.com/panel`, `quezby.com/api`), so no preflight is needed. On staging it
+lives on its own origin (`quezby-admin.kubisimsek.com`) and every call starts with
+a preflight; `config/cors.php` lets the browser remember its answer for two
+hours. No cookies cross origins.

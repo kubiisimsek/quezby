@@ -8,8 +8,8 @@ API it talks to.
 | Environment | `QUEZBY_ENV` | Name on the phone | API (`apps/mobile/.env`) | API `APP_ENV` |
 | --- | --- | --- | --- | --- |
 | local | `local` | Quezby Local | `API_URL_LOCAL` (default `http://localhost:8000`) | `local` — `.env.example` |
-| staging | `staging` | Quezby Staging | `API_URL_STAGING` (default `https://staging-api.quezby.com`) | `staging` — `.env.staging.example` |
-| production | `production` | Quezby | `API_URL_PRODUCTION` (default `https://api.quezby.com`) | `production` — `.env.production.example` |
+| staging | `staging` | Quezby Staging | `API_URL_STAGING` (default `https://quezby.kubisimsek.com`) | `staging` — `.env.staging.example` |
+| production | `production` | Quezby | `API_URL_PRODUCTION` (default `https://quezby.com`: the API at quezby.com/api) | `production` — `.env.production.example` |
 
 ## The admin panel
 
@@ -19,8 +19,8 @@ at build time from `apps/admin/deploy/environments.mjs`.
 | Environment | Build | Panel | API |
 | --- | --- | --- | --- |
 | local | `pnpm dev:admin` (Vite, `:5180`) | `http://localhost:5180` | `/api` proxied to `http://localhost:8000` — same origin, no CORS |
-| staging | `pnpm admin:package:staging` | `https://staging-admin.quezby.com` | `https://staging-api.quezby.com` |
-| production | `pnpm admin:package:production` | `https://admin.quezby.com` | `https://api.quezby.com` |
+| staging | `pnpm admin:package:staging` | `https://quezby-admin.kubisimsek.com` | `https://quezby.kubisimsek.com` |
+| production | `pnpm admin:package:production` | `https://quezby.com/panel/` | `https://quezby.com/api` — same origin, no CORS |
 
 `VITE_API_ORIGIN` (`apps/admin/.env`, git-ignored; `.env.example`) points a
 local panel at another API; it is the panel's only variable, and public — the
@@ -282,5 +282,7 @@ reaches the phone through Firebase Cloud Messaging.
   Messaging API (V1) on, and a service account with "Firebase Cloud Messaging
   API Admin".
 - Google Play: one app, `com.kubisimsek.game.quezby`.
-- DNS: `staging-api.quezby.com` and `api.quezby.com` (or whatever you set in
-  `apps/mobile/.env`) pointing at the hosting, each with HTTPS.
+- DNS: `quezby.kubisimsek.com` and `quezby.com` (or whatever you set in
+  `apps/mobile/.env`) pointing at the hosting, each with HTTPS. Production is
+  one domain: the API at `/api`, the panel at `/panel`, the privacy policy at
+  `/privacy-policy` (`docs/deployment/shared-hosting.md`).

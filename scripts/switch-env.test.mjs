@@ -154,7 +154,7 @@ describe('apiUrlFor', () => {
     const values = new Map([['API_URL_STAGING', 'https://staging.example.com/']]);
 
     assert.equal(apiUrlFor('staging', values), 'https://staging.example.com');
-    assert.equal(apiUrlFor('production', values), 'https://api.quezby.com');
+    assert.equal(apiUrlFor('production', values), 'https://quezby.com');
     assert.equal(apiUrlFor('local', new Map()), 'http://localhost:8000');
   });
 });

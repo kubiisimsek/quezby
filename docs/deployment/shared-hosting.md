@@ -1,9 +1,132 @@
 # API'yi ve yönetim panelini paylaşımlı hostinge kurmak (cPanel)
 
 API tek bir zip olarak yüklenir; SSH gerekmez. Yönetim paneli ayrı, statik
-bir zip'tir ve kendi alt alan adında durur (aşağıda **Yönetim paneli**). Adımlar staging için yazıldı —
-production'da `staging` yerine `production`, alan adı olarak `api.quezby.com`
-kullan.
+bir zip'tir (aşağıda **Yönetim paneli**). Adımlar staging için yazıldı:
+staging'de API ve panel kendi alt alan adlarında durur. Production tek alan
+adındadır, klasör düzeni hemen aşağıda.
+
+## Production: tek alan adı (quezby.com)
+
+| Adres | Ne | `public_html` içinde |
+| --- | --- | --- |
+| `https://quezby.com/api/…` | API (`apps/api`) | `api/`: `pnpm api:package:production` zip'i |
+| `https://quezby.com/panel/` | Yönetim paneli (`apps/admin`) | `panel/`: `pnpm admin:package:production` zip'i |
+| `https://quezby.com/privacy-policy` | Gizlilik politikası, 8 dil | kök: `.htaccess`, `robots.txt`, `legal/` (site zip'i) |
+
+- **API:** zip'i `public_html/api` klasörüne aç (4. adım, klasör adı `api`).
+  Alan adı bağlamak gerekmez (5. adımı atla). Zip'in kökündeki `.htaccess`
+  her isteği `public/`'e verir. `.env`, `vendor/`, `storage/`, `app/` gibi
+  yollar dışarıdan 403 döner. Laravel `/api/public/index.php`'den çalışır ve
+  rotalar `/api/v1/…` olarak kalır (`tests/Feature/SubfolderHostingTest.php`).
+  **Yalnızca `public/`'i `public_html/api`'ye kopyalama:** o zaman Laravel
+  `/api`'yi kendi yolu sayar ve her rota 404 olur. `.env`'de
+  `APP_URL=https://quezby.com`.
+- **Panel:** production paketi `/panel/` için derlenir. Zip'i
+  `public_html/panel` klasörüne aç. Panel API'yle aynı kökte olduğu için
+  CORS ön isteği de yoktur.
+- **Gizlilik politikası:** `store-screenshots/quezby-site.zip`
+  (git'e girmez; `python3 store-screenshots/kaynak/privacy.py` üretir).
+  `public_html`'in köküne aç.
+  - `/privacy-policy`, tarayıcının diline göre sayfayı açar:
+    - `Accept-Language` başlığına bakılır;
+    - eşleşme yoksa İngilizce açılır;
+    - adres değişmez.
+  - `/privacy-policy/de` gibi bir adres tek bir dili açar. Bilinmeyen bir dil
+    `/privacy-policy`'ye döner.
+  - `legal/` doğrudan açılmaz (404).
+- **Kökteki `.htaccess`:**
+  - http'yi ve `www`'yu `https://quezby.com`'a yönlendirir.
+  - `api/` ile `panel/`'e dokunmaz: Apache yalnızca en içteki klasörün
+    `.htaccess` kurallarını çalıştırır.
+  - Bu yüzden `/api` ve `/panel` için https'i cPanel → **Domains** →
+    **Force HTTPS Redirect** ile aç.
+- **Uygulama:** production derlemesi `https://quezby.com`'a bağlanır
+  (`apps/mobile/.env` → `API_URL_PRODUCTION=https://quezby.com`, `/api`
+  olmadan).
+
+## Tek tuşla: GitHub Actions
+
+Hostta SSH açıksa API'yi ve paneli zip'le uğraşmadan tek düğmeyle
+gönderirsin. Yol şu: **Actions** → **Deploy** → **Run workflow**. Orada ortamı
+(`staging` / `production`), neyin gideceğini (`all` / `api` / `admin`)
+seçersin; istersen **Deneme**'yi de işaretlersin.
+
+İş akışı (`.github/workflows/deploy.yml`) şunları yapar:
+
+1. Testleri koşar: lint, typecheck, `pnpm test`, `pnpm test:api`. Biri
+   kırmızıysa hiçbir şey gitmez.
+2. `scripts/deploy.mjs` ile iki paketi derler: `package-api.sh` ve
+   `package-admin.mjs`, elle paketlemedekiyle aynı.
+3. API'yi rsync ile SSH'tan yükler. Sonra `migrate --force` ve `optimize`
+   çalışır, ardından `/api/v1/health` yanıt veriyor mu diye bakılır.
+4. Sonra paneli yükler.
+
+Production yalnızca `main` dalından gider.
+
+**Sunucuda neye dokunulmaz, ne silinir:**
+
+- `storage/`'a (oyuncuların fotoğrafları, `storage/app/private/`'daki
+  anahtarlar) ve hostun `error_log` dosyalarına dokunulmaz.
+- Pakette olmayan her şey silinir.
+- Klasör boş değilse ve içinde `artisan` (API) ya da `index.html` (panel)
+  yoksa yükleme reddedilir.
+- Ev klasörü, `public_html`'in kendisi ve `..` içeren yollar da reddedilir.
+
+**Bir kez kurulum:**
+
+1. **SSH anahtarı.** Kendi bilgisayarında bir anahtar çift üret:
+
+   ```bash
+   ssh-keygen -t ed25519 -N "" -C quezby-deploy -f ~/.ssh/quezby_deploy
+   ```
+
+   Açık anahtarı cPanel → **SSH Access** → **Manage SSH Keys** → **Import
+   Key**'e yapıştır (`~/.ssh/quezby_deploy.pub`), sonra **Authorize**'a bas.
+2. **Sunucunun parmak izi:**
+
+   ```bash
+   ssh-keyscan -p <port> <host>
+   ```
+
+   Çıktının tamamı `SSH_KNOWN_HOSTS` olur.
+3. **PHP'nin yolu.** Hostta `php -v` 8.3 demiyorsa cPanel'in PHP'sinin tam
+   yolunu bul, ör. `/opt/cpanel/ea-php83/root/usr/bin/php`.
+4. **GitHub ortamları.** Repo → **Settings** → **Environments**'ta `staging`
+   ve `production` adlı iki ortam aç. Production'a **Required reviewers**
+   ekle; böylece her production gönderimi senin onayını bekler. Her ortama
+   şunları gir:
+
+   | Tür | Ad | Değer |
+   | --- | --- | --- |
+   | Secret | `API_ENV_FILE` | `apps/api/.env.<ortam>`'ın **tamamı** (aynı `APP_KEY`) |
+   | Secret | `SSH_PRIVATE_KEY` | `~/.ssh/quezby_deploy` (gizli anahtar) |
+   | Secret | `SSH_KNOWN_HOSTS` | 2. adımın çıktısı |
+   | Variable | `DEPLOY_SSH_HOST` | ör. `quezby.com` |
+   | Variable | `DEPLOY_SSH_USER` | cPanel kullanıcı adı |
+   | Variable | `DEPLOY_SSH_PORT` | boşsa `22` |
+   | Variable | `DEPLOY_API_DIR` | production: `public_html/api` · staging: `quezby-api-staging` |
+   | Variable | `DEPLOY_ADMIN_DIR` | production: `public_html/panel` · staging: panelin Document Root'u |
+   | Variable | `DEPLOY_PHP` | boşsa `php`, değilse 3. adımdaki yol |
+
+**Dikkat edilecekler:**
+
+- Klasör yolları SSH ev klasörüne göredir; `~` yazma.
+- İlk seferde **Deneme** ile çalıştır. rsync neyi yükleyeceğini ve neyi
+  sileceğini listeler; hiçbir şey göndermez, migration da yapmaz.
+- `.env`'i değiştireceksen önce `API_ENV_FILE`'ı güncelle, sonra gönder.
+  Her gönderim sunucudaki `.env`'i bu secret'la değiştirir; elle
+  yaptığın bir düzeltme bir sonraki gönderimde geri gider.
+- SSH ile `OPS_TOKEN` gerekmez, boş kalabilir.
+- Aynı betik kendi bilgisayarından da çalışır. Aynı `DEPLOY_*` değişkenleri
+  gerekir, bir de GNU rsync: macOS'un rsync'i `--chmod`'u tanımaz, önce
+  `brew install rsync`. Komut:
+
+  ```bash
+  node scripts/deploy.mjs production api
+  ```
+
+Elle zip yolu (aşağıdaki adımlar) SSH olmayan hostlar için olduğu gibi
+duruyor.
 
 **Gereksinimler**
 
@@ -156,7 +279,7 @@ cPanel → **File Manager**:
 
 ## 5. Alan adını bağla
 
-cPanel → **Domains** → `staging-api.quezby.com`:
+cPanel → **Domains** → `quezby.kubisimsek.com`:
 
 - **Önerilen:** Document Root = `quezby-api-staging/public`.
 - Host buna izin vermiyorsa Document Root = `quezby-api-staging` (klasörün
@@ -164,8 +287,8 @@ cPanel → **Domains** → `staging-api.quezby.com`:
   `vendor/`, `storage/` gibi yollar dışarıdan açılmaz (403).
 - SSL için cPanel → **SSL/TLS Status** → AutoSSL.
 
-Kontrol: `curl https://staging-api.quezby.com/api/v1/health` →
-`{"status":"ok",…}`. `500` dönüyorsa önce `APP_KEY`'e bak (Sorun giderme).
+Kontrol: `curl https://quezby.kubisimsek.com/api/v1/health` (production'da
+`https://quezby.com/api/v1/health`) → `{"status":"ok",…}`. `500` dönüyorsa önce `APP_KEY`'e bak (Sorun giderme).
 
 ## 6. Migration ve önbellek
 
@@ -192,7 +315,7 @@ curl -X POST https://quezby.kubisimsek.com/api/v1/ops/optimize -H "X-Ops-Token: 
 `.env` içinde `MODERATION_TOKEN` doluysa aynı işleri `artisan` olmadan yaparsın:
 
 ```bash
-curl -X POST https://api.quezby.com/api/v1/ops/moderate -H "X-Moderation-Token: <MODERATION_TOKEN>" \
+curl -X POST https://quezby.com/api/v1/ops/moderate -H "X-Moderation-Token: <MODERATION_TOKEN>" \
   -H "Content-Type: application/json" -d '{"action":"held"}'                              # incelemedeki turlar
 curl … -d '{"action":"approve","runId":"01J…"}'                                            # sıralamaya al
 curl … -d '{"action":"reject","runId":"01J…","reason":"bot"}'                               # reddet
@@ -232,12 +355,12 @@ yoksa güncelleme onu geri alır. `storage/` ise zip'te boş klasörlerden
 ibarettir: oyuncuların profil fotoğrafları (`storage/app/avatars`) ve
 `storage/app/private/`'a yüklediğin anahtarlar güncellemeden etkilenmez.
 
-## Yönetim paneli (admin.quezby.com)
+## Yönetim paneli (quezby.com/panel)
 
-Panel (`apps/admin`) statik dosyalardan oluşur: PHP ya da Node gerekmez,
-kendi alt alan adında durur ve API'ye tarayıcıdan bağlanır. Staging için
-`staging` / `staging-admin.quezby.com`, production için `production` /
-`admin.quezby.com` kullan.
+Panel (`apps/admin`) statik dosyalardan oluşur: PHP ya da Node gerekmez ve
+API'ye tarayıcıdan bağlanır. Production'da `quezby.com/panel/` adresinde,
+`public_html/panel` klasöründe durur. Staging'de kendi alt alan adındadır:
+`staging` / `quezby-admin.kubisimsek.com`.
 
 1. **Önce API.** Panelin tabloları (`admins`, `audit_entries`) API'nin
    migration'larıyla gelir: API'nin yeni sürümünü yükle ve 6. adımdaki
@@ -250,7 +373,7 @@ kendi alt alan adında durur ve API'ye tarayıcıdan bağlanır. Staging için
    php artisan quezby:admin:create sen@ornek.com --name="Adın Soyadın"
 
    # SSH yoksa (.env'de OPS_TOKEN dolu olmalı)
-   curl -X POST https://api.quezby.com/api/v1/ops/admins -H "X-Ops-Token: <OPS_TOKEN>" \
+   curl -X POST https://quezby.com/api/v1/ops/admins -H "X-Ops-Token: <OPS_TOKEN>" \
      -H "Content-Type: application/json" -d '{"email":"sen@ornek.com","name":"Adın Soyadın"}'
    ```
 
@@ -270,23 +393,22 @@ kendi alt alan adında durur ve API'ye tarayıcıdan bağlanır. Staging için
    `VITE_API_ORIGIN` dışında bir `VITE_*` değişkeni doluysa betik paketlemez:
    o değerler herkese açık pakete girerdi.
 
-4. **Alan adı.** cPanel → **Domains** → `admin.quezby.com` oluştur. Document
-   Root için boş bir klasör seç (ör. `admin.quezby.com`); statik dosyalar
-   olduğu için `public_html` altında olabilir. SSL: **SSL/TLS Status** →
-   AutoSSL.
+4. **Klasör.** Production: `public_html/panel` (alan adı gerekmez). Staging:
+   cPanel → **Domains** → `quezby-admin.kubisimsek.com` oluştur, Document Root
+   için boş bir klasör seç; SSL: **SSL/TLS Status** → AutoSSL.
 5. **Yükle.** File Manager → o klasör → zip'i yükle → **Extract**. `.htaccess`
    gizli bir dosyadır (File Manager → Settings → _Show Hidden Files_); orada
    olduğundan emin ol. Güncellemede önce eski `assets/` klasörünü sil, sonra
    yeni zip'i açıp üzerine yaz.
-6. **Gir.** `https://admin.quezby.com` → geçici şifreyle giriş → panel önce
+6. **Gir.** `https://quezby.com/panel/` → geçici şifreyle giriş → panel önce
    kendi şifreni seçtirir. Başka yöneticileri panelden eklersin: **Yöneticiler
    → Yönetici ekle** (Sahip, Moderatör ya da İzleyici; geçici şifreyi bir kez
    gösterir).
 
 Kontrol: tarayıcıda panel açılıyorsa ve bir alt sayfayı yenileyince
-(`/players`) yine açılıyorsa `.htaccess` çalışıyor demektir. Giriş "Sunucuya
+(`/panel/players`) yine açılıyorsa `.htaccess` çalışıyor demektir. Giriş "Sunucuya
 ulaşılamadı" diyorsa API'nin adresi yanlış paketlenmiştir ya da API
-kapalıdır: `curl https://api.quezby.com/api/v1/health`.
+kapalıdır: `curl https://quezby.com/api/v1/health`.
 
 Panel oturumu 12 saat sürer (`QUEZBY_ADMIN_TOKEN_HOURS`). Yöneticilerin her
 işlemi — yasak, ad sıfırlama, fotoğraf kaldırma, bildirimleri kapatma, tur
