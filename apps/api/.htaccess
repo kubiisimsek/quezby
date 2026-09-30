@@ -17,6 +17,12 @@
     RewriteRule ^(app|bootstrap|config|database|lang|resources|routes|storage|tests|vendor)(/|$) - [F,L]
     RewriteRule ^(artisan|composer\.(json|lock)|phpunit\.xml|README\.md)$ - [F,L]
 
+    # A trailing slash is dropped here, before public/ is in the path: done
+    # after it, public/.htaccess would redirect to /…/public/v1/health.
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} ^(.+)/$
+    RewriteRule ^ %1 [R=301,L]
+
     RewriteRule ^(?!public/)(.*)$ public/$1 [L]
 </IfModule>
 
