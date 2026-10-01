@@ -1,6 +1,7 @@
 import { Rng } from './rng';
 import {
   RULES,
+  capsFor,
   drainFor,
   holdFillFor,
   levelFor,
@@ -32,13 +33,16 @@ export type Reel = {
  * not — so reel `n` always reads the same bits of the seed, whatever came
  * before it, and the PHP replay cannot drift out of step. It is the same
  * feed at every Dereceli difficulty: difficulty only tightens the meter
- * (`difficulty.ts`), never what comes on screen.
+ * (`difficulty.ts`), never what comes on screen. Its caps go by the reel,
+ * never the score, so everyone on a seed sees the same reels.
  */
 export class ReelStream {
   private readonly rng: Rng;
   private index = 0;
   private previous: ReelKind | null = null;
   private specialRun = 0;
+  /** The kinds of the last `capWindow − 1` reels, oldest first. */
+  private readonly recent: ReelKind[] = [];
 
   constructor(seed: number) {
     this.rng = new Rng(seed);
@@ -61,14 +65,15 @@ export class ReelStream {
       kind = 'skip';
     } else if (pick < RULES.weightLike) {
       kind = 'like';
-    } else if (pick < RULES.weightLike + RULES.weightHold) {
-      kind = 'hold';
     } else {
-      kind = this.previous === 'freeze' ? 'like' : 'freeze';
+      kind = pick < RULES.weightLike + RULES.weightHold ? 'hold' : 'freeze';
+      if (!this.allows(kind, n)) kind = 'skip';
     }
 
     this.specialRun = kind === 'skip' ? 0 : this.specialRun + 1;
     this.previous = kind;
+    this.recent.push(kind);
+    if (this.recent.length >= RULES.capWindow) this.recent.shift();
     this.index += 1;
 
     const isHold = kind === 'hold';
@@ -82,5 +87,13 @@ export class ReelStream {
       drain: drainFor(n),
       level: levelFor(n),
     };
+  }
+
+  /** Whether a hold or a freeze may come on reel `n`: never a freeze after a freeze, never past its cap. */
+  private allows(kind: 'hold' | 'freeze', n: number): boolean {
+    if (kind === 'freeze' && this.previous === 'freeze') return false;
+    let seen = 0;
+    for (const recent of this.recent) if (recent === kind) seen += 1;
+    return seen < capsFor(n)[kind];
   }
 }

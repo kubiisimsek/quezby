@@ -294,8 +294,11 @@ return [
         // rated runs from before the difficulty table.
         'targets' => [
             2 => [0 => 8000, 1000 => 34000, 2000 => 100000, 3000 => 240000, 4000 => 480000, 5000 => 800000, 6000 => 1100000],
-            // Engine v3 (blind moves): v2's anchors 1 % lower, as the simulated medians moved.
-            3 => [0 => 8000, 1000 => 33700, 2000 => 99000, 3000 => 238000, 4000 => 475000, 5000 => 792000, 6000 => 1090000],
+            // Engine v3, re-set in place on 2026-10-01 (staging, no new season)
+            // with the short game: each anchor where it stood against its
+            // profile's median — casual at 1000, average 2000, good 3000, pro
+            // 4000, elite past 5000.
+            3 => [0 => 8000, 1000 => 33100, 2000 => 109000, 3000 => 267200, 4000 => 497600, 5000 => 840400, 6000 => 1156200],
         ],
         // Dereceli gets harder as the rating climbs (`App\Game\Difficulty`):
         // difficulty 0 below `from`, then one more every `step` Elo, up to
@@ -315,7 +318,11 @@ return [
             'targets' => [
                 3 => [
                     1 => [0 => 8000, 1000 => 31600, 2000 => 74100, 3000 => 148300, 4000 => 265700, 5000 => 394000, 6000 => 542300],
-                    2 => [0 => 8000, 1000 => 31600, 2000 => 76200, 3000 => 96100, 4000 => 129500, 5000 => 176700, 6000 => 294400, 7000 => 485800],
+                    // Re-set in place on 2026-10-01 with the short game, by the same
+                    // anchors — but 2000 at average's score one difficulty below it:
+                    // its runs now spread wider, and the flat step up to 3000
+                    // would carry it into Altın.
+                    2 => [0 => 8000, 1000 => 29900, 2000 => 90000, 3000 => 97300, 4000 => 130000, 5000 => 178700, 6000 => 310600, 7000 => 529700],
                 ],
             ],
         ],

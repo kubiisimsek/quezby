@@ -253,8 +253,8 @@ function comeback(): BonusFixture {
 /**
  * Plays clean until the intro is over, then makes a blind move — a quick
  * double tap on a skip reel — and fills the meter back with fast hits that
- * never forgive it, so the next blind move doubles again: x2, x4, then the
- * third, which always ends the run.
+ * never forgive it, so the next blind move doubles: the plain loss, x2, then
+ * x4 on the third, which always ends the run.
  */
 function thirdBlindMove(): BonusFixture {
   const quick: Record<ReelKind, Action | null> = {

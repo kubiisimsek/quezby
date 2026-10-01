@@ -1,5 +1,5 @@
-import { playRun, type SkillProfile } from './bot';
-import { Run, type RunSummary } from './run';
+import { Bot, ErrorBot, type SkillProfile, type Thumb } from './bot';
+import { Run, type Action, type RunSummary, type Step } from './run';
 
 /**
  * The measurements behind the balance promise in `docs/product/scoring.md`,
@@ -7,24 +7,64 @@ import { Run, type RunSummary } from './run';
  * floats here never reach a score. Not shipped in the app.
  */
 
-/** What the app spends between two reels on average — the swipe out and in. */
-export const TRANSITION_MS = 220;
+/**
+ * The app's pace, so a run's length is what the player sees on the clock:
+ * the countdown, how long a verdict stays up, the slide to the next reel and
+ * the frame it goes live on. A copy of `@quezby/config`'s PACE, checked
+ * against `packages/config/fixtures/pace.json` by `balance.test.ts`.
+ */
+export const APP_PACE = {
+  countdownMs: 1800,
+  slideMs: 140,
+  exitMs: { skipHit: 0, hit: 100, miss: 200 },
+  frameMs: 16,
+} as const;
+
+/** What a reel costs on the clock after its verdict, unless it ended the run. */
+export function afterMs(step: Step): number {
+  if (step.over) return 0;
+  const hit = step.verdict === 'hit' || step.verdict === 'perfect';
+  const exit = !hit
+    ? APP_PACE.exitMs.miss
+    : step.reel.kind === 'skip'
+      ? APP_PACE.exitMs.skipHit
+      : APP_PACE.exitMs.hit;
+  return exit + APP_PACE.slideMs + APP_PACE.frameMs;
+}
 
 export type Played = { summary: RunSummary; seconds: number };
+
+/** Plays one run to its end (or 5000 reels) with `decide`, on the app's clock. */
+function played(run: Run, decide: (run: Run) => Action): Played {
+  let between = 0;
+  for (let reels = 0; !run.over && reels < 5000; reels += 1) {
+    between += afterMs(run.apply(decide(run)));
+  }
+  const summary = run.summary();
+  return { summary, seconds: (APP_PACE.countdownMs + summary.activeMs + between) / 1000 };
+}
 
 /**
  * `runs` runs of one profile on seeds `i · 7919`, bot seed `i`, as the
  * simulator plays them — at a Dereceli `difficulty` when one is given.
  */
 export function playProfile(profile: SkillProfile, runs: number, firstSeed = 1, difficulty = 0): Played[] {
-  const played: Played[] = [];
+  const all: Played[] = [];
   for (let i = firstSeed; i < firstSeed + runs; i += 1) {
-    const run = new Run(i * 7919, difficulty);
-    playRun(run, profile, i);
-    const summary = run.summary();
-    played.push({ summary, seconds: (summary.activeMs + summary.reels * TRANSITION_MS) / 1000 });
+    const bot = new Bot(profile, i);
+    all.push(played(new Run(i * 7919, difficulty), (run) => bot.decide(run)));
   }
-  return played;
+  return all;
+}
+
+/** `runs` runs of a thumb that errs on a share `err` of the reels (`ErrorBot`), seeds as `playProfile`. */
+export function playThumb(thumb: Thumb, err: number, runs: number, firstSeed = 1): Played[] {
+  const all: Played[] = [];
+  for (let i = firstSeed; i < firstSeed + runs; i += 1) {
+    const bot = new ErrorBot(thumb, err, i);
+    all.push(played(new Run(i * 7919), (run) => bot.decide(run)));
+  }
+  return all;
 }
 
 const ascending = (values: number[]) => [...values].sort((a, b) => a - b);

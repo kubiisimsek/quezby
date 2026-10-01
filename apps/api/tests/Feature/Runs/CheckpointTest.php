@@ -40,10 +40,10 @@ function checkpointNeeded(int $seed, array $actions, int $reel): int
     return app(RunClock::class)->verdicts(Engine::replay($seed, $actions))[$reel - 1];
 }
 
-/** A long run, played honestly and started as long ago as it took. */
+/** A long run — the longest of the replay fixtures, well past every mark — played honestly and started as long ago as it took. */
 function longRun(object $test): array
 {
-    $fixture = replayFixture('pro-7919');
+    $fixture = replayFixture('pro-42');
 
     return [$fixture, $test->startRunFor($fixture)];
 }

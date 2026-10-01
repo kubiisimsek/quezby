@@ -6,6 +6,8 @@
  * the PHP replay (`apps/api/app/Game/Rules.php`) lands on the same score to
  * the point. The rules are locked (`rules.lock.json`): changing any value is
  * an `ENGINE_VERSION` bump, `pnpm engine:lock`, and a new leaderboard season.
+ * Until the first store release the owner may keep the version and re-seal
+ * it in place (`pnpm engine:lock -- --reseal`): staging has no season to keep.
  */
 export const ENGINE_VERSION = 3;
 
@@ -24,11 +26,11 @@ export const RULES = {
   /** A double tap costs a second touch, so a friend's post waits a little longer. */
   likeExtra: 250,
   /** How long a freeze reel must be left alone, as a share of the window. */
-  freezePercent: 55,
-  freezeMin: 500,
+  freezePercent: 45,
+  freezeMin: 400,
   /** How long the hold bar takes to fill, on the same curve as the window. */
-  holdFillMax: 1600,
-  holdFillMin: 700,
+  holdFillMax: 1200,
+  holdFillMin: 600,
   /** The green zone's width in per-mille of the bar, on the same curve. */
   zoneMax: 200,
   zoneMin: 90,
@@ -43,6 +45,19 @@ export const RULES = {
   weightHold: 30,
   /** Never more specials in a row than this — the autopilot needs its feed. */
   maxSpecialRun: 3,
+  /**
+   * The most holds and freezes any `capWindow` reels in a row may hold, by
+   * the reel the run has reached: one each at first, a second freeze from
+   * level 9, a second hold from level 17. A pick past its cap, or a freeze
+   * right after a freeze, is an ordinary reel: the slow reels never crowd
+   * together and the feed keeps its pace.
+   */
+  capWindow: 10,
+  caps: [
+    { fromReel: 0, hold: 1, freeze: 1 },
+    { fromReel: 160, hold: 1, freeze: 2 },
+    { fromReel: 320, hold: 2, freeze: 2 },
+  ] as readonly { fromReel: number; hold: number; freeze: number }[],
   intro: [
     'skip',
     'skip',
@@ -56,21 +71,26 @@ export const RULES = {
 
   /** The dopamine meter, per-mille. */
   meterMax: 1000,
-  /** Drain in per-mille per second: `base + n · num / den`. It never stops growing. */
-  drainBase: 55,
+  /**
+   * Drain in per-mille per second: `base + n · num / den + n² / quad`. It
+   * never stops growing, and by the sixth minute the best thumb cannot keep
+   * up: the longest run is about six minutes.
+   */
+  drainBase: 60,
   drainNum: 1,
-  drainDen: 5,
+  drainDen: 6,
+  drainQuad: 3000,
   gain: { skip: 80, like: 90, hold: 100, freeze: 90 } as Record<
     ReelKind,
     number
   >,
   perfectGain: 60,
-  loss: { timeout: 200, wrong: 200, holdMiss: 120, caught: 250 },
+  loss: { timeout: 250, wrong: 250, holdMiss: 150, caught: 300 },
   /**
    * A blind move: a swipe or a double tap on the wrong post, made sooner than
-   * this — too soon to have looked. Its penalty doubles, and doubles again
-   * for each blind move after it (x2, x4, x8…) until a considered hit, so the
-   * third in a row always empties the meter.
+   * this — too soon to have looked. The first costs the plain loss; each one
+   * after it doubles (x2, x4…) until a considered hit, so the third in a row
+   * always empties the meter.
    */
   blindMs: 300,
 
@@ -86,12 +106,12 @@ export const RULES = {
   perfectPrecision: 700,
   levelEvery: 20,
   /**
-   * The level multiplier, per-mille: `1000 + max · ℓ / (ℓ + curve)` with
-   * `ℓ = level − 1`. x2 at level 11, never x3 — so a longer run is worth more
-   * without one lucky minute outweighing the rest.
+   * The level multiplier, per-mille: `1000 + step · ℓ` with `ℓ = level − 1`.
+   * It keeps climbing — x2.8 at level 10, x4.8 at 20 — so the posts of a long,
+   * fast run are worth far more than the first ones, and the drain decides
+   * how far anyone gets.
    */
-  levelBoostMax: 2000,
-  levelBoostCurve: 10,
+  levelBoostStep: 200,
   /** The combo, per-mille: each hit adds a step up to the cap; a miss halves what is above x1. */
   comboStart: 1000,
   comboStep: 50,
@@ -147,17 +167,29 @@ export function specialShareFor(n: number): number {
 
 /** Meter lost per second on reel `n`, in per-mille. */
 export function drainFor(n: number): number {
-  return RULES.drainBase + Math.floor((n * RULES.drainNum) / RULES.drainDen);
+  return (
+    RULES.drainBase +
+    Math.floor((n * RULES.drainNum) / RULES.drainDen) +
+    Math.floor((n * n) / RULES.drainQuad)
+  );
+}
+
+/** The most holds and freezes the `capWindow` reels ending at reel `n` may hold. */
+export function capsFor(n: number): { hold: number; freeze: number } {
+  let caps = RULES.caps[0]!;
+  for (const tier of RULES.caps) {
+    if (n >= tier.fromReel) caps = tier;
+  }
+  return caps;
 }
 
 export function levelFor(n: number): number {
   return 1 + Math.floor(n / RULES.levelEvery);
 }
 
-/** The level multiplier on reel `n`, per-mille: 1000 on level 1, approaching 3000. */
+/** The level multiplier on reel `n`, per-mille: 1000 on level 1, `levelBoostStep` more each level. */
 export function levelBoostFor(n: number): number {
-  const climbed = Math.floor(n / RULES.levelEvery);
-  return 1000 + Math.floor((RULES.levelBoostMax * climbed) / (climbed + RULES.levelBoostCurve));
+  return 1000 + RULES.levelBoostStep * Math.floor(n / RULES.levelEvery);
 }
 
 /** The combo after a hit, per-mille. */
@@ -171,11 +203,17 @@ export function comboAfterMiss(combo: number): number {
 }
 
 /**
- * What a miss costs the meter: `loss`, doubled once for each blind move in a
- * row — `blind` is 0 for a miss that was not blind.
+ * What a blind move multiplies its loss by: 1 for the first in a row, then
+ * 2, 4… — `blind` is how many blind moves in a row this one makes, 0 for a
+ * miss that was not blind.
  */
+export function blindFactor(blind: number): number {
+  return 2 ** Math.max(0, blind - 1);
+}
+
+/** What a miss costs the meter: `loss`, times its blind factor. */
 export function penaltyFor(loss: number, blind: number): number {
-  return loss * 2 ** blind;
+  return loss * blindFactor(blind);
 }
 
 /** A named combo's points on reel `n`. */

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { PROFILES, blindSwipe, playRun } from '../bot';
-import { RULES, levelBoostFor, penaltyFor } from '../rules';
+import { RULES, blindFactor, levelBoostFor, penaltyFor } from '../rules';
 import { EngineError, GESTURE, Run, replay, type Action } from '../run';
 
 /** Plays the intro perfectly and fast, returning the run at reel 8. */
@@ -99,14 +99,14 @@ describe('Run', () => {
       return run;
     }
 
-    it('doubles the penalty of a swipe on the wrong post made too soon to have looked', () => {
+    it('calls a swipe on the wrong post made too soon to have looked blind, at the plain loss the first time', () => {
       const run = atTheLike();
       const before = run.meter;
       const drain = Math.floor((run.current.drain * 299) / 1000);
       const step = run.apply([GESTURE.up, RULES.blindMs - 1, 0]);
       expect(step.verdict).toBe('wrong');
       expect(step.blind).toBe(1);
-      expect(step.meter).toBe(before - drain - RULES.loss.wrong * 2);
+      expect(step.meter).toBe(before - drain - RULES.loss.wrong);
     });
 
     it('counts a quick double tap on the wrong post as blind too', () => {
@@ -142,15 +142,22 @@ describe('Run', () => {
       expect([pressed.verdict, pressed.blind]).toEqual(['wrong', 0]);
     });
 
-    it('doubles again for each blind move in a row, while fast hits never forgive', () => {
+    it('doubles from the second blind move in a row, while fast hits never forgive', () => {
       const run = new Run(1);
       expect(run.apply([GESTURE.like, 250, 0]).blind).toBe(1);
       run.apply([GESTURE.up, 200, 0]);
+      const before = run.meter;
+      const drain = Math.floor((run.current.drain * 200) / 1000);
       const second = run.apply([GESTURE.up, 200, 0]);
       expect(second.reel.kind).toBe('like');
       expect(second.blind).toBe(2);
-      expect(second.over).toBe(true);
-      expect(run.summary().endedBy).toBe('penalty');
+      expect(second.meter).toBe(before - drain - RULES.loss.wrong * 2);
+      expect(second.over).toBe(false);
+    });
+
+    it('always ends the run on the third blind move in a row', () => {
+      expect(penaltyFor(RULES.loss.wrong, 3)).toBeGreaterThanOrEqual(RULES.meterMax);
+      expect(penaltyFor(RULES.loss.timeout, 3)).toBeGreaterThanOrEqual(RULES.meterMax);
     });
 
     it('starts over after a considered hit', () => {
@@ -174,20 +181,22 @@ describe('Run', () => {
       expect(run.apply([GESTURE.like, 250, 0]).blind).toBe(1);
     });
 
-    it('costs a loss doubled once per blind move', () => {
+    it('costs the plain loss for the first blind move, then doubles it for each one after', () => {
       expect([0, 1, 2, 3].map((blind) => penaltyFor(RULES.loss.wrong, blind))).toEqual([
-        200, 400, 800, 1600,
+        250, 250, 500, 1000,
       ]);
+      expect([0, 1, 2, 3, 4].map(blindFactor)).toEqual([1, 1, 2, 4, 8]);
     });
 
-    it('ends a player who swipes everything within the intro, on every seed', () => {
+    it('ends a player who swipes everything within a few dozen reels, on every seed', () => {
       for (const seed of [1, 42, 7919, 123456789]) {
         for (const ms of [150, 200, RULES.blindMs - 1]) {
           const run = new Run(seed);
           while (!run.over) run.apply(blindSwipe(run, ms));
           const summary = run.summary();
           expect(summary.endedBy).toBe('penalty');
-          expect(summary.reels).toBeLessThanOrEqual(RULES.intro.length);
+          expect(summary.reels).toBeLessThanOrEqual(50);
+          expect(summary.score).toBeLessThan(20_000);
         }
       }
     });

@@ -98,8 +98,9 @@ kaldığı adıma döner, başka bir hesaba giren görmez.
    paylaşım yoktur; VS'in kendisi vardır: gönderildi, ya da kazandın,
    kaybettin, berabere.
 
-Tur süresi yeni başlayanda ~2, ortalama oyuncuda ~3,5, iyi oyuncuda 5–6,
-profesyonelde ~7,5 dakikadır. Aynı yetenek aynı sürede ±%20 aynı skoru yapar.
+Tur süresi yeni başlayanda ~1:45, ortalama oyuncuda ~2:50, iyi oyuncuda ~3:50,
+profesyonelde ~4:35; en uzun tur ~6 dakikadır. Aynı yetenek aynı sürede ±%20
+aynı skoru yapar.
 Ayrıntılar: [scoring.md](./scoring.md).
 
 ## Modlar

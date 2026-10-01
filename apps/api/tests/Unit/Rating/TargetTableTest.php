@@ -38,21 +38,21 @@ test('a season without a table has none — its runs cannot be rated', function 
 test('the target is each anchor\'s score, geometric in between and past the ends', function () {
     $table = targets();
 
-    expect($table->target(1000))->toEqualWithDelta(33700, 0.01)
-        ->and($table->target(2000))->toEqualWithDelta(99000, 0.01)
-        ->and($table->target(1500))->toEqualWithDelta(sqrt(33700 * 99000), 0.01)
-        ->and($table->target(6500))->toBeGreaterThan(1090000.0)
-        ->and($table->shown(1500))->toBe(57800)
-        ->and($table->shown(2000))->toBe(99000)
+    expect($table->target(1000))->toEqualWithDelta(33100, 0.01)
+        ->and($table->target(2000))->toEqualWithDelta(109000, 0.01)
+        ->and($table->target(1500))->toEqualWithDelta(sqrt(33100 * 109000), 0.01)
+        ->and($table->target(6500))->toBeGreaterThan(1156200.0)
+        ->and($table->shown(1500))->toBe(60100)
+        ->and($table->shown(2000))->toBe(109000)
         ->and($table->shown(0))->toBe(8000);
 });
 
 test('performance is the rating whose typical score a score is', function () {
     $table = targets();
 
-    expect($table->performance(33700))->toBe(1000)
-        ->and($table->performance(99000))->toBe(2000)
-        ->and($table->performance(1090000))->toBe(6000)
+    expect($table->performance(33100))->toBe(1000)
+        ->and($table->performance(109000))->toBe(2000)
+        ->and($table->performance(1156200))->toBe(6000)
         ->and($table->performance(4000))->toBeLessThan(0)
         ->and($table->performance(2000000))->toBeGreaterThan(6000)
         ->and($table->performance(0))->toBeNull();

@@ -151,6 +151,92 @@ export class Bot {
 }
 
 /**
+ * A thumb by two numbers, for the speed × error table in `pnpm
+ * engine:simulate`: how fast it decides, and (`ErrorBot`) how often it errs.
+ */
+export type Thumb = {
+  /** Mean decision time, ms. */
+  reaction: number;
+  reactionSd: number;
+  /** Spread of a hold's release around the zone's centre, ms. */
+  holdSd: number;
+  /** Time between the two taps of a like, ms. */
+  tapGap: number;
+};
+
+/** From a slow thumb to the fastest a person can be without the `fast_decisions` flag. */
+export const THUMBS: readonly Thumb[] = [
+  { reaction: 700, reactionSd: 150, holdSd: 110, tapGap: 180 },
+  { reaction: 600, reactionSd: 125, holdSd: 90, tapGap: 165 },
+  { reaction: 500, reactionSd: 105, holdSd: 65, tapGap: 145 },
+  { reaction: 400, reactionSd: 75, holdSd: 40, tapGap: 120 },
+  { reaction: 300, reactionSd: 45, holdSd: 18, tapGap: 90 },
+];
+
+/**
+ * A thumb that errs on a share `err` of the reels, whatever they are: on such
+ * a reel it makes the mistake the reel invites — a double tap on an ordinary
+ * reel, a swipe on a friend's, a release outside the green on a hold, a touch
+ * on a freeze — at its reaction time. Every other reel it plays right, a hold
+ * landing in the green. Timeouts come on their own, when a window is shorter
+ * than the thumb.
+ */
+export class ErrorBot {
+  private readonly rng: Rng;
+
+  constructor(
+    private readonly thumb: Thumb,
+    private readonly err: number,
+    seed: number,
+  ) {
+    this.rng = new Rng(seed ^ 0x2c1b3c6d);
+  }
+
+  private chance(): number {
+    return this.rng.int(1_000_000) / 1_000_000;
+  }
+
+  private normal(mean: number, sd: number): number {
+    const u = Math.max(this.chance(), 1e-9);
+    const v = this.chance();
+    return mean + Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v) * sd;
+  }
+
+  decide(run: Run): Action {
+    const reel = run.current;
+    const reaction = Math.max(170, Math.round(this.normal(this.thumb.reaction, this.thumb.reactionSd)));
+    const wrong = this.chance() < this.err;
+    switch (reel.kind) {
+      case 'skip': {
+        if (reaction >= reel.window) return [GESTURE.none, 0, 0];
+        return wrong ? [GESTURE.like, reaction, 0] : [GESTURE.up, reaction, 0];
+      }
+      case 'like': {
+        if (wrong) return reaction < reel.window ? [GESTURE.up, reaction, 0] : [GESTURE.none, 0, 0];
+        const second = reaction + this.thumb.tapGap;
+        return second < reel.window ? [GESTURE.like, second, 0] : [GESTURE.none, 0, 0];
+      }
+      case 'hold': {
+        if (reaction >= reel.window) return [GESTURE.none, 0, 0];
+        const fill = reel.holdFill;
+        const first = Math.ceil(((reel.zoneCenter - reel.zoneHalf) * fill) / 1000) + 1;
+        const last = Math.floor(((reel.zoneCenter + reel.zoneHalf) * fill) / 1000) - 1;
+        if (wrong) {
+          const early = Math.max(1, first - 1 - Math.round(Math.abs(this.normal(0, 40))));
+          return [GESTURE.hold, reaction, this.chance() < 0.5 ? early : run.holdFailAfter()];
+        }
+        const release = Math.round(this.normal((reel.zoneCenter * fill) / 1000, this.thumb.holdSd));
+        return [GESTURE.hold, reaction, Math.min(last, Math.max(first, release))];
+      }
+      case 'freeze':
+        return wrong
+          ? [GESTURE.touch, Math.min(reel.window - 1, Math.round(reaction * 0.8)), 0]
+          : [GESTURE.none, 0, 0];
+    }
+  }
+}
+
+/**
  * A thumb that swipes every reel `ms` after it goes live, without looking —
  * the player the blind-move penalty is for. On a freeze reel the swipe is a
  * touch.

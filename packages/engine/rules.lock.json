@@ -1,12 +1,12 @@
 {
   "engineVersion": 3,
-  "rulesSha256": "211e4dcd942f7d697dee1268224df5a801e37192199e95224204795a2e231cb4",
-  "behaviourSha256": "a694bcf89d99924b41a22b457183e82472a9cc843a6bfe26f938c3a2a7093ea0",
+  "rulesSha256": "ca8830a260ea4dd1756331e181e2452965c973b98238905db97fdeb52c3e4fbe",
+  "behaviourSha256": "cd899eca3b502f177b603d1eb19ac754287a9c5bdf647c7a25948d2175ac7800",
   "goldens": {
-    "casual-42": 41082,
-    "average-42": 115698,
-    "good-42": 291304,
-    "pro-7919": 557623
+    "casual-42": 11825,
+    "average-42": 28482,
+    "good-42": 206387,
+    "pro-7919": 437003
   },
   "history": [
     {
@@ -23,9 +23,9 @@
     },
     {
       "engineVersion": 3,
-      "rulesSha256": "211e4dcd942f7d697dee1268224df5a801e37192199e95224204795a2e231cb4",
-      "behaviourSha256": "a694bcf89d99924b41a22b457183e82472a9cc843a6bfe26f938c3a2a7093ea0",
-      "lockedAt": "2026-09-29"
+      "rulesSha256": "ca8830a260ea4dd1756331e181e2452965c973b98238905db97fdeb52c3e4fbe",
+      "behaviourSha256": "cd899eca3b502f177b603d1eb19ac754287a9c5bdf647c7a25948d2175ac7800",
+      "lockedAt": "2026-10-01"
     }
   ]
 }

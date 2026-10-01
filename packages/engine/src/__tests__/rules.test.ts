@@ -7,6 +7,7 @@ import {
   RULES,
   baseWindow,
   bonusFor,
+  capsFor,
   comboAfterHit,
   comboAfterMiss,
   drainFor,
@@ -75,11 +76,13 @@ describe('curves', () => {
     expect(drainFor(10000)).toBeGreaterThan(drainFor(1000));
   });
 
-  it('drains slowly enough for long runs, faster every five reels', () => {
-    expect(drainFor(0)).toBe(55);
-    expect(drainFor(4)).toBe(55);
-    expect(drainFor(5)).toBe(56);
-    expect(drainFor(500)).toBe(155);
+  it('drains a little faster every six reels, and steeply once the run is long', () => {
+    expect(drainFor(0)).toBe(60);
+    expect(drainFor(5)).toBe(60);
+    expect(drainFor(6)).toBe(61);
+    expect(drainFor(100)).toBe(60 + 16 + 3);
+    expect(drainFor(300)).toBe(60 + 50 + 30);
+    expect(drainFor(600)).toBe(60 + 100 + 120);
   });
 
   it('levels every twenty reels', () => {
@@ -88,15 +91,14 @@ describe('curves', () => {
     expect(levelFor(20)).toBe(2);
   });
 
-  it('raises the level multiplier along a curve that never reaches x3', () => {
+  it('raises the level multiplier by the same step every level', () => {
     expect(levelBoostFor(0)).toBe(1000);
     expect(levelBoostFor(19)).toBe(1000);
-    expect(levelBoostFor(20)).toBe(1181);
-    expect(levelBoostFor(200)).toBe(2000);
-    expect(levelBoostFor(600)).toBe(2500);
+    expect(levelBoostFor(20)).toBe(1200);
+    expect(levelBoostFor(180)).toBe(2800);
+    expect(levelBoostFor(380)).toBe(4800);
     for (let n = 20; n < 100_000; n += 997) {
-      expect(levelBoostFor(n)).toBeGreaterThanOrEqual(levelBoostFor(n - 20));
-      expect(levelBoostFor(n)).toBeLessThan(3000);
+      expect(levelBoostFor(n) - levelBoostFor(n - 20)).toBe(RULES.levelBoostStep);
     }
   });
 
@@ -121,7 +123,7 @@ describe('curves', () => {
   it('pays named combos by the level multiplier', () => {
     for (const kind of BONUS_KINDS) {
       expect(bonusFor(kind, 0)).toBe(RULES.bonus[kind]);
-      expect(bonusFor(kind, 200)).toBe(RULES.bonus[kind] * 2);
+      expect(bonusFor(kind, 200)).toBe(RULES.bonus[kind] * 3);
     }
   });
 });
@@ -156,6 +158,30 @@ describe('ReelStream', () => {
         previous = reel.kind;
       }
     }
+  });
+
+  it('never holds more holds or freezes in any ten reels than the level allows', () => {
+    for (const seed of [1, 2, 3, 99, 1000, 7919]) {
+      const stream = new ReelStream(seed);
+      const kinds: string[] = [];
+      for (let n = 0; n < 1500; n += 1) {
+        kinds.push(stream.next().kind);
+        if (n < RULES.intro.length) continue;
+        const window = kinds.slice(Math.max(0, n - RULES.capWindow + 1));
+        const caps = capsFor(n);
+        expect(window.filter((kind) => kind === 'hold').length).toBeLessThanOrEqual(caps.hold);
+        expect(window.filter((kind) => kind === 'freeze').length).toBeLessThanOrEqual(caps.freeze);
+      }
+    }
+  });
+
+  it('lets a second freeze in from level 9 and a second hold from level 17', () => {
+    expect(capsFor(0)).toEqual({ fromReel: 0, hold: 1, freeze: 1 });
+    expect(capsFor(159)).toMatchObject({ hold: 1, freeze: 1 });
+    expect(capsFor(160)).toMatchObject({ hold: 1, freeze: 2 });
+    expect(capsFor(319)).toMatchObject({ hold: 1, freeze: 2 });
+    expect(capsFor(320)).toMatchObject({ hold: 2, freeze: 2 });
+    expect(capsFor(100_000)).toMatchObject({ hold: 2, freeze: 2 });
   });
 
   it('keeps every hold zone inside the bar', () => {

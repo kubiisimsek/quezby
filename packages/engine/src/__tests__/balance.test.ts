@@ -1,7 +1,10 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { describe, expect, it } from 'vitest';
 
-import { median, playProfile, sameLengthSpread, type Played } from '../balance';
-import { ELITE, PROFILES } from '../bot';
+import { APP_PACE, median, playProfile, playThumb, sameLengthSpread, type Played } from '../balance';
+import { ELITE, PROFILES, THUMBS } from '../bot';
 import { MAX_DIFFICULTY } from '../difficulty';
 
 /**
@@ -12,13 +15,24 @@ import { MAX_DIFFICULTY } from '../difficulty';
  */
 const RUNS = 400;
 
-/** Median run length per profile, seconds (the transition between reels included). */
+/** Median run length per profile, seconds on the app's clock (countdown and transitions included). */
 const LENGTH: Record<string, [number, number]> = {
-  casual: [100, 145],
-  average: [170, 240],
-  good: [280, 370],
-  pro: [400, 500],
+  casual: [90, 125],
+  average: [145, 195],
+  good: [200, 260],
+  pro: [245, 310],
 };
+
+describe('the clock', () => {
+  it('times runs with the app’s own pace', () => {
+    const pace = JSON.parse(
+      readFileSync(join(__dirname, '..', '..', '..', 'config', 'fixtures', 'pace.json'), 'utf8'),
+    ) as { countdownStepMs: number; countdownSteps: number; slideMs: number; exitMs: unknown };
+    expect(APP_PACE.countdownMs).toBe(pace.countdownStepMs * pace.countdownSteps);
+    expect(APP_PACE.slideMs).toBe(pace.slideMs);
+    expect(APP_PACE.exitMs).toEqual(pace.exitMs);
+  });
+});
 
 const played = PROFILES.map((profile) => ({ profile, runs: playProfile(profile, RUNS) }));
 
@@ -109,7 +123,47 @@ describe('difficulty balance', () => {
       const hard = playProfile(profile, DIFFICULTY_RUNS, 1, MAX_DIFFICULTY);
       expect(scoreOf(hard)).toBeLessThan(scoreOf(easy) * 0.8);
       expect(scoreOf(hard)).toBeGreaterThan(scoreOf(easy) * 0.5);
-      expect(lengthOf(hard)).toBeLessThan(lengthOf(easy) - 90);
+      expect(lengthOf(hard)).toBeLessThan(lengthOf(easy) * 0.85);
+    }
+  });
+});
+
+/**
+ * The owner's table (2026-10-01), locked: thumbs from 700 to 300 ms, erring
+ * on a share of the reels (`ErrorBot`). The longest run is about six
+ * minutes, 500k takes a fast and careful thumb, and 1M only the fastest.
+ */
+describe('speed and errors', () => {
+  const THUMB_RUNS = 150;
+  const thumb = (reaction: number) => THUMBS.find((candidate) => candidate.reaction === reaction)!;
+  const scores = (runs: Played[]) => runs.map((run) => run.summary.score);
+
+  it('ends even a flawless 300 ms thumb within about six minutes', () => {
+    const runs = playThumb(thumb(300), 0, THUMB_RUNS);
+    expect(median(runs.map((run) => run.seconds))).toBeGreaterThan(300);
+    expect(Math.max(...runs.map((run) => run.seconds))).toBeLessThan(380);
+  });
+
+  it('keeps 500k from a 500 ms thumb, flawless or not, and gives it to a careful 400 ms one', () => {
+    expect(median(scores(playThumb(thumb(500), 0, THUMB_RUNS)))).toBeLessThan(500_000);
+    expect(median(scores(playThumb(thumb(400), 0.01, THUMB_RUNS)))).toBeGreaterThan(500_000);
+  });
+
+  it('leaves 1M to the fastest thumb', () => {
+    expect(Math.max(...scores(playThumb(thumb(400), 0, THUMB_RUNS)))).toBeLessThan(1_000_000);
+    expect(median(scores(playThumb(thumb(300), 0, THUMB_RUNS)))).toBeGreaterThan(1_000_000);
+  });
+
+  it('pays a faster thumb more, and an error costs every thumb', () => {
+    for (const err of [0, 0.01, 0.05]) {
+      const medians = THUMBS.map((candidate) => median(scores(playThumb(candidate, err, 100))));
+      for (let i = 1; i < medians.length; i += 1) {
+        expect(medians[i]!).toBeGreaterThan(medians[i - 1]!);
+      }
+    }
+    for (const candidate of THUMBS) {
+      const clean = median(scores(playThumb(candidate, 0, 100)));
+      expect(median(scores(playThumb(candidate, 0.05, 100)))).toBeLessThan(clean * 0.75);
     }
   });
 });

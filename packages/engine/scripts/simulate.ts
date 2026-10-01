@@ -1,8 +1,10 @@
 /**
  * Balancing report: plays thousands of runs per skill profile and prints how
- * long they last, what they score, and whether the consistency promise holds
- * (same skill + same length → within ±20 %) — then the same for Dereceli's
- * difficulties (`src/difficulty.ts`). Run after touching either table:
+ * long they last on the app's clock, what they score, and whether the
+ * consistency promise holds (same skill + same length → within ±20 %); then
+ * the speed × error table (thumbs from 700 to 300 ms, erring on 0–30 % of
+ * the reels) and Dereceli's difficulties (`src/difficulty.ts`). Run after
+ * touching either table:
  *
  *   pnpm engine:simulate            # 2000 runs per profile
  *   pnpm engine:simulate -- 500     # quicker
@@ -12,10 +14,11 @@ import {
   elasticity,
   percentile,
   playProfile,
+  playThumb,
   sameLengthSpread,
   type Played,
 } from '../src/balance';
-import { ELITE, PROFILES, blindSwipe } from '../src/bot';
+import { ELITE, PROFILES, THUMBS, blindSwipe } from '../src/bot';
 import { MAX_DIFFICULTY, difficultyRules } from '../src/difficulty';
 import { BONUS_KINDS } from '../src/rules';
 import { Run } from '../src/run';
@@ -53,7 +56,7 @@ for (const profile of PROFILES) {
   console.log(profile.name.padEnd(8));
   console.log(`  reels     ${row(played.map((run) => run.summary.reels)).map(fmt).join(' / ')}`);
   console.log(`  score     ${row(played.map((run) => run.summary.score)).map(fmt).join(' / ')}`);
-  console.log(`  seconds   ${seconds.map(fmt).join(' / ')}  (median ${clock(seconds[1])})`);
+  console.log(`  seconds   ${seconds.map(fmt).join(' / ')}  (median ${clock(seconds[1])}, the app's clock)`);
   console.log(
     `  accuracy  ${row(played.map((run) => run.summary.accuracy / 10))
       .map((v) => `${v.toFixed(1)}%`)
@@ -85,6 +88,27 @@ for (const ms of [150, 200, 250]) {
   console.log(`  reels     ${row(summaries.map((summary) => summary.reels)).map(fmt).join(' / ')}`);
   console.log(`  score     ${row(summaries.map((summary) => summary.score)).map(fmt).join(' / ')}\n`);
 }
+
+// The speed × error table: a thumb that decides in 700 … 300 ms and errs on a
+// share of the reels, whatever they are — median score and length, and how
+// many runs pass 500k and 1M. docs/product/scoring.md → "Hız ve hata".
+const ERRORS = [0, 0.01, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3];
+const thumbRuns = Math.min(runs, 300);
+console.log(`speed × error · ${thumbRuns} runs a cell · median score · median length · ≥500k · ≥1M`);
+console.log(`          ${ERRORS.map((err) => `${Math.round(err * 100)} %`.padStart(22)).join('')}`);
+for (const thumb of THUMBS) {
+  const cells = ERRORS.map((err) => {
+    const played = playThumb(thumb, err, thumbRuns);
+    const share = (min: number) =>
+      Math.round((played.filter((run) => run.summary.score >= min).length / played.length) * 100);
+    const score = row(played.map((run) => run.summary.score))[1];
+    const length = row(played.map((run) => run.seconds))[1];
+    return `${fmt(score)} ${clock(length)} ${share(500_000)}/${share(1_000_000)}`.padStart(22);
+  });
+  console.log(`  ${String(thumb.reaction).padStart(3)} ms  ${cells.join('')}`);
+}
+const longest = Math.max(...playThumb(THUMBS[THUMBS.length - 1]!, 0, runs).map((run) => run.seconds));
+console.log(`  the longest of ${runs} flawless ${THUMBS[THUMBS.length - 1]!.reaction} ms runs: ${clock(longest)}\n`);
 
 // Dereceli's difficulties: each profile at every fourth step — the feed is
 // the same at all of them; only the meter's gain and loss tighten. The table

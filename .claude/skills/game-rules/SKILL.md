@@ -38,12 +38,20 @@ and `RatingBalanceTest`'s difficulty medians — never a new season.
 
 ## Changing a rule (only when the owner asked for a new season)
 
+Before the first store release the owner may keep the version instead
+("henüz staging yapıdayız", 2026-10-01): make the same changes in both
+engines, then `pnpm engine:lock -- --reseal` replaces the current version's
+seal in both locks (the history keeps one seal per version), and the Elo
+targets of that version are re-set in place. Never after the release.
+
 1. Edit `packages/engine/src/rules.ts` (or `reels.ts` / `run.ts`) and bump `ENGINE_VERSION`.
 2. `pnpm engine:simulate` — the consistency promise must hold: for every
    profile, runs within ±10 % of the median length score between 0.8× and 1.2×
-   their median (p10/p90), medians ordered by skill, lengths in the bands
-   `balance.test.ts` sets (casual ≈ 2 min, average ≈ 3.5, good 5–6, pro ≈ 7.5).
-   Update the tables in `docs/product/scoring.md`.
+   their median (p10/p90), medians ordered by skill, lengths on the app's
+   clock in the bands `balance.test.ts` sets (casual ≈ 1:45, average ≈ 2:50,
+   good ≈ 3:50, pro ≈ 4:35; the longest run ≈ 6 min) and the owner's speed ×
+   error targets (*speed and errors*: 500k for a careful 400 ms thumb, 1M only
+   for 300 ms). Update the tables in `docs/product/scoring.md`.
 3. `pnpm engine:fixtures` — regenerates `packages/engine/fixtures/*.json`
    (replays, rejects, curves, bonuses, rules).
 4. `pnpm engine:lock` — seals the new version.

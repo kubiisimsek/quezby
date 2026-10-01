@@ -2,7 +2,7 @@
   "difficultyVersion": 2,
   "engineVersion": 3,
   "tableSha256": "ca49b4cd40f1cc6acb46bba8844aa5b04d6f9460b01cca764501b6324874c800",
-  "behaviourSha256": "9c74066098ecd5c6ec1981c9fa1f01bd491fed6509e3d17e081f4c4338084a12",
+  "behaviourSha256": "6316d02239b146322284ed4e862feaa7a46c37adee857e66410d07dd3c05b91b",
   "history": [
     {
       "difficultyVersion": 1,
@@ -15,8 +15,8 @@
       "difficultyVersion": 2,
       "engineVersion": 3,
       "tableSha256": "ca49b4cd40f1cc6acb46bba8844aa5b04d6f9460b01cca764501b6324874c800",
-      "behaviourSha256": "9c74066098ecd5c6ec1981c9fa1f01bd491fed6509e3d17e081f4c4338084a12",
-      "lockedAt": "2026-09-30"
+      "behaviourSha256": "6316d02239b146322284ed4e862feaa7a46c37adee857e66410d07dd3c05b91b",
+      "lockedAt": "2026-10-01"
     }
   ]
 }

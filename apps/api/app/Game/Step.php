@@ -22,7 +22,8 @@ final readonly class Step
         public array $bonuses,
         /**
          * How many blind moves in a row this miss made: its penalty was
-         * doubled this many times. 0 on a hit, and on a miss that was not blind.
+         * multiplied by `Rules::blindFactor($blind)` — 1 for the first, then
+         * 2, 4. 0 on a hit, and on a miss that was not blind.
          */
         public int $blind,
         public int $meter,

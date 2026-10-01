@@ -6,15 +6,18 @@
 
 Quezby sonsuz bir oyundur: reel akışı hiç bitmez, ama her reel bir öncekinden
 biraz daha zordur ve **dopamin barı her reelde biraz daha hızlı erir**. Er ya da
-geç herkes düşer; soru kimin ne kadar uzağa gittiğidir.
+geç herkes düşer; soru kimin ne kadar uzağa gittiğidir. **En uzun tur yaklaşık
+6 dakikadır:** 5. dakikadan sonra erime en hızlı başparmağı da geçer.
 
 Puan sisteminin iki sözü var:
 
-1. **Aynı yetenek, aynı süre → ±%20.** 5–6 dakikalık bir turda 1000 yapan
-   oyuncu, başka bir 5–6 dakikalık turda 800 ile 1200 arası yapar. Kombolar her
+1. **Aynı yetenek, aynı süre → ±%20.** 4 dakikalık bir turda 1000 yapan
+   oyuncu, başka bir 4 dakikalık turda 800 ile 1200 arası yapar. Kombolar her
    turu farklı kılar, ama şans bir turu ikiye katlayamaz.
 2. **Kurallar kilitli.** Bir kuralı değiştirmek sessiz bir düzenleme değil,
-   yeni bir sezondur (aşağıda: *Kilit ve sezonlar*).
+   yeni bir sezondur (aşağıda: *Kilit ve sezonlar*). Mağaza yayınından önce
+   sahip sürümü koruyup kuralı yerinde değiştirebilir: v3 böyle, 2026-10-01'de
+   "kısa oyun" ile yeniden mühürlendi.
 
 Her şey **tam sayı** aritmetiğiyle hesaplanır (oranlar binde, süreler
 milisaniye). Sunucu, uygulamanın gönderdiği hareket kaydını PHP'de yeniden
@@ -33,6 +36,22 @@ edilmez.
 İlk 8 reel sabittir ve her türü bir kez öğretir: `skip, skip, like, skip, hold,
 skip, freeze, skip`. Sonrası seed'den gelir. Reel türü dağılımında şans payı
 ölçüldü ve önemsiz çıktı; "torba" karıştırıcısına gerek yok.
+
+**Ağır postlar seyrek ve dağınık gelir.** Altın ve kırmızı post, oyunu en çok
+yavaşlatan ve (geç dakikalarda) barı en çok eriten postlardır. Bu yüzden her 10
+ardışık postta:
+
+| Seviye (post) | En fazla altın | En fazla kırmızı |
+| --- | --: | --: |
+| 1–8 (ilk 160 post) | 1 | 1 |
+| 9–16 (160–319) | 1 | 2 |
+| 17 ve üstü (320+) | 2 | 2 |
+
+İki kırmızı asla yan yana gelmez. Sınırı dolan tür gelirse post sıradan olur;
+arkadaş postunun sınırı yoktur. Sınırlar puana değil post sırasına bağlıdır:
+aynı seed'i oynayan herkes (Günün akışı, VS) ve Dereceli'nin her zorluğu aynı
+postları görür. Sınırsız v3'te 10 postluk pencerelerin %30'unda 2+ altın
+geliyordu; artık seviye 17'ye kadar hiç gelmez.
 
 ### Süre: ne zaman başlar, ne zaman biter
 
@@ -91,17 +110,21 @@ değer(n) = min + (max − min) · 70 / (70 + n)
 
 | n | Pencere | Beğeni penceresi | Dokunma süresi | Altın dolum | Yeşil bölge | Özel reel payı | Dopamin erimesi | Seviye çarpanı |
 | --: | --: | --: | --: | --: | --: | --: | --: | --: |
-| 0 | 2200 ms | 2450 ms | 1210 ms | 1600 ms | %20,0 | %25,0 | 5,5 %/sn | x1,00 |
-| 100 | 1258 | 1508 | 691 | 1070 | %13,5 | %35,0 | 7,5 | x1,66 |
-| 200 | 1014 | 1264 | 557 | 933 | %11,8 | %39,2 | 9,5 | x2,00 |
-| 400 | 838 | 1088 | 500 | 834 | %10,6 | %43,1 | 13,5 | x2,33 |
-| 600 | 767 | 1017 | 500 | 794 | %10,1 | %45,0 | 17,5 | x2,50 |
+| 0 | 2200 ms | 2450 ms | 990 ms | 1200 ms | %20,0 | %25,0 | 6,0 %/sn | x1,00 |
+| 100 | 1258 | 1508 | 566 | 847 | %13,5 | %35,0 | 7,9 | x2,00 |
+| 200 | 1014 | 1264 | 456 | 755 | %11,8 | %39,2 | 10,6 | x3,00 |
+| 400 | 838 | 1088 | 400 | 689 | %10,6 | %43,1 | 17,9 | x5,00 |
+| 600 | 767 | 1017 | 400 | 662 | %10,1 | %45,0 | 28,0 | x7,00 |
 
 - Pencere 600 ms'nin altına **asla** inmez (insan tepki + hareket süresi).
-- Dopamin erimesi `55 + ⌊n / 5⌋` binde/saniye — **sınırsız artar**, bu yüzden
-  mükemmel oynayan bir bot bile sonunda düşer.
-- Özel reel payı %25'ten %50'ye yaklaşır; art arda en fazla 3 özel reel gelir
-  ve iki "dokunma" reeli asla yan yana gelmez.
+- Dokunma süresi pencerenin %45'i, en az 400 ms; altın dolum 1200 → 600 ms.
+- Dopamin erimesi `60 + ⌊n / 6⌋ + ⌊n² / 3000⌋` binde/saniye: ilk 100 postta
+  eski doğrusal erimeye (`55 + ⌊n / 5⌋`) yakın, sonra giderek dikleşir (400.
+  postta 13,5 yerine 17,9, 600.'de 17,5 yerine 28 %/sn). **Sınırsız artar**,
+  bu yüzden mükemmel oynayan bir bot bile düşer; en hızlısı ~6. dakikada.
+- Özel reel payı %25'ten %50'ye yaklaşır; art arda en fazla 3 özel reel gelir.
+  Altın ve kırmızı ayrıca 10'luk pencere sınırına bağlıdır (*Dört reel*): payın
+  büyüyen kısmı çoğunlukla arkadaş postudur.
 
 ## Dopamin barı (can)
 
@@ -112,9 +135,9 @@ Bar 1000'den (%100) başlar, reel ekrandayken saniyede `erime(n)` kadar düşer.
 | Sıradan reeli kaydırmak | +80 |
 | Arkadaşı beğenmek / dokunmadan beklemek | +90 |
 | Altın reeli yeşilde bırakmak | +100 (mükemmelse +60 daha) |
-| Süreyi kaçırmak / yanlış hareket | −200 |
-| Altında erken ya da geç bırakmak | −120 |
-| Dokunma reeline dokunmak | −250 |
+| Süreyi kaçırmak / yanlış hareket | −250 |
+| Altında erken ya da geç bırakmak | −150 |
+| Dokunma reeline dokunmak | −300 |
 
 Bar bir reelin ortasında biterse tur o anda biter (`drained`); bir ceza onu
 sıfıra indirirse de biter (`penalty`).
@@ -123,8 +146,8 @@ sıfıra indirirse de biter (`penalty`).
 
 Reel canlandıktan sonraki **ilk 300 ms içinde** (`blindMs`) yanlış posta
 kaydırmak ya da çift dokunmak **kör hamledir**: o sürede postun ne olduğuna
-bakılamaz. Kör hamlenin cezası **ikiye katlanır**, arkasından gelen her kör
-hamlede yeniden katlanır: −400, −800, −1600. Üçüncüsü turu her zaman bitirir.
+bakılamaz. İlk kör hamle normal ceza alır (−250); arkasından gelen her kör
+hamlede ceza **ikiye katlanır**: −500, −1000. Üçüncüsü turu her zaman bitirir.
 
 - Sayaç **düşünülmüş bir isabetle** sıfırlanır: 300 ms ya da daha geç bir
   kaydırma/beğeni isabeti, bir altın isabeti ya da dokunulmadan geçilen bir
@@ -135,15 +158,19 @@ hamlede yeniden katlanır: −400, −800, −1600. Üçüncüsü turu her zaman
   hızlı ama dürüst oyuncular gereğinden sert cezalanırdı.
 - Amaç, bakmadan (iki parmakla, art arda) kaydırarak puan toplamayı bitirmek:
   motor v2'de her şeyi kaydıran bir oyuncu medyanda 7–8 B, en iyi %10'da
-  20–38 B yapıyordu; v3'te her tohumda 5. reelde, 650 puanla düşer.
-- Oyunda kör hamle "Bakmadan!" ve altında "Ceza x2" (x4, x8) olarak görünür
-  (`Step.blind`).
+  20–38 B yapıyordu; artık 10–45. postta (medyan 15) düşer, ~4 B yapar, en
+  fazla ~17 B.
+- Katlanma 2026-10-01'e kadar ilk kör hamlede başlıyordu: 300 ms'de oynayan
+  dürüst ama hızlı oyuncunun tek hatası da iki kat yiyor, %5 hatada 400
+  ms'lik oyuncudan az puan alıyordu. Artık yalnız art arda kör hamle katlanır.
+- Oyunda kör hamle "Bakmadan!", ikinciden itibaren altında "Ceza x2" (x4)
+  olarak görünür (`Step.blind`, `blindFactor`).
 
 ## Puan
 
 ```
 ℓ          = ⌊n / 20⌋                              (seviye − 1)
-L          = 1000 + ⌊2000 · ℓ / (ℓ + 10)⌋          seviye çarpanı, binde
+L          = 1000 + 200 · ℓ                        seviye çarpanı, binde
 kombo c    : isabet → min(1500, c + 50)            her isabet +0,05
              hata   → 1000 + ⌊(c − 1000) / 2⌋       x1'in üstü yarıya iner
 reel puanı = ⌊(taban + bonus) · L · c / 1.000.000⌋
@@ -154,8 +181,11 @@ reel puanı = ⌊(taban + bonus) · L · c / 1.000.000⌋
 | Taban | 100 | 120 | 150 | 120 |
 | Bonus | hız: 0 → taban | hız: 0 → taban | hassasiyet: 0 → 150 | — |
 
-- **Seviye çarpanı** x1,00'dan başlar, 11. seviyede x2,00'dır ve x3'e asla
-  varmaz. Uzun tur daha değerlidir, ama bir şanslı dakika gerisini ezemez.
+- **Seviye çarpanı katlanır:** x1,00'dan başlar, her seviye +0,20 ekler —
+  10. seviyede x2,80, 20.'de x4,80, 30.'da x6,80. Uzun ve hızlı bir turun son
+  postları ilk postlarından kat kat değerlidir; çarpanın sınırı turu bitiren
+  erimedir. (2026-10-01'e kadar çarpan 11. seviyede x2'ye varıp duruyordu:
+  uzun tur az ödüllendiriliyordu.)
 - **Kombo** x1,00 → x1,50: her isabet +0,05 ekler, bir hata yalnızca x1'in
   üstünü yarıya indirir. HUD'da "x1,25" diye görünür.
 - **Hız bonusu:** `taban × (pencere − t) / (pencere − 250)`; `t` hareketin
@@ -178,32 +208,58 @@ Her biri reelin üstüne `⌊değer · L / 1000⌋` puan ekler (kombo çarpanı 
 ## Denge — 2.000'er simüle tur (`pnpm engine:simulate`)
 
 Dört yetenek profili (tepki süresi, hata oranı, "dokunma" refleksi, altın
-bırakma isabeti) ile ölçüldü. Süre = aktif süre + reel başına 220 ms geçiş.
-Bir profilin tepki süresi, reelin çizildiği kareden hareketin tanındığı ana
-kadar geçen süredir.
+bırakma isabeti) ile ölçüldü. **Süre, oyuncunun gördüğü saattir:** 1,8 sn geri
+sayım + aktif süre + her postun ardından karar bekleme (0/100/200 ms), 140 ms
+kayma ve bir çizim karesi. Bir profilin tepki süresi, reelin çizildiği
+kareden hareketin tanındığı ana kadar geçen süredir.
 
 | Profil | Reel p50 | Süre p10 / p50 / p90 | Skor p10 / p50 / p90 | Aynı süre (±%10) p10/p50 · p90/p50 | İsimli kombo payı |
 | --- | --: | --- | --- | --- | --: |
-| Yeni başlayan | 126 | 1:05 / **2:02** / 2:57 | 17 B / **40 B** / 65 B | **0,88 · 1,15** | %7 |
-| Ortalama | 243 | 2:17 / **3:27** / 4:33 | 60 B / **103 B** / 147 B | **0,88 · 1,12** | %11 |
-| İyi | 401 | 3:51 / **5:10** / 6:15 | 164 B / **238 B** / 304 B | **0,89 · 1,11** | %23 |
-| Profesyonel | 626 | 6:00 / **7:21** / 8:15 | 384 B / **494 B** / 573 B | **0,89 · 1,09** | %31 |
-| Kör kaydıran (150–250 ms, her reel) | 5 | — | **650** (her tohumda) | — | — |
-
-Kör hamle cezası dürüst profilleri medyanda ~%1 kısaltır (v2'de 40 / 104 /
-240 / 499 B); en çok, dokunma reeline refleksle hızlı dokunan
-profesyonellerin kötü turlarında hissedilir (p10 402 → 384 B).
+| Yeni başlayan | 115 | 0:43 / **1:44** / 2:38 | 11 B / **39 B** / 74 B | **0,88 · 1,17** | %7 |
+| Ortalama | 219 | 1:49 / **2:50** / 3:40 | 56 B / **113 B** / 174 B | **0,87 · 1,14** | %12 |
+| İyi | 329 | 2:52 / **3:50** / 4:22 | 166 B / **267 B** / 343 B | **0,85 · 1,12** | %24 |
+| Profesyonel | 439 | 3:55 / **4:36** / 5:06 | 392 B / **518 B** / 631 B | **0,86 · 1,14** | %31 |
+| Kör kaydıran (150–250 ms, her reel) | 15 | — | **~4 B** (en fazla ~17 B) | — | — |
 
 - **±%20 sözü dört profilde de tutuyor.** Engine v1'de aynı ölçüm
   0,74–0,77 / 1,26–1,41 idi: sıfırlanan x1→x5 kombo gürültü, sınırsız seviye
-  çarpanı süreyi skora üslü yansıtıyordu.
-- Yetenek skora belirgin yansır (her basamak 2,1–2,6 kat); aynı tohumla
+  çarpanı süreyi skora üslü yansıtıyordu. Katlanan çarpan skorları daha geniş
+  yayar (yeni başlayanda p90/p10 ≈ 7), ama aynı uzunluktaki turlar ±%20'de
+  kalır.
+- Yetenek skora belirgin yansır (her basamak 1,9–2,9 kat); aynı tohumla
   (Günün akışı) da kural tutar.
-- Ortalama oyuncu ~3,5 dakika oynar: tek doğrusal erime hem yeni başlayanı
-  uzatıp hem ortalamayı kısaltamaz. Gerçek veriyle ayar gerekirse bu yeni bir
-  sürüm ve yeni sezon olur.
+- 2026-10-01'e kadar (aynı v3, kısa oyundan önce) süreler 2:02 / 3:27 / 5:10 /
+  7:21, skorlar 40 / 103 / 238 / 494 B idi; altın ve kırmızı sınırsızdı,
+  özel postlar ilerledikçe 10 postta 3'ten 4'e çıkıyordu.
 - Aynı eşikler `packages/engine/src/__tests__/balance.test.ts`'te kilitlidir
   (400 tur/profil): biri bozulursa test kırılır.
+
+### Hız ve hata
+
+Botlar iki sayıyla oynar: karar hızı (700 → 300 ms) ve hata oranı. "%X hata",
+her postta %X ihtimalle o postun hatası demektir: sıradanda çift dokunma,
+arkadaşta kaydırma, altında yeşilin dışında bırakma, kırmızıda dokunma
+(`ErrorBot`). 300 ms, bir insanın `fast_decisions` bayrağına takılmadan
+inebileceği en hızlı tempodur. Hücreler 300 turun medyan skoru ve süresidir.
+
+| Refleks | %0 | %1 | %5 | %10 | %15 | %20 | %25 | %30 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| **700 ms** | 173 B · 4:11 | 158 B · 4:03 | 91 B · 3:11 | 24 B · 1:21 | 9 B · 0:41 | 5 B · 0:27 | 3 B · 0:20 | 2 B · 0:16 |
+| **600 ms** | 292 B · 4:57 | 259 B · 4:45 | 144 B · 3:39 | 38 B · 1:35 | 11 B · 0:41 | 6 B · 0:26 | 3 B · 0:20 | 2 B · 0:15 |
+| **500 ms** | 450 B · 5:15 | 402 B · 5:03 | 235 B · 4:01 | 57 B · 1:47 | 16 B · 0:47 | 7 B · 0:28 | 4 B · 0:19 | 2 B · 0:15 |
+| **400 ms** | 735 B · 5:28 | 659 B · 5:16 | 382 B · 4:14 | 97 B · 1:57 | 22 B · 0:46 | 9 B · 0:27 | 5 B · 0:19 | 3 B · 0:14 |
+| **300 ms** | 1,11 M · 5:42 | 999 B · 5:31 | 590 B · 4:28 | 154 B · 2:08 | 26 B · 0:43 | 10 B · 0:24 | 6 B · 0:17 | 3 B · 0:13 |
+
+- **1M yalnız en hızlıya açık:** 300 ms kusursuzsa her turda, %1 hatayla
+  turların %48'inde. 400 ms kusursuz oynasa da 1M'ye varmaz.
+- **500 bin zordur:** 400 ms ve en fazla %1 hata (turların %97–100'ü), ya da
+  300 ms ve %5 hata (%67). Oyuna alışmış 500 ms'lik oyuncu kusursuz oynasa
+  bile turların %1'inde geçer.
+- **En uzun tur ~6 dakikadır:** 2000 kusursuz 300 ms turunun en uzunu 5:59.
+- Gerçek oyuncu hatasını çoğunlukla altın ve kırmızıda yapar; profillerin
+  karışık hata payı: yeni başlayan ~%10, ortalama ~%7, iyi ~%5, profesyonel
+  ~%3, elit ~%1,6.
+- Bu sözler `balance.test.ts` → *speed and errors*'ta kilitlidir.
 
 ## Kilit ve sezonlar
 
@@ -215,6 +271,14 @@ altın skoru ve geçmişi tutar.
   da davranış değiştiği anda kırılır.
 - `pnpm engine:lock` yalnızca `ENGINE_VERSION` arttıysa yeniden mühürler; aynı
   sürümde değişmiş kuralları **reddeder**.
+- **Yayından önce, yerinde:** mağaza yayınına kadar sahip sürümü koruyup bir
+  kuralı yerinde değiştirebilir (staging'de korunacak bir sezon yoktur).
+  `pnpm engine:lock -- --reseal` aynı sürümün mührünü (iki kilitte de)
+  değiştirir; geçmişte sürüm başına tek mühür kalır. Motor v3, 2026-10-01'de
+  kısa oyunla böyle yeniden mühürlendi. Staging'de API ile uygulama birlikte
+  güncellenmelidir: eski uygulamanın turları yeni kurallarla tutmaz
+  (`client_mismatch`). Yayından sonra bu yol kapalıdır: canlı bir sürümde
+  değişen oyun, tek tabloda iki oyunu sıralar.
 - **Sezon = motor sürümü.** Her sıralama satırı bir sezona aittir
   (`leaderboard_entries.season`) ve her sorgu geçerli sezona bakar. Kurallar bir
   gün değişirse eski skorlar yenileriyle asla aynı tabloya çıkmaz; "Tüm
@@ -269,18 +333,21 @@ arası geometrik (motorun skorları bir beceri basamağında 2–3 katına çık
 
 | Reyting | 0 | 1000 | 2000 | 3000 | 4000 | 5000 | 6000 | 7000 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| **Hedef (motor v3, zorluk tablosu 2)** | 8 B | 31,6 B | 76,2 B | 96,1 B | 129,5 B | **176,7 B** | 294,4 B | 485,8 B |
+| **Hedef (motor v3, zorluk tablosu 2)** | 8 B | 29,9 B | 90 B | 97,3 B | 130 B | **178,7 B** | 310,6 B | 529,7 B |
 | Hedef (motor v3, zorluk tablosu 1, eski turlar) | 8 B | 31,6 B | 74,1 B | 148,3 B | 265,7 B | 394 B | 542,3 B | — |
-| Hedef (motor v3, zorluk 0: yerleşme ve tablodan önceki turlar) | 8 B | 33,7 B | 99 B | 238 B | 475 B | 792 B | 1,09 M | — |
+| Hedef (motor v3, zorluk 0: yerleşme ve tablodan önceki turlar) | 8 B | 33,1 B | 109 B | 267,2 B | 497,6 B | 840,4 B | 1,16 M | — |
 | Hedef (motor v2, geç onaylar için) | 8 B | 34 B | 100 B | 240 B | 480 B | 800 B | 1,1 M | — |
 
-Zorluk tablosu 2'nin merdiveni insanlara göre kurulu (2026-09-30):
-1000'de yeni başlayan, 2000'de ortalama, 4000'de iyi oyuncunun tipik skoru;
-**MasterClass'ın kapısı (5000) iyi ile profesyonelin ortası** — zorluk
-16'da tur başına ~177 bin, yaklaşık 3,5 dakika temiz oyun. 6000 profesyonel,
-7000 elit. Tablo 1 kapıyı en iyi simüle oyuncunun bile ötesine koymuştu
-(394 B): kimse MasterClass olamıyordu. 1000'deki hedef, yerleşme tablosuyla
-aynı hizada kaldı.
+Zorluk tablosu 2'nin merdiveni insanlara göre kurulu (2026-09-30; kısa oyunla
+2026-10-01'de aynı çapalarla yerinde yeniden hesaplandı): 1000'de yeni
+başlayan, 2000'de ortalama oyuncunun bir alt zorluktaki tipik skoru (kısa
+oyunda skorları daha geniş yayıldığı için), 4000'de iyi oyuncunun tipik skoru;
+**MasterClass'ın kapısı (5000) iyi ile profesyonelin ortası** — zorluk 16'da
+tur başına ~179 bin, 3 dakikadan kısa temiz oyun. 6000 profesyonel, 7000
+elit. Tablo 1 kapıyı en iyi simüle oyuncunun bile ötesine koymuştu (394 B):
+kimse MasterClass olamıyordu. Zorluk 0 tablosunun çapaları da aynı profillere
+bağlı kaldı (1000 yeni başlayan, 2000 ortalama, 3000 iyi, 4000 profesyonel,
+5000'in ötesi elit).
 
 Yerleşmiş oyuncunun dereceli turu, oynadığı zorluk tablosunun hedefleriyle
 ölçülür (`rating.difficulty.targets[motor][zorluk tablosu]`): her reytingin
@@ -350,16 +417,16 @@ değişince reytingler sıfırlanmaz, oyuncular birkaç turda yeni dengeye kayar
 
 **Söz** (`tests/Unit/Rating/RatingBalanceTest.php`, motorun ±%20 sözü gibi):
 zorluk 0'da, motorun kendi tablosuyla, motor profilleri (gerçek başparmak
-için −%15) kendi liglerinde durur — yeni başlayan ~1070 ve ortalama ~1910
-Gümüş, iyi ~2825 Altın, profesyonel ~3830 Platin, elit ~4540 Elmas. Dereceli
+için −%15) kendi liglerinde durur — yeni başlayan ~1060 ve ortalama ~1910
+Gümüş, iyi ~2830 Altın, profesyonel ~3800 Platin, elit ~4550 Elmas. Dereceli
 merdiveninde (her tur reytinginin zorluğunda, zorluk tablosu 2'nin
-hedefleriyle) yerleri: yeni başlayan ~1020 ve ortalama ~1940 **Gümüş**, iyi
-~3760 **Platin**, profesyonel ~5680 ve elit ~6670 **MasterClass**. İyi oyuncu
+hedefleriyle) yerleri: yeni başlayan ~1070 ve ortalama ~1980 **Gümüş**, iyi
+~3740 **Platin**, profesyonel ~5700 ve elit ~6690 **MasterClass**. İyi oyuncu
 4500'ün altında kalır; MasterClass'taki profesyonel ve elit sakindir (sapma
-< 100, tipik değişim ±70 içinde). Yeni başlayan ve ortalama oyuncunun turları
-±%35–50 oynadığı için reytingleri tur başına daha çok oynar (sapma < 150,
-tipik değişim ±95), ligden taşmaz. Motorun kendi hedefleriyle elit Elmas'a
-bile çıkamazdı.
+< 100, tipik değişim ±70 içinde). Kısa oyunda yeni başlayan, ortalama ve iyi
+oyuncunun turları daha geniş yayıldığı için reytingleri tur başına daha çok
+oynar (sapma < 150, tipik değişim ±100; zorluk 0 tablosunda ±85), ligden
+taşmaz. Motorun kendi hedefleriyle elit Elmas'a bile çıkamazdı.
 
 ## Dereceli zorluğu
 
@@ -393,8 +460,8 @@ ekonomisi sıkılaşır** (`z` zorluk, `packages/engine/src/difficulty.ts` ·
 Reeller, pencereler, özel reel payı, beğeni/basılı tut/dokunma ağırlıkları
 ve dopamin erimesi zorluk 0 ile birebir aynıdır: ekrana gelen hiçbir şey
 değişmez. z = 16'da kaydırma 80 yerine 64, basılı tut 100 yerine 80 dopamin
-verir (mükemmelse +60 yine tam); süre aşımı 200 yerine 328, yakalanma 250
-yerine 410 götürür. Kör hamle katlaması büyümüş cezanın üstüne gelir.
+verir (mükemmelse +60 yine tam); süre aşımı 250 yerine 410, yakalanma 300
+yerine 492 götürür. Kör hamle katlaması büyümüş cezanın üstüne gelir.
 Zorluk 0 v3'ün ta kendisidir: `rules.lock.json`, bütün fixture'lar ve altın
 skorlar aynı kalır.
 
@@ -408,19 +475,18 @@ qb'sinin Dereceli merdiveninde ulaştığı zorlukta):
 
 | Profil (lig) | Zorluk | Skor p50 | Süre p50 | Aynı süre ±%10 |
 | --- | --: | --- | --- | --- |
-| Yeni başlayan (Gümüş) | 1 | 39 B → 37 B (−%7) | 2:02 → 1:54 | ±%20 içinde |
-| Ortalama (Gümüş) | 4 | 102 B → 81 B (−%20) | 3:27 → 2:52 | ±%20 içinde |
-| İyi (Platin) | 12 | 240 B → 140 B (−%42) | 5:10 → 3:17 | ±%20 içinde |
-| Profesyonel (MasterClass) | 16 | 493 B → 294 B (−%40) | 7:21 → 4:44 | ±%20 içinde |
-| Elit (MasterClass) | 16 | 727 B → 486 B (−%33) | 8:48 → 6:24 | ±%20 içinde |
+| Yeni başlayan (Gümüş) | 1 | 39 B → 35 B (−%11) | 1:44 → 1:35 | ±%20 içinde |
+| Ortalama (Gümüş) | 4 | 113 B → 89 B (−%21) | 2:50 → 2:24 | ±%20 içinde |
+| İyi (Platin) | 12 | 270 B → 138 B (−%49) | 3:50 → 2:28 | ±%20 içinde |
+| Profesyonel (MasterClass) | 16 | 520 B → 311 B (−%40) | 4:37 → 3:17 | ±%20 içinde |
+| Elit (MasterClass) | 16 | 781 B → 530 B (−%32) | 5:10 → 4:03 | ±%20 içinde |
 
 - ±%20 sözü her profilde, oynadığı zorluklarda tutar; hiçbir zorluk bir
   alttakinden kolay değildir ve hiçbir profile daha çok puan ya da daha uzun
   tur getirmez; tepede en iyilerin skorunun beşte biri ile yarısı arası
-  gider, hiçbir zaman umutsuz değildir (`balance.test.ts` → *difficulty
-  balance*).
-- Normal'de %10 hata yapan bir oyuncu (yeni başlayan ile ortalamanın arası)
-  zorluk 16'da ~1:06 oynar, ~23 B yapar; tablo 1'de 0:52 ve ~15 B idi.
+  gider, tur en az %15 kısalır, hiçbir zaman umutsuz değildir
+  (`balance.test.ts` → *difficulty balance*).
+- Ortalama bir oyuncu zorluk 16'da ~1:08 oynar, ~31 B yapar.
 - Dereceli tur skor tablolarına yazılmadığı için zorluk hiçbir tabloyu
   bozmaz; qb'yi zorluk tablosunun hedefleri dengeler (*Elo*).
 

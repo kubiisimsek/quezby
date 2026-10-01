@@ -1,5 +1,48 @@
 # Changelog
 
+## 2026-10-01 — The short game: rules re-sealed in place (engine v3)
+
+After about 15 staging runs (best 190k) the owner found the game too slow:
+golds and friends broke the flow, the best runs took 10+ minutes, 500k felt
+out of reach. A bot analysis measured it (a lab copy of the engine, replaying
+the real one exactly); the rules changed in place under engine v3, since
+staging has no season to keep:
+
+- **Feed:** in any 10 reels in a row at most 1 hold and 1 freeze; a second
+  freeze from level 9 (reel 160), a second hold from level 17 (reel 320); a
+  freeze never follows a freeze. A capped pick is an ordinary reel. The caps
+  go by the reel, never the score: a seed shows everyone, at every Dereceli
+  difficulty, the same reels.
+- **Shorter golds and reds:** hold fill 1600–700 → 1200–600 ms; a freeze
+  waits 45 % of the window (was 55 %), at least 400 ms (was 500).
+- **Drain** `55 + n/5` → `60 + n/6 + n²/3000` per-mille a second: the longest
+  run is about six minutes (5:59 for a flawless 300 ms thumb).
+- **Losses** 200/200/120/250 → 250/250/150/300. **Blind moves:** the first
+  costs the plain loss, doubling starts with the second (x2 from the first
+  also doubled a fast honest player's single slip).
+- **Level multiplier** `1000 + 2000·ℓ/(ℓ+10)` → `1000 + 200·ℓ`: it keeps
+  climbing (x2.8 at level 10, x4.8 at 20).
+- **App pace:** slide 170 → 140 ms, pause after a special hit 160 → 100,
+  after a miss 260 → 200 (`@quezby/config` PACE, the API's
+  `plausibility.pace`, `fixtures/pace.json`).
+- **Result** (medians on the app's clock): casual 39k 1:44, average 113k 2:50,
+  good 267k 3:50, pro 518k 4:36. 500k takes a 400 ms thumb with ≤1 % errors;
+  1M only a 300 ms one (48 % of its runs at 1 % errors). ±20 % holds; a blind
+  swiper is out within 45 reels, at most ~17k.
+- `pnpm engine:simulate` times runs on the app's clock (`APP_PACE`, checked
+  against `pace.json`) and prints the speed × error table (`ErrorBot`,
+  700–300 ms × 0–30 %); `balance.test.ts` → *speed and errors* locks the
+  targets. `pnpm engine:lock -- --reseal` replaces the current version's seal
+  in both locks — before the store release only.
+- **Elo:** `rating.targets.3` and `rating.difficulty.targets.3.2` re-set in
+  place by the same anchors (on the ladder, 2000 at average's score one
+  difficulty below); `RatingBalanceTest` medians follow, and its volatility
+  limits widen with the wider score spread (±85 plain, ±100 on the ladder).
+- **App:** the help line on blind moves (8 languages); "Ceza x2" shows from
+  the second blind move.
+- **Staging:** deploy the API and the app together — an older app's runs no
+  longer match the server's replay.
+
 ## 2026-10-01 — Logging never breaks a request
 
 The staging deploy answered every request 500, `/health` too: the release

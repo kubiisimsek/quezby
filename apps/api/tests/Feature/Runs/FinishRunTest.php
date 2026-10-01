@@ -89,16 +89,16 @@ test('the share text speaks the request\'s language', function (string $acceptLa
     $this->withHeader('Accept-Language', $acceptLanguage)
         ->finishRunFor($runId, $fixture)
         ->assertOk()
-        ->assertJsonPath('run.score', 557623)
-        ->assertJsonPath('run.reels', 685)
+        ->assertJsonPath('run.score', 437003)
+        ->assertJsonPath('run.reels', 392)
         ->assertJsonPath('shareText', $shareText);
 })->with([
-    'Turkish' => ['tr', "Quezby'de 557.623 puan yaptım! 685 post · bu hafta #1. Sen kaç yaparsın?"],
-    'English' => ['en', 'I scored 557,623 points on Quezby! 685 posts · this week #1. How many can you score?'],
-    'German' => ['de', 'Ich habe in Quezby 557.623 Punkte geholt! 685 Posts · diese Woche #1. Wie viele schaffst du?'],
-    'Arabic' => ['ar', "\u{200F}نتيجتي في Quezby: 557,623 نقطة! 685 منشورًا · هذا الأسبوع #1. وأنت، كم ستحقق؟"],
-    'French' => ['fr', "J'ai fait 557\u{00A0}623 points sur Quezby\u{00A0}! 685 posts · cette semaine #1. Et toi, tu en fais combien\u{00A0}?"],
-    'Spanish' => ['es', '¡Hice 557.623 puntos en Quezby! 685 posts · esta semana #1. ¿Cuántos puedes hacer tú?'],
+    'Turkish' => ['tr', "Quezby'de 437.003 puan yaptım! 392 post · bu hafta #1. Sen kaç yaparsın?"],
+    'English' => ['en', 'I scored 437,003 points on Quezby! 392 posts · this week #1. How many can you score?'],
+    'German' => ['de', 'Ich habe in Quezby 437.003 Punkte geholt! 392 Posts · diese Woche #1. Wie viele schaffst du?'],
+    'Arabic' => ['ar', "\u{200F}نتيجتي في Quezby: 437,003 نقاط! 392 منشورًا · هذا الأسبوع #1. وأنت، كم ستحقق؟"],
+    'French' => ['fr', "J'ai fait 437\u{00A0}003 points sur Quezby\u{00A0}! 392 posts · cette semaine #1. Et toi, tu en fais combien\u{00A0}?"],
+    'Spanish' => ['es', '¡Hice 437.003 puntos en Quezby! 392 posts · esta semana #1. ¿Cuántos puedes hacer tú?'],
 ]);
 
 test('a run with no rank this week shares its score alone, counted the language\'s way', function (string $acceptLanguage, string $shareText) {

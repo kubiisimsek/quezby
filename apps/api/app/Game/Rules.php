@@ -8,7 +8,8 @@ namespace App\Game;
  * there is an `intdiv` on non-negative integers here. The rules are locked
  * (`packages/engine/rules.lock.json`, checked by `tests/Unit/RulesLockTest.php`):
  * changing any value is an `ENGINE_VERSION` bump in both engines, a new
- * fixture set and a new leaderboard season.
+ * fixture set and a new leaderboard season — or, before the first store
+ * release, the same version re-sealed in place (`pnpm engine:lock -- --reseal`).
  */
 final class Rules
 {
@@ -22,13 +23,13 @@ final class Rules
 
     public const LIKE_EXTRA = 250;
 
-    public const FREEZE_PERCENT = 55;
+    public const FREEZE_PERCENT = 45;
 
-    public const FREEZE_MIN = 500;
+    public const FREEZE_MIN = 400;
 
-    public const HOLD_FILL_MAX = 1600;
+    public const HOLD_FILL_MAX = 1200;
 
-    public const HOLD_FILL_MIN = 700;
+    public const HOLD_FILL_MIN = 600;
 
     public const ZONE_MAX = 200;
 
@@ -50,6 +51,21 @@ final class Rules
 
     public const MAX_SPECIAL_RUN = 3;
 
+    /**
+     * The most holds and freezes any `CAP_WINDOW` reels in a row may hold, by
+     * the reel the run has reached: one each at first, a second freeze from
+     * level 9, a second hold from level 17. A pick past its cap, or a freeze
+     * right after a freeze, is an ordinary reel.
+     */
+    public const CAP_WINDOW = 10;
+
+    /** @var list<array{fromReel: int, hold: int, freeze: int}> */
+    public const CAPS = [
+        ['fromReel' => 0, 'hold' => 1, 'freeze' => 1],
+        ['fromReel' => 160, 'hold' => 1, 'freeze' => 2],
+        ['fromReel' => 320, 'hold' => 2, 'freeze' => 2],
+    ];
+
     /** @var list<ReelKind> */
     public const INTRO = [
         ReelKind::Skip,
@@ -64,30 +80,36 @@ final class Rules
 
     public const METER_MAX = 1000;
 
-    public const DRAIN_BASE = 55;
+    /**
+     * Drain per second, per-mille: `base + n · num / den + n² / quad` — by the
+     * sixth minute the best thumb cannot keep up.
+     */
+    public const DRAIN_BASE = 60;
 
     public const DRAIN_NUM = 1;
 
-    public const DRAIN_DEN = 5;
+    public const DRAIN_DEN = 6;
+
+    public const DRAIN_QUAD = 3000;
 
     /** Meter gained per hit, keyed by `ReelKind` value. */
     public const GAIN = ['skip' => 80, 'like' => 90, 'hold' => 100, 'freeze' => 90];
 
     public const PERFECT_GAIN = 60;
 
-    public const LOSS_TIMEOUT = 200;
+    public const LOSS_TIMEOUT = 250;
 
-    public const LOSS_WRONG = 200;
+    public const LOSS_WRONG = 250;
 
-    public const LOSS_HOLD_MISS = 120;
+    public const LOSS_HOLD_MISS = 150;
 
-    public const LOSS_CAUGHT = 250;
+    public const LOSS_CAUGHT = 300;
 
     /**
      * A blind move: a swipe or a double tap on the wrong post, made sooner
-     * than this — too soon to have looked. Its penalty doubles, and doubles
-     * again for each blind move after it (x2, x4, x8…) until a considered hit,
-     * so the third in a row always empties the meter.
+     * than this — too soon to have looked. The first costs the plain loss;
+     * each one after it doubles (x2, x4…) until a considered hit, so the
+     * third in a row always empties the meter.
      */
     public const BLIND_MS = 300;
 
@@ -102,9 +124,8 @@ final class Rules
 
     public const LEVEL_EVERY = 20;
 
-    public const LEVEL_BOOST_MAX = 2000;
-
-    public const LEVEL_BOOST_CURVE = 10;
+    /** The level multiplier climbs this much per level, per-mille: x2.8 at level 10, x4.8 at 20. */
+    public const LEVEL_BOOST_STEP = 200;
 
     public const COMBO_START = 1000;
 
@@ -164,7 +185,24 @@ final class Rules
     /** Meter lost per second on reel `$n`, in per-mille. */
     public static function drainFor(int $n): int
     {
-        return self::DRAIN_BASE + intdiv($n * self::DRAIN_NUM, self::DRAIN_DEN);
+        return self::DRAIN_BASE + intdiv($n * self::DRAIN_NUM, self::DRAIN_DEN) + intdiv($n * $n, self::DRAIN_QUAD);
+    }
+
+    /**
+     * The most holds and freezes the `CAP_WINDOW` reels ending at reel `$n` may hold.
+     *
+     * @return array{fromReel: int, hold: int, freeze: int}
+     */
+    public static function capsFor(int $n): array
+    {
+        $caps = self::CAPS[0];
+        foreach (self::CAPS as $tier) {
+            if ($n >= $tier['fromReel']) {
+                $caps = $tier;
+            }
+        }
+
+        return $caps;
     }
 
     public static function levelFor(int $n): int
@@ -172,12 +210,10 @@ final class Rules
         return 1 + intdiv($n, self::LEVEL_EVERY);
     }
 
-    /** The level multiplier on reel `$n`, per-mille: 1000 on level 1, approaching 3000. */
+    /** The level multiplier on reel `$n`, per-mille: 1000 on level 1, `LEVEL_BOOST_STEP` more each level. */
     public static function levelBoostFor(int $n): int
     {
-        $climbed = intdiv($n, self::LEVEL_EVERY);
-
-        return 1000 + intdiv(self::LEVEL_BOOST_MAX * $climbed, $climbed + self::LEVEL_BOOST_CURVE);
+        return 1000 + self::LEVEL_BOOST_STEP * intdiv($n, self::LEVEL_EVERY);
     }
 
     /** The combo after a hit, per-mille. */
@@ -193,12 +229,18 @@ final class Rules
     }
 
     /**
-     * What a miss costs the meter: `$loss`, doubled once for each blind move
-     * in a row — `$blind` is 0 for a miss that was not blind.
+     * What a blind move multiplies its loss by: 1 for the first in a row,
+     * then 2, 4… — `$blind` is 0 for a miss that was not blind.
      */
+    public static function blindFactor(int $blind): int
+    {
+        return 2 ** max(0, $blind - 1);
+    }
+
+    /** What a miss costs the meter: `$loss`, times its blind factor. */
     public static function penaltyFor(int $loss, int $blind): int
     {
-        return $loss * 2 ** $blind;
+        return $loss * self::blindFactor($blind);
     }
 
     /** A named combo's points on reel `$n`. */
@@ -234,11 +276,14 @@ final class Rules
             'weightLike' => self::WEIGHT_LIKE,
             'weightHold' => self::WEIGHT_HOLD,
             'maxSpecialRun' => self::MAX_SPECIAL_RUN,
+            'capWindow' => self::CAP_WINDOW,
+            'caps' => self::CAPS,
             'intro' => array_map(fn (ReelKind $kind) => $kind->value, self::INTRO),
             'meterMax' => self::METER_MAX,
             'drainBase' => self::DRAIN_BASE,
             'drainNum' => self::DRAIN_NUM,
             'drainDen' => self::DRAIN_DEN,
+            'drainQuad' => self::DRAIN_QUAD,
             'gain' => self::GAIN,
             'perfectGain' => self::PERFECT_GAIN,
             'loss' => [
@@ -253,8 +298,7 @@ final class Rules
             'precisionBonus' => self::PRECISION_BONUS,
             'perfectPrecision' => self::PERFECT_PRECISION,
             'levelEvery' => self::LEVEL_EVERY,
-            'levelBoostMax' => self::LEVEL_BOOST_MAX,
-            'levelBoostCurve' => self::LEVEL_BOOST_CURVE,
+            'levelBoostStep' => self::LEVEL_BOOST_STEP,
             'comboStart' => self::COMBO_START,
             'comboStep' => self::COMBO_STEP,
             'comboMax' => self::COMBO_MAX,

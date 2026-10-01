@@ -44,10 +44,10 @@ describe('difficulty table', () => {
     expect(gainsAt(0)).toEqual(RULES.gain);
     expect(gainsAt(16)).toEqual({ skip: 64, like: 72, hold: 80, freeze: 72 });
     expect(gainAt(RULES.gain.skip, 8)).toBe(Math.floor((80 * 904) / 1000));
-    expect(lossAt(RULES.loss.caught, 0)).toBe(250);
-    expect(lossAt(RULES.loss.caught, 16)).toBe(410);
-    expect(lossAt(RULES.loss.holdMiss, 16)).toBe(196);
-    expect(lossAt(RULES.loss.timeout, 16)).toBe(328);
+    expect(lossAt(RULES.loss.caught, 0)).toBe(300);
+    expect(lossAt(RULES.loss.caught, 16)).toBe(492);
+    expect(lossAt(RULES.loss.holdMiss, 16)).toBe(246);
+    expect(lossAt(RULES.loss.timeout, 16)).toBe(410);
   });
 });
 
@@ -96,23 +96,23 @@ describe('a run at a difficulty', () => {
     const both = (action: Action) => [plain.apply(action), hard.apply(action)] as const;
 
     let [a, b] = both([GESTURE.none, 0, 0]);
-    expect(a.meter - b.meter).toBe(328 - 200);
+    expect(a.meter - b.meter).toBe(410 - 250);
     [a, b] = both([GESTURE.up, 400, 0]);
-    expect(a.meter - b.meter).toBe(128 + (80 - 64));
+    expect(a.meter - b.meter).toBe(160 + (80 - 64));
     [a, b] = both([GESTURE.like, 400, 0]);
-    expect(a.meter - b.meter).toBe(144 + (90 - 72));
+    expect(a.meter - b.meter).toBe(176 + (90 - 72));
     [a, b] = both([GESTURE.up, 400, 0]);
-    expect(a.meter - b.meter).toBe(162 + (80 - 64));
+    expect(a.meter - b.meter).toBe(194 + (80 - 64));
     expect(plain.current.kind).toBe('hold');
     [a, b] = both(clean(plain));
     expect(a.verdict).toBe('perfect');
     expect(b.verdict).toBe('perfect');
     // 100 + 60 against 80 + 60: the perfect's 60 is not cut.
-    expect(a.meter - b.meter).toBe(178 + (100 - 80));
+    expect(a.meter - b.meter).toBe(210 + (100 - 80));
     expect(a.points).toBe(b.points);
   });
 
-  it('doubles the bigger loss for a blind move', () => {
+  it('charges a blind move the bigger loss', () => {
     const run = new Run(42, MAX_DIFFICULTY);
     run.apply([GESTURE.up, 400, 0]);
     const blind = run.apply([GESTURE.like, 200, 0]);

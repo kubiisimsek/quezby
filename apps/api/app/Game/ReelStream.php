@@ -6,7 +6,8 @@ namespace App\Game;
  * The feed. Every reel costs exactly three draws — used or not — so reel `n`
  * always reads the same bits of the seed as `packages/engine/src/reels.ts`.
  * It is the same feed at every Dereceli difficulty: difficulty only tightens
- * the meter (`Difficulty`), never what comes on screen.
+ * the meter (`Difficulty`), never what comes on screen. Its caps go by the
+ * reel, never the score, so everyone on a seed sees the same reels.
  */
 final class ReelStream
 {
@@ -17,6 +18,9 @@ final class ReelStream
     private ?ReelKind $previous = null;
 
     private int $specialRun = 0;
+
+    /** @var list<ReelKind> The kinds of the last `CAP_WINDOW − 1` reels, oldest first. */
+    private array $recent = [];
 
     public function __construct(int $seed)
     {
@@ -37,14 +41,19 @@ final class ReelStream
             $kind = ReelKind::Skip;
         } elseif ($pick < Rules::WEIGHT_LIKE) {
             $kind = ReelKind::Like;
-        } elseif ($pick < Rules::WEIGHT_LIKE + Rules::WEIGHT_HOLD) {
-            $kind = ReelKind::Hold;
         } else {
-            $kind = $this->previous === ReelKind::Freeze ? ReelKind::Like : ReelKind::Freeze;
+            $kind = $pick < Rules::WEIGHT_LIKE + Rules::WEIGHT_HOLD ? ReelKind::Hold : ReelKind::Freeze;
+            if (! $this->allows($kind, $n)) {
+                $kind = ReelKind::Skip;
+            }
         }
 
         $this->specialRun = $kind === ReelKind::Skip ? 0 : $this->specialRun + 1;
         $this->previous = $kind;
+        $this->recent[] = $kind;
+        if (count($this->recent) >= Rules::CAP_WINDOW) {
+            array_shift($this->recent);
+        }
         $this->index++;
 
         $isHold = $kind === ReelKind::Hold;
@@ -59,5 +68,16 @@ final class ReelStream
             drain: Rules::drainFor($n),
             level: Rules::levelFor($n),
         );
+    }
+
+    /** Whether a hold or a freeze may come on reel `$n`: never a freeze after a freeze, never past its cap. */
+    private function allows(ReelKind $kind, int $n): bool
+    {
+        if ($kind === ReelKind::Freeze && $this->previous === ReelKind::Freeze) {
+            return false;
+        }
+        $seen = count(array_filter($this->recent, fn (ReelKind $recent) => $recent === $kind));
+
+        return $seen < Rules::capsFor($n)[$kind->value];
     }
 }

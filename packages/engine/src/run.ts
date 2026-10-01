@@ -57,8 +57,9 @@ export type Step = {
   combo: number;
   bonuses: readonly BonusHit[];
   /**
-   * How many blind moves in a row this miss made: its penalty was doubled
-   * this many times. 0 on a hit, and on a miss that was not blind.
+   * How many blind moves in a row this miss made: its penalty was multiplied
+   * by `blindFactor(blind)` — 1 for the first, then 2, 4. 0 on a hit, and on
+   * a miss that was not blind.
    */
   blind: number;
   meter: number;

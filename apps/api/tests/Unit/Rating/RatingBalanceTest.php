@@ -64,25 +64,27 @@ function settle(int $median, float $sigma, int $players = 150, int $runs = 120):
 test('each simulated player settles in their league, and stays there', function (int $median, float $sigma, LeagueTier $league) {
     $settled = settle($median, $sigma);
 
+    // The short game spreads a casual run's score wider (p90/p10 ≈ 7): its
+    // rating moves a little more a run, never across a league.
     expect(LeagueTier::fromRating((int) round($settled['mean'])))->toBe($league)
         ->and($settled['sd'])->toBeLessThan(120.0)
-        ->and($settled['p90'])->toBeLessThanOrEqual(75);
+        ->and($settled['p90'])->toBeLessThanOrEqual(85);
 })->with([
     // median score, log spread (p90/p10 of the profile), league
-    'casual' => [39900, 0.52, LeagueTier::Silver],
-    'average' => [102700, 0.35, LeagueTier::Silver],
-    'good' => [238100, 0.24, LeagueTier::Gold],
-    'pro' => [494400, 0.16, LeagueTier::Platinum],
-    'elite' => [737000, 0.12, LeagueTier::Diamond],
+    'casual' => [39200, 0.75, LeagueTier::Silver],
+    'average' => [113100, 0.44, LeagueTier::Silver],
+    'good' => [267200, 0.28, LeagueTier::Gold],
+    'pro' => [517800, 0.19, LeagueTier::Platinum],
+    'elite' => [781700, 0.13, LeagueTier::Diamond],
 ]);
 
 test('only near-flawless play holds MasterClass', function () {
-    expect(LeagueTier::fromRating((int) round(settle(1000000, 0.08, players: 40)['mean'])))->toBe(LeagueTier::Master)
-        ->and(LeagueTier::fromRating((int) round(settle(737000, 0.12, players: 40)['mean'])))->not->toBe(LeagueTier::Master);
+    expect(LeagueTier::fromRating((int) round(settle(1100000, 0.08, players: 40)['mean'])))->toBe(LeagueTier::Master)
+        ->and(LeagueTier::fromRating((int) round(settle(781700, 0.13, players: 40)['mean'])))->not->toBe(LeagueTier::Master);
 });
 
 test('a better player always settles higher', function () {
-    $medians = [40000, 104000, 240000, 499000, 744000];
+    $medians = [39200, 113100, 267200, 517800, 781700];
     $settled = array_map(fn (int $median) => settle($median, 0.2, players: 40)['mean'], $medians);
 
     foreach (range(1, count($settled) - 1) as $i) {
@@ -104,11 +106,11 @@ test('a better player always settles higher', function () {
 */
 
 const DIFFICULTY_MEDIANS = [
-    'casual' => [39300, 36700, 34500, 32500, 30900, 29300, 27000, 25000, 23200, 21600, 19700, 17800, 17000, 15700, 14600, 13500, 12800],
-    'average' => [101500, 96600, 91000, 85400, 80900, 76200, 72600, 67400, 64400, 59500, 58000, 53000, 49100, 44400, 42900, 41200, 38600],
-    'good' => [240300, 231500, 222500, 212300, 204200, 195100, 187000, 178500, 169200, 159400, 152500, 147000, 140000, 129500, 124600, 119700, 112300],
-    'pro' => [493200, 474400, 461200, 448800, 440900, 430200, 416400, 405700, 392100, 376500, 364400, 353000, 340100, 326000, 311100, 302100, 294400],
-    'elite' => [726800, 710000, 693000, 679400, 667000, 651200, 637400, 622500, 612300, 601400, 586300, 570000, 549100, 529700, 519100, 503300, 485800],
+    'casual' => [38800, 34700, 30300, 28000, 25200, 23800, 21600, 19400, 18400, 16400, 14600, 13500, 12100, 11400, 10700, 10000, 9800],
+    'average' => [113200, 105600, 101600, 94300, 89300, 82400, 75000, 67500, 61500, 57900, 52800, 47300, 43200, 40300, 37100, 33800, 31200],
+    'good' => [270000, 256000, 246500, 230400, 222500, 213700, 199600, 190500, 178000, 168000, 156800, 148400, 138300, 130000, 123400, 116700, 108900],
+    'pro' => [520000, 500200, 487800, 472900, 458200, 445200, 436100, 422000, 411600, 393200, 384000, 371100, 359600, 351900, 338800, 325200, 310600],
+    'elite' => [781300, 764400, 748600, 733600, 722100, 712000, 692400, 672500, 655400, 641100, 621900, 603200, 589700, 571600, 558600, 547000, 529700],
 ];
 
 /**
@@ -169,23 +171,23 @@ function difficultyTargets(): TargetTable
 test('at the difficulties, each simulated player settles in its league on the ladder, and stays there', function (string $profile, float $sigma, LeagueTier $league) {
     $hard = settleAtDifficulty(DIFFICULTY_MEDIANS[$profile], $sigma, difficultyTargets());
 
-    // A run's score spreads ±35–50 % for casual and average thumbs: their
+    // A run's score spreads wide for casual, average and good thumbs: their
     // rating moves more a run than a steady player's, never across a league.
     expect(LeagueTier::fromRating((int) round($hard['mean'])))->toBe($league)
         ->and($hard['sd'])->toBeLessThan(150.0)
-        ->and($hard['p90'])->toBeLessThanOrEqual(95);
+        ->and($hard['p90'])->toBeLessThanOrEqual(100);
 })->with([
-    'casual' => ['casual', 0.52, LeagueTier::Silver],
-    'average' => ['average', 0.35, LeagueTier::Silver],
-    'good' => ['good', 0.24, LeagueTier::Platinum],
-    'pro' => ['pro', 0.16, LeagueTier::Master],
-    'elite' => ['elite', 0.12, LeagueTier::Master],
+    'casual' => ['casual', 0.75, LeagueTier::Silver],
+    'average' => ['average', 0.44, LeagueTier::Silver],
+    'good' => ['good', 0.28, LeagueTier::Platinum],
+    'pro' => ['pro', 0.19, LeagueTier::Master],
+    'elite' => ['elite', 0.13, LeagueTier::Master],
 ]);
 
 test('MasterClass is a pro’s to reach and to keep: calm once there, and good play stays below it', function () {
-    $pro = settleAtDifficulty(DIFFICULTY_MEDIANS['pro'], 0.16, difficultyTargets());
-    $elite = settleAtDifficulty(DIFFICULTY_MEDIANS['elite'], 0.12, difficultyTargets());
-    $good = settleAtDifficulty(DIFFICULTY_MEDIANS['good'], 0.24, difficultyTargets());
+    $pro = settleAtDifficulty(DIFFICULTY_MEDIANS['pro'], 0.19, difficultyTargets());
+    $elite = settleAtDifficulty(DIFFICULTY_MEDIANS['elite'], 0.13, difficultyTargets());
+    $good = settleAtDifficulty(DIFFICULTY_MEDIANS['good'], 0.28, difficultyTargets());
 
     expect($pro['mean'])->toBeGreaterThan(5000.0)
         ->and($elite['mean'])->toBeGreaterThan($pro['mean'] + 500)
@@ -197,13 +199,13 @@ test('MasterClass is a pro’s to reach and to keep: calm once there, and good p
 
 test('MasterClass’s door asks a run a person can play', function () {
     // At 5000 the target is what halfway from good to pro scores at difficulty
-    // 16 — under 180 000, some three and a half minutes of clean play.
+    // 16 — under 180 000, under three minutes of clean play.
     expect(difficultyTargets()->shown(5000))->toBeLessThan(180000)
         ->and(difficultyTargets()->shown(5000))->toBeGreaterThan(difficultyTargets()->shown(4000));
 });
 
 test('the difficulty-0 targets would push the best players down a league', function () {
-    $elite = settleAtDifficulty(DIFFICULTY_MEDIANS['elite'], 0.12, TargetTable::forEngine(Rules::ENGINE_VERSION), players: 40);
+    $elite = settleAtDifficulty(DIFFICULTY_MEDIANS['elite'], 0.13, TargetTable::forEngine(Rules::ENGINE_VERSION), players: 40);
 
     expect(LeagueTier::fromRating((int) round($elite['mean'])))->not->toBe(LeagueTier::Diamond);
 });
