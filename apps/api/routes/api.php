@@ -187,6 +187,7 @@ Route::prefix('v1')->group(function () {
             Route::middleware('admin.role:owner')->group(function () {
                 Route::post('players/{player}/delete', [Admin\PlayerActionController::class, 'destroy'])->whereUlid('player')->name('players.delete');
                 Route::post('players/{player}/rating', [Admin\PlayerActionController::class, 'rating'])->whereUlid('player')->name('players.rating');
+                Route::post('players/{player}/push', [Admin\PlayerActionController::class, 'push'])->whereUlid('player')->name('players.push');
 
                 Route::get('admins', [Admin\AdminController::class, 'index'])->name('admins.index');
                 Route::post('admins', [Admin\AdminController::class, 'store'])->name('admins.store');

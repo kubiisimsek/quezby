@@ -5,6 +5,8 @@ use App\Enums\AdminRole;
 use App\Enums\AuditAction;
 use App\Enums\AuditVia;
 use App\Enums\FunnelStep;
+use App\Enums\LogLevel;
+use App\Enums\LogSource;
 use App\Enums\PlayerMilestone;
 
 /*
@@ -58,4 +60,9 @@ it('names the same firsts', function () {
 
 it('names the same activity states', function () {
     expect(adminContractUnion('AdminActivityStatus'))->not->toBeEmpty()->toBe(adminContractCases(ActivityStatus::class));
+});
+
+test('the log levels and sources are the same on both sides', function () {
+    expect(adminContractUnion('AdminLogLevel'))->not->toBeEmpty()->toBe(adminContractCases(LogLevel::class));
+    expect(adminContractUnion('AdminLogSource'))->not->toBeEmpty()->toBe(adminContractCases(LogSource::class));
 });

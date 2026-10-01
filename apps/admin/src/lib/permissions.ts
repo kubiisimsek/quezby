@@ -4,7 +4,7 @@ import type { AdminRole, AdminRunRow, AdminRunStatus } from '@quezby/types';
  * What a role may do in the panel. The API decides — every admin route says
  * the least role it takes — and the panel only hides what a role cannot use.
  */
-export type Ability = 'moderate' | 'setRatings' | 'deletePlayers' | 'manageAdmins' | 'manageSystem' | 'seeIps' | 'seeLogs';
+export type Ability = 'moderate' | 'setRatings' | 'deletePlayers' | 'manageAdmins' | 'manageSystem' | 'seeIps' | 'seeLogs' | 'sendPush';
 
 const RANK: Record<AdminRole, number> = { viewer: 1, moderator: 2, owner: 3 };
 
@@ -18,6 +18,8 @@ const LEAST: Record<Ability, AdminRole> = {
   seeIps: 'owner',
   /** The Loglar page names players and their phones: not for a viewer. */
   seeLogs: 'moderator',
+  /** Words of the panel's choosing on a player's lock screen: an owner's call. */
+  sendPush: 'owner',
 };
 
 export function atLeast(role: AdminRole | null | undefined, least: AdminRole): boolean {

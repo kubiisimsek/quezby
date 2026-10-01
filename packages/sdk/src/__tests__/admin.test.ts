@@ -172,6 +172,14 @@ const CALLS: Call[] = [
     auth: true,
   },
   {
+    name: 'players.push',
+    call: (api) => api.players.push(PLAYER, { title: 'Quezby', body: 'Deneme' }),
+    method: 'POST',
+    url: `/players/${PLAYER}/push`,
+    body: { title: 'Quezby', body: 'Deneme' },
+    auth: true,
+  },
+  {
     name: 'logs.list',
     call: (api) => api.logs.list({ level: 'error', source: 'push', event: 'push.no_device', player: PLAYER, status: 403 }),
     method: 'GET',

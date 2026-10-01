@@ -6,6 +6,7 @@ use App\Enums\ErrorCode;
 use App\Exceptions\ApiException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\DeletePlayerRequest;
+use App\Http\Requests\Admin\PushMessageRequest;
 use App\Http\Requests\Admin\ReasonRequest;
 use App\Http\Requests\Admin\SetRatingRequest;
 use App\Models\Admin;
@@ -64,6 +65,12 @@ class PlayerActionController extends Controller
     public function signOut(Request $request, string $player, #[CurrentUser('admin')] Admin $admin): JsonResponse
     {
         return response()->json(['changed' => $this->actions->signOut($this->player($player), Actor::panel($admin, $request)) > 0]);
+    }
+
+    /** Sends the player's phones a push now: `AdminPushResult`, what Firebase said for each. Owner only. */
+    public function push(PushMessageRequest $request, string $player, #[CurrentUser('admin')] Admin $admin): JsonResponse
+    {
+        return response()->json($this->actions->push($this->player($player), $request->title(), $request->body(), Actor::panel($admin, $request)));
     }
 
     /** Sets a player's rating (qb) by hand: `{ changed, rating, tier }`. Owner only. */

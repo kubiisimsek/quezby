@@ -16,6 +16,8 @@ enum AuditAction: string
     case ReportsDismiss = 'player.reports_dismiss';
     /** An owner set a player's rating (qb) by hand; `details` holds `from`, `to`, `tierFrom` and `tierTo`. */
     case PlayerRating = 'player.rating';
+    /** An owner sent a player's phones a push from the panel; `details` holds the words and what Firebase said. */
+    case PlayerPush = 'player.push';
     case RunApprove = 'run.approve';
     case RunReject = 'run.reject';
     case AdminCreate = 'admin.create';

@@ -29,6 +29,8 @@ import type {
   AdminPlayerResponse,
   AdminPlayersQuery,
   AdminPlayersResponse,
+  AdminPushRequest,
+  AdminPushResult,
   AdminRatingsResponse,
   AdminReasonRequest,
   AdminRenameResponse,
@@ -115,6 +117,9 @@ export function createAdminClient(options: AdminClientOptions) {
       /** Sets the player's rating (qb) by hand, placing them if they are not yet. Owner only. */
       setRating: (playerId: string, input: AdminSetRatingRequest) =>
         request<AdminSetRatingResponse>(`/players/${id(playerId)}/rating`, { method: 'POST', body: input }),
+      /** Owner only: a push to every phone of the player, now — what Firebase said for each. */
+      push: (playerId: string, input: AdminPushRequest) =>
+        request<AdminPushResult>(`/players/${id(playerId)}/push`, { method: 'POST', body: input }),
       /** Owner only. */
       remove: (playerId: string, input: AdminDeletePlayerRequest) =>
         request<void>(`/players/${id(playerId)}/delete`, { method: 'POST', body: input }),

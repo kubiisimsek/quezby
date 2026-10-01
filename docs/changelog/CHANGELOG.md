@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-10-01 — A push from the panel, and the player's push devices
+
+Push from real phones still did not arrive; the owner asked for a way to send
+one from the panel and try it there.
+
+- **Oyuncu → Push** (every role reads it): the phones registered for pushes
+  (platform, app version, the token's last eight characters, when) and the
+  kinds the player turned off — "Kayıtlı cihaz yok" says at once that no
+  token ever reached the API.
+- **Push gönder** (owner): `POST /admin/players/{id}/push`
+  `{ title, body }` sends now — not after the response — to every phone,
+  whatever the settings, and answers `AdminPushResult`: why nothing went
+  (`no_device`, `not_configured`, `no_access_token`) or Firebase's answer
+  phone by phone (`Gitti`, `Gitmedi · 401 · THIRD_PARTY_AUTH_ERROR`…). Audited
+  as `player.push`; on the Loglar page like every push.
+- `PushService::send` returns what happened to each token; `test()` is the
+  panel's way in. `AdminPlayerResponse.push`, `AdminPushRequest`,
+  `AdminPushResult`; `admin.players.push`. Contract parity now covers the
+  log levels and sources.
+
 ## 2026-10-01 — Loglar for ten years: rows by level, counts for good
 
 The owner asked for a log structure that holds up for ten years. At 10,000

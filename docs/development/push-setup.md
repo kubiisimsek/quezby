@@ -328,7 +328,15 @@ Sunucuda `.env` her değiştiğinde `/ops/optimize` çalıştır.
 
 ## 7. Sorun giderme
 
-İlk bakılacak yer panelin **Loglar** sayfası (Sahip ve Moderatör). Alıcı
+En hızlı deneme panelden: **Oyuncular → oyuncu → Push → Push gönder**
+(Sahip). Push hemen gider ve her cihaz için Firebase'in cevabı açılan
+pencerede görünür: *Gitti* (Firebase kabul etti), *Gitmedi · 401*
+(`THIRD_PARTY_AUTH_ERROR`: iOS'ta APNs anahtarı), *Gitmedi · 403*
+(`PERMISSION_DENIED`: servis hesabı ya da proje), *Oyuncunun kayıtlı cihazı
+yok* (token API'ye hiç ulaşmamış). Aynı kartta oyuncunun kayıtlı cihazları ve
+kapattığı türler durur.
+
+Sonra bakılacak yer panelin **Loglar** sayfası (Sahip ve Moderatör). Alıcı
 oyuncunun loglarını aç (kayıttaki oyuncu adı → *Bu oyuncunun logları*):
 
 - **Push → Cihaz kaydedildi** hiç yoksa telefonun token'ı API'ye hiç

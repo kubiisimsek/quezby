@@ -531,4 +531,62 @@ describe('PlayerPage', () => {
     expect(within(rating).getByText('Henüz reyting yok')).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Reyting geçmişi' })).not.toBeInTheDocument();
   });
+
+  it('shows which phones can take a push, and what the player turned off', async () => {
+    const response = playerResponse();
+    response.push = { devices: [], settings: { friends: true, vs: false, messages: true } };
+    renderApp({ path: `/players/${ID}`, api: withPlayer(response) });
+
+    const push = await card('Push');
+    expect(within(push).getByText(/Kayıtlı cihaz yok/)).toBeInTheDocument();
+    expect(within(push).getByText('VS kapalı')).toBeInTheDocument();
+  });
+
+  it('lets an owner send a push now, and shows what Firebase said for each phone', async () => {
+    const api = withPlayer();
+    api.players.push.mockResolvedValue({
+      problem: null,
+      devices: 2,
+      delivered: 1,
+      results: [
+        { device: '…a1b2c3d4', platform: 'ios', appVersion: '1.0.4', ok: false, status: 401, error: 'UNAUTHENTICATED · THIRD_PARTY_AUTH_ERROR', dropped: false },
+        { device: '…e5f6a7b8', platform: 'android', appVersion: null, ok: true, status: 200, error: null, dropped: false },
+      ],
+    });
+    const { user } = renderApp({ path: `/players/${ID}`, api });
+
+    const push = await card('Push');
+    expect(within(push).getByText('iOS · 1.0.4')).toBeInTheDocument();
+    await user.click(within(push).getByRole('button', { name: 'Push gönder' }));
+    const dialog = await screen.findByRole('dialog', { name: '@kerem.35 için push' });
+    await user.clear(within(dialog).getByLabelText('Mesaj'));
+    await user.type(within(dialog).getByLabelText('Mesaj'), 'Merhaba');
+    await user.click(within(dialog).getByRole('button', { name: 'Gönder' }));
+
+    await waitFor(() => expect(api.players.push).toHaveBeenCalledWith(ID, { title: 'Quezby', body: 'Merhaba' }));
+    const result = await screen.findByRole('dialog', { name: '1 / 2 cihaza gitti' });
+    expect(within(result).getByText('UNAUTHENTICATED · THIRD_PARTY_AUTH_ERROR')).toBeInTheDocument();
+    expect(within(result).getByText('Gitmedi · 401')).toBeInTheDocument();
+    expect(within(result).getByText('Gitti')).toBeInTheDocument();
+    expect(within(result).getByRole('link', { name: 'Loglarda gör' })).toHaveAttribute('href', `/logs?player=${ID}`);
+  });
+
+  it('says why a push went nowhere', async () => {
+    const api = withPlayer();
+    api.players.push.mockResolvedValue({ problem: 'no_device', devices: 0, delivered: 0, results: [] });
+    const { user } = renderApp({ path: `/players/${ID}`, api });
+
+    await user.click(within(await card('Push')).getByRole('button', { name: 'Push gönder' }));
+    await user.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Gönder' }));
+
+    const result = await screen.findByRole('dialog', { name: 'Push gitmedi' });
+    expect(within(result).getByText('Oyuncunun kayıtlı cihazı yok')).toBeInTheDocument();
+  });
+
+  it('offers a push only to an owner', async () => {
+    renderApp({ path: `/players/${ID}`, api: withPlayer(), session: adminSession({ role: 'moderator' }) });
+
+    const push = await card('Push');
+    expect(within(push).queryByRole('button', { name: 'Push gönder' })).not.toBeInTheDocument();
+  });
 });

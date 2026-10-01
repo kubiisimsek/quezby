@@ -49,6 +49,7 @@ function adminRouteRoles(): array
         'GET logs/summary' => 'moderator',
         'POST players/{player}/delete' => 'owner',
         'POST players/{player}/rating' => 'owner',
+        'POST players/{player}/push' => 'owner',
         'GET admins' => 'owner',
         'POST admins' => 'owner',
         'PUT admins/{admin}' => 'owner',

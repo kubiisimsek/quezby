@@ -28,7 +28,7 @@ comes from here; `apps/admin` may not import `@quezby/engine` (lint).
   | --- | --- | --- |
   | İzleyici | `viewer` | read every page |
   | Moderatör | `moderator` | ban and unban, reset a name, take a photo down, dismiss reports, sign a player out, approve and reject runs, read the logs |
-  | Sahip | `owner` | set a player's rating (qb) by hand, delete a player's account, manage admins, run the system chores, see IP addresses in the audit log |
+  | Sahip | `owner` | set a player's rating (qb) by hand, send a player's phones a push, delete a player's account, manage admins, run the system chores, see IP addresses in the audit log |
 
   Every admin route but the login carries `admin.role:<least role>`
   (`EnsureAdminRole`); `RolesTest` lists every route with its least role and
@@ -111,7 +111,11 @@ player never rated), runs by status, the ten latest runs, the flag codes of the 
 the other accounts seen on it — `social` (`friends`: their friends who are
 not banned; `blockedBy`: how many players blocked them, a sign worth a look),
 `openReports` (the reports still open about their photo and their name,
-`{ photo, name }`) and the audit entries about them.
+`{ photo, name }`), `push` (`AdminPlayerPush`: the phones registered for
+pushes, most recent first, each `{ device: "…a1b2c3d4", platform, appVersion,
+registeredAt, updatedAt }` — a token only by its last eight characters — and
+`settings { friends, vs, messages }`, the kinds the player let through) and
+the audit entries about them.
 
 ### `GET /players/{id}/activity` — viewer
 
@@ -161,6 +165,20 @@ upload a new photo. A player with no photo: `changed: false`, nothing recorded.
 — they close as `dismissed`, the photo and the name stay as they are —
 recorded as `player.reports_dismiss` with how many in the details. None open:
 `changed: false`, nothing recorded.
+
+### `POST /players/{id}/push` — owner
+
+`AdminPushRequest` `{ title (≤ 60), body (≤ 240) }` → `AdminPushResult`
+`{ problem, devices, delivered, results }`. A push to every phone of the
+player, sent **now** (not after the response) and whatever their settings —
+to see whether their phones can get one at all. `problem`: `no_device`,
+`not_configured` or `no_access_token` when nothing went; otherwise
+`results`, phone by phone, `{ device, platform, appVersion, ok, status,
+error, dropped }` as Firebase answered (`error` like
+`UNAUTHENTICATED · THIRD_PARTY_AUTH_ERROR · …`; a token Firebase no longer
+knows is taken off, `dropped`). `data` is `{ kind: "admin" }`, which the app
+opens to nothing. Audited as `player.push` with the words, `devices`,
+`delivered` and `problem`; every push is on the Loglar page too.
 
 ### `POST /players/{id}/rating` — owner
 
@@ -420,6 +438,7 @@ subject { type, id, label }, reason, details, ip` — `ip` only for an owner.
 - `action`: `auth.login`, `auth.password_changed`, `player.ban`,
   `player.unban`, `player.rename`, `player.sign_out`, `player.delete`,
   `player.avatar_remove`, `player.reports_dismiss`, `player.rating`,
+  `player.push`,
   `run.approve`, `run.reject`, `admin.create`, `admin.update`,
   `admin.reset_password`, `system.migrate`, `system.optimize`,
   `system.expire_runs`, `system.analytics_prune`.

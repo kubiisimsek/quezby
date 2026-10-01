@@ -59,6 +59,7 @@ import {
   SignOutPlayerDialog,
   UnbanPlayerDialog,
 } from '@/components/moderation/player-dialogs';
+import { PushPanel } from '@/components/moderation/push-panel';
 import { ActivityStrip } from '@/components/patterns/activity-strip';
 import { BandStats } from '@/components/patterns/band-stats';
 import { Callout } from '@/components/patterns/callout';
@@ -344,7 +345,9 @@ export function PlayerPage() {
         </Callout>
       ) : null}
 
-      {tab === 'summary' ? <Summary data={data} moderator={moderator} setsRatings={setsRatings} onDialog={setDialog} /> : null}
+      {tab === 'summary' ? (
+        <Summary data={data} moderator={moderator} setsRatings={setsRatings} sendsPush={can(role, 'sendPush')} onDialog={setDialog} />
+      ) : null}
       {tab === 'activity' ? <ActivityTab playerId={me.id} /> : null}
       {tab === 'devices' ? (
         <div className="space-y-6">
@@ -411,6 +414,7 @@ function Summary({
   data,
   moderator,
   setsRatings,
+  sendsPush,
   onDialog,
 }: {
   data: AdminPlayerResponse;
@@ -418,6 +422,8 @@ function Summary({
   moderator: boolean;
   /** Whether the admin may set the player's qb by hand: an owner. */
   setsRatings: boolean;
+  /** Whether the admin may send the player's phones a push: an owner. */
+  sendsPush: boolean;
   onDialog: (dialog: 'avatar' | 'dismiss' | 'rating') => void;
 }) {
   const me = data.player;
@@ -552,6 +558,8 @@ function Summary({
             ]}
           />
         </Panel>
+
+        <PushPanel player={me} push={data.push} canSend={sendsPush} />
 
         <RatingPanel rating={data.rating} onSet={setsRatings ? () => onDialog('rating') : undefined} />
 

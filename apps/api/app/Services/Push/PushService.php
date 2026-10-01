@@ -149,26 +149,60 @@ final class PushService
     }
 
     /**
+     * A push from the admin panel, now rather than after the response, to
+     * every phone of the player whatever their settings — to see whether
+     * their phones get one at all. `AdminPushResult` in `packages/types`:
+     * why nothing went (`problem`), and what Firebase said for each phone.
+     *
+     * @return array{problem: string|null, devices: int, delivered: int, results: list<array<string, mixed>>}
+     */
+    public function test(User $to, string $title, string $body): array
+    {
+        $tokens = $to->pushTokens()->orderByDesc('updated_at')->orderByDesc('id')->get();
+        if ($tokens->isEmpty()) {
+            $this->log(LogLevel::Warning, 'push.no_device', 'Panelden deneme: oyuncunun kayıtlı cihazı yok.', $to, 'admin');
+
+            return ['problem' => 'no_device', 'devices' => 0, 'delivered' => 0, 'results' => []];
+        }
+
+        $sent = $this->send($tokens, $title, $body, ['kind' => 'admin'], 'quezby-admin', $to);
+        $results = $sent['results'];
+
+        return [
+            'problem' => $sent['problem'],
+            'devices' => $tokens->count(),
+            'delivered' => count(array_filter($results, fn (array $result) => $result['ok'])),
+            'results' => $results,
+        ];
+    }
+
+    /**
+     * Sends one push to each of the tokens. Answers why nothing went
+     * (`not_configured`, `no_access_token`) or what Firebase said for each.
+     *
      * @param  Collection<int, PushToken>  $tokens
      * @param  array<string, string>  $data
+     * @return array{problem: string|null, results: list<array{device: string, platform: string, appVersion: string|null, ok: bool, status: int|null, error: string|null, dropped: bool}>}
      */
-    public function send(Collection $tokens, string $title, string $body, array $data, string $thread, ?User $to = null): void
+    public function send(Collection $tokens, string $title, string $body, array $data, string $thread, ?User $to = null): array
     {
         $line = $data['kind'] ?? null;
         if (! $this->isConfigured()) {
             $this->log(LogLevel::Error, 'push.not_configured', 'FIREBASE_PROJECT_ID ya da FIREBASE_CREDENTIALS okunamıyor; bildirim gönderilmedi.', $to, $line);
 
-            return;
+            return ['problem' => 'not_configured', 'results' => []];
         }
         $access = $this->token->accessToken();
         if ($access === null) {
             $this->log(LogLevel::Error, 'push.no_access_token', 'Google, Firebase için erişim anahtarı vermedi; bildirim gönderilmedi.', $to, $line);
 
-            return;
+            return ['problem' => 'no_access_token', 'results' => []];
         }
 
+        $results = [];
         foreach ($tokens as $token) {
             $about = ['userId' => $to?->id, 'platform' => $token->platform, 'kind' => $line, 'device' => self::tail($token->token)];
+            $result = ['device' => self::tail($token->token), 'platform' => $token->platform, 'appVersion' => $token->app_version, 'ok' => false, 'status' => null, 'error' => null, 'dropped' => false];
             try {
                 $response = Http::withToken($access)->acceptJson()->timeout(5)->withAttributes(['log' => $about])->post(sprintf(self::SEND_URL, $this->projectId), [
                     'message' => [
@@ -184,22 +218,52 @@ final class PushService
                 ]);
             } catch (Throwable $e) {
                 Log::warning('A push could not be sent.', ['reason' => $e->getMessage()]);
+                $results[] = [...$result, 'error' => $e->getMessage()];
 
                 continue;
             }
 
-            if ($response->status() === 401) {
+            $status = $response->status();
+            $error = $response->json('error');
+            $result = [...$result, 'status' => $status];
+            if ($status === 401) {
                 $this->token->forget();
             }
-            if ($this->gone($response->status(), (array) $response->json('error'))) {
+            if ($this->gone($status, (array) $error)) {
                 $token->delete();
                 $this->log(LogLevel::Warning, 'push.token_dropped', 'Firebase bu cihazı artık tanımıyor (uygulama silinmiş ya da token geçersiz); cihaz silindi.', $to, $line, $token);
+                $results[] = [...$result, 'error' => $this->firebaseError($error), 'dropped' => true];
             } elseif (! $response->successful()) {
-                Log::warning('Firebase refused a push.', ['status' => $response->status(), 'error' => $response->json('error.status')]);
+                Log::warning('Firebase refused a push.', ['status' => $status, 'error' => $response->json('error.status')]);
+                $results[] = [...$result, 'error' => $this->firebaseError($error)];
             } else {
                 $this->log(LogLevel::Info, 'push.sent', 'Firebase bildirimi kabul etti.', $to, $line, $token);
+                $results[] = [...$result, 'ok' => true];
             }
         }
+
+        return ['problem' => null, 'results' => $results];
+    }
+
+    /** `PERMISSION_DENIED: …`, `THIRD_PARTY_AUTH_ERROR` — what Firebase said, in a line. */
+    private function firebaseError(mixed $error): ?string
+    {
+        if (! is_array($error)) {
+            return null;
+        }
+        $codes = [];
+        foreach ((array) ($error['details'] ?? []) as $detail) {
+            if (is_array($detail) && is_string($detail['errorCode'] ?? null)) {
+                $codes[] = $detail['errorCode'];
+            }
+        }
+        $parts = array_filter([
+            is_string($error['status'] ?? null) ? $error['status'] : null,
+            $codes === [] ? null : implode(', ', $codes),
+            is_string($error['message'] ?? null) ? $error['message'] : null,
+        ]);
+
+        return $parts === [] ? null : SystemLogger::cut(implode(' · ', $parts), 300);
     }
 
     /** A row of source `push`, about the player it was for. */

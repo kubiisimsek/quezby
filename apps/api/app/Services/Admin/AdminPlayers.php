@@ -6,6 +6,7 @@ use App\Enums\LeaderboardPeriod;
 use App\Enums\RunFlag;
 use App\Models\DeviceCheck;
 use App\Models\LeaderboardEntry;
+use App\Models\PushToken;
 use App\Models\Run;
 use App\Models\SocialIdentity;
 use App\Models\User;
@@ -145,6 +146,21 @@ final class AdminPlayers
             'installs' => $this->devices->of($player),
             'social' => ['friends' => $this->friends->count($player), 'blockedBy' => $this->friends->blockedByCount($player)],
             'openReports' => $this->reports->openOf($player),
+            // Whether the player's phones can get a push at all: what registered, and what they turned off.
+            'push' => [
+                'devices' => $player->pushTokens()->orderByDesc('updated_at')->orderByDesc('id')->get()->map(fn (PushToken $token) => [
+                    'device' => '…'.substr($token->token, -8),
+                    'platform' => $token->platform,
+                    'appVersion' => $token->app_version,
+                    'registeredAt' => Timestamp::iso($token->created_at),
+                    'updatedAt' => Timestamp::iso($token->updated_at),
+                ])->values()->all(),
+                'settings' => [
+                    'friends' => $player->resolvedSettings()['pushFriends'],
+                    'vs' => $player->resolvedSettings()['pushVs'],
+                    'messages' => $player->resolvedSettings()['pushMessages'],
+                ],
+            ],
             'audit' => $this->audit->about('player', $player->id)->map(fn ($entry) => $this->audit->present($entry, $withIp))->values()->all(),
         ];
     }

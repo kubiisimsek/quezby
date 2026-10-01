@@ -1135,6 +1135,10 @@ gone (`defer()` — no queue, no cron):
   token, or one that moved account, platform or app version, is
   `push.registered`. Tokens never reach a row — only their last eight
   characters (`…a1b2c3d4`).
+- An owner can send a player's phones a push from the admin panel, now and
+  whatever their settings, and read Firebase's answer for each phone
+  (`POST /admin/players/{id}/push`, `data.kind` `admin`, which the app
+  opens to nothing — `docs/backend/admin-api.md`).
 - Nothing is sent, and nothing breaks, until `QUEZBY_PUSH_ENABLED`,
   `FIREBASE_PROJECT_ID` and a readable `FIREBASE_CREDENTIALS` are all set; the
   admin panel's Sistem page says whether they are. Setup:

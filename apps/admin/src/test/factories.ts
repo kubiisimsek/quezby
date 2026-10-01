@@ -211,6 +211,12 @@ export function playerResponse(overrides: Partial<AdminPlayerResponse> = {}, pla
     ],
     social: { friends: 4, blockedBy: 0 },
     openReports: { photo: 0, name: 0 },
+    push: {
+      devices: [
+        { device: '…a1b2c3d4', platform: 'ios', appVersion: '1.0.4', registeredAt: '2026-09-28T08:00:00.000Z', updatedAt: '2026-09-30T08:00:00.000Z' },
+      ],
+      settings: { friends: true, vs: true, messages: true },
+    },
     audit: [],
     ...overrides,
   };
