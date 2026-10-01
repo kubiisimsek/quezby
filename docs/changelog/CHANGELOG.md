@@ -105,6 +105,14 @@ The owner wanted to deploy the API and the panel with one button. The host
     formatters, which kept the runner's UTC.
   - **The panel's Testing Library** waits up to 10 s, not 3 s, for a page's
     lazy chunk on CI's two cores.
+- **Apple's App Attestation Root CA is now in git.**
+  - Path: `apps/api/resources/certs/apple-app-attestation-root-ca.pem`.
+  - `*.pem` in `.gitignore` had kept it out. It is public, and the API
+    cannot verify an iPhone without it.
+  - Zips built on the Mac carried it from the working tree. One built by CI
+    from git would have shipped without it.
+  - `.gitignore` now lets `apps/api/resources/certs/*.pem` through; every
+    other `.pem` stays out.
 
 ## 2026-09-30 — Production on one domain: quezby.com/api, /panel, /privacy-policy
 
