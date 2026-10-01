@@ -1,3 +1,9 @@
+// Dates and times are read on the phone's own clock: the tests' phone is in
+// Istanbul. Set here, before Jest starts its workers, so they are born on it:
+// set later (jest.setup.js) the date formatters keep the machine's own zone,
+// which on CI is UTC.
+process.env.TZ = 'Europe/Istanbul';
+
 module.exports = {
   setupFiles: ['<rootDir>/jest.setup.js'],
   setupFilesAfterEnv: ['<rootDir>/jest.after-env.js'],

@@ -99,6 +99,12 @@ The owner wanted to deploy the API and the panel with one button. The host
     refused. So are the home folder, `public_html` itself, absolute paths
     and paths with `..`.
 - The manual zip route stays as it was.
+- **Tests on CI** failed where the Mac passed, so two fixes:
+  - **The app's Jest** pins `TZ=Europe/Istanbul` in `jest.config.js`, before
+    the workers start. Set in `jest.setup.js` it came too late for the date
+    formatters, which kept the runner's UTC.
+  - **The panel's Testing Library** waits up to 10 s, not 3 s, for a page's
+    lazy chunk on CI's two cores.
 
 ## 2026-09-30 — Production on one domain: quezby.com/api, /panel, /privacy-policy
 
