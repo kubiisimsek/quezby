@@ -1,5 +1,66 @@
 # Changelog
 
+## 2026-10-01 — Loglar for ten years: rows by level, counts for good
+
+The owner asked for a log structure that holds up for ten years. At 10,000
+players a day the first cut would have kept ~550 MB of mostly "push sent"
+rows for two weeks and forgotten everything older.
+
+- **Retention by level** (`logs.keep_days`): an error 90 days, a warning
+  14, an info 3 — `QUEZBY_LOG_KEEP_ERROR_DAYS`, `…_WARNING_DAYS`,
+  `…_INFO_DAYS` replace `QUEZBY_LOG_KEEP_DAYS`.
+- **A budget a minute for each level** (600 / 300 / 300): a flood of pushes
+  no longer drops an error.
+- **`system_log_days`** — one row per game day, source, event and level with
+  how many, every row counted (dropped ones too), kept for good (~25 MB in
+  ten years). Loglar opens on it: hata/uyarı/bilgi over 30 days or 12 months
+  (`GET /admin/logs/summary`), a stacked chart and the events seen most —
+  one tap filters the table.
+- **The list no longer counts the table**: `AdminLogsResponse` is
+  `{ items, page, perPage, hasMore, events }` (no `total`); `Pager` pages a
+  list too long to count. The event picker reads the small daily table.
+- **`push.registered` only when something changed** — a new phone, another
+  account, platform or app version (`context.change`) — not on every launch.
+- Estimated size at 10,000 players a day: ~150 MB of rows plus ~25 MB of
+  counts, flat for ten years.
+
+## 2026-10-01 — Loglar: what went wrong, where staff can read it
+
+Push notifications from real phones did not arrive, and nothing said why:
+`storage/logs/laravel.log` was only reachable through cPanel, a missing
+Firebase key returned without a line, 4xx answers were never kept, and the
+phone swallowed every push error. The owner asked for logs of every outside
+call and every API error.
+
+- **`system_logs` + `SystemLogger`** (API): one table, read on the panel's new
+  **Loglar** page (`GET /admin/logs`, moderator and up; Yönetim → Loglar).
+  Kept `QUEZBY_LOG_KEEP_DAYS` (14) days, pruned now and then on a write; past
+  300 rows a minute the rest of that minute is dropped; a deleted account's
+  rows go with it. Secrets are masked at any depth (`[gizli]`), request bodies
+  never kept.
+- **Outside calls** (`ExternalCallLogger`, on Laravel's HTTP client events):
+  every call to Firebase, Google or Apple that answers ≥ 400 or never answers,
+  with what the service said.
+- **API errors** (`ApiErrorLogger`): every answer ≥ 400 but 401/404/405 —
+  code, message, validation fields, player, phone — and every reported
+  exception with its file, line and first frames.
+- **Push** (`PushService`, `PushTokenController`): every decision is a row —
+  `push.registered`, `push.sent`, `push.no_device`, `push.muted`,
+  `push.disabled`, `push.not_configured`, `push.no_access_token`,
+  `push.token_dropped` — about the player the push was for.
+- **The phone** (`lib/appLog.ts`, `useAppLogs`, `POST /me/logs`): push
+  permission and token failures, a token the API never took, a build without
+  Firebase, requests that never reached the API (`onUnreached` in
+  `@quezby/sdk`), and crashes; kept on the phone (50 at most, once per ten
+  minutes each) until a player is signed in.
+- The panel's closed-page notice names the least role it takes (Loglar opens
+  for a Moderatör, not only a Sahip).
+- Contract: `AppLogRequest`, `AppLogEntry`, `LogLevel`; `AdminLogEntry`,
+  `AdminLogsQuery`, `AdminLogsResponse`; `api.me.sendLogs`,
+  `admin.logs.list`. Docs: `api-contract.md` → *Logs*, `admin-api.md` →
+  *Logs*, `push-setup.md` → *Sorun giderme*, `analytics.md`,
+  `admin-rules.md`.
+
 ## 2026-10-01 — The panel's release under the theme switch
 
 - The sidebar's foot names the panel's release under the theme switch, e.g.

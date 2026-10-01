@@ -16,6 +16,7 @@ const AuditPage = lazy(() => import('@/pages/AuditPage').then((module) => ({ def
 const BoardsPage = lazy(() => import('@/pages/BoardsPage').then((module) => ({ default: module.BoardsPage })));
 const ContentPage = lazy(() => import('@/pages/ContentPage').then((module) => ({ default: module.ContentPage })));
 const DailyPage = lazy(() => import('@/pages/DailyPage').then((module) => ({ default: module.DailyPage })));
+const LogsPage = lazy(() => import('@/pages/LogsPage').then((module) => ({ default: module.LogsPage })));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage').then((module) => ({ default: module.NotFoundPage })));
 const OverviewPage = lazy(() => import('@/pages/OverviewPage').then((module) => ({ default: module.OverviewPage })));
 const PlayerPage = lazy(() => import('@/pages/PlayerPage').then((module) => ({ default: module.PlayerPage })));
@@ -52,6 +53,14 @@ export const appRoutes: RouteObject[] = [
           { path: '/ratings', element: <RatingsPage /> },
           { path: '/content', element: <ContentPage /> },
           { path: '/audit', element: <AuditPage /> },
+          {
+            path: '/logs',
+            element: (
+              <RequireRole least="moderator">
+                <LogsPage />
+              </RequireRole>
+            ),
+          },
           {
             path: '/admins',
             element: (

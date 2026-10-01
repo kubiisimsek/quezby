@@ -40,6 +40,18 @@ Sözleşme: [api-contract.md](../backend/api-contract.md) (`POST /analytics/visi
 Oyunun kendisi (turlar, skorlar, her post ve hareket) zaten `runs` ve
 `content_stats`'ta; analitik onları bir daha toplamaz.
 
+**Hata kayıtları (panelin Loglar sayfası) analitik değildir.** API'nin
+hataları, Firebase/Google/Apple'a giden başarısız istekler, her push'un ne
+olduğu ve telefonun yuttuğu hatalar (push token alınamadı, API'ye
+ulaşılamadı, çökme — `POST /me/logs`) oyunun çalışması için tutulur; izne
+bakılmaz. Oyuncu kimliği, platform ve uygulama sürümüyle `system_logs`'ta
+seviyesine göre durur (hata 90, uyarı 14, bilgi 3 gün), hesapla birlikte
+silinir; günlük sayıları (`system_log_days`) kimseyi adlandırmaz ve hiç
+silinmez; token, şifre ve anahtar hiç yazılmaz,
+oyuncunun yazdığı hiçbir şey gitmez. Mağaza beyanında bu **Tanılama → Çökme
+verisi / Diğer tanılama verileri** (kullanıcıya bağlı, uygulama işlevi
+için) demektir — `docs/backend/api-contract.md` → *Logs*.
+
 ## İzin
 
 - **Nerede sorulur:**

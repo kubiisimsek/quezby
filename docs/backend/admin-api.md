@@ -27,7 +27,7 @@ comes from here; `apps/admin` may not import `@quezby/engine` (lint).
   | Role | `role` | May |
   | --- | --- | --- |
   | İzleyici | `viewer` | read every page |
-  | Moderatör | `moderator` | ban and unban, reset a name, take a photo down, dismiss reports, sign a player out, approve and reject runs |
+  | Moderatör | `moderator` | ban and unban, reset a name, take a photo down, dismiss reports, sign a player out, approve and reject runs, read the logs |
   | Sahip | `owner` | set a player's rating (qb) by hand, delete a player's account, manage admins, run the system chores, see IP addresses in the audit log |
 
   Every admin route but the login carries `admin.role:<least role>`
@@ -427,6 +427,35 @@ subject { type, id, label }, reason, details, ip` — `ip` only for an owner.
   the player it names: the subject is an id and a label, not a foreign key.
 - Moderation from the command line and the ops route is recorded too:
   `ModerationService` takes an `Actor` and writes the entry itself.
+
+## Logs
+
+### `GET /logs?level=&source=&event=&player=&status=&page=&perPage=` — moderator
+
+`AdminLogsResponse` `{ items, page, perPage, hasMore, events }`: newest
+first, a page of `AdminLogEntry` `{ id, at, level, source, event, message,
+status, method, path, durationMs, player { id, username }, platform,
+appVersion, context }`. No `total`: the table can hold millions, so the API
+reads one row more than asked and says whether a next page is there
+(`hasMore`). `events` — the events the daily counts hold for the days rows are
+kept (of `source`, when given), for the panel's picker. `player.username` is
+null once the account is gone.
+
+- `level`: `error`, `warning`, `info`. `source`: `api`, `external`, `push`,
+  `app` — what each holds, how long, and what a row never holds:
+  `docs/backend/api-contract.md` → *Logs*.
+
+### `GET /logs/summary?range=30d|12m` — moderator
+
+`AdminLogSummary` `{ range, buckets, totals, top }` from the daily counts
+(`system_log_days`, kept for good, dropped rows counted too): `buckets` —
+oldest first, `{ key, error, warning, info }` a game day for thirty days
+(`2026-10-01`) or a month for twelve (`2026-10`), empty ones as zeros;
+`totals` over the range; `top` — the twenty source/event/level triples seen
+most, `{ source, event, level, total }`.
+
+A moderator and up: rows name players and their phones, so a viewer does not
+read them. Reading changes nothing, so nothing is audited.
 
 ## Admins — owner
 

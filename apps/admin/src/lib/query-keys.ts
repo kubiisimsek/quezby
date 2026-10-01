@@ -21,6 +21,8 @@ export const keys = {
   content: (query?: object) => (query ? (['content', query] as const) : (['content'] as const)),
   analytics: (query?: object) => (query ? (['analytics', query] as const) : (['analytics'] as const)),
   audit: (query?: object) => (query ? (['audit', query] as const) : (['audit'] as const)),
+  logs: (query?: object) => (query ? (['logs', query] as const) : (['logs'] as const)),
+  logSummary: (range: string) => ['logs', 'summary', range] as const,
   admins: ['admins'] as const,
   system: ['system'] as const,
 };

@@ -193,6 +193,14 @@ const CALLS: Call[] = [
     body: { token: 'fcm:abc' },
     auth: true,
   },
+  {
+    name: 'me.sendLogs',
+    call: (api) => api.me.sendLogs({ entries: [{ level: 'error', event: 'push.token', message: 'unregistered' }] }),
+    method: 'POST',
+    url: '/me/logs',
+    body: { entries: [{ level: 'error', event: 'push.token', message: 'unregistered' }] },
+    auth: true,
+  },
   { name: 'duels.get', call: (api) => api.duels.get('01jduel'), method: 'GET', url: '/duels/01jduel', auth: true },
   { name: 'duels.decline', call: (api) => api.duels.decline('01jduel'), method: 'POST', url: '/duels/01jduel/decline', auth: true },
   {

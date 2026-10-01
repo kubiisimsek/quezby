@@ -6,6 +6,7 @@ import { api } from '@/api/client';
 import { useSession } from '@/auth/session';
 import { APP_PLATFORM } from '@/config/env';
 import { refreshSocial } from '@/hooks/useSocial';
+import { logAppError } from '@/lib/appLog';
 import {
   askPushPermission,
   dropPushToken,
@@ -54,10 +55,10 @@ export function usePushRegistration(): void {
       await api.me.registerPushToken({ token: fcm, platform: APP_PLATFORM });
       if (!cancelled) usePush.getState().setToken(fcm);
     };
-    void pushToken()
-      .then(register)
-      .catch(() => undefined);
-    const stop = onPushToken((fcm) => void register(fcm).catch(() => undefined));
+    // The API logs its own refusals; a request that never got there is kept by the API client.
+    const failed = (error: unknown) => logAppError('push.register', error);
+    void pushToken().then(register).catch(failed);
+    const stop = onPushToken((fcm) => void register(fcm).catch(failed));
     return () => {
       cancelled = true;
       stop();

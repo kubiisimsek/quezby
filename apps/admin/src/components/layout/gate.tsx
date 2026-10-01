@@ -6,6 +6,7 @@ import { Link, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { Button } from '@/components/base/button';
 import { EmptyState } from '@/components/patterns/empty-state';
 import { Page } from '@/components/patterns/page';
+import { ADMIN_ROLE } from '@/lib/format';
 import { atLeast } from '@/lib/permissions';
 import { useSession } from '@/stores/session';
 
@@ -27,13 +28,20 @@ export function RequireSession() {
   return <Outlet />;
 }
 
-/** A page for owners only. The menu never links here for anyone else; a typed-in address says why not. */
+/** A page for a role and those above it. The menu never links here for anyone else; a typed-in address says why not. */
 export function RequireRole({ least, children }: { least: AdminRole; children: ReactNode }) {
   const role = useSession((state) => state.session?.admin.role);
   if (atLeast(role, least)) return <>{children}</>;
 
   return (
-    <Page title="Bu sayfa sana kapalı" description="Bu sayfayı yalnızca Sahip rolündeki yöneticiler açabilir.">
+    <Page
+      title="Bu sayfa sana kapalı"
+      description={
+        least === 'owner'
+          ? 'Bu sayfayı yalnızca Sahip rolündeki yöneticiler açabilir.'
+          : `Bu sayfayı ${ADMIN_ROLE[least].label} ve üstü roldeki yöneticiler açabilir.`
+      }
+    >
       <div className="rounded-panel bg-raised shadow-card">
         <EmptyState
           icon={<Lock />}

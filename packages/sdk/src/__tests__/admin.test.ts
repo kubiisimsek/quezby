@@ -171,6 +171,14 @@ const CALLS: Call[] = [
     url: `/audit?action=player.ban&via=cli&subjectType=player&subjectId=${PLAYER}`,
     auth: true,
   },
+  {
+    name: 'logs.list',
+    call: (api) => api.logs.list({ level: 'error', source: 'push', event: 'push.no_device', player: PLAYER, status: 403 }),
+    method: 'GET',
+    url: `/logs?level=error&source=push&event=push.no_device&player=${PLAYER}&status=403`,
+    auth: true,
+  },
+  { name: 'logs.summary', call: (api) => api.logs.summary('12m'), method: 'GET', url: '/logs/summary?range=12m', auth: true },
   { name: 'admins.list', call: (api) => api.admins.list(), method: 'GET', url: '/admins', auth: true },
   {
     name: 'admins.create',

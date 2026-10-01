@@ -97,6 +97,22 @@ describe('DataTable', () => {
 });
 
 describe('Pager', () => {
+  it('pages a list too long to count by whether more follow', async () => {
+    const onPage = vi.fn();
+    const { user, unmount } = renderWithProviders(<Pager page={2} perPage={25} count={25} hasMore onPage={onPage} noun="log" />);
+
+    expect(screen.getByText('26–50')).toBeInTheDocument();
+    expect(screen.getByText(/^\s*log$/)).toBeInTheDocument();
+    expect(screen.getByText('Sayfa 2')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Sonraki sayfa' }));
+    expect(onPage).toHaveBeenLastCalledWith(3);
+
+    unmount();
+    renderWithProviders(<Pager page={3} perPage={25} count={7} hasMore={false} onPage={onPage} noun="log" />);
+    expect(screen.getByText('51–57')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Sonraki sayfa' })).toBeDisabled();
+  });
+
   it('says which rows these are and moves between pages', async () => {
     const onPage = vi.fn();
     const { user } = renderWithProviders(<Pager page={2} perPage={25} total={1234} onPage={onPage} noun="oyuncu" />);

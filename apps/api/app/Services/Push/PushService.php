@@ -3,12 +3,15 @@
 namespace App\Services\Push;
 
 use App\Enums\Locale;
+use App\Enums\LogLevel;
+use App\Enums\LogSource;
 use App\Enums\MessageKind;
 use App\Models\Duel;
 use App\Models\Message;
 use App\Models\PushToken;
 use App\Models\User;
 use App\Services\Google\ServiceAccountToken;
+use App\Services\Logs\SystemLogger;
 use Illuminate\Container\Attributes\Config;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -25,7 +28,9 @@ use Throwable;
  * doings push nothing; phrases push at most once every
  * `inbox.push_gap_seconds` from one friend, the rest wait in the inbox. A VS
  * turned down or run out only lands in the inbox. A token Firebase no longer
- * knows is dropped.
+ * knows is dropped. Every decision is a row of the panel's Loglar page
+ * (source `push`, about the player it was for): sent, or why not — and a
+ * refusal from Firebase is one more, from `ExternalCallLogger`.
  */
 final class PushService
 {
@@ -46,6 +51,7 @@ final class PushService
         int $ttlSeconds,
         #[Config('quezby.inbox.push_gap_seconds')]
         private readonly int $phraseGap,
+        private readonly SystemLogger $logger,
     ) {
         $this->token = new ServiceAccountToken($credentials, self::SCOPE, $ttlSeconds, 'fcm', 'FIREBASE_CREDENTIALS');
     }
@@ -91,11 +97,23 @@ final class PushService
      */
     private function notify(User $to, string $setting, string $line, array $replace, array $data, ?string $phrase = null): void
     {
-        if (! $this->enabled || ! ($to->resolvedSettings()[$setting] ?? true) || $to->isBanned()) {
+        if ($to->isBanned()) {
+            return;
+        }
+        if (! $this->enabled) {
+            $this->log(LogLevel::Info, 'push.disabled', 'QUEZBY_PUSH_ENABLED kapalı; bildirim gönderilmedi.', $to, $line);
+
+            return;
+        }
+        if (! ($to->resolvedSettings()[$setting] ?? true)) {
+            $this->log(LogLevel::Info, 'push.muted', "Oyuncu bu türü kapatmış ({$setting}).", $to, $line);
+
             return;
         }
         $tokens = $to->pushTokens()->get();
         if ($tokens->isEmpty()) {
+            $this->log(LogLevel::Warning, 'push.no_device', 'Oyuncunun kayıtlı cihazı yok: telefon bildirime izin vermemiş ya da token API\'ye ulaşmamış.', $to, $line);
+
             return;
         }
 
@@ -106,7 +124,7 @@ final class PushService
         $body = __('push.'.$line, $replace, $locale);
         $thread = 'friend-'.($data['username'] ?? 'quezby');
 
-        defer(fn () => $this->send($tokens, __('push.title', [], $locale), $body, $data, $thread));
+        defer(fn () => $this->send($tokens, __('push.title', [], $locale), $body, $data, $thread, $to));
     }
 
     /**
@@ -134,19 +152,25 @@ final class PushService
      * @param  Collection<int, PushToken>  $tokens
      * @param  array<string, string>  $data
      */
-    public function send(Collection $tokens, string $title, string $body, array $data, string $thread): void
+    public function send(Collection $tokens, string $title, string $body, array $data, string $thread, ?User $to = null): void
     {
+        $line = $data['kind'] ?? null;
         if (! $this->isConfigured()) {
+            $this->log(LogLevel::Error, 'push.not_configured', 'FIREBASE_PROJECT_ID ya da FIREBASE_CREDENTIALS okunamıyor; bildirim gönderilmedi.', $to, $line);
+
             return;
         }
         $access = $this->token->accessToken();
         if ($access === null) {
+            $this->log(LogLevel::Error, 'push.no_access_token', 'Google, Firebase için erişim anahtarı vermedi; bildirim gönderilmedi.', $to, $line);
+
             return;
         }
 
         foreach ($tokens as $token) {
+            $about = ['userId' => $to?->id, 'platform' => $token->platform, 'kind' => $line, 'device' => self::tail($token->token)];
             try {
-                $response = Http::withToken($access)->acceptJson()->timeout(5)->post(sprintf(self::SEND_URL, $this->projectId), [
+                $response = Http::withToken($access)->acceptJson()->timeout(5)->withAttributes(['log' => $about])->post(sprintf(self::SEND_URL, $this->projectId), [
                     'message' => [
                         'token' => $token->token,
                         'notification' => ['title' => $title, 'body' => $body],
@@ -169,10 +193,34 @@ final class PushService
             }
             if ($this->gone($response->status(), (array) $response->json('error'))) {
                 $token->delete();
+                $this->log(LogLevel::Warning, 'push.token_dropped', 'Firebase bu cihazı artık tanımıyor (uygulama silinmiş ya da token geçersiz); cihaz silindi.', $to, $line, $token);
             } elseif (! $response->successful()) {
                 Log::warning('Firebase refused a push.', ['status' => $response->status(), 'error' => $response->json('error.status')]);
+            } else {
+                $this->log(LogLevel::Info, 'push.sent', 'Firebase bildirimi kabul etti.', $to, $line, $token);
             }
         }
+    }
+
+    /** A row of source `push`, about the player it was for. */
+    private function log(LogLevel $level, string $event, string $message, ?User $to, ?string $line, ?PushToken $token = null): void
+    {
+        $this->logger->write($level, LogSource::Push, $event, $message, [
+            'userId' => $to?->id,
+            'platform' => $token?->platform,
+            'context' => array_filter([
+                'to' => $to === null ? null : '@'.$to->username,
+                'kind' => $line,
+                'device' => $token === null ? null : self::tail($token->token),
+                'appVersion' => $token?->app_version,
+            ]),
+        ]);
+    }
+
+    /** The end of a token — enough to tell a player's phones apart, never the token. */
+    private static function tail(string $token): string
+    {
+        return '…'.substr($token, -8);
     }
 
     /**

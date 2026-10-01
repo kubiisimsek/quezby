@@ -328,11 +328,28 @@ Sunucuda `.env` her değiştiğinde `/ops/optimize` çalıştır.
 
 ## 7. Sorun giderme
 
-`storage/logs/laravel-<tarih>.log` (`LOG_STACK=single` ise `laravel.log`)
-sebebi söyler: *Google did not hand out a fcm access token.*, *Firebase refused
-a push.* (`status` ve `error` ile), *A push could not be sent.* Anahtar eksik
-ya da okunamıyorsa log'a hiçbir şey yazılmaz: API sessizce göndermez, Sistem
-sayfası **Kapalı** der.
+İlk bakılacak yer panelin **Loglar** sayfası (Sahip ve Moderatör). Alıcı
+oyuncunun loglarını aç (kayıttaki oyuncu adı → *Bu oyuncunun logları*):
+
+- **Push → Cihaz kaydedildi** hiç yoksa telefonun token'ı API'ye hiç
+  ulaşmamış (bu satır yalnızca yeni cihazda, hesap ya da sürüm değişince
+  yazılır; bilgi satırları 3 gün durur — daha eskisi için üstteki sayılara
+  bak). Aynı oyuncuda **Telefon** kaynağına bak: *Push token alınamadı*
+  (Firebase token vermedi; iOS'ta çoğunlukla APNs), *Token API'ye gitmedi*,
+  *Bu sürümde Firebase yok*.
+- **Push → Kayıtlı cihaz yok**: gönderim denendi ama alıcının cihazı yok
+  (yukarıdaki madde).
+- **Push → Gönderildi** varsa Firebase kabul etmiş; bildirim gelmiyorsa sorun
+  Firebase'den sonrasında: iOS'ta APNs anahtarı, Android'de telefonun bildirim
+  ayarı.
+- **Dış servis → Firebase / Google erişim anahtarı**: Firebase ya da Google
+  reddetmiş; ayrıntıda servisin kendi cevabı durur (`403 PERMISSION_DENIED`,
+  `400 invalid_grant`…).
+- **Push → Firebase ayarlı değil**: Sistem sayfası da **Kapalı** der.
+
+Laravel'in kendi satırları `storage/logs/laravel-<tarih>.log`'da
+(`LOG_STACK=single` ise `laravel.log`) da durur: *Google did not hand out a
+fcm access token.*, *Firebase refused a push.*, *A push could not be sent.*
 
 | Belirti | Anlamı | Çözüm |
 | --- | --- | --- |

@@ -3,9 +3,14 @@
 namespace App\Providers;
 
 use App\Services\Analytics\Presence;
+use App\Services\Logs\ApiErrorLogger;
+use App\Services\Logs\ExternalCallLogger;
 use App\Support\ModerationToken;
 use App\Support\OpsToken;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Foundation\Http\Events\RequestHandled;
+use Illuminate\Http\Client\Events\ConnectionFailed;
+use Illuminate\Http\Client\Events\ResponseReceived;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
@@ -23,6 +28,9 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->refuseDebugOnPublicHosts();
+
+        // One per request: it remembers whether an exception already wrote this request's row.
+        $this->app->scoped(ApiErrorLogger::class);
     }
 
     /**
@@ -37,6 +45,11 @@ class AppServiceProvider extends ServiceProvider
 
         // Sanctum names the token just before it moves `last_used_at`: the old value says whether today was seen.
         Event::listen(fn (TokenAuthenticated $event) => Presence::remember($event));
+
+        // The Loglar page: failed calls to Firebase, Google and Apple, and API errors.
+        Event::listen(ResponseReceived::class, [ExternalCallLogger::class, 'received']);
+        Event::listen(ConnectionFailed::class, [ExternalCallLogger::class, 'failed']);
+        Event::listen(RequestHandled::class, [ApiErrorLogger::class, 'handled']);
     }
 
     /**
@@ -124,6 +137,10 @@ class AppServiceProvider extends ServiceProvider
             ->by($request->user()?->getAuthIdentifier() ?? $request->ip()));
 
         RateLimiter::for('push-token', fn (Request $request) => Limit::perMinute(20)
+            ->by($request->user()?->getAuthIdentifier() ?? $request->ip()));
+
+        // What a phone sends in for the Loglar page (`POST /me/logs`).
+        RateLimiter::for('app-logs', fn (Request $request) => Limit::perMinute(10)
             ->by($request->user()?->getAuthIdentifier() ?? $request->ip()));
 
         RateLimiter::for('reads', fn (Request $request) => Limit::perMinute(60)

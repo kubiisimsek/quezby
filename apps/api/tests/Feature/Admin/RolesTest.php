@@ -45,6 +45,8 @@ function adminRouteRoles(): array
         'GET content' => 'viewer',
         'POST runs/{run}/approve' => 'moderator',
         'POST runs/{run}/reject' => 'moderator',
+        'GET logs' => 'moderator',
+        'GET logs/summary' => 'moderator',
         'POST players/{player}/delete' => 'owner',
         'POST players/{player}/rating' => 'owner',
         'GET admins' => 'owner',

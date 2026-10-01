@@ -22,6 +22,7 @@ import {
   usePushEvents,
   usePushRegistration,
 } from '@/hooks/usePush';
+import { pendingAppLogs, resetAppLogs } from '@/lib/appLog';
 import { NUDGE_REST_MS, usePush } from '@/stores/push';
 import { buildMe } from '@/test/factories';
 import { createTestQueryClient } from '@/test/renderWithProviders';
@@ -53,6 +54,7 @@ function resetPush() {
 beforeEach(async () => {
   jest.clearAllMocks();
   await AsyncStorage.clear();
+  resetAppLogs();
   resetPush();
   jest.mocked(getApps).mockReturnValue([{ name: '[DEFAULT]' } as ReactNativeFirebase.FirebaseApp]);
   mocked.me.registerPushToken.mockResolvedValue(undefined);
@@ -108,6 +110,19 @@ describe('usePushRegistration', () => {
 
     expect(mocked.me.registerPushToken).toHaveBeenCalledWith({ token: 'fcm-token', platform: 'ios' });
     expect(usePush.getState().token).toBe('fcm-token');
+  });
+
+  it('keeps a token the API would not take for the Loglar page', async () => {
+    jest.mocked(hasPermission).mockResolvedValue(1);
+    mocked.me.registerPushToken.mockRejectedValue(new Error('The API answered 500.'));
+
+    await renderHook(() => usePushRegistration());
+    await settle();
+
+    expect(usePush.getState().token).toBeNull();
+    expect(pendingAppLogs()).toEqual([
+      expect.objectContaining({ level: 'error', event: 'push.register', message: 'The API answered 500.' }),
+    ]);
   });
 
   it('hands nothing over before the player said yes', async () => {

@@ -3,6 +3,7 @@ import type {
   AnalyticsVisitsResponse,
   AndroidIntegrityRequest,
   AppConfigResponse,
+  AppLogRequest,
   AppleLinkRequest,
   AppleSignInRequest,
   AuthResponse,
@@ -65,9 +66,9 @@ import type {
   UserSettings,
   VerifyEmailRequest,
 } from '@quezby/types';
-import { createRequest } from './http';
+import { createRequest, type UnreachedRequest } from './http';
 
-export { ApiError, type RequestOptions } from './http';
+export { ApiError, type RequestOptions, type UnreachedRequest } from './http';
 
 /**
  * The phone the app runs on, as every call tells the API (`X-Device`): the
@@ -106,6 +107,8 @@ export type ApiClientOptions = {
   getToken?: () => string | null;
   /** Called on any 401 from an authenticated request. */
   onUnauthorized?: () => void;
+  /** Called when a request never got an answer — no network, or past the deadline. */
+  onUnreached?: (failure: UnreachedRequest) => void;
   /** Hard deadline per request. A dead network must not hang a screen. */
   timeoutMs?: number;
   /** Sent as `X-App-Version` so the API can tell builds apart. */
@@ -264,6 +267,8 @@ export function createApiClient({ device, ...options }: ApiClientOptions) {
       /** This phone takes no more of the player's pushes — before signing out. */
       unregisterPushToken: (token: string) =>
         request<void>('/me/push-token', { method: 'DELETE', body: { token } }),
+      /** Errors the app swallowed, for the admin panel's Loglar page. */
+      sendLogs: (input: AppLogRequest) => request<void>('/me/logs', { method: 'POST', body: input }),
       /** The player's friends, the one last heard from first; fifty a page. */
       friends: (cursor?: string) =>
         request<FriendsResponse>('/me/friends', { query: { cursor } }),

@@ -710,6 +710,87 @@ export type AdminAuditQuery = AdminPageQuery & {
   subjectId?: string;
 };
 
+/* ---------------------------------------------------------------- logs -- */
+
+export type AdminLogLevel = 'error' | 'warning' | 'info';
+
+/**
+ * Where a row comes from: `api` — an API answer of 400 or more (not a 401 or
+ * a 404) or an exception; `external` — a failed call to Firebase, Google or
+ * Apple; `push` — what a push did, sent or why not; `app` — an error a phone
+ * sent in (`POST /me/logs`).
+ */
+export type AdminLogSource = 'api' | 'external' | 'push' | 'app';
+
+export type AdminLogEntry = {
+  id: number;
+  at: string;
+  level: AdminLogLevel;
+  source: AdminLogSource;
+  /**
+   * `validation_failed`, `exception` (api); `firebase`, `google_oauth`,
+   * `google_keys`, `play_integrity`, `apple` or a host (external);
+   * `push.sent`, `push.no_device`, `push.muted`, `push.disabled`,
+   * `push.not_configured`, `push.no_access_token`, `push.token_dropped`
+   * (push); whatever the phone named it (app).
+   */
+  event: string;
+  message: string;
+  status: number | null;
+  method: string | null;
+  /** The API's path, or an outside call's host and path — never a query string. */
+  path: string | null;
+  durationMs: number | null;
+  /** Who asked, or whom a push was for; `username` is null once the account is gone. */
+  player: { id: string; username: string | null } | null;
+  platform: string | null;
+  appVersion: string | null;
+  /** What else is known: a service's answer, validation fields, a stack's first frames — secrets hidden. */
+  context: Record<string, unknown> | null;
+};
+
+export type AdminLogsQuery = AdminPageQuery & {
+  level?: AdminLogLevel;
+  source?: AdminLogSource;
+  event?: string;
+  /** A player id. */
+  player?: string;
+  status?: number;
+};
+
+/**
+ * `GET /admin/logs` (moderator): rows newest first, kept by level — an error
+ * 90 days, a warning 14, an info 3 (`quezby.logs.keep_days`). Paged without a
+ * total (the table can hold millions): `hasMore` says whether a next page is
+ * there.
+ */
+export type AdminLogsResponse = {
+  items: AdminLogEntry[];
+  page: number;
+  perPage: number;
+  hasMore: boolean;
+  /** The events of the days rows are kept — of the source asked for, when one is. */
+  events: string[];
+};
+
+/** `30d`: a bucket a day for thirty days; `12m`: a bucket a month for twelve. */
+export type AdminLogRange = '30d' | '12m';
+
+export type AdminLogCounts = { error: number; warning: number; info: number };
+
+/**
+ * `GET /admin/logs/summary?range=` (moderator): what the daily counts
+ * (`system_log_days`, kept for good, dropped rows counted too) say.
+ */
+export type AdminLogSummary = {
+  range: AdminLogRange;
+  /** Oldest first; `key` is `2026-10-01` by day, `2026-10` by month — the game's days. */
+  buckets: Array<{ key: string } & AdminLogCounts>;
+  totals: AdminLogCounts;
+  /** The twenty events seen most in the range, the most first. */
+  top: Array<{ source: AdminLogSource; event: string; level: AdminLogLevel; total: number }>;
+};
+
 /* -------------------------------------------------------------- system -- */
 
 export type AdminSystem = {

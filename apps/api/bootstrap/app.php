@@ -6,6 +6,7 @@ use App\Http\Middleware\EnsureAdminRole;
 use App\Http\Middleware\RecordPresence;
 use App\Http\Middleware\RequireAppKey;
 use App\Http\Middleware\ResolveLocale;
+use App\Services\Logs\ApiErrorLogger;
 use Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -43,6 +44,9 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->dontReport(ApiException::class);
+
+        // Every reported exception is a row of the panel's Loglar page too.
+        $exceptions->report(fn (Throwable $e) => app(ApiErrorLogger::class)->exception($e));
 
         // An API only: every error, whatever threw it, in the contract's shape.
         $exceptions->shouldRenderJsonWhen(fn () => true);

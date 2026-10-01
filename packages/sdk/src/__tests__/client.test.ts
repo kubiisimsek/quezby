@@ -154,6 +154,38 @@ describe('createApiClient', () => {
     });
   });
 
+  it('says which request never reached the API, and which ran out of time', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        throw new TypeError('Network request failed');
+      }),
+    );
+    const onUnreached = vi.fn();
+    const api = createApiClient({ baseUrl: 'http://x', getToken: () => 't', onUnreached });
+
+    await expect(api.me.inbox()).rejects.toMatchObject({ code: 'network' });
+    expect(onUnreached).toHaveBeenCalledWith({ method: 'GET', path: '/me/inbox', code: 'network' });
+
+    vi.useFakeTimers();
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        (_url: string, init: RequestInit) =>
+          new Promise((_resolve, reject) => {
+            init.signal?.addEventListener('abort', () => reject(new Error('aborted')));
+          }),
+      ),
+    );
+    const slow = createApiClient({ baseUrl: 'http://x', getToken: () => 't', onUnreached, timeoutMs: 50 });
+    const pending = slow.me.sendLogs({ entries: [{ level: 'info', event: 'a', message: 'b' }] });
+    const settled = expect(pending).rejects.toMatchObject({ code: 'timeout' });
+    await vi.advanceTimersByTimeAsync(60);
+    await settled;
+    vi.useRealTimers();
+    expect(onUnreached).toHaveBeenLastCalledWith({ method: 'POST', path: '/me/logs', code: 'timeout' });
+  });
+
   it('returns nothing for a 204', async () => {
     vi.stubGlobal('fetch', respond(204));
     const api = createApiClient({ baseUrl: 'http://x', getToken: () => 't' });

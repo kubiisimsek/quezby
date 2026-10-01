@@ -1124,11 +1124,84 @@ gone (`defer()` — no queue, no cron):
   (`scope firebase.messaging`), traded at `oauth2.googleapis.com` and kept
   about 50 minutes (dropped on a 401). A token FCM calls gone — 404,
   `UNREGISTERED`, or an invalid `message.token` — is deleted; any other
-  refusal is logged ("Firebase refused a push.").
+  refusal is logged ("Firebase refused a push.") and is a row of the admin
+  panel's Loglar page with what Firebase said (*Logs* below).
+- Every decision is a row of the Loglar page (source `push`, about the
+  player the push was for): `push.sent`, `push.no_device` (the player has no
+  phone registered — it never allowed notifications, or its token never
+  reached the API), `push.muted` (the player turned that kind off),
+  `push.disabled`, `push.not_configured`, `push.no_access_token`,
+  `push.token_dropped`; a phone registering (`PUT /me/push-token`) a new
+  token, or one that moved account, platform or app version, is
+  `push.registered`. Tokens never reach a row — only their last eight
+  characters (`…a1b2c3d4`).
 - Nothing is sent, and nothing breaks, until `QUEZBY_PUSH_ENABLED`,
   `FIREBASE_PROJECT_ID` and a readable `FIREBASE_CREDENTIALS` are all set; the
   admin panel's Sistem page says whether they are. Setup:
   `docs/development/push-setup.md`.
+
+## Logs
+
+### `POST /me/logs`
+
+`AppLogRequest` `{ "entries": AppLogEntry[] }` → `204`. Errors the app
+swallowed, for the admin panel's Loglar page (`GET /admin/logs`), as rows of
+source `app` under the player: 1–20 entries (`logs.app_batch`), each
+`{ level: "error"|"warning"|"info", event, message, context?, at? }` —
+`event` dotted lower-case (≤ 40), `message` ≤ 500, `context` flat (≤ 20 keys
+of short scalars), `at` the phone's clock. No other key is taken
+(`422 validation_failed`). Ten calls a minute (`app-logs`); the platform and
+version come from `X-Device` and `X-App-Version`.
+
+What the app sends (`apps/mobile/src/lib/appLog.ts`): `push.token` (Firebase
+gave no token), `push.register` (the API never took it), `push.permission`,
+`push.unavailable` (a build without Firebase's files), `api.unreachable` and
+`api.timeout` (a request that never got an answer — not for `/me/logs`
+itself), `crash` (a JavaScript error that reached React Native's handler,
+with the stack's first lines). The phone keeps at most 50, the same event and
+message once in ten minutes, until a player is signed in; an answer of 4xx
+(not 429) drops the batch.
+
+### What else the API keeps
+
+Two tables, read only through `GET /admin/logs` and `GET /admin/logs/summary`
+(`SystemLogger`), so the logs stay the same size however long the game runs:
+
+- **`system_logs`** — every row in full, kept by level: an `error`
+  `QUEZBY_LOG_KEEP_ERROR_DAYS` (90) days, a `warning`
+  `QUEZBY_LOG_KEEP_WARNING_DAYS` (14), an `info` `QUEZBY_LOG_KEEP_INFO_DAYS`
+  (3). One write in a hundred takes up to a thousand rows of each level past
+  their days. Each level has its own budget a minute (`logs.per_minute`:
+  600 errors, 300 warnings, 300 infos); past it the rest of that minute is not
+  written — so a flood of pushes never drops an error.
+- **`system_log_days`** — one row per game day (`quezby.leaderboard.timezone`),
+  source, event and level with how many, every row counted — the dropped ones
+  too. Kept for good: a few dozen rows a day whatever the traffic (some 25 MB
+  in ten years).
+
+What each source holds:
+
+- **`api`** — every answer of 400 or more but a 401 or a 404/405: the
+  method, the path (never the query), the player, the error's `code` and
+  `message`, a validation error's `fields` (never what was sent), how long it
+  took; a 429 is `info`, other 4xx `warning`, 5xx `error`. Every reported
+  exception is one row of its own (`exception`, with the file and line and
+  the API's first frames) — a 500 from it is not counted twice.
+- **`external`** — every call to Firebase (`firebase`), Google
+  (`google_oauth`, `google_keys`, `play_integrity`) or Apple (`apple`) that
+  answers 400 or more or never answers: the host and path, the status, what
+  the service said (its JSON or the start of its text). What was sent is never
+  kept.
+- **`push`** — above, *Push*. `push.registered` only when something changed
+  (`context.change`: `new`, `account`, `platform`, `version`), not on every
+  launch that sends the same token again.
+- **`app`** — above.
+
+Keys that name a secret (`token`, `access_token`, `password`,
+`private_key`, `authorization`…) keep only `[gizli]`, at any depth; strings
+are cut to 1,000 characters and a row's context to 8 KB. A deleted account's
+rows go with it. Laravel keeps writing its own lines to
+`storage/logs/laravel.log`.
 
 ## Ops (no SSH on shared hosting)
 

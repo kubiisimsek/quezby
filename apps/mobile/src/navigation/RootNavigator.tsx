@@ -7,6 +7,7 @@ import { ActivityIndicator, Linking, StatusBar, StyleSheet } from 'react-native'
 import { track, trackScreen } from '@/analytics/track';
 import { useSession } from '@/auth/session';
 import { useAnalytics } from '@/hooks/useAnalytics';
+import { useAppLogs } from '@/hooks/useAppLogs';
 import { useAppStatus } from '@/hooks/useAppStatus';
 import { useConsentSync } from '@/hooks/useConsentSync';
 import { useDeviceCheck } from '@/hooks/useDeviceCheck';
@@ -119,6 +120,7 @@ export function RootNavigator() {
   useAnalytics();
   usePushRegistration();
   usePushEvents();
+  useAppLogs();
   const notice = usePush((state) => state.notice);
   const opened = usePush((state) => state.opened);
   /** The navigator has mounted: a tapped notification can be opened. */

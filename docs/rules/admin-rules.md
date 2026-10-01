@@ -36,6 +36,13 @@
 - **A report never names its reporter.** The game promises it ("kimin
   bildirdiği söylenmez"): `AdminReportRow` carries none, and the panel asks
   for none.
+- **Logs keep no secrets and judge nothing.** The Loglar page
+  (`GET /logs`, moderator and up) shows `system_logs` as `SystemLogger` wrote
+  them; a key that names a secret keeps only `[gizli]`, a request's body is
+  never kept, and a push token only by its last eight characters. Reading the
+  logs changes nothing, so it is not audited. The list is paged without a
+  total (`hasMore`); history is read from the daily counts
+  (`GET /logs/summary`), never by counting `system_logs`.
 - Secrets never reach the bundle. `VITE_*` values are public; only
   `VITE_API_ORIGIN` exists, and `scripts/package-admin.mjs` refuses a build
   with any other. The system page shows whether a token is set, never its value.

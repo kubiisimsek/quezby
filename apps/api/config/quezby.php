@@ -490,6 +490,41 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | The panel's Loglar page (`SystemLogger`)
+    |--------------------------------------------------------------------------
+    |
+    | Failed calls to Firebase, Google and Apple, API errors (not a 401 or a
+    | 404), every push decision and the errors phones send in. Two layers, so
+    | the table stays the same size however long the game runs:
+    |
+    | - `system_logs`, every row in full, kept by level (`keep_days`): an
+    |   error for months, a warning for two weeks, a push that went fine for
+    |   days. Old rows go, a batch at a time, on one write in `prune_odds`.
+    | - `system_log_days`, one row per day, source, event and level with how
+    |   many — kept for good, a few dozen rows a day whatever the traffic.
+    |
+    | Past `per_minute` rows of a level in a minute, the rest of that minute
+    | is dropped from `system_logs` (still counted in `system_log_days`), each
+    | level on its own budget so a flood of pushes never drops an error.
+    | storage/logs/laravel*.log keeps getting Laravel's own lines.
+    |
+    */
+
+    'logs' => [
+        'keep_days' => [
+            'error' => (int) env('QUEZBY_LOG_KEEP_ERROR_DAYS', 90),
+            'warning' => (int) env('QUEZBY_LOG_KEEP_WARNING_DAYS', 14),
+            'info' => (int) env('QUEZBY_LOG_KEEP_INFO_DAYS', 3),
+        ],
+        'per_minute' => ['error' => 600, 'warning' => 300, 'info' => 300],
+        'prune_odds' => 100,
+        'prune_batch' => 1000,
+        // What a phone may send in one `POST /me/logs`.
+        'app_batch' => 20,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Usage analytics and the device registry
     |--------------------------------------------------------------------------
     |

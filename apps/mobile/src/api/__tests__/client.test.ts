@@ -1,6 +1,7 @@
 import { api } from '@/api/client';
 import { installId, useSession } from '@/auth/session';
 import { useLanguage } from '@/i18n/language';
+import { pendingAppLogs, resetAppLogs } from '@/lib/appLog';
 
 describe('api', () => {
   const fetchMock = jest.fn(async () => new Response(JSON.stringify({ user: {}, ranks: {} }), { status: 200 }));
@@ -31,5 +32,21 @@ describe('api', () => {
     const headers = fetchMock.mock.calls.map((call) => (call as unknown as [string, RequestInit])[1].headers);
     expect(headers[0]).toMatchObject({ 'Accept-Language': 'tr' });
     expect(headers[1]).toMatchObject({ 'Accept-Language': 'ar' });
+  });
+
+  it('keeps a request that never reached the API for the Loglar page — but not the logs’ own', async () => {
+    resetAppLogs();
+    globalThis.fetch = jest.fn(async () => {
+      throw new TypeError('Network request failed');
+    }) as unknown as typeof fetch;
+
+    await expect(api.me.inbox()).rejects.toMatchObject({ code: 'network' });
+    await expect(api.me.sendLogs({ entries: [{ level: 'info', event: 'a', message: 'b' }] })).rejects.toMatchObject({
+      code: 'network',
+    });
+
+    expect(pendingAppLogs()).toEqual([
+      expect.objectContaining({ level: 'warning', event: 'api.unreachable', message: 'GET /me/inbox' }),
+    ]);
   });
 });

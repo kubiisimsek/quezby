@@ -24,6 +24,7 @@ import {
   pushPermission,
   pushToken,
 } from '@/lib/push';
+import { pendingAppLogs, resetAppLogs } from '@/lib/appLog';
 
 const apps = jest.mocked(getApps);
 
@@ -35,6 +36,7 @@ function withFirebase() {
 describe('push, in a build without Firebase', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    resetAppLogs();
     apps.mockReturnValue([]);
   });
 
@@ -50,12 +52,15 @@ describe('push, in a build without Firebase', () => {
     expect(onMessage).not.toHaveBeenCalled();
     expect(requestPermission).not.toHaveBeenCalled();
     expect(deleteToken).not.toHaveBeenCalled();
+    // Said once for the Loglar page, however often it is asked.
+    expect(pendingAppLogs().map((entry) => [entry.level, entry.event])).toEqual([['warning', 'push.unavailable']]);
   });
 });
 
 describe('push, with Firebase', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    resetAppLogs();
     withFirebase();
   });
 
@@ -93,9 +98,29 @@ describe('push, with Firebase', () => {
   });
 
   it('has no token when Firebase cannot give one', async () => {
-    jest.mocked(getToken).mockRejectedValueOnce(new Error('no APNs token'));
+    jest.mocked(getToken).mockRejectedValueOnce(
+      Object.assign(new Error('No APNS token specified before fetching FCM Token'), { code: 'messaging/unknown' }),
+    );
 
     expect(await pushToken()).toBeNull();
+    // The API would never hear of it: the phone keeps it for the Loglar page.
+    expect(pendingAppLogs()).toEqual([
+      expect.objectContaining({
+        level: 'error',
+        event: 'push.token',
+        message: 'No APNS token specified before fetching FCM Token',
+        context: { code: 'messaging/unknown' },
+      }),
+    ]);
+  });
+
+  it('keeps a failed question for the Loglar page too', async () => {
+    jest.mocked(requestPermission).mockRejectedValueOnce(new Error('denied by policy'));
+
+    expect(await askPushPermission()).toBe('unavailable');
+    expect(pendingAppLogs()).toEqual([
+      expect.objectContaining({ event: 'push.permission', message: 'denied by policy', context: { asked: true } }),
+    ]);
   });
 
   it('shows a notification that comes while the game is open, with what a tap opens', () => {

@@ -17,6 +17,10 @@ import type {
   AdminCreateRequest,
   AdminDeletePlayerRequest,
   AdminLoginRequest,
+  AdminLogRange,
+  AdminLogsQuery,
+  AdminLogsResponse,
+  AdminLogSummary,
   AdminMeResponse,
   AdminOverview,
   AdminPage,
@@ -150,6 +154,10 @@ export function createAdminClient(options: AdminClientOptions) {
     audit: {
       list: (query: AdminAuditQuery = {}) =>
         request<AdminPage<AdminAuditEntry>>('/audit', { query }),
+    },
+    logs: {
+      list: (query: AdminLogsQuery = {}) => request<AdminLogsResponse>('/logs', { query }),
+      summary: (range: AdminLogRange = '30d') => request<AdminLogSummary>('/logs/summary', { query: { range } }),
     },
     admins: {
       list: () => request<AdminAccountsResponse>('/admins'),

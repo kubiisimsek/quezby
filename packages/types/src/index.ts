@@ -825,6 +825,29 @@ export type ReportRequest = { reason: ReportReason };
 /** `PUT` / `DELETE /me/push-token` → `204`: the phone's Firebase Cloud Messaging token. */
 export type PushTokenRequest = { token: string; platform: Platform };
 
+/** How bad a log row is — the admin panel's Loglar page. */
+export type LogLevel = 'error' | 'warning' | 'info';
+
+/**
+ * An error the app swallowed, for the admin panel's Loglar page: a push
+ * token Firebase would not give, a request that never reached the API, a
+ * crash. `event` is dotted lower-case (`push.token`); `context` is flat, at
+ * most twenty short values, and never holds a secret — the API hides any
+ * `token`, `password` or key there anyway.
+ */
+export type AppLogEntry = {
+  level: LogLevel;
+  event: string;
+  /** At most 500 characters. */
+  message: string;
+  context?: Record<string, string | number | boolean | null>;
+  /** When it happened, by the phone's clock. */
+  at?: string;
+};
+
+/** `POST /me/logs` → `204`: at most twenty entries at once, ten calls a minute. */
+export type AppLogRequest = { entries: AppLogEntry[] };
+
 /**
  * What a push tells a phone besides its words: which kind of news, the friend
  * it is about and — for a VS — which one. Tapping it opens that conversation.

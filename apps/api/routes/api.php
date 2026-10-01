@@ -4,6 +4,7 @@ use App\Enums\LeaderboardPeriod;
 use App\Http\Controllers\Admin;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AppConfigController;
+use App\Http\Controllers\AppLogController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AvatarController;
 use App\Http\Controllers\BlockController;
@@ -81,6 +82,7 @@ Route::prefix('v1')->group(function () {
             Route::put('me/avatar', [AvatarController::class, 'update'])->middleware('throttle:avatar');
             Route::put('me/push-token', [PushTokenController::class, 'store'])->middleware('throttle:push-token');
             Route::delete('me/push-token', [PushTokenController::class, 'destroy'])->middleware('throttle:push-token');
+            Route::post('me/logs', AppLogController::class)->middleware('throttle:app-logs');
             Route::delete('me/avatar', [AvatarController::class, 'destroy'])->middleware('throttle:avatar');
             Route::get('me/runs', [RunHistoryController::class, 'index'])->middleware('throttle:reads');
             Route::get('me/runs/{runId}', [RunHistoryController::class, 'show'])->middleware('throttle:reads');
@@ -170,6 +172,8 @@ Route::prefix('v1')->group(function () {
             });
 
             Route::middleware('admin.role:moderator')->group(function () {
+                Route::get('logs', [Admin\LogController::class, 'index'])->name('logs.index');
+                Route::get('logs/summary', [Admin\LogController::class, 'summary'])->name('logs.summary');
                 Route::post('players/{player}/ban', [Admin\PlayerActionController::class, 'ban'])->whereUlid('player')->name('players.ban');
                 Route::post('players/{player}/unban', [Admin\PlayerActionController::class, 'unban'])->whereUlid('player')->name('players.unban');
                 Route::post('players/{player}/rename', [Admin\PlayerActionController::class, 'rename'])->whereUlid('player')->name('players.rename');

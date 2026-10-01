@@ -13,6 +13,13 @@ describe('the menu', () => {
     }
   });
 
+  it('shows the logs to owners and moderators, never to a viewer', () => {
+    expect(navFor('owner').map((item) => item.href)).toContain('/logs');
+    expect(navFor('moderator').map((item) => item.href)).toContain('/logs');
+    expect(navFor('viewer').map((item) => item.href)).not.toContain('/logs');
+    expect(NAV.find((item) => item.href === '/logs')).toMatchObject({ label: 'Loglar', section: 'Yönetim' });
+  });
+
   it('shows every role the reports, and badges what waits by the API\'s counts', () => {
     for (const role of ['owner', 'moderator', 'viewer'] as const) {
       expect(navFor(role).map((item) => item.href)).toContain('/reports');

@@ -17,6 +17,8 @@ import {
 import type { PushData } from '@quezby/types';
 import { PermissionsAndroid, Platform } from 'react-native';
 
+import { logApp, logAppError } from '@/lib/appLog';
+
 /**
  * Push notifications through Firebase Cloud Messaging — the only thing the
  * app uses Firebase for. A build without Firebase's files
@@ -42,8 +44,11 @@ export type PushNotice = { title: string; body: string; data: PushData | null };
 
 function messaging(): Messaging | null {
   try {
-    return getApps().length > 0 ? getMessaging() : null;
-  } catch {
+    if (getApps().length > 0) return getMessaging();
+    logApp('warning', 'push.unavailable', 'No Firebase app in this build (GoogleService-Info.plist / google-services.json missing).');
+    return null;
+  } catch (error) {
+    logAppError('push.unavailable', error);
     return null;
   }
 }
@@ -79,7 +84,8 @@ export async function pushPermission(): Promise<PushPermission> {
       return granted ? 'granted' : 'undetermined';
     }
     return fromStatus(await hasPermission(instance));
-  } catch {
+  } catch (error) {
+    logAppError('push.permission', error, { asked: false });
     return 'unavailable';
   }
 }
@@ -105,7 +111,8 @@ export async function askPushPermission(): Promise<PushPermission> {
       );
     }
     return fromStatus(await requestPermission(instance));
-  } catch {
+  } catch (error) {
+    logAppError('push.permission', error, { asked: true });
     return 'unavailable';
   }
 }
@@ -121,7 +128,9 @@ export async function pushToken(): Promise<string | null> {
   try {
     await setAutoInitEnabled(instance, true);
     return await getToken(instance);
-  } catch {
+  } catch (error) {
+    // The one place a phone can fail to take pushes without anyone knowing: the API never hears of it.
+    logAppError('push.token', error);
     return null;
   }
 }

@@ -6,6 +6,8 @@ import type {
   AdminDeviceVerdict,
   AdminFunnelStep,
   AdminGesture,
+  AdminLogLevel,
+  AdminLogSource,
   AdminMilestone,
   AdminPostKind,
   AdminReportStatus,
@@ -268,6 +270,60 @@ export const AUDIT_ACTION: Record<AdminAuditAction, Label> = {
   'system.expire_runs': { tone: 'primary', label: 'Yarım turları kapattı' },
   'system.analytics_prune': { tone: 'primary', label: 'Analitiği temizledi' },
 };
+
+export const LOG_LEVEL: Record<AdminLogLevel, Label> = {
+  error: { tone: 'bad', label: 'Hata' },
+  warning: { tone: 'warn', label: 'Uyarı' },
+  info: { tone: 'neutral', label: 'Bilgi' },
+};
+
+export const LOG_SOURCE: Record<AdminLogSource, string> = {
+  api: 'API',
+  external: 'Dış servis',
+  push: 'Push',
+  app: 'Telefon',
+};
+
+/** What a log row's event means, by its source; an event the panel does not know shows as it is. */
+const LOG_EVENT: Record<AdminLogSource, Record<string, string>> = {
+  api: {
+    exception: 'Sunucu hatası',
+    server_error: 'Sunucu hatası',
+    validation_failed: 'Geçersiz istek',
+    too_many_requests: 'Çok fazla istek',
+    forbidden: 'Yetki yok',
+  },
+  external: {
+    firebase: 'Firebase',
+    google_oauth: 'Google erişim anahtarı',
+    google_keys: 'Google imza anahtarları',
+    play_integrity: 'Play Integrity',
+    apple: 'Apple',
+  },
+  push: {
+    'push.sent': 'Gönderildi',
+    'push.registered': 'Cihaz kaydedildi',
+    'push.no_device': 'Kayıtlı cihaz yok',
+    'push.muted': 'Oyuncu kapatmış',
+    'push.disabled': 'Push kapalı',
+    'push.not_configured': 'Firebase ayarlı değil',
+    'push.no_access_token': 'Google anahtar vermedi',
+    'push.token_dropped': 'Cihaz silindi',
+  },
+  app: {
+    'push.token': 'Push token alınamadı',
+    'push.register': 'Token API’ye gitmedi',
+    'push.permission': 'Bildirim izni okunamadı',
+    'push.unavailable': 'Bu sürümde Firebase yok',
+    'api.unreachable': 'API’ye ulaşılamadı',
+    'api.timeout': 'API geç kaldı',
+    crash: 'Çökme',
+  },
+};
+
+export function logEventLabel(source: AdminLogSource, event: string): string {
+  return LOG_EVENT[source][event] ?? event;
+}
 
 export const AUDIT_VIA: Record<AdminAuditVia, string> = {
   panel: 'Panel',

@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\PushToken;
+use App\Models\SystemLog;
 use App\Models\User;
 use App\Services\Push\PushService;
 use Illuminate\Http\Client\Request;
@@ -16,8 +17,9 @@ beforeEach(function () {
     config(['quezby.push.project_id' => 'quezby-test', 'quezby.push.credentials' => $path, 'quezby.push.enabled' => true]);
     // What Firebase answers a push; a test may change it.
     $this->fcmAnswer = fn () => Http::response(['name' => 'projects/quezby-test/messages/1']);
+    $this->oauthAnswer = fn () => Http::response(['access_token' => 'fcm-token', 'expires_in' => 3600]);
     Http::fake([
-        'oauth2.googleapis.com/*' => Http::response(['access_token' => 'fcm-token', 'expires_in' => 3600]),
+        'oauth2.googleapis.com/*' => fn () => ($this->oauthAnswer)(),
         'fcm.googleapis.com/*' => fn () => ($this->fcmAnswer)(),
     ]);
 });
@@ -171,4 +173,116 @@ test('push tokens need a player, and are throttled', function () {
         $this->putJson('/api/v1/me/push-token', ['token' => pushToken(), 'platform' => 'ios'])->assertNoContent();
     }
     $this->assertApiError($this->putJson('/api/v1/me/push-token', ['token' => pushToken(), 'platform' => 'ios']), 429, 'too_many_requests');
+});
+
+/** @return list<array{event: string, level: string, user: string|null, platform: string|null}> */
+function pushLogs(): array
+{
+    return SystemLog::query()->where('source', 'push')->orderBy('id')->get()
+        ->map(fn (SystemLog $row) => ['event' => $row->event, 'level' => $row->level->value, 'user' => $row->user_id, 'platform' => $row->platform])
+        ->all();
+}
+
+test('every push decision is on the Loglar page, under the player it was for', function () {
+    $ayse = User::factory()->withUsername('ayse')->create();
+    PushToken::query()->create(['user_id' => $ayse->id, 'token' => pushToken(), 'platform' => 'android', 'app_version' => '1.0.0']);
+    $deniz = User::factory()->withUsername('deniz')->create();
+    $sessiz = User::factory()->withUsername('sessiz')->create(['settings' => ['haptics' => true, 'pushFriends' => false]]);
+
+    $this->signIn(User::factory()->withUsername('ben')->create());
+    $this->putJson('/api/v1/users/ayse/friend')->assertOk();
+    $this->putJson('/api/v1/users/deniz/friend')->assertOk();
+    $this->putJson('/api/v1/users/sessiz/friend')->assertOk();
+
+    expect(pushLogs())->toBe([
+        ['event' => 'push.sent', 'level' => 'info', 'user' => $ayse->id, 'platform' => 'android'],
+        ['event' => 'push.no_device', 'level' => 'warning', 'user' => $deniz->id, 'platform' => null],
+        ['event' => 'push.muted', 'level' => 'info', 'user' => $sessiz->id, 'platform' => null],
+    ]);
+    $sent = SystemLog::query()->where('event', 'push.sent')->sole();
+    expect($sent->context)->toBe(['to' => '@ayse', 'kind' => 'friend_request', 'device' => '…aaaaaaaa', 'appVersion' => '1.0.0'])
+        ->and(json_encode($sent->context))->not->toContain(pushToken());
+});
+
+test('a push Firebase refuses is on the Loglar page with what Firebase said', function () {
+    $this->fcmAnswer = fn () => Http::response(['error' => ['code' => 403, 'status' => 'PERMISSION_DENIED', 'message' => 'Permission denied.']], 403);
+    $ayse = User::factory()->withUsername('ayse')->create();
+    PushToken::query()->create(['user_id' => $ayse->id, 'token' => pushToken(), 'platform' => 'ios']);
+
+    $this->signIn();
+    $this->putJson('/api/v1/users/ayse/friend')->assertOk();
+
+    $row = SystemLog::query()->where('source', 'external')->sole();
+    expect($row->event)->toBe('firebase')
+        ->and($row->level->value)->toBe('error')
+        ->and($row->status)->toBe(403)
+        ->and($row->message)->toBe('403 PERMISSION_DENIED: Permission denied.')
+        ->and($row->path)->toBe('fcm.googleapis.com/v1/projects/quezby-test/messages:send')
+        ->and($row->user_id)->toBe($ayse->id)
+        ->and($row->platform)->toBe('ios')
+        ->and($row->context['kind'])->toBe('friend_request')
+        ->and($row->context['device'])->toBe('…aaaaaaaa')
+        ->and(json_encode($row->context))->not->toContain(pushToken());
+    expect(pushLogs())->toBe([]);
+});
+
+test('a dropped token says so', function () {
+    $this->fcmAnswer = fn () => Http::response(['error' => ['status' => 'NOT_FOUND', 'details' => [['errorCode' => 'UNREGISTERED']]]], 404);
+    $ayse = User::factory()->withUsername('ayse')->create();
+    PushToken::query()->create(['user_id' => $ayse->id, 'token' => pushToken(), 'platform' => 'ios']);
+
+    $this->signIn();
+    $this->putJson('/api/v1/users/ayse/friend')->assertOk();
+
+    expect(pushLogs())->toBe([['event' => 'push.token_dropped', 'level' => 'warning', 'user' => $ayse->id, 'platform' => 'ios']]);
+});
+
+test('a missing key says so', function () {
+    config(['quezby.push.credentials' => null]);
+    $ayse = User::factory()->withUsername('ayse')->create();
+    PushToken::query()->create(['user_id' => $ayse->id, 'token' => pushToken(), 'platform' => 'ios']);
+
+    $this->signIn();
+    $this->putJson('/api/v1/users/ayse/friend')->assertOk();
+
+    expect(pushLogs())->toBe([['event' => 'push.not_configured', 'level' => 'error', 'user' => $ayse->id, 'platform' => null]]);
+});
+
+test('an access token Google will not give says so, with what Google said', function () {
+    $this->oauthAnswer = fn () => Http::response(['error' => 'invalid_grant', 'error_description' => 'Invalid JWT Signature.'], 400);
+    $ayse = User::factory()->withUsername('ayse')->create();
+    PushToken::query()->create(['user_id' => $ayse->id, 'token' => pushToken(), 'platform' => 'ios']);
+
+    $this->signIn();
+    $this->putJson('/api/v1/users/ayse/friend')->assertOk();
+
+    expect(pushLogs())->toBe([['event' => 'push.no_access_token', 'level' => 'error', 'user' => $ayse->id, 'platform' => null]]);
+    $google = SystemLog::query()->where('source', 'external')->sole();
+    expect($google->event)->toBe('google_oauth')
+        ->and($google->message)->toBe('400 invalid_grant: Invalid JWT Signature.')
+        ->and($google->path)->toBe('oauth2.googleapis.com/token');
+});
+
+test('a registered phone is on the Loglar page when something changed — not on every launch', function () {
+    $me = $this->signIn();
+    $register = fn (string $version) => $this->withHeaders(['X-App-Version' => $version])
+        ->putJson('/api/v1/me/push-token', ['token' => pushToken('z'), 'platform' => 'android'])
+        ->assertNoContent();
+
+    $register('1.0.4');
+    $register('1.0.4');
+    $register('1.0.5');
+    $other = $this->signIn();
+    $register('1.0.5');
+
+    $rows = SystemLog::query()->orderBy('id')->get();
+    expect($rows->map(fn (SystemLog $row) => [$row->context['change'], $row->user_id, $row->app_version])->all())->toBe([
+        ['new', $me->id, '1.0.4'],
+        ['version', $me->id, '1.0.5'],
+        ['account', $other->id, '1.0.5'],
+    ]);
+    expect($rows[0]->event)->toBe('push.registered')
+        ->and($rows[0]->platform)->toBe('android')
+        ->and($rows[0]->context['device'])->toBe('…zzzzzzzz')
+        ->and(json_encode($rows->pluck('context')))->not->toContain(pushToken('z'));
 });

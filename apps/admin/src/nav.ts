@@ -7,6 +7,7 @@ import {
   GalleryVerticalEnd,
   Gauge,
   LayoutDashboard,
+  Logs,
   ScrollText,
   Server,
   ShieldAlert,
@@ -46,6 +47,7 @@ export const NAV: NavItem[] = [
   { href: '/ratings', label: 'Reytingler', icon: Gauge, section: 'Oyun' },
   { href: '/content', label: 'İçerik', icon: GalleryVerticalEnd, section: 'Oyun' },
   { href: '/audit', label: 'Denetim kaydı', icon: ScrollText, section: 'Yönetim' },
+  { href: '/logs', label: 'Loglar', icon: Logs, section: 'Yönetim', least: 'moderator' },
   { href: '/admins', label: 'Yöneticiler', icon: UserCog, section: 'Yönetim', least: 'owner' },
   { href: '/system', label: 'Sistem', icon: Server, section: 'Yönetim', least: 'owner' },
 ];

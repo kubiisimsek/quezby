@@ -7,6 +7,9 @@ import type {
   AdminBoardRow,
   AdminCalibrationResponse,
   AdminContentResponse,
+  AdminLogEntry,
+  AdminLogsResponse,
+  AdminLogSummary,
   AdminOverview,
   AdminMe,
   AdminPage,
@@ -92,6 +95,52 @@ export function runRow(overrides: Partial<AdminRunRow> = {}): AdminRunRow {
     engineVersion: 2,
     startedAt: '2026-09-25T08:00:00.000Z',
     finishedAt: '2026-09-25T08:05:00.000Z',
+    ...overrides,
+  };
+}
+
+export function logEntry(overrides: Partial<AdminLogEntry> = {}): AdminLogEntry {
+  return {
+    id: 1,
+    at: '2026-10-01T09:00:00.000Z',
+    level: 'error',
+    source: 'external',
+    event: 'firebase',
+    message: '403 PERMISSION_DENIED: The caller does not have permission',
+    status: 403,
+    method: 'POST',
+    path: 'fcm.googleapis.com/v1/projects/quezby-staging/messages:send',
+    durationMs: 182,
+    player: { id: '01jplayer00000000000000000a', username: 'kerem.35' },
+    platform: 'ios',
+    appVersion: null,
+    context: { kind: 'vs_invite', device: '…a1b2c3d4', response: { error: { status: 'PERMISSION_DENIED' } } },
+    ...overrides,
+  };
+}
+
+export function logsPage(
+  items: AdminLogEntry[],
+  { events = ['firebase', 'push.no_device'], hasMore = false, page: at = 1 }: { events?: string[]; hasMore?: boolean; page?: number } = {},
+): AdminLogsResponse {
+  return { items, page: at, perPage: 25, hasMore, events };
+}
+
+export function logSummary(overrides: Partial<AdminLogSummary> = {}): AdminLogSummary {
+  return {
+    range: '30d',
+    buckets: Array.from({ length: 30 }, (_, index) => ({
+      key: `2026-09-${String(index + 2).padStart(2, '0')}`.replace('2026-09-31', '2026-10-01'),
+      error: index === 29 ? 3 : 0,
+      warning: index === 29 ? 5 : 1,
+      info: 12,
+    })),
+    totals: { error: 3, warning: 34, info: 360 },
+    top: [
+      { source: 'push', event: 'push.sent', level: 'info', total: 340 },
+      { source: 'push', event: 'push.no_device', level: 'warning', total: 30 },
+      { source: 'external', event: 'firebase', level: 'error', total: 3 },
+    ],
     ...overrides,
   };
 }

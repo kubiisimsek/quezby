@@ -23,7 +23,12 @@ export type HttpOptions = {
    * right now, which the API answers its messages and share texts in.
    */
   locale?: () => string | null;
+  /** Called when a request never got an answer — no network, or past the deadline. */
+  onUnreached?: (failure: UnreachedRequest) => void;
 };
+
+/** A request that never reached the API, or got no answer in time. */
+export type UnreachedRequest = { method: string; path: string; code: 'network' | 'timeout' };
 
 export class ApiError extends Error {
   constructor(
@@ -102,6 +107,8 @@ export function createRequest(options: HttpOptions) {
         signal: controller.signal,
       });
     } catch {
+      const code = expired ? 'timeout' : 'network';
+      options.onUnreached?.({ method, path, code });
       throw expired
         ? new ApiError(0, 'timeout', 'The request timed out.')
         : new ApiError(0, 'network', 'The API could not be reached.');
