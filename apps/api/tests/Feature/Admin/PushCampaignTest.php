@@ -61,7 +61,7 @@ test('counts the players a filter picks, those with a phone, and the phones', fu
     User::factory()->withUsername('telefonsuz')->create();
     campaignPlayer('yasakli', 'ios', ['banned_at' => now()]);
 
-    audienceOf([])->assertOk()->assertExactJson(['players' => 3, 'reachable' => 2, 'devices' => 3, 'ios' => 2, 'android' => 1]);
+    audienceOf([])->assertOk()->assertExactJson(['players' => 3, 'reachable' => 2, 'devices' => 3, 'ios' => 2, 'android' => 1, 'locales' => ['tr' => 3]]);
     audienceOf(['platform' => 'android'])->assertJsonPath('reachable', 1)->assertJsonPath('devices', 1);
     audienceOf(['username' => '@Deniz'])->assertJsonPath('players', 1)->assertJsonPath('devices', 2);
 });
@@ -116,7 +116,7 @@ test('sends a campaign a batch at a time, tallies what Firebase said, and is on 
     $this->rate(campaignPlayer('altin'), 2500);
     $this->fcmAnswers['fcm:'.str_pad('a2', 40, 'x')] = fn () => Http::response(['error' => ['status' => 'NOT_FOUND', 'details' => [['errorCode' => 'UNREGISTERED']]]], 404);
 
-    $created = $this->postJson('/api/v1/admin/push/campaigns', ['title' => 'Elmas', 'body' => 'Bu hafta çift qb!', 'filters' => ['tiers' => ['diamond'], 'username' => '']])
+    $created = $this->postJson('/api/v1/admin/push/campaigns', ['messages' => ['tr' => ['title' => 'Elmas', 'body' => 'Bu hafta çift qb!']], 'fallback' => 'tr', 'filters' => ['tiers' => ['diamond'], 'username' => '']])
         ->assertCreated()
         ->assertJsonPath('campaign.status', 'sending')
         ->assertJsonPath('campaign.players', 3)
@@ -144,18 +144,18 @@ test('sends a campaign a batch at a time, tallies what Firebase said, and is on 
     expect($entry->action)->toBe(AuditAction::PushCampaign)
         ->and($entry->admin_id)->toBe($owner->id)
         ->and($entry->subject_type)->toBe('system')
-        ->and($entry->details)->toMatchArray(['campaign' => $id, 'title' => 'Elmas', 'filters' => ['tiers' => ['diamond']], 'players' => 3, 'devices' => 3]);
+        ->and($entry->details)->toMatchArray(['campaign' => $id, 'messages' => ['tr' => ['title' => 'Elmas', 'body' => 'Bu hafta çift qb!']], 'fallback' => 'tr', 'filters' => ['tiers' => ['diamond']], 'players' => 3, 'devices' => 3]);
 
     $this->getJson('/api/v1/admin/push/campaigns')->assertOk()->assertJsonPath('campaigns.0.id', $id)->assertJsonPath('campaigns.0.status', 'done');
 });
 
 test('a campaign nobody can get is done at once; a stopped one sends no more', function () {
     $this->signInAdmin(AdminRole::Owner);
-    $this->postJson('/api/v1/admin/push/campaigns', ['title' => 'Q', 'body' => 'Kimse', 'filters' => ['tiers' => ['master']]])
+    $this->postJson('/api/v1/admin/push/campaigns', ['messages' => ['tr' => ['title' => 'Q', 'body' => 'Kimse']], 'fallback' => 'tr', 'filters' => ['tiers' => ['master']]])
         ->assertCreated()->assertJsonPath('campaign.status', 'done')->assertJsonPath('campaign.devices', 0);
 
     campaignPlayer('ayse');
-    $id = $this->postJson('/api/v1/admin/push/campaigns', ['title' => 'Q', 'body' => 'Herkes', 'filters' => []])->json('campaign.id');
+    $id = $this->postJson('/api/v1/admin/push/campaigns', ['messages' => ['tr' => ['title' => 'Q', 'body' => 'Herkes']], 'fallback' => 'tr', 'filters' => []])->json('campaign.id');
     $this->postJson("/api/v1/admin/push/campaigns/{$id}/stop")->assertOk()->assertJsonPath('campaign.status', 'stopped');
     $this->postJson("/api/v1/admin/push/campaigns/{$id}/step")->assertOk()->assertJsonPath('campaign.sent', 0);
 
@@ -166,7 +166,7 @@ test('a campaign nobody can get is done at once; a stopped one sends no more', f
 test('cron steps every campaign still going out', function () {
     $this->signInAdmin(AdminRole::Owner);
     campaignPlayer('ayse');
-    $this->postJson('/api/v1/admin/push/campaigns', ['title' => 'Q', 'body' => 'Herkes', 'filters' => []])->assertCreated();
+    $this->postJson('/api/v1/admin/push/campaigns', ['messages' => ['tr' => ['title' => 'Q', 'body' => 'Herkes']], 'fallback' => 'tr', 'filters' => []])->assertCreated();
 
     $this->artisan('quezby:push:campaigns')->assertSuccessful();
 
@@ -179,11 +179,49 @@ test('a campaign needs words and filters it knows', function (array $body) {
     $this->assertApiError($this->postJson('/api/v1/admin/push/campaigns', $body), 422, 'validation_failed');
     expect(PushCampaign::query()->count())->toBe(0);
 })->with([
-    'no words' => [['title' => 'Q', 'filters' => []]],
-    'no filters' => [['title' => 'Q', 'body' => 'b']],
-    'a long title' => [['title' => str_repeat('a', 61), 'body' => 'b', 'filters' => []]],
-    'an unknown league' => [['title' => 'Q', 'body' => 'b', 'filters' => ['tiers' => ['wood']]]],
-    'an unknown filter' => [['title' => 'Q', 'body' => 'b', 'filters' => ['rich' => true]]],
-    'a daily of its own' => [['title' => 'Q', 'body' => 'b', 'filters' => ['daily' => 'maybe']]],
-    'zero days' => [['title' => 'Q', 'body' => 'b', 'filters' => ['notPlayedForDays' => 0]]],
+    'no words' => [['fallback' => 'tr', 'filters' => []]],
+    'no filters' => [['messages' => ['tr' => ['title' => 'Q', 'body' => 'b']], 'fallback' => 'tr']],
+    'no fallback' => [['messages' => ['tr' => ['title' => 'Q', 'body' => 'b']], 'filters' => []]],
+    'a fallback with no words' => [['messages' => ['tr' => ['title' => 'Q', 'body' => 'b']], 'fallback' => 'en', 'filters' => []]],
+    'a language of its own' => [['messages' => ['xx' => ['title' => 'Q', 'body' => 'b']], 'fallback' => 'tr', 'filters' => []]],
+    'a language without words' => [['messages' => ['tr' => ['title' => 'Q', 'body' => 'b'], 'en' => ['title' => 'Q']], 'fallback' => 'tr', 'filters' => []]],
+    'a long title' => [['messages' => ['tr' => ['title' => str_repeat('a', 61), 'body' => 'b']], 'fallback' => 'tr', 'filters' => []]],
+    'an unknown league' => [['messages' => ['tr' => ['title' => 'Q', 'body' => 'b']], 'fallback' => 'tr', 'filters' => ['tiers' => ['wood']]]],
+    'an unknown filter' => [['messages' => ['tr' => ['title' => 'Q', 'body' => 'b']], 'fallback' => 'tr', 'filters' => ['rich' => true]]],
+    'zero days' => [['messages' => ['tr' => ['title' => 'Q', 'body' => 'b']], 'fallback' => 'tr', 'filters' => ['notPlayedForDays' => 0]]],
 ]);
+
+test('each player gets the words of their own language, the rest the fallback’s', function () {
+    $this->signInAdmin(AdminRole::Owner);
+    campaignPlayer('turk', 'ios', ['locale' => 'tr']);
+    campaignPlayer('ingiliz', 'android', ['locale' => 'en']);
+    campaignPlayer('alman', 'ios', ['locale' => 'de']);
+    campaignPlayer('japon', 'ios', ['locale' => 'ja']);
+
+    audienceOf([])->assertJsonPath('locales', ['de' => 1, 'en' => 1, 'ja' => 1, 'tr' => 1]);
+
+    $this->postJson('/api/v1/admin/push/campaigns', [
+        'messages' => [
+            'tr' => ['title' => 'Quezby', 'body' => 'Günün akışı seni bekliyor!'],
+            'en' => ['title' => 'Quezby', 'body' => 'Today’s feed is waiting!'],
+            'de' => ['title' => 'Quezby', 'body' => 'Der Feed des Tages wartet!'],
+        ],
+        'fallback' => 'en',
+        'filters' => [],
+    ])->assertCreated()
+        ->assertJsonPath('campaign.fallback', 'en')
+        ->assertJsonPath('campaign.messages.de.body', 'Der Feed des Tages wartet!');
+    $this->artisan('quezby:push:campaigns')->assertSuccessful();
+
+    $bodies = collect(Http::recorded())->map(fn (array $pair) => $pair[0])
+        ->filter(fn (Request $request) => str_contains($request->url(), 'fcm.googleapis.com'))
+        ->mapWithKeys(fn (Request $request) => [substr($request['message']['token'], 4, 6) => $request['message']['notification']['body']])
+        ->all();
+    expect($bodies)->toEqual([
+        'turkxx' => 'Günün akışı seni bekliyor!',
+        'ingili' => 'Today’s feed is waiting!',
+        'almanx' => 'Der Feed des Tages wartet!',
+        'japonx' => 'Today’s feed is waiting!',
+    ]);
+    expect(PushCampaign::query()->sole())->status->toBe('done')->sent->toBe(4);
+});

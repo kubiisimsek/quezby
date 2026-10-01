@@ -440,11 +440,16 @@ The Push bildirimi page: pushes to the players a filter picks.
   `notPlayedForDays` (never played counts), `joinedWithinDays`, `platform`,
   `locales`, `account` (`guest` / `registered`). An unknown key is a 422.
 - `POST /push/audience` `{ filters }` → `AdminPushAudience`
-  `{ players, reachable, devices, ios, android }`; changes nothing.
-- `POST /push/campaigns` `{ title (≤ 60), body (≤ 240), filters }` → `201
-  { campaign }`. Writes the campaign — status `sending`, or `done` at once
+  `{ players, reachable, devices, ios, android, locales }` — `locales`: the
+  phones by their player's language; changes nothing.
+- `POST /push/campaigns` `{ messages, fallback, filters }` → `201
+  { campaign }`. `messages`: the words in one language or more,
+  `{ "tr": { title (≤ 60), body (≤ 240) }, "en": … }` (the eight game
+  languages only); each player gets their account's language, a player whose
+  language has none gets `fallback`'s, which must be among `messages`. Writes the campaign — status `sending`, or `done` at once
   when no phone matches — and sends nothing yet. Audited as `push.campaign`
-  with the words, the filters and the counts.
+  with the words in every language, the fallback, the filters and the counts.
+  Each step sends one batch per language.
 - `POST /push/campaigns/{id}/step` → `{ campaign }`: the next
   `push.campaign_batch` (100) phones at once (`Http::pool`), after the last one
   done (`cursor`); `done` once fewer are left. One step at a time per campaign
@@ -454,7 +459,7 @@ The Push bildirimi page: pushes to the players a filter picks.
 - `POST /push/campaigns/{id}/stop` → `{ campaign }` `stopped`; audited as
   `push.campaign_stop`.
 - `GET /push/campaigns` → `{ campaigns }`, the latest twenty, newest first.
-  `AdminPushCampaign` `{ id, title, body, filters, status, players, devices,
+  `AdminPushCampaign` `{ id, messages, fallback, filters, status, players, devices,
   sent, failed, dropped, errors: [{ error, count }], admin, createdAt,
   finishedAt }` — `errors` what Firebase said, the most frequent first.
 - `data` is `{ kind: "admin" }`, which the app opens to nothing. A failed

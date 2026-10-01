@@ -182,10 +182,10 @@ const CALLS: Call[] = [
   { name: 'push.campaigns', call: (api) => api.push.campaigns(), method: 'GET', url: '/push/campaigns', auth: true },
   {
     name: 'push.send',
-    call: (api) => api.push.send({ title: 'Q', body: 'b', filters: {} }),
+    call: (api) => api.push.send({ messages: { tr: { title: 'Q', body: 'b' } }, fallback: 'tr', filters: {} }),
     method: 'POST',
     url: '/push/campaigns',
-    body: { title: 'Q', body: 'b', filters: {} },
+    body: { messages: { tr: { title: 'Q', body: 'b' } }, fallback: 'tr', filters: {} },
     auth: true,
   },
   { name: 'push.step', call: (api) => api.push.step(7), method: 'POST', url: '/push/campaigns/7/step', auth: true },

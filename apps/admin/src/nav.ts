@@ -43,7 +43,7 @@ export const NAV: NavItem[] = [
   { href: '/suspects', label: 'Şüpheliler', icon: ShieldAlert, section: 'Oyuncular', badge: 'review' },
   { href: '/reports', label: 'Bildirimler', icon: Flag, section: 'Oyuncular', badge: 'reports' },
   { href: '/runs', label: 'Turlar', icon: Gamepad2, section: 'Oyuncular' },
-  { href: '/push', label: 'Push bildirimi', icon: BellRing, section: 'Oyuncular', least: 'owner' },
+  { href: '/push', label: 'Push bildirimleri', icon: BellRing, section: 'Oyuncular', least: 'owner' },
   { href: '/boards', label: 'Sıralamalar', icon: Trophy, section: 'Oyun' },
   { href: '/daily', label: 'Günün akışı', icon: CalendarDays, section: 'Oyun' },
   { href: '/ratings', label: 'Reytingler', icon: Gauge, section: 'Oyun' },

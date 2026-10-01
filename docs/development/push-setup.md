@@ -328,8 +328,9 @@ Sunucuda `.env` her değiştiğinde `/ops/optimize` çalıştır.
 
 ## 7. Sorun giderme
 
-En hızlı deneme panelden: **Push bildirimi** (Sahip) → *Tek oyuncu*'ya
-oyuncunun adını yaz → mesaj → gönder. Alıcılar kartı oyuncunun push
+En hızlı deneme panelden: **Push bildirimleri → Yeni bildirim** (Sahip) →
+mesajı yaz → *Kime → Tek oyuncu*'ya oyuncunun adını yaz → *Önizle ve
+gönder*. Alıcılar kartı oyuncunun push
 alabilecek cihazı olup olmadığını hemen söyler (0 cihaz: token API'ye hiç
 ulaşmamış). Gönderilenler tablosunda *Firebase ne dedi* sütunu her hatayı
 sayısıyla gösterir: `UNAUTHENTICATED · THIRD_PARTY_AUTH_ERROR` (iOS'ta APNs

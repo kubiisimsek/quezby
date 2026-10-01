@@ -3,9 +3,11 @@
 namespace App\Services\Push;
 
 use App\Enums\AuditAction;
+use App\Enums\Locale;
 use App\Enums\LogLevel;
 use App\Enums\LogSource;
 use App\Models\PushCampaign;
+use App\Models\PushToken;
 use App\Services\Admin\AuditLog;
 use App\Services\Logs\SystemLogger;
 use App\Support\Actor;
@@ -15,7 +17,8 @@ use Illuminate\Support\Facades\Cache;
 
 /**
  * Pushes from the panel's Push bildirimi page to the players a filter picks
- * (`PushAudience`). Sending writes the campaign and sends nothing yet;
+ * (`PushAudience`), each in the player's own language — the words written
+ * for it, or the `fallback` language's when none were. Sending writes the campaign and sends nothing yet;
  * `step()` sends the next `push.campaign_batch` phones at once and moves the
  * cursor, until none are left. The open panel page steps it, and so does
  * `php artisan quezby:push-campaigns` from cron — one step at a time per
@@ -37,16 +40,17 @@ final class PushCampaigns
     ) {}
 
     /**
+     * @param  array<string, array{title: string, body: string}>  $messages  by language
      * @param  array<string, mixed>  $filters
      */
-    public function start(string $title, string $body, array $filters, Actor $actor): PushCampaign
+    public function start(array $messages, string $fallback, array $filters, Actor $actor): PushCampaign
     {
         $count = $this->audience->count($filters);
         $campaign = PushCampaign::query()->create([
             'admin_id' => $actor->admin?->id,
             'admin_name' => mb_substr($actor->label, 0, 64),
-            'title' => $title,
-            'body' => $body,
+            'messages' => $messages,
+            'fallback' => $fallback,
             'filters' => $filters,
             'status' => $count['devices'] === 0 ? PushCampaign::DONE : PushCampaign::SENDING,
             'players' => $count['reachable'],
@@ -60,14 +64,14 @@ final class PushCampaigns
 
         $this->audit->record($actor, AuditAction::PushCampaign, null, details: [
             'campaign' => $campaign->id,
-            'title' => $title,
-            'body' => $body,
+            'messages' => $messages,
+            'fallback' => $fallback,
             'filters' => $filters,
             'players' => $count['reachable'],
             'devices' => $count['devices'],
         ]);
         $this->logger->write(LogLevel::Info, LogSource::Push, 'push.campaign', "Kampanya #{$campaign->id} başladı: {$count['reachable']} oyuncu, {$count['devices']} cihaz.", [
-            'context' => ['campaign' => $campaign->id, 'title' => $title, 'filters' => $filters],
+            'context' => ['campaign' => $campaign->id, 'title' => $messages[$fallback]['title'], 'languages' => array_keys($messages), 'filters' => $filters],
         ]);
 
         return $campaign;
@@ -90,29 +94,19 @@ final class PushCampaigns
                 return $campaign;
             }
             $tokens = $this->audience->devices($campaign->filters)
-                ->where('id', '>', $campaign->cursor)
-                ->orderBy('id')
+                ->with('user:id,locale')
+                ->where('push_tokens.id', '>', $campaign->cursor)
+                ->orderBy('push_tokens.id')
                 ->limit($this->batch)
                 ->get();
 
             if ($tokens->isNotEmpty()) {
-                $cursor = (int) $tokens->max('id');
-                $sent = $this->push->send($tokens, $campaign->title, $campaign->body, ['kind' => 'admin'], 'quezby-admin', logEach: false);
-                if ($sent['problem'] !== null) {
-                    $campaign->forceFill([
-                        'failed' => $campaign->failed + $tokens->count(),
-                        'errors' => $this->tally($campaign->errors ?? [], array_fill(0, $tokens->count(), $sent['problem'])),
-                        'cursor' => $cursor,
-                    ]);
-                } else {
-                    $failures = array_values(array_filter($sent['results'], fn (array $result) => ! $result['ok']));
-                    $campaign->forceFill([
-                        'sent' => $campaign->sent + count($sent['results']) - count($failures),
-                        'failed' => $campaign->failed + count($failures),
-                        'dropped' => $campaign->dropped + count(array_filter($failures, fn (array $result) => $result['dropped'])),
-                        'errors' => $this->tally($campaign->errors ?? [], array_map(fn (array $result) => $result['error'] ?? 'status '.($result['status'] ?? '—'), $failures)),
-                        'cursor' => $cursor,
-                    ]);
+                $campaign->cursor = (int) $tokens->max('id');
+                // One send per language, each phone in its player's.
+                $byLanguage = $tokens->groupBy(fn (PushToken $token) => $this->languageOf($campaign, $token));
+                foreach ($byLanguage as $language => $group) {
+                    $words = $campaign->messages[$language];
+                    $this->count($campaign, $group->count(), $this->push->send($group, $words['title'], $words['body'], ['kind' => 'admin'], 'quezby-admin', logEach: false));
                 }
             }
 
@@ -167,8 +161,8 @@ final class PushCampaigns
 
         return [
             'id' => $campaign->id,
-            'title' => $campaign->title,
-            'body' => $campaign->body,
+            'messages' => (object) $campaign->messages,
+            'fallback' => $campaign->fallback,
             'filters' => (object) $campaign->filters,
             'status' => $campaign->status,
             'players' => $campaign->players,
@@ -181,6 +175,39 @@ final class PushCampaigns
             'createdAt' => Timestamp::iso($campaign->created_at),
             'finishedAt' => Timestamp::iso($campaign->finished_at),
         ];
+    }
+
+    /** The language a phone gets the words in: its player's, when they were written. */
+    private function languageOf(PushCampaign $campaign, PushToken $token): string
+    {
+        $locale = $token->user?->locale;
+        $locale = $locale instanceof Locale ? $locale->value : (string) $locale;
+
+        return isset($campaign->messages[$locale]) ? $locale : $campaign->fallback;
+    }
+
+    /**
+     * Adds one send's outcome to the campaign's counts.
+     *
+     * @param  array{problem: string|null, results: list<array<string, mixed>>}  $sent
+     */
+    private function count(PushCampaign $campaign, int $phones, array $sent): void
+    {
+        if ($sent['problem'] !== null) {
+            $campaign->forceFill([
+                'failed' => $campaign->failed + $phones,
+                'errors' => $this->tally($campaign->errors ?? [], array_fill(0, $phones, $sent['problem'])),
+            ]);
+
+            return;
+        }
+        $failures = array_values(array_filter($sent['results'], fn (array $result) => ! $result['ok']));
+        $campaign->forceFill([
+            'sent' => $campaign->sent + count($sent['results']) - count($failures),
+            'failed' => $campaign->failed + count($failures),
+            'dropped' => $campaign->dropped + count(array_filter($failures, fn (array $result) => $result['dropped'])),
+            'errors' => $this->tally($campaign->errors ?? [], array_map(fn (array $result) => $result['error'] ?? 'status '.($result['status'] ?? '—'), $failures)),
+        ]);
     }
 
     /**

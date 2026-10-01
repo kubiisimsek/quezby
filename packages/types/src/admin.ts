@@ -748,10 +748,23 @@ export type AdminPushAudience = {
   devices: number;
   ios: number;
   android: number;
+  /** Phones by their player's language — which words are worth writing. */
+  locales: Partial<Record<Locale, number>>;
 };
 
-/** `POST /admin/push/campaigns` (owner): a title of at most 60 characters, words of at most 240. */
-export type AdminPushCampaignRequest = { title: string; body: string; filters: AdminPushFilters };
+/** A push's words in one language: a title of at most 60 characters, words of at most 240. */
+export type AdminPushMessage = { title: string; body: string };
+
+/**
+ * `POST /admin/push/campaigns` (owner): the words in one language or more.
+ * Each player gets their account's language; a player whose language has no
+ * words gets `fallback`'s, which must be among them.
+ */
+export type AdminPushCampaignRequest = {
+  messages: Partial<Record<Locale, AdminPushMessage>>;
+  fallback: Locale;
+  filters: AdminPushFilters;
+};
 
 export type AdminPushCampaignStatus = 'sending' | 'done' | 'stopped';
 
@@ -761,8 +774,8 @@ export type AdminPushCampaignStatus = 'sending' | 'done' | 'stopped';
  */
 export type AdminPushCampaign = {
   id: number;
-  title: string;
-  body: string;
+  messages: Partial<Record<Locale, AdminPushMessage>>;
+  fallback: Locale;
   filters: AdminPushFilters;
   status: AdminPushCampaignStatus;
   /** Players and phones the filter found when it was sent. */

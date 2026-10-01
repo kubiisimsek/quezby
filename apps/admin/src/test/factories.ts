@@ -149,8 +149,8 @@ export function logSummary(overrides: Partial<AdminLogSummary> = {}): AdminLogSu
 export function pushCampaign(overrides: Partial<AdminPushCampaign> = {}): AdminPushCampaign {
   return {
     id: 7,
-    title: 'Quezby',
-    body: 'Günün akışı seni bekliyor!',
+    messages: { tr: { title: 'Quezby', body: 'Günün akışı seni bekliyor!' }, en: { title: 'Quezby', body: 'Today’s feed is waiting!' } },
+    fallback: 'en',
     filters: { tiers: ['diamond'], daily: 'not_played' },
     status: 'done',
     players: 40,

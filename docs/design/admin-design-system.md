@@ -133,6 +133,8 @@ exceptions). Numbers are tabular in tables and tiles.
 | `patterns/activity-strip` | a player's days as cells: grey when they did not come, greener the longer they stayed; each cell says its day in words |
 | `analytics/journey` | a visit's path: screens as quiet chips joined by arrows, the moments between them as tags in their own colour; the rest as "+N adım" |
 | `patterns/secret-reveal` | a temporary password, shown once |
+| `patterns/accordion` | sections that fold, each saying what it holds while closed (its choice in magenta-text when one is made) — long forms like a push's filters |
+| `push/notification-preview` | a push as a player sees it: the lock screen on the game's colours, the game's mark, the title and the words (right to left where they are) |
 | `layout/shell`, `sidebar`, `login-layout`, `gate` | the frame and the doors |
 | `moderation/*`, `boards/board-table` | the moderation dialogs and the board table every page shares |
 | `lib/columns` | the cells many tables draw: `PlayerCell` (the photo, where the row carries it), `When` (a moment on one line, the exact time on hover), `RunStatusTag` (what the status means for the boards, on hover), `FlagTags`, `TierTag` (a league's name with its medal, a crown for MasterClass), `EloDelta` (a rating move with its sign, green up, red down, grey none), the audit columns |

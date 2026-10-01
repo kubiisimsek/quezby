@@ -9,13 +9,14 @@ use Illuminate\Support\Carbon;
 
 /**
  * A push an owner sent from the panel to the players a filter picked
- * (`PushCampaigns`): its words, the filter, and how far it got.
+ * (`PushCampaigns`): its words in each language, the language for the rest,
+ * the filter, and how far it got.
  *
  * @property int $id
  * @property string|null $admin_id
  * @property string $admin_name
- * @property string $title
- * @property string $body
+ * @property array<string, array{title: string, body: string}> $messages
+ * @property string $fallback
  * @property array<string, mixed> $filters
  * @property string $status
  * @property int $players
@@ -28,7 +29,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $finished_at
  * @property Carbon $created_at
  */
-#[Fillable(['admin_id', 'admin_name', 'title', 'body', 'filters', 'status', 'players', 'devices', 'cursor', 'sent', 'failed', 'dropped', 'errors', 'finished_at'])]
+#[Fillable(['admin_id', 'admin_name', 'messages', 'fallback', 'filters', 'status', 'players', 'devices', 'cursor', 'sent', 'failed', 'dropped', 'errors', 'finished_at'])]
 class PushCampaign extends Model
 {
     public const SENDING = 'sending';
@@ -45,6 +46,7 @@ class PushCampaign extends Model
     protected function casts(): array
     {
         return [
+            'messages' => 'array',
             'filters' => 'array',
             'errors' => 'array',
             'finished_at' => 'datetime',

@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-10-01 — Push bildirimleri: a list, and a new push on its own page
+
+- **Push bildirimleri** (`/push`) lists what was sent; **Yeni bildirim**
+  (top right) opens `/push/new`.
+- The new push puts the words first: a large title and message per language
+  (TR … KO tabs, a tick on each written one) beside a live lock-screen
+  preview. Who it goes to folds into sections (`patterns/accordion`), each
+  saying its choice while closed, with a count of active filters and
+  Temizle. The Alıcılar card stays beside, sticky: players and phones in
+  large type, phones by language, the fallback language.
+- **Önizle ve gönder** opens the push as players will see it, language by
+  language, with who and how many — it goes only from there.
+
+## 2026-10-01 — Push bildirimi in every language
+
+- A push from the panel is written in one language or more (TR, EN, DE, AR,
+  FR, ES, JA, KO tabs; a tick on each written one). Each player gets their
+  account's language; the rest get the language chosen under "Çevirisi
+  olmayanlara". The Alıcılar count says how many phones each language has.
+- `AdminPushCampaignRequest` is `{ messages, fallback, filters }`;
+  `AdminPushCampaign` carries `messages` and `fallback` in place of
+  `title`/`body`; `AdminPushAudience.locales`. `push_campaigns` holds
+  `messages` (JSON) and `fallback` (never released with `title`/`body`).
+
 ## 2026-10-01 — Push bildirimi: pushes to the players a filter picks
 
 The owner wanted pushes on a page of their own, to many players by filter —

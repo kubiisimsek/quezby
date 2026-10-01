@@ -8,7 +8,7 @@ return new class extends Migration
 {
     /**
      * Pushes an owner sends from the panel's Push bildirimi page to the
-     * players a filter picks. One goes out a batch of phones at a time
+     * players a filter picks, in each player's language. One goes out a batch of phones at a time
      * (`cursor`: the last `push_tokens.id` done), driven by the open panel
      * page or `php artisan quezby:push-campaigns` from cron, so no request
      * runs long on shared hosting; the counts say how far it got.
@@ -19,8 +19,10 @@ return new class extends Migration
             $table->id();
             $table->foreignUlid('admin_id')->nullable()->constrained('admins')->nullOnDelete();
             $table->string('admin_name', 64);
-            $table->string('title', 60);
-            $table->string('body', 240);
+            // The words, by language: `{ "tr": { "title", "body" }, "en": … }`.
+            // Each player gets their account's language; one without it gets `fallback`.
+            $table->json('messages');
+            $table->string('fallback', 2);
             $table->json('filters');
             // sending, done or stopped.
             $table->string('status', 8);

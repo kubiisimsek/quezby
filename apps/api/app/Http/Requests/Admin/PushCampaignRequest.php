@@ -2,7 +2,13 @@
 
 namespace App\Http\Requests\Admin;
 
-/** `AdminPushCampaignRequest` in `packages/types`: the words, and who they go to. */
+use App\Enums\Locale;
+use Illuminate\Validation\Rule;
+
+/**
+ * `AdminPushCampaignRequest` in `packages/types`: the words in one language
+ * or more, the language the rest get, and who they go to.
+ */
 class PushCampaignRequest extends PushAudienceRequest
 {
     /**
@@ -10,20 +16,32 @@ class PushCampaignRequest extends PushAudienceRequest
      */
     public function rules(): array
     {
+        $locales = array_map(fn (Locale $locale) => $locale->value, Locale::cases());
+        $given = array_keys((array) $this->input('messages', []));
+
         return [
-            'title' => ['required', 'string', 'max:60'],
-            'body' => ['required', 'string', 'max:240'],
+            'messages' => ['required', 'array', 'min:1', 'array:'.implode(',', $locales)],
+            'messages.*' => ['required', 'array:title,body'],
+            'messages.*.title' => ['required', 'string', 'max:60'],
+            'messages.*.body' => ['required', 'string', 'max:240'],
+            'fallback' => ['required', Rule::enum(Locale::class), Rule::in($given)],
             ...parent::rules(),
         ];
     }
 
-    public function title(): string
+    /**
+     * @return array<string, array{title: string, body: string}>
+     */
+    public function words(): array
     {
-        return trim((string) $this->validated('title'));
+        return array_map(fn (array $message) => [
+            'title' => trim((string) $message['title']),
+            'body' => trim((string) $message['body']),
+        ], (array) $this->validated('messages'));
     }
 
-    public function body(): string
+    public function fallback(): string
     {
-        return trim((string) $this->validated('body'));
+        return (string) $this->validated('fallback');
     }
 }

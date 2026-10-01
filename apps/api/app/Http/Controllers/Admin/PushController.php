@@ -36,7 +36,7 @@ class PushController extends Controller
     /** `POST /admin/push/campaigns` — writes the campaign; the steps send it. */
     public function store(PushCampaignRequest $request, #[CurrentUser('admin')] Admin $admin): JsonResponse
     {
-        $campaign = $this->campaigns->start($request->title(), $request->body(), $request->filters(), Actor::panel($admin, $request));
+        $campaign = $this->campaigns->start($request->words(), $request->fallback(), $request->filters(), Actor::panel($admin, $request));
 
         return response()->json(['campaign' => $this->campaigns->present($campaign)], 201);
     }

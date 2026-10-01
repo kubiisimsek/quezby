@@ -83,27 +83,35 @@ final class PushAudience
     public function devices(array $filters): Builder
     {
         return PushToken::query()
-            ->whereIn('user_id', $this->players($filters)->select('id'))
-            ->when($filters['platform'] ?? null, fn (Builder $query, string $platform) => $query->where('platform', $platform));
+            ->whereIn('push_tokens.user_id', $this->players($filters)->select('id'))
+            ->when($filters['platform'] ?? null, fn (Builder $query, string $platform) => $query->where('push_tokens.platform', $platform));
     }
 
     /**
      * `AdminPushAudience`: how many players the filter picks, how many of
-     * them have a phone to push to, and how many phones.
+     * them have a phone to push to, how many phones — and how many phones
+     * of each language, to see which words are worth writing.
      *
      * @param  array<string, mixed>  $filters
-     * @return array{players: int, reachable: int, devices: int, ios: int, android: int}
+     * @return array{players: int, reachable: int, devices: int, ios: int, android: int, locales: object}
      */
     public function count(array $filters): array
     {
-        $byPlatform = $this->devices($filters)->toBase()->selectRaw('platform, count(*) as total')->groupBy('platform')->pluck('total', 'platform');
+        $byPlatform = $this->devices($filters)->toBase()->selectRaw('push_tokens.platform as platform, count(*) as total')->groupBy('push_tokens.platform')->pluck('total', 'platform');
 
         return [
             'players' => $this->players($filters)->count(),
-            'reachable' => (int) $this->devices($filters)->toBase()->distinct()->count('user_id'),
+            'reachable' => (int) $this->devices($filters)->toBase()->distinct()->count('push_tokens.user_id'),
             'devices' => (int) $byPlatform->sum(),
             'ios' => (int) ($byPlatform['ios'] ?? 0),
             'android' => (int) ($byPlatform['android'] ?? 0),
+            'locales' => (object) $this->devices($filters)->toBase()
+                ->join('users', 'users.id', '=', 'push_tokens.user_id')
+                ->selectRaw('users.locale as locale, count(*) as total')
+                ->groupBy('users.locale')
+                ->pluck('total', 'locale')
+                ->map(fn ($total) => (int) $total)
+                ->all(),
         ];
     }
 }
