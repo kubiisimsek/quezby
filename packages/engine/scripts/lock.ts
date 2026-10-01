@@ -10,6 +10,11 @@
  * `difficulty.lock.json` seals Dereceli's difficulty table the same way under
  * `DIFFICULTY_VERSION`: a change there is a new difficulty version and a new
  * Elo target table, not a new season.
+ *
+ * Before the first store release the owner may keep a version and change it
+ * in place: `pnpm engine:lock -- --reseal` replaces the current version's
+ * seal (in both locks) instead of refusing. Never after the release — a
+ * changed game under a live version would rank two games on one board.
  */
 import { existsSync, writeFileSync } from 'node:fs';
 
@@ -31,6 +36,7 @@ import {
   type Lock,
 } from './lockfile';
 
+const reseal = process.argv.includes('--reseal');
 const current = {
   rulesSha256: rulesSha256(),
   behaviourSha256: behaviourSha256(),
@@ -44,7 +50,7 @@ function fail(message: string): never {
 
 const lockedAt = new Date().toISOString().slice(0, 10);
 
-const decision = decide(previous, ENGINE_VERSION, current);
+const decision = decide(previous, ENGINE_VERSION, current, reseal);
 if (decision.kind === 'current') {
   console.log(`rules.lock.json is current (engine v${ENGINE_VERSION}).`);
 } else if (decision.kind === 'refuse' && decision.reason === 'older-version') {
@@ -61,17 +67,20 @@ if (decision.kind === 'current') {
     ].join('\n'),
   );
 } else {
+  // A re-seal replaces the version's own seal: the history keeps one per version.
+  const kept = (previous?.history ?? []).filter(
+    (seal) => decision.kind !== 'reseal' || seal.engineVersion !== ENGINE_VERSION,
+  );
   const lock: Lock = {
     engineVersion: ENGINE_VERSION,
     ...current,
     goldens: goldenScores(),
-    history: [
-      ...(previous?.history ?? []),
-      { engineVersion: ENGINE_VERSION, ...current, lockedAt },
-    ],
+    history: [...kept, { engineVersion: ENGINE_VERSION, ...current, lockedAt }],
   };
   writeFileSync(LOCK_FILE, `${JSON.stringify(lock, null, 2)}\n`);
-  console.log(`Locked engine v${ENGINE_VERSION}: rules ${current.rulesSha256.slice(0, 12)}…`);
+  console.log(
+    `${decision.kind === 'reseal' ? 'Re-sealed' : 'Locked'} engine v${ENGINE_VERSION}: rules ${current.rulesSha256.slice(0, 12)}…`,
+  );
 }
 
 const difficulty = {
@@ -79,7 +88,7 @@ const difficulty = {
   behaviourSha256: difficultyBehaviourSha256(),
 };
 const sealedDifficulty: DifficultyLock | null = existsSync(DIFFICULTY_LOCK_FILE) ? readDifficultyLock() : null;
-const difficultyDecision = decideDifficulty(sealedDifficulty, DIFFICULTY_VERSION, difficulty);
+const difficultyDecision = decideDifficulty(sealedDifficulty, DIFFICULTY_VERSION, difficulty, reseal);
 if (difficultyDecision.kind === 'current') {
   console.log(`difficulty.lock.json is current (difficulty v${DIFFICULTY_VERSION}).`);
 } else if (difficultyDecision.kind === 'refuse' && difficultyDecision.reason === 'older-version') {
@@ -96,15 +105,20 @@ if (difficultyDecision.kind === 'current') {
     ].join('\n'),
   );
 } else {
+  const kept = (sealedDifficulty?.history ?? []).filter(
+    (seal) => difficultyDecision.kind !== 'reseal' || seal.difficultyVersion !== DIFFICULTY_VERSION,
+  );
   const lock: DifficultyLock = {
     difficultyVersion: DIFFICULTY_VERSION,
     engineVersion: ENGINE_VERSION,
     ...difficulty,
     history: [
-      ...(sealedDifficulty?.history ?? []),
+      ...kept,
       { difficultyVersion: DIFFICULTY_VERSION, engineVersion: ENGINE_VERSION, ...difficulty, lockedAt },
     ],
   };
   writeFileSync(DIFFICULTY_LOCK_FILE, `${JSON.stringify(lock, null, 2)}\n`);
-  console.log(`Locked difficulty v${DIFFICULTY_VERSION}: table ${difficulty.tableSha256.slice(0, 12)}…`);
+  console.log(
+    `${difficultyDecision.kind === 'reseal' ? 'Re-sealed' : 'Locked'} difficulty v${DIFFICULTY_VERSION}: table ${difficulty.tableSha256.slice(0, 12)}…`,
+  );
 }

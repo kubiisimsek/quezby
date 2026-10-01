@@ -91,6 +91,12 @@ describe('pnpm engine:lock', () => {
       kind: 'seal',
     });
   });
+
+  it('re-seals the same version in place only when asked (--reseal), never an older one', () => {
+    expect(decide(sealed, 2, { ...same, rulesSha256: 'edited' }, true)).toEqual({ kind: 'reseal' });
+    expect(decide(sealed, 2, same, true)).toEqual({ kind: 'current' });
+    expect(decide(sealed, 1, same, true)).toEqual({ kind: 'refuse', reason: 'older-version' });
+  });
 });
 
 const DIFFICULTY_BUMP =
@@ -157,6 +163,11 @@ describe('pnpm engine:lock, for the difficulty table', () => {
   it('re-seals after the version went up, never back', () => {
     expect(decideDifficulty(sealed, 2, { tableSha256: 'new', behaviourSha256: 'new' })).toEqual({ kind: 'seal' });
     expect(decideDifficulty(sealed, 0, same)).toEqual({ kind: 'refuse', reason: 'older-version' });
+  });
+
+  it('re-seals the same version in place only when asked (--reseal)', () => {
+    expect(decideDifficulty(sealed, 1, { ...same, behaviourSha256: 'edited' }, true)).toEqual({ kind: 'reseal' });
+    expect(decideDifficulty(sealed, 0, same, true)).toEqual({ kind: 'refuse', reason: 'older-version' });
   });
 });
 

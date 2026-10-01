@@ -107,17 +107,26 @@ export type Hashes = { rulesSha256: string; behaviourSha256: string };
 export type Decision =
   | { kind: 'current' }
   | { kind: 'seal' }
+  | { kind: 'reseal' }
   | { kind: 'refuse'; reason: 'older-version' | 'changed-without-bump' };
 
 /**
  * Whether `pnpm engine:lock` may seal: never over a newer lock, never a
  * changed game under the same version — only a bumped version is re-sealed.
+ * `reseal` (`pnpm engine:lock -- --reseal`) is the owner's way out before
+ * the first store release: the same version's seal is replaced in place.
  */
-export function decide(previous: Lock | null, engineVersion: number, current: Hashes): Decision {
+export function decide(
+  previous: Lock | null,
+  engineVersion: number,
+  current: Hashes,
+  reseal = false,
+): Decision {
   return sealing(
     previous && { version: previous.engineVersion, hashes: [previous.rulesSha256, previous.behaviourSha256] },
     engineVersion,
     [current.rulesSha256, current.behaviourSha256],
+    reseal,
   );
 }
 
@@ -132,11 +141,13 @@ export function decideDifficulty(
   previous: DifficultyLock | null,
   difficultyVersion: number,
   current: DifficultyHashes,
+  reseal = false,
 ): Decision {
   return sealing(
     previous && { version: previous.difficultyVersion, hashes: [previous.tableSha256, previous.behaviourSha256] },
     difficultyVersion,
     [current.tableSha256, current.behaviourSha256],
+    reseal,
   );
 }
 
@@ -144,10 +155,12 @@ function sealing(
   previous: { version: number; hashes: string[] } | null,
   version: number,
   current: string[],
+  reseal: boolean,
 ): Decision {
   if (!previous) return { kind: 'seal' };
   if (version < previous.version) return { kind: 'refuse', reason: 'older-version' };
   if (version > previous.version) return { kind: 'seal' };
   const same = previous.hashes.every((hash, i) => hash === current[i]);
-  return same ? { kind: 'current' } : { kind: 'refuse', reason: 'changed-without-bump' };
+  if (same) return { kind: 'current' };
+  return reseal ? { kind: 'reseal' } : { kind: 'refuse', reason: 'changed-without-bump' };
 }
