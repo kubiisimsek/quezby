@@ -42,22 +42,55 @@ final class SystemLogger
 
     private const MAX_CONTEXT_BYTES = 8000;
 
+    /** What the logs keep and allow when the config has no say — a config cached before `quezby.logs` existed. */
+    public const DEFAULT_KEEP_DAYS = ['error' => 90, 'warning' => 14, 'info' => 3];
+
+    public const DEFAULT_PER_MINUTE = ['error' => 600, 'warning' => 300, 'info' => 300];
+
+    /** @var array<string, int> */
+    private readonly array $keepDays;
+
+    /** @var array<string, int> */
+    private readonly array $perMinute;
+
+    private readonly string $timezone;
+
+    private readonly int $pruneOdds;
+
+    private readonly int $pruneBatch;
+
     /**
-     * @param  array<string, int>  $keepDays  by level
-     * @param  array<string, int>  $perMinute  by level
+     * Every setting may be missing: a host whose config was cached by an
+     * older release must still answer every request (logging never breaks
+     * one), so each falls back to its default.
+     *
+     * @param  array<string, int>|null  $keepDays  by level
+     * @param  array<string, int>|null  $perMinute  by level
      */
     public function __construct(
         #[Config('quezby.logs.keep_days')]
-        private readonly array $keepDays,
+        ?array $keepDays = null,
         #[Config('quezby.logs.per_minute')]
-        private readonly array $perMinute,
+        ?array $perMinute = null,
         #[Config('quezby.leaderboard.timezone')]
-        private readonly string $timezone,
+        ?string $timezone = null,
         #[Config('quezby.logs.prune_odds')]
-        private readonly int $pruneOdds,
+        ?int $pruneOdds = null,
         #[Config('quezby.logs.prune_batch')]
-        private readonly int $pruneBatch,
-    ) {}
+        ?int $pruneBatch = null,
+    ) {
+        $this->keepDays = $keepDays ?? self::DEFAULT_KEEP_DAYS;
+        $this->perMinute = $perMinute ?? self::DEFAULT_PER_MINUTE;
+        $this->timezone = $timezone ?? 'Europe/Istanbul';
+        $this->pruneOdds = $pruneOdds ?? 100;
+        $this->pruneBatch = $pruneBatch ?? 1000;
+    }
+
+    /** The longest any row is kept, in days. */
+    public function longestKeep(): int
+    {
+        return max($this->keepDays);
+    }
 
     /**
      * @param  array{status?: int|null, method?: string|null, path?: string|null, durationMs?: int|null, userId?: string|null, platform?: string|null, appVersion?: string|null, context?: array<string, mixed>|null}  $fields

@@ -30,14 +30,18 @@ final class PushCampaigns
     /** The Firebase errors a campaign keeps, the most frequent. */
     public const ERRORS_KEPT = 20;
 
+    private readonly int $batch;
+
     public function __construct(
         private readonly PushAudience $audience,
         private readonly PushService $push,
         private readonly AuditLog $audit,
         private readonly SystemLogger $logger,
         #[Config('quezby.push.campaign_batch')]
-        private readonly int $batch,
-    ) {}
+        ?int $batch = null,
+    ) {
+        $this->batch = $batch ?? 100;
+    }
 
     /**
      * @param  array<string, array{title: string, body: string}>  $messages  by language

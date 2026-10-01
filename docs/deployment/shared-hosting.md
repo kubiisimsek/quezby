@@ -90,8 +90,9 @@ gönderimde hiç kullanılmaz.
    sunucudaki sürüm okunur.
 3. Yeni sürümle iki paket derlenir. API paketi `.env`'siz derlenir.
 4. API zip'i ev klasörüne yüklenir, API klasörüne açılır ve silinir.
-5. `ops/migrate` ve `ops/optimize` çağrılır. `/api/v1/health` yeni sürümü
-   söyleyene kadar beklenir.
+5. Önce `ops/optimize`, sonra `ops/migrate` çağrılır: yeni kod bir önceki
+   sürümün önbelleğe aldığı config ile hiç çalışmaz. `/api/v1/health` yeni
+   sürümü söyleyene kadar beklenir.
 6. Panel aynı yolla yüklenir.
 
 Production yalnızca `main` dalından gider (GitHub'dan gönderimde). Her

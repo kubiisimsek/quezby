@@ -47,7 +47,7 @@ final class AdminLogs
             ->get();
 
         // The events of the days rows are still kept, from the small table.
-        $since = Carbon::parse($this->logger->today())->subDays(max(config('quezby.logs.keep_days')))->format('Y-m-d');
+        $since = Carbon::parse($this->logger->today())->subDays($this->logger->longestKeep())->format('Y-m-d');
         $events = DB::table('system_log_days')
             ->where('day', '>=', $since)
             ->when($filters['source'] ?? null, fn (QueryBuilder $query, string $source) => $query->where('source', $source))

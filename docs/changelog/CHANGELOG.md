@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-10-01 — Logging never breaks a request
+
+The staging deploy answered every request 500, `/health` too: the release
+was up, but the config cached by the last one had no `quezby.logs`, so the
+API-error listener could not be built — on every response — and the deploy
+stopped at `ops/migrate`, before `ops/optimize` would have rebuilt the cache.
+
+- `SystemLogger` and `PushCampaigns` fall back to their defaults when a
+  setting is missing; every logging listener and the exception reporter run
+  through `AppServiceProvider::quietly()` — a failure in logging goes to
+  laravel.log, never into the request. Tests: a cached config without
+  `quezby.logs`, and the log tables not migrated yet.
+- `pnpm deploy:*` calls `ops/optimize` before `ops/migrate`.
+
 ## 2026-10-01 — Push bildirimleri: a list, and a new push on its own page
 
 - **Push bildirimleri** (`/push`) lists what was sent; **Yeni bildirim**

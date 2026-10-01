@@ -466,9 +466,12 @@ async function main(argv) {
     }
 
     if (part === 'api') {
-      step('Migrating and caching');
-      console.log(await ops(apiOrigin, 'migrate', opsToken));
+      // Caches first: the new code must not run on the last release's cached
+      // config (a key it reads missing), and nothing in a cache needs the
+      // new tables.
+      step('Caching and migrating');
       console.log(await ops(apiOrigin, 'optimize', opsToken));
+      console.log(await ops(apiOrigin, 'migrate', opsToken));
       await health(apiOrigin, releases.api);
     }
   }

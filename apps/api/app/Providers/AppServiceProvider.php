@@ -7,18 +7,21 @@ use App\Services\Logs\ApiErrorLogger;
 use App\Services\Logs\ExternalCallLogger;
 use App\Support\ModerationToken;
 use App\Support\OpsToken;
+use Closure;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Http\Events\RequestHandled;
 use Illuminate\Http\Client\Events\ConnectionFailed;
 use Illuminate\Http\Client\Events\ResponseReceived;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\Events\TokenAuthenticated;
 use RuntimeException;
+use Throwable;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -47,9 +50,27 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(fn (TokenAuthenticated $event) => Presence::remember($event));
 
         // The Loglar page: failed calls to Firebase, Google and Apple, and API errors.
-        Event::listen(ResponseReceived::class, [ExternalCallLogger::class, 'received']);
-        Event::listen(ConnectionFailed::class, [ExternalCallLogger::class, 'failed']);
-        Event::listen(RequestHandled::class, [ApiErrorLogger::class, 'handled']);
+        // Logging never breaks what it logs: whatever goes wrong in it is swallowed.
+        Event::listen(ResponseReceived::class, fn (ResponseReceived $event) => self::quietly(fn () => $this->app->make(ExternalCallLogger::class)->received($event)));
+        Event::listen(ConnectionFailed::class, fn (ConnectionFailed $event) => self::quietly(fn () => $this->app->make(ExternalCallLogger::class)->failed($event)));
+        Event::listen(RequestHandled::class, fn (RequestHandled $event) => self::quietly(fn () => $this->app->make(ApiErrorLogger::class)->handled($event)));
+    }
+
+    /**
+     * Runs a piece of logging; a failure in it goes to laravel.log, never up
+     * into the request, the call or the exception it was logging.
+     */
+    public static function quietly(Closure $log): void
+    {
+        try {
+            $log();
+        } catch (Throwable $e) {
+            try {
+                Log::warning('Logging failed.', ['reason' => $e->getMessage()]);
+            } catch (Throwable) {
+                // Nowhere left to say it.
+            }
+        }
     }
 
     /**

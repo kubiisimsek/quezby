@@ -20,7 +20,7 @@ class AppLogRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'entries' => ['required', 'array', 'min:1', 'max:'.config('quezby.logs.app_batch')],
+            'entries' => ['required', 'array', 'min:1', 'max:'.(config('quezby.logs.app_batch') ?? 20)],
             'entries.*' => ['required', 'array:level,event,message,context,at'],
             'entries.*.level' => ['required', Rule::enum(LogLevel::class)],
             'entries.*.event' => ['required', 'string', 'max:40', 'regex:/^[a-z0-9_]+(\.[a-z0-9_]+)*$/'],

@@ -12,6 +12,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 
 beforeEach(function () {
     Carbon::setTestNow(Carbon::parse('2026-10-01 12:00', 'Europe/Istanbul'));
@@ -271,4 +272,28 @@ test('a deleted player takes their rows along', function () {
     app(AccountDeletion::class)->delete($player);
 
     expect(SystemLog::query()->pluck('user_id')->all())->toBe([$other->id]);
+});
+
+test('a config cached before the logs existed breaks no request, and errors are still kept', function () {
+    // What a host has between uploading a release and `ops/optimize`.
+    config(['quezby.logs' => null, 'quezby.push.campaign_batch' => null]);
+    app()->forgetScopedInstances();
+
+    $this->getJson('/api/v1/health')->assertOk();
+    $this->signIn();
+    $this->putJson('/api/v1/me/push-token', ['token' => 'kısa', 'platform' => 'ios'])->assertStatus(422);
+
+    expect(logEvents(LogSource::Api))->toBe(['validation_failed']);
+});
+
+test('logging that fails never fails the request it logs', function () {
+    // A host where the release is up but its migrations have not run yet.
+    Schema::drop('system_logs');
+    Schema::drop('system_log_days');
+
+    $this->getJson('/api/v1/health')->assertOk();
+    $this->signIn();
+    $this->putJson('/api/v1/me/push-token', ['token' => 'kısa', 'platform' => 'ios'])->assertStatus(422);
+    Route::middleware('api')->get('/api/v1/test-boom-quiet', fn () => throw new RuntimeException('Kaboom'));
+    $this->getJson('/api/v1/test-boom-quiet')->assertStatus(500)->assertJsonPath('error.code', 'server_error');
 });
