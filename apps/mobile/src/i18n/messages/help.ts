@@ -29,7 +29,7 @@ const tr = {
     ],
     /** A blind move (`RULES.blindMs`, in ms). */
     blind: (ms: string) =>
-      `Bir postun ilk ${ms} ms’sinde, bakmadan yanlış kaydırır ya da çift dokunursan ceza iki katı olur. Üst üste yaparsan dört, sonra sekiz katı.`,
+      `Bir postun ilk ${ms} ms’sinde bakmadan yanlış kaydırır ya da çift dokunursan kör hamle sayılır. Üst üste ikincisinin cezası iki katı, üçüncüsünün dört katı olur.`,
   },
   scoring: {
     title: 'Puan ve kombolar',
@@ -160,7 +160,7 @@ const en: HelpMessages = {
       "As it drains, the bar turns from green to yellow, then red. When it's empty, the run is over.",
     ],
     blind: (ms) =>
-      `Swipe or double-tap the wrong post in its first ${ms} ms, before you could look, and the penalty doubles. Do it again in a row and it’s four times, then eight.`,
+      `Swipe or double-tap the wrong post in its first ${ms} ms, before you could look, and it’s a blind move. A second in a row costs double, a third four times.`,
   },
   scoring: {
     title: 'Points and combos',
@@ -292,7 +292,7 @@ const de: HelpMessages = {
       'Wird er leerer, wechselt der Balken von Grün zu Gelb, dann zu Rot. Ist er leer, ist die Runde vorbei.',
     ],
     blind: (ms) =>
-      `Wischst du den falschen Post in seinen ersten ${ms} ms blind weg oder tippst doppelt darauf, zählt die Strafe doppelt. Gleich noch einmal: vierfach, dann achtfach.`,
+      `Wischst du den falschen Post in seinen ersten ${ms} ms blind weg oder tippst doppelt darauf, ist das ein Blindzug. Der zweite in Folge kostet doppelt, der dritte vierfach.`,
   },
   scoring: {
     title: 'Punkte und Kombos',
@@ -423,7 +423,7 @@ const ar: HelpMessages = {
       'كلما نقص الشريط تحوّل من الأخضر إلى الأصفر ثم إلى الأحمر. وإن نفد انتهت الجولة.',
     ],
     blind: (ms) =>
-      `إذا سحبت المنشور الخاطئ أو نقرت عليه مرتين في أول ${iso(`${ms} ms`)} دون أن تنظر، تتضاعف العقوبة. وإن كررتها متتاليةً تصبح أربعة أضعاف ثم ثمانية.`,
+      `إذا سحبت المنشور الخاطئ أو نقرت عليه مرتين في أول ${iso(`${ms} ms`)} دون أن تنظر، فهذه حركة عمياء. الثانية على التوالي عقوبتها مضاعفة، والثالثة أربعة أضعاف.`,
   },
   scoring: {
     title: 'النقاط والكومبو',
@@ -559,7 +559,7 @@ const fr: HelpMessages = {
       'En baissant, la barre passe du vert au jaune, puis au rouge. Si elle se vide, la partie est finie.',
     ],
     blind: (ms) =>
-      `Balaie ou tape deux fois le mauvais post dans ses ${ms} premières ms, sans regarder, et la pénalité double. Recommence aussitôt : quatre fois, puis huit.`,
+      `Balaie ou tape deux fois le mauvais post dans ses ${ms} premières ms, sans regarder, et c’est un coup à l’aveugle. Le deuxième d’affilée coûte double, le troisième quatre fois plus.`,
   },
   scoring: {
     title: 'Points et combos',
@@ -691,7 +691,7 @@ const es: HelpMessages = {
       'A medida que baja, la barra pasa de verde a amarillo y luego a rojo. Si se vacía, la partida termina.',
     ],
     blind: (ms) =>
-      `Si deslizas o tocas dos veces el post equivocado en sus primeros ${ms} ms, sin mirar, la penalización se duplica. Si lo repites seguido, se multiplica por cuatro y luego por ocho.`,
+      `Si deslizas o tocas dos veces el post equivocado en sus primeros ${ms} ms, sin mirar, es una jugada a ciegas. La segunda seguida cuesta el doble y la tercera, cuatro veces más.`,
   },
   scoring: {
     title: 'Puntos y combos',
@@ -822,7 +822,7 @@ const ja: HelpMessages = {
       'バーは減るにつれて緑から黄色、そして赤に変わります。空になったらゲームオーバーです。',
     ],
     blind: (ms) =>
-      `投稿が出てから${ms} ms以内に、よく見ずに間違った投稿をスワイプやダブルタップすると、ペナルティが2倍になります。続けてやると4倍、さらに8倍に。`,
+      `投稿が出てから${ms} ms以内に、よく見ずに間違った投稿をスワイプやダブルタップすると「見ずにプレイ」です。続けて2回目はペナルティ2倍、3回目は4倍に。`,
   },
   scoring: {
     title: 'ポイントとコンボ',
@@ -953,7 +953,7 @@ const ko: HelpMessages = {
       '바는 줄어들수록 초록에서 노랑, 그다음 빨강으로 바뀌어요. 바닥나면 게임이 끝나요.',
     ],
     blind: (ms) =>
-      `게시물이 나오고 ${ms} ms 안에 보지도 않고 잘못 스와이프하거나 두 번 탭하면 페널티가 두 배가 돼요. 연속으로 하면 네 배, 그다음엔 여덟 배예요.`,
+      `게시물이 나오고 ${ms} ms 안에 보지도 않고 잘못 스와이프하거나 두 번 탭하면 '안 보고 하기'예요. 연속 두 번째는 페널티가 두 배, 세 번째는 네 배예요.`,
   },
   scoring: {
     title: '점수와 콤보',

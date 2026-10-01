@@ -50,11 +50,18 @@ describe('FeedbackLayer', () => {
     expect(screen.getByText(words)).toBeOnTheScreen();
   });
 
+  it('calls a first blind move what it is, at no extra cost', async () => {
+    await render(<FeedbackLayer feedback={feedback({ verdict: 'wrong', kind: 'like', blind: 1 })} />);
+
+    expect(screen.getByText('Bakmadan!')).toBeOnTheScreen();
+    expect(screen.queryByText(/Ceza/)).toBeNull();
+    expect(screen.queryByText('Yanlış hareket')).toBeNull();
+  });
+
   it.each([
-    [1, 'Ceza x2'],
-    [2, 'Ceza x4'],
-    [3, 'Ceza x8'],
-  ])('calls a blind move %i in a row what it is, and says what it cost', async (blind, penalty) => {
+    [2, 'Ceza x2'],
+    [3, 'Ceza x4'],
+  ])('calls blind move %i in a row what it is, and says what it cost', async (blind, penalty) => {
     await render(<FeedbackLayer feedback={feedback({ verdict: 'wrong', kind: 'like', blind })} />);
 
     expect(screen.getByText('Bakmadan!')).toBeOnTheScreen();
@@ -84,7 +91,7 @@ describe('FeedbackLayer', () => {
     expect(screen.getByText('Too slow!')).toBeOnTheScreen();
 
     await screen.rerender(
-      <FeedbackLayer feedback={feedback({ id: 3, verdict: 'wrong', kind: 'hold', blind: 1 })} />,
+      <FeedbackLayer feedback={feedback({ id: 3, verdict: 'wrong', kind: 'hold', blind: 2 })} />,
     );
     expect(screen.getByText('Didn’t look!')).toBeOnTheScreen();
     expect(screen.getByText('Penalty x2')).toBeOnTheScreen();
@@ -103,7 +110,7 @@ describe('FeedbackLayer', () => {
     expect(screen.getByText('نفد الدوبامين')).toBeOnTheScreen();
 
     await screen.rerender(
-      <FeedbackLayer feedback={feedback({ id: 3, verdict: 'wrong', kind: 'like', blind: 2 })} />,
+      <FeedbackLayer feedback={feedback({ id: 3, verdict: 'wrong', kind: 'like', blind: 3 })} />,
     );
     expect(screen.getByText('العقوبة \u200Ex4\u200E')).toBeOnTheScreen();
   });

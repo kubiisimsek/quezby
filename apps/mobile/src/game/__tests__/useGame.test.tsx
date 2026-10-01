@@ -1174,7 +1174,7 @@ describe('useGame timing', () => {
     expect(await logOf(game)).toEqual([[GESTURE.up, 330, 0]]);
   });
 
-  it('tells a blind swipe on a friend’s post from a looked-at one, by its doubled penalty', async () => {
+  it('tells a blind swipe on a friend’s post from a looked-at one', async () => {
     const { game } = await afterCountdown();
     await answerRight(game);
     await answerRight(game);

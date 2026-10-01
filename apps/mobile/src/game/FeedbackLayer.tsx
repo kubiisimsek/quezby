@@ -1,4 +1,4 @@
-import { RULES, type BonusHit } from '@quezby/engine';
+import { RULES, blindFactor, type BonusHit } from '@quezby/engine';
 import { useEffect, useRef } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated, {
@@ -151,10 +151,10 @@ function Burst({ feedback }: { feedback: Feedback }) {
                 {feedback.blind > 0 ? t.game.feedback.blind : label}
               </Text>
             </Animated.View>
-            {feedback.blind > 0 ? (
+            {blindFactor(feedback.blind) > 1 ? (
               <Animated.View style={[styles.penalty, missStyle]}>
                 <Text style={styles.penaltyText}>
-                  {t.game.feedback.penalty(2 ** feedback.blind)}
+                  {t.game.feedback.penalty(blindFactor(feedback.blind))}
                 </Text>
               </Animated.View>
             ) : null}
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     paddingVertical: SPACE.sm,
   },
   missBlock: { alignItems: 'center', gap: SPACE.sm },
-  /** A blind move's doubled penalty, stamped under the miss: "Ceza x2". */
+  /** A blind move's doubled penalty, from the second in a row, stamped under the miss: "Ceza x2". */
   penalty: {
     backgroundColor: REEL.outline,
     borderColor: REEL.miss,

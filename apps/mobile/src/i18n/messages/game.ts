@@ -30,7 +30,7 @@ const tr = {
     bonus: (toast: string, points: string) => `${toast} +${points}`,
     /** A blind move (`RULES.blindMs`): the wrong post, swiped or double-tapped too soon to have looked. */
     blind: 'Bakmadan!',
-    /** Under it, what the penalty was multiplied by: 2, 4, 8. */
+    /** Under it, from the second blind move in a row, what the penalty was multiplied by: 2, 4. */
     penalty: (times: number) => `Ceza x${times}`,
   },
   /** The head-up display over the post (Hud). */
