@@ -15,7 +15,8 @@
  * the build is refused if any VITE_* other than VITE_API_ORIGIN is set.
  *
  * QUEZBY_RELEASE=1.00.00.01 (scripts/deploy.mjs) is shown on the Sistem page
- * and written to version.json beside index.html.
+ * and written to version.json beside index.html, with QUEZBY_COMMIT — the
+ * commit it was built from, so the next deploy knows what changed since.
  */
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -90,6 +91,8 @@ async function main(argv) {
   const environment = parseEnvironment(argv[0]);
   const release = process.env.QUEZBY_RELEASE ?? '';
   if (release !== '' && !RELEASE.test(release)) throw new Error(`QUEZBY_RELEASE must look like 1.00.00.01, not '${release}'`);
+  const commit = process.env.QUEZBY_COMMIT ?? '';
+  if (commit !== '' && !/^[0-9a-f]{40}$/.test(commit)) throw new Error('QUEZBY_COMMIT must be a full commit hash');
 
   const texts = envFilesFor(environment)
     .map((file) => join(ADMIN, file))
@@ -111,7 +114,7 @@ async function main(argv) {
   const missing = missingFiles(dist);
   if (missing.length > 0) throw new Error(`the build has no ${missing.join(', ')}`);
   if (release !== '') {
-    writeFileSync(join(dist, 'version.json'), `${JSON.stringify({ version: release, deployedAt: new Date().toISOString() })}\n`);
+    writeFileSync(join(dist, 'version.json'), `${JSON.stringify({ version: release, commit, deployedAt: new Date().toISOString() })}\n`);
     step(`Release ${release}`);
   }
 

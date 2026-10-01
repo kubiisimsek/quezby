@@ -1,7 +1,14 @@
-# One button for the API and the admin panel: Actions → Deploy → Run workflow.
-# The tests run first; only if they pass does `pnpm deploy:<environment>`
-# (scripts/deploy.mjs) build, give each part its release and upload it
-# through cPanel's API. The API's .env stays on the server and is never sent.
+# Deploys the API and the admin panel through cPanel's API
+# (`pnpm deploy:<environment>`, scripts/deploy.mjs):
+#
+#   push to develop  → staging
+#   push to main     → production (a merged pull request is a push to main)
+#   Run workflow     → by hand, any choice below
+#
+# The tests run first; only if they pass is anything built. A push sends only
+# the parts whose files changed since the commit the server's version.json
+# names (--changed-only), each with its minipatch raised. The API's .env
+# stays on the server and is never sent.
 #
 # Repository secrets: CPANEL_USER, CPANEL_TOKEN.
 # Repository variables: DEPLOY_STAGING_API_DIR, DEPLOY_STAGING_ADMIN_DIR,
@@ -10,6 +17,8 @@
 name: Deploy
 
 on:
+  push:
+    branches: [develop, main]
   workflow_dispatch:
     inputs:
       environment:
@@ -39,9 +48,10 @@ on:
 permissions:
   contents: read
 
-# One deploy per environment at a time; a second one waits instead of racing.
+# One deploy per environment at a time; the next one waits instead of racing.
+# develop → staging, main → production; by hand, what was chosen.
 concurrency:
-  group: deploy-${{ inputs.environment }}
+  group: deploy-${{ github.event_name == 'push' && (github.ref_name == 'main' && 'production' || 'staging') || inputs.environment }}
   cancel-in-progress: false
 
 jobs:
@@ -70,16 +80,20 @@ jobs:
       - run: pnpm test:api
 
   deploy:
-    name: Deploy ${{ inputs.only }} → ${{ inputs.environment }}
+    name: Deploy → ${{ github.event_name == 'push' && (github.ref_name == 'main' && 'production' || 'staging') || inputs.environment }}
     needs: verify
     # Production only ever gets what is on main.
-    if: inputs.environment != 'production' || github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' || inputs.environment != 'production' || github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
+    # Settings → Environments → production → Required reviewers makes every production deploy wait for a yes.
+    environment: ${{ github.event_name == 'push' && (github.ref_name == 'main' && 'production' || 'staging') || inputs.environment }}
     env:
-      ENVIRONMENT: ${{ inputs.environment }}
+      ENVIRONMENT: ${{ github.event_name == 'push' && (github.ref_name == 'main' && 'production' || 'staging') || inputs.environment }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The whole history: what changed since the deployed commit is a git diff.
+          fetch-depth: 0
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -100,13 +114,18 @@ jobs:
           DEPLOY_STAGING_ADMIN_DIR: ${{ vars.DEPLOY_STAGING_ADMIN_DIR }}
           DEPLOY_PROD_API_DIR: ${{ vars.DEPLOY_PROD_API_DIR }}
           DEPLOY_PROD_ADMIN_DIR: ${{ vars.DEPLOY_PROD_ADMIN_DIR }}
+          EVENT: ${{ github.event_name }}
           ONLY: ${{ inputs.only }}
           BUMP: ${{ inputs.bump }}
           VERSION: ${{ inputs.version }}
           DRY_RUN: ${{ inputs.dry_run }}
         run: |
-          set -- --only "$ONLY" --bump "$BUMP" --version "$VERSION"
-          if [ "$DRY_RUN" = true ]; then set -- "$@" --dry-run; fi
+          if [ "$EVENT" = push ]; then
+            set -- --changed-only
+          else
+            set -- --only "$ONLY" --bump "$BUMP" --version "$VERSION"
+            if [ "$DRY_RUN" = true ]; then set -- "$@" --dry-run; fi
+          fi
           pnpm "deploy:$ENVIRONMENT" "$@"
 
       - name: Forget the build

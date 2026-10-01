@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, it } from 'node:test';
@@ -7,6 +8,8 @@ import { describe, it } from 'node:test';
 import {
   api2Data,
   bumpRelease,
+  changedSince,
+  commitIn,
   compareReleases,
   cpanel,
   dirVariable,
@@ -89,18 +92,82 @@ describe('release', () => {
   });
 });
 
+describe('what changed since the last deploy', () => {
+  const A = 'a'.repeat(40);
+
+  it('reads the commit the last deploy left', () => {
+    assert.equal(commitIn(`{"version":"1.00.00.03","commit":"${A}"}`), A);
+    assert.equal(commitIn('{"version":"1.00.00.03","commit":""}'), null);
+    assert.equal(commitIn('{"version":"1.00.00.03"}'), null);
+    assert.equal(commitIn(null), null);
+  });
+
+  it('deploys when it cannot tell', () => {
+    const never = () => assert.fail('git should not be asked');
+    assert.equal(changedSince(null, 'api', never), true);
+    assert.equal(
+      changedSince(A, 'api', () => {
+        throw new Error('fatal: bad object');
+      }),
+      true,
+    );
+  });
+
+  it('asks git about the part\'s own sources only', () => {
+    let asked = [];
+    assert.equal(changedSince(A, 'admin', (args) => ((asked = args), '')), false);
+    assert.deepEqual(asked.slice(0, 5), ['diff', '--name-only', A, 'HEAD', '--']);
+    assert.ok(asked.includes('apps/admin/') && asked.includes('packages/sdk/') && !asked.includes('apps/api/'));
+  });
+
+  it('skips the API after a commit that only touched the app, and not after one in apps/api', () => {
+    const repo = mkdtempSync(join(tmpdir(), 'quezby-changes-'));
+    const git = (args) => execFileSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', ...args], { cwd: repo, encoding: 'utf8' });
+    try {
+      git(['init', '-q']);
+      for (const dir of ['apps/api', 'apps/admin', 'apps/mobile']) mkdirSync(join(repo, dir), { recursive: true });
+      writeFileSync(join(repo, 'apps/api/a.php'), '1');
+      writeFileSync(join(repo, 'apps/admin/a.tsx'), '1');
+      git(['add', '.']);
+      git(['commit', '-qm', 'deployed']);
+      const deployed = git(['rev-parse', 'HEAD']).trim();
+
+      writeFileSync(join(repo, 'apps/mobile/a.tsx'), '2');
+      git(['add', '.']);
+      git(['commit', '-qm', 'app only']);
+      assert.equal(changedSince(deployed, 'api', git), false);
+      assert.equal(changedSince(deployed, 'admin', git), false);
+
+      writeFileSync(join(repo, 'apps/api/a.php'), '2');
+      git(['commit', '-qam', 'api']);
+      assert.equal(changedSince(deployed, 'api', git), true);
+      assert.equal(changedSince(deployed, 'admin', git), false);
+    } finally {
+      rmSync(repo, { recursive: true, force: true });
+    }
+  });
+});
+
 describe('parseArguments', () => {
   it('deploys both parts, minipatch up, unless told otherwise', () => {
-    assert.deepEqual(parseArguments(['production']), { environment: 'production', parts: ['api', 'admin'], bump: 'minipatch', version: null, dryRun: false });
+    assert.deepEqual(parseArguments(['production']), {
+      environment: 'production',
+      parts: ['api', 'admin'],
+      bump: 'minipatch',
+      version: null,
+      dryRun: false,
+      changedOnly: false,
+    });
   });
 
   it('reads the flags the workflow and pnpm pass', () => {
-    assert.deepEqual(parseArguments(['staging', '--', '--only', 'admin', '--bump', 'minor', '--dry-run']), {
+    assert.deepEqual(parseArguments(['staging', '--', '--only', 'admin', '--bump', 'minor', '--dry-run', '--changed-only']), {
       environment: 'staging',
       parts: ['admin'],
       bump: 'minor',
       version: null,
       dryRun: true,
+      changedOnly: true,
     });
     assert.deepEqual(parseArguments(['staging', '--only', 'all', '--version', '1.01.01.01']).parts, ['api', 'admin']);
     assert.equal(parseArguments(['staging', '--version', '1.01.01.01']).version, '1.01.01.01');

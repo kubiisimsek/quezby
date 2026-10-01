@@ -9,6 +9,7 @@
  *   pnpm deploy:production --bump minor         # 1.00.03.07 → 1.01.00.00
  *   pnpm deploy:staging --version 1.01.01.01    # a release of your choosing
  *   pnpm deploy:staging --dry-run               # check and build, send nothing
+ *   pnpm deploy:staging --changed-only          # skip a part unchanged since its last deploy
  *
  * Reads, from the environment (or from a git-ignored .env.deploy at the root):
  *   DEPLOY_CPANEL_USER, DEPLOY_CPANEL_TOKEN      cPanel → Manage API Tokens
@@ -23,6 +24,11 @@
  * patch, minipatch — is read from the version.json the last deploy left in
  * each folder, raised, and written into the new build; /api/v1/health and the
  * panel's Sistem page show it.
+ *
+ * version.json also names the commit a part was built from: with
+ * --changed-only (what a push to develop or main runs) a part whose files have
+ * not changed since that commit is skipped, and nothing at all is sent when
+ * neither has.
  *
  * Each zip goes to the home folder, is extracted over its folder — as the
  * manual steps do — and deleted. The API goes first because the panel's
@@ -47,6 +53,15 @@ export const CPANEL = Object.freeze({ host: 'quezby.com', port: '2083' });
 export const ENVIRONMENTS = ['staging', 'production'];
 export const PARTS = ['api', 'admin'];
 export const BUMPS = ['major', 'minor', 'patch', 'minipatch'];
+
+/**
+ * What each part is built from: a change under one of these paths since the
+ * commit the server's version.json names is a reason to deploy it again.
+ */
+export const SOURCES = Object.freeze({
+  api: ['apps/api/', 'scripts/package-api.sh'],
+  admin: ['apps/admin/', 'packages/types/', 'packages/sdk/', 'packages/config/', 'scripts/package-admin.mjs', 'pnpm-lock.yaml'],
+});
 
 /** The file that proves a folder already holds what is about to replace it. */
 export const MARKER = { api: 'artisan', admin: 'index.html' };
@@ -113,19 +128,46 @@ export function releaseIn(text) {
   }
 }
 
+/** The commit in a version.json the last deploy left, or null. */
+export function commitIn(text) {
+  try {
+    const commit = JSON.parse(text ?? '')?.commit;
+    return typeof commit === 'string' && /^[0-9a-f]{40}$/.test(commit) ? commit : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Whether a part has to go: yes without a commit to compare with, or when
+ * git cannot compare (a commit it does not know, a shallow clone); otherwise
+ * only when one of its sources changed since.
+ *
+ * @param {(args: string[]) => string} git runs git and hands back its output
+ */
+export function changedSince(commit, part, git) {
+  if (!commit) return true;
+  try {
+    return git(['diff', '--name-only', commit, 'HEAD', '--', ...SOURCES[part]]).trim() !== '';
+  } catch {
+    return true;
+  }
+}
+
 /* ------------------------------------------------------------ settings -- */
 
-/** @returns {{ environment: string, parts: string[], bump: string, version: string | null, dryRun: boolean }} */
+/** @returns {{ environment: string, parts: string[], bump: string, version: string | null, dryRun: boolean, changedOnly: boolean }} */
 export function parseArguments(argv) {
   const args = argv.filter((arg) => arg !== '--');
   const environment = args.shift();
-  const usage = `usage: deploy.mjs <${ENVIRONMENTS.join('|')}> [--only api|admin] [--bump ${BUMPS.join('|')}] [--version 1.00.00.01] [--dry-run]`;
+  const usage = `usage: deploy.mjs <${ENVIRONMENTS.join('|')}> [--only api|admin] [--bump ${BUMPS.join('|')}] [--version 1.00.00.01] [--changed-only] [--dry-run]`;
   if (!ENVIRONMENTS.includes(environment)) throw new Error(usage);
 
-  const options = { environment, parts: PARTS, bump: 'minipatch', version: null, dryRun: false };
+  const options = { environment, parts: PARTS, bump: 'minipatch', version: null, dryRun: false, changedOnly: false };
   while (args.length > 0) {
     const [flag, value] = [args.shift(), args[0]];
     if (flag === '--dry-run') options.dryRun = true;
+    else if (flag === '--changed-only') options.changedOnly = true;
     else if (flag === '--only' && PARTS.includes(value)) options.parts = [args.shift()];
     else if (flag === '--only' && value === 'all') args.shift();
     else if (flag === '--bump' && BUMPS.includes(value)) options.bump = args.shift();
@@ -341,8 +383,10 @@ async function health(apiOrigin, release) {
 }
 
 async function main(argv) {
-  const { environment, parts, bump, version, dryRun } = parseArguments(argv);
-  const config = readConfig(settings(), environment, parts);
+  const { environment, parts: asked, bump, version, dryRun, changedOnly } = parseArguments(argv);
+  const config = readConfig(settings(), environment, asked);
+  const git = (args) => execFileSync('git', args, { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+  const commit = git(['rev-parse', 'HEAD']).trim();
   const { ENVIRONMENTS: ORIGINS } = await import(pathToFileURL(join(root, 'apps/admin/deploy/environments.mjs')).href);
   const { apiOrigin } = ORIGINS[environment];
   const name = { api: 'API', admin: 'panel' };
@@ -354,11 +398,18 @@ async function main(argv) {
   const verdicts = {};
   const releases = {};
   let opsToken = '';
-  for (const part of parts) {
+  const parts = [];
+  for (const part of asked) {
     const dir = config.dirs[part];
     verdicts[part] = folderVerdict(await panel.list(dir), part);
     if (verdicts[part] === 'foreign') {
       throw new Error(`refusing: ${dir} is not empty and has no ${MARKER[part]} — is ${dirVariable(environment, part)} right?`);
+    }
+    const deployed = verdicts[part] === 'same' ? await panel.read(dir, 'version.json') : null;
+    const current = releaseIn(deployed);
+    if (changedOnly && current && !changedSince(commitIn(deployed), part, git)) {
+      console.log(`  ${name[part]} in ${dir}: ${current}, unchanged since ${commitIn(deployed).slice(0, 7)} — skipped`);
+      continue;
     }
     if (part === 'api') {
       const env = serverEnv(verdicts.api === 'new' ? null : await panel.read(dir, '.env'), environment);
@@ -367,15 +418,19 @@ async function main(argv) {
       opsToken = env.opsToken;
       if (process.env.GITHUB_ACTIONS === 'true') console.log(`::add-mask::${opsToken}`);
     }
-    const current = verdicts[part] === 'same' ? releaseIn(await panel.read(dir, 'version.json')) : null;
     releases[part] = nextRelease(current, { bump, version });
+    parts.push(part);
     console.log(`  ${name[part]} in ${dir}: ${current ?? 'no release yet'} → ${releases[part]}`);
+  }
+  if (parts.length === 0) {
+    console.log(`\n✓ ${environment}: nothing changed since the last deploy, nothing sent`);
+    return;
   }
 
   const zips = {};
   for (const part of parts) {
     step(`Building the ${name[part]} ${releases[part]} for ${environment}`);
-    const env = { ...process.env, QUEZBY_RELEASE: releases[part] };
+    const env = { ...process.env, QUEZBY_RELEASE: releases[part], QUEZBY_COMMIT: commit };
     if (part === 'api') {
       execFileSync('./scripts/package-api.sh', [environment, '--without-env'], { cwd: root, stdio: 'inherit', env });
       zips.api = newest(`quezby-api-${environment}-`);

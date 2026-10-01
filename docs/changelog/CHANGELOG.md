@@ -54,9 +54,18 @@ The owner wanted to deploy the API and the panel with one button. The host
   - `--bump major|minor|patch|minipatch`;
   - `--version 1.01.01.01`;
   - `--dry-run`.
-- **`.github/workflows/deploy.yml`:** Actions → Deploy → Run workflow, with
-  the same choices. It runs the tests first: lint, typecheck, `pnpm test`,
-  `pnpm test:api`. Production deploys only from `main`.
+- **`.github/workflows/deploy.yml`:**
+  - A push to `develop` deploys staging; a push to `main` (a merged PR)
+    deploys production.
+  - Actions → Deploy → Run workflow does it by hand, with the same choices.
+  - It runs the tests first: lint, typecheck, `pnpm test`, `pnpm test:api`.
+  - By hand, production deploys only from `main`.
+- **A push sends only what changed:** `--changed-only`.
+  - `version.json` also names the commit each part was built from.
+  - A part none of whose sources changed since is skipped: `apps/api/` for
+    the API; `apps/admin/`, `packages/types|sdk|config/` and the lockfile
+    for the panel.
+  - An app-only push sends nothing and raises no release.
 - **Settings:**
   - repository secrets `CPANEL_USER` and `CPANEL_TOKEN`;
   - repository variables `DEPLOY_STAGING_API_DIR`,

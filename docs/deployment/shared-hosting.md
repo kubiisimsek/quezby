@@ -48,12 +48,28 @@ adındadır, klasör düzeni hemen aşağıda.
 
 ## Tek tuşla: GitHub Actions
 
-API'yi ve paneli tek düğmeyle ya da tek komutla gönderirsin. SSH gerekmez:
-her şey cPanel'in kendi API'siyle yapılır.
+API ve panel git'ten kendiliğinden gider. SSH gerekmez: her şey cPanel'in
+kendi API'siyle yapılır.
 
-- **GitHub'dan:** **Actions** → **Deploy** → **Run workflow**.
-- **Kendi bilgisayarından:** `pnpm deploy:staging` ya da
-  `pnpm deploy:production`.
+| Ne yaparsın | Nereye gider |
+| --- | --- |
+| `develop`'a push | **staging** |
+| `main`'e push ya da PR merge | **production** |
+| Actions → **Deploy** → **Run workflow** | seçtiğin ortama, seçtiğin ayarlarla |
+| `pnpm deploy:staging` / `pnpm deploy:production` | kendi bilgisayarından |
+
+**Push'ta yalnızca değişen gider.**
+
+- Sunucudaki `version.json` en son hangi commit'in yüklendiğini yazar.
+- Push o commit'ten bu yana değişenlere bakar. API giderse
+  `apps/api/` değişmiştir; panel giderse `apps/admin/`, `packages/types/`,
+  `packages/sdk/`, `packages/config/` ya da `pnpm-lock.yaml`.
+- Sadece mobil uygulamayı ya da dokümanları değiştiren bir push hiçbir şey
+  yüklemez, sürümü de artırmaz.
+- Arada bir push atlansa bile hiçbir değişiklik kaçmaz, çünkü karşılaştırma
+  sunucudaki commit'le yapılır.
+- Elle çalıştırma (**Run workflow** ya da `pnpm deploy:…`) değişmese de
+  gönderir.
 
 **`.env` sunucuda kalır.** Gönderim onu hiç yüklemez ve değiştirmez, yalnızca
 okur:
@@ -78,7 +94,9 @@ gönderimde hiç kullanılmaz.
    söyleyene kadar beklenir.
 6. Panel aynı yolla yüklenir.
 
-Production yalnızca `main` dalından gider (GitHub'dan gönderimde).
+Production yalnızca `main` dalından gider (GitHub'dan gönderimde). Her
+production gönderiminin senin onayını beklemesini istersen: Repo →
+**Settings** → **Environments** → `production` → **Required reviewers**.
 
 **Sürüm** `major.minor.patch.minipatch` biçimindedir, ör. `1.01.01.01`:
 
@@ -148,6 +166,7 @@ pnpm deploy:production --only api            # yalnızca API
 pnpm deploy:production --bump minor          # 1.00.03.07 → 1.01.00.00
 pnpm deploy:staging --version 1.01.01.01     # tam sürüm
 pnpm deploy:staging --dry-run                # kontrol eder ve derler, hiçbir şey yüklemez
+pnpm deploy:staging --changed-only           # push'taki gibi: yalnızca değişen gider
 ```
 
 GitHub'daki **Run workflow** penceresinde aynı seçenekler var: ortam, ne

@@ -12,7 +12,8 @@
 # checked first (scripts/check-api-env.mjs): without APP_KEY, or with another
 # APP_ENV or debug on, nothing is built. With --without-env no .env goes in
 # at all (scripts/deploy.mjs). QUEZBY_RELEASE=1.00.00.01 writes version.json,
-# which /api/v1/health and the panel's Sistem page show.
+# which /api/v1/health and the panel's Sistem page show; QUEZBY_COMMIT adds
+# the commit it was built from, so the next deploy knows what changed since.
 
 set -euo pipefail
 
@@ -36,6 +37,11 @@ esac
 RELEASE="${QUEZBY_RELEASE:-}"
 if [[ -n "$RELEASE" && ! "$RELEASE" =~ ^[0-9]+\.[0-9]{2,}\.[0-9]{2,}\.[0-9]{2,}$ ]]; then
   echo "error: QUEZBY_RELEASE must look like 1.00.00.01, not '$RELEASE'." >&2
+  exit 64
+fi
+COMMIT="${QUEZBY_COMMIT:-}"
+if [[ -n "$COMMIT" && ! "$COMMIT" =~ ^[0-9a-f]{40}$ ]]; then
+  echo "error: QUEZBY_COMMIT must be a full commit hash." >&2
   exit 64
 fi
 
@@ -114,7 +120,7 @@ if [[ "$WITH_ENV" == 1 && -f "$ENV_FILE" ]]; then
 fi
 
 if [[ -n "$RELEASE" ]]; then
-  printf '{"version":"%s","deployedAt":"%s"}\n' "$RELEASE" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$BUILD/version.json"
+  printf '{"version":"%s","commit":"%s","deployedAt":"%s"}\n' "$RELEASE" "$COMMIT" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$BUILD/version.json"
   echo "→ Release $RELEASE"
 fi
 
