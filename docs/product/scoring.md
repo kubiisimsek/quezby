@@ -460,8 +460,8 @@ görünen her sayı sunucudan gelir.
    `gesture_not_allowed`…) tur olarak sayılmaz (`rejected`).
 4. **Sert bayraklar** (tur saklanır, hiçbir tabloya girmez):
    - `wall_clock`: geçen süre, uygulamanın gerçek temposundan kısa — 1,8 sn geri
-     sayım + her reelin aktif süresi + karardan sonraki bekleme (0/160/260 ms) ve
-     170 ms kayma, 1 sn tolerans. Tempo `@quezby/config` `PACE` ile paylaşılır.
+     sayım + her reelin aktif süresi + karardan sonraki bekleme (0/100/200 ms) ve
+     140 ms kayma, 1 sn tolerans. Tempo `@quezby/config` `PACE` ile paylaşılır.
    - `fast_decisions`: ≥30 kaydırma/beğeni isabetinin %20'den fazlası 250 ms altında
      — ama 250 ms altındaki tüm hareketlerin %10'dan fazlası yanlışsa bayrak
      kalkar (`fast_wrong_share`): her şeyi kaydıran oyuncu tahmin ediyordur,

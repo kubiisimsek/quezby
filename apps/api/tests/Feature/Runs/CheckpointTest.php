@@ -247,10 +247,11 @@ describe('at the finish', function () {
         $this->signIn();
         [$fixture, $runId] = longRun($this);
         $replay = Engine::replay($fixture['seed'], $fixture['actions']);
-        // A miss past the first mark: its pause and slide are the longest the app takes, 260 + 170 ms.
+        // A miss past the first mark: its pause and slide are the longest the app takes.
         $reel = collect($replay->steps)->search(fn ($step, int $i) => $i > 100 && ! $step->verdict->isHit()) + 1;
         $atVerdict = checkpointNeeded($fixture['seed'], $fixture['actions'], $reel);
-        expect(app(RunClock::class)->needed($replay)[$reel] - $atVerdict)->toBe(430);
+        expect(app(RunClock::class)->needed($replay)[$reel] - $atVerdict)
+            ->toBe(config('quezby.plausibility.pace.exit_ms.miss') + config('quezby.plausibility.pace.slide_ms'));
 
         $receipts = [...$this->honestCheckpoints($runId, $fixture['actions']), checkpointReceipt($runId, $fixture['actions'], $reel, $atVerdict)];
         $this->finishRun($runId, $fixture['actions'], $fixture['summary']['score'], $fixture['summary']['reels'], $receipts)

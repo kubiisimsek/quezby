@@ -10,9 +10,9 @@ export const PACE = {
   countdownStepMs: 600,
   countdownSteps: 3,
   /** The reel sliding away after its verdict. */
-  slideMs: 170,
+  slideMs: 140,
   /** How long a verdict stays on screen before the slide. */
-  exitMs: { skipHit: 0, hit: 160, miss: 260 },
+  exitMs: { skipHit: 0, hit: 100, miss: 200 },
 } as const;
 
 export type PaceKind = 'skip' | 'like' | 'hold' | 'freeze';

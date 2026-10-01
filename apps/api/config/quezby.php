@@ -110,8 +110,8 @@ return [
         'pace' => [
             'countdown_step_ms' => 600,
             'countdown_steps' => 3,
-            'slide_ms' => 170,
-            'exit_ms' => ['skip_hit' => 0, 'hit' => 160, 'miss' => 260],
+            'slide_ms' => 140,
+            'exit_ms' => ['skip_hit' => 0, 'hit' => 100, 'miss' => 200],
         ],
         'clock_tolerance_ms' => 1000,
 
