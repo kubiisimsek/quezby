@@ -307,9 +307,15 @@ return [
             // difficulty that rating plays, per engine and difficulty version.
             // From the simulated profiles' medians at their difficulties
             // (`pnpm engine:simulate`); calibrate with `quezby:rating:calibrate`.
+            // Version 2 sets the ladder on people: casual play at 1000 (level
+            // with the placement table, as version 1 had it), average at 2000,
+            // good at 4000, halfway from good to pro at MasterClass's door
+            // (5000), pro at 6000, elite at 7000. Version 1 put the door past
+            // the best simulated thumb; its table stays for its runs.
             'targets' => [
                 3 => [
                     1 => [0 => 8000, 1000 => 31600, 2000 => 74100, 3000 => 148300, 4000 => 265700, 5000 => 394000, 6000 => 542300],
+                    2 => [0 => 8000, 1000 => 31600, 2000 => 76200, 3000 => 96100, 4000 => 129500, 5000 => 176700, 6000 => 294400, 7000 => 485800],
                 ],
             ],
         ],

@@ -3,10 +3,9 @@ export {
   DIFFICULTY_VERSION,
   MAX_DIFFICULTY,
   difficultyRules,
-  drainAt,
-  likeWeightAt,
+  gainAt,
+  gainsAt,
   lossAt,
-  specialShareAt,
   type DifficultyRules,
 } from './difficulty';
 export { Rng } from './rng';

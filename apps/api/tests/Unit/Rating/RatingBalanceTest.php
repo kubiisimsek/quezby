@@ -91,10 +91,12 @@ test('a better player always settles higher', function () {
 });
 
 /*
-| The same promise at Dereceli's difficulties: every rated run is played at
-| the difficulty of the player's rating (`RatingService::difficultyAt`), so a
-| player's scores fall as they climb. The difficulty table's targets hold
-| each profile where it settles at difficulty 0; the engine's own targets
+| Dereceli's ladder: every rated run is played at the difficulty of the
+| player's rating (`RatingService::difficultyAt`) — the same feed, a tighter
+| meter — so a player's scores fall as they climb. The difficulty table's
+| targets (version 2) set the ladder on people: casual and average play in
+| Gümüş, good play in Platin, and MasterClass within a pro's reach, not past
+| the best simulated thumb as version 1 had it. The engine's own targets
 | would push the best players down a league.
 |
 | Each profile's median score at difficulties 0–16 (600 simulated runs each,
@@ -102,11 +104,11 @@ test('a better player always settles higher', function () {
 */
 
 const DIFFICULTY_MEDIANS = [
-    'casual' => [39300, 36900, 34300, 33000, 30700, 27200, 24400, 22300, 19200, 16800, 15300, 13600, 13000, 11700, 9900, 9300, 8200],
-    'average' => [101500, 97100, 92900, 87500, 83100, 75300, 72700, 66500, 60700, 56900, 51300, 46900, 41600, 37400, 33000, 29000, 26000],
-    'good' => [240300, 228800, 224600, 213000, 200800, 193400, 180300, 164600, 155300, 145700, 134100, 129000, 119000, 104300, 95300, 89400, 79300],
-    'pro' => [493200, 478500, 470000, 455600, 440600, 419100, 398000, 384200, 365700, 350900, 327200, 311200, 290100, 270000, 251400, 233900, 214200],
-    'elite' => [726800, 725000, 709000, 696800, 671000, 650000, 628200, 608800, 578500, 553300, 522500, 496300, 473500, 435500, 415800, 391700, 361600],
+    'casual' => [39300, 36700, 34500, 32500, 30900, 29300, 27000, 25000, 23200, 21600, 19700, 17800, 17000, 15700, 14600, 13500, 12800],
+    'average' => [101500, 96600, 91000, 85400, 80900, 76200, 72600, 67400, 64400, 59500, 58000, 53000, 49100, 44400, 42900, 41200, 38600],
+    'good' => [240300, 231500, 222500, 212300, 204200, 195100, 187000, 178500, 169200, 159400, 152500, 147000, 140000, 129500, 124600, 119700, 112300],
+    'pro' => [493200, 474400, 461200, 448800, 440900, 430200, 416400, 405700, 392100, 376500, 364400, 353000, 340100, 326000, 311100, 302100, 294400],
+    'elite' => [726800, 710000, 693000, 679400, 667000, 651200, 637400, 622500, 612300, 601400, 586300, 570000, 549100, 529700, 519100, 503300, 485800],
 ];
 
 /**
@@ -164,21 +166,41 @@ function difficultyTargets(): TargetTable
     return TargetTable::forDifficulty(Rules::ENGINE_VERSION, Difficulty::VERSION) ?? throw new RuntimeException('No difficulty targets.');
 }
 
-test('at the difficulties, each simulated player settles in the league it settles in without them', function (string $profile, float $sigma, LeagueTier $league) {
+test('at the difficulties, each simulated player settles in its league on the ladder, and stays there', function (string $profile, float $sigma, LeagueTier $league) {
     $hard = settleAtDifficulty(DIFFICULTY_MEDIANS[$profile], $sigma, difficultyTargets());
-    $easy = settle((int) round(DIFFICULTY_MEDIANS[$profile][0]), $sigma);
 
+    // A run's score spreads ±35–50 % for casual and average thumbs: their
+    // rating moves more a run than a steady player's, never across a league.
     expect(LeagueTier::fromRating((int) round($hard['mean'])))->toBe($league)
-        ->and(abs($hard['mean'] - $easy['mean']))->toBeLessThan(150.0)
-        ->and($hard['sd'])->toBeLessThan(120.0)
-        ->and($hard['p90'])->toBeLessThanOrEqual(80);
+        ->and($hard['sd'])->toBeLessThan(150.0)
+        ->and($hard['p90'])->toBeLessThanOrEqual(95);
 })->with([
     'casual' => ['casual', 0.52, LeagueTier::Silver],
     'average' => ['average', 0.35, LeagueTier::Silver],
-    'good' => ['good', 0.24, LeagueTier::Gold],
-    'pro' => ['pro', 0.16, LeagueTier::Platinum],
-    'elite' => ['elite', 0.12, LeagueTier::Diamond],
+    'good' => ['good', 0.24, LeagueTier::Platinum],
+    'pro' => ['pro', 0.16, LeagueTier::Master],
+    'elite' => ['elite', 0.12, LeagueTier::Master],
 ]);
+
+test('MasterClass is a pro’s to reach and to keep: calm once there, and good play stays below it', function () {
+    $pro = settleAtDifficulty(DIFFICULTY_MEDIANS['pro'], 0.16, difficultyTargets());
+    $elite = settleAtDifficulty(DIFFICULTY_MEDIANS['elite'], 0.12, difficultyTargets());
+    $good = settleAtDifficulty(DIFFICULTY_MEDIANS['good'], 0.24, difficultyTargets());
+
+    expect($pro['mean'])->toBeGreaterThan(5000.0)
+        ->and($elite['mean'])->toBeGreaterThan($pro['mean'] + 500)
+        ->and($pro['p90'])->toBeLessThanOrEqual(70)
+        ->and($elite['p90'])->toBeLessThanOrEqual(70)
+        ->and($pro['sd'])->toBeLessThan(100.0)
+        ->and($good['mean'])->toBeLessThan(4500.0);
+});
+
+test('MasterClass’s door asks a run a person can play', function () {
+    // At 5000 the target is what halfway from good to pro scores at difficulty
+    // 16 — under 180 000, some three and a half minutes of clean play.
+    expect(difficultyTargets()->shown(5000))->toBeLessThan(180000)
+        ->and(difficultyTargets()->shown(5000))->toBeGreaterThan(difficultyTargets()->shown(4000));
+});
 
 test('the difficulty-0 targets would push the best players down a league', function () {
     $elite = settleAtDifficulty(DIFFICULTY_MEDIANS['elite'], 0.12, TargetTable::forEngine(Rules::ENGINE_VERSION), players: 40);

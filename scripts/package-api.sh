@@ -5,11 +5,14 @@
 #
 #   ./scripts/package-api.sh staging
 #   ./scripts/package-api.sh production
+#   ./scripts/package-api.sh production --without-env   # the server keeps its own .env
 #
 # → dist-deploy/quezby-api-<env>-<timestamp>.zip with production dependencies
 # installed and apps/api/.env.<env> (git-ignored) inside as .env. That file is
 # checked first (scripts/check-api-env.mjs): without APP_KEY, or with another
-# APP_ENV or debug on, nothing is built.
+# APP_ENV or debug on, nothing is built. With --without-env no .env goes in
+# at all (scripts/deploy.mjs). QUEZBY_RELEASE=1.00.00.01 writes version.json,
+# which /api/v1/health and the panel's Sistem page show.
 
 set -euo pipefail
 
@@ -17,10 +20,24 @@ ENVIRONMENT="${1:-}"
 case "$ENVIRONMENT" in
   staging | production) ;;
   *)
-    echo "usage: $0 <staging|production>" >&2
+    echo "usage: $0 <staging|production> [--without-env]" >&2
     exit 64
     ;;
 esac
+WITH_ENV=1
+case "${2:-}" in
+  "") ;;
+  --without-env) WITH_ENV=0 ;;
+  *)
+    echo "usage: $0 <staging|production> [--without-env]" >&2
+    exit 64
+    ;;
+esac
+RELEASE="${QUEZBY_RELEASE:-}"
+if [[ -n "$RELEASE" && ! "$RELEASE" =~ ^[0-9]+\.[0-9]{2,}\.[0-9]{2,}\.[0-9]{2,}$ ]]; then
+  echo "error: QUEZBY_RELEASE must look like 1.00.00.01, not '$RELEASE'." >&2
+  exit 64
+fi
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 API="$ROOT/apps/api"
@@ -37,7 +54,9 @@ done
 
 # The .env goes first: a zip that would answer every player 500 is not worth building.
 ENV_FILE="$API/.env.$ENVIRONMENT"
-if [[ -f "$ENV_FILE" ]]; then
+if [[ "$WITH_ENV" == 0 ]]; then
+  echo "→ No .env in the zip: the server keeps its own"
+elif [[ -f "$ENV_FILE" ]]; then
   echo "→ Checking apps/api/.env.$ENVIRONMENT"
   node "$ROOT/scripts/check-api-env.mjs" "$ENVIRONMENT" "$ENV_FILE"
 else
@@ -89,9 +108,14 @@ mkdir -p \
 echo "→ Installing production dependencies"
 (cd "$BUILD" && "$COMPOSER" install --no-dev --optimize-autoloader --no-interaction --no-progress)
 
-if [[ -f "$ENV_FILE" ]]; then
+if [[ "$WITH_ENV" == 1 && -f "$ENV_FILE" ]]; then
   cp "$ENV_FILE" "$BUILD/.env"
   echo "→ Using apps/api/.env.$ENVIRONMENT as .env"
+fi
+
+if [[ -n "$RELEASE" ]]; then
+  printf '{"version":"%s","deployedAt":"%s"}\n' "$RELEASE" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$BUILD/version.json"
+  echo "→ Release $RELEASE"
 fi
 
 mkdir -p "$OUT"

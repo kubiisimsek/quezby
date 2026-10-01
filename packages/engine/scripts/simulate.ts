@@ -16,8 +16,7 @@ import {
   type Played,
 } from '../src/balance';
 import { ELITE, PROFILES, blindSwipe } from '../src/bot';
-import { MAX_DIFFICULTY } from '../src/difficulty';
-import { ReelStream } from '../src/reels';
+import { MAX_DIFFICULTY, difficultyRules } from '../src/difficulty';
 import { BONUS_KINDS } from '../src/rules';
 import { Run } from '../src/run';
 
@@ -87,26 +86,10 @@ for (const ms of [150, 200, 250]) {
   console.log(`  score     ${row(summaries.map((summary) => summary.score)).map(fmt).join(' / ')}\n`);
 }
 
-// Dereceli's difficulties: each profile at every fourth step, and what the
-// feed and the meter did to it — the table in docs/product/scoring.md.
-const share = (played: readonly Played[], difficulty: number) => {
-  let reels = 0;
-  let specials = 0;
-  let freezes = 0;
-  played.forEach((run, i) => {
-    const stream = new ReelStream((i + 1) * 7919, difficulty);
-    for (let n = 0; n < run.summary.reels; n += 1) {
-      const { kind } = stream.next();
-      if (n < 8) continue;
-      reels += 1;
-      if (kind !== 'skip') specials += 1;
-      if (kind === 'freeze') freezes += 1;
-    }
-  });
-  return { specials: (specials * 100) / reels, freezes: (freezes * 100) / reels };
-};
-
-console.log('difficulties · median score (vs 0) · median length · special / freeze share · same length ±10 %\n');
+// Dereceli's difficulties: each profile at every fourth step — the feed is
+// the same at all of them; only the meter's gain and loss tighten. The table
+// in docs/product/scoring.md, and the medians RatingBalanceTest draws from.
+console.log('difficulties · gain / penalty · median score (vs 0) · median length · same length ±10 %\n');
 for (const profile of [...PROFILES, ELITE]) {
   console.log(profile.name);
   let base = 0;
@@ -115,13 +98,24 @@ for (const profile of [...PROFILES, ELITE]) {
     const score = row(played.map((run) => run.summary.score))[1];
     if (difficulty === 0) base = score;
     const seconds = row(played.map((run) => run.seconds))[1];
-    const kinds = share(played, difficulty);
     const spread = sameLengthSpread(played, 0.1);
+    const rules = difficultyRules(difficulty);
     console.log(
-      `  ${String(difficulty).padStart(2)}  ${fmt(score).padStart(9)} (${difficulty === 0 ? '   —' : `${Math.round((score / base - 1) * 100)} %`.padStart(5)})` +
-        `  ${clock(seconds)}  specials ${kinds.specials.toFixed(0)} % · freeze ${kinds.freezes.toFixed(0)} %` +
-        `  · ${ratio(spread.low)} · ${ratio(spread.high)}`,
+      `  ${String(difficulty).padStart(2)}  ×${(rules.gain / 1000).toFixed(2)} / ×${(rules.penalty / 1000).toFixed(2)}` +
+        `  ${fmt(score).padStart(9)} (${difficulty === 0 ? '   —' : `${Math.round((score / base - 1) * 100)} %`.padStart(5)})` +
+        `  ${clock(seconds)}  · ${ratio(spread.low)} · ${ratio(spread.high)}`,
     );
   }
   console.log();
+}
+
+// Every difficulty's median for each profile, as RatingBalanceTest's
+// DIFFICULTY_MEDIANS lists them.
+if (process.env.MEDIANS) {
+  for (const profile of [...PROFILES, ELITE]) {
+    const medians = Array.from({ length: MAX_DIFFICULTY + 1 }, (_, difficulty) =>
+      Math.round(row(playProfile(profile, runs, 1, difficulty).map((run) => run.summary.score))[1] / 100) * 100,
+    );
+    console.log(`'${profile.name}' => [${medians.join(', ')}],`);
+  }
 }

@@ -148,12 +148,9 @@ export function SystemPage() {
           <p className="font-mono text-micro">{data.pendingMigrations.join(', ')}</p>
         </Callout>
       ) : null}
-      {data.tokens.ops || data.tokens.moderation ? (
+      {data.tokens.moderation ? (
         <Callout tone="warn" title="Paylaşılan bir anahtar açık">
-          <p>
-            {[data.tokens.ops ? 'OPS_TOKEN' : null, data.tokens.moderation ? 'MODERATION_TOKEN' : null].filter(Boolean).join(' ve ')} dolu. Kullanmıyorsan
-            sunucudaki .env dosyasında boşalt; panel bu işleri anahtarsız yapıyor.
-          </p>
+          <p>MODERATION_TOKEN dolu. Kullanmıyorsan sunucudaki .env dosyasında boşalt; panel bu işleri anahtarsız yapıyor.</p>
         </Callout>
       ) : null}
 
@@ -162,12 +159,19 @@ export function SystemPage() {
           <Facts
             facts={[
               { label: 'Ortam', value: data.environment },
+              { label: 'API sürümü', value: data.version ?? 'Yüklenmemiş' },
+              { label: 'Panel sürümü', value: __PANEL_VERSION__ || 'Yerel' },
               { label: 'PHP', value: data.php },
               { label: 'Laravel', value: data.laravel },
               { label: 'Veritabanı', value: data.database },
               { label: 'Saat dilimi', value: data.timezone },
               { label: 'Sunucu saati', value: formatDateTime(data.serverTime) },
               { label: 'APP_KEY', value: <Tag tone={data.appKey ? 'ok' : 'bad'} label={data.appKey ? 'Tanımlı' : 'Eksik'} /> },
+              {
+                label: 'Gönderim anahtarı (OPS_TOKEN)',
+                value: <Tag tone={data.tokens.ops ? 'ok' : 'neutral'} label={data.tokens.ops ? 'Dolu' : 'Boş'} />,
+                hint: 'GitHub’dan gönderim migration’ı bununla yapar',
+              },
               { label: 'GD (profil fotoğrafları)', value: <Tag tone={data.gd ? 'ok' : 'bad'} label={data.gd ? 'Kurulu' : 'Eksik'} /> },
               { label: 'Push bildirimleri (Firebase)', value: <Tag tone={data.push ? 'ok' : 'warn'} label={data.push ? 'Açık' : 'Kapalı'} /> },
               { label: 'Yapılandırma önbelleği', value: <Tag tone={data.cached.config ? 'ok' : 'neutral'} label={data.cached.config ? 'Açık' : 'Kapalı'} /> },

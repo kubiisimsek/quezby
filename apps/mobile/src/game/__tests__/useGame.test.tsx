@@ -1,4 +1,4 @@
-import { DIFFICULTY_VERSION, ENGINE_VERSION, GESTURE, drainAt } from '@quezby/engine';
+import { DIFFICULTY_VERSION, ENGINE_VERSION, GESTURE, drainFor } from '@quezby/engine';
 import { CHECKPOINTS, CONTENT_VERSION, PACE, exitDelayMs, prefixHash } from '@quezby/config';
 import { ApiError } from '@quezby/sdk';
 import type { CheckpointRequest, FinishRunRequest } from '@quezby/types';
@@ -84,9 +84,8 @@ describe('useGame', () => {
 
     expect(runs.start).toHaveBeenCalledWith(expect.objectContaining({ mode: 'rated', difficultyVersion: DIFFICULTY_VERSION }));
     expect(hook.result.current.difficulty).toBe(12);
-    // The meter drains as the API will replay it: at difficulty 12, not the Normal game's pace.
-    expect(hook.result.current.reel?.drain).toBe(drainAt(0, 12));
-    expect(hook.result.current.reel?.drain).toBeGreaterThan(drainAt(0, 0));
+    // The same feed as Normal — difficulty only tightens the meter's gain and loss.
+    expect(hook.result.current.reel?.drain).toBe(drainFor(0));
   });
 
   it('sends a VS to a friend: the start names them, and the run is played like any other', async () => {

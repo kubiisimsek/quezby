@@ -468,6 +468,7 @@ export function adminAccount(overrides: Partial<AdminAccount> = {}): AdminAccoun
 export function system(overrides: Partial<AdminSystem> = {}): AdminSystem {
   return {
     environment: 'production',
+    version: '1.00.00.12',
     php: '8.3.12',
     laravel: '13.33.0',
     database: 'mysql',

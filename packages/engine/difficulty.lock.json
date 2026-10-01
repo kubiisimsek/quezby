@@ -1,8 +1,8 @@
 {
-  "difficultyVersion": 1,
+  "difficultyVersion": 2,
   "engineVersion": 3,
-  "tableSha256": "698a9e685f3d3d70ca36ad1e8428e4652335a3ab37bc6c886e65ad564526d4d1",
-  "behaviourSha256": "6018b6ca1dafce8025076fc5eda98ac7b75574a6b1e05711d1d5c72753d70b01",
+  "tableSha256": "ca49b4cd40f1cc6acb46bba8844aa5b04d6f9460b01cca764501b6324874c800",
+  "behaviourSha256": "9c74066098ecd5c6ec1981c9fa1f01bd491fed6509e3d17e081f4c4338084a12",
   "history": [
     {
       "difficultyVersion": 1,
@@ -10,6 +10,13 @@
       "tableSha256": "698a9e685f3d3d70ca36ad1e8428e4652335a3ab37bc6c886e65ad564526d4d1",
       "behaviourSha256": "6018b6ca1dafce8025076fc5eda98ac7b75574a6b1e05711d1d5c72753d70b01",
       "lockedAt": "2026-09-29"
+    },
+    {
+      "difficultyVersion": 2,
+      "engineVersion": 3,
+      "tableSha256": "ca49b4cd40f1cc6acb46bba8844aa5b04d6f9460b01cca764501b6324874c800",
+      "behaviourSha256": "9c74066098ecd5c6ec1981c9fa1f01bd491fed6509e3d17e081f4c4338084a12",
+      "lockedAt": "2026-09-30"
     }
   ]
 }

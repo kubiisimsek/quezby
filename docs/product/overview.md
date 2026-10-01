@@ -115,10 +115,13 @@ CS2'nin rekabetçi modu gibi: önce oyunu öğren, sonra dereceli oyna.
   Lig ekranı da ilerlemeyi gösterir.
   İlk **3 dereceli tur yerleşmedir**, sonra her dereceli tur Elo'yu değiştirir.
   Bir kez dereceli oynayan için hep açıktır.
-  **Elo arttıkça Dereceli zorlaşır:** 1000 Elo'dan itibaren her 250 Elo'da bir
-  zorluk (0–16): engeller sıklaşır, "Dokunma" reeli artar, hatalar daha çok
-  dopamin götürür ve bar daha hızlı erir. Bronz ve yerleşme turları oyunu
-  olduğu gibi oynar. Ayrıntılar: [scoring.md → Dereceli zorluğu](./scoring.md#dereceli-zorluğu).
+  **qb arttıkça Dereceli zorlaşır:** 1000 qb'den itibaren her 250 qb'de bir
+  zorluk (0–16). Ekrana gelenler Normal'le aynı kalır; isabetler daha az
+  dopamin verir, hatalar daha çok götürür, mükemmellerin bonusu hiç azalmaz
+  (zorluk tablosu 2, 2026-09-30; tablo 1 akışı "basılı tut" ve "dokunma"
+  reelleriyle dolduruyordu). Bronz ve yerleşme turları oyunu olduğu gibi
+  oynar. MasterClass'ın kapısı tur başına ~177 bin puandır: iyi ile
+  profesyonel oyuncunun arası. Ayrıntılar: [scoring.md → Dereceli zorluğu](./scoring.md#dereceli-zorluğu).
 
 Hafta / Ay / Tüm zamanlar tablolarına (Zirve) **yalnız Normal ve Günlük**
 turlar yazılır. Dereceli yalnızca Elo için oynanır: Elo'yu ve lig sıralamasını

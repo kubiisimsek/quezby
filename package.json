@@ -37,6 +37,8 @@
     "api:package:production": "./scripts/package-api.sh production",
     "admin:package:staging": "node scripts/package-admin.mjs staging",
     "admin:package:production": "node scripts/package-admin.mjs production",
+    "deploy:staging": "node scripts/deploy.mjs staging",
+    "deploy:production": "node scripts/deploy.mjs production",
     "android:bundle:staging": "node scripts/package-android.mjs staging",
     "android:bundle:production": "node scripts/package-android.mjs production"
   },

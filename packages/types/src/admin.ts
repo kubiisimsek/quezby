@@ -714,6 +714,8 @@ export type AdminAuditQuery = AdminPageQuery & {
 
 export type AdminSystem = {
   environment: string;
+  /** The release the API was deployed as (`1.00.00.01`); null when it was never deployed. */
+  version: string | null;
   php: string;
   laravel: string;
   database: string;

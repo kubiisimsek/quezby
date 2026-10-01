@@ -1,9 +1,10 @@
-import { difficultyRules, drainAt, likeWeightAt, specialShareAt } from './difficulty';
 import { Rng } from './rng';
 import {
   RULES,
+  drainFor,
   holdFillFor,
   levelFor,
+  specialShareFor,
   windowFor,
   zoneWidthFor,
   type ReelKind,
@@ -29,23 +30,18 @@ export type Reel = {
 /**
  * The feed. Every reel costs exactly three draws — whether they are used or
  * not — so reel `n` always reads the same bits of the seed, whatever came
- * before it, and the PHP replay cannot drift out of step. A Dereceli
- * `difficulty` (`difficulty.ts`) only moves the thresholds the draws are
- * held against, and the drain; 0 is the feed of every other run.
+ * before it, and the PHP replay cannot drift out of step. It is the same
+ * feed at every Dereceli difficulty: difficulty only tightens the meter
+ * (`difficulty.ts`), never what comes on screen.
  */
 export class ReelStream {
   private readonly rng: Rng;
-  private readonly difficulty: number;
-  private readonly likeWeight: number;
   private index = 0;
   private previous: ReelKind | null = null;
   private specialRun = 0;
 
-  constructor(seed: number, difficulty = 0) {
-    difficultyRules(difficulty);
+  constructor(seed: number) {
     this.rng = new Rng(seed);
-    this.difficulty = difficulty;
-    this.likeWeight = likeWeightAt(difficulty);
   }
 
   next(): Reel {
@@ -59,13 +55,13 @@ export class ReelStream {
     if (intro !== undefined) {
       kind = intro;
     } else if (
-      special >= specialShareAt(n, this.difficulty) ||
+      special >= specialShareFor(n) ||
       this.specialRun >= RULES.maxSpecialRun
     ) {
       kind = 'skip';
-    } else if (pick < this.likeWeight) {
+    } else if (pick < RULES.weightLike) {
       kind = 'like';
-    } else if (pick < this.likeWeight + RULES.weightHold) {
+    } else if (pick < RULES.weightLike + RULES.weightHold) {
       kind = 'hold';
     } else {
       kind = this.previous === 'freeze' ? 'like' : 'freeze';
@@ -83,7 +79,7 @@ export class ReelStream {
       holdFill: isHold ? holdFillFor(n) : 0,
       zoneCenter: isHold ? RULES.zoneCenterMin + center : 0,
       zoneHalf: isHold ? Math.floor(zoneWidthFor(n) / 2) : 0,
-      drain: drainAt(n, this.difficulty),
+      drain: drainFor(n),
       level: levelFor(n),
     };
   }

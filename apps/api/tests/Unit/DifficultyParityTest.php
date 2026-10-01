@@ -3,7 +3,8 @@
 use App\Game\BonusHit;
 use App\Game\Difficulty;
 use App\Game\EngineError;
-use App\Game\ReelStream;
+use App\Game\Reel;
+use App\Game\ReelKind;
 use App\Game\Rules;
 use App\Game\Run;
 
@@ -14,19 +15,15 @@ use App\Game\Run;
 */
 
 test('the table is the TypeScript table, row for row', function () {
-    expect(Difficulty::TABLE)->toBe(engineFixture('difficulty.json')['table'])
+    expect(Difficulty::table())->toBe(engineFixture('difficulty.json')['table'])
         ->and(Difficulty::VERSION)->toBe(engineFixture('difficulty.json')['version'])
-        ->and(Difficulty::MAX)->toBe(count(Difficulty::TABLE) - 1);
+        ->and(Difficulty::MAX)->toBe(count(Difficulty::table()) - 1);
 });
 
-test('the curves and the losses match', function (array $curve) {
+test('the gains and the losses match', function (array $curve) {
     $difficulty = $curve['difficulty'];
 
-    expect(Difficulty::likeWeightAt($difficulty))->toBe($curve['likeWeight']);
-    foreach ($curve['reels'] as $reel) {
-        expect(Difficulty::specialShareAt($reel['n'], $difficulty))->toBe($reel['specialShare'])
-            ->and(Difficulty::drainAt($reel['n'], $difficulty))->toBe($reel['drain']);
-    }
+    expect(array_map(fn (int $gain) => Difficulty::gainAt($gain, $difficulty), Rules::GAIN))->toEqual($curve['gains']);
     expect([
         'timeout' => Difficulty::lossAt(Rules::LOSS_TIMEOUT, $difficulty),
         'wrong' => Difficulty::lossAt(Rules::LOSS_WRONG, $difficulty),
@@ -64,19 +61,39 @@ it('replays every engine fixture the same at difficulty 0', function (array $fix
     $this->assertSame($fixture['summary'], Run::replay($fixture['seed'], $fixture['actions'], 0)->summary->toArray());
 })->with('engine replays');
 
-test('a rated log is a different game at difficulty 0', function () {
+test('a rated log is a different game at difficulty 0: the same reels, another meter', function () {
     $fixture = collect(engineFixture('difficulty.json')['replays'])->firstWhere('name', 'pro-42-d16');
 
     try {
         $plain = Run::replay($fixture['seed'], $fixture['actions'])->summary->toArray();
         expect($plain)->not->toBe($fixture['summary']);
     } catch (EngineError) {
-        // The feed differs: the log does not even fit the easier game.
+        // The meter lasts longer at 0: the log runs out before the easier game ends.
         expect(true)->toBeTrue();
     }
 });
 
+test('every difficulty plays the same feed: the same reels, windows and drain', function () {
+    $clean = fn (Reel $reel): array => match ($reel->kind) {
+        ReelKind::Skip => [1, 400, 0],
+        ReelKind::Like => [2, 400, 0],
+        ReelKind::Freeze => [0, 0, 0],
+        ReelKind::Hold => [3, 300, (int) round($reel->zoneCenter * $reel->holdFill / 1000)],
+    };
+    $plain = new Run(7919);
+    $hard = new Run(7919, Difficulty::MAX);
+    $reels = 0;
+    while (! $plain->isOver() && ! $hard->isOver() && $reels < 400) {
+        expect($hard->current())->toEqual($plain->current());
+        $action = $clean($plain->current());
+        $plain->apply($action);
+        $hard->apply($action);
+        $reels++;
+    }
+    expect($reels)->toBeGreaterThan(100);
+});
+
 test('a difficulty that is not a row is refused', function (int $difficulty) {
     expect(fn () => new Run(42, $difficulty))->toThrow(InvalidArgumentException::class)
-        ->and(fn () => new ReelStream(42, $difficulty))->toThrow(InvalidArgumentException::class);
+        ->and(fn () => Difficulty::rulesFor($difficulty))->toThrow(InvalidArgumentException::class);
 })->with([-1, 17]);

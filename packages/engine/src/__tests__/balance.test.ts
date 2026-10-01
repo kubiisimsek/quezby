@@ -58,14 +58,20 @@ describe('balance', () => {
  * takes a real bite out of the best players' runs.
  */
 const DIFFICULTY_RUNS = 240;
+/**
+ * The ±20 % promise is read off the runs within 10 % of the median length:
+ * 600 runs leave about 130 of them, enough for a steady p10 and p90 (240
+ * leave some 50, and the p90 wanders by a few per cent).
+ */
+const SPREAD_RUNS = 600;
 
-/** The difficulties each profile's rating settles on (casual ~1070 Elo … elite ~4540). */
+/** The difficulties each profile's qb settles on (casual ~1100 … pro ~5500, elite past 6000). */
 const BAND: Record<string, number[]> = {
   casual: [0, 1, 2],
-  average: [3, 4, 5],
-  good: [7, 8, 9],
-  pro: [11, 12, 13],
-  elite: [15, 16],
+  average: [4, 5, 6],
+  good: [11, 12, 13],
+  pro: [15, 16],
+  elite: [16],
 };
 
 const STEPS = [0, 4, 8, 12, MAX_DIFFICULTY];
@@ -79,7 +85,7 @@ describe('difficulty balance', () => {
     'keeps same-length %s runs within ±20 %% at the difficulties it plays',
     (name, profile) => {
       for (const difficulty of BAND[name]!) {
-        const spread = sameLengthSpread(playProfile(profile, DIFFICULTY_RUNS, 1, difficulty), 0.1);
+        const spread = sameLengthSpread(playProfile(profile, SPREAD_RUNS, 1, difficulty), 0.1);
         expect(spread.low, `difficulty ${difficulty}`).toBeGreaterThanOrEqual(0.8);
         expect(spread.high, `difficulty ${difficulty}`).toBeLessThanOrEqual(1.2);
       }
@@ -97,12 +103,13 @@ describe('difficulty balance', () => {
     },
   );
 
-  it('takes at least a third off the best runs at the top', () => {
+  it('takes a fifth to a half off the best runs at the top: hard, never hopeless', () => {
     for (const profile of [PROFILES.at(-1)!, ELITE]) {
       const easy = playProfile(profile, DIFFICULTY_RUNS);
       const hard = playProfile(profile, DIFFICULTY_RUNS, 1, MAX_DIFFICULTY);
-      expect(scoreOf(hard)).toBeLessThan(scoreOf(easy) * 0.67);
-      expect(lengthOf(hard)).toBeLessThan(lengthOf(easy) - 120);
+      expect(scoreOf(hard)).toBeLessThan(scoreOf(easy) * 0.8);
+      expect(scoreOf(hard)).toBeGreaterThan(scoreOf(easy) * 0.5);
+      expect(lengthOf(hard)).toBeLessThan(lengthOf(easy) - 90);
     }
   });
 });

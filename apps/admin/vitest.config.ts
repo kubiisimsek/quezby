@@ -5,7 +5,7 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   plugins: [react()],
   resolve: { alias: { '@': path.resolve(import.meta.dirname, 'src') } },
-  define: { __API_ORIGIN__: JSON.stringify('') },
+  define: { __API_ORIGIN__: JSON.stringify(''), __PANEL_VERSION__: JSON.stringify('1.00.00.04') },
   test: {
     environment: 'jsdom',
     include: ['src/**/*.test.{ts,tsx}', 'deploy/**/*.test.ts'],

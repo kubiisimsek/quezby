@@ -88,13 +88,39 @@ describe('SystemPage', () => {
     expect(screen.getByText('Push bildirimleri (Firebase)').parentElement).toHaveTextContent('Kapalı');
   });
 
-  it('warns when a shared key is left open', async () => {
+  it('shows the API\'s and the panel\'s release', async () => {
+    const api = fakeApi();
+    api.system.get.mockResolvedValue(system({ version: '1.02.00.07' }));
+    renderApp({ path: '/system', api });
+
+    expect((await screen.findByText('API sürümü')).parentElement).toHaveTextContent('1.02.00.07');
+    expect(screen.getByText('Panel sürümü').parentElement).toHaveTextContent('1.00.00.04');
+  });
+
+  it('says when the API was never deployed', async () => {
+    const api = fakeApi();
+    api.system.get.mockResolvedValue(system({ version: null }));
+    renderApp({ path: '/system', api });
+
+    expect((await screen.findByText('API sürümü')).parentElement).toHaveTextContent('Yüklenmemiş');
+  });
+
+  it('warns when the moderation key is left open', async () => {
+    const api = fakeApi();
+    api.system.get.mockResolvedValue(system({ tokens: { ops: false, moderation: true } }));
+    renderApp({ path: '/system', api });
+
+    expect(await screen.findByText('Paylaşılan bir anahtar açık')).toBeInTheDocument();
+    expect(screen.getByText(/MODERATION_TOKEN dolu/)).toBeInTheDocument();
+  });
+
+  it('keeps OPS_TOKEN quiet: the GitHub deploy needs it', async () => {
     const api = fakeApi();
     api.system.get.mockResolvedValue(system({ tokens: { ops: true, moderation: false } }));
     renderApp({ path: '/system', api });
 
-    expect(await screen.findByText('Paylaşılan bir anahtar açık')).toBeInTheDocument();
-    expect(screen.getByText(/OPS_TOKEN dolu/)).toBeInTheDocument();
+    expect((await screen.findByText('Gönderim anahtarı (OPS_TOKEN)')).parentElement).toHaveTextContent('Dolu');
+    expect(screen.queryByText('Paylaşılan bir anahtar açık')).not.toBeInTheDocument();
   });
 
   it('shows why a chore failed', async () => {

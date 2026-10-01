@@ -22,7 +22,7 @@ it('runs the difficulty version the lock names, on the locked engine', function 
 });
 
 it('hashes its table to the locked hash', function () {
-    expect(hash('sha256', Rules::canonicalJson(Difficulty::TABLE)))->toBe(difficultyLock()['tableSha256']);
+    expect(hash('sha256', Rules::canonicalJson(Difficulty::table())))->toBe(difficultyLock()['tableSha256']);
 });
 
 it('is tested against the locked fixtures', function () {

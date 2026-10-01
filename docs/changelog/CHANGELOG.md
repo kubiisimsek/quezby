@@ -1,31 +1,94 @@
 # Changelog
 
-## 2026-09-30 — One-button deploy from GitHub Actions
+## 2026-09-30 — Dereceli: the same game, a tighter meter, and a MasterClass people can reach
 
-The owner wanted to deploy the API and the panel with one button.
+The owner found MasterClass a slog — "gold screens" over and over, time
+passing, 30 k where Normal gave 50 k — and asked for difficulty to change
+the dopamine gained and lost, not what comes on screen; then for a qb target
+table a person can climb, where not everyone is MasterClass but a
+MasterClass player does not tire of the game.
 
+- **Difficulty table 2** (`DIFFICULTY_VERSION` 2, engine v3 kept, no new
+  season): the feed is the same at every difficulty — the same reels,
+  windows, special share, weights and drain as Normal. Only the meter
+  tightens: a hit's dopamine × `(1000 − 12·z)`‰ (×0.81 at 16), a perfect's
+  +60 never cut; a miss's loss × `(1000 + 40·z)`‰ (×1.64 at 16). Table 1 had
+  added up to +24 % special reels, turned likes into freezes and sped the
+  drain ×1.38: at the top some 55 % of reels were holds and freezes.
+  `ReelStream` no longer takes a difficulty (TS and PHP); `gainAt`,
+  `gainsAt` join `lossAt`; `specialShareAt`, `likeWeightAt` and `drainAt`
+  are gone. Fixtures (`difficulty.json`) and `difficulty.lock.json`
+  regenerated; every other engine fixture is unchanged, so Normal, Günlük
+  and VS play exactly as before.
+- **qb targets 2** (`rating.difficulty.targets.3.2`): 31.6 k at 1000, 76.2 k
+  at 2000, 96.1 k at 3000, 129.5 k at 4000, **176.7 k at MasterClass's door
+  (5000)**, 294.4 k at 6000, 485.8 k at 7000 — casual play at 1000,
+  average at 2000, good at 4000, halfway from good to pro at 5000, pro at
+  6000, elite at 7000. Table 1's door (394 k) stood past the best simulated
+  thumb. Table 1's targets stay for runs opened on it.
+- Where simulated players settle now (real thumb −15 %): casual ~1020 and
+  average ~1940 Gümüş, good ~3760 Platin, pro ~5680 and elite ~6670
+  MasterClass. A 10 %-mistake player at difficulty 16 lasts ~1:06 for
+  ~23 k (table 1: 0:52, ~15 k); elite at 16 loses a third of its Normal
+  score (table 1: half).
+- The "?" help says how difficulty works now, in six languages.
+- Tests: engine `difficulty.test.ts` (the formula, the same feed at every
+  difficulty, less gain and more loss, a perfect's extra whole),
+  `balance.test.ts` (the new bands; the ±20 % promise read off 600 runs;
+  "a fifth to a half off the best at the top"); API `DifficultyParityTest`,
+  `DifficultyLockTest`, `RatingBalanceTest` (the new ladder, "MasterClass is
+  a pro's to reach and keep", "the door asks a run a person can play"),
+  `TargetTableTest`, `RatedDifficultyTest` (a sloppy log played at 0 does
+  not pass at its difficulty); app `useGame`.
+- Deploy: API (config + game) and a new app build together — an app still
+  on table 1 cannot open a rated run (`engine_outdated`) until it updates.
+
+## 2026-10-01 — One-button deploy, releases for the API and the panel
+
+The owner wanted to deploy the API and the panel with one button. The host
+(Güzel Hosting) has no SSH, so everything goes through cPanel's API.
+
+- **`pnpm deploy:staging` / `pnpm deploy:production`** (`scripts/deploy.mjs`)
+  take these flags:
+  - `--only api|admin`;
+  - `--bump major|minor|patch|minipatch`;
+  - `--version 1.01.01.01`;
+  - `--dry-run`.
 - **`.github/workflows/deploy.yml`:** Actions → Deploy → Run workflow, with
-  three choices:
-  - environment: `staging` or `production`;
-  - target: `all`, `api` or `admin`;
-  - dry run.
-- **Tests first:** lint, typecheck, `pnpm test` and `pnpm test:api` run
-  first. Nothing is built unless they pass.
-- **Production** deploys only from `main`.
-- **`scripts/deploy.mjs`:**
-  - Builds with the existing `package-api.sh` and `package-admin.mjs`, then
-    uploads over SSH with rsync.
-  - The API goes first, then `migrate --force` + `optimize`, then
-    `/api/v1/health`. After that the panel goes up.
-  - `storage/` (players' photos, keys) and the host's `error_log` are never
-    deleted.
+  the same choices. It runs the tests first: lint, typecheck, `pnpm test`,
+  `pnpm test:api`. Production deploys only from `main`.
+- **Settings:**
+  - repository secrets `CPANEL_USER` and `CPANEL_TOKEN`;
+  - repository variables `DEPLOY_STAGING_API_DIR`,
+    `DEPLOY_STAGING_ADMIN_DIR`, `DEPLOY_PROD_API_DIR` and
+    `DEPLOY_PROD_ADMIN_DIR`.
+  - From your own computer the same names come from `.env.deploy`
+    (git-ignored, `.env.deploy.example`).
+- **The `.env` stays on the server.**
+  - The API zip is built `--without-env` (new flag of `package-api.sh`).
+    A zip carrying a `.env` is refused.
+  - The deploy only reads the server's `.env`: it checks it with
+    `check-api-env.mjs` and takes `OPS_TOKEN` from it for `ops/migrate` and
+    `ops/optimize`.
+- **Releases** look like `1.01.01.01` (major.minor.patch.minipatch).
+  - The API and the panel each keep their own, per environment, in the
+    `version.json` the deploy writes into their folder.
+  - Every deploy raises the minipatch unless told otherwise. The first
+    release is `1.00.00.01`.
+  - The API reads it with `App\Support\Release`. `/api/v1/health` and
+    `AdminSystem.version` carry it, and the deploy waits until health names
+    the new release.
+  - The panel's Sistem page shows both releases. The panel's own comes in at
+    build time (`QUEZBY_RELEASE` → `__PANEL_VERSION__`).
+- **Sistem page:** it no longer warns about `OPS_TOKEN`, since the deploy
+  needs it set. It shows it as "Gönderim anahtarı" instead.
+  `MODERATION_TOKEN` still warns.
+- **Upload path:**
+  - Each zip goes to the home folder, outside the web root. It is
+    extracted over its folder and deleted.
   - A folder that is not empty and has no `artisan` / `index.html` is
-    refused. So are the home folder, `public_html` itself and paths with
-    `..`.
-- **Secrets:** GitHub environments `staging` and `production` hold them:
-  - `API_ENV_FILE` (the whole `.env`), `SSH_PRIVATE_KEY` and
-    `SSH_KNOWN_HOSTS`;
-  - the folders and the SSH host are variables.
+    refused. So are the home folder, `public_html` itself, absolute paths
+    and paths with `..`.
 - The manual zip route stays as it was.
 
 ## 2026-09-30 — Production on one domain: quezby.com/api, /panel, /privacy-policy

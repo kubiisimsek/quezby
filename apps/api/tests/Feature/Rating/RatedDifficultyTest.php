@@ -4,6 +4,9 @@ use App\Enums\RatingKind;
 use App\Enums\RunMode;
 use App\Enums\RunStatus;
 use App\Game\Difficulty;
+use App\Game\EngineError;
+use App\Game\Gesture;
+use App\Game\ReelKind;
 use App\Game\Rules;
 use App\Game\Run as Engine;
 use App\Models\LeaderboardEntry;
@@ -126,9 +129,15 @@ test('a log played at another difficulty does not count, and costs the rating', 
     $player = $this->signIn();
     $this->rate($player, 3000);
     $start = $this->startRun(['mode' => 'rated'])->assertCreated();
-    // The app played the easier game than the one it was handed.
-    $actions = playedLog($start->json('seed'), 80, 430, 110);
+    // The app played the easier game than the one it was handed: the reels are
+    // the same, but a sloppy thumb's meter lasts longer at difficulty 0.
+    $actions = sloppyLog($start->json('seed'));
     $summary = Engine::replay($start->json('seed'), $actions)->summary;
+    try {
+        expect(Engine::replay($start->json('seed'), $actions, $start->json('difficulty'))->summary->reels)->toBeLessThan($summary->reels);
+    } catch (EngineError) {
+        // The meter ran out at the handed difficulty before the log did.
+    }
     Run::query()->whereKey($start->json('runId'))->update(['started_at' => now()->subMinutes(10)]);
 
     $this->finishRun($start->json('runId'), $actions, $summary->score, $summary->reels);
@@ -200,3 +209,29 @@ test('the difficulty of a rating steps every 250 Elo from 1000, up to the top', 
     }
     expect(RunMode::onBoards())->toBe(['free', 'daily']);
 });
+
+/**
+ * A run played at difficulty 0 that lets every fourth reel time out: the
+ * meter just lasts there, and runs out sooner at a harder difficulty.
+ *
+ * @return list<array{int, int, int}>
+ */
+function sloppyLog(int $seed): array
+{
+    $run = new Engine($seed);
+    $actions = [];
+    while (count($actions) < 300 && ! $run->isOver()) {
+        $reel = $run->current();
+        $action = match (true) {
+            $reel->index % 4 === 3 && $reel->kind !== ReelKind::Freeze => [Gesture::None->value, 0, 0],
+            $reel->kind === ReelKind::Skip => [Gesture::Up->value, 430, 0],
+            $reel->kind === ReelKind::Like => [Gesture::Like->value, 430, 0],
+            $reel->kind === ReelKind::Hold => [Gesture::Hold->value, 300, intdiv($reel->zoneCenter * $reel->holdFill, 1000)],
+            default => [Gesture::None->value, 0, 0],
+        };
+        $run->apply($action);
+        $actions[] = $action;
+    }
+
+    return $actions;
+}

@@ -13,9 +13,12 @@
  *
  * Everything a Vite build reads from VITE_* ends up public in the bundle, so
  * the build is refused if any VITE_* other than VITE_API_ORIGIN is set.
+ *
+ * QUEZBY_RELEASE=1.00.00.01 (scripts/deploy.mjs) is shown on the Sistem page
+ * and written to version.json beside index.html.
  */
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -27,6 +30,9 @@ export const ENVIRONMENTS = ['staging', 'production'];
 
 /** The one VITE_* a panel build may carry: where the API is. It is public by design. */
 export const PUBLIC_VARIABLES = ['VITE_API_ORIGIN'];
+
+/** A release: major.minor.patch.minipatch, the last three at least two digits. */
+export const RELEASE = /^\d+\.\d{2,}\.\d{2,}\.\d{2,}$/;
 
 /** What a build must have produced for Apache to serve it as the panel. */
 export const REQUIRED_FILES = ['index.html', '.htaccess'];
@@ -82,6 +88,8 @@ function sh(command, args, cwd = root) {
 
 async function main(argv) {
   const environment = parseEnvironment(argv[0]);
+  const release = process.env.QUEZBY_RELEASE ?? '';
+  if (release !== '' && !RELEASE.test(release)) throw new Error(`QUEZBY_RELEASE must look like 1.00.00.01, not '${release}'`);
 
   const texts = envFilesFor(environment)
     .map((file) => join(ADMIN, file))
@@ -102,6 +110,10 @@ async function main(argv) {
   const dist = join(ADMIN, 'dist');
   const missing = missingFiles(dist);
   if (missing.length > 0) throw new Error(`the build has no ${missing.join(', ')}`);
+  if (release !== '') {
+    writeFileSync(join(dist, 'version.json'), `${JSON.stringify({ version: release, deployedAt: new Date().toISOString() })}\n`);
+    step(`Release ${release}`);
+  }
 
   mkdirSync(OUT, { recursive: true });
   const name = archiveName(environment);

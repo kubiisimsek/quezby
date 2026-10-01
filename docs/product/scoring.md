@@ -267,11 +267,20 @@ Oyuncunun **ligi, Elo'sunun kademesidir**: 0–999 Bronz, 1000–1999 Gümüş,
 motor sürümüne bağlıdır (`quezby.rating.targets`), her 1000 reytingde bir çapa,
 arası geometrik (motorun skorları bir beceri basamağında 2–3 katına çıkar):
 
-| Reyting | 0 | 1000 | 2000 | 3000 | 4000 | 5000 | 6000 |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| **Hedef (motor v3, zorluk tablosu 1)** | 8 B | 31,6 B | 74,1 B | 148,3 B | 265,7 B | 394 B | 542,3 B |
-| Hedef (motor v3, zorluk 0: yerleşme ve tablodan önceki turlar) | 8 B | 33,7 B | 99 B | 238 B | 475 B | 792 B | 1,09 M |
-| Hedef (motor v2, geç onaylar için) | 8 B | 34 B | 100 B | 240 B | 480 B | 800 B | 1,1 M |
+| Reyting | 0 | 1000 | 2000 | 3000 | 4000 | 5000 | 6000 | 7000 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| **Hedef (motor v3, zorluk tablosu 2)** | 8 B | 31,6 B | 76,2 B | 96,1 B | 129,5 B | **176,7 B** | 294,4 B | 485,8 B |
+| Hedef (motor v3, zorluk tablosu 1, eski turlar) | 8 B | 31,6 B | 74,1 B | 148,3 B | 265,7 B | 394 B | 542,3 B | — |
+| Hedef (motor v3, zorluk 0: yerleşme ve tablodan önceki turlar) | 8 B | 33,7 B | 99 B | 238 B | 475 B | 792 B | 1,09 M | — |
+| Hedef (motor v2, geç onaylar için) | 8 B | 34 B | 100 B | 240 B | 480 B | 800 B | 1,1 M | — |
+
+Zorluk tablosu 2'nin merdiveni insanlara göre kurulu (2026-09-30):
+1000'de yeni başlayan, 2000'de ortalama, 4000'de iyi oyuncunun tipik skoru;
+**MasterClass'ın kapısı (5000) iyi ile profesyonelin ortası** — zorluk
+16'da tur başına ~177 bin, yaklaşık 3,5 dakika temiz oyun. 6000 profesyonel,
+7000 elit. Tablo 1 kapıyı en iyi simüle oyuncunun bile ötesine koymuştu
+(394 B): kimse MasterClass olamıyordu. 1000'deki hedef, yerleşme tablosuyla
+aynı hizada kaldı.
 
 Yerleşmiş oyuncunun dereceli turu, oynadığı zorluk tablosunun hedefleriyle
 ölçülür (`rating.difficulty.targets[motor][zorluk tablosu]`): her reytingin
@@ -340,25 +349,29 @@ liglerin hedef payları (Bronz %20 · Gümüş %35 · Altın %25 · Platin %13 �
 değişince reytingler sıfırlanmaz, oyuncular birkaç turda yeni dengeye kayar.
 
 **Söz** (`tests/Unit/Rating/RatingBalanceTest.php`, motorun ±%20 sözü gibi):
-motor profilleri (gerçek başparmak için −%15) kendi liglerinde durur — yeni
-başlayan ~1070 ve ortalama ~1910 Gümüş, iyi ~2825 Altın, profesyonel ~3830
-Platin, elit ~4540 Elmas; kusursuza yakın oyun MasterClass. Dengede sapma < 120,
-tipik değişim ±75 içinde. Her tur reytinginin zorluğunda oynandığında da
-zorluk tablosunun hedefleriyle aynı liglerde, zorluk 0'daki yerlerinin 150
-Elo yakınında dururlar (tipik değişim ±80); motorun kendi hedefleriyle elit
-Platin'e düşerdi.
+zorluk 0'da, motorun kendi tablosuyla, motor profilleri (gerçek başparmak
+için −%15) kendi liglerinde durur — yeni başlayan ~1070 ve ortalama ~1910
+Gümüş, iyi ~2825 Altın, profesyonel ~3830 Platin, elit ~4540 Elmas. Dereceli
+merdiveninde (her tur reytinginin zorluğunda, zorluk tablosu 2'nin
+hedefleriyle) yerleri: yeni başlayan ~1020 ve ortalama ~1940 **Gümüş**, iyi
+~3760 **Platin**, profesyonel ~5680 ve elit ~6670 **MasterClass**. İyi oyuncu
+4500'ün altında kalır; MasterClass'taki profesyonel ve elit sakindir (sapma
+< 100, tipik değişim ±70 içinde). Yeni başlayan ve ortalama oyuncunun turları
+±%35–50 oynadığı için reytingleri tur başına daha çok oynar (sapma < 150,
+tipik değişim ±95), ligden taşmaz. Motorun kendi hedefleriyle elit Elmas'a
+bile çıkamazdı.
 
 ## Dereceli zorluğu
 
-Elo arttıkça Dereceli zorlaşır. Sunucu dereceli turu açarken oyuncunun o
+qb arttıkça Dereceli zorlaşır. Sunucu dereceli turu açarken oyuncunun o
 anki reytinginden bir **zorluk** (0–16) seçer, seed'le birlikte verir
 (`StartRunResponse.difficulty`) ve turu o zorlukla tekrar oynatır. Uygulama
 turu `new Run(seed, difficulty)` ile oynar; motorun sürümü değişmez.
 
-| Elo | Lig | Zorluk |
+| qb | Lig | Zorluk |
 | --- | --- | --- |
 | Yerleşme turları, 0–999 | — / Bronz | 0 (oyun olduğu gibi) |
-| 1000–1999 | Gümüş | 1–4 (her 250 Elo'da bir) |
+| 1000–1999 | Gümüş | 1–4 (her 250 qb'de bir) |
 | 2000–2999 | Altın | 5–8 |
 | 3000–3999 | Platin | 9–12 |
 | 4000–4749 | Elmas | 13–15 |
@@ -368,39 +381,48 @@ Normal, Günlük, VS ve deneme turu hep zorluk 0'dadır. Zorluk, terk edilen
 açık tur hükmen sayıldıktan **sonra** hesaplanır (`rating.difficulty.from`,
 `step`).
 
-Her zorluk dört sayıyı biraz daha oynatır (`z` zorluk,
-`packages/engine/src/difficulty.ts` · `apps/api/app/Game/Difficulty.php`):
+**Zorluk tablosu 2 (2026-09-30): akış her zorlukta aynı, yalnız barın
+ekonomisi sıkılaşır** (`z` zorluk, `packages/engine/src/difficulty.ts` ·
+`apps/api/app/Game/Difficulty.php`):
 
 | | Kural | z = 4 | z = 8 | z = 12 | z = 16 |
 | --- | --- | --: | --: | --: | --: |
-| Engel sıklığı | özel reel payına `+15·z` binde | +%6 | +%12 | +%18 | +%24 |
-| Dokunma payı | özel reellerde beğeni ağırlığı `−⌊5·z/8⌋`, dokunmaya | 40/30/30 → 38/30/32 | 35/30/35 | 33/30/37 | 30/30/40 |
-| Ceza | bar kayıpları × `(1000 + 30·z)` binde | ×1,12 | ×1,24 | ×1,36 | ×1,48 |
-| Dopamin erimesi | erime × `(1000 + ⌊3·z²/2⌋)` binde | ×1,02 | ×1,10 | ×1,22 | ×1,38 |
+| İsabetin dopamini | kazanç × `(1000 − 12·z)` binde; **mükemmelin +60'ı kesilmez** | ×0,95 | ×0,90 | ×0,86 | ×0,81 |
+| Hatanın kaybı | bar kayıpları × `(1000 + 40·z)` binde | ×1,16 | ×1,32 | ×1,48 | ×1,64 |
 
-Kör hamle katlaması büyümüş cezanın üstüne gelir (z = 16'da yanlış kaydırma
-−296, kör −592). Pencere, 600 ms taban, seed'in reel başına üç çekimi, giriş
-reelleri, "art arda en fazla 3 özel" ve "iki dokunma yan yana gelmez"
-değişmez. Zorluk 0 v3'ün ta kendisidir: `rules.lock.json`, bütün fixture'lar
-ve altın skorlar aynı kalır.
+Reeller, pencereler, özel reel payı, beğeni/basılı tut/dokunma ağırlıkları
+ve dopamin erimesi zorluk 0 ile birebir aynıdır: ekrana gelen hiçbir şey
+değişmez. z = 16'da kaydırma 80 yerine 64, basılı tut 100 yerine 80 dopamin
+verir (mükemmelse +60 yine tam); süre aşımı 200 yerine 328, yakalanma 250
+yerine 410 götürür. Kör hamle katlaması büyümüş cezanın üstüne gelir.
+Zorluk 0 v3'ün ta kendisidir: `rules.lock.json`, bütün fixture'lar ve altın
+skorlar aynı kalır.
+
+Tablo 1 (2026-09-30'a kadar) engel payını z = 16'da +%24 artırıyor, beğeniyi
+dokunmaya kaydırıyor ve erimeyi ×1,38 hızlandırıyordu: MasterClass'ta
+akışın ~%55'i altın "basılı tut" ve kırmızı "dokunma" reeli oluyordu, tur
+beklemeye dönüyordu. Tablo 2 bunu bırakıp zorluğu yalnız dikkatten ister.
 
 **Denge** (600'er simüle tur, `pnpm engine:simulate`; her profil
-reytinginin ulaştığı zorlukta):
+qb'sinin Dereceli merdiveninde ulaştığı zorlukta):
 
-| Profil (lig) | Zorluk | Skor p50 | Süre p50 | Engel · dokunma payı | Aynı süre ±%10 |
-| --- | --: | --- | --- | --- | --- |
-| Ortalama (Gümüş) | 4 | 101 B → 83 B (−%18) | 3:26 → 2:58 | %34 → %39 · %9 → %11 | 0,87 · 1,13 |
-| İyi (Altın) | 8 | 240 B → 155 B (−%35) | 5:13 → 3:51 | %37 → %45 · %10 → %14 | 0,90 · 1,12 |
-| Profesyonel (Platin) | 12 | 493 B → 290 B (−%41) | 7:21 → 5:04 | %38 → %51 · %10 → %16 | 0,89 · 1,10 |
-| Elit (Elmas) | 16 | 727 B → 362 B (−%50) | 8:48 → 5:27 | %40 → %56 · %11 → %18 | 0,89 · 1,11 |
+| Profil (lig) | Zorluk | Skor p50 | Süre p50 | Aynı süre ±%10 |
+| --- | --: | --- | --- | --- |
+| Yeni başlayan (Gümüş) | 1 | 39 B → 37 B (−%7) | 2:02 → 1:54 | ±%20 içinde |
+| Ortalama (Gümüş) | 4 | 102 B → 81 B (−%20) | 3:27 → 2:52 | ±%20 içinde |
+| İyi (Platin) | 12 | 240 B → 140 B (−%42) | 5:10 → 3:17 | ±%20 içinde |
+| Profesyonel (MasterClass) | 16 | 493 B → 294 B (−%40) | 7:21 → 4:44 | ±%20 içinde |
+| Elit (MasterClass) | 16 | 727 B → 486 B (−%33) | 8:48 → 6:24 | ±%20 içinde |
 
 - ±%20 sözü her profilde, oynadığı zorluklarda tutar; hiçbir zorluk bir
   alttakinden kolay değildir ve hiçbir profile daha çok puan ya da daha uzun
-  tur getirmez (`balance.test.ts` → *difficulty balance*).
-- Yalnız seed seçmek (motora dokunmadan "zor seed" vermek) önce ölçüldü:
-  en zor %2'lik seed bile iyi ve profesyonel oyuncuyu %2–4 zorlaştırıyordu.
+  tur getirmez; tepede en iyilerin skorunun beşte biri ile yarısı arası
+  gider, hiçbir zaman umutsuz değildir (`balance.test.ts` → *difficulty
+  balance*).
+- Normal'de %10 hata yapan bir oyuncu (yeni başlayan ile ortalamanın arası)
+  zorluk 16'da ~1:06 oynar, ~23 B yapar; tablo 1'de 0:52 ve ~15 B idi.
 - Dereceli tur skor tablolarına yazılmadığı için zorluk hiçbir tabloyu
-  bozmaz; Elo'yu zorluk tablosunun hedefleri dengeler (*Elo*).
+  bozmaz; qb'yi zorluk tablosunun hedefleri dengeler (*Elo*).
 
 ### Zorluk tablosunu değiştirmek (yeni sezon değil)
 
@@ -409,7 +431,9 @@ Zorluk tablosu kurallardan ayrı mühürlüdür: `packages/engine/difficulty.loc
 `packages/engine/fixtures/difficulty.json` (`DifficultyParityTest`).
 
 1. `difficulty.ts` içinde tabloyu değiştir, `DIFFICULTY_VERSION`'ı artır;
-   aynısını `Difficulty.php`'de yap, `Difficulty::VERSION`'ı eşitle.
+   aynısını `Difficulty.php`'de yap, `Difficulty::VERSION`'ı eşitle. Eski
+   sürümün hedef tablosunu `config`'te bırak: o sürümle açılmış turlar onunla
+   ölçülür (`TargetTable::forRun`).
 2. `pnpm engine:simulate` — zorluk raporu ve `balance.test.ts` tutmalı.
 3. `pnpm engine:fixtures`, `pnpm engine:lock`.
 4. Yeni Elo hedeflerini ekle: `config/quezby.php` ›

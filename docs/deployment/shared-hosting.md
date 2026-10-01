@@ -48,87 +48,122 @@ adındadır, klasör düzeni hemen aşağıda.
 
 ## Tek tuşla: GitHub Actions
 
-Hostta SSH açıksa API'yi ve paneli zip'le uğraşmadan tek düğmeyle
-gönderirsin. Yol şu: **Actions** → **Deploy** → **Run workflow**. Orada ortamı
-(`staging` / `production`), neyin gideceğini (`all` / `api` / `admin`)
-seçersin; istersen **Deneme**'yi de işaretlersin.
+API'yi ve paneli tek düğmeyle ya da tek komutla gönderirsin. SSH gerekmez:
+her şey cPanel'in kendi API'siyle yapılır.
 
-İş akışı (`.github/workflows/deploy.yml`) şunları yapar:
+- **GitHub'dan:** **Actions** → **Deploy** → **Run workflow**.
+- **Kendi bilgisayarından:** `pnpm deploy:staging` ya da
+  `pnpm deploy:production`.
 
-1. Testleri koşar: lint, typecheck, `pnpm test`, `pnpm test:api`. Biri
-   kırmızıysa hiçbir şey gitmez.
-2. `scripts/deploy.mjs` ile iki paketi derler: `package-api.sh` ve
-   `package-admin.mjs`, elle paketlemedekiyle aynı.
-3. API'yi rsync ile SSH'tan yükler. Sonra `migrate --force` ve `optimize`
-   çalışır, ardından `/api/v1/health` yanıt veriyor mu diye bakılır.
-4. Sonra paneli yükler.
+**`.env` sunucuda kalır.** Gönderim onu hiç yüklemez ve değiştirmez, yalnızca
+okur:
 
-Production yalnızca `main` dalından gider.
+- Hazır mı diye kontrol eder: `APP_KEY`, `APP_ENV`, `APP_DEBUG`. Eksikse
+  hiçbir şey göndermez.
+- İçindeki `OPS_TOKEN`'ı alır. Migration bununla yapılır.
 
-**Sunucuda neye dokunulmaz, ne silinir:**
+`.env`'e bir şey eklemek için File Manager'da sunucudakini düzenle, sonra
+**Sistem → Önbelleği yenile**. Yerel `.env.staging` / `.env.production`
+gönderimde hiç kullanılmaz.
 
-- `storage/`'a (oyuncuların fotoğrafları, `storage/app/private/`'daki
-  anahtarlar) ve hostun `error_log` dosyalarına dokunulmaz.
-- Pakette olmayan her şey silinir.
+**Her gönderimde ne olur:**
+
+1. GitHub'da önce testler koşar: lint, typecheck, `pnpm test`,
+   `pnpm test:api`. Biri kırmızıysa hiçbir şey gitmez.
+2. cPanel'e bağlanılır. Klasörler ve sunucudaki `.env` kontrol edilir,
+   sunucudaki sürüm okunur.
+3. Yeni sürümle iki paket derlenir. API paketi `.env`'siz derlenir.
+4. API zip'i ev klasörüne yüklenir, API klasörüne açılır ve silinir.
+5. `ops/migrate` ve `ops/optimize` çağrılır. `/api/v1/health` yeni sürümü
+   söyleyene kadar beklenir.
+6. Panel aynı yolla yüklenir.
+
+Production yalnızca `main` dalından gider (GitHub'dan gönderimde).
+
+**Sürüm** `major.minor.patch.minipatch` biçimindedir, ör. `1.01.01.01`:
+
+- API'nin ve panelin sürümü ayrı ayrı tutulur, her ortamda ayrı.
+- Sunucuda her klasörün `version.json`'ında durur.
+- Her gönderim varsayılan olarak minipatch'i bir artırır:
+  `1.01.01.01` → `1.01.01.02`.
+- Başka bir hane seçersen ondan sonrakiler sıfırlanır: `patch` →
+  `1.01.02.00`, `minor` → `1.02.00.00`, `major` → `2.00.00.00`.
+- Tam bir sürüm de verebilirsin (`--version 1.01.01.01`), sunucudakinden
+  büyük olmak şartıyla.
+- İlk gönderim `1.00.00.01` olur.
+- API'nin sürümü `/api/v1/health`'te görünür. İkisinin sürümü de panelin
+  **Sistem** sayfasında görünür.
+
+**Sunucuda neye dokunulur:**
+
+- Zip, elle güncellemedeki gibi klasörün üzerine açılır. Pakette olmayan
+  eski dosyalar silinmez; `.env` ve `storage/` (oyuncuların fotoğrafları,
+  anahtarlar) yerinde kalır.
 - Klasör boş değilse ve içinde `artisan` (API) ya da `index.html` (panel)
   yoksa yükleme reddedilir.
-- Ev klasörü, `public_html`'in kendisi ve `..` içeren yollar da reddedilir.
+- Ev klasörü, `public_html`'in kendisi, mutlak yollar ve `..` içeren yollar
+  da reddedilir.
 
 **Bir kez kurulum:**
 
-1. **SSH anahtarı.** Kendi bilgisayarında bir anahtar çift üret:
+1. **cPanel API token'ı.** cPanel → **Manage API Tokens** → **Create**. Ad:
+   `quezby-deploy`. Token'ı bir kez gösterir; kopyala.
+2. **Sunucudaki `.env`'lerde `OPS_TOKEN` dolu olsun.** File Manager → API
+   klasörü → `.env` → Edit:
 
    ```bash
-   ssh-keygen -t ed25519 -N "" -C quezby-deploy -f ~/.ssh/quezby_deploy
+   openssl rand -hex 32
    ```
 
-   Açık anahtarı cPanel → **SSH Access** → **Manage SSH Keys** → **Import
-   Key**'e yapıştır (`~/.ssh/quezby_deploy.pub`), sonra **Authorize**'a bas.
-2. **Sunucunun parmak izi:**
+   Çıktıyı `OPS_TOKEN=` satırına yaz, sonra **Sistem → Önbelleği yenile**.
+   Token hep dolu kalır; 7. adımı atla.
+3. **GitHub.** Repo → **Settings** → **Secrets and variables** → **Actions**.
 
-   ```bash
-   ssh-keyscan -p <port> <host>
-   ```
+   **Secrets** sekmesi → **New repository secret**:
 
-   Çıktının tamamı `SSH_KNOWN_HOSTS` olur.
-3. **PHP'nin yolu.** Hostta `php -v` 8.3 demiyorsa cPanel'in PHP'sinin tam
-   yolunu bul, ör. `/opt/cpanel/ea-php83/root/usr/bin/php`.
-4. **GitHub ortamları.** Repo → **Settings** → **Environments**'ta `staging`
-   ve `production` adlı iki ortam aç. Production'a **Required reviewers**
-   ekle; böylece her production gönderimi senin onayını bekler. Her ortama
-   şunları gir:
+   | Ad | Değer |
+   | --- | --- |
+   | `CPANEL_USER` | cPanel kullanıcı adı |
+   | `CPANEL_TOKEN` | 1. adımdaki token |
 
-   | Tür | Ad | Değer |
-   | --- | --- | --- |
-   | Secret | `API_ENV_FILE` | `apps/api/.env.<ortam>`'ın **tamamı** (aynı `APP_KEY`) |
-   | Secret | `SSH_PRIVATE_KEY` | `~/.ssh/quezby_deploy` (gizli anahtar) |
-   | Secret | `SSH_KNOWN_HOSTS` | 2. adımın çıktısı |
-   | Variable | `DEPLOY_SSH_HOST` | ör. `quezby.com` |
-   | Variable | `DEPLOY_SSH_USER` | cPanel kullanıcı adı |
-   | Variable | `DEPLOY_SSH_PORT` | boşsa `22` |
-   | Variable | `DEPLOY_API_DIR` | production: `public_html/api` · staging: `quezby-api-staging` |
-   | Variable | `DEPLOY_ADMIN_DIR` | production: `public_html/panel` · staging: panelin Document Root'u |
-   | Variable | `DEPLOY_PHP` | boşsa `php`, değilse 3. adımdaki yol |
+   **Variables** sekmesi → **New repository variable**. Yollar cPanel ev
+   klasörüne göredir; başına `/` ya da `~` koyma:
+
+   | Ad | Değer |
+   | --- | --- |
+   | `DEPLOY_STAGING_API_DIR` | staging API klasörü, ör. `quezby-api-staging` |
+   | `DEPLOY_STAGING_ADMIN_DIR` | `quezby-admin.kubisimsek.com`'un Document Root'u |
+   | `DEPLOY_PROD_API_DIR` | `public_html/api` |
+   | `DEPLOY_PROD_ADMIN_DIR` | `public_html/panel` |
+
+4. **Kendi bilgisayarından göndereceksen:** `.env.deploy.example`'ı
+   `.env.deploy` olarak kopyala ve aynı değerleri yaz. Bu dosya git'e
+   girmez.
+
+**Kullanım:**
+
+```bash
+pnpm deploy:staging                          # API + panel, minipatch +1
+pnpm deploy:production --only api            # yalnızca API
+pnpm deploy:production --bump minor          # 1.00.03.07 → 1.01.00.00
+pnpm deploy:staging --version 1.01.01.01     # tam sürüm
+pnpm deploy:staging --dry-run                # kontrol eder ve derler, hiçbir şey yüklemez
+```
+
+GitHub'daki **Run workflow** penceresinde aynı seçenekler var: ortam, ne
+gideceği, hangi hanenin artacağı, tam sürüm ve deneme.
 
 **Dikkat edilecekler:**
 
-- Klasör yolları SSH ev klasörüne göredir; `~` yazma.
-- İlk seferde **Deneme** ile çalıştır. rsync neyi yükleyeceğini ve neyi
-  sileceğini listeler; hiçbir şey göndermez, migration da yapmaz.
-- `.env`'i değiştireceksen önce `API_ENV_FILE`'ı güncelle, sonra gönder.
-  Her gönderim sunucudaki `.env`'i bu secret'la değiştirir; elle
-  yaptığın bir düzeltme bir sonraki gönderimde geri gider.
-- SSH ile `OPS_TOKEN` gerekmez, boş kalabilir.
-- Aynı betik kendi bilgisayarından da çalışır. Aynı `DEPLOY_*` değişkenleri
-  gerekir, bir de GNU rsync: macOS'un rsync'i `--chmod`'u tanımaz, önce
-  `brew install rsync`. Komut:
+- İlk seferde **Deneme** ile çalıştır. Token'ı, klasörleri, sunucudaki
+  `.env`'i ve sürümleri kontrol eder, paketleri derler; hiçbir şey yüklemez.
+- Ops uçları saatte 10 istekle sınırlıdır ve her API gönderimi 2 istek
+  harcar. Saatte en çok 5 API gönderimi yapılır.
+- cPanel "token kabul edilmiyor" derse token'ın süresine ve kullanıcı adına
+  bak. GitHub'dan bağlantı hiç kurulamıyorsa host GitHub'ın IP'lerini 2083'te
+  engelliyor olabilir (cPHulk); hosting desteğine sor.
 
-  ```bash
-  node scripts/deploy.mjs production api
-  ```
-
-Elle zip yolu (aşağıdaki adımlar) SSH olmayan hostlar için olduğu gibi
-duruyor.
+Elle zip yolu (aşağıdaki adımlar) olduğu gibi duruyor.
 
 **Gereksinimler**
 
@@ -342,6 +377,9 @@ parçalarla); panelde **Sistem → Analitiği temizle** aynısını hemen yapar.
 Cron `schedule:run` çağırıyorsa ikisi de kendiliğinden çalışır.
 
 ## 7. `OPS_TOKEN`'ı kapat
+
+Tek tuşla gönderiyorsan (`pnpm deploy:…`) bu adımı atla: gönderim
+migration'ı `OPS_TOKEN`'la yapar, token hep dolu kalır.
 
 Sunucudaki `.env` dosyasında (File Manager → Edit) satırı `OPS_TOKEN=` yap.
 Hemen geçerli olur — config önbellekte olsa bile uç noktalar artık `404`

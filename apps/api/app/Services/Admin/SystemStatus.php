@@ -10,6 +10,7 @@ use App\Services\Push\PushService;
 use App\Support\AppKey;
 use App\Support\ModerationToken;
 use App\Support\OpsToken;
+use App\Support\Release;
 use App\Support\Timestamp;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Support\Facades\DB;
@@ -34,6 +35,7 @@ final class SystemStatus
 
         return [
             'environment' => (string) app()->environment(),
+            'version' => Release::version(),
             'php' => PHP_VERSION,
             'laravel' => app()->version(),
             'database' => DB::connection()->getDriverName(),

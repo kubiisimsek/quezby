@@ -42,7 +42,8 @@ export default defineConfig(({ mode }) => {
     base,
     plugins: [react(), tailwindcss(), htaccess(apiOrigin, base)],
     resolve: { alias: { '@': path.resolve(here, 'src') } },
-    define: { __API_ORIGIN__: JSON.stringify(apiOrigin) },
+    // The release scripts/deploy.mjs gives this build; empty when built by hand.
+    define: { __API_ORIGIN__: JSON.stringify(apiOrigin), __PANEL_VERSION__: JSON.stringify(process.env.QUEZBY_RELEASE ?? '') },
     server,
     preview: server,
     build: { outDir: 'dist', emptyOutDir: true },

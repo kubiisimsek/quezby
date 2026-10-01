@@ -64,8 +64,9 @@ export const PROFILES: readonly SkillProfile[] = [
 
 /**
  * A thumb past `pro`, for the Dereceli difficulties (`difficulty.ts`) only:
- * the rating's "elite" (~4540 Elo, Elmas) plays like this. Kept out of
- * `PROFILES`, whose runs are the engine's replay fixtures.
+ * the ladder's "elite" (~6670 qb, MasterClass, on difficulty table 2) plays
+ * like this. Kept out of `PROFILES`, whose runs are the engine's replay
+ * fixtures.
  */
 export const ELITE: SkillProfile = {
   name: 'elite',

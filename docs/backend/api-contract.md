@@ -78,7 +78,10 @@ profile photos served 600/min/IP.
 
 ### `GET /health` — public
 
-`{ "status": "ok", "time": "…" }`
+`{ "status": "ok", "version": "1.00.00.01", "time": "…" }`
+
+`version` is the release the API was deployed as (major.minor.patch.minipatch,
+`version.json` written by `scripts/deploy.mjs`); `null` when it never was.
 
 ### `GET /app/config?platform=ios&version=1.0.0` — public
 

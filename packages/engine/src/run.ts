@@ -1,4 +1,4 @@
-import { lossAt } from './difficulty';
+import { difficultyRules, gainAt, lossAt } from './difficulty';
 import { ReelStream, type Reel } from './reels';
 import {
   ENGINE_VERSION,
@@ -170,7 +170,8 @@ export class Run {
   constructor(seed: number, difficulty = 0) {
     this.seed = seed >>> 0;
     this.difficulty = difficulty;
-    this.stream = new ReelStream(this.seed, difficulty);
+    difficultyRules(difficulty);
+    this.stream = new ReelStream(this.seed);
     this.reel = this.stream.next();
   }
 
@@ -336,7 +337,7 @@ export class Run {
     this.meterValue = Math.min(
       RULES.meterMax,
       this.meterValue +
-        RULES.gain[reel.kind] +
+        gainAt(RULES.gain[reel.kind], this.difficulty) +
         (verdict === 'perfect' ? RULES.perfectGain : 0),
     );
     const bonuses = this.namedCombos(reel, t);

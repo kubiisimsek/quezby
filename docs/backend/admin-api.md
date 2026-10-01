@@ -444,7 +444,8 @@ subject { type, id, label }, reason, details, ip` — `ip` only for an owner.
 
 ## System — owner
 
-- `GET /system` → `AdminSystem`: environment, PHP, Laravel, database,
+- `GET /system` → `AdminSystem`: environment, the API's release (`version`,
+  `1.00.00.01`, `null` when never deployed), PHP, Laravel, database,
   timezone, season and engine, content version, integrity mode, the daily
   epoch, the apps' minimum and latest versions, whether `OPS_TOKEN` and
   `MODERATION_TOKEN` are set (**never their values**), `appKey` — whether

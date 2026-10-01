@@ -71,8 +71,9 @@ final class Run
 
     public function __construct(int $seed, public readonly int $difficulty = 0)
     {
+        Difficulty::rulesFor($difficulty);
         $this->seed = $seed & self::MASK;
-        $this->stream = new ReelStream($this->seed, $difficulty);
+        $this->stream = new ReelStream($this->seed);
         $this->reel = $this->stream->next();
     }
 
@@ -273,7 +274,7 @@ final class Run
         $this->score += $points;
         $this->meter = min(
             Rules::METER_MAX,
-            $this->meter + Rules::GAIN[$reel->kind->value] + ($verdict === Verdict::Perfect ? Rules::PERFECT_GAIN : 0),
+            $this->meter + Difficulty::gainAt(Rules::GAIN[$reel->kind->value], $this->difficulty) + ($verdict === Verdict::Perfect ? Rules::PERFECT_GAIN : 0),
         );
         $bonuses = $this->namedCombos($reel, $t);
         $this->previousHit = $reel->kind;

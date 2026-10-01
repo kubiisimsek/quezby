@@ -1,7 +1,12 @@
 # One button for the API and the admin panel: Actions → Deploy → Run workflow.
-# The tests run first; only if they pass is anything built and uploaded over
-# SSH (scripts/deploy.mjs). Setting it up: docs/deployment/shared-hosting.md →
-# "Tek tuşla: GitHub Actions".
+# The tests run first; only if they pass does `pnpm deploy:<environment>`
+# (scripts/deploy.mjs) build, give each part its release and upload it
+# through cPanel's API. The API's .env stays on the server and is never sent.
+#
+# Repository secrets: CPANEL_USER, CPANEL_TOKEN.
+# Repository variables: DEPLOY_STAGING_API_DIR, DEPLOY_STAGING_ADMIN_DIR,
+# DEPLOY_PROD_API_DIR, DEPLOY_PROD_ADMIN_DIR.
+# docs/deployment/shared-hosting.md → "Tek tuşla: GitHub Actions".
 name: Deploy
 
 on:
@@ -12,13 +17,22 @@ on:
         type: choice
         options: [staging, production]
         default: staging
-      target:
+      only:
         description: Ne gitsin
         type: choice
         options: [all, api, admin]
         default: all
+      bump:
+        description: Sürümün hangi hanesi artsın (major.minor.patch.minipatch)
+        type: choice
+        options: [minipatch, patch, minor, major]
+        default: minipatch
+      version:
+        description: Ya da tam sürüm (ör. 1.01.01.01, boşsa yukarıdaki artış)
+        type: string
+        required: false
       dry_run:
-        description: Deneme (yalnızca neyin değişeceğini listeler, hiçbir şey yüklemez)
+        description: Deneme (kontrol eder ve derler, hiçbir şey yüklemez)
         type: boolean
         default: false
 
@@ -56,7 +70,7 @@ jobs:
       - run: pnpm test:api
 
   deploy:
-    name: Deploy ${{ inputs.target }} → ${{ inputs.environment }}
+    name: Deploy ${{ inputs.only }} → ${{ inputs.environment }}
     needs: verify
     # Production only ever gets what is on main.
     if: inputs.environment != 'production' || github.ref == 'refs/heads/main'
@@ -64,7 +78,6 @@ jobs:
     environment: ${{ inputs.environment }}
     env:
       ENVIRONMENT: ${{ inputs.environment }}
-      TARGET: ${{ inputs.target }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -79,44 +92,23 @@ jobs:
           coverage: none
       - run: pnpm install --frozen-lockfile
 
-      - name: Write the API's .env
-        if: inputs.target != 'admin'
+      - name: Deploy
         env:
-          API_ENV_FILE: ${{ secrets.API_ENV_FILE }}
+          DEPLOY_CPANEL_USER: ${{ secrets.CPANEL_USER }}
+          DEPLOY_CPANEL_TOKEN: ${{ secrets.CPANEL_TOKEN }}
+          DEPLOY_STAGING_API_DIR: ${{ vars.DEPLOY_STAGING_API_DIR }}
+          DEPLOY_STAGING_ADMIN_DIR: ${{ vars.DEPLOY_STAGING_ADMIN_DIR }}
+          DEPLOY_PROD_API_DIR: ${{ vars.DEPLOY_PROD_API_DIR }}
+          DEPLOY_PROD_ADMIN_DIR: ${{ vars.DEPLOY_PROD_ADMIN_DIR }}
+          ONLY: ${{ inputs.only }}
+          BUMP: ${{ inputs.bump }}
+          VERSION: ${{ inputs.version }}
+          DRY_RUN: ${{ inputs.dry_run }}
         run: |
-          if [ -z "$API_ENV_FILE" ]; then
-            echo "::error::The $ENVIRONMENT environment has no API_ENV_FILE secret (the whole apps/api/.env.$ENVIRONMENT)."
-            exit 1
-          fi
-          umask 077
-          printf '%s\n' "$API_ENV_FILE" > "apps/api/.env.$ENVIRONMENT"
+          set -- --only "$ONLY" --bump "$BUMP" --version "$VERSION"
+          if [ "$DRY_RUN" = true ]; then set -- "$@" --dry-run; fi
+          pnpm "deploy:$ENVIRONMENT" "$@"
 
-      - name: Set up SSH
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
-        run: |
-          if [ -z "$SSH_PRIVATE_KEY" ] || [ -z "$SSH_KNOWN_HOSTS" ]; then
-            echo "::error::The $ENVIRONMENT environment needs the SSH_PRIVATE_KEY and SSH_KNOWN_HOSTS secrets."
-            exit 1
-          fi
-          install -d -m 700 ~/.ssh
-          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_deploy
-          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
-          printf 'Host *\n  IdentityFile ~/.ssh/id_deploy\n  IdentitiesOnly yes\n  StrictHostKeyChecking yes\n' > ~/.ssh/config
-          chmod 600 ~/.ssh/id_deploy ~/.ssh/known_hosts ~/.ssh/config
-
-      - name: Build and upload
-        env:
-          DEPLOY_SSH_HOST: ${{ vars.DEPLOY_SSH_HOST }}
-          DEPLOY_SSH_USER: ${{ vars.DEPLOY_SSH_USER }}
-          DEPLOY_SSH_PORT: ${{ vars.DEPLOY_SSH_PORT }}
-          DEPLOY_API_DIR: ${{ vars.DEPLOY_API_DIR }}
-          DEPLOY_ADMIN_DIR: ${{ vars.DEPLOY_ADMIN_DIR }}
-          DEPLOY_PHP: ${{ vars.DEPLOY_PHP }}
-          DEPLOY_DRY_RUN: ${{ inputs.dry_run && '1' || '' }}
-        run: node scripts/deploy.mjs "$ENVIRONMENT" "$TARGET"
-
-      - name: Forget the secrets
+      - name: Forget the build
         if: always()
-        run: rm -rf ~/.ssh/id_deploy "apps/api/.env.$ENVIRONMENT" dist-deploy
+        run: rm -rf dist-deploy

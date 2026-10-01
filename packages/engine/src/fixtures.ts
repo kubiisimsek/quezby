@@ -1,12 +1,4 @@
-import {
-  DIFFICULTIES,
-  DIFFICULTY_VERSION,
-  MAX_DIFFICULTY,
-  drainAt,
-  likeWeightAt,
-  lossAt,
-  specialShareAt,
-} from './difficulty';
+import { DIFFICULTIES, DIFFICULTY_VERSION, MAX_DIFFICULTY, gainsAt, lossAt } from './difficulty';
 import { PROFILES, blindSwipe, playRun } from './bot';
 import { Rng } from './rng';
 import {
@@ -348,7 +340,6 @@ const PLAYED_DIFFICULTIES = [1, 8, MAX_DIFFICULTY];
  * 0 needs none of its own — it is every other fixture.
  */
 export function buildDifficulty() {
-  const reels = [0, 7, 8, 20, 100, 300, 600, 2000];
   const replays: DifficultyReplayFixture[] = [];
   for (const difficulty of PLAYED_DIFFICULTIES) {
     for (const profile of PROFILES) {
@@ -402,12 +393,7 @@ export function buildDifficulty() {
     table: DIFFICULTIES,
     curves: DIFFICULTIES.map((_, difficulty) => ({
       difficulty,
-      likeWeight: likeWeightAt(difficulty),
-      reels: reels.map((n) => ({
-        n,
-        specialShare: specialShareAt(n, difficulty),
-        drain: drainAt(n, difficulty),
-      })),
+      gains: gainsAt(difficulty),
       losses: Object.fromEntries(
         Object.entries(RULES.loss).map(([kind, loss]) => [kind, lossAt(loss, difficulty)]),
       ),
