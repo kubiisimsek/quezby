@@ -98,7 +98,9 @@ exceptions). Numbers are tabular in tables and tiles.
   you are on; its groups (Genel, Oyuncular, Oyun, Yönetim) fold and are
   remembered; badges count what waits (`GET /counts`: the review queue on
   Şüpheliler, the players with an open report on Bildirimler); the account,
-  the theme and signing out live at its foot. There is no top bar.
+  the theme and signing out live at its foot, the panel's release ("Sürüm
+  1.00.00.12", `lib/release.ts`) under the theme while the sidebar is wide.
+  There is no top bar.
 - **Page** — every route body: the brand band (title, description, one
   action, `BandStats` or an eyebrow of tags, and `leading` — a record's
   picture beside its title, the player's photo on a player's page), the

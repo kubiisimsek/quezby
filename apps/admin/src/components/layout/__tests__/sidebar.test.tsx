@@ -52,6 +52,16 @@ describe('Sidebar', () => {
     expect(screen.queryByText('Yönetim paneli')).not.toBeInTheDocument();
   });
 
+  it('names the panel\'s release under the theme switch, and drops it when narrowed', async () => {
+    const { user } = renderSidebar();
+
+    expect(screen.getByText('Sürüm 1.00.00.04')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Menüyü daralt' }));
+
+    expect(screen.queryByText('Sürüm 1.00.00.04')).not.toBeInTheDocument();
+  });
+
   it('switches the theme', async () => {
     const { user } = renderSidebar();
 

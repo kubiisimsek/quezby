@@ -15,6 +15,7 @@ import { Page } from '@/components/patterns/page';
 import { useSystem, useSystemAction } from '@/hooks/api/system';
 import { errorMessage } from '@/lib/errors';
 import { formatDateTime, formatNumber } from '@/lib/format';
+import { PANEL_VERSION } from '@/lib/release';
 
 const CHORES: Record<AdminSystemAction, { title: string; description: string; label: string; done: string }> = {
   migrate: {
@@ -160,7 +161,7 @@ export function SystemPage() {
             facts={[
               { label: 'Ortam', value: data.environment },
               { label: 'API sürümü', value: data.version ?? 'Yüklenmemiş' },
-              { label: 'Panel sürümü', value: __PANEL_VERSION__ || 'Yerel' },
+              { label: 'Panel sürümü', value: PANEL_VERSION || 'Yerel' },
               { label: 'PHP', value: data.php },
               { label: 'Laravel', value: data.laravel },
               { label: 'Veritabanı', value: data.database },

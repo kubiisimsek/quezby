@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-01 — The panel's release under the theme switch
+
+- The sidebar's foot names the panel's release under the theme switch, e.g.
+  "Sürüm 1.00.00.12".
+  - A hand-built panel says "Sürüm yerel".
+  - The narrowed sidebar has no room for it, so it shows there only when
+    wide.
+- `lib/release.ts` reads `__PANEL_VERSION__` once. The sidebar and the
+  Sistem page both take it from there.
+
 ## 2026-09-30 — Dereceli: the same game, a tighter meter, and a MasterClass people can reach
 
 The owner found MasterClass a slog — "gold screens" over and over, time

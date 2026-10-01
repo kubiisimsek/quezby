@@ -21,6 +21,7 @@ import { Menu } from '@/components/base/menu';
 import { Segmented } from '@/components/base/segmented';
 import { useSlidingThumb } from '@/hooks/useSlidingThumb';
 import { ADMIN_ROLE, formatNumber } from '@/lib/format';
+import { PANEL_VERSION } from '@/lib/release';
 import { cn } from '@/lib/utils';
 import { activeNavHref, NAV_SECTIONS, type NavItem, type NavSection } from '@/nav';
 import { useTheme, type Theme } from '@/providers/theme-provider';
@@ -265,6 +266,7 @@ export function Sidebar({
             </Button>
           ) : null}
         </div>
+        {!collapsed ? <p className="px-1 text-micro font-medium text-ink-faint tabular-nums">Sürüm {PANEL_VERSION || 'yerel'}</p> : null}
       </div>
     </aside>
   );
