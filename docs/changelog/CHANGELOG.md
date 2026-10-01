@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-10-01 — Push bildirimi: pushes to the players a filter picks
+
+The owner wanted pushes on a page of their own, to many players by filter —
+"only Elmas league", "only those who have not played today" — not one player
+at a time on the player's page.
+
+- **Oyuncular → Push bildirimi** (owner). Filters, each narrowing: one
+  player; Dereceli leagues (Bronz … MasterClass, Ligi yok); today's Günün
+  akışı played / not played; last run (played in 1/3/7/30 days, or idle for
+  3/7/14/30); joined in 1/7/30/90 days; iOS / Android; languages; guest or
+  registered. The Alıcılar card counts players, those with a phone and the
+  phones (iOS/Android) as the filters change; sending asks first.
+- **Campaigns** (`push_campaigns`, `PushAudience`, `PushCampaigns`): a send
+  writes the campaign; it goes out 100 phones a step, all at once
+  (`Http::pool`), stepped by the open page and by
+  `quezby:push:campaigns` every minute from cron — never one long request.
+  Gönderilenler shows progress, Firebase's errors by count, and Durdur.
+  Audited as `push.campaign` / `push.campaign_stop`.
+- **Removed** from the player's page: the Push card and
+  `POST /admin/players/{id}/push`, `AdminPlayerResponse.push`,
+  `player.push` (never released).
+- `PushService::send` pushes to many tokens at once and can keep the Loglar
+  page to failures (`logEach: false`).
+
 ## 2026-10-01 — A push from the panel, and the player's push devices
 
 Push from real phones still did not arrive; the owner asked for a way to send

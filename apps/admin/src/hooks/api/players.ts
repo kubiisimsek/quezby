@@ -1,4 +1,4 @@
-import type { AdminDeletePlayerRequest, AdminPlayersQuery, AdminPushRequest, AdminSetRatingRequest } from '@quezby/types';
+import type { AdminDeletePlayerRequest, AdminPlayersQuery, AdminSetRatingRequest } from '@quezby/types';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { afterModeration } from '@/hooks/api/invalidate';
@@ -32,11 +32,6 @@ export function usePlayerActions(id: string) {
     removeAvatar: useMutation({ mutationFn: (reason: string) => api.players.removeAvatar(id, { reason }), onSuccess }),
     dismissReports: useMutation({ mutationFn: (reason: string) => api.players.dismissReports(id, { reason }), onSuccess }),
     setRating: useMutation({ mutationFn: (input: AdminSetRatingRequest) => api.players.setRating(id, input), onSuccess }),
-    push: useMutation({
-      mutationFn: (input: AdminPushRequest) => api.players.push(id, input),
-      // A push can take a phone off, and always writes the logs.
-      onSuccess: () => Promise.all([afterModeration(queryClient), queryClient.invalidateQueries({ queryKey: keys.logs() })]),
-    }),
     remove: useMutation({
       mutationFn: (input: AdminDeletePlayerRequest) => api.players.remove(id, input),
       onSuccess: () => {

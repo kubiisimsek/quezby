@@ -9,7 +9,6 @@ use App\Exceptions\ApiException;
 use App\Models\User;
 use App\Services\AccountDeletion;
 use App\Services\Identity\GuestNames;
-use App\Services\Push\PushService;
 use App\Services\Rating\RatingService;
 use App\Services\Social\ReportService;
 use App\Support\Actor;
@@ -29,7 +28,6 @@ final class PlayerActions
         private readonly AuditLog $audit,
         private readonly ReportService $reports,
         private readonly RatingService $ratings,
-        private readonly PushService $push,
     ) {}
 
     /**
@@ -78,27 +76,6 @@ final class PlayerActions
 
             return $ended;
         });
-    }
-
-    /**
-     * Sends the player's phones a push from the panel — now, whatever their
-     * settings — and says what Firebase answered for each (`PushService::test`).
-     * On the audit log with its words and how many phones took it.
-     *
-     * @return array{problem: string|null, devices: int, delivered: int, results: list<array<string, mixed>>}
-     */
-    public function push(User $player, string $title, string $body, Actor $actor): array
-    {
-        $result = $this->push->test($player, $title, $body);
-        $this->audit->record($actor, AuditAction::PlayerPush, $player, details: [
-            'title' => $title,
-            'body' => $body,
-            'devices' => $result['devices'],
-            'delivered' => $result['delivered'],
-            'problem' => $result['problem'],
-        ]);
-
-        return $result;
     }
 
     /**

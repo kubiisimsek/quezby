@@ -16,8 +16,7 @@ enum AuditAction: string
     case ReportsDismiss = 'player.reports_dismiss';
     /** An owner set a player's rating (qb) by hand; `details` holds `from`, `to`, `tierFrom` and `tierTo`. */
     case PlayerRating = 'player.rating';
-    /** An owner sent a player's phones a push from the panel; `details` holds the words and what Firebase said. */
-    case PlayerPush = 'player.push';
+
     case RunApprove = 'run.approve';
     case RunReject = 'run.reject';
     case AdminCreate = 'admin.create';
@@ -27,4 +26,8 @@ enum AuditAction: string
     case SystemOptimize = 'system.optimize';
     case SystemExpireRuns = 'system.expire_runs';
     case SystemAnalyticsPrune = 'system.analytics_prune';
+    /** An owner sent a push to the players a filter picked; `details` holds the words, the filters and how many. */
+    case PushCampaign = 'push.campaign';
+    /** An owner stopped a push still going out; `details` holds how far it got. */
+    case PushCampaignStop = 'push.campaign_stop';
 }

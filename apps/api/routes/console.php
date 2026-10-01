@@ -14,3 +14,7 @@ Schedule::command('quezby:runs:expire')->hourly();
 
 // Optional too: the API prunes analytics a chunk an hour by itself.
 Schedule::command('quezby:analytics:prune')->dailyAt('04:30');
+
+// Optional: pushes from the panel go out by themselves; without cron the open
+// Push bildirimi page sends them.
+Schedule::command('quezby:push:campaigns')->everyMinute()->withoutOverlapping();

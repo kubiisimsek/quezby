@@ -221,55 +221,7 @@ export type AdminPlayerResponse = {
   social: { friends: number; blockedBy: number };
   /** Reports still open about the player's photo and name. */
   openReports: { photo: number; name: number };
-  /** Whether the player's phones can get a push at all. */
-  push: AdminPlayerPush;
   audit: AdminAuditEntry[];
-};
-
-/** A phone registered for pushes (`PUT /me/push-token`) — the token only by its last eight characters. */
-export type AdminPushDevice = {
-  device: string;
-  platform: string;
-  appVersion: string | null;
-  registeredAt: string | null;
-  updatedAt: string | null;
-};
-
-export type AdminPlayerPush = {
-  /** The most recently registered first; none when the player never allowed notifications or no token reached the API. */
-  devices: AdminPushDevice[];
-  /** The kinds of news the player let through (`settings.pushFriends|pushVs|pushMessages`). */
-  settings: { friends: boolean; vs: boolean; messages: boolean };
-};
-
-/** `POST /admin/players/{id}/push` (owner): a title of at most 60 characters, words of at most 240. */
-export type AdminPushRequest = { title: string; body: string };
-
-/** Why nothing went: no phone registered, Firebase not set up, or Google would not give an access token. */
-export type AdminPushProblem = 'no_device' | 'not_configured' | 'no_access_token';
-
-/**
- * What a push from the panel did — sent now, to every phone of the player,
- * whatever their settings — phone by phone, as Firebase answered. Firebase
- * taking it (`ok`) means it went on to Apple or Google; whether the phone
- * shows it is the phone's.
- */
-export type AdminPushResult = {
-  problem: AdminPushProblem | null;
-  devices: number;
-  delivered: number;
-  results: Array<{
-    device: string;
-    platform: string;
-    appVersion: string | null;
-    ok: boolean;
-    /** Firebase's HTTP status; null when it never answered. */
-    status: number | null;
-    /** What Firebase said (`PERMISSION_DENIED · …`), or why it never answered. */
-    error: string | null;
-    /** Firebase no longer knows the token: the phone was taken off. */
-    dropped: boolean;
-  }>;
 };
 
 export type AdminRenameResponse = AdminActionResponse & { username: string };
@@ -723,8 +675,6 @@ export type AdminAuditAction =
   | 'player.reports_dismiss'
   /** An owner set a player's rating (qb) by hand; `details` holds `from`, `to` and the leagues. */
   | 'player.rating'
-  /** An owner sent the player's phones a push from the panel; `details` holds `title`, `body`, `devices`, `delivered` and `problem`. */
-  | 'player.push'
   | 'run.approve'
   | 'run.reject'
   | 'admin.create'
@@ -733,7 +683,11 @@ export type AdminAuditAction =
   | 'system.migrate'
   | 'system.optimize'
   | 'system.expire_runs'
-  | 'system.analytics_prune';
+  | 'system.analytics_prune'
+  /** An owner sent a push to the players a filter picked; `details`: `campaign`, `title`, `body`, `filters`, `players`, `devices`. */
+  | 'push.campaign'
+  /** An owner stopped a push still going out; `details`: `campaign`, `sent`, `failed`, `devices`. */
+  | 'push.campaign_stop';
 
 export type AdminAuditSubjectType = 'player' | 'run' | 'admin' | 'system';
 
@@ -758,6 +712,71 @@ export type AdminAuditQuery = AdminPageQuery & {
   admin?: string;
   subjectType?: AdminAuditSubjectType;
   subjectId?: string;
+};
+
+/* ---------------------------------------------------------------- push -- */
+
+/**
+ * Who a push from the panel's Push bildirimi page goes to. Every filter
+ * narrows; a banned player is never picked; only a player with a phone
+ * registered for pushes gets one.
+ */
+export type AdminPushFilters = {
+  /** One player, by name (`@` optional). */
+  username?: string;
+  /** Dereceli leagues; `none` — players with no league yet. */
+  tiers?: Array<LeagueTier | 'none'>;
+  /** Today's Günün akışı. */
+  daily?: 'played' | 'not_played';
+  /** Started a run in the last N days (1–365). */
+  playedWithinDays?: number;
+  /** No run in the last N days, never counts too (1–365). */
+  notPlayedForDays?: number;
+  /** An account made in the last N days. */
+  joinedWithinDays?: number;
+  platform?: Platform;
+  locales?: Locale[];
+  /** `guest`: no email, no Apple or Google; `registered`: one of them. */
+  account?: 'guest' | 'registered';
+};
+
+/** `POST /admin/push/audience` `{ filters }` (owner): how many it picks; changes nothing. */
+export type AdminPushAudience = {
+  players: number;
+  /** Of them, with a phone registered for pushes. */
+  reachable: number;
+  devices: number;
+  ios: number;
+  android: number;
+};
+
+/** `POST /admin/push/campaigns` (owner): a title of at most 60 characters, words of at most 240. */
+export type AdminPushCampaignRequest = { title: string; body: string; filters: AdminPushFilters };
+
+export type AdminPushCampaignStatus = 'sending' | 'done' | 'stopped';
+
+/**
+ * A push from the panel. It goes out a batch of phones at a time
+ * (`POST …/{id}/step`, by the open page or by cron) until none are left.
+ */
+export type AdminPushCampaign = {
+  id: number;
+  title: string;
+  body: string;
+  filters: AdminPushFilters;
+  status: AdminPushCampaignStatus;
+  /** Players and phones the filter found when it was sent. */
+  players: number;
+  devices: number;
+  /** Phones Firebase took, and refused; `dropped` — of the refused, ones Firebase no longer knows (taken off). */
+  sent: number;
+  failed: number;
+  dropped: number;
+  /** What Firebase said, the most frequent first. */
+  errors: Array<{ error: string; count: number }>;
+  admin: string;
+  createdAt: string;
+  finishedAt: string | null;
 };
 
 /* ---------------------------------------------------------------- logs -- */

@@ -373,6 +373,9 @@ return [
         'access_token_ttl_seconds' => 3000,
         // Phones one player's pushes go to; the longest unused go first.
         'tokens_per_player' => 10,
+        // Phones a push from the panel's Push bildirimi page reaches in one
+        // step, all at once — one panel request or one cron run.
+        'campaign_batch' => 100,
     ],
 
     /*

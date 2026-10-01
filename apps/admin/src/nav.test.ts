@@ -13,6 +13,13 @@ describe('the menu', () => {
     }
   });
 
+  it('shows the push page to an owner only, among the players', () => {
+    expect(navFor('owner').map((item) => item.href)).toContain('/push');
+    expect(navFor('moderator').map((item) => item.href)).not.toContain('/push');
+    expect(navFor('viewer').map((item) => item.href)).not.toContain('/push');
+    expect(NAV.find((item) => item.href === '/push')).toMatchObject({ label: 'Push bildirimi', section: 'Oyuncular' });
+  });
+
   it('shows the logs to owners and moderators, never to a viewer', () => {
     expect(navFor('owner').map((item) => item.href)).toContain('/logs');
     expect(navFor('moderator').map((item) => item.href)).toContain('/logs');

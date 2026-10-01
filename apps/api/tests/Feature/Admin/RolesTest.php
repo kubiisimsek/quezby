@@ -49,11 +49,15 @@ function adminRouteRoles(): array
         'GET logs/summary' => 'moderator',
         'POST players/{player}/delete' => 'owner',
         'POST players/{player}/rating' => 'owner',
-        'POST players/{player}/push' => 'owner',
         'GET admins' => 'owner',
         'POST admins' => 'owner',
         'PUT admins/{admin}' => 'owner',
         'POST admins/{admin}/reset-password' => 'owner',
+        'GET push/campaigns' => 'owner',
+        'POST push/audience' => 'owner',
+        'POST push/campaigns' => 'owner',
+        'POST push/campaigns/{campaign}/step' => 'owner',
+        'POST push/campaigns/{campaign}/stop' => 'owner',
         'GET system' => 'owner',
         'POST system/{action}' => 'owner',
     ];
@@ -64,7 +68,7 @@ const ADMIN_ROUTE_ID = '01jzzzzzzzzzzzzzzzzzzzzzzz';
 
 function adminRouteUri(string $uri): string
 {
-    return '/api/v1/admin/'.preg_replace(['/\{group\}/', '/\{action\}/', '/\{[^}]+\}/'], ['999999', 'expire-runs', ADMIN_ROUTE_ID], $uri);
+    return '/api/v1/admin/'.preg_replace(['/\{(group|campaign)\}/', '/\{action\}/', '/\{[^}]+\}/'], ['999999', 'expire-runs', ADMIN_ROUTE_ID], $uri);
 }
 
 /**

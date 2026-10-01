@@ -13,6 +13,8 @@ use App\Models\User;
 use App\Services\Google\ServiceAccountToken;
 use App\Services\Logs\SystemLogger;
 use Illuminate\Container\Attributes\Config;
+use Illuminate\Http\Client\Pool;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -149,42 +151,16 @@ final class PushService
     }
 
     /**
-     * A push from the admin panel, now rather than after the response, to
-     * every phone of the player whatever their settings — to see whether
-     * their phones get one at all. `AdminPushResult` in `packages/types`:
-     * why nothing went (`problem`), and what Firebase said for each phone.
-     *
-     * @return array{problem: string|null, devices: int, delivered: int, results: list<array<string, mixed>>}
-     */
-    public function test(User $to, string $title, string $body): array
-    {
-        $tokens = $to->pushTokens()->orderByDesc('updated_at')->orderByDesc('id')->get();
-        if ($tokens->isEmpty()) {
-            $this->log(LogLevel::Warning, 'push.no_device', 'Panelden deneme: oyuncunun kayıtlı cihazı yok.', $to, 'admin');
-
-            return ['problem' => 'no_device', 'devices' => 0, 'delivered' => 0, 'results' => []];
-        }
-
-        $sent = $this->send($tokens, $title, $body, ['kind' => 'admin'], 'quezby-admin', $to);
-        $results = $sent['results'];
-
-        return [
-            'problem' => $sent['problem'],
-            'devices' => $tokens->count(),
-            'delivered' => count(array_filter($results, fn (array $result) => $result['ok'])),
-            'results' => $results,
-        ];
-    }
-
-    /**
-     * Sends one push to each of the tokens. Answers why nothing went
-     * (`not_configured`, `no_access_token`) or what Firebase said for each.
+     * Sends one push to each of the tokens, all at once (`Http::pool`).
+     * Answers why nothing went (`not_configured`, `no_access_token`) or
+     * what Firebase said for each. `$logEach` false — a push to many from the
+     * panel — keeps the Loglar page to the failures (`ExternalCallLogger`).
      *
      * @param  Collection<int, PushToken>  $tokens
      * @param  array<string, string>  $data
      * @return array{problem: string|null, results: list<array{device: string, platform: string, appVersion: string|null, ok: bool, status: int|null, error: string|null, dropped: bool}>}
      */
-    public function send(Collection $tokens, string $title, string $body, array $data, string $thread, ?User $to = null): array
+    public function send(Collection $tokens, string $title, string $body, array $data, string $thread, ?User $to = null, bool $logEach = true): array
     {
         $line = $data['kind'] ?? null;
         if (! $this->isConfigured()) {
@@ -199,26 +175,30 @@ final class PushService
             return ['problem' => 'no_access_token', 'results' => []];
         }
 
+        $tokens = $tokens->values();
+        $url = sprintf(self::SEND_URL, $this->projectId);
+        $responses = Http::pool(fn (Pool $pool) => $tokens->map(fn (PushToken $token, int $index) => $pool->as((string) $index)
+            ->withToken($access)->acceptJson()->timeout(10)
+            ->withAttributes(['log' => ['userId' => $to?->id ?? $token->user_id, 'platform' => $token->platform, 'kind' => $line, 'device' => self::tail($token->token)]])
+            ->post($url, ['message' => [
+                'token' => $token->token,
+                'notification' => ['title' => $title, 'body' => $body],
+                'data' => $data,
+                'android' => ['priority' => 'high', 'notification' => ['channel_id' => 'social', 'tag' => $thread]],
+                'apns' => [
+                    'headers' => ['apns-priority' => '10'],
+                    'payload' => ['aps' => ['sound' => 'default', 'thread-id' => $thread]],
+                ],
+            ]]))->all());
+
         $results = [];
-        foreach ($tokens as $token) {
-            $about = ['userId' => $to?->id, 'platform' => $token->platform, 'kind' => $line, 'device' => self::tail($token->token)];
+        foreach ($tokens as $index => $token) {
+            $response = $responses[(string) $index] ?? null;
             $result = ['device' => self::tail($token->token), 'platform' => $token->platform, 'appVersion' => $token->app_version, 'ok' => false, 'status' => null, 'error' => null, 'dropped' => false];
-            try {
-                $response = Http::withToken($access)->acceptJson()->timeout(5)->withAttributes(['log' => $about])->post(sprintf(self::SEND_URL, $this->projectId), [
-                    'message' => [
-                        'token' => $token->token,
-                        'notification' => ['title' => $title, 'body' => $body],
-                        'data' => $data,
-                        'android' => ['priority' => 'high', 'notification' => ['channel_id' => 'social', 'tag' => $thread]],
-                        'apns' => [
-                            'headers' => ['apns-priority' => '10'],
-                            'payload' => ['aps' => ['sound' => 'default', 'thread-id' => $thread]],
-                        ],
-                    ],
-                ]);
-            } catch (Throwable $e) {
-                Log::warning('A push could not be sent.', ['reason' => $e->getMessage()]);
-                $results[] = [...$result, 'error' => $e->getMessage()];
+            if (! $response instanceof Response) {
+                $reason = $response instanceof Throwable ? $response->getMessage() : 'Firebase cevap vermedi.';
+                Log::warning('A push could not be sent.', ['reason' => $reason]);
+                $results[] = [...$result, 'error' => $reason];
 
                 continue;
             }
@@ -237,7 +217,9 @@ final class PushService
                 Log::warning('Firebase refused a push.', ['status' => $status, 'error' => $response->json('error.status')]);
                 $results[] = [...$result, 'error' => $this->firebaseError($error)];
             } else {
-                $this->log(LogLevel::Info, 'push.sent', 'Firebase bildirimi kabul etti.', $to, $line, $token);
+                if ($logEach) {
+                    $this->log(LogLevel::Info, 'push.sent', 'Firebase bildirimi kabul etti.', $to, $line, $token);
+                }
                 $results[] = [...$result, 'ok' => true];
             }
         }

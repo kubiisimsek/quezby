@@ -23,6 +23,8 @@ export const keys = {
   audit: (query?: object) => (query ? (['audit', query] as const) : (['audit'] as const)),
   logs: (query?: object) => (query ? (['logs', query] as const) : (['logs'] as const)),
   logSummary: (range: string) => ['logs', 'summary', range] as const,
+  pushAudience: (filters: object) => ['push', 'audience', filters] as const,
+  pushCampaigns: () => ['push', 'campaigns'] as const,
   admins: ['admins'] as const,
   system: ['system'] as const,
 };

@@ -33,9 +33,11 @@
   `admin.role:owner` and goes through `RatingService::adjust` (the rating row
   locked, the change on the player's history as `adjust`), never a write to
   `player_ratings` of the panel's own.
-- **Only an owner puts words on a player's phone.** `POST /players/{id}/push`
-  is `admin.role:owner`, goes through `PushService::test` (sent now, every
-  phone, settings ignored) and is audited as `player.push` with its words.
+- **Only an owner puts words on players' phones.** The Push bildirimi page
+  (`/push/*`, `admin.role:owner`) picks players only through `PushAudience`,
+  never a banned one; sending is a `push.campaign` on the audit log with its
+  words and filters, stopping a `push.campaign_stop`. A campaign goes out in
+  steps of `push.campaign_batch` phones, never all in one request.
 - **A report never names its reporter.** The game promises it ("kimin
   bildirdiği söylenmez"): `AdminReportRow` carries none, and the panel asks
   for none.

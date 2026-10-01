@@ -10,7 +10,6 @@ import type {
   AdminLogSource,
   AdminMilestone,
   AdminPostKind,
-  AdminPushProblem,
   AdminReportStatus,
   AdminRole,
   AdminRunStatus,
@@ -261,7 +260,6 @@ export const AUDIT_ACTION: Record<AdminAuditAction, Label> = {
   'player.avatar_remove': { tone: 'warn', label: 'Fotoğrafı kaldırdı' },
   'player.reports_dismiss': { tone: 'neutral', label: 'Bildirimleri kapattı' },
   'player.rating': { tone: 'warn', label: 'qb’yi değiştirdi' },
-  'player.push': { tone: 'neutral', label: 'Push gönderdi' },
   'run.approve': { tone: 'ok', label: 'Turu onayladı' },
   'run.reject': { tone: 'bad', label: 'Turu reddetti' },
   'admin.create': { tone: 'secondary', label: 'Yönetici ekledi' },
@@ -270,6 +268,8 @@ export const AUDIT_ACTION: Record<AdminAuditAction, Label> = {
   'system.migrate': { tone: 'primary', label: 'Migration çalıştırdı' },
   'system.optimize': { tone: 'primary', label: 'Önbelleği yeniledi' },
   'system.expire_runs': { tone: 'primary', label: 'Yarım turları kapattı' },
+  'push.campaign': { tone: 'secondary', label: 'Push gönderdi' },
+  'push.campaign_stop': { tone: 'warn', label: 'Push’u durdurdu' },
   'system.analytics_prune': { tone: 'primary', label: 'Analitiği temizledi' },
 };
 
@@ -311,6 +311,8 @@ const LOG_EVENT: Record<AdminLogSource, Record<string, string>> = {
     'push.not_configured': 'Firebase ayarlı değil',
     'push.no_access_token': 'Google anahtar vermedi',
     'push.token_dropped': 'Cihaz silindi',
+    'push.campaign': 'Panelden push başladı',
+    'push.campaign_done': 'Panelden push bitti',
   },
   app: {
     'push.token': 'Push token alınamadı',
@@ -320,22 +322,6 @@ const LOG_EVENT: Record<AdminLogSource, Record<string, string>> = {
     'api.unreachable': 'API’ye ulaşılamadı',
     'api.timeout': 'API geç kaldı',
     crash: 'Çökme',
-  },
-};
-
-/** Why a push from the panel went nowhere. */
-export const PUSH_PROBLEM: Record<AdminPushProblem, { title: string; hint: string }> = {
-  no_device: {
-    title: 'Oyuncunun kayıtlı cihazı yok',
-    hint: 'Telefon bildirime izin vermemiş ya da token API’ye ulaşmamış. Loglar’da bu oyuncunun Telefon satırlarına bak.',
-  },
-  not_configured: {
-    title: 'Firebase ayarlı değil',
-    hint: 'QUEZBY_PUSH_ENABLED, FIREBASE_PROJECT_ID ve FIREBASE_CREDENTIALS sunucuda okunamıyor; Sistem sayfası da Kapalı der.',
-  },
-  no_access_token: {
-    title: 'Google erişim anahtarı vermedi',
-    hint: 'Servis hesabının anahtarı reddedildi ya da sunucu Google’a ulaşamadı. Loglar’da Dış servis → Google erişim anahtarı satırına bak.',
   },
 };
 

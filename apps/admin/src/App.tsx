@@ -21,6 +21,7 @@ const NotFoundPage = lazy(() => import('@/pages/NotFoundPage').then((module) => 
 const OverviewPage = lazy(() => import('@/pages/OverviewPage').then((module) => ({ default: module.OverviewPage })));
 const PlayerPage = lazy(() => import('@/pages/PlayerPage').then((module) => ({ default: module.PlayerPage })));
 const PlayersPage = lazy(() => import('@/pages/PlayersPage').then((module) => ({ default: module.PlayersPage })));
+const PushPage = lazy(() => import('@/pages/PushPage').then((module) => ({ default: module.PushPage })));
 const RatingsPage = lazy(() => import('@/pages/RatingsPage').then((module) => ({ default: module.RatingsPage })));
 const ReportsPage = lazy(() => import('@/pages/ReportsPage').then((module) => ({ default: module.ReportsPage })));
 const RunPage = lazy(() => import('@/pages/RunPage').then((module) => ({ default: module.RunPage })));
@@ -48,6 +49,14 @@ export const appRoutes: RouteObject[] = [
           { path: '/reports', element: <ReportsPage /> },
           { path: '/runs', element: <RunsPage /> },
           { path: '/runs/:runId', element: <RunPage /> },
+          {
+            path: '/push',
+            element: (
+              <RequireRole least="owner">
+                <PushPage />
+              </RequireRole>
+            ),
+          },
           { path: '/boards', element: <BoardsPage /> },
           { path: '/daily', element: <DailyPage /> },
           { path: '/ratings', element: <RatingsPage /> },

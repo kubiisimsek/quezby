@@ -29,8 +29,10 @@ import type {
   AdminPlayerResponse,
   AdminPlayersQuery,
   AdminPlayersResponse,
-  AdminPushRequest,
-  AdminPushResult,
+  AdminPushAudience,
+  AdminPushCampaign,
+  AdminPushCampaignRequest,
+  AdminPushFilters,
   AdminRatingsResponse,
   AdminReasonRequest,
   AdminRenameResponse,
@@ -117,9 +119,6 @@ export function createAdminClient(options: AdminClientOptions) {
       /** Sets the player's rating (qb) by hand, placing them if they are not yet. Owner only. */
       setRating: (playerId: string, input: AdminSetRatingRequest) =>
         request<AdminSetRatingResponse>(`/players/${id(playerId)}/rating`, { method: 'POST', body: input }),
-      /** Owner only: a push to every phone of the player, now — what Firebase said for each. */
-      push: (playerId: string, input: AdminPushRequest) =>
-        request<AdminPushResult>(`/players/${id(playerId)}/push`, { method: 'POST', body: input }),
       /** Owner only. */
       remove: (playerId: string, input: AdminDeletePlayerRequest) =>
         request<void>(`/players/${id(playerId)}/delete`, { method: 'POST', body: input }),
@@ -159,6 +158,14 @@ export function createAdminClient(options: AdminClientOptions) {
     audit: {
       list: (query: AdminAuditQuery = {}) =>
         request<AdminPage<AdminAuditEntry>>('/audit', { query }),
+    },
+    push: {
+      audience: (filters: AdminPushFilters) => request<AdminPushAudience>('/push/audience', { method: 'POST', body: { filters } }),
+      campaigns: () => request<{ campaigns: AdminPushCampaign[] }>('/push/campaigns'),
+      send: (input: AdminPushCampaignRequest) =>
+        request<{ campaign: AdminPushCampaign }>('/push/campaigns', { method: 'POST', body: input }),
+      step: (campaignId: number) => request<{ campaign: AdminPushCampaign }>(`/push/campaigns/${campaignId}/step`, { method: 'POST' }),
+      stop: (campaignId: number) => request<{ campaign: AdminPushCampaign }>(`/push/campaigns/${campaignId}/stop`, { method: 'POST' }),
     },
     logs: {
       list: (query: AdminLogsQuery = {}) => request<AdminLogsResponse>('/logs', { query }),

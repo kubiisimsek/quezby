@@ -10,6 +10,7 @@ import type {
   AdminLogEntry,
   AdminLogsResponse,
   AdminLogSummary,
+  AdminPushCampaign,
   AdminOverview,
   AdminMe,
   AdminPage,
@@ -145,6 +146,26 @@ export function logSummary(overrides: Partial<AdminLogSummary> = {}): AdminLogSu
   };
 }
 
+export function pushCampaign(overrides: Partial<AdminPushCampaign> = {}): AdminPushCampaign {
+  return {
+    id: 7,
+    title: 'Quezby',
+    body: 'Günün akışı seni bekliyor!',
+    filters: { tiers: ['diamond'], daily: 'not_played' },
+    status: 'done',
+    players: 40,
+    devices: 52,
+    sent: 49,
+    failed: 3,
+    dropped: 1,
+    errors: [{ error: 'UNAUTHENTICATED · THIRD_PARTY_AUTH_ERROR', count: 2 }, { error: 'NOT_FOUND · UNREGISTERED', count: 1 }],
+    admin: 'Kubilay Şimşek',
+    createdAt: '2026-10-01T09:00:00.000Z',
+    finishedAt: '2026-10-01T09:00:05.000Z',
+    ...overrides,
+  };
+}
+
 export function auditEntry(overrides: Partial<AdminAuditEntry> = {}): AdminAuditEntry {
   return {
     id: 1,
@@ -211,12 +232,6 @@ export function playerResponse(overrides: Partial<AdminPlayerResponse> = {}, pla
     ],
     social: { friends: 4, blockedBy: 0 },
     openReports: { photo: 0, name: 0 },
-    push: {
-      devices: [
-        { device: '…a1b2c3d4', platform: 'ios', appVersion: '1.0.4', registeredAt: '2026-09-28T08:00:00.000Z', updatedAt: '2026-09-30T08:00:00.000Z' },
-      ],
-      settings: { friends: true, vs: true, messages: true },
-    },
     audit: [],
     ...overrides,
   };

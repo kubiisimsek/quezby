@@ -28,7 +28,7 @@ comes from here; `apps/admin` may not import `@quezby/engine` (lint).
   | --- | --- | --- |
   | İzleyici | `viewer` | read every page |
   | Moderatör | `moderator` | ban and unban, reset a name, take a photo down, dismiss reports, sign a player out, approve and reject runs, read the logs |
-  | Sahip | `owner` | set a player's rating (qb) by hand, send a player's phones a push, delete a player's account, manage admins, run the system chores, see IP addresses in the audit log |
+  | Sahip | `owner` | set a player's rating (qb) by hand, send pushes (Push bildirimi), delete a player's account, manage admins, run the system chores, see IP addresses in the audit log |
 
   Every admin route but the login carries `admin.role:<least role>`
   (`EnsureAdminRole`); `RolesTest` lists every route with its least role and
@@ -111,11 +111,7 @@ player never rated), runs by status, the ten latest runs, the flag codes of the 
 the other accounts seen on it — `social` (`friends`: their friends who are
 not banned; `blockedBy`: how many players blocked them, a sign worth a look),
 `openReports` (the reports still open about their photo and their name,
-`{ photo, name }`), `push` (`AdminPlayerPush`: the phones registered for
-pushes, most recent first, each `{ device: "…a1b2c3d4", platform, appVersion,
-registeredAt, updatedAt }` — a token only by its last eight characters — and
-`settings { friends, vs, messages }`, the kinds the player let through) and
-the audit entries about them.
+`{ photo, name }`) and the audit entries about them.
 
 ### `GET /players/{id}/activity` — viewer
 
@@ -165,20 +161,6 @@ upload a new photo. A player with no photo: `changed: false`, nothing recorded.
 — they close as `dismissed`, the photo and the name stay as they are —
 recorded as `player.reports_dismiss` with how many in the details. None open:
 `changed: false`, nothing recorded.
-
-### `POST /players/{id}/push` — owner
-
-`AdminPushRequest` `{ title (≤ 60), body (≤ 240) }` → `AdminPushResult`
-`{ problem, devices, delivered, results }`. A push to every phone of the
-player, sent **now** (not after the response) and whatever their settings —
-to see whether their phones can get one at all. `problem`: `no_device`,
-`not_configured` or `no_access_token` when nothing went; otherwise
-`results`, phone by phone, `{ device, platform, appVersion, ok, status,
-error, dropped }` as Firebase answered (`error` like
-`UNAUTHENTICATED · THIRD_PARTY_AUTH_ERROR · …`; a token Firebase no longer
-knows is taken off, `dropped`). `data` is `{ kind: "admin" }`, which the app
-opens to nothing. Audited as `player.push` with the words, `devices`,
-`delivered` and `problem`; every push is on the Loglar page too.
 
 ### `POST /players/{id}/rating` — owner
 
@@ -438,7 +420,7 @@ subject { type, id, label }, reason, details, ip` — `ip` only for an owner.
 - `action`: `auth.login`, `auth.password_changed`, `player.ban`,
   `player.unban`, `player.rename`, `player.sign_out`, `player.delete`,
   `player.avatar_remove`, `player.reports_dismiss`, `player.rating`,
-  `player.push`,
+  `push.campaign`, `push.campaign_stop`,
   `run.approve`, `run.reject`, `admin.create`, `admin.update`,
   `admin.reset_password`, `system.migrate`, `system.optimize`,
   `system.expire_runs`, `system.analytics_prune`.
@@ -446,6 +428,38 @@ subject { type, id, label }, reason, details, ip` — `ip` only for an owner.
   the player it names: the subject is an id and a label, not a foreign key.
 - Moderation from the command line and the ops route is recorded too:
   `ModerationService` takes an `Actor` and writes the entry itself.
+
+## Push — owner
+
+The Push bildirimi page: pushes to the players a filter picks.
+
+- `AdminPushFilters` — every one narrows, a banned player is never picked,
+  only a player with a phone registered for pushes gets one: `username` (one
+  player), `tiers` (Dereceli leagues, `none` for no league yet), `daily`
+  (`played` / `not_played` today's Günün akışı), `playedWithinDays`,
+  `notPlayedForDays` (never played counts), `joinedWithinDays`, `platform`,
+  `locales`, `account` (`guest` / `registered`). An unknown key is a 422.
+- `POST /push/audience` `{ filters }` → `AdminPushAudience`
+  `{ players, reachable, devices, ios, android }`; changes nothing.
+- `POST /push/campaigns` `{ title (≤ 60), body (≤ 240), filters }` → `201
+  { campaign }`. Writes the campaign — status `sending`, or `done` at once
+  when no phone matches — and sends nothing yet. Audited as `push.campaign`
+  with the words, the filters and the counts.
+- `POST /push/campaigns/{id}/step` → `{ campaign }`: the next
+  `push.campaign_batch` (100) phones at once (`Http::pool`), after the last one
+  done (`cursor`); `done` once fewer are left. One step at a time per campaign
+  (a lock). The filter is read again at each step. The open page steps until
+  done; `php artisan quezby:push:campaigns` (scheduled every minute — cron on
+  `schedule:run`) does the same when it is closed.
+- `POST /push/campaigns/{id}/stop` → `{ campaign }` `stopped`; audited as
+  `push.campaign_stop`.
+- `GET /push/campaigns` → `{ campaigns }`, the latest twenty, newest first.
+  `AdminPushCampaign` `{ id, title, body, filters, status, players, devices,
+  sent, failed, dropped, errors: [{ error, count }], admin, createdAt,
+  finishedAt }` — `errors` what Firebase said, the most frequent first.
+- `data` is `{ kind: "admin" }`, which the app opens to nothing. A failed
+  phone is a row of the Loglar page (`ExternalCallLogger`); a phone that went
+  is only counted, not a row each.
 
 ## Logs
 
