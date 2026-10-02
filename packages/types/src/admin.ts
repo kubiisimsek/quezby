@@ -173,8 +173,6 @@ export type AdminRatingChange = RatingChange & {
   id: number;
   /** The rating whose typical score the run's was. */
   performance: number | null;
-  /** The width the run was measured with: smaller while provisional. */
-  width: number | null;
   shielded: boolean;
   engineVersion: number | null;
   /** False for a run that did not count (`void`). */
@@ -191,7 +189,6 @@ export type AdminPlayerRating = {
   /** The difficulty the next rated run is played at; null until placed. */
   difficulty: number | null;
   placement: RatingPlacement | null;
-  provisionalLeft: number;
   shield: { tier: LeagueTier; runs: number } | null;
   ratedRuns: number;
   ratedAt: string | null;
@@ -579,10 +576,12 @@ export type AdminRatingsResponse = {
   /** The rules the ratings run on (`config/quezby.php` › `rating`). */
   rules: {
     engineVersion: number;
-    maxDelta: number;
-    width: number;
-    provisionalWidth: number;
-    provisionalRuns: number;
+    /**
+     * How far a run moves a rating: its score as a per cent of the target →
+     * qb, lowest share first — straight between two points, the end's past
+     * either end. The first point's move is the biggest loss, a forfeit's.
+     */
+    curve: Array<{ percent: number; qb: number }>;
     placementRuns: number;
     placementMin: number;
     placementMax: number;

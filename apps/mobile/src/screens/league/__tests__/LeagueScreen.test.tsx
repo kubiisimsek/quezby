@@ -33,6 +33,7 @@ function entry(overrides: Partial<RatingEntry> = {}): RatingEntry {
     avatarUrl: null,
     rating: 2_900,
     tier: 'gold',
+    leagueBest: null,
     isMe: false,
     isFriend: false,
     gap: null,
@@ -40,11 +41,11 @@ function entry(overrides: Partial<RatingEntry> = {}): RatingEntry {
   };
 }
 
-/** Four players of Altın by qb, you third. */
+/** Four players of Altın by qb, you third — the last fresh from Gümüş, with no Altın score yet. */
 const ROWS: RatingEntry[] = [
-  entry({ rank: 1, username: 'ust', rating: 2_900 }),
-  entry({ rank: 2, username: 'es', rating: 2_500, gap: 401 }),
-  entry({ rank: 3, username: 'kubi', rating: 2_340, gap: 161, isMe: true }),
+  entry({ rank: 1, username: 'ust', rating: 2_900, leagueBest: 142_300 }),
+  entry({ rank: 2, username: 'es', rating: 2_500, leagueBest: 118_000, gap: 401 }),
+  entry({ rank: 3, username: 'kubi', rating: 2_340, leagueBest: 96_400, gap: 161, isMe: true }),
   entry({ rank: 4, username: 'alt', rating: 2_100, gap: 241 }),
 ];
 
@@ -237,12 +238,21 @@ describe('LeagueScreen — Lig', () => {
     expect(
       screen.getAllByRole('button', { name: /\. sıra, @/ }).map((row) => row.props.accessibilityLabel),
     ).toEqual([
-      '1. sıra, @ust, 2.900 qb',
-      '2. sıra, @es, 2.500 qb, geçmek için 401 qb',
-      '3. sıra, @kubi, sen, 2.340 qb, geçmek için 161 qb',
+      '1. sıra, @ust, 2.900 qb, En iyi skor 142.300',
+      '2. sıra, @es, 2.500 qb, En iyi skor 118.000, geçmek için 401 qb',
+      '3. sıra, @kubi, sen, 2.340 qb, En iyi skor 96.400, geçmek için 161 qb',
       '4. sıra, @alt, 2.100 qb, geçmek için 241 qb',
     ]);
     expect(screen.queryByText(/HAFTALIK|Bitmesine|bonus/i)).not.toBeOnTheScreen();
+  });
+
+  it('writes each player’s best score in the league small under the name, and nothing before they have one', async () => {
+    await renderLeague();
+
+    expect(await screen.findByText('En iyi skor 142.300')).toBeOnTheScreen();
+    expect(screen.getByText('En iyi skor 118.000')).toBeOnTheScreen();
+    expect(screen.getByText('En iyi skor 96.400')).toBeOnTheScreen();
+    expect(screen.getAllByText(/^En iyi skor /)).toHaveLength(3);
   });
 
   it('pins your floor with the qb to the player above, and plays rated to pass them', async () => {
@@ -309,6 +319,7 @@ describe('LeagueScreen — in other languages', () => {
     expect(screen.getByText('LEAGUE')).toBeOnTheScreen();
     expect(screen.getByLabelText('2,340 qb')).toBeOnTheScreen();
     expect(screen.getByText('Best 2,400')).toBeOnTheScreen();
+    expect(screen.getByText('Best score 142,300')).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Open your qb history' })).toBeOnTheScreen();
     expect(screen.getByText('161 qb to @es')).toBeOnTheScreen();
   });
@@ -335,5 +346,6 @@ describe('LeagueScreen — in other languages', () => {
     expect(screen.getByText('ترتيب الدوري')).toBeOnTheScreen();
     expect(screen.getByText('الدوري')).toBeOnTheScreen();
     expect(screen.getByLabelText(`${iso('2,340')} qb`)).toBeOnTheScreen();
+    expect(screen.getByText(`أفضل نتيجة ${iso('142,300')}`)).toBeOnTheScreen();
   });
 });

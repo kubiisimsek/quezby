@@ -22,7 +22,7 @@ type Row = {
   name: string;
   isMe: boolean;
   score: number;
-  /** One more fact, after the score — "3 gün" on a league row. */
+  /** One more fact, after the score — the best score in the league on a league row. */
   detail?: string;
   /** Points to pass the row above; none when there is nobody to pass. */
   gap?: number | null;

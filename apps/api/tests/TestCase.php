@@ -238,7 +238,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * `$player` placed at `$rating`, their last counted run `$ratedAt` (now by
      * default) — as if they had played their way there. `$attributes` sets
-     * the rest of the row: a shield, provisional runs.
+     * the rest of the row: a shield, the peak.
      *
      * @param  array<string, mixed>  $attributes
      */
@@ -250,7 +250,6 @@ abstract class TestCase extends BaseTestCase
             'peak' => $rating,
             'placement_scores' => null,
             'rated_runs' => 20,
-            'provisional_left' => 0,
             'rated_at' => $ratedAt ?? now(),
             'changed_at' => $ratedAt ?? now(),
             ...$attributes,

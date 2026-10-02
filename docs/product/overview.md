@@ -145,7 +145,10 @@ yalnız o besler, hiçbir skor tablosuna yazılmaz.
   yükseldikçe süslenir: sade Bronz, küçük kanatlı Gümüş, büyüyen kanatlar,
   Platin'in sivri tepesi, Elmas'ın tacı, MasterClass'ın taç, hale ve ışınları;
   lig ekranında ve sonuçta parlar, ışıldar. Her dereceli turun bir **hedef
-  skoru** var: geçen Elo kazanır, altında kalan kaybeder, bir tur en fazla ±100.
+  skoru** var: değişim skorun hedefe oranıdır, her reytingde aynı (hedefin
+  üstündeki her %1 +2 qb; altındaki her %1 −2 qb, %20'den sonra −4 qb), bir
+  tur en fazla ±200. Lig sıralamasında her oyuncunun adının altında o ligdeki
+  en iyi dereceli skoru küçükçe yazar.
   İlk 3 dereceli tur yerleşmedir, herkes Gümüş'te başlar. Hedef ve zorluk
   oyuncuya gösterilmez (aşağıda). Yarım bırakılan dereceli tur hükmen
   kayıptır.

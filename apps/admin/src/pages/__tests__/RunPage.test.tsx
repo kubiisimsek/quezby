@@ -203,7 +203,8 @@ describe('RunPage', () => {
     expect(fact(card, 'Skor')).toHaveTextContent('140.000');
     expect(fact(card, 'Skor')).toHaveTextContent('hedef 120.000');
     expect(fact(card, 'Performans')).toHaveTextContent('2.560');
-    expect(fact(card, 'Genişlik')).toHaveTextContent('800');
+    expect(fact(card, 'Hedefe oranı')).toHaveTextContent('%116,7');
+    expect(fact(card, 'Hedefe oranı')).toHaveTextContent('Değişimi bu oran belirler');
     expect(fact(card, 'Terfi kalkanı')).toHaveTextContent('Yok');
     expect(within(card).queryByText(/Moderatör geri aldı/)).not.toBeInTheDocument();
   });
@@ -224,7 +225,7 @@ describe('RunPage', () => {
   it('shows a run that did not count as such', async () => {
     const api = fakeApi();
     api.runs.get.mockResolvedValue(
-      runResponse({}, { rating: runRating({ kind: 'void', delta: 0, before: 2378, after: 2378, target: null, performance: null, width: null, counted: false }) }),
+      runResponse({}, { rating: runRating({ kind: 'void', delta: 0, before: 2378, after: 2378, target: null, performance: null, counted: false }) }),
     );
     renderApp({ path: `/runs/${ID}`, api });
 
@@ -232,6 +233,7 @@ describe('RunPage', () => {
     expect(within(fact(card, 'Ne oldu')).getByText('Sayılmadı')).toBeInTheDocument();
     expect(fact(card, 'Değişim')).toHaveTextContent('Sayılmadı');
     expect(fact(card, 'Performans')).toHaveTextContent('—');
+    expect(fact(card, 'Hedefe oranı')).toHaveTextContent('—');
   });
 
   it('says when a run never touched the rating', async () => {

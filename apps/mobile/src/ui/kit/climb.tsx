@@ -67,7 +67,7 @@ export function ClimbRow({
   reels?: number;
   /**
    * One more fact under the name, after the reels when both are given —
-   * "3 gün" on a league row. Read aloud after the score.
+   * the best score in the league on a league row. Read aloud after the score.
    */
   detail?: string;
   /** Points to pass the row above; null hides the pill. */

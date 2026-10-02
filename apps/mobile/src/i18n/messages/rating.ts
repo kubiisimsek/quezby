@@ -29,9 +29,10 @@ function signed(locale: Locale, value: number): string {
  * qb — the players' name for the Elo rating — is what a player's league
  * comes from. Every counted run plays
  * against a target — the score to beat — and moves the rating up past it, down
- * short of it, never more than a hundred. The first runs place the player; a
- * fresh promotion is shielded for a few runs. The numbers are the API's;
- * these are the words round them. Tier names are `tiers`'s.
+ * short of it, by the score's share of it: never more than 200. The first
+ * runs place the player; a fresh promotion is shielded for a few runs. The
+ * numbers are the API's; these are the words round them. Tier names are
+ * `tiers`'s.
  */
 const tr = {
   elo: (value: string) => `${value} qb`,

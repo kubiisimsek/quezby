@@ -3,6 +3,7 @@
 use App\Enums\LeagueTier;
 use App\Game\Difficulty;
 use App\Game\Rules;
+use App\Services\Rating\RatingCurve;
 use App\Services\Rating\RatingService;
 use App\Services\Rating\TargetTable;
 
@@ -11,7 +12,9 @@ use App\Services\Rating\TargetTable;
 | of the engine's simulated players in their league, and holds them there
 | without swinging them across it. Scores are drawn around each profile's
 | median from `docs/product/scoring.md` (2,000 runs each), 15 % lower for a
-| real thumb, spread like the profile's p10–p90.
+| real thumb, spread like the profile's p10–p90. A run moves the rating by
+| its score as a share of the target (`RatingCurve`, up to ±200): a steady
+| thumb's runs land near it and move little, a wide one's swing further.
 */
 
 /**
@@ -23,6 +26,7 @@ use App\Services\Rating\TargetTable;
 function settle(int $median, float $sigma, int $players = 150, int $runs = 120): array
 {
     $table = TargetTable::forEngine(Rules::ENGINE_VERSION);
+    $curve = app(RatingCurve::class);
     $config = config('quezby.rating');
     $draw = function () use ($median, $sigma): int {
         $u = max(mt_rand() / mt_getrandmax(), 1e-9);
@@ -38,8 +42,7 @@ function settle(int $median, float $sigma, int $players = 150, int $runs = 120):
         $placement = array_map(fn () => $draw(), range(1, $config['placement_runs']));
         $rating = max($config['placement_min'], min($config['placement_max'], $table->performance(TargetTable::median($placement)) ?? 0));
         for ($n = 1; $n <= $runs; $n++) {
-            $width = $n <= $config['provisional_runs'] ? $config['provisional_width'] : $config['width'];
-            $delta = TargetTable::delta($rating, $table->performance($draw()), $width, $config['max_delta']);
+            $delta = $curve->delta($draw(), $table->shown($rating));
             if ($delta < 0 && LeagueTier::fromRating($rating)->isBottom()) {
                 $delta = -intdiv(-$delta * $config['bronze_loss_percent'] + 99, 100);
             }
@@ -61,21 +64,23 @@ function settle(int $median, float $sigma, int $players = 150, int $runs = 120):
     ];
 }
 
-test('each simulated player settles in their league, and stays there', function (int $median, float $sigma, LeagueTier $league) {
+test('each simulated player settles in their league, and stays there', function (int $median, float $sigma, LeagueTier $league, float $sd, int $p90) {
     $settled = settle($median, $sigma);
 
-    // The short game spreads a casual run's score wider (p90/p10 ≈ 7): its
-    // rating moves a little more a run, never across a league.
+    // The short game spreads a casual run's score wide (p90/p10 ≈ 7): one run
+    // in ten moves it the full 200, and its rating wanders the most — but
+    // settles in its league. A steady thumb's runs land near the target.
     expect(LeagueTier::fromRating((int) round($settled['mean'])))->toBe($league)
-        ->and($settled['sd'])->toBeLessThan(120.0)
-        ->and($settled['p90'])->toBeLessThanOrEqual(85);
+        ->and($settled['sd'])->toBeLessThan($sd)
+        ->and($settled['p90'])->toBeLessThanOrEqual($p90);
 })->with([
-    // median score, log spread (p90/p10 of the profile), league
-    'casual' => [39200, 0.75, LeagueTier::Silver],
-    'average' => [113100, 0.44, LeagueTier::Silver],
-    'good' => [267200, 0.28, LeagueTier::Gold],
-    'pro' => [517800, 0.19, LeagueTier::Platinum],
-    'elite' => [781700, 0.13, LeagueTier::Diamond],
+    // median score, log spread (p90/p10 of the profile), league, the rating's
+    // spread across players, the move of nine runs in ten once settled
+    'casual' => [39200, 0.75, LeagueTier::Silver, 200.0, 200],
+    'average' => [113100, 0.44, LeagueTier::Silver, 175.0, 200],
+    'good' => [267200, 0.28, LeagueTier::Gold, 125.0, 130],
+    'pro' => [517800, 0.19, LeagueTier::Platinum, 100.0, 85],
+    'elite' => [781700, 0.13, LeagueTier::Diamond, 75.0, 60],
 ]);
 
 test('only near-flawless play holds MasterClass', function () {
@@ -125,6 +130,7 @@ function settleAtDifficulty(array $medians, float $sigma, TargetTable $table, in
 {
     $placementTable = TargetTable::forEngine(Rules::ENGINE_VERSION);
     $ratings = app(RatingService::class);
+    $curve = app(RatingCurve::class);
     $config = config('quezby.rating');
     $draw = function (int $difficulty) use ($medians, $sigma): int {
         $u = max(mt_rand() / mt_getrandmax(), 1e-9);
@@ -140,8 +146,7 @@ function settleAtDifficulty(array $medians, float $sigma, TargetTable $table, in
         $placement = array_map(fn () => $draw(0), range(1, $config['placement_runs']));
         $rating = max($config['placement_min'], min($config['placement_max'], $placementTable->performance(TargetTable::median($placement)) ?? 0));
         for ($n = 1; $n <= $runs; $n++) {
-            $width = $n <= $config['provisional_runs'] ? $config['provisional_width'] : $config['width'];
-            $delta = TargetTable::delta($rating, $table->performance($draw($ratings->difficultyAt($rating))), $width, $config['max_delta']);
+            $delta = $curve->delta($draw($ratings->difficultyAt($rating)), $table->shown($rating));
             if ($delta < 0 && LeagueTier::fromRating($rating)->isBottom()) {
                 $delta = -intdiv(-$delta * $config['bronze_loss_percent'] + 99, 100);
             }
@@ -168,20 +173,20 @@ function difficultyTargets(): TargetTable
     return TargetTable::forDifficulty(Rules::ENGINE_VERSION, Difficulty::VERSION) ?? throw new RuntimeException('No difficulty targets.');
 }
 
-test('at the difficulties, each simulated player settles in its league on the ladder, and stays there', function (string $profile, float $sigma, LeagueTier $league) {
+test('at the difficulties, each simulated player settles in its league on the ladder, and stays there', function (string $profile, float $sigma, LeagueTier $league, float $sd, int $p90) {
     $hard = settleAtDifficulty(DIFFICULTY_MEDIANS[$profile], $sigma, difficultyTargets());
 
     // A run's score spreads wide for casual, average and good thumbs: their
     // rating moves more a run than a steady player's, never across a league.
     expect(LeagueTier::fromRating((int) round($hard['mean'])))->toBe($league)
-        ->and($hard['sd'])->toBeLessThan(150.0)
-        ->and($hard['p90'])->toBeLessThanOrEqual(100);
+        ->and($hard['sd'])->toBeLessThan($sd)
+        ->and($hard['p90'])->toBeLessThanOrEqual($p90);
 })->with([
-    'casual' => ['casual', 0.75, LeagueTier::Silver],
-    'average' => ['average', 0.44, LeagueTier::Silver],
-    'good' => ['good', 0.28, LeagueTier::Platinum],
-    'pro' => ['pro', 0.19, LeagueTier::Master],
-    'elite' => ['elite', 0.13, LeagueTier::Master],
+    'casual' => ['casual', 0.75, LeagueTier::Silver, 190.0, 200],
+    'average' => ['average', 0.44, LeagueTier::Silver, 175.0, 200],
+    'good' => ['good', 0.28, LeagueTier::Platinum, 150.0, 130],
+    'pro' => ['pro', 0.19, LeagueTier::Master, 100.0, 85],
+    'elite' => ['elite', 0.13, LeagueTier::Master, 75.0, 60],
 ]);
 
 test('MasterClass is a pro’s to reach and to keep: calm once there, and good play stays below it', function () {
@@ -191,8 +196,8 @@ test('MasterClass is a pro’s to reach and to keep: calm once there, and good p
 
     expect($pro['mean'])->toBeGreaterThan(5000.0)
         ->and($elite['mean'])->toBeGreaterThan($pro['mean'] + 500)
-        ->and($pro['p90'])->toBeLessThanOrEqual(70)
-        ->and($elite['p90'])->toBeLessThanOrEqual(70)
+        ->and($pro['p90'])->toBeLessThanOrEqual(80)
+        ->and($elite['p90'])->toBeLessThanOrEqual(80)
         ->and($pro['sd'])->toBeLessThan(100.0)
         ->and($good['mean'])->toBeLessThan(4500.0);
 });

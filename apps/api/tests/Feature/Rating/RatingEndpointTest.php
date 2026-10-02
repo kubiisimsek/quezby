@@ -1,7 +1,11 @@
 <?php
 
 use App\Enums\LeagueTier;
+use App\Enums\RatingKind;
+use App\Enums\RunStatus;
+use App\Game\Rules;
 use App\Models\PlayerRating;
+use App\Models\RatingChange;
 use App\Models\Run;
 use App\Models\User;
 use App\Services\Rating\RatingService;
@@ -11,7 +15,8 @@ use Illuminate\Support\Facades\Schema;
 /*
 | `GET /rating`: the player's Elo, league, and the target of their next run.
 | `GET /ratings`: the highest ratings of the players who played lately —
-| everyone's, friends', or your own league's.
+| everyone's, friends', or your own league's — each with their best score in
+| the league they are in.
 */
 
 beforeEach(function () {
@@ -35,7 +40,6 @@ test('a player still placing sees how far placement has got, and nothing else', 
         'difficulty' => null,
         'peak' => null,
         'placement' => ['played' => 2, 'required' => 3],
-        'provisional' => false,
         'shield' => null,
         'history' => [],
     ]);
@@ -43,7 +47,7 @@ test('a player still placing sees how far placement has got, and nothing else', 
 
 test('a placed player sees their league, how far into it, the next target and their last changes', function () {
     $player = $this->signIn();
-    $this->rate($player, 2400, attributes: ['peak' => 2600, 'provisional_left' => 2, 'shield_tier' => LeagueTier::Gold, 'shield_left' => 1]);
+    $this->rate($player, 2400, attributes: ['peak' => 2600, 'shield_tier' => LeagueTier::Gold, 'shield_left' => 1]);
     $run = Run::factory()->for($player)->rated()->ranked(240000)->create();
     $counted = app(RatingService::class)->forFinishedRun($run);
 
@@ -57,7 +61,7 @@ test('a placed player sees their league, how far into it, the next target and th
         ->assertJsonPath('target', $counted['nextTarget'])
         ->assertJsonPath('difficulty', $counted['nextDifficulty'])
         ->assertJsonPath('peak', 2600)
-        ->assertJsonPath('provisional', true)
+        ->assertJsonMissingPath('provisional')
         ->assertJsonPath('shield', null)
         ->assertJsonPath('history.0.kind', 'run')
         ->assertJsonPath('history.0.delta', $counted['delta'])
@@ -126,6 +130,7 @@ test('the board ranks the players who played lately, highest first, the one who 
             'avatarUrl' => null,
             'rating' => 3000,
             'tier' => 'platinum',
+            'leagueBest' => null,
             'isMe' => true,
             'isFriend' => false,
             'gap' => 1101,
@@ -161,6 +166,73 @@ test('the league board ranks the players of your own league by Elo, and never re
     $this->rate($players['alt'], 2100);
     $this->rate($me, 2400);
     $this->getJson('/api/v1/ratings?scope=league')->assertJsonPath('entries.*.username', ['ust', 'es', $me->username, 'alt']);
+});
+
+/**
+ * A counted rated run of `$score` that `$player` played in `$tier` — this
+ * season's, unless `$change` says otherwise.
+ *
+ * @param  array<string, mixed>  $run
+ * @param  array<string, mixed>  $change
+ */
+function playedIn(User $player, LeagueTier $tier, int $score, array $run = [], array $change = []): Run
+{
+    $played = Run::factory()->for($player)->rated()->ranked($score)->create($run);
+    RatingChange::query()->create([
+        'user_id' => $player->id,
+        'run_id' => $played->id,
+        'kind' => RatingKind::Run,
+        'score' => $score,
+        'target' => 100000,
+        'before' => $tier->floor() + 100,
+        'after' => $tier->floor() + 120,
+        'delta' => 20,
+        'tier_before' => $tier,
+        'tier_after' => $tier,
+        'engine_version' => Rules::ENGINE_VERSION,
+        'created_at' => now(),
+        ...$change,
+    ]);
+
+    return $played;
+}
+
+test('every row shows the player\'s best rated score in the league they are in now', function () {
+    $me = $this->signIn();
+    $rival = User::factory()->withUsername('rakip')->create();
+    $promoted = User::factory()->withUsername('yeni')->create();
+    $this->rate($me, 2400);
+    $this->rate($rival, 2600);
+    $this->rate($promoted, 2100);
+
+    playedIn($me, LeagueTier::Gold, 90000);
+    playedIn($me, LeagueTier::Gold, 130000);
+    // Not in Altın: before the promotion, a forfeit, last season, thrown out since.
+    playedIn($me, LeagueTier::Silver, 200000);
+    playedIn($me, LeagueTier::Gold, 0, change: ['kind' => RatingKind::Forfeit, 'score' => null]);
+    playedIn($me, LeagueTier::Gold, 300000, change: ['engine_version' => Rules::ENGINE_VERSION - 1]);
+    playedIn($me, LeagueTier::Gold, 250000, run: ['status' => RunStatus::Rejected]);
+    playedIn($rival, LeagueTier::Gold, 110000);
+    playedIn($promoted, LeagueTier::Silver, 180000);
+
+    $this->getJson('/api/v1/ratings?scope=league')->assertOk()
+        ->assertJsonPath('entries.*.username', ['rakip', $me->username, 'yeni'])
+        ->assertJsonPath('entries.*.leagueBest', [110000, 130000, null])
+        ->assertJsonPath('me.leagueBest', 130000);
+});
+
+test('on the everyone board each best is from the player\'s own league', function () {
+    $me = $this->signIn();
+    $platinum = User::factory()->withUsername('platin')->create();
+    $this->rate($me, 2400);
+    $this->rate($platinum, 3100);
+    playedIn($platinum, LeagueTier::Platinum, 95000);
+    playedIn($platinum, LeagueTier::Gold, 140000);
+    playedIn($me, LeagueTier::Gold, 120000);
+
+    $this->getJson('/api/v1/ratings')->assertOk()
+        ->assertJsonPath('entries.*.username', ['platin', $me->username])
+        ->assertJsonPath('entries.*.leagueBest', [95000, 120000]);
 });
 
 test('a player not placed yet has no league board', function () {

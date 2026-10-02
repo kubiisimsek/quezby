@@ -1,5 +1,5 @@
 import type { AdminCalibrationResponse, AdminRatingRow, AdminRatingsResponse } from '@quezby/types';
-import { BookOpen, Crown, Hash, Hourglass, Medal, SlidersHorizontal, Target, Trophy } from 'lucide-react';
+import { BookOpen, Crown, Hash, Hourglass, Medal, SlidersHorizontal, Target, TrendingUp, Trophy } from 'lucide-react';
 
 import { Panel } from '@/components/base/panel';
 import { Segmented } from '@/components/base/segmented';
@@ -16,13 +16,14 @@ import { useCalibration, useRatings } from '@/hooks/api/ratings';
 import { useListParams } from '@/hooks/useListParams';
 import { PlayerCell, TierTag, When } from '@/lib/columns';
 import { errorMessage } from '@/lib/errors';
-import { formatNumber, formatPercent, LEAGUE_TIER, LEAGUE_TIERS } from '@/lib/format';
+import { formatDelta, formatNumber, formatPercent, LEAGUE_TIER, LEAGUE_TIERS } from '@/lib/format';
 
 type Window = '7' | '14' | '30' | '90';
 
 const WINDOWS: Window[] = ['7', '14', '30', '90'];
 
 type TargetRow = AdminRatingsResponse['rules']['targets'][number];
+type CurvePoint = AdminRatingsResponse['rules']['curve'][number];
 type Anchor = AdminCalibrationResponse['anchors'][number];
 
 /** The highest ratings, in the API's order: the row's place is its rank. */
@@ -34,6 +35,12 @@ const TOP_COLUMNS: Column<AdminRatingRow>[] = [
   { key: 'difficulty', header: 'Zorluk', cell: (row) => formatNumber(row.difficulty), align: 'end', tone: 'muted', hideBelow: 'lg' },
   { key: 'peak', header: 'En yüksek', cell: (row) => formatNumber(row.peak), align: 'end', tone: 'muted', hideBelow: 'lg' },
   { key: 'rated', header: 'Son sayılan', cell: (row) => <When at={row.ratedAt} />, tone: 'muted', hideBelow: 'xl' },
+];
+
+/** The curve's points: a run's score as a share of its target, and how far that moves the rating. */
+const CURVE_COLUMNS: Column<CurvePoint>[] = [
+  { key: 'percent', header: 'Skor / hedef', cell: (row) => formatPercent(row.percent), tone: 'strong' },
+  { key: 'qb', header: 'Değişim', cell: (row) => `${formatDelta(row.qb)} qb`, align: 'end' },
 ];
 
 const TARGET_COLUMNS: Column<TargetRow>[] = [
@@ -84,7 +91,7 @@ export function RatingsPage() {
   return (
     <Page
       title="Reytingler"
-      description="Her sayılan tur bir hedefe karşı oynanır: geçen reyting kazanır, kalan kaybeder. Oyuncunun ligi reytinginden gelir."
+      description="Her sayılan tur bir hedefe karşı oynanır: skoru hedefin yüzde kaçıysa reyting o kadar oynar. Oyuncunun ligi reytinginden gelir."
       band={
         <BandStats
           stats={[
@@ -125,6 +132,16 @@ export function RatingsPage() {
         <div className="space-y-6">
           <Rules rules={data.rules} />
           <DataTable
+            title="qb eğrisi"
+            description="Turun skoru hedefin yüzde kaçıysa reyting o kadar oynar: iki nokta arası düz, uçların ötesi uçtaki kadar. Her reytingde aynı."
+            icon={<TrendingUp />}
+            tone="secondary"
+            columns={CURVE_COLUMNS}
+            rows={data.rules.curve}
+            rowKey={(row) => String(row.percent)}
+            empty={{ title: 'Eğri yok', hint: 'config’de rating.curve gerekir.', icon: <TrendingUp /> }}
+          />
+          <DataTable
             title="Hedef tablosu"
             description="Bir reytingin kendi zorluğundaki tipik skoru: tur bunu geçerse reyting artar. Yerleşme turları zorluk 0'ın tablosuyla ölçülür."
             icon={<Target />}
@@ -144,17 +161,23 @@ export function RatingsPage() {
 
 /** The numbers the ratings run on, as `config/quezby.php` sets them. */
 function Rules({ rules }: { rules: AdminRatingsResponse['rules'] }) {
+  const loss = rules.curve[0];
+  const gain = rules.curve[rules.curve.length - 1];
+
   return (
     <Panel title="Kurallar" description="config/quezby.php › rating" icon={<BookOpen />} tone="secondary">
       <Facts
         facts={[
-          { label: 'Tek turda en fazla', value: `±${formatNumber(rules.maxDelta)} qb` },
           {
-            label: 'Genişlik',
-            value: formatNumber(rules.width),
-            hint: `Geçici dönemde ${formatNumber(rules.provisionalWidth)}: değişimler daha büyük`,
+            label: 'En çok kazanç',
+            value: `${formatDelta(gain?.qb)} qb`,
+            hint: gain ? `Skor hedefin ${formatPercent(gain.percent)} ya da üstüyse` : undefined,
           },
-          { label: 'Geçici dönem', value: `${formatNumber(rules.provisionalRuns)} tur`, hint: 'Yerleştikten sonra ve uzun aradan dönünce' },
+          {
+            label: 'En çok kayıp',
+            value: `${formatDelta(loss?.qb)} qb`,
+            hint: loss ? `Skor hedefin ${formatPercent(loss.percent)} ya da altıysa; hükmen kayıp da bu` : undefined,
+          },
           {
             label: 'Yerleşme',
             value: `${formatNumber(rules.placementRuns)} tur`,

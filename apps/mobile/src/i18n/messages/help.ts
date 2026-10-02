@@ -60,7 +60,7 @@ const tr = {
     lead: 'Üç mod var: Günlük, Normal ve Dereceli. qb’ni yalnız Dereceli değiştirir. Dereceli, 20 Normal ya da Günlük oyundan sonra açılır; ilk 3 dereceli oyunun qb’ni belirler ve herkes Gümüş’te başlar.',
     more: [
       'Altı lig var: Bronz, Gümüş, Altın, Platin, Elmas ve MasterClass. Her lig 1.000 qb, MasterClass 5.000 ve üstü.',
-      'Her dereceli oyunun bir hedef skoru var. Geçersen qb’n artar, altında kalırsan düşer; ne kadar farkla, o kadar çok. Bir oyun en fazla 100 qb değiştirir.',
+      'Her dereceli oyunun bir hedef skoru var. Hedefi geçtiğin her %1 için 2 qb kazanırsın. Hedefin altında kaldığın her %1 için 2 qb kaybedersin, %20’den sonraki her %1 için 4 qb. Bir oyun en fazla 200 qb değiştirir.',
       'Dereceli oyundan çıkarsan oyun o anki skorunla sayılır. Yarım bırakılan dereceli oyun ise en düşük sonuç sayılır.',
       'Yeni bir lige çıkınca 3 oyun boyunca ondan düşmezsin. Bronz’da kayıplar yarıdır.',
       'Lig sıralaması hiç sıfırlanmaz: ligindeki, son 14 günde dereceli oynamış oyuncular qb’ye göre sıralanır.',
@@ -193,7 +193,7 @@ const en: HelpMessages = {
     lead: 'There are three modes: Daily, Normal and Ranked. Only Ranked changes your qb. Ranked opens after 20 Normal or Daily games; your first 3 ranked games set your qb, and everyone starts in Silver.',
     more: [
       'There are six leagues: Bronze, Silver, Gold, Platinum, Diamond and MasterClass. Each league is 1,000 qb; MasterClass is 5,000 and up.',
-      'Every ranked game has a target score. Beat it and your qb goes up, fall short and it goes down; the bigger the gap, the bigger the move. One game changes it by 100 qb at most.',
+      'Every ranked game has a target score. You win 2 qb for each 1% above it. You lose 2 qb for each 1% below it, and 4 qb for each 1% beyond 20% below. One game changes your qb by 200 at most.',
       'If you quit a ranked game, it counts with your score so far. A ranked game left unfinished counts as the lowest result.',
       "When you move up a league, you can't drop out of it for 3 games. Losses in Bronze are halved.",
       'The league ranking never resets: the players of your league who played Ranked in the last 14 days, by qb.',
@@ -325,7 +325,7 @@ const de: HelpMessages = {
     lead: 'Es gibt drei Modi: Täglich, Normal und Gewertet. Nur Gewertet ändert dein qb. Gewertet öffnet sich nach 20 normalen oder täglichen Spielen; deine ersten 3 gewerteten Spiele bestimmen dein qb, und alle starten in Silber.',
     more: [
       'Es gibt sechs Ligen: Bronze, Silber, Gold, Platin, Diamant und MasterClass. Jede Liga umfasst 1.000 qb, MasterClass beginnt bei 5.000.',
-      'Jedes gewertete Spiel hat einen Ziel-Score. Schlägst du ihn, steigt dein qb, bleibst du darunter, sinkt es; je größer der Abstand, desto mehr. Ein Spiel ändert es um höchstens 100 qb.',
+      'Jedes gewertete Spiel hat einen Ziel-Score. Für jedes Prozent darüber bekommst du 2 qb. Für jedes Prozent darunter verlierst du 2 qb, ab 20 % darunter 4 qb pro Prozent. Ein Spiel ändert dein qb um höchstens 200.',
       'Brichst du ein gewertetes Spiel ab, zählt es mit deinem Score bis dahin. Ein liegen gelassenes gewertetes Spiel zählt als schlechtestes Ergebnis.',
       'Nach einem Aufstieg kannst du 3 Spiele lang nicht aus der neuen Liga fallen. In Bronze zählen Verluste nur zur Hälfte.',
       'Die Liga-Rangliste wird nie zurückgesetzt: die Spieler deiner Liga, die in den letzten 14 Tagen gewertet gespielt haben, nach qb.',
@@ -461,7 +461,7 @@ const ar: HelpMessages = {
     lead: 'هناك ثلاثة أنماط: يومي وعادي ومصنَّف. وحده المصنَّف يغيّر تصنيفك (qb). يُفتح المصنَّف بعد 20 مباراة عادية أو يومية، وأول 3 مباريات مصنَّفة لك تحدد تصنيفك، والجميع يبدأ في الفضة.',
     more: [
       'هناك ستة دوريات: البرونز والفضة والذهب والبلاتين والماس وماستر كلاس. كل دوري ‎1000‎ qb، وماستر كلاس من ‎5000‎ فما فوق.',
-      'لكل مباراة مصنَّفة نتيجة هدف. إن تجاوزتها ارتفع تصنيفك، وإن بقيت دونها انخفض، وكلما كبر الفارق كبر التغيير. لا تغيّر المباراة الواحدة أكثر من 100 qb.',
+      'لكل مباراة مصنَّفة نتيجة هدف. تكسب 2 qb عن كل 1% فوقها. وتخسر 2 qb عن كل 1% دونها، و4 qb عن كل 1% بعد أول 20%. لا تغيّر المباراة الواحدة أكثر من 200 qb.',
       'إن خرجت من مباراة مصنَّفة تُحسب بنتيجتك حتى تلك اللحظة. أما المباراة المصنَّفة المتروكة دون إنهاء فتُحسب أدنى نتيجة.',
       'عندما تصعد إلى دوري جديد لا تهبط منه طوال 3 مباريات. وفي البرونز تُحسب الخسارة بالنصف.',
       'ترتيب الدوري لا يُصفَّر أبدًا: لاعبو دوريك الذين لعبوا مصنَّفًا في آخر 14 يومًا، حسب qb.',
@@ -592,7 +592,7 @@ const fr: HelpMessages = {
     lead: "Il y a trois modes : Quotidien, Normal et Classé. Seul le mode classé change ton qb. Il s'ouvre après 20 parties normales ou quotidiennes ; tes 3 premières parties classées fixent ton qb, et tout le monde commence en Argent.",
     more: [
       'Il y a six ligues : Bronze, Argent, Or, Platine, Diamant et MasterClass. Chaque ligue fait 1 000 qb, MasterClass commence à 5 000.',
-      "Chaque partie classée a un score objectif. Dépasse-le et ton qb monte, reste en dessous et il baisse ; plus l'écart est grand, plus il bouge. Une partie le change de 100 qb au plus.",
+      'Chaque partie classée a un score objectif. Tu gagnes 2 qb pour chaque 1 % au-dessus. Tu perds 2 qb pour chaque 1 % en dessous, et 4 qb par 1 % au-delà de 20 % en dessous. Une partie change ton qb de 200 au plus.',
       'Si tu quittes une partie classée, elle compte avec ton score du moment. Une partie classée laissée en plan compte comme le plus mauvais résultat.',
       'Quand tu montes de ligue, tu ne peux pas en redescendre pendant 3 parties. En Bronze, les pertes sont divisées par deux.',
       'Le classement de la ligue ne repart jamais de zéro : les joueurs de ta ligue qui ont joué en classé ces 14 derniers jours, par qb.',
@@ -724,7 +724,7 @@ const es: HelpMessages = {
     lead: 'Hay tres modos: Diario, Normal y Competitivo. Solo Competitivo cambia tu qb. Se abre después de 20 partidas normales o diarias; tus primeras 3 partidas competitivas fijan tu qb y todos empiezan en Plata.',
     more: [
       'Hay seis ligas: Bronce, Plata, Oro, Platino, Diamante y MasterClass. Cada liga son 1.000 qb y MasterClass empieza en 5.000.',
-      'Cada partida competitiva tiene una puntuación objetivo. Si la superas, tu qb sube; si te quedas por debajo, baja; cuanto mayor la diferencia, mayor el cambio. Una partida lo cambia 100 qb como mucho.',
+      'Cada partida competitiva tiene una puntuación objetivo. Ganas 2 qb por cada 1 % por encima. Pierdes 2 qb por cada 1 % por debajo, y 4 qb por cada 1 % más allá del 20 % por debajo. Una partida cambia tu qb 200 como mucho.',
       'Si sales de una partida competitiva, cuenta con la puntuación que llevabas. Una partida competitiva abandonada cuenta como el peor resultado.',
       'Al subir de liga, no puedes caer de ella durante 3 partidas. En Bronce, las pérdidas son la mitad.',
       'La tabla de la liga nunca se reinicia: los jugadores de tu liga que jugaron Competitivo en los últimos 14 días, por qb.',
@@ -854,11 +854,11 @@ const ja: HelpMessages = {
     lead: 'モードはデイリー、ノーマル、ランク戦の3つ。qbが変わるのはランク戦だけです。ランク戦はノーマルかデイリーを20ゲーム遊ぶと解放されます。最初の3ゲームでqbが決まり、全員シルバーからスタートします。',
     more: [
       'リーグはブロンズ、シルバー、ゴールド、プラチナ、ダイヤモンド、マスタークラスの6つ。各リーグの幅は1,000 qbで、マスタークラスは5,000 qb以上です。',
-      'ランク戦には毎回目標スコアがあります。超えればqbが上がり、届かなければ下がります。差が大きいほど大きく動きます。1ゲームで動くのは最大100 qbです。',
+      'ランク戦には毎回目標スコアがあります。目標を1%上回るごとに2 qb増えます。1%下回るごとに2 qb減り、20%を超えて下回った分は1%ごとに4 qb減ります。1ゲームで動くのは最大200 qbです。',
       'ランク戦を途中でやめると、その時点のスコアで記録されます。やりかけのまま放置したランク戦は最低の結果になります。',
       '新しいリーグに上がると、3ゲームの間はそこから落ちません。ブロンズでは減る分が半分になります。',
       'リーグのランキングはリセットされません。同じリーグで直近14日間にランク戦をプレイした人が、qb順に並びます。',
-      'qbが高いほどランク戦は難しくなります。障害が増え、ミスで失うドーパミンが増え、ドーパミンの減りも速くなります。難しさは1,000 qbから始まり、250 qbごとに上がります。',
+      'qbが高いほどランク戦は難しくなります。流れてくる投稿は同じですが、正しい動きで回復するドーパミンが減り、ミスで失うドーパミンが増えます。パーフェクトのボーナスは減りません。難しさは1,000 qbから始まり、250 qbごとに上がります。',
       'ランク戦はqbのためだけのモードです。スコアは今週・今月・全期間のランキングには載りません。',
     ],
   },
@@ -984,11 +984,11 @@ const ko: HelpMessages = {
     lead: '모드는 데일리, 일반, 랭크전 세 가지예요. qb는 랭크전에서만 바뀌어요. 랭크전은 일반이나 데일리를 20판 하면 열려요. 처음 3판으로 qb가 정해지고, 모두 실버에서 시작해요.',
     more: [
       '리그는 브론즈, 실버, 골드, 플래티넘, 다이아몬드, 마스터클래스 여섯 개예요. 리그마다 1,000 qb 구간이고, 마스터클래스는 5,000 qb 이상이에요.',
-      '랭크전마다 목표 점수가 있어요. 넘으면 qb가 오르고, 못 미치면 내려가요. 차이가 클수록 많이 움직여요. 한 판에 바뀌는 qb는 최대 100이에요.',
+      '랭크전마다 목표 점수가 있어요. 목표보다 1% 높을 때마다 2 qb를 얻어요. 1% 낮을 때마다 2 qb를 잃고, 20%를 넘게 낮은 부분은 1%마다 4 qb를 잃어요. 한 판에 바뀌는 qb는 최대 200이에요.',
       '랭크전을 그만두면 그때까지의 점수로 계산돼요. 끝내지 않고 남겨 둔 랭크전은 가장 낮은 결과로 계산돼요.',
       '새 리그로 올라가면 3판 동안은 떨어지지 않아요. 브론즈에서는 잃는 qb가 절반이에요.',
       '리그 순위는 초기화되지 않아요. 내 리그에서 최근 14일 안에 랭크전을 한 플레이어들이 qb 순으로 정렬돼요.',
-      'qb가 높을수록 랭크전이 어려워져요. 장애물이 많아지고, 실수하면 도파민을 더 많이 잃고, 도파민도 더 빨리 줄어요. 난이도는 1,000 qb부터 시작해 250 qb마다 올라가요.',
+      'qb가 높을수록 랭크전이 어려워져요. 나오는 게시물은 같지만, 올바른 동작으로 얻는 도파민은 줄고 실수하면 잃는 도파민은 늘어요. 퍼펙트 보너스는 줄지 않아요. 난이도는 1,000 qb부터 시작해 250 qb마다 올라가요.',
       '랭크전은 qb만을 위한 모드예요. 점수는 이번 주, 이번 달, 전체 기간 랭킹에 올라가지 않아요.',
     ],
   },

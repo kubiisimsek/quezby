@@ -1,5 +1,53 @@
 # Changelog
 
+## 2026-10-02 — qb: skorun hedefe oranı; ligdeki en iyi skor
+
+The owner found the qb moves illogical: against a ~100k target, 80k cost
+−100 and 110k gave +89, while 300k could never give more than +100. The move
+came from the rating whose typical score the run was (`100·tanh((P − R)/W)`);
+difficulty table 2's targets barely rise from 2000 to 3000 (90k → 97.3k), so a
+10–20 % miss moved P by over a thousand and the tanh hit its cap — twice as
+fast in the 15 provisional runs (`W = 400`).
+
+- **The move is the score's share of the target the player saw**
+  (`rating.curve` = `[40 => −200, 80 => −40, 100 => 0, 200 => 200]`,
+  `App\Services\Rating\RatingCurve`, straight between points): +2 qb a per
+  cent above the target, +200 at twice it; −2 a per cent below it, −4 below
+  80 %, −200 at 40 %. The same share moves the same at every rating. Against
+  100k: 40k −200 · 60k −120 · 80k −40 · 90k −20 · 110k +20 · 120k +40 ·
+  150k +100 · 200k+ +200.
+- **A forfeit is the curve's floor**, −200 (Bronz −100): leaving still never
+  beats quitting with the worst score.
+- **No provisional stretch**: `max_delta`, `width`, `provisional_*` and
+  `return_*` are gone from `quezby.rating`; migration `2026_10_02_000200`
+  drops `player_ratings.provisional_left` and `rating_changes.width`.
+  `RatingResponse.provisional`, `AdminPlayerRating.provisionalLeft` and
+  `AdminRatingChange.width` are gone; the admin `rules` carry `curve`.
+  `rating_changes.target` now keeps the target as the player saw it (rounded
+  up to a hundred) — the one the move is worked out from.
+- **Balance** (`RatingBalanceTest`, same profiles): everyone settles in the
+  same league — on the ladder casual ~1060 and average ~1860 Gümüş, good
+  ~3780 Platin, pro ~5720 and elite ~6700 MasterClass. Pro and elite stay
+  calm (nine runs in ten move ≤ 80); casual and average thumbs, whose runs
+  spread widest, see ±200 one run in ten and sway ~150–190 inside their
+  league (was < 150).
+- **League ranking**: under each name, small, the player's best rated score
+  this season in the league they are in now (`RatingEntry.leagueBest` —
+  runs played in it, counted, never thrown out since; null fresh from a
+  promotion): "En iyi skor 142.300" in eight languages, read aloud after the
+  qb.
+- **Help** says the rule in eight languages ("Hedefi geçtiğin her %1 için
+  2 qb kazanırsın…", at most 200 a game). The Japanese and Korean difficulty
+  lines still described table 1 (more obstacles, a faster drain); they now
+  say table 2's.
+- **Panel**: Reytingler shows the curve ("qb eğrisi") and the biggest gain
+  and loss in place of the width; a run's rating card shows the score's share
+  of its target ("Hedefe oranı") in place of "Genişlik"; "Geçici dönem" is
+  gone from the player page.
+- Deploy: API with the migration, then `/ops/migrate` and `/ops/optimize`
+  before the panel; the app's league rows need the new app (an older one
+  just ignores `leagueBest`).
+
 ## 2026-10-02 — Analitik: cihazlar tablo tablo, telefonun markası
 
 The panel's single "Cihazlar" card on Analitik (three lists: app versions,

@@ -35,8 +35,8 @@ test('starting a new run forfeits the rated one left open', function () {
     $this->startRun()->assertCreated();
 
     expect($left->refresh()->status)->toBe(RunStatus::Abandoned)
-        ->and(forfeitOf($left))->kind->toBe(RatingKind::Forfeit)->delta->toBe(-100)
-        ->and(PlayerRating::query()->findOrFail($player->id)->rating)->toBe(2400);
+        ->and(forfeitOf($left))->kind->toBe(RatingKind::Forfeit)->delta->toBe(-200)
+        ->and(PlayerRating::query()->findOrFail($player->id)->rating)->toBe(2300);
 });
 
 test('a free, daily or VS run left open costs no Elo', function (RunMode $mode) {
@@ -71,7 +71,7 @@ test('a finish that comes too late is refused, and forfeited', function () {
 
     $this->assertApiError($this->finishRun($run->id, playedLog($run->seed, 10, 430), 0, 10), 410, 'run_expired');
 
-    expect(forfeitOf($run)?->delta)->toBe(-100);
+    expect(forfeitOf($run)?->delta)->toBe(-200);
 });
 
 test('a log the engine throws out is forfeited', function () {
@@ -82,7 +82,7 @@ test('a log the engine throws out is forfeited', function () {
     // A hold on a swipe reel's move that the app could never send.
     $this->assertApiError($this->finishRun($start->json('runId'), [[9, 400, 0]], 0, 1), 422, 'run_rejected');
 
-    expect(forfeitOf(Run::query()->findOrFail($start->json('runId'))))->kind->toBe(RatingKind::Forfeit)->delta->toBe(-100);
+    expect(forfeitOf(Run::query()->findOrFail($start->json('runId'))))->kind->toBe(RatingKind::Forfeit)->delta->toBe(-200);
 });
 
 test('a run of a past season left open is only noted', function () {
@@ -112,7 +112,7 @@ test('the hourly sweep forfeits every run past its time, once', function () {
         ->and($staleVs->refresh()->status)->toBe(RunStatus::Expired)
         ->and($fresh->refresh()->status)->toBe(RunStatus::Started)
         ->and(RatingChange::query()->count())->toBe(1)
-        ->and(PlayerRating::query()->findOrFail($players[0]->id)->rating)->toBe(2900);
+        ->and(PlayerRating::query()->findOrFail($players[0]->id)->rating)->toBe(2800);
 });
 
 test('the owner\'s expire-runs button is the same sweep', function () {
@@ -123,7 +123,7 @@ test('the owner\'s expire-runs button is the same sweep', function () {
 
     $this->postJson('/api/v1/admin/system/expire-runs')->assertOk();
 
-    expect(PlayerRating::query()->findOrFail($player->id)->rating)->toBe(2900);
+    expect(PlayerRating::query()->findOrFail($player->id)->rating)->toBe(2800);
 });
 
 test('a forfeit during placement counts as a zero', function () {
@@ -159,7 +159,7 @@ test('a rated run already under way is not cancelled for nothing', function () {
 
     $this->postJson("/api/v1/runs/{$runId}/cancel")->assertNoContent();
 
-    expect(forfeitOf(Run::query()->findOrFail($runId)))->kind->toBe(RatingKind::Forfeit)->delta->toBe(-100);
+    expect(forfeitOf(Run::query()->findOrFail($runId)))->kind->toBe(RatingKind::Forfeit)->delta->toBe(-200);
 });
 
 test('only the player\'s own run can be cancelled', function () {

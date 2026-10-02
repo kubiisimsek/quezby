@@ -25,7 +25,8 @@ use Illuminate\Support\Facades\DB;
 /**
  * Elo — played for in Dereceli (`RunMode::Rated`) alone, which opens once a
  * player has counted enough free and daily runs (`unlock`). Every rated run
- * is a match against the target of the player's rating (`TargetTable`); the
+ * is a match against the target of the player's rating (`TargetTable`),
+ * and moves it by its score as a share of that target (`RatingCurve`); the
  * first few place them. The game gets harder as the rating climbs
  * (`difficultyFor`), and the targets of a rated run are the scores of its
  * difficulty.
@@ -55,6 +56,7 @@ final class RatingService
      */
     public function __construct(
         private readonly FriendService $friends,
+        private readonly RatingCurve $curve,
         #[Config('quezby.rating')]
         private readonly array $config,
         #[Config('quezby.engine_version')]
@@ -101,8 +103,7 @@ final class RatingService
             return false;
         }
         $before = (int) $rating->rating;
-        $width = (int) $this->config[$rating->provisional_left > 0 ? 'provisional_width' : 'width'];
-        $delta = TargetTable::delta($before, $table->performance($score), $width, (int) $this->config['max_delta']);
+        $delta = $this->curve->delta($score, $table->shown($before));
         if ($delta <= 0) {
             return false;
         }
@@ -268,13 +269,12 @@ final class RatingService
     /**
      * Sets a player's rating by hand — an owner's call from the panel
      * (`PlayerActions::setRating`), which writes the audit entry. A player
-     * not placed yet is placed with it: the rating row opens Dereceli, the
-     * placement ends, and the provisional runs a placement gives start. No
-     * run was played, so the runs counted and when the last one counted stay
-     * as they are; the rating moved now, so of two equal ratings the other
-     * one ranks first. A shield keeps the league a run promoted the player
-     * into, so it goes when the rating leaves that league. Null when the
-     * rating is `$rating` already — nothing written.
+     * not placed yet is placed with it: the rating row opens Dereceli and
+     * the placement ends. No run was played, so the runs counted and when
+     * the last one counted stay as they are; the rating moved now, so of two
+     * equal ratings the other one ranks first. A shield keeps the league a
+     * run promoted the player into, so it goes when the rating leaves that
+     * league. Null when the rating is `$rating` already — nothing written.
      *
      * @return array{from: int|null, to: int, tierFrom: string|null, tierTo: string}|null
      */
@@ -284,9 +284,6 @@ final class RatingService
             $before = $row->rating;
             if ($before === $rating) {
                 return null;
-            }
-            if (! $row->isPlaced()) {
-                $row->provisional_left = (int) $this->config['provisional_runs'];
             }
             $this->move($row, $rating, now());
             if ($row->shield_tier !== null && $row->shield_tier !== $row->tier) {
@@ -361,8 +358,9 @@ final class RatingService
     /**
      * `RatingBoardResponse` in `packages/types`: the highest ratings of the
      * players who counted a rated run lately — everyone's, among friends, or
-     * in the viewer's own league (none before they are placed). It never
-     * resets: the league is the rating's.
+     * in the viewer's own league (none before they are placed) — each with
+     * their best score in their league. It never resets: the league is the
+     * rating's.
      *
      * @return array<string, mixed>
      */
@@ -395,13 +393,16 @@ final class RatingService
                 ->where('player_ratings.rating', $mine->rating)
                 ->where('player_ratings.changed_at', '<', $mine->getRawOriginal('changed_at'))));
 
-        $friends = $this->friends->among($viewer, [...$top->pluck('user_id')->all(), ...($mine === null ? [] : [$mine->user_id])]);
+        $shown = [...$top->pluck('user_id')->all(), ...($mine === null ? [] : [$mine->user_id])];
+        $friends = $this->friends->among($viewer, $shown);
+        $bests = $this->leagueBests($shown);
         $entry = fn (PlayerRating $row, int $rank, ?PlayerRating $over) => [
             'rank' => $rank,
             'username' => (string) $row->getAttribute('username'),
             'avatarUrl' => AvatarService::url($row->getAttribute('avatar')),
             'rating' => (int) $row->rating,
             'tier' => LeagueTier::fromRating((int) $row->rating)->slug(),
+            'leagueBest' => $bests[$row->user_id] ?? null,
             'isMe' => $row->user_id === $viewer->id,
             'isFriend' => isset($friends[$row->user_id]),
             'gap' => $over === null ? null : (int) $over->rating - (int) $row->rating + 1,
@@ -430,6 +431,36 @@ final class RatingService
             'me' => $me,
             'players' => $query()->count(),
         ];
+    }
+
+    /**
+     * Each player's best rated score this season in the league they are in
+     * now: the runs they played in it — counted, and never thrown out
+     * since. A player who has none yet (fresh from a promotion) has no entry.
+     *
+     * @param  list<string>  $ids
+     * @return array<string, int>
+     */
+    private function leagueBests(array $ids): array
+    {
+        if ($ids === []) {
+            return [];
+        }
+
+        return RatingChange::query()
+            ->toBase()
+            ->join('player_ratings', 'player_ratings.user_id', '=', 'rating_changes.user_id')
+            ->join('runs', 'runs.id', '=', 'rating_changes.run_id')
+            ->whereIn('rating_changes.user_id', $ids)
+            ->where('rating_changes.kind', RatingKind::Run->value)
+            ->where('rating_changes.engine_version', $this->engineVersion)
+            ->whereColumn('rating_changes.tier_before', 'player_ratings.tier')
+            ->where('runs.status', RunStatus::Ranked->value)
+            ->groupBy('rating_changes.user_id')
+            ->selectRaw('rating_changes.user_id as user_id, max(rating_changes.score) as best')
+            ->pluck('best', 'user_id')
+            ->map(fn ($best) => (int) $best)
+            ->all();
     }
 
     /**
@@ -554,7 +585,6 @@ final class RatingService
         $median = TargetTable::median($scores);
         $performance = $table->performance($median);
         $start = max((int) $this->config['placement_min'], min((int) $this->config['placement_max'], $performance ?? 0));
-        $rating->provisional_left = (int) $this->config['provisional_runs'];
         $this->move($rating, $start, $now);
         $rating->save();
 
@@ -564,7 +594,8 @@ final class RatingService
     }
 
     /**
-     * A placed player's run against their target.
+     * A placed player's run against their target — as they saw it, rounded
+     * up to a hundred, so its share is the one they can work out.
      *
      * @return array<string, mixed>
      */
@@ -573,15 +604,10 @@ final class RatingService
         $now = now();
         $before = (int) $rating->rating;
         $tierBefore = LeagueTier::fromRating($before);
-
-        if ($rating->rated_at !== null && $rating->rated_at->lt($now->copy()->subDays((int) $this->config['return_after_days']))) {
-            $rating->provisional_left = max($rating->provisional_left, (int) $this->config['return_provisional_runs']);
-        }
-        $width = (int) $this->config[$rating->provisional_left > 0 ? 'provisional_width' : 'width'];
-        $max = (int) $this->config['max_delta'];
+        $target = $table->shown($before);
         $performance = $score === null ? null : $table->performance($score);
 
-        $delta = $kind === RatingKind::Forfeit ? -$max : TargetTable::delta($before, $performance, $width, $max);
+        $delta = $kind === RatingKind::Forfeit ? $this->curve->floor() : $this->curve->delta($score, $target);
         if ($delta < 0 && $tierBefore->isBottom()) {
             $delta = -intdiv(-$delta * (int) $this->config['bronze_loss_percent'] + 99, 100);
         }
@@ -596,7 +622,6 @@ final class RatingService
             }
             $rating->shield_left--;
         }
-        $rating->provisional_left = max(0, $rating->provisional_left - 1);
         $rating->rated_runs++;
         $rating->rated_at = $now;
         $this->move($rating, $after, $now);
@@ -609,9 +634,8 @@ final class RatingService
         return $this->viewOf($rating, $this->record($rating, $kind, $before, [
             'run_id' => $run->id,
             'score' => $score,
-            'target' => (int) round($table->target($before)),
+            'target' => $target,
             'performance' => $performance,
-            'width' => $width,
             'shielded' => $shielded,
             'engine_version' => $run->engine_version,
         ]));
@@ -774,7 +798,6 @@ final class RatingService
             'difficulty' => $this->difficultyAt($rating->rating),
             'peak' => $rating->peak,
             'placement' => $this->placementOf($rating),
-            'provisional' => $rating->isPlaced() && $rating->provisional_left > 0,
             'shield' => $rating->shield_tier !== null && $rating->shield_left > 0
                 ? ['tier' => $rating->shield_tier->slug(), 'runs' => $rating->shield_left]
                 : null,

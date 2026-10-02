@@ -42,7 +42,12 @@ test('counts players per league, those who played lately apart, and lists the hi
         ->assertJsonPath('top.0.player.username', $players[0]->username)
         ->assertJsonPath('top.0.tier', 'master')
         ->assertJsonPath('top.*.difficulty', [16, 8, 5, 0])
-        ->assertJsonPath('rules.maxDelta', 100)
+        ->assertJsonPath('rules.curve', [
+            ['percent' => 40, 'qb' => -200],
+            ['percent' => 80, 'qb' => -40],
+            ['percent' => 100, 'qb' => 0],
+            ['percent' => 200, 'qb' => 200],
+        ])
         ->assertJsonPath('rules.activeDays', 14)
         ->assertJsonPath('rules.unlockRuns', 20)
         ->assertJsonPath('rules.difficultyVersion', Difficulty::VERSION)
@@ -85,7 +90,9 @@ test('a player\'s page shows their rating and every change, the runs that did no
         ->assertJsonPath('rating.history.0.counted', false)
         ->assertJsonPath('rating.history.1.runId', $counted->id)
         ->assertJsonPath('rating.history.1.performance', 3000)
-        ->assertJsonPath('rating.history.1.width', 800);
+        ->assertJsonPath('rating.history.1.target', 99000)
+        ->assertJsonPath('rating.history.1.delta', 200)
+        ->assertJsonMissingPath('rating.history.1.width');
 
     $this->getJson('/api/v1/admin/players/'.User::factory()->withUsername()->create()->id)->assertOk()->assertJsonPath('rating', null);
 });
@@ -93,17 +100,18 @@ test('a player\'s page shows their rating and every change, the runs that did no
 test('a run\'s page says what it did to the rating, and whether a moderator took it back', function () {
     $player = User::factory()->withUsername()->create();
     $this->rate($player, 1500);
-    $run = Run::factory()->for($player)->rated()->ranked(100000)->create();
+    // 150 % of the 58,400 the player saw.
+    $run = Run::factory()->for($player)->rated()->ranked(87600)->create();
     app(RatingService::class)->forFinishedRun($run);
 
     $this->getJson("/api/v1/admin/runs/{$run->id}")->assertOk()
         ->assertJsonPath('run.rating.kind', 'run')
-        ->assertJsonPath('run.rating.delta', 55)
+        ->assertJsonPath('run.rating.delta', 100)
         ->assertJsonPath('run.rating.target', 58400)
         ->assertJsonPath('run.rating.reversedBy', null);
 
     app(RatingService::class)->rejected($run);
-    $this->getJson("/api/v1/admin/runs/{$run->id}")->assertJsonPath('run.rating.reversedBy', -55);
+    $this->getJson("/api/v1/admin/runs/{$run->id}")->assertJsonPath('run.rating.reversedBy', -100);
 
     $open = Run::factory()->for($player)->create();
     $this->getJson("/api/v1/admin/runs/{$open->id}")->assertOk()->assertJsonPath('run.rating', null);

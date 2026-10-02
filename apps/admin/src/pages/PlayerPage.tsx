@@ -651,15 +651,6 @@ function RatingPanel({ rating, onSet }: { rating: AdminPlayerRating | null; onSe
             value: formatNumber(rating.target),
             hint: rating.target === null ? undefined : 'Reyting kazanmak için geçmesi gereken skor',
           },
-          ...(rating.provisionalLeft > 0
-            ? [
-                {
-                  label: 'Geçici dönem',
-                  value: `${formatNumber(rating.provisionalLeft)} tur daha`,
-                  hint: 'Değişimler daha büyük: yeni yerleşti ya da uzun aradan döndü.',
-                },
-              ]
-            : []),
           ...(rating.shield
             ? [
                 {

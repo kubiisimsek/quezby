@@ -19,14 +19,13 @@ use Illuminate\Support\Carbon;
  * @property int|null $reversal_of
  * @property RatingKind $kind
  * @property int|null $score
- * @property int|null $target The score the run had to reach, exactly.
+ * @property int|null $target The score the run had to reach, as the player saw it.
  * @property int|null $performance The rating whose typical score the run's was.
  * @property int|null $before
  * @property int|null $after
  * @property int $delta
  * @property LeagueTier|null $tier_before
  * @property LeagueTier|null $tier_after
- * @property int|null $width
  * @property bool $shielded
  * @property int|null $engine_version
  * @property Carbon $created_at
@@ -55,7 +54,6 @@ class RatingChange extends Model
             'delta' => 'integer',
             'tier_before' => LeagueTier::class,
             'tier_after' => LeagueTier::class,
-            'width' => 'integer',
             'shielded' => 'boolean',
             'engine_version' => 'integer',
         ];

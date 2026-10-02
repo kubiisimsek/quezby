@@ -13,12 +13,14 @@ use App\Models\User;
 use App\Services\Rating\RatingService;
 use App\Services\Rating\TargetTable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Schema;
 
 /*
 | A rated (Dereceli) run against its target: placement first, then past the
-| target up and short of it down, never more than a hundred — Bronz halved,
-| a fresh promotion shielded, and the runs that do not count noted as such.
-| Free, daily and VS runs never touch the rating.
+| target up and short of it down, by the score's share of the target —
+| never more than 200 either way, Bronz's losses halved, a fresh promotion
+| shielded, and the runs that do not count noted as such. Free, daily and VS
+| runs never touch the rating.
 */
 
 beforeEach(function () {
@@ -83,7 +85,6 @@ test('the first three rated runs place the player at the rating of their median,
         ->rating->toBe(1500)
         ->tier->toBe(LeagueTier::Silver)
         ->peak->toBe(1500)
-        ->provisional_left->toBe(15)
         ->rated_runs->toBe(3);
 });
 
@@ -100,27 +101,27 @@ test('placement is held inside Gümüş, whatever the median', function (int $sc
     'a strong start' => [600000, 1800],
 ]);
 
-test('a placed run past its target rises, short of it falls, by tanh of the distance', function () {
+test('a placed run past its target rises, short of it falls, by its score as a share of the target it saw', function () {
     $player = User::factory()->withUsername()->create();
     $this->rate($player, 1500);
 
-    $up = ratedRun($player, 100000);
+    // The target at 1500 is 58,309 — 58,400 as the player sees it: 87,600 is 150 % of that.
+    $up = ratedRun($player, 87600);
 
     expect($up)->toMatchArray([
-        'kind' => 'run', 'before' => 1500, 'after' => 1555, 'delta' => 55,
+        'kind' => 'run', 'before' => 1500, 'after' => 1600, 'delta' => 100,
         'tierBefore' => 'silver', 'tier' => 'silver', 'target' => 58400, 'placement' => null, 'shielded' => false,
-    ])->and($up['nextTarget'])->toBe(TargetTable::forDifficulty(Rules::ENGINE_VERSION, Difficulty::VERSION)?->shown(1555));
+    ])->and($up['nextTarget'])->toBe(TargetTable::forDifficulty(Rules::ENGINE_VERSION, Difficulty::VERSION)?->shown(1600))
+        ->and($up['nextTarget'])->toBe(65000);
 
-    $down = ratedRun($player, 34000);
-    expect($down['delta'])->toBe(TargetTable::delta(1555, 1000, 800, 100))
-        ->and($down['delta'])->toBeLessThan(0);
+    // 52,000 is 80 % of 65,000.
+    expect(ratedRun($player, 52000))->toMatchArray(['before' => 1600, 'after' => 1560, 'delta' => -40, 'target' => 65000]);
 
     $change = RatingChange::query()->where('kind', RatingKind::Run->value)->orderBy('id')->firstOrFail();
     expect($change)
-        ->score->toBe(100000)
-        ->performance->toBe(2000)
-        ->target->toBe(58310)
-        ->width->toBe(800)
+        ->score->toBe(87600)
+        ->performance->toBe(1877)
+        ->target->toBe(58400)
         ->engine_version->toBe(Rules::ENGINE_VERSION);
 });
 
@@ -128,29 +129,40 @@ test('a run that scored nothing is the full loss', function () {
     $player = User::factory()->withUsername()->create();
     $this->rate($player, 2400);
 
-    expect(ratedRun($player, 0, ['reels' => 3])['delta'])->toBe(-100);
+    expect(ratedRun($player, 0, ['reels' => 3])['delta'])->toBe(-200);
 });
 
-test('provisional runs move twice as fast, and so do the first runs back after a long break', function () {
-    $player = User::factory()->withUsername()->create();
-    $this->rate($player, 1500, attributes: ['provisional_left' => 2]);
-
-    expect(ratedRun($player, 100000)['delta'])->toBe(85)
-        ->and(ratingOf($player)->provisional_left)->toBe(1);
-
+test('the same share moves the same at every rating, right after placement and back after a long break too', function () {
+    $placed = User::factory()->withUsername()->create();
+    $this->rate($placed, 1500, attributes: ['rated_runs' => 3]);
+    $high = User::factory()->withUsername()->create();
+    $this->rate($high, 4500);
     $returning = User::factory()->withUsername()->create();
-    $this->rate($returning, 1500, ratedAt: now()->subDays(40));
+    $this->rate($returning, 1700, ratedAt: now()->subDays(40));
+    $targets = TargetTable::forDifficulty(Rules::ENGINE_VERSION, Difficulty::VERSION);
 
-    expect(ratedRun($returning, 100000)['delta'])->toBe(85)
-        ->and(ratingOf($returning)->provisional_left)->toBe(4);
+    foreach ([$placed, $high, $returning] as $player) {
+        $target = $targets?->shown((int) ratingOf($player)->rating) ?? 0;
+
+        expect(ratedRun($player, intdiv($target * 3, 2))['delta'])->toBe(100);
+    }
+});
+
+test('no stretch moves faster: no provisional runs to count, no width to measure with', function () {
+    expect(Schema::hasColumn('player_ratings', 'provisional_left'))->toBeFalse()
+        ->and(Schema::hasColumn('rating_changes', 'width'))->toBeFalse()
+        ->and(config('quezby.rating'))->not->toHaveKeys(['max_delta', 'width', 'provisional_width', 'provisional_runs']);
 });
 
 test('Bronz loses half, and never below zero', function () {
+    // At 700 the target is 22,100: 17,680 is 80 % of it (−40), 4,000 far short (−200).
     $player = User::factory()->withUsername()->create();
     $this->rate($player, 700);
-    $full = TargetTable::delta(700, TargetTable::forEngine(2)?->performance(4000), 800, 100);
+    expect(ratedRun($player, 17680)['delta'])->toBe(-20);
 
-    expect(ratedRun($player, 4000)['delta'])->toBe(-intdiv(-$full + 1, 2));
+    $far = User::factory()->withUsername()->create();
+    $this->rate($far, 700);
+    expect(ratedRun($far, 4000)['delta'])->toBe(-100);
 
     $bottom = User::factory()->withUsername()->create();
     $this->rate($bottom, 20);
@@ -172,7 +184,7 @@ test('a promotion shields the new league for three runs — against bad luck, no
     $left = Run::factory()->for($player)->rated()->create(['status' => RunStatus::Abandoned, 'started_at' => now()->subMinute()]);
     app(RatingService::class)->forfeit($left);
     expect(ratingOf($player))
-        ->rating->toBe(1900)
+        ->rating->toBe(1800)
         ->tier->toBe(LeagueTier::Silver)
         ->shield_tier->toBeNull()
         ->shield_left->toBe(0);
@@ -242,10 +254,10 @@ test('a flagged run is a forfeit when it was played wrong, and nothing when only
 
     expect($view)->toMatchArray(['kind' => $kind, 'delta' => $delta]);
 })->with([
-    'too fast' => [['fast_decisions'], 'forfeit', -100],
-    'slowed down' => [['slow_motion', 'checkpoint_mismatch'], 'forfeit', -100],
+    'too fast' => [['fast_decisions'], 'forfeit', -200],
+    'slowed down' => [['slow_motion', 'checkpoint_mismatch'], 'forfeit', -200],
     'a failed phone' => [['device_integrity'], 'void', 0],
-    'a failed phone that also played too fast' => [['device_integrity', 'wall_clock'], 'forfeit', -100],
+    'a failed phone that also played too fast' => [['device_integrity', 'wall_clock'], 'forfeit', -200],
     'banned' => [['banned', 'fast_decisions'], 'void', 0],
 ]);
 
@@ -262,7 +274,7 @@ test('a run given up in the countdown does not count; one quit later is the full
     $this->rate($player, 2500);
 
     expect(ratedRun($player, 0, ['reels' => 0, 'started_at' => now()->subSeconds(8)])['kind'])->toBe('void')
-        ->and(ratedRun($player, 0, ['reels' => 0, 'started_at' => now()->subMinutes(2)])['delta'])->toBe(-100);
+        ->and(ratedRun($player, 0, ['reels' => 0, 'started_at' => now()->subMinutes(2)])['delta'])->toBe(-200);
 });
 
 test('a run moves the rating once, however often it is counted', function () {
@@ -275,7 +287,7 @@ test('a run moves the rating once, however often it is counted', function () {
     $second = $ratings->forFinishedRun($run);
 
     expect($second)->toBe($first)
-        ->and(ratingOf($player)->rating)->toBe(1555)
+        ->and(ratingOf($player)->rating)->toBe(1642)
         ->and(RatingChange::query()->where('run_id', $run->id)->count())->toBe(1);
 });
 

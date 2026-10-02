@@ -70,8 +70,9 @@ type Props = CompositeScreenProps<
  * far into the league you are, your best. The
  * coin in the stage's corner opens your qb moves. Before it: how far
  * Dereceli is, then the placement games. Under it, the league's players by
- * qb — a ranking that never resets — with your floor pinned over the dock:
- * the qb to pass the player right above you.
+ * qb — a ranking that never resets — each with their best score in the
+ * league small under the name, and your floor pinned over the dock: the qb
+ * to pass the player right above you.
  */
 export function LeagueScreen({ navigation }: Props) {
   const rating = useRating();
@@ -158,6 +159,12 @@ export function LeagueScreen({ navigation }: Props) {
                 username={entry.username}
                 avatarUrl={entry.avatarUrl}
                 score={entry.rating}
+                detail={
+                  // An API from before the field sends none: no line, as for a player with no best yet.
+                  entry.leagueBest == null
+                    ? undefined
+                    : t.league.best(t.fmt.score(entry.leagueBest))
+                }
                 gap={entry.gap}
                 isMe={entry.isMe}
                 index={index}

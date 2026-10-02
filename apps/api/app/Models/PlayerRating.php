@@ -19,7 +19,6 @@ use Illuminate\Support\Carbon;
  * @property int|null $peak
  * @property list<int>|null $placement_scores
  * @property int $rated_runs
- * @property int $provisional_left Runs still moved at the provisional width.
  * @property LeagueTier|null $shield_tier The tier a fresh promotion keeps the player in…
  * @property int $shield_left …for this many more runs.
  * @property Carbon|null $rated_at The last run that counted.
@@ -51,7 +50,6 @@ class PlayerRating extends Model
             'peak' => 'integer',
             'placement_scores' => 'array',
             'rated_runs' => 'integer',
-            'provisional_left' => 'integer',
             'shield_tier' => LeagueTier::class,
             'shield_left' => 'integer',
             'rated_at' => 'datetime',

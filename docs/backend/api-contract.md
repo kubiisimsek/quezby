@@ -592,7 +592,10 @@ until the last one places the player, when `after` is set); `forfeit` — a run
 flagged for how it was played, the full loss; `void` — did not count (a banned
 player's, one flagged only for its phone, one without a reel inside 30 s of
 its start); `pending` — held for review, counted if a moderator lets it
-through. `delta` is `after − before`, never beyond ±100; `tierBefore`/`tier`
+through. `delta` is `after − before`: the run's score as a share of its
+`target` (`rating.curve` — +2 a per cent above it, +200 at twice it; −2 a per
+cent below it, −4 below 80 %, −200 at 40 % and for a forfeit; Bronz's losses
+halved), never beyond ±200; `tierBefore`/`tier`
 say whether the run moved the player between leagues; `nextTarget` is the next
 run's target; `shielded` — a fresh promotion held the player in their league;
 `difficulty` — the difficulty the run was played at; `nextDifficulty` — the
@@ -686,7 +689,7 @@ jour`, `Feed del día` in the other five; each Arabic line opens with U+200F).
 
 ```json
 { "placed": true, "rating": 2340, "tier": "gold", "floor": 2000, "ceil": 3000, "progress": 340, "target": 108600, "difficulty": 6, "peak": 2400,
-  "placement": null, "provisional": false, "shield": { "tier": "gold", "runs": 2 },
+  "placement": null, "shield": { "tier": "gold", "runs": 2 },
   "history": [{ "kind": "run", "delta": 42, "before": 2298, "after": 2340, "score": 162000, "target": 150800, "tier": "gold", "runId": "01J…", "at": "…" }] }
 ```
 
@@ -698,8 +701,7 @@ and null once it is open. Before placement `placed` is false, `placement` is
 `target` is the score the next run has to reach to win rating, rounded up to a
 hundred — the typical score of the rating at its own difficulty;
 `difficulty` is the Dereceli difficulty the next rated run is played at;
-`provisional` — moves are still twice as big (after placement, back
-after 30 idle days); `shield` — a fresh promotion's runs left. `history` is the
+`shield` — a fresh promotion's runs left. `history` is the
 last 20 changes that set or moved the rating, newest first — runs that did
 not count and the placement runs before the last are left out; `kind` is
 `placement`, `run`, `forfeit`, `reversal` (a moderator took a gain back) or
@@ -712,7 +714,7 @@ Dereceli (`unlock` null). See [scoring.md → Elo](../product/scoring.md#elo).
 
 ```json
 { "scope": "everyone", "players": 312,
-  "entries": [{ "rank": 1, "username": "ekin", "avatarUrl": null, "rating": 5210, "tier": "master", "isMe": false, "isFriend": false, "gap": null }],
+  "entries": [{ "rank": 1, "username": "ekin", "avatarUrl": null, "rating": 5210, "tier": "master", "leagueBest": 312400, "isMe": false, "isFriend": false, "gap": null }],
   "me": RatingEntry }
 ```
 
@@ -723,7 +725,10 @@ and you; `league` is the players of your own league (your rating's tier) —
 the league screen's ranking, which never resets: there are no weekly groups.
 Before placement `league` answers no rows (`players: 0`, `me` null). The top
 50; `me` is your row wherever it is (null when you are not on the board);
-`gap` is the rating to pass the row above.
+`gap` is the rating to pass the row above. `leagueBest` is the player's best
+rated score this season in the league they are in now — the runs they played
+in it, counted and not thrown out since; null before they have one (fresh
+from a promotion). The league screen writes it small under the name.
 
 ## Analytics
 
@@ -1246,10 +1251,12 @@ board; the league adds those rows up (`LeaderboardPeriod::calendar()`).
 ## Rating
 
 `player_ratings` holds one row per player: `rating` (null until placed),
-`tier`, `peak`, `placement_scores`, `provisional_left`, `shield_tier` /
-`shield_left`, `rated_at`, `changed_at`. `rating_changes` holds every move and
-every run that did not count (`kind`, `score`, `target`, `performance`,
-`before`/`after`/`delta`, `width`, `shielded`, `engine_version`) — `run_id`,
+`tier`, `peak`, `placement_scores`, `shield_tier` / `shield_left`,
+`rated_at`, `changed_at`. `rating_changes` holds every move and every run
+that did not count (`kind`, `score`, `target` — as the player saw it,
+`performance`, `before`/`after`/`delta`, `tier_before`, `shielded`,
+`engine_version`); a league's best scores are read from its `run` rows by
+`tier_before` — `run_id`,
 `reversal_of` and `league_member_id` are unique, so a run, a reversal and a
 week's bonus each move a rating once. Every write locks the player's row. The
 rating is not reset by a new season; the target table is per engine version

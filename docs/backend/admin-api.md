@@ -102,7 +102,7 @@ CSP names the API's origin in `img-src` (`apps/admin/deploy/htaccess.mjs`).
 sessions, last seen, `analyticsAt` — when they said yes to usage analytics),
 this season's best and ranks, lifetime stats, `rating`
 (`AdminPlayerRating`: rating, league (the rating's tier), peak, next target,
-placement or provisional runs left, shield, counted runs, when the last one
+placement runs played, shield, counted runs, when the last one
 counted, and the last 30 changes (`placement`, `run`, `forfeit`, `void`,
 `reversal`, `adjust`), the runs that did not count too, `counted: false`; null for a
 player never rated), runs by status, the ten latest runs, the flag codes of the last
@@ -173,8 +173,8 @@ rating (qb) by hand, to test the leagues or put one right, through
 - the league (`tier`), the peak and `changed_at` follow it — it moved now, so
   of two equal ratings the one reached first still ranks first;
 - a player not placed yet is placed: their rating row opens Dereceli
-  (`GET /rating` answers `placed: true`, `unlock: null`), the placement ends
-  and the provisional runs a placement gives start;
+  (`GET /rating` answers `placed: true`, `unlock: null`) and the placement
+  ends;
 - no run was played: the counted runs (`ratedRuns`) and `ratedAt` stay, so a
   player with no counted run in the last `rules.activeDays` joins the qb board
   with their next rated run;
@@ -226,8 +226,9 @@ verdict, points, bonusPoints, combo, meter`; points and bonus points add up to
 the score) — or `timelineUnavailable`: `no_log` (never finished),
 `other_engine` (another season's rules) or `engine_error`; `rating`
 (`AdminRunRating`) — what the run did to the rating (kind, delta, before and
-after, the target it played against, its performance and width, whether a
-shield held) and `reversedBy` when a moderator's reject took the gain back;
+after, the target it played against as the player saw it, its performance,
+whether a shield held — the panel shows the score's share of the target,
+which set the move) and `reversedBy` when a moderator's reject took the gain back;
 null for a run that never reached the rating (a VS, one still open or held);
 and the audit entries about it.
 
@@ -386,7 +387,10 @@ ranked by Elo (qb, as players call it) and never reset.
 out) and those of them with a counted run in the last `rules.activeDays`
 (`active`), `placing` (still in their placement runs), the highest fifty
 (`top`: player, rating, league, difficulty, peak, last counted) and `rules` —
-the numbers the ratings run on, `unlockRuns` (the counted Normal or Günlük
+the numbers the ratings run on: `curve` (`[{ percent, qb }]`, lowest share
+first — a run's score as a per cent of its target and the move it makes,
+straight between two points; the first point's is the biggest loss and a
+forfeit's), `unlockRuns` (the counted Normal or Günlük
 runs before Dereceli opens, 20 by default), the difficulty ladder
 (`difficultyVersion`, `difficultyFrom`, `difficultyStep`, `maxDifficulty`),
 `targets` — the difficulty table's, what a placed player's run is measured

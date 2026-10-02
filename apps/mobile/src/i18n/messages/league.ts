@@ -1,15 +1,20 @@
 import type { Locale } from '@quezby/types';
 
+import { iso } from '@/i18n/format';
+
 /**
  * The league screen: the league a player's rating puts them in (its words
  * are `rating`'s), and under it that league's players by qb — a ranking that
- * never resets. Before placement, and for a player who has not played rated
- * lately, what it takes to be on it. Tier names are `tiers`'s.
+ * never resets — each with their best score in the league. Before placement,
+ * and for a player who has not played rated lately, what it takes to be on
+ * it. Tier names are `tiers`'s.
  */
 const tr = {
   ribbon: 'LİG',
   /** Over the league's ranking. */
   board: 'LİG SIRALAMASI',
+  /** Small under a name on the ranking: their best Dereceli score in this league. */
+  best: (score: string) => `En iyi skor ${score}`,
   failed: 'Lig sıralaması yüklenemedi',
   retry: 'Tekrar dene',
   /** Before placement: Dereceli still shut, or its first games still to play. */
@@ -30,6 +35,7 @@ export type LeagueMessages = typeof tr;
 const en: LeagueMessages = {
   ribbon: 'LEAGUE',
   board: 'LEAGUE RANKING',
+  best: (score) => `Best score ${score}`,
   failed: "Couldn't load the league ranking",
   retry: 'Try again',
   closed: {
@@ -46,6 +52,7 @@ const en: LeagueMessages = {
 const de: LeagueMessages = {
   ribbon: 'LIGA',
   board: 'LIGA-RANGLISTE',
+  best: (score) => `Bester Score ${score}`,
   failed: 'Die Liga-Rangliste konnte nicht geladen werden',
   retry: 'Noch mal versuchen',
   closed: {
@@ -62,6 +69,7 @@ const de: LeagueMessages = {
 const ar: LeagueMessages = {
   ribbon: 'الدوري',
   board: 'ترتيب الدوري',
+  best: (score) => `أفضل نتيجة ${iso(score)}`,
   failed: 'تعذّر تحميل ترتيب الدوري',
   retry: 'حاول مجددًا',
   closed: {
@@ -78,6 +86,7 @@ const ar: LeagueMessages = {
 const fr: LeagueMessages = {
   ribbon: 'LIGUE',
   board: 'CLASSEMENT DE LA LIGUE',
+  best: (score) => `Meilleur score ${score}`,
   failed: 'Impossible de charger le classement de la ligue',
   retry: 'Réessayer',
   closed: {
@@ -94,6 +103,7 @@ const fr: LeagueMessages = {
 const es: LeagueMessages = {
   ribbon: 'LIGA',
   board: 'TABLA DE LA LIGA',
+  best: (score) => `Mejor puntuación ${score}`,
   failed: 'No se pudo cargar la tabla de la liga',
   retry: 'Reintentar',
   closed: {
@@ -110,6 +120,7 @@ const es: LeagueMessages = {
 const ja: LeagueMessages = {
   ribbon: 'リーグ',
   board: 'リーグランキング',
+  best: (score) => `ベストスコア ${score}`,
   failed: 'リーグランキングを読み込めませんでした',
   retry: '再試行',
   closed: {
@@ -126,6 +137,7 @@ const ja: LeagueMessages = {
 const ko: LeagueMessages = {
   ribbon: '리그',
   board: '리그 순위',
+  best: (score) => `최고 점수 ${score}`,
   failed: '리그 순위를 불러올 수 없어요',
   retry: '다시 시도',
   closed: {

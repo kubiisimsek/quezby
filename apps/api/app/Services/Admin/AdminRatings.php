@@ -9,6 +9,7 @@ use App\Models\PlayerRating;
 use App\Models\RatingChange;
 use App\Models\Run;
 use App\Models\User;
+use App\Services\Rating\RatingCurve;
 use App\Services\Rating\RatingService;
 use App\Services\Rating\TargetTable;
 use App\Support\Timestamp;
@@ -32,6 +33,7 @@ final class AdminRatings
         #[Config('quezby.difficulty_version')]
         private readonly int $difficultyVersion,
         private readonly RatingService $ratings,
+        private readonly RatingCurve $curve,
     ) {}
 
     /** The targets a placed player's run is measured with: its difficulty table's. */
@@ -106,10 +108,7 @@ final class AdminRatings
                 ->all(),
             'rules' => [
                 'engineVersion' => $this->engineVersion,
-                'maxDelta' => (int) $this->config['max_delta'],
-                'width' => (int) $this->config['width'],
-                'provisionalWidth' => (int) $this->config['provisional_width'],
-                'provisionalRuns' => (int) $this->config['provisional_runs'],
+                'curve' => $this->curve->points(),
                 'placementRuns' => (int) $this->config['placement_runs'],
                 'placementMin' => (int) $this->config['placement_min'],
                 'placementMax' => (int) $this->config['placement_max'],
@@ -150,7 +149,6 @@ final class AdminRatings
                 'played' => count($rating->placement_scores ?? []),
                 'required' => (int) $this->config['placement_runs'],
             ],
-            'provisionalLeft' => $rating->provisional_left,
             'shield' => $rating->shield_tier !== null && $rating->shield_left > 0
                 ? ['tier' => $rating->shield_tier->slug(), 'runs' => $rating->shield_left]
                 : null,
@@ -194,7 +192,6 @@ final class AdminRatings
             ...RatingService::presentChange($change),
             'id' => $change->id,
             'performance' => $change->performance,
-            'width' => $change->width,
             'shielded' => $change->shielded,
             'engineVersion' => $change->engine_version,
             'counted' => $change->kind !== RatingKind::Void,

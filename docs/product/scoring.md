@@ -354,13 +354,29 @@ Yerleşmiş oyuncunun dereceli turu, oynadığı zorluk tablosunun hedefleriyle
 **kendi zorluğundaki** tipik skoru. Yerleşme turları zorluk 0'da oynanır ve
 motorun kendi tablosuyla (`rating.targets[motor]`) ölçülür.
 
+- **Değişim, skorun hedefe oranıdır** (`rating.curve`,
+  `App\Services\Rating\RatingCurve`): aynı oran her reytingde, her ligde
+  aynı qb'dir. Hedefin üstündeki her %1 **+2 qb**; hedefin iki katı ve
+  üstü **+200** (tavan). Hedefin altındaki her %1 **−2 qb**, %20'den
+  sonraki her %1 **−4 qb**; hedefin %40'ı ve altı **−200** (taban). Eğri
+  noktaları arasında düz gider; hedef 100 B iken:
+
+  | Skor | ≤ 40 B | 50 B | 60 B | 70 B | 80 B | 90 B | 100 B | 110 B | 120 B | 150 B | ≥ 200 B |
+  | --- | --: | --: | --: | --: | --: | --: | --: | --: | --: | --: | --: |
+  | qb | −200 | −160 | −120 | −80 | −40 | −20 | 0 | +20 | +40 | +100 | +200 |
+
+  Hedefe yakın kaçırmak ucuzdur, büyük kaçırmak pahalı; tutturmak hiçbir şey
+  değiştirmez. Kayıp %20'den sonra iki kat hızlanır, çünkü skorlar çarpanla
+  yayılır: hedefin yarısı, iki katı kadar uzaktır. Böylece oyuncular, hedefi
+  turlarının yaklaşık yarısında geçtikleri reytingde dengelenir.
+- Oran, oyuncunun gördüğü **hedefle** hesaplanır: gerçek hedefin yüze yukarı
+  yuvarlanmışı. Onu tutturan asla kaybetmez, oranı oyuncu kendisi bulabilir.
 - `P(skor)`: skorun, hangi reytingin tipik skoru olduğu (tablonun tersi).
-- **Değişim** `Δ = round(100 × tanh((P − R) / W))`: hedefi geçen artar,
-  altında kalan düşer; ne kadar farkla, o kadar çok, **asla ±100'ü aşmaz**.
-  `W = 800`; yerleşmeden sonraki 15 turda ve 30+ gün aradan sonra dönüşte 5
-  turda `W = 400` (iki kat hızlı).
-- Oyuncuya gösterilen **hedef**, gerçek hedefin yüze yukarı yuvarlanmışıdır:
-  onu tutturan asla kaybetmez.
+  Yalnız yerleşmeyi belirler; turun kaydında da durur.
+- **Geçici dönem yoktur** (2026-10-02'ye kadar yerleşmeden sonraki 15 turda
+  ve uzun aradan dönüşte değişimler iki kat büyüktü): yerleşmeden sonraki ilk
+  turdan beri aynı oran aynı qb'dir. Yanlış yerleşen oyuncu, hedefini iki
+  katıyla geçtikçe tur başına 200 qb ile yerine çıkar.
 - **Yerleşme:** ilk 3 dereceli sonuç reytingi gizli tutar; 3.'sü
   `clamp(P(medyan), 1200, 1800)` ile yerleştirir, herkes Gümüş'te başlar
   (`rating.placement_runs`). Normal ve Günlük turlar yerleşmeye sayılmaz;
@@ -375,14 +391,15 @@ motorun kendi tablosuyla (`rating.targets[motor]`) ölçülür.
 | Dereceli tur (`ranked`) | Hemen sayılır |
 | Normal tur, Günün akışı, VS | Hiçbir etkisi yok (Normal ve Günlük, Dereceli'nin kilidine sayılır) |
 | `review` | Bekler; moderatör onaylarsa **onay anındaki** reytinge, turun kendi motor sürümünün tablosuyla sayılır |
-| Oynanışından sert bayrak (`wall_clock`, `fast_decisions`, `hold_bounds`, `client_mismatch`, `checkpoint_*`, `slow_motion`) | **Hükmen kayıp**: −100 (Bronz'da −50) |
+| Oynanışından sert bayrak (`wall_clock`, `fast_decisions`, `hold_bounds`, `client_mismatch`, `checkpoint_*`, `slow_motion`) | **Hükmen kayıp**: eğrinin tabanı, −200 (Bronz'da −100) |
 | Yarım bırakılan (`abandoned`), süresi dolan (`expired`), motorun reddettiği (`rejected`) | **Hükmen kayıp** |
 | Yasaklı oyuncunun, yalnız `device_integrity` bayraklı, eski sezonun turu | Sayılmaz (`void`) |
 | Geri sayımda iptal (`POST /runs/{id}/cancel`, ilk 5 sn) ya da hiç reel görmeden 30 sn içinde biten | Sayılmaz |
 
 Hükmen kayıp bir kaçış kapısını kapatır: kötü giden bir turu bağlantıyı kesip
 yenisini başlatarak ya da bozuk bir kayıt göndererek yok etmek. Oyundan çıkmak
-turu **o anki skoruyla** gönderir; kaçmak asla ondan iyi değildir. Telefon,
+turu **o anki skoruyla** gönderir; kaçmak asla ondan iyi değildir: hükmen
+kayıp, en kötü skorun kaybıyla (−200) aynıdır. Telefon,
 yeni tura başlamadan önce ağ yüzünden bekleyen bitişini gönderir, geri sayımda
 vazgeçilen turu iptal eder.
 
@@ -393,8 +410,8 @@ reytingi donar ve Elo tabelasında görünmez.
 **Elle düzeltme:** yalnızca bir sahip, yönetim panelinden bir oyuncunun
 reytingini (qb) sebebiyle birlikte elle koyabilir (`adjust`, oyuncunun
 geçmişinde "Düzeltme"; denetim kaydında `player.rating`, eski ve yeni
-değerle). Yerleşmemiş oyuncu yerleşir ve Dereceli ona açılır; yerleşmeden
-sonraki geçici dönem başlar. Tur oynanmadığı için sayılan tur ve son sayılan
+değerle). Yerleşmemiş oyuncu yerleşir ve Dereceli ona açılır. Tur
+oynanmadığı için sayılan tur ve son sayılan
 tur anı değişmez — Elo tabelasına bir sonraki dereceli turuyla girer. Reyting
 o an değiştiği için eşitlikte o reytinge önce ulaşan önde kalır; yeni lig
 terfi kalkanının ligi değilse kalkan düşer.
@@ -404,9 +421,14 @@ kademesidir ve sıralaması **hiç sıfırlanmaz**. Haftalık grup, hafta kapan�
 ve Elo bonusu yoktur. Lig ekranı, oyuncunun liginde son 14 günde dereceli
 oynamış oyuncuları Elo'ya göre sıralar (`GET /ratings?scope=league`,
 `rating.board_active_days`); oyuncunun satırı altta sabit durur, bir üsttekini
-geçmek için gereken Elo'yla. Yerleşmemiş oyuncunun lig sıralaması yoktur.
-Hafta / Ay / Tüm zamanlar skor tabloları bundan ayrıdır ve aynen sürer; gün
-satırı hiçbir tur için yazılmaz.
+geçmek için gereken Elo'yla. Her satırda, adın altında küçükçe, oyuncunun
+**bulunduğu ligdeki en iyi dereceli skoru** yazar ("En iyi skor 142.300",
+`leagueBest`): bu sezon, o ligdeyken oynadığı, sayılan ve sonradan
+reddedilmemiş turlarından. Ligin zorluğu bir olduğu için skorlar
+karşılaştırılabilir; yeni terfi eden oyuncunun o ligde henüz skoru yoktur.
+Yerleşmemiş oyuncunun lig sıralaması yoktur. Hafta / Ay / Tüm zamanlar skor
+tabloları bundan ayrıdır ve aynen sürer; gün satırı hiçbir tur için
+yazılmaz.
 
 **Sezon:** Elo taşınır (beceriye çapalı). Hedef tablo gerçek oyunculara göre
 `php artisan quezby:rating:calibrate --days=30` (ya da admin paneli →
@@ -417,16 +439,18 @@ değişince reytingler sıfırlanmaz, oyuncular birkaç turda yeni dengeye kayar
 
 **Söz** (`tests/Unit/Rating/RatingBalanceTest.php`, motorun ±%20 sözü gibi):
 zorluk 0'da, motorun kendi tablosuyla, motor profilleri (gerçek başparmak
-için −%15) kendi liglerinde durur — yeni başlayan ~1060 ve ortalama ~1910
-Gümüş, iyi ~2830 Altın, profesyonel ~3800 Platin, elit ~4550 Elmas. Dereceli
+için −%15) kendi liglerinde durur — yeni başlayan ~1070 ve ortalama ~1910
+Gümüş, iyi ~2830 Altın, profesyonel ~3810 Platin, elit ~4560 Elmas. Dereceli
 merdiveninde (her tur reytinginin zorluğunda, zorluk tablosu 2'nin
-hedefleriyle) yerleri: yeni başlayan ~1070 ve ortalama ~1980 **Gümüş**, iyi
-~3740 **Platin**, profesyonel ~5700 ve elit ~6690 **MasterClass**. İyi oyuncu
-4500'ün altında kalır; MasterClass'taki profesyonel ve elit sakindir (sapma
-< 100, tipik değişim ±70 içinde). Kısa oyunda yeni başlayan, ortalama ve iyi
-oyuncunun turları daha geniş yayıldığı için reytingleri tur başına daha çok
-oynar (sapma < 150, tipik değişim ±100; zorluk 0 tablosunda ±85), ligden
-taşmaz. Motorun kendi hedefleriyle elit Elmas'a bile çıkamazdı.
+hedefleriyle) yerleri: yeni başlayan ~1060 ve ortalama ~1860 **Gümüş**, iyi
+~3780 **Platin**, profesyonel ~5720 ve elit ~6700 **MasterClass**. İyi
+oyuncu 4500'ün altında kalır;
+MasterClass'taki profesyonel ve elit sakindir (sapma < 100, onda dokuz turda
+değişim ≤ 80; elit ≤ 45). Yüzde eğrisiyle hedefinden uzak düşen tur çok
+oynatır: kısa oyunda turları en geniş yayılan yeni başlayan ve ortalama
+oyuncu onda bir turda ±200 görür ve reytingleri ligleri içinde ~150–190
+sapar (iyi oyuncu ~130), ama ortalamada liglerinden taşmaz. Motorun kendi
+hedefleriyle elit Elmas'a bile çıkamazdı.
 
 ## Dereceli zorluğu
 

@@ -245,7 +245,6 @@ export function buildRating(overrides: Partial<RatingResponse> = {}): RatingResp
     difficulty: 3,
     peak: 1_702,
     placement: null,
-    provisional: false,
     shield: null,
     history: [
       {

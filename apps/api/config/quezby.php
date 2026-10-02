@@ -246,9 +246,8 @@ return [
     | Only Dereceli (`rated`) runs play for Elo. Each is a match against a
     | target: the score a player of that rating typically makes (`targets`, per engine version — a new
     | season needs its own). Past it the rating rises, short of it it falls,
-    | by `max_delta × tanh((P − R) / width)` where P is the rating whose
-    | typical score the run's was — never more than `max_delta` either way.
-    | `docs/product/scoring.md` → "Elo".
+    | by the run's score as a share of the target (`curve`): the same share
+    | moves the same at every rating. `docs/product/scoring.md` → "Elo".
     |
     */
 
@@ -257,14 +256,13 @@ return [
         // it Elo and a league — opens to a player. Once they have played a
         // rated run, it never closes again.
         'unlock_runs' => (int) env('QUEZBY_LEAGUE_UNLOCK_RUNS', 20),
-        'max_delta' => 100,
-        'width' => 800,
-        // Faster moves while the rating is still finding its level: right
-        // after placement, and when a player comes back after a long break.
-        'provisional_width' => 400,
-        'provisional_runs' => 15,
-        'return_provisional_runs' => 5,
-        'return_after_days' => 30,
+        // A run's move by its score as a per cent of the target it saw → qb,
+        // straight between two points and the end's past either end
+        // (`App\Services\Rating\RatingCurve`). Up, 2 qb a per cent: +200 at
+        // twice the target. Down, 2 qb a per cent to 80 %, 4 below it: −200
+        // at 40 %, which is also a forfeit's. The help screen says it in
+        // words (`apps/mobile/src/i18n/messages/help.ts` → leagues).
+        'curve' => [40 => -200, 80 => -40, 100 => 0, 200 => 200],
         // The first rated runs place a player: the rating their median
         // scores, held inside `placement_min`–`placement_max` (Gümüş).
         'placement_runs' => 3,

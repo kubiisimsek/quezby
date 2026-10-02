@@ -61,31 +61,6 @@ test('performance is the rating whose typical score a score is', function () {
     }
 });
 
-test('reaching the shown target never loses', function () {
-    $table = targets();
-
-    foreach (range(0, 6000, 137) as $rating) {
-        $performance = $table->performance($table->shown($rating));
-
-        expect(TargetTable::delta($rating, $performance, 800, 100))->toBeGreaterThanOrEqual(0)
-            ->and(TargetTable::delta($rating, $table->performance($table->shown($rating) - 1000), 800, 100))->toBeLessThanOrEqual(0);
-    }
-});
-
-test('a run moves the rating by tanh of how far past or short of the target it played, never more than the cap', function () {
-    expect(TargetTable::delta(1500, 2000, 800, 100))->toBe(55)
-        ->and(TargetTable::delta(1500, 2000, 400, 100))->toBe(85)
-        ->and(TargetTable::delta(1500, 1000, 800, 100))->toBe(-55)
-        ->and(TargetTable::delta(1500, 1500, 800, 100))->toBe(0)
-        ->and(TargetTable::delta(1500, 9000, 800, 100))->toBe(100)
-        ->and(TargetTable::delta(1500, -9000, 800, 100))->toBe(-100)
-        ->and(TargetTable::delta(1500, null, 800, 100))->toBe(-100);
-
-    foreach (range(-4000, 9000, 250) as $performance) {
-        expect(abs(TargetTable::delta(2000, $performance, 400, 100)))->toBeLessThanOrEqual(100);
-    }
-});
-
 test('the median of placement is the middle score, the lower one of an even count', function () {
     expect(TargetTable::median([50000, 10000, 30000, 20000, 40000]))->toBe(30000)
         ->and(TargetTable::median([4, 1, 3, 2]))->toBe(2)

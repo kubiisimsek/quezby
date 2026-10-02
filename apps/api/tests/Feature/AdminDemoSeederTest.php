@@ -43,11 +43,11 @@ test('locally it makes an admin of each role and something for each of them to l
         ->and(AuditEntry::query()->pluck('action')->all())->toEqualCanonicalizing([AuditAction::RunReject, AuditAction::PlayerBan]);
 
     // The suspects' runs were counted as a finish counts them: the bot's flagged rated runs are
-    // forfeits — three zeros place it at the floor of Gümüş, two more take a hundred each.
+    // forfeits — three zeros place it at the floor of Gümüş, two more take two hundred each.
     $speedy = User::query()->where('username', 'bot.hizli')->sole();
     expect(PlayerRating::query()->findOrFail($speedy->id))
         ->placement_scores->toBe([0, 0, 0])
-        ->rating->toBe(1000)
+        ->rating->toBe(800)
         ->and(RatingChange::query()->where('user_id', $speedy->id)->where('kind', RatingKind::Forfeit->value)->count())->toBe(5);
 
     $this->signInAdmin(AdminRole::Viewer);

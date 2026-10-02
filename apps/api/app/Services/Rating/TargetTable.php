@@ -13,8 +13,9 @@ use App\Models\Run;
  *
  *   target(R)      the score a player rated R typically makes
  *   performance(s) the rating whose typical score s is
- *   delta          max × tanh((P − R) / width): past the target up, short of
- *                  it down, never more than max either way
+ *
+ * How far a run then moves the rating is `RatingCurve`'s: by its score as a
+ * share of the target.
  */
 final readonly class TargetTable
 {
@@ -94,19 +95,6 @@ final readonly class TargetTable
         [[$r0, $t0], [$r1, $t1]] = $this->stretch(fn (array $anchor) => $score <= $anchor[1]);
 
         return (int) round($r0 + ($r1 - $r0) * log($score / $t0) / log($t1 / $t0));
-    }
-
-    /**
-     * How far a run moves a rating: `$max` × tanh of how far above or below
-     * the rating the run played, in widths. No score at all is the full loss.
-     */
-    public static function delta(int $rating, ?int $performance, int $width, int $max): int
-    {
-        if ($performance === null) {
-            return -$max;
-        }
-
-        return (int) round($max * tanh(($performance - $rating) / $width));
     }
 
     /**

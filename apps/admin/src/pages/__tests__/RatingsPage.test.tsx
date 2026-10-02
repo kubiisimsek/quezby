@@ -68,8 +68,13 @@ describe('RatingsPage', () => {
     renderApp({ path: '/ratings', api: withRatings() });
 
     const rules = (await screen.findByRole('heading', { name: 'Kurallar' })).closest('section') as HTMLElement;
-    expect(within(rules).getByText('±100 qb')).toBeInTheDocument();
-    expect(within(rules).getByText('Geçici dönemde 400: değişimler daha büyük')).toBeInTheDocument();
+    const gain = within(rules).getByText('En çok kazanç', { selector: 'dt' }).parentElement as HTMLElement;
+    expect(gain).toHaveTextContent('+200 qb');
+    expect(gain).toHaveTextContent('Skor hedefin %200 ya da üstüyse');
+    const loss = within(rules).getByText('En çok kayıp', { selector: 'dt' }).parentElement as HTMLElement;
+    expect(loss).toHaveTextContent('−200 qb');
+    expect(loss).toHaveTextContent('Skor hedefin %40 ya da altıysa; hükmen kayıp da bu');
+    expect(within(rules).queryByText(/Geçici dönem|Genişlik/)).not.toBeInTheDocument();
     expect(within(rules).getByText('1.200 ile 1.800 arasına')).toBeInTheDocument();
     expect(within(rules).getByText('%50')).toBeInTheDocument();
     const unlock = within(rules).getByText('Dereceli kilidi', { selector: 'dt' }).parentElement as HTMLElement;
@@ -80,6 +85,12 @@ describe('RatingsPage', () => {
     const difficulty = within(rules).getByText('Zorluk', { selector: 'dt' }).parentElement as HTMLElement;
     expect(difficulty).toHaveTextContent('0–16');
     expect(difficulty).toHaveTextContent('1.000 qb’den sonra her 250 qb’de bir artar · tablo 1');
+
+    // The curve: a run's score as a share of its target, and the move it makes.
+    const curve = screen.getByRole('heading', { name: 'qb eğrisi' }).closest('section') as HTMLElement;
+    expect(within(within(curve).getByRole('row', { name: /%80/ })).getByText('−40 qb')).toBeInTheDocument();
+    expect(within(within(curve).getByRole('row', { name: /%100/ })).getByText('0 qb')).toBeInTheDocument();
+    expect(within(within(curve).getByRole('row', { name: /%200/ })).getByText('+200 qb')).toBeInTheDocument();
 
     // The targets of the difficulty table: what a placed player's run is measured with.
     const targets = screen.getByRole('heading', { name: 'Hedef tablosu' }).closest('section') as HTMLElement;

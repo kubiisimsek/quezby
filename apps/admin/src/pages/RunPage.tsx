@@ -42,6 +42,7 @@ import {
   formatDuration,
   formatMs,
   formatNumber,
+  formatPercent,
   formatPerMille,
   formatRatingMove,
   playerName,
@@ -334,7 +335,11 @@ function RatingCard({ rating }: { rating: AdminRunRating | null }) {
             { label: 'Lig', value: rating.tier ? <TierTag tier={rating.tier} /> : null },
             { label: 'Skor', value: formatNumber(rating.score), hint: rating.target === null ? undefined : `hedef ${formatNumber(rating.target)}` },
             { label: 'Performans', value: formatNumber(rating.performance), hint: 'Bu skoru tipik yapan reyting' },
-            { label: 'Genişlik', value: formatNumber(rating.width), hint: 'Geçici dönemde daha dar: değişim daha büyük' },
+            {
+              label: 'Hedefe oranı',
+              value: rating.score === null || !rating.target ? '—' : formatPercent((rating.score * 100) / rating.target),
+              hint: rating.score === null || !rating.target ? undefined : 'Değişimi bu oran belirler',
+            },
             {
               label: 'Terfi kalkanı',
               value: rating.shielded ? 'Tuttu' : 'Yok',

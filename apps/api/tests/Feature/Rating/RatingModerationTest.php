@@ -113,7 +113,7 @@ test('a run thrown out that lost keeps its loss', function () {
 
     $this->postJson("/api/v1/admin/runs/{$run->id}/reject", ['reason' => 'Bot'])->assertOk();
 
-    expect(ratingNow($player))->toBe(2400)
+    expect(ratingNow($player))->toBe(2300)
         ->and(RatingChange::query()->where('kind', RatingKind::Reversal->value)->count())->toBe(0);
 });
 

@@ -256,7 +256,7 @@ describe('PlayerPage', () => {
           rating: playerRating({
             rating: 3250,
             tier: 'platinum',
-            history: [ratingChange({ kind: 'adjust', delta: 800, before: 2450, after: 3250, score: null, target: null, tier: 'platinum', runId: null, performance: null, width: null, engineVersion: null })],
+            history: [ratingChange({ kind: 'adjust', delta: 800, before: 2450, after: 3250, score: null, target: null, tier: 'platinum', runId: null, performance: null, engineVersion: null })],
           }),
         }),
       ),
@@ -445,7 +445,6 @@ describe('PlayerPage', () => {
     expect(fact(rating, 'Zorluk')).toHaveTextContent('6');
     expect(fact(rating, 'Sayılan tur')).toHaveTextContent('36');
     expect(within(rating).queryByText('Yerleşme', { selector: 'dt' })).not.toBeInTheDocument();
-    expect(within(rating).queryByText('Geçici dönem', { selector: 'dt' })).not.toBeInTheDocument();
     expect(within(rating).queryByText('Terfi kalkanı', { selector: 'dt' })).not.toBeInTheDocument();
   });
 
@@ -504,13 +503,12 @@ describe('PlayerPage', () => {
     expect(within(row).getByText('—')).toBeInTheDocument();
   });
 
-  it('says what still speeds or shields a fresh rating', async () => {
+  it('says what still shields a fresh rating', async () => {
     renderApp({
       path: `/players/${ID}`,
       api: withPlayer(
         playerResponse({
           rating: playerRating({
-            provisionalLeft: 7,
             shield: { tier: 'platinum', runs: 2 },
             history: [ratingChange({ shielded: true, delta: -30 })],
           }),
@@ -519,7 +517,6 @@ describe('PlayerPage', () => {
     });
 
     const rating = await card('Reyting');
-    expect(fact(rating, 'Geçici dönem')).toHaveTextContent('7 tur daha');
     expect(fact(rating, 'Terfi kalkanı')).toHaveTextContent('Platin · 2 tur');
     const history = await card('Reyting geçmişi');
     expect(within(history).getByText('Kalkan')).toBeInTheDocument();

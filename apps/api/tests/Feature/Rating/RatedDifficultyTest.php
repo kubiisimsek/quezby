@@ -95,9 +95,9 @@ test('the difficulty is set once the run left open has been charged', function (
     $this->startRun(['mode' => 'rated'])->assertCreated()->assertJsonPath('difficulty', 1);
     Carbon::setTestNow(now()->addMinutes(2));
 
-    // Leaving it is a forfeit: 1050 − 100 is Bronz, and Bronz plays difficulty 0.
+    // Leaving it is a forfeit: 1050 − 200 is Bronz, and Bronz plays difficulty 0.
     $this->startRun(['mode' => 'rated'])->assertCreated()->assertJsonPath('difficulty', 0);
-    expect(PlayerRating::query()->findOrFail($player->id)->rating)->toBe(950);
+    expect(PlayerRating::query()->findOrFail($player->id)->rating)->toBe(850);
 });
 
 test('a rated run is replayed at its difficulty, moves the rating and the stats, and never reaches the boards', function () {
@@ -143,7 +143,7 @@ test('a log played at another difficulty does not count, and costs the rating', 
     $this->finishRun($start->json('runId'), $actions, $summary->score, $summary->reels);
 
     expect(Run::query()->findOrFail($start->json('runId'))->status)->toBeIn([RunStatus::Rejected, RunStatus::Flagged])
-        ->and(PlayerRating::query()->findOrFail($player->id)->rating)->toBe(2900);
+        ->and(PlayerRating::query()->findOrFail($player->id)->rating)->toBe(2800);
 });
 
 test('a soft-signalled rated run waits for review only when it would lift its player into the Elo board\'s top', function (int $above, RunStatus $status) {

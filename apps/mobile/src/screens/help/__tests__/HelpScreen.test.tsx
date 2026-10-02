@@ -166,7 +166,10 @@ describe('HelpScreen', () => {
     expect(screen.getByText(/ilk 3 dereceli oyunun qb’ni belirler/)).toBeOnTheScreen();
     expect(screen.getByText(/Altı lig var/)).toBeOnTheScreen();
     expect(screen.getByText(/Her dereceli oyunun bir hedef skoru var/)).toBeOnTheScreen();
-    expect(screen.getByText(/en fazla 100 qb/)).toBeOnTheScreen();
+    expect(screen.getByText(/Hedefi geçtiğin her %1 için 2 qb kazanırsın/)).toBeOnTheScreen();
+    expect(screen.getByText(/%20’den sonraki her %1 için 4 qb/)).toBeOnTheScreen();
+    expect(screen.getByText(/en fazla 200 qb/)).toBeOnTheScreen();
+    expect(screen.queryByText(/en fazla 100 qb/)).not.toBeOnTheScreen();
     expect(screen.getByText(/Yarım bırakılan dereceli oyun ise en düşük sonuç sayılır/)).toBeOnTheScreen();
     expect(screen.getByText(/Lig sıralaması hiç sıfırlanmaz/)).toBeOnTheScreen();
     expect(screen.queryByText(/Haftalık grup|\+50, \+30 ve \+15/)).not.toBeOnTheScreen();

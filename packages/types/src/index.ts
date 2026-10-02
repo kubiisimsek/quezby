@@ -411,8 +411,6 @@ export type RatingResponse = {
   difficulty: number | null;
   peak: number | null;
   placement: RatingPlacement | null;
-  /** Moves are still twice as big: right after placement, and back after a long break. */
-  provisional: boolean;
   /** A fresh promotion's protection: `runs` more runs cannot drop the player out of `tier`. */
   shield: { tier: LeagueTier; runs: number } | null;
   /** Latest changes, newest first — runs that did not count are left out. */
@@ -425,6 +423,11 @@ export type RatingEntry = {
   avatarUrl: string | null;
   rating: number;
   tier: LeagueTier;
+  /**
+   * The player's best rated score this season in the league they are in
+   * now; null before they have counted a run in it (fresh from a promotion).
+   */
+  leagueBest: number | null;
   isMe: boolean;
   isFriend: boolean;
   /** Rating to pass the row above; null for the first. */

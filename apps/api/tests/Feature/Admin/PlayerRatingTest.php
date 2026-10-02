@@ -35,7 +35,7 @@ function setPlayerRating(User $player, array $body): TestResponse
 test('an owner sets a placed player\'s rating, and the league follows it', function () {
     $owner = $this->signInAdmin(AdminRole::Owner, ['name' => 'Kubilay']);
     $player = User::factory()->withUsername('kerem.35')->create();
-    $this->rate($player, 1450, now()->subDays(3), ['peak' => 1600, 'provisional_left' => 4]);
+    $this->rate($player, 1450, now()->subDays(3), ['peak' => 1600]);
 
     setPlayerRating($player, ['rating' => 3250, 'reason' => 'Lig testi'])
         ->assertOk()
@@ -46,7 +46,6 @@ test('an owner sets a placed player\'s rating, and the league follows it', funct
         ->and($rating->tier)->toBe(LeagueTier::Platinum)
         ->and($rating->peak)->toBe(3250)
         ->and($rating->changed_at?->equalTo(now()))->toBeTrue()
-        ->and($rating->provisional_left)->toBe(4)
         ->and($rating->rated_runs)->toBe(20)
         ->and($rating->rated_at?->equalTo(now()->subDays(3)))->toBeTrue();
 
@@ -120,7 +119,6 @@ test('a player still placing is placed by it, and their placement ends', functio
         ->assertJsonPath('rating', 4200)
         ->assertJsonPath('tier', 'diamond')
         ->assertJsonPath('placement', null)
-        ->assertJsonPath('provisional', true)
         ->assertJsonPath('history.0.kind', 'adjust')
         ->assertJsonPath('history.0.after', 4200);
 });
@@ -142,8 +140,7 @@ test('it opens Dereceli to a player who has not counted the runs for it yet', fu
         ->assertJsonPath('placement', null);
     expect(PlayerRating::query()->findOrFail($player->id))
         ->rated_runs->toBe(0)
-        ->rated_at->toBeNull()
-        ->provisional_left->toBe(15);
+        ->rated_at->toBeNull();
 });
 
 test('the panel shows the move in the player\'s rating history, as counted', function () {
