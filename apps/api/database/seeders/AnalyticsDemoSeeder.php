@@ -30,9 +30,10 @@ use RuntimeException;
  */
 final class AnalyticsDemoSeeder extends Seeder
 {
-    private const IOS = [['iPhone 15 Pro', '18.2'], ['iPhone 14', '18.1'], ['iPhone 13', '17.6.1'], ['iPhone 16', '18.3']];
+    private const IOS = [['iPhone 15 Pro', '18.2', 'Apple'], ['iPhone 14', '18.1', 'Apple'], ['iPhone 13', '17.6.1', 'Apple'], ['iPhone 16', '18.3', 'Apple']];
 
-    private const ANDROID = [['Pixel 8', '14'], ['Galaxy S23', '14'], ['Redmi Note 12', '13'], ['Galaxy A54', '15']];
+    // The model and maker as Android names them: a Galaxy is `SM-…` by `samsung`.
+    private const ANDROID = [['Pixel 8', '14', 'Google'], ['SM-S911B', '14', 'samsung'], ['Redmi Note 12', '13', 'Xiaomi'], ['SM-A546E', '15', 'samsung']];
 
     private const WANDER = ['leaderboard', 'league', 'daily', 'search', 'profile', 'help'];
 
@@ -130,14 +131,15 @@ final class AnalyticsDemoSeeder extends Seeder
     private function phoneOf(User $player, Randomizer $dice): DeviceHeader
     {
         $android = $player->platform === 'android';
-        [$model, $os] = ($android ? self::ANDROID : self::IOS)[$dice->getInt(0, 3)];
+        [$model, $os, $brand] = ($android ? self::ANDROID : self::IOS)[$dice->getInt(0, 3)];
         $install = preg_replace('/[^A-Za-z0-9-]/', '-', (string) ($player->install_id ?: 'demo-'.$player->id));
 
         return DeviceHeader::parse(sprintf(
-            'install=%s; platform=%s; os=%s; model=%s; build=42',
+            'install=%s; platform=%s; os=%s; brand=%s; model=%s; build=42',
             str_pad((string) $install, 8, '0'),
             $android ? 'android' : 'ios',
             rawurlencode($os),
+            rawurlencode($brand),
             rawurlencode($model),
         )) ?? throw new RuntimeException('A demo phone the registry would not take.');
     }

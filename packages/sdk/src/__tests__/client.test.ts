@@ -41,7 +41,7 @@ describe('createApiClient', () => {
       getToken: () => 'tok',
       device: () =>
         known
-          ? { installId: 'c0ffee00c0ffee00', platform: 'ios', os: '18.2', model: 'iPhone 15 Pro', build: '42' }
+          ? { installId: 'c0ffee00c0ffee00', platform: 'ios', os: '18.2', brand: 'Apple', model: 'iPhone 15 Pro', build: '42' }
           : null,
     });
 
@@ -53,7 +53,7 @@ describe('createApiClient', () => {
     const [, after] = fetchMock.mock.calls[1] as unknown as [string, RequestInit];
     expect(before.headers).not.toHaveProperty('X-Device');
     expect(after.headers).toMatchObject({
-      'X-Device': 'install=c0ffee00c0ffee00; platform=ios; os=18.2; model=iPhone%2015%20Pro; build=42',
+      'X-Device': 'install=c0ffee00c0ffee00; platform=ios; os=18.2; brand=Apple; model=iPhone%2015%20Pro; build=42',
     });
   });
 
@@ -79,8 +79,8 @@ describe('createApiClient', () => {
 
   it('encodes every device value, so nothing can break the header apart', () => {
     expect(
-      deviceHeader({ installId: 'a;b', platform: 'android', os: '14', model: 'Pixel=8\nPro', build: '7' }),
-    ).toBe('install=a%3Bb; platform=android; os=14; model=Pixel%3D8%0APro; build=7');
+      deviceHeader({ installId: 'a;b', platform: 'android', os: '14', brand: 'Sam;sung', model: 'Pixel=8\nPro', build: '7' }),
+    ).toBe('install=a%3Bb; platform=android; os=14; brand=Sam%3Bsung; model=Pixel%3D8%0APro; build=7');
   });
 
   it('never sends the token to a public route', async () => {

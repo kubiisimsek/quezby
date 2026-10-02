@@ -40,6 +40,7 @@ final class AdminAnalytics
         private readonly Totals $totals,
         private readonly DaySeries $series,
         private readonly LeaderboardService $leaderboards,
+        private readonly DeviceBreakdown $devices,
         #[Config('quezby.analytics.keep_visits_days')]
         private readonly int $keepVisits,
         #[Config('quezby.analytics.keep_days_days')]
@@ -82,7 +83,7 @@ final class AdminAnalytics
             'funnel' => $this->funnel($days[0]['start']),
             'screens' => $this->ranked('screen:', $keys[0], $today, 'screen', 'views', fn (string $code) => AnalyticsScreen::tryFrom($code) !== null),
             'events' => $this->ranked('event:', $keys[0], $today, 'event', 'count', fn (string $code) => AnalyticsEvent::tryFrom($code) !== null),
-            'devices' => $this->devices($now),
+            'devices' => $this->devices->since($now->subDays(7)->format('Y-m-d H:i:s')),
             'storage' => $this->storage($today),
         ];
     }
@@ -293,59 +294,6 @@ final class AdminAnalytics
             ->sortBy([[$amount, 'desc'], [$name, 'asc']])
             ->values()
             ->all();
-    }
-
-    /**
-     * Every player's phones seen in the last 7 days, from the device registry:
-     * app versions, systems (by major version) and models.
-     *
-     * @return array<string, mixed>
-     */
-    private function devices(CarbonImmutable $now): array
-    {
-        $since = $now->subDays(7)->format('Y-m-d H:i:s');
-        $seen = fn (): QueryBuilder => DB::table('player_devices')->where('last_seen_at', '>=', $since);
-        $total = $seen()->count();
-        $share = fn (int $devices) => $total > 0 ? (int) round($devices * 1000 / $total) : 0;
-
-        $slices = fn (string $column, int $limit) => $seen()
-            ->selectRaw("platform, {$column} as label, count(*) as devices")
-            ->groupBy('platform', $column)
-            ->orderByDesc('devices')
-            ->orderBy('platform')
-            ->orderBy($column)
-            ->limit($limit)
-            ->get()
-            ->map(fn (object $row) => [
-                'platform' => $row->platform,
-                'value' => $row->label,
-                'devices' => (int) $row->devices,
-                'share' => $share((int) $row->devices),
-            ])
-            ->values()
-            ->all();
-
-        $systems = [];
-        $seen()->selectRaw('platform, os_version, count(*) as devices')->groupBy('platform', 'os_version')->get()
-            ->each(function (object $row) use (&$systems) {
-                $major = $row->os_version === null ? null : explode('.', (string) $row->os_version)[0];
-                $key = ($row->platform ?? '').'|'.($major ?? '');
-                $systems[$key] ??= ['platform' => $row->platform, 'value' => $major, 'devices' => 0];
-                $systems[$key]['devices'] += (int) $row->devices;
-            });
-
-        return [
-            'total' => $total,
-            'versions' => $slices('app_version', 12),
-            'systems' => collect($systems)
-                ->map(fn (array $slice) => $slice + ['share' => $share($slice['devices'])])
-                ->values()
-                ->sortBy([['devices', 'desc'], ['platform', 'asc'], ['value', 'asc']])
-                ->take(12)
-                ->values()
-                ->all(),
-            'models' => $slices('model', 10),
-        ];
     }
 
     /**

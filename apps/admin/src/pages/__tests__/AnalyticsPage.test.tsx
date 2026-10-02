@@ -62,20 +62,61 @@ describe('AnalyticsPage', () => {
     expect(within(await screen.findByRole('list', { name: 'Ekranlar' })).getByText('Zirve')).toBeInTheDocument();
     expect(screen.getByText('Turu paylaştı').parentElement).toHaveTextContent('40');
     expect(screen.getByText('Gönderilemeyen tur')).toBeInTheDocument();
-    expect(within(screen.getByRole('list', { name: 'Uygulama sürümleri' })).getByText('iOS 1.0.0').closest('li')).toHaveTextContent('200 · %66,7');
-    expect(within(screen.getByRole('list', { name: 'Sistemler' })).getByText('Android 14')).toBeInTheDocument();
-    expect(within(screen.getByRole('list', { name: 'Modeller' })).getByText('Pixel 8')).toBeInTheDocument();
   });
 
-  it('shows what analytics keeps, so its growth is plain', async () => {
+  it('splits the phones into a table per system and per maker, the app versions under every row', async () => {
+    const api = fakeApi();
+    api.analytics.get.mockResolvedValue(analytics());
+    renderApp({ path: '/analytics', api });
+    const table = async (title: string) => (await screen.findByRole('heading', { name: title })).closest('section') as HTMLElement;
+
+    expect(await screen.findByText('Son 7 günde görülen 300 telefon; izin aranmaz.')).toBeInTheDocument();
+    const ios = await table('iOS');
+    expect(within(ios).getByText('200 telefon · %66,7')).toBeInTheDocument();
+    expect(within(ios).getByRole('table', { name: 'iOS' })).toBeInTheDocument();
+    const ios18 = within(ios).getByText('iOS 18').closest('tr');
+    expect(ios18).toHaveTextContent('Uygulama 1.0.0 (170) · 0.9.0 (10)');
+    expect(ios18).toHaveTextContent('180');
+    expect(ios18).toHaveTextContent('%90');
+    expect(within(await table('Android')).getByText('Android 14')).toBeInTheDocument();
+
+    // Apple's phones are the iPhones; a row names three versions and counts the phones on the rest.
+    const iphone = await table('iPhone');
+    expect(within(iphone).getByText('iPhone 15 Pro').closest('tr')).toHaveTextContent('Uygulama 1.0.0 (80) · 0.9.0 (6) · bilinmiyor (2) · diğer (2)');
+    expect(within(iphone).getByText('Listede olmayanlar: 110 telefon')).toBeInTheDocument();
+    expect(within(await table('Samsung')).getByText('SM-S918B')).toBeInTheDocument();
+    expect(within(await table('Markası bilinmeyen')).getByText('Uygulamanın eski sürümü markayı göndermiyor.')).toBeInTheDocument();
+
+    const others = within(await table('Diğer markalar')).getAllByRole('row').slice(1);
+    expect(others).toHaveLength(2);
+    expect(others[0]).toHaveTextContent('Xiaomi');
+    expect(others[1]).toHaveTextContent('Google');
+  });
+
+  it('says so when no phone was seen this week', async () => {
+    const api = fakeApi();
+    api.analytics.get.mockResolvedValue(
+      analytics({ devices: { total: 0, platforms: [], brands: [], otherBrands: { devices: 0, share: 0, rows: [], rest: 0 } } }),
+    );
+    renderApp({ path: '/analytics', api });
+
+    expect(await screen.findByText('Son 7 günde görülen telefon yok.')).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'iOS' })).toBeNull();
+  });
+
+  it('shows what analytics keeps, layer by layer, at the foot of the page', async () => {
     const api = fakeApi();
     api.analytics.get.mockResolvedValue(analytics());
     renderApp({ path: '/analytics', api });
 
-    expect((await screen.findByText('Ziyaretler', { selector: 'dt' })).parentElement).toHaveTextContent('5.400 satır');
-    expect(screen.getByText('30 gün tutulur')).toBeInTheDocument();
-    expect(screen.getByText('Süresiz; günde birkaç düzine satır')).toBeInTheDocument();
-    expect(screen.getByText('Geri çevrilen', { selector: 'dt' }).parentElement).toHaveTextContent('4');
+    const storage = (await screen.findByRole('heading', { name: 'Veri hacmi' })).closest('section') as HTMLElement;
+    const layer = (name: string) => within(storage).getByText(name).closest('tr');
+    expect(layer('Ziyaretler')).toHaveTextContent('5.400');
+    expect(layer('Ziyaretler')).toHaveTextContent('30 gün');
+    expect(layer('Günlük toplamlar')).toHaveTextContent('Süresiz; günde birkaç düzine satır');
+    expect(layer('Cihaz kaydı')).toHaveTextContent('180 gün görülmeyen silinir');
+    expect(layer('İlkler')).toHaveTextContent('700');
+    expect(within(storage).getByText(/Son 7 günde geri çevrilen/)).toHaveTextContent('Son 7 günde geri çevrilen: 4.');
   });
 
   it('covers ninety days when asked, from the address bar', async () => {

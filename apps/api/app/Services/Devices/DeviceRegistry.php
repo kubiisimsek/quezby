@@ -13,10 +13,10 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * The device registry: every phone a player used — its install, system,
- * model and app build, first and last seen. Kept for every player, consent
- * or not, for support and security (`docs/product/analytics.md`); written at
- * most once a day per phone by `Analytics\Presence`, bounded to a few phones
- * a player and pruned once unseen for long.
+ * maker, model and app build, first and last seen. Kept for every player,
+ * consent or not, for support and security (`docs/product/analytics.md`);
+ * written at most once a day per phone by `Analytics\Presence`, bounded to a
+ * few phones a player and pruned once unseen for long.
  */
 final class DeviceRegistry
 {
@@ -32,6 +32,7 @@ final class DeviceRegistry
         $labels = [
             'platform' => $device->platform?->value,
             'os_version' => $device->os,
+            'brand' => $device->brand,
             'model' => $device->model,
             'app_version' => self::version($appVersion),
             'app_build' => $device->build,
@@ -80,6 +81,7 @@ final class DeviceRegistry
             'installId' => $device->install_id,
             'platform' => $device->platform,
             'osVersion' => $device->os_version,
+            'brand' => $device->brand,
             'model' => $device->model,
             'appVersion' => $device->app_version,
             'appBuild' => $device->app_build,

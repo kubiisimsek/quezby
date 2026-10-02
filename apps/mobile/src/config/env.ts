@@ -33,10 +33,13 @@ export const APP_ENV: AppEnvironment = environmentFrom(QUEZBY_ENV);
 
 export const APP_VERSION: string = DeviceInfo.getVersion();
 
-/** The build number, the system's version and the phone's model — the API's device registry, with every call. */
+/** The build number, the system's version and the phone's maker and model — the API's device registry, with every call. */
 export const APP_BUILD: string = DeviceInfo.getBuildNumber();
 
 export const OS_VERSION: string = DeviceInfo.getSystemVersion();
+
+/** `Apple`, `samsung`, `Xiaomi` — the maker, not the sub-brand: a Redmi or a POCO is Xiaomi's. */
+export const DEVICE_BRAND: string = DeviceInfo.getManufacturerSync();
 
 export const DEVICE_MODEL: string = DeviceInfo.getModel();
 

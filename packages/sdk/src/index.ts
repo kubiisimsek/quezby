@@ -81,20 +81,24 @@ export type ClientDevice = {
   platform: Platform;
   /** The system's version, `18.2`. */
   os: string;
+  /** The phone's maker as the system names it — `Apple`, `samsung`, `Xiaomi`. */
+  brand: string;
   model: string;
   /** The app's build number. */
   build: string;
 };
 
 /**
- * `install=…; platform=ios; os=18.2; model=iPhone%2015; build=42` — every
- * value URI-encoded, so no `;`, `=` or line break can slip into the header.
+ * `install=…; platform=ios; os=18.2; brand=Apple; model=iPhone%2015; build=42`
+ * — every value URI-encoded, so no `;`, `=` or line break can slip into the
+ * header.
  */
 export function deviceHeader(device: ClientDevice): string {
   const fields: Array<[string, string]> = [
     ['install', device.installId],
     ['platform', device.platform],
     ['os', device.os],
+    ['brand', device.brand],
     ['model', device.model],
     ['build', device.build],
   ];

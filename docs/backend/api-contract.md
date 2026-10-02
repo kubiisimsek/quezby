@@ -34,13 +34,18 @@ A contract change is one commit: `packages/types` → Laravel request/resource �
   is found (an unknown path, a wrong method, maintenance).
 - The app sends `X-App-Version: 1.0.0` on every call; the API stores it on runs.
 - The app also names the phone on every call, once it knows its install id:
-  `X-Device: install=…; platform=ios; os=18.2; model=iPhone%2015; build=42`
-  (every value URI-encoded — `deviceHeader` in `@quezby/sdk`). A token's first
+  `X-Device: install=…; platform=ios; os=18.2; brand=Apple; model=iPhone%2015; build=42`
+  (every value URI-encoded — `deviceHeader` in `@quezby/sdk`). `brand` is the
+  system's manufacturer (`getManufacturer`: `Apple`, `samsung`, `Xiaomi` — a
+  Redmi is Xiaomi's); the API capitalises an all-lower-case one (`Samsung`)
+  and drops `unknown`. A token's first
   request of the Istanbul day writes it into the **device registry** — every
-  player's, consent or not: install, system, model, app build, first and last
-  seen; no IP — and, for a player who said yes to usage analytics, marks their
-  day (`docs/product/analytics.md`). Later requests that day write nothing.
-  A header without a sound install id (8–100 of `A-Za-z0-9-`) is ignored.
+  player's, consent or not: install, system, maker, model, app build, first
+  and last seen; no IP — and, for a player who said yes to usage analytics,
+  marks their day (`docs/product/analytics.md`). Later requests that day write
+  nothing. A missing field never clears a known one, so an app from before
+  `brand` leaves the maker as it was. A header without a sound install id
+  (8–100 of `A-Za-z0-9-`) is ignored.
 - Errors always have one shape, whatever the status:
 
   ```json

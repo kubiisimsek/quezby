@@ -1,4 +1,4 @@
-import type { AdminAnalytics, AdminDeviceSlice } from '@quezby/types';
+import type { AdminAnalytics } from '@quezby/types';
 import {
   Activity,
   CalendarRange,
@@ -17,6 +17,7 @@ import {
   Users,
 } from 'lucide-react';
 
+import { DeviceTable } from '@/components/analytics/device-table';
 import { Panel } from '@/components/base/panel';
 import { Segmented } from '@/components/base/segmented';
 import { Skeleton } from '@/components/base/skeleton';
@@ -24,6 +25,7 @@ import { Tag } from '@/components/base/tag';
 import { BandStats } from '@/components/patterns/band-stats';
 import { BarChart } from '@/components/patterns/bar-chart';
 import { Callout } from '@/components/patterns/callout';
+import { DataTable, type Column } from '@/components/patterns/data-table';
 import { Facts } from '@/components/patterns/facts';
 import { FunnelList } from '@/components/patterns/funnel-list';
 import { Page } from '@/components/patterns/page';
@@ -36,6 +38,7 @@ import { errorMessage } from '@/lib/errors';
 import {
   ANALYTICS_EVENT,
   ANALYTICS_SCREEN,
+  deviceBrand,
   formatDate,
   formatDayKey,
   formatDuration,
@@ -228,44 +231,58 @@ export function AnalyticsPage() {
               <p className="text-meta text-ink-muted">Henüz bir an sayılmadı.</p>
             )}
           </Panel>
-          <Devices devices={data.devices} />
-          <Storage storage={data.storage} />
-          <p className="px-1 text-micro text-ink-faint">Son güncelleme {formatRelative(data.serverTime)}</p>
         </div>
       </div>
+
+      <Devices devices={data.devices} />
+      <Storage storage={data.storage} />
+      <p className="px-1 text-micro text-ink-faint">Son güncelleme {formatRelative(data.serverTime)}</p>
     </Page>
   );
 }
 
-/** Every player's phones seen in the last week — the device registry, consent or not. */
+/**
+ * Every player's phones seen in the last week — the device registry, consent
+ * or not — in one card: a table per system, then a table per big maker and
+ * one for the other makers.
+ */
 function Devices({ devices }: { devices: AdminAnalytics['devices'] }) {
-  const slices = (items: AdminDeviceSlice[], name: string) =>
-    items.map((item) => ({
-      key: `${item.platform ?? '-'}|${item.value ?? '-'}`,
-      label: `${item.platform ? PLATFORM[item.platform] : 'Bilinmiyor'} ${item.value ?? '—'}`,
-      count: item.devices,
-      rate: item.share,
-      hint: name,
-    }));
-
   return (
-    <Panel title="Cihazlar · son 7 gün" description={`${formatNumber(devices.total)} telefon; izin verip vermediğine bakmadan, oyunun çalışması için.`} icon={<MonitorSmartphone />}>
+    <Panel
+      title="Cihazlar"
+      description={devices.total > 0 ? `Son 7 günde görülen ${formatNumber(devices.total)} telefon; izin aranmaz.` : 'Son 7 gün; izin aranmaz.'}
+      icon={<MonitorSmartphone />}
+    >
       {devices.total > 0 ? (
-        <div className="space-y-5">
-          <FunnelList label="Uygulama sürümleri" numbered={false} tone="secondary" steps={slices(devices.versions, 'sürüm')} />
-          <FunnelList label="Sistemler" numbered={false} tone="secondary" steps={slices(devices.systems, 'sistem')} />
-          <FunnelList
-            label="Modeller"
-            numbered={false}
-            tone="secondary"
-            steps={devices.models.map((item) => ({
-              key: `${item.platform ?? '-'}|${item.value ?? '-'}`,
-              label: item.value ?? 'Bilinmiyor',
-              hint: item.platform ? PLATFORM[item.platform] : undefined,
-              count: item.devices,
-              rate: item.share,
-            }))}
-          />
+        <div className="space-y-6">
+          {devices.platforms.length > 0 ? (
+            <div className="grid grid-cols-1 gap-x-10 gap-y-6 md:grid-cols-2">
+              {devices.platforms.map((platform) => (
+                <DeviceTable
+                  key={platform.platform}
+                  title={PLATFORM[platform.platform]}
+                  header="Sürüm"
+                  table={platform}
+                  name={(row) => (row.value === null ? 'Sürümü bilinmeyen' : `${PLATFORM[platform.platform]} ${row.value}`)}
+                />
+              ))}
+            </div>
+          ) : null}
+          <div className="grid grid-cols-1 gap-x-10 gap-y-6 border-t border-line-soft pt-6 first:border-t-0 first:pt-0 md:grid-cols-2">
+            {devices.brands.map((brand) => (
+              <DeviceTable
+                key={brand.brand ?? '—'}
+                title={deviceBrand(brand.brand)}
+                note={brand.brand === null ? 'Uygulamanın eski sürümü markayı göndermiyor.' : undefined}
+                header="Model"
+                table={brand}
+                name={(row) => row.value ?? 'Modeli bilinmeyen'}
+              />
+            ))}
+            {devices.otherBrands.devices > 0 ? (
+              <DeviceTable title="Diğer markalar" header="Marka" table={devices.otherBrands} name={(row) => deviceBrand(row.value)} />
+            ) : null}
+          </div>
         </div>
       ) : (
         <p className="text-meta text-ink-muted">Son 7 günde görülen telefon yok.</p>
@@ -274,25 +291,47 @@ function Devices({ devices }: { devices: AdminAnalytics['devices'] }) {
   );
 }
 
-/** What analytics keeps, layer by layer, and for how long. */
+type Layer = { key: string; label: string; rows: number; oldest: string | null; keep: string };
+
+/** What analytics keeps, layer by layer, and for how long — at the foot of the page. */
 function Storage({ storage }: { storage: AdminAnalytics['storage'] }) {
-  const tier = (tier: AdminAnalytics['storage']['visits']) =>
-    `${formatNumber(tier.rows)} satır · en eski ${formatDate(tier.oldest)}`;
-  const keep = (days: number | null) => (days === null ? 'Süresiz; günde birkaç düzine satır' : `${formatNumber(days)} gün tutulur`);
+  const kept = (days: number | null) => (days === null ? 'Süresiz; günde birkaç düzine satır' : `${formatNumber(days)} gün`);
+  const layers: Layer[] = [
+    { key: 'visits', label: 'Ziyaretler', rows: storage.visits.rows, oldest: storage.visits.oldest, keep: kept(storage.visits.keepDays) },
+    { key: 'days', label: 'Oyuncu günleri', rows: storage.days.rows, oldest: storage.days.oldest, keep: kept(storage.days.keepDays) },
+    { key: 'totals', label: 'Günlük toplamlar', rows: storage.totals.rows, oldest: storage.totals.oldest, keep: kept(storage.totals.keepDays) },
+    {
+      key: 'devices',
+      label: 'Cihaz kaydı',
+      rows: storage.devices.rows,
+      oldest: storage.devices.oldest,
+      keep: storage.devices.keepDays === null ? 'Süresiz' : `${formatNumber(storage.devices.keepDays)} gün görülmeyen silinir`,
+    },
+    { key: 'milestones', label: 'İlkler', rows: storage.milestones, oldest: null, keep: 'Hesap silinince ya da izin geri alınınca' },
+  ];
+  const columns: Column<Layer>[] = [
+    { key: 'label', header: 'Katman', cell: (layer) => layer.label, tone: 'strong' },
+    { key: 'rows', header: 'Satır', cell: (layer) => <span className="tabular">{formatNumber(layer.rows)}</span>, align: 'end' },
+    { key: 'oldest', header: 'En eski', cell: (layer) => formatDate(layer.oldest), tone: 'muted', hideBelow: 'md' },
+    { key: 'keep', header: 'Ne kadar kalır', cell: (layer) => layer.keep, tone: 'muted' },
+  ];
 
   return (
-    <Panel title="Veri hacmi" description="Budama kendiliğinden, saatte bir parça; Sistem’den elle de çalışır." icon={<Database />}>
-      <Facts
-        facts={[
-          { label: 'Ziyaretler', value: tier(storage.visits), hint: keep(storage.visits.keepDays) },
-          { label: 'Oyuncu günleri', value: tier(storage.days), hint: keep(storage.days.keepDays) },
-          { label: 'Günlük toplamlar', value: tier(storage.totals), hint: keep(storage.totals.keepDays) },
-          { label: 'Cihaz kaydı', value: tier(storage.devices), hint: storage.devices.keepDays === null ? undefined : `${formatNumber(storage.devices.keepDays)} gün görülmeyen silinir` },
-          { label: 'İlkler', value: `${formatNumber(storage.milestones)} satır` },
-          { label: 'Geri çevrilen', value: formatNumber(storage.dropped), hint: 'Son 7 gün: bayat, bilinmeyen ya da sınırı aşan' },
-        ]}
-      />
-    </Panel>
+    <DataTable
+      title="Veri hacmi"
+      description="Budama kendiliğinden, saatte bir parça; Sistem’den elle de çalışır."
+      icon={<Database />}
+      columns={columns}
+      rows={layers}
+      rowKey={(layer) => layer.key}
+      empty={{ title: 'Analitik henüz bir şey tutmuyor' }}
+      footer={
+        <p className="text-meta text-ink-muted">
+          Son 7 günde geri çevrilen: <span className="font-semibold text-ink tabular">{formatNumber(storage.dropped)}</span>. Bayat,
+          bilinmeyen ya da sınırı aşan ziyaret ve kodlar.
+        </p>
+      }
+    />
   );
 }
 

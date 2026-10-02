@@ -1,7 +1,7 @@
 import { createApiClient } from '@quezby/sdk';
 
 import { currentInstallId, useSession } from '@/auth/session';
-import { API_URL, APP_BUILD, APP_PLATFORM, APP_VERSION, DEVICE_MODEL, OS_VERSION } from '@/config/env';
+import { API_URL, APP_BUILD, APP_PLATFORM, APP_VERSION, DEVICE_BRAND, DEVICE_MODEL, OS_VERSION } from '@/config/env';
 import { currentLocale } from '@/i18n/language';
 import { logApp } from '@/lib/appLog';
 
@@ -24,7 +24,14 @@ export const api = createApiClient({
   device: () => {
     const installId = currentInstallId();
     return installId
-      ? { installId, platform: APP_PLATFORM, os: OS_VERSION, model: DEVICE_MODEL, build: APP_BUILD }
+      ? {
+          installId,
+          platform: APP_PLATFORM,
+          os: OS_VERSION,
+          brand: DEVICE_BRAND,
+          model: DEVICE_MODEL,
+          build: APP_BUILD,
+        }
       : null;
   },
 });

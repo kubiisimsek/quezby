@@ -223,7 +223,9 @@ function analyticsTotals(string $day): array
 }
 
 /** The `X-Device` header of a phone, as `@quezby/sdk` writes it. */
-function deviceHeaderOf(string $install = 'c0ffee00c0ffee00', string $platform = 'ios', string $os = '18.2', string $model = 'iPhone 15 Pro', string $build = '42'): string
+function deviceHeaderOf(string $install = 'c0ffee00c0ffee00', string $platform = 'ios', string $os = '18.2', ?string $brand = 'Apple', string $model = 'iPhone 15 Pro', string $build = '42'): string
 {
-    return "install={$install}; platform={$platform}; os=".rawurlencode($os).'; model='.rawurlencode($model).'; build='.rawurlencode($build);
+    return "install={$install}; platform={$platform}; os=".rawurlencode($os)
+        .($brand === null ? '' : '; brand='.rawurlencode($brand))
+        .'; model='.rawurlencode($model).'; build='.rawurlencode($build);
 }

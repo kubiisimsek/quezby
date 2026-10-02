@@ -73,9 +73,9 @@ test('shows the phones the player used, with the other accounts seen on them, an
     $other = User::factory()->withUsername('kerem.yedek')->create();
     $seen = fn (int $daysAgo) => now()->subDays($daysAgo)->utc()->format('Y-m-d H:i:s');
     DB::table('player_devices')->insert([
-        ['user_id' => $player->id, 'install_id' => 'install-old', 'platform' => 'ios', 'os_version' => '17.5', 'model' => 'iPhone 12', 'app_version' => '0.9.0', 'app_build' => '30', 'first_seen_at' => $seen(40), 'last_seen_at' => $seen(20)],
-        ['user_id' => $player->id, 'install_id' => 'install-new', 'platform' => 'ios', 'os_version' => '18.2', 'model' => 'iPhone 15 Pro', 'app_version' => '1.0.0', 'app_build' => '42', 'first_seen_at' => $seen(3), 'last_seen_at' => $seen(0)],
-        ['user_id' => $other->id, 'install_id' => 'install-new', 'platform' => 'ios', 'os_version' => '18.2', 'model' => 'iPhone 15 Pro', 'app_version' => '1.0.0', 'app_build' => '42', 'first_seen_at' => $seen(1), 'last_seen_at' => $seen(1)],
+        ['user_id' => $player->id, 'install_id' => 'install-old', 'platform' => 'ios', 'os_version' => '17.5', 'brand' => null, 'model' => 'iPhone 12', 'app_version' => '0.9.0', 'app_build' => '30', 'first_seen_at' => $seen(40), 'last_seen_at' => $seen(20)],
+        ['user_id' => $player->id, 'install_id' => 'install-new', 'platform' => 'ios', 'os_version' => '18.2', 'brand' => 'Apple', 'model' => 'iPhone 15 Pro', 'app_version' => '1.0.0', 'app_build' => '42', 'first_seen_at' => $seen(3), 'last_seen_at' => $seen(0)],
+        ['user_id' => $other->id, 'install_id' => 'install-new', 'platform' => 'ios', 'os_version' => '18.2', 'brand' => 'Apple', 'model' => 'iPhone 15 Pro', 'app_version' => '1.0.0', 'app_build' => '42', 'first_seen_at' => $seen(1), 'last_seen_at' => $seen(1)],
     ]);
 
     $response = adminPlayerDetail($player)->assertOk()
@@ -85,12 +85,14 @@ test('shows the phones the player used, with the other accounts seen on them, an
         ->and($response->json('installs.0'))->toMatchArray([
             'platform' => 'ios',
             'osVersion' => '18.2',
+            'brand' => 'Apple',
             'model' => 'iPhone 15 Pro',
             'appVersion' => '1.0.0',
             'appBuild' => '42',
             'firstSeenAt' => '2026-09-22T09:00:00.000Z',
             'lastSeenAt' => '2026-09-25T09:00:00.000Z',
         ])
+        ->and($response->json('installs.1.brand'))->toBeNull()
         ->and($response->json('installs.0.others'))->toBe([['id' => $other->id, 'username' => 'kerem.yedek', 'bannedAt' => null]])
         ->and($response->json('installs.1.others'))->toBe([]);
 });

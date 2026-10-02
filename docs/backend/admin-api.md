@@ -337,8 +337,15 @@ and `devices` counts only the players who said yes to usage analytics:
   returned`; `league` — placed in a league by Elo (the placement games
   played); `returned` is of those who joined before today;
 - `screens`, `events` — the window's totals, most first;
-- `devices` — every player's phones seen in the last 7 days: app versions,
-  systems (by major version) and models, each with its share per-mille;
+- `devices` — every player's phones seen in the last 7 days, as
+  `AdminDeviceTable`s: one per system (`platforms`, rows by major version),
+  one per maker for the three with the most phones (`brands`, rows by model;
+  an iPhone is Apple's whatever its app says, `brand: null` gathers the phones
+  whose app is too old to name its maker) and `otherBrands` (a row per maker).
+  A table lists its 10 biggest rows and counts the phones of the rest
+  (`rest`); its `share` is of every phone, a row's of its table. Every row
+  names the app versions on its phones — the three with the most, newest
+  first on a tie — and counts the phones on any other (`otherVersions`);
 - `storage` — each layer's rows, oldest and keep, and what was turned away
   in the last 7 days.
 

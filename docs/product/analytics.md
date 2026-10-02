@@ -25,7 +25,7 @@ Sözleşme: [api-contract.md](../backend/api-contract.md) (`POST /analytics/visi
 
 | | Kullanım verisi (analitik) | Cihaz kaydı |
 | --- | --- | --- |
-| Ne | Ziyaretler (uygulamanın ön planda kaldığı her süre), gezilen ekranlar sırasıyla, birkaç an (paylaşım, "Geç onu", deneme turunun bitişi…), oyuncunun aktif günleri, ilk kezleri | Telefon başına tek satır: kurulum kimliği, platform, sistem sürümü, model, uygulama sürümü ve derlemesi, ilk ve son görüldüğü gün |
+| Ne | Ziyaretler (uygulamanın ön planda kaldığı her süre), gezilen ekranlar sırasıyla, birkaç an (paylaşım, "Geç onu", deneme turunun bitişi…), oyuncunun aktif günleri, ilk kezleri | Telefon başına tek satır: kurulum kimliği, platform, sistem sürümü, marka (üretici), model, uygulama sürümü ve derlemesi, ilk ve son görüldüğü gün |
 | Ne zaman | Yalnızca oyuncu **"İzin ver"** dedikten sonra | Herkes için; izne bakılmaz |
 | Neden | Oyunu iyileştirmek: geri dönüş, ilk adımlar, ekranlar | Oyunun çalışması ve güvenliği: destek, uyumluluk, aynı telefondaki hesaplar |
 | Nerede | `analytics_visits`, `analytics_player_days`, `analytics_totals`, `analytics_milestones` | `player_devices` |
@@ -84,21 +84,77 @@ için) demektir — `docs/backend/api-contract.md` → *Logs*.
 | 10 | Saat düzeltme | Toplu istek gönderildiği anın `sentAt` damgasını taşır. API, telefon saatinin kaymasını her ziyaretin başlangıcından düşer. |
 | 11 | Transaction yok | MySQL'de `INSERT IGNORE` kilidini commit'e kadar tutar. Aynı sıcak toplamı artıran iki toplu istek kilitlenirdi. Her ifade tek başına çalışır, kovalar hep aynı sırayla yazılır. |
 
-**Kabaca hacim** (izin veren 1.000 günlük aktif oyuncu, günde 2 ziyaret):
+**Hacim (ölçüldü, 2026-10-02).** Gerçek migration'larla kurulan bir MySQL 9
+veritabanına gerçeğe benzer satırlar yazıldı, boyutları `information_schema`'dan
+okundu (veri + indeks). Satır başına:
 
-- Ziyaretler: 30 günde yaklaşık 60 bin satır, 30 MB.
-- Oyuncu-günleri: 90 günde yaklaşık 90 bin satır, 13 MB.
-- Toplamlar: yılda yaklaşık 20 bin satır, 2 MB.
-- Cihaz kaydı: telefon başına bir satır, 10 bin telefonda 3 MB.
-- İstek: günde yaklaşık 2.000 alım isteği. "Bugün geldi" için ek istek yok.
-- Karşılaştırma: aynı oyuncularla olay başına bir satır ve istek tutan saf bir olay günlüğü, günde yaklaşık 100 bin satır ve istek demek; yılda 11 GB.
+- ziyaret 631 B (yolculuk ortalama 12 adım);
+- oyuncu-günü 228 B;
+- günlük toplam 97 B;
+- ilk kez 131 B;
+- cihaz 421 B;
+- tur 6,2 KB (karşılaştırma için).
+
+Varsayımlar:
+
+- Herkes izin veriyor (üst sınır).
+- Oyuncu başına günde 3 ziyaret.
+- Günlük aktiflerin %10'u yeni, her biri yaklaşık 4 ilk kez.
+- Son 180 günde görülen farklı telefon, günlük aktifin 10 katı.
+- Günde yaklaşık 45 toplam satırı, oyuncu sayısından bağımsız.
+
+| Günlük aktif oyuncu | Günde eklenen | 90 günde (tavan) | 1 yılda | Sonra her yıl |
+| ---: | ---: | ---: | ---: | ---: |
+| 1 | 6 KB | 0,5 MB | 1,6 MB | +1,5 MB |
+| 100 | 0,2 MB | 8,6 MB | 11 MB | +3 MB |
+| 1.000 | 2,1 MB | 83 MB | 98 MB | +20 MB |
+| 10.000 | 21 MB | 823 MB | 0,94 GB | +0,18 GB |
+
+- **Tavan:** Ziyaretler 30, oyuncu-günleri 90 günde silinir; analitik 90. günde büyümeyi bırakır.
+- **10.000 oyuncuda dağılım:** ziyaretler 542 MB, oyuncu-günleri 196 MB, cihaz kaydı 40 MB.
+- **Büyümeye devam edenler:** İlk kezler (yılda 0,18 GB, hesapla birlikte silinir) ve toplamlar (yılda 1,5 MB).
+- **İstek:** oyuncu başına günde yaklaşık 3 alım isteği (10.000 oyuncuda 30 bin). "Bugün geldi" için ek istek yok.
+- **İzin oranı:** İzin verenlerin oranı neyse cihaz kaydı dışındaki her şey o kadar küçülür.
 
 **Ölçek büyüyünce kullanılacak kollar:**
 
 - `QUEZBY_ANALYTICS_VISIT_DAYS=14` ziyaret katmanını yarıya indirir.
 - `QUEZBY_ANALYTICS_SAMPLE=250` her şeyi dörtte birine indirir.
 
-**Asıl büyük tablo başka yerde.** Her biten tur, tüm hamle kaydını `runs.actions`'ta tutuyor (tur başına 1–5 KB). Eski sıralı turların kaydı için ayrı bir saklama kuralı ileride gerekecek; bu belge onu kapsamıyor.
+**Asıl büyük tablo başka yerde.** Her biten tur, tüm hamle kaydını `runs.actions`'ta tutuyor ve hiç silinmiyor. Yereldeki gerçek turlarla ölçüldü (2026-10-02, MySQL 9):
+
+- Hamle kaydı ortalama 3,1 KB metin (yaklaşık 310 hamle).
+- Tur satırı 9,1 KB tutuyor; bunun %85'i hamle kaydı.
+- Kaydı silinmiş bir tur 1,4 KB.
+- Kayıt zlib ile sıkıştırılırsa (0,8 KB) tur 2,5 KB.
+
+Bugünkü hali, oyuncu başına günde 10 turla:
+
+| Günlük aktif oyuncu | Günde | 30 günde | 1 yılda |
+| ---: | ---: | ---: | ---: |
+| 1 | 89 KB | 2,6 MB | 32 MB |
+| 100 | 8,7 MB | 260 MB | 3,1 GB |
+| 1.000 | 87 MB | 2,5 GB | 31 GB |
+| 10.000 | 868 MB | 25 GB | 309 GB |
+
+10.000 oyuncuda turlar, analitiğin bir yılda tuttuğunu bir günde tutar. Seçenekler (10.000 oyuncu):
+
+| Seçenek | 1. yıl | Sonra her yıl |
+| --- | ---: | ---: |
+| Bugünkü hali | 309 GB | +309 GB |
+| Kayıt 90 gün sonra silinir | 112 GB | +47 GB |
+| Kayıt 30 gün sonra silinir | 68 GB | +47 GB |
+| Kayıt sıkıştırılır, hiç silinmez | 84 GB | +84 GB |
+| Sıkıştırılır, 90 gün sonra silinir | 56 GB | +47 GB |
+
+- **Kaydı silinen turlar da büyür:** 10.000 oyuncuda yılda 47 GB. Bunu durdurmak, eski turların kendisi için ayrı bir karar ister.
+- **Boşalan yer:** Silinen kaydın yeri yeni turlarca kendiliğinden kullanılır. Dosya küçülmez; hostinge geri vermek için bir kez `OPTIMIZE TABLE runs` gerekir.
+- **Kaydı kim okuyor:**
+  - incelemede bekleyen bir turun onayı (oyuncunun istatistiğine eklenir);
+  - sıralamadaki turların kanıtı;
+  - panelin tur sayfasındaki post post zaman çizelgesi.
+  Oyuncunun geçmiş oyunları kaydı değil, kayıtlı özeti (`stats`) okur.
+- Saklama kuralı henüz yok; bu belge onu kapsamıyor.
 
 ## Telefonda
 
@@ -117,10 +173,10 @@ Diğer ayrıntılar:
 - **Cihaz başlığı:** Her istek `X-Device` başlığını taşır:
 
   ```
-  install=…; platform=ios; os=18.2; model=iPhone%2015; build=42
+  install=…; platform=ios; os=18.2; brand=Apple; model=iPhone%2015; build=42
   ```
 
-  Kurulum kimliği, token'la birlikte açılışta okunur; böylece ilk istek bile telefonu tanıtır.
+  Kurulum kimliği, token'la birlikte açılışta okunur; böylece ilk istek bile telefonu tanıtır. Marka sistemin üreticisidir (`getManufacturer`): Redmi ve POCO, Xiaomi'dir.
 
 ## Panelde okumak
 
@@ -140,6 +196,13 @@ Diğer ayrıntılar:
   - Ekran kodları uygulamanın rotalarıdır (`src/analytics/screens.ts`; yeni bir rota burada adlandırılmadan derlenmez).
   - Arkadaşlarla gelenler: `friends` Mesajlar sekmesi, yani mesaj kutusu (2026-09-29'a kadar adı Arkadaşlar'dı ve istekler de oradaydı), `friend_list` bir arkadaş listesi (oyuncunun kendi listesi bekleyen istekleriyle ya da bir arkadaşının listesi), `search` **Arkadaş bul**, `thread` bir arkadaşla sohbet, `alerts` lobideki zilin açtığı **Bildirimler** listesi (istekler, VS'ler ve sonuçları). Yeni oyuncunun bildirim izni adımı `notifications`'tır, bu değil.
   - Profille ve ilk adımlarla gelenler: `history` geçmiş oyunlar, `avatar` profil fotoğrafını çerçeveleme, `notifications` yeni oyuncunun bildirim adımı, `account` Ayarlar → **Hesap bilgileri** (ad, giriş yolları, hesabı silme).
+- **Cihazlar (sayfanın altında):** Son 7 günde görülen telefonlar, tablo tablo:
+  - her sistem için bir tablo (iOS, Android), satırlar ana sürüm;
+  - en çok telefonu olan üç marka için birer tablo (Apple'ınki **iPhone**), satırlar model;
+  - kalan markalar **Diğer markalar**'da, marka başına bir satır;
+  - her satırın altında o telefonlardaki uygulama sürümleri: en çok kullanılan üçü ve "diğer";
+  - tablo en büyük 10 satırı listeler, kalan telefonları altında sayar;
+  - marka 2026-10-02'den sonraki uygulama sürümüyle gelir. Daha eski sürümdeki Android telefonlar **Markası bilinmeyen** tablosunda durur ve yeni sürümle açıldıkları gün yerlerine geçer. iPhone her zaman Apple'dır.
 - **Veri hacmi:** Her katmanın satır sayısı, en eski kaydı ve saklama süresi, bir de son 7 günde geri çevrilenler. Şişme gözle görülür.
 - **Oyuncunun Etkinlik sekmesi:**
   - 30 günlük şerit (gelmediği gün gri, kaldıkça yeşil);

@@ -37,6 +37,7 @@ test('the day\'s first request records the phone, and a consenting player\'s day
     expect($device->install_id)->toBe('c0ffee00c0ffee00')
         ->and($device->platform)->toBe('ios')
         ->and($device->os_version)->toBe('18.2')
+        ->and($device->brand)->toBe('Apple')
         ->and($device->model)->toBe('iPhone 15 Pro')
         ->and($device->app_build)->toBe('42')
         ->and($device->app_version)->toBe('1.0.0')
@@ -78,12 +79,27 @@ test('the next day counts again: the day, the cohort\'s day 1, the newest labels
         ->and(analyticsTotals('2026-09-27'))->toBe(['active' => 1]);
 });
 
+test('an app too old to name its maker leaves it empty, and the first one that does fills it for good', function () {
+    $player = User::factory()->withUsername()->create();
+    $token = $this->tokenFor($player);
+    presenceRequest($token, deviceHeaderOf(platform: 'android', os: '14', brand: null, model: 'SM-S918B'));
+
+    expect(DB::table('player_devices')->where('user_id', $player->id)->value('brand'))->toBeNull();
+
+    Carbon::setTestNow(Carbon::parse('2026-09-27 09:00', 'Europe/Istanbul'));
+    presenceRequest($token, deviceHeaderOf(platform: 'android', os: '14', brand: 'samsung', model: 'SM-S918B'), '1.1.0');
+    Carbon::setTestNow(Carbon::parse('2026-09-28 09:00', 'Europe/Istanbul'));
+    presenceRequest($token, deviceHeaderOf(platform: 'android', os: '14', brand: null, model: 'SM-S918B'));
+
+    expect(DB::table('player_devices')->where('user_id', $player->id)->value('brand'))->toBe('Samsung');
+});
+
 test('a player who has not said yes is in the registry, and nowhere else', function () {
     $player = User::factory()->withUsername()->create();
 
-    presenceRequest($this->tokenFor($player), deviceHeaderOf(platform: 'android', os: '14', model: 'Pixel 8'));
+    presenceRequest($this->tokenFor($player), deviceHeaderOf(platform: 'android', os: '14', brand: 'samsung', model: 'SM-S918B'));
 
-    $this->assertDatabaseHas('player_devices', ['user_id' => $player->id, 'platform' => 'android', 'model' => 'Pixel 8']);
+    $this->assertDatabaseHas('player_devices', ['user_id' => $player->id, 'platform' => 'android', 'brand' => 'Samsung', 'model' => 'SM-S918B']);
     expect(DB::table('analytics_player_days')->count())->toBe(0)
         ->and(DB::table('analytics_totals')->count())->toBe(0);
 });

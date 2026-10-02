@@ -153,6 +153,7 @@ const INSTALL_COLUMNS: Column<AdminPlayerDevice>[] = [
         <span className="block truncate font-semibold text-ink">{device.model ?? 'Bilinmeyen model'}</span>
         <span className="block truncate text-micro text-ink-faint">
           {device.platform ? PLATFORM[device.platform] : '—'} {device.osVersion ?? ''}
+          {device.brand ? ` · ${device.brand}` : ''}
         </span>
       </span>
     ),

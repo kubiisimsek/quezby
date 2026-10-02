@@ -222,6 +222,7 @@ export function playerResponse(overrides: Partial<AdminPlayerResponse> = {}, pla
         installId: 'install-1',
         platform: 'ios',
         osVersion: '18.2',
+        brand: 'Apple',
         model: 'iPhone 15 Pro',
         appVersion: '1.0.0',
         appBuild: '42',
@@ -607,19 +608,69 @@ export function analytics(overrides: Partial<AdminAnalytics> = {}): AdminAnalyti
     ],
     devices: {
       total: 300,
-      versions: [
-        { platform: 'ios', value: '1.0.0', devices: 200, share: 667 },
-        { platform: 'android', value: '1.0.0', devices: 100, share: 333 },
+      platforms: [
+        {
+          platform: 'ios',
+          devices: 200,
+          share: 667,
+          rows: [
+            { value: '18', devices: 180, share: 900, versions: [{ version: '1.0.0', devices: 170 }, { version: '0.9.0', devices: 10 }], otherVersions: 0 },
+            { value: '17', devices: 20, share: 100, versions: [{ version: '1.0.0', devices: 20 }], otherVersions: 0 },
+          ],
+          rest: 0,
+        },
+        {
+          platform: 'android',
+          devices: 100,
+          share: 333,
+          rows: [{ value: '14', devices: 100, share: 1000, versions: [{ version: '1.0.0', devices: 100 }], otherVersions: 0 }],
+          rest: 0,
+        },
       ],
-      systems: [
-        { platform: 'ios', value: '18', devices: 180, share: 600 },
-        { platform: 'android', value: '14', devices: 100, share: 333 },
-        { platform: 'ios', value: '17', devices: 20, share: 67 },
+      brands: [
+        {
+          brand: 'Apple',
+          devices: 200,
+          share: 667,
+          rows: [
+            {
+              value: 'iPhone 15 Pro',
+              devices: 90,
+              share: 450,
+              versions: [
+                { version: '1.0.0', devices: 80 },
+                { version: '0.9.0', devices: 6 },
+                { version: null, devices: 2 },
+              ],
+              otherVersions: 2,
+            },
+          ],
+          rest: 110,
+        },
+        {
+          brand: 'Samsung',
+          devices: 60,
+          share: 200,
+          rows: [{ value: 'SM-S918B', devices: 60, share: 1000, versions: [{ version: '1.0.0', devices: 60 }], otherVersions: 0 }],
+          rest: 0,
+        },
+        {
+          brand: null,
+          devices: 25,
+          share: 83,
+          rows: [{ value: 'SM-A546E', devices: 25, share: 1000, versions: [{ version: '0.9.0', devices: 25 }], otherVersions: 0 }],
+          rest: 0,
+        },
       ],
-      models: [
-        { platform: 'ios', value: 'iPhone 15 Pro', devices: 90, share: 300 },
-        { platform: 'android', value: 'Pixel 8', devices: 40, share: 133 },
-      ],
+      otherBrands: {
+        devices: 15,
+        share: 50,
+        rows: [
+          { value: 'Xiaomi', devices: 10, share: 667, versions: [{ version: '1.0.0', devices: 10 }], otherVersions: 0 },
+          { value: 'Google', devices: 5, share: 333, versions: [{ version: '1.0.0', devices: 5 }], otherVersions: 0 },
+        ],
+        rest: 0,
+      },
     },
     storage: {
       visits: { rows: 5400, oldest: '2026-09-01T05:00:00.000Z', keepDays: 30 },

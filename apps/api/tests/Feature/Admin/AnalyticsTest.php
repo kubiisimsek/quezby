@@ -47,10 +47,10 @@ function analyticsPlayers(): array
 
     $seen = fn (int $daysAgo) => now()->subDays($daysAgo)->utc()->format('Y-m-d H:i:s');
     DB::table('player_devices')->insert([
-        ['user_id' => $players['ada']->id, 'install_id' => 'install-ada', 'platform' => 'ios', 'os_version' => '18.2', 'model' => 'iPhone 15 Pro', 'app_version' => '1.0.0', 'app_build' => '42', 'first_seen_at' => $seen(7), 'last_seen_at' => $seen(0)],
-        ['user_id' => $players['can']->id, 'install_id' => 'install-can', 'platform' => 'android', 'os_version' => '14', 'model' => 'Pixel 8', 'app_version' => '1.1.0', 'app_build' => '43', 'first_seen_at' => $seen(0), 'last_seen_at' => $seen(0)],
-        ['user_id' => $players['deniz']->id, 'install_id' => 'install-deniz', 'platform' => 'ios', 'os_version' => '17.5.1', 'model' => 'iPhone 12', 'app_version' => '1.0.0', 'app_build' => '42', 'first_seen_at' => $seen(1), 'last_seen_at' => $seen(1)],
-        ['user_id' => $players['bora']->id, 'install_id' => 'install-bora', 'platform' => 'ios', 'os_version' => '18.1', 'model' => 'iPhone 13', 'app_version' => '0.9.0', 'app_build' => '30', 'first_seen_at' => $seen(10), 'last_seen_at' => $seen(10)],
+        ['user_id' => $players['ada']->id, 'install_id' => 'install-ada', 'platform' => 'ios', 'os_version' => '18.2', 'brand' => 'Apple', 'model' => 'iPhone 15 Pro', 'app_version' => '1.0.0', 'app_build' => '42', 'first_seen_at' => $seen(7), 'last_seen_at' => $seen(0)],
+        ['user_id' => $players['can']->id, 'install_id' => 'install-can', 'platform' => 'android', 'os_version' => '14', 'brand' => 'Google', 'model' => 'Pixel 8', 'app_version' => '1.1.0', 'app_build' => '43', 'first_seen_at' => $seen(0), 'last_seen_at' => $seen(0)],
+        ['user_id' => $players['deniz']->id, 'install_id' => 'install-deniz', 'platform' => 'ios', 'os_version' => '17.5.1', 'brand' => null, 'model' => 'iPhone 12', 'app_version' => '1.0.0', 'app_build' => '42', 'first_seen_at' => $seen(1), 'last_seen_at' => $seen(1)],
+        ['user_id' => $players['bora']->id, 'install_id' => 'install-bora', 'platform' => 'ios', 'os_version' => '18.1', 'brand' => 'Apple', 'model' => 'iPhone 13', 'app_version' => '0.9.0', 'app_build' => '30', 'first_seen_at' => $seen(10), 'last_seen_at' => $seen(10)],
     ]);
     $players['ada']->createToken('ios')->accessToken->forceFill(['last_used_at' => now()->subMinutes(2)])->save();
     $players['deniz']->createToken('ios')->accessToken->forceFill(['last_used_at' => now()->subMinutes(1)])->save();
@@ -131,18 +131,107 @@ test('ranks screens and moments, and every player\'s phones of the last week', f
             ['event' => 'tutorial_done', 'count' => 1],
         ]);
 
-    // `bora`'s phone was last seen ten days ago.
-    expect($response->json('devices.total'))->toBe(3)
-        ->and($response->json('devices.versions'))->toBe([
-            ['platform' => 'ios', 'value' => '1.0.0', 'devices' => 2, 'share' => 667],
-            ['platform' => 'android', 'value' => '1.1.0', 'devices' => 1, 'share' => 333],
+    // `bora`'s phone was last seen ten days ago; `deniz`'s app never named its maker, but an iPhone is Apple's.
+    $phone = fn (string $value, string $version, int $share = 500) => ['value' => $value, 'devices' => 1, 'share' => $share, 'versions' => [['version' => $version, 'devices' => 1]], 'otherVersions' => 0];
+    expect($response->json('devices'))->toBe([
+        'total' => 3,
+        'platforms' => [
+            ['platform' => 'ios', 'devices' => 2, 'share' => 667, 'rows' => [$phone('17', '1.0.0'), $phone('18', '1.0.0')], 'rest' => 0],
+            ['platform' => 'android', 'devices' => 1, 'share' => 333, 'rows' => [$phone('14', '1.1.0', 1000)], 'rest' => 0],
+        ],
+        'brands' => [
+            ['brand' => 'Apple', 'devices' => 2, 'share' => 667, 'rows' => [$phone('iPhone 12', '1.0.0'), $phone('iPhone 15 Pro', '1.0.0')], 'rest' => 0],
+            ['brand' => 'Google', 'devices' => 1, 'share' => 333, 'rows' => [$phone('Pixel 8', '1.1.0', 1000)], 'rest' => 0],
+        ],
+        'otherBrands' => ['devices' => 0, 'share' => 0, 'rows' => [], 'rest' => 0],
+    ]);
+});
+
+test('splits the phones by system and by maker, the app versions under every row', function () {
+    $player = User::factory()->withUsername()->create();
+    $phones = [
+        // platform, system, maker as stored, model, app version
+        ['android', '14', 'Samsung', 'SM-S918B', '1.0.2'],
+        ['android', '14', 'Samsung', 'SM-S918B', '1.0.1'],
+        ['android', '10', 'Samsung', 'SM-S918B', '1.0.0'],
+        ['android', '9', 'Samsung', 'SM-S918B', '0.9.0'],
+        ['ios', '18.6', 'Apple', 'iPhone 15', '1.0.2'],
+        ['ios', '18.5', null, 'iPhone 15', '1.0.2'],
+        ['android', '14', 'Xiaomi', 'Redmi Note 12', '1.0.2'],
+        ['android', '13', 'Xiaomi', 'Redmi Note 12', '1.0.2'],
+        ['android', '13', null, 'SM-A546E', '1.0.0'],
+        ['android', '14', 'Google', 'Pixel 8', '1.0.2'],
+        ['android', '14', 'OnePlus', 'CPH2581', null],
+    ];
+    DB::table('player_devices')->insert(array_map(fn (array $phone, int $index) => [
+        'user_id' => $player->id,
+        'install_id' => "install-{$index}",
+        'platform' => $phone[0],
+        'os_version' => $phone[1],
+        'brand' => $phone[2],
+        'model' => $phone[3],
+        'app_version' => $phone[4],
+        'first_seen_at' => now()->utc()->format('Y-m-d H:i:s'),
+        'last_seen_at' => now()->utc()->format('Y-m-d H:i:s'),
+    ], $phones, array_keys($phones)));
+    $this->signInAdmin(AdminRole::Viewer);
+
+    $devices = $this->getJson('/api/v1/admin/analytics')->assertOk()->json('devices');
+
+    $row = fn (?string $value, int $devices, int $share, array $versions, int $otherVersions = 0) => [
+        'value' => $value,
+        'devices' => $devices,
+        'share' => $share,
+        // `''` stands for phones whose app never said its version.
+        'versions' => array_map(fn (string $version, int $count) => ['version' => $version === '' ? null : $version, 'devices' => $count], array_keys($versions), $versions),
+        'otherVersions' => $otherVersions,
+    ];
+    expect($devices['total'])->toBe(11)
+        // Most phones first; a tie by name, naturally (9 before 10); a tied version newest first, the nameless last.
+        ->and($devices['platforms'])->toBe([
+            ['platform' => 'android', 'devices' => 9, 'share' => 818, 'rows' => [
+                $row('14', 5, 556, ['1.0.2' => 3, '1.0.1' => 1, '' => 1]),
+                $row('13', 2, 222, ['1.0.2' => 1, '1.0.0' => 1]),
+                $row('9', 1, 111, ['0.9.0' => 1]),
+                $row('10', 1, 111, ['1.0.0' => 1]),
+            ], 'rest' => 0],
+            ['platform' => 'ios', 'devices' => 2, 'share' => 182, 'rows' => [$row('18', 2, 1000, ['1.0.2' => 2])], 'rest' => 0],
         ])
-        ->and($response->json('devices.systems'))->toBe([
-            ['platform' => 'android', 'value' => '14', 'devices' => 1, 'share' => 333],
-            ['platform' => 'ios', 'value' => '17', 'devices' => 1, 'share' => 333],
-            ['platform' => 'ios', 'value' => '18', 'devices' => 1, 'share' => 333],
+        // Three makers get a table; a row names three app versions and counts the phones on the rest.
+        ->and($devices['brands'])->toBe([
+            ['brand' => 'Samsung', 'devices' => 4, 'share' => 364, 'rows' => [$row('SM-S918B', 4, 1000, ['1.0.2' => 1, '1.0.1' => 1, '1.0.0' => 1], 1)], 'rest' => 0],
+            ['brand' => 'Apple', 'devices' => 2, 'share' => 182, 'rows' => [$row('iPhone 15', 2, 1000, ['1.0.2' => 2])], 'rest' => 0],
+            ['brand' => 'Xiaomi', 'devices' => 2, 'share' => 182, 'rows' => [$row('Redmi Note 12', 2, 1000, ['1.0.2' => 2])], 'rest' => 0],
         ])
-        ->and(array_column($response->json('devices.models'), 'value'))->toBe(['Pixel 8', 'iPhone 12', 'iPhone 15 Pro']);
+        // The others share one table; a phone whose app is too old to name its maker comes last.
+        ->and($devices['otherBrands'])->toBe(['devices' => 3, 'share' => 273, 'rows' => [
+            $row('Google', 1, 333, ['1.0.2' => 1]),
+            $row('OnePlus', 1, 333, ['' => 1]),
+            $row(null, 1, 333, ['1.0.0' => 1]),
+        ], 'rest' => 0]);
+});
+
+test('lists a table\'s ten biggest rows and counts the phones of the rest', function () {
+    $player = User::factory()->withUsername()->create();
+    $models = ['A0', 'A0', ...array_map(fn (int $index) => "A{$index}", range(1, 12))];
+    DB::table('player_devices')->insert(array_map(fn (string $model, int $index) => [
+        'user_id' => $player->id,
+        'install_id' => "install-{$index}",
+        'platform' => 'android',
+        'os_version' => '14',
+        'brand' => 'Samsung',
+        'model' => $model,
+        'app_version' => '1.0.2',
+        'first_seen_at' => now()->utc()->format('Y-m-d H:i:s'),
+        'last_seen_at' => now()->utc()->format('Y-m-d H:i:s'),
+    ], $models, array_keys($models)));
+    $this->signInAdmin(AdminRole::Viewer);
+
+    $samsung = $this->getJson('/api/v1/admin/analytics')->assertOk()->json('devices.brands.0');
+
+    expect($samsung['devices'])->toBe(14)
+        ->and(array_column($samsung['rows'], 'value'))->toBe(['A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9'])
+        ->and($samsung['rest'])->toBe(3);
 });
 
 test('says what each layer holds, so its growth shows', function () {

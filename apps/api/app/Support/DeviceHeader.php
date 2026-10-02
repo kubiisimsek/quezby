@@ -7,9 +7,9 @@ use Illuminate\Http\Request;
 
 /**
  * The phone a request comes from, as the app says in `X-Device`:
- * `install=…; platform=ios; os=18.2; model=iPhone%2015; build=42`, every
- * value URI-encoded (`deviceHeader` in `@quezby/sdk`). The phone's word is
- * only a label here — nothing ranks or unlocks on it — so each value is
+ * `install=…; platform=ios; os=18.2; brand=Apple; model=iPhone%2015; build=42`,
+ * every value URI-encoded (`deviceHeader` in `@quezby/sdk`). The phone's word
+ * is only a label here — nothing ranks or unlocks on it — so each value is
  * trimmed to printable ASCII and a length, and a header without a sound
  * install id is no header at all.
  */
@@ -23,6 +23,7 @@ final class DeviceHeader
         public readonly string $installId,
         public readonly ?Platform $platform,
         public readonly ?string $os,
+        public readonly ?string $brand,
         public readonly ?string $model,
         public readonly ?string $build,
     ) {}
@@ -55,9 +56,24 @@ final class DeviceHeader
             installId: $install,
             platform: Platform::tryFrom($fields['platform'] ?? ''),
             os: self::label($fields['os'] ?? null, 32),
+            brand: self::brand(self::label($fields['brand'] ?? null, 32)),
             model: self::label($fields['model'] ?? null, 64),
             build: self::label($fields['build'] ?? null, 16),
         );
+    }
+
+    /**
+     * The maker as one name, however the system spells it: Android's
+     * `samsung` and `motorola` capitalised, `Xiaomi` and `HUAWEI` left as they
+     * are, and the library's `unknown` nothing at all.
+     */
+    private static function brand(?string $brand): ?string
+    {
+        if ($brand === null || strtolower($brand) === 'unknown') {
+            return null;
+        }
+
+        return $brand === strtolower($brand) ? ucwords($brand) : $brand;
     }
 
     /** Printable ASCII only, squeezed and cut to the column's length; null when nothing is left. */

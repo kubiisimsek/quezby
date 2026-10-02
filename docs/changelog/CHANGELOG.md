@@ -1,5 +1,42 @@
 # Changelog
 
+## 2026-10-02 — Analitik: cihazlar tablo tablo, telefonun markası
+
+The panel's single "Cihazlar" card on Analitik (three lists: app versions,
+systems, models) is split into tables, all in one wide card under the usage
+grid:
+
+- **A table per system** (iOS, Android), rows by major version; under a rule,
+  **a table per maker** for the three with the most phones (Apple's titled
+  "iPhone"), rows by model, and **Diğer markalar** for the rest, a row each.
+  Each heading says its phones and their share of every phone; a table lists
+  its 10 biggest rows and counts the phones of the rest; the bars show only
+  where a table has room.
+- **The page reads in order**: the side column keeps Ekranlar and Anlar, so
+  both columns end together; Cihazlar follows, then **Veri hacmi** as a table
+  (layer, rows, oldest, how long it stays; what was turned away in its foot),
+  and "Son güncelleme" last.
+- **App versions under every row** ("Uygulama 1.0.2 (40) · 1.0.1 (3) ·
+  diğer (2)") instead of a list of their own, so an old build shows on the
+  phones it lives on.
+- **The phone's maker**: the app sends `brand=` in `X-Device`
+  (`getManufacturerSync`: `Apple`, `samsung`, `Xiaomi`); the API capitalises
+  an all-lower-case one and drops `unknown`, and the registry keeps it in
+  `player_devices.brand` (migration `2026_10_02_000100`). An Android model
+  alone is a code like `SM-S918B`, so the maker is what tells a Samsung apart.
+  Phones on an older app stay "Markası bilinmeyen" until they open the new
+  one; an iPhone is always Apple's. The player page's Cihazlar tab shows it
+  too.
+- `AdminAnalytics.devices` is now `{ total, platforms, brands, otherBrands }`
+  of `AdminDeviceTable`s (`App\Services\Admin\DeviceBreakdown`, one grouped
+  read); `AdminDeviceSlice` is gone.
+- `docs/product/analytics.md` → *Hacim* is measured now (real migrations on
+  MySQL 9, bytes per row): about 0.94 GB of analytics a year at 10,000 daily
+  players. The game's own `runs` (real rows: 9.1 KB a run, 85 % of it the
+  action log) come to about 309 GB a year at 10 runs a player a day. Dropping
+  the log after 90 days would make that 112 GB the first year and +47 GB a
+  year after; no retention rule exists yet.
+
 ## 2026-10-01 — The short game: rules re-sealed in place (engine v3)
 
 After about 15 staging runs (best 190k) the owner found the game too slow:

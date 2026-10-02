@@ -132,6 +132,7 @@ exceptions). Numbers are tabular in tables and tiles.
 | `patterns/funnel-list` | rows with a count and the API's per-mille on a bar of that length — numbered steps (a funnel) or slices of a whole; never sums anything itself, unlike `share-list` |
 | `patterns/activity-strip` | a player's days as cells: grey when they did not come, greener the longer they stayed; each cell says its day in words |
 | `analytics/journey` | a visit's path: screens as quiet chips joined by arrows, the moments between them as tags in their own colour; the rest as "+N adım" |
+| `analytics/device-table` | one table inside the Analitik page's Cihazlar card (a system's versions, a maker's models, the other makers): a heading with its phones and their share of every phone, rows with a count and the API's share, the bar only where the table has room (a container query), the app versions on those phones as a line under each name ("Uygulama 1.0.2 (40) · diğer (2)"), the phones of the rows left out and a note under it |
 | `patterns/secret-reveal` | a temporary password, shown once |
 | `patterns/accordion` | sections that fold, each saying what it holds while closed (its choice in magenta-text when one is made) — long forms like a push's filters |
 | `push/notification-preview` | a push as a player sees it: the lock screen on the game's colours, the game's mark, the title and the words (right to left where they are) |

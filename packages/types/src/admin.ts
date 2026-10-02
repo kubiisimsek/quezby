@@ -156,6 +156,8 @@ export type AdminPlayerDevice = {
   installId: string;
   platform: Platform | null;
   osVersion: string | null;
+  /** The phone's maker as it names itself (`Apple`, `Samsung`); null from an app too old to say. */
+  brand: string | null;
   model: string | null;
   appVersion: string | null;
   appBuild: string | null;
@@ -938,12 +940,29 @@ export type AdminFunnelStep =
 /** One kept layer of analytics: how many rows, since when, and how long rows stay (null: for good). */
 export type AdminStorageTier = { rows: number; oldest: string | null; keepDays: number | null };
 
-/** Devices of one kind — an app version, a system, a model — and their share of all, per-mille. */
-export type AdminDeviceSlice = {
-  platform: Platform | null;
+/** How many of a row's phones run one app version (`X-App-Version`); null: they never said. */
+export type AdminDeviceVersion = { version: string | null; devices: number };
+
+/**
+ * Phones of one kind — a system's major version, a model, a maker — and their
+ * share of their table's phones, per-mille, with the app versions on them.
+ */
+export type AdminDeviceRow = {
   value: string | null;
   devices: number;
   share: number;
+  /** The most used app versions on these phones, at most three, most phones first. */
+  versions: AdminDeviceVersion[];
+  /** Phones on any version not named in `versions`. */
+  otherVersions: number;
+};
+
+/** A table of phones: how many, their share of every phone (per-mille), its biggest rows, and the phones left out of them. */
+export type AdminDeviceTable = {
+  devices: number;
+  share: number;
+  rows: AdminDeviceRow[];
+  rest: number;
 };
 
 /**
@@ -1011,12 +1030,22 @@ export type AdminAnalytics = {
   screens: Array<{ screen: AnalyticsScreen; views: number }>;
   /** How often each moment happened in the window, most first. */
   events: Array<{ event: AnalyticsEvent; count: number }>;
-  /** Every player's phones seen in the last 7 days — the device registry, consent or not. */
+  /**
+   * Every player's phones seen in the last 7 days — the device registry,
+   * consent or not: a table per system and per big maker, one for the rest.
+   */
   devices: {
     total: number;
-    versions: AdminDeviceSlice[];
-    systems: AdminDeviceSlice[];
-    models: AdminDeviceSlice[];
+    /** A table per system, most phones first; its rows are the major versions, `18`, `14`. */
+    platforms: Array<AdminDeviceTable & { platform: Platform }>;
+    /**
+     * The three makers with the most phones, a table each; its rows are the
+     * models. An iPhone is Apple's whatever its app says; `null` gathers the
+     * phones whose app is too old to name its maker.
+     */
+    brands: Array<AdminDeviceTable & { brand: string | null }>;
+    /** Every other maker, a row each. */
+    otherBrands: AdminDeviceTable;
   };
   /** What analytics keeps, so its growth shows. */
   storage: {

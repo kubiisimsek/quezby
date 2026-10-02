@@ -448,6 +448,12 @@ export const BOARD: Record<LeaderboardBoard, string> = {
 
 export const PLATFORM: Record<Platform, string> = { ios: 'iOS', android: 'Android' };
 
+/** A phone's maker as the panel names it: Apple's phones are the iPhones the game runs on; null, an app too old to say. */
+export function deviceBrand(brand: string | null): string {
+  if (brand === null) return 'Markası bilinmeyen';
+  return brand === 'Apple' ? 'iPhone' : brand;
+}
+
 export const PROVIDER: Record<SocialProvider, string> = { apple: 'Apple', google: 'Google' };
 
 /** The language a player plays in, named the panel's way — in Turkish, whatever the game speaks. */

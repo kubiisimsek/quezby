@@ -15,6 +15,7 @@ use Illuminate\Support\Carbon;
  * @property string $install_id
  * @property string|null $platform
  * @property string|null $os_version
+ * @property string|null $brand
  * @property string|null $model
  * @property string|null $app_version
  * @property string|null $app_build

@@ -321,6 +321,7 @@ describe('PlayerPage', () => {
 
     expect(await screen.findByText('Cihaz kaydı')).toBeInTheDocument();
     expect(screen.getByText('iPhone 15 Pro')).toBeInTheDocument();
+    expect(screen.getByText('iPhone 15 Pro').nextElementSibling).toHaveTextContent('iOS 18.2 · Apple');
     expect(screen.getByText('1.0.0 (42)')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: '@kerem.yedek' })).toHaveAttribute('href', '/players/01jplayer00000000000000000b');
   });
